@@ -1614,8 +1614,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(1).HasShadeControl = true;
     DataSurfaces::Surface(2).HasShadeControl = true;
 
-    DataSurfaces::SurfWinHasShadeOrBlindLayer(1) = false;
-    DataSurfaces::SurfWinHasShadeOrBlindLayer(2) = false;
+    state->dataSurface->SurfWinHasShadeOrBlindLayer(1) = false;
+    state->dataSurface->SurfWinHasShadeOrBlindLayer(2) = false;
     DataSurfaces::Surface(1).activeShadedConstruction = 1;
     DataSurfaces::Surface(2).activeShadedConstruction = 1;
 
@@ -1633,17 +1633,17 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     SetupWindowShadingControlActuators(*state);
 
-    EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
-    EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0);
+    EXPECT_FALSE(state->dataSurface->SurfWinShadingFlagEMSOn(2));
+    EXPECT_EQ(state->dataSurface->SurfWinShadingFlagEMSValue(2), 0);
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 2;
     state->dataGlobal->NumOfZones = 1;
-    DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
-    DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
+    state->dataSurface->SurfWinShadingFlagEMSOn(2) = true;
+    state->dataSurface->SurfWinShadingFlagEMSValue(2) = 1.0;
     SolarShading::WindowShadingManager(*state);
-    EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::SurfWinShadingFlagEMSValue(2));
+    EXPECT_EQ(state->dataSurface->SurfWinShadingFlag(2), state->dataSurface->SurfWinShadingFlagEMSValue(2));
 }
 TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 {

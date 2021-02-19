@@ -269,13 +269,13 @@ namespace HeatBalanceIntRadExchange {
                         if (IntShadeOrBlindStatusChanged || IntMovInsulChanged)
                             break; // Need only check if one window's status or one movable insulation status has changed
                         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                            ShadeFlag = SurfWinShadingFlag(SurfNum);
-                            ShadeFlagPrev = SurfWinExtIntShadePrevTS(SurfNum);
+                            ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
+                            ShadeFlagPrev = state.dataSurface->SurfWinExtIntShadePrevTS(SurfNum);
                             if ((ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn) ||
                                 (ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn) ||
                                 (ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn) || (ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn))
                                 IntShadeOrBlindStatusChanged = true;
-                            if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
+                            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                                 DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
                                 IntShadeOrBlindStatusChanged = true;
                             }
@@ -292,16 +292,16 @@ namespace HeatBalanceIntRadExchange {
                         zone_info.Emissivity(ZoneSurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                         auto const &surface_window(SurfaceWindow(SurfNum));
                         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow &&
-                            (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)) {
+                            (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn)) {
                             zone_info.Emissivity(ZoneSurfNum) =
-                                InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
-                                InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
+                                InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
+                                InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
                         }
                         if (Surface(SurfNum).MovInsulIntPresent) {
                             HeatBalanceMovableInsulation::EvalInsideMovableInsulation(state, SurfNum, HMovInsul, AbsInt);
                             zone_info.Emissivity(ZoneSurfNum) = state.dataMaterial->Material(Surface(SurfNum).MaterialMovInsulInt).AbsorpThermal;
                         }
-                        if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
+                        if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                             DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(ConstrNum).EQLConsPtr).ISControlled) {
                             zone_info.Emissivity(ZoneSurfNum) = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
                         }
@@ -329,16 +329,16 @@ namespace HeatBalanceIntRadExchange {
                 int const ConstrNum = Surface(SurfNum).Construction;
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
                 if (construct.WindowTypeEQL) {
-                    SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
+                    SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
-                } else if (construct.WindowTypeBSDF && SurfWinShadingFlag(SurfNum) == IntShadeOn) {
-                    SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
+                } else if (construct.WindowTypeBSDF && state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn) {
+                    SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
                 } else if (construct.WindowTypeBSDF) {
-                    SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
+                    SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
-                } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
-                    if (SurfIterations == 0 && SurfWinShadingFlag(SurfNum) <= 0) {
+                } else if (construct.TypeIsWindow && state.dataSurface->SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
+                    if (SurfIterations == 0 && state.dataSurface->SurfWinShadingFlag(SurfNum) <= 0) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
@@ -346,10 +346,10 @@ namespace HeatBalanceIntRadExchange {
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
-                    } else if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
-                        SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
-                        SurfaceEmiss[ZoneSurfNum] = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
-                            InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
+                    } else if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                        SurfaceTempRad[ZoneSurfNum] = state.dataSurface->SurfWinEffInsSurfTemp(SurfNum);
+                        SurfaceEmiss[ZoneSurfNum] = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
+                            InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
                     } else {
                         SurfaceTempRad[ZoneSurfNum] = SurfaceTemp(SurfNum);
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;

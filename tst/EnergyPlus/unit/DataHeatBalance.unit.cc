@@ -850,10 +850,10 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
 
-    EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
+    EXPECT_FALSE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
-    EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
+    EXPECT_FALSE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
 
     GetEMSInput(*state);
     // check if EMS actuator is not setup because there is no blind/shade layer
@@ -882,9 +882,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer(*state);
-    EXPECT_TRUE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
+    EXPECT_TRUE(state->dataSurface->SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
-    SurfWinMovableSlats(windowSurfNum) = true;
+    state->dataSurface->SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators(*state);
     EXPECT_EQ(state->dataRuntimeLang->numEMSActuatorsAvailable, 2);

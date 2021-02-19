@@ -1691,13 +1691,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfWinShadingFlag;
-        using DataSurfaces::SurfWinFrameArea;
-        using DataSurfaces::SurfWinProjCorrFrIn;
-        using DataSurfaces::SurfWinFrameTempSurfIn;
-        using DataSurfaces::SurfWinDividerArea;
-        using DataSurfaces::SurfWinProjCorrDivIn;
-        using DataSurfaces::SurfWinDividerTempSurfIn;
 
         // Return value
         Real64 SumHATsurf;
@@ -1705,8 +1698,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
-
-
         SumHATsurf = 0.0;
 
         for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
@@ -1719,20 +1710,20 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
 
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += DataSurfaces::SurfWinDividerArea(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn && SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && state.dataSurface->SurfWinShadingFlag(SurfNum) != IntShadeOn && state.dataSurface->SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf +=
-                        state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);
+                        state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

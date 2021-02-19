@@ -102,8 +102,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
@@ -196,8 +196,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements

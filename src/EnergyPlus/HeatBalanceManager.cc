@@ -5256,7 +5256,7 @@ namespace HeatBalanceManager {
 
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
                 DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
-                DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
+                state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }
 
@@ -5273,7 +5273,7 @@ namespace HeatBalanceManager {
                 state.dataHeatBal->StormWinChangeThisDay = false;
                 for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
                     SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-                    DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
+                    state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
                 }
                 ChangeSet = true;
             }
@@ -5381,9 +5381,9 @@ namespace HeatBalanceManager {
                 int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
-                        DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
-                        DataSurfaces::SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
                     }
                 }
             }
@@ -7120,20 +7120,8 @@ namespace HeatBalanceManager {
         //  -Month that Storm Window Is Taken Off
         //  -Day of Month that Storm Window Is Taken Off
 
-        // REFERENCES:na
         // Using/Aliasing
         using General::BetweenDates;
-        using DataSurfaces::SurfWinStormWinFlag;
-        using DataSurfaces::SurfWinStormWinFlagPrevDay;
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:na
-
-        // INTERFACE BLOCK SPECIFICATIONS:na
-
-        // DERIVED TYPE DEFINITIONS:na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int SurfNum;      // Surface number
         int StormWinNum;  // Number of storm window object
@@ -7146,7 +7134,7 @@ namespace HeatBalanceManager {
 
         for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
             SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-            SurfWinStormWinFlagPrevDay(SurfNum) = SurfWinStormWinFlag(SurfNum);
+            state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
             DateOff = StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
@@ -7155,9 +7143,9 @@ namespace HeatBalanceManager {
             } else {
                 StormWinFlag = 0;
             }
-            SurfWinStormWinFlag(SurfNum) = StormWinFlag;
-            if (state.dataGlobal->BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
-            if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) state.dataHeatBal->StormWinChangeThisDay = true;
+            state.dataSurface->SurfWinStormWinFlag(SurfNum) = StormWinFlag;
+            if (state.dataGlobal->BeginSimFlag) state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
+            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) != state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum)) state.dataHeatBal->StormWinChangeThisDay = true;
         }
     }
 

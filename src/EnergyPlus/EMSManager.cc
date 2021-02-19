@@ -1851,28 +1851,28 @@ namespace EMSManager {
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
 
-            if (DataSurfaces::SurfWinHasShadeOrBlindLayer(loopSurfNum)) {
+            if (state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum)) {
                 SetupEMSActuator(state, "Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
                                  "[ShadeStatus]",
-                                 DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
-                                 DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
-                if (DataSurfaces::SurfWinMovableSlats(loopSurfNum)) {
+                                 state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
+                                 state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
+                if (state.dataSurface->SurfWinMovableSlats(loopSurfNum)) {
                     SetupEMSActuator(state, "Window Shading Control",
                                      Surface(loopSurfNum).Name,
                                      "Slat Angle",
                                      "[degrees]",
-                                     DataSurfaces::SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
-                                     DataSurfaces::SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
+                                     state.dataSurface->SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
+                                     state.dataSurface->SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
             } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator(state, "Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
                                  "[ShadeStatus]",
-                                 DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
-                                 DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
+                                 state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
+                                 state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +

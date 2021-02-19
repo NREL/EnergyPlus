@@ -395,7 +395,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         if (!Surface(SurfNum).ExtWind) {
             SurfWindSpeed = 0.0; // No wind exposure
-        } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
+        } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
             SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
         } else {
             SurfWindSpeed = Surface(SurfNum).WindSpeed;
@@ -4699,7 +4699,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
             if (!Surface(SurfNum).ExtWind) {
                 SurfWindSpeed = 0.0; // No wind exposure
-            } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
+            } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
                 SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;

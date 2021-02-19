@@ -161,7 +161,7 @@ namespace WindowEquivalentLayer {
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
-            SurfWinWindowModelType(SurfNum) = WindowEQLModel;
+            state.dataSurface->SurfWinWindowModelType(SurfNum) = WindowEQLModel;
 
         } //  end do for SurfNum
     }
@@ -878,7 +878,7 @@ namespace WindowEquivalentLayer {
         QXConv = QCONV - HcIn * (SurfInsideTemp - TaIn);
         // Save the extra convection term. This term is added to the zone air heat
         // balance equation
-        SurfWinOtherConvHeatGain(SurfNum) = Surface(SurfNum).Area * QXConv;
+        state.dataSurface->SurfWinOtherConvHeatGain(SurfNum) = Surface(SurfNum).Area * QXConv;
         SurfOutsideTemp = T(1) - DataGlobalConstants::KelvinConv;
         // Various reporting calculations
         InSideLayerType = CFS(EQLNum).L(NL).LTYPE;
@@ -887,7 +887,7 @@ namespace WindowEquivalentLayer {
         } else {
             ConvHeatFlowNatural = Surface(SurfNum).Area * QOCFRoom;
         }
-        SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
+        state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
         NetIRHeatGainWindow = Surface(SurfNum).Area * LWAbsIn * (DataGlobalConstants::StefanBoltzmann * pow_4(SurfInsideTemp + DataGlobalConstants::KelvinConv) - rmir);
         ConvHeatGainWindow = Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
         // Window heat gain (or loss) is calculated here
@@ -907,7 +907,7 @@ namespace WindowEquivalentLayer {
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
         }
         // Advanced report variable (DisplayAdvancedReportVariables)
-        state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
+        state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
     }
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)
@@ -8176,7 +8176,7 @@ namespace WindowEquivalentLayer {
             }
         }
         if (CFS(EQLNum).VBLayerPtr > 0) {
-            SurfWinSlatAngThisTSDeg(SurfNum) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+            state.dataSurface->SurfWinSlatAngThisTSDeg(SurfNum) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
         }
     }
 

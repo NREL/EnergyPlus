@@ -5555,22 +5555,22 @@ namespace LowTempRadiantSystem {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass::Window) {
-                if (SurfWinShadingFlag(surfNum) == IntShadeOn || SurfWinShadingFlag(surfNum) == IntBlindOn) {
+                if (state.dataSurface->SurfWinShadingFlag(surfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(surfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfWinDividerArea(surfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(surfNum);
                 }
 
-                if (SurfWinFrameArea(surfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
-                                  SurfWinFrameTempSurfIn(surfNum);
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) *
+                                  state.dataSurface->SurfWinFrameTempSurfIn(surfNum);
                 }
 
-                if (SurfWinDividerArea(surfNum) > 0.0 && SurfWinShadingFlag(surfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(surfNum) != IntBlindOn) {
+                if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 && state.dataSurface->SurfWinShadingFlag(surfNum) != IntShadeOn &&
+                    state.dataSurface->SurfWinShadingFlag(surfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
-                                  SurfWinDividerTempSurfIn(surfNum);
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) *
+                                  state.dataSurface->SurfWinDividerTempSurfIn(surfNum);
                 }
             }
 

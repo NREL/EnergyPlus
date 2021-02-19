@@ -159,100 +159,100 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinProfileAngHor.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProfileAngVert.dimension(NumSurfaces, 0);
 
-        SurfWinShadingFlag.dimension(NumSurfaces, 0);
-        SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
-        SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0);
-        SurfWinStormWinFlag.dimension(NumSurfaces, 0);
-        SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
-        SurfWinFracTimeShadingDeviceOn.dimension(NumSurfaces, 0);
-        SurfWinExtIntShadePrevTS.dimension(NumSurfaces, 0);
-        SurfWinHasShadeOrBlindLayer.dimension(NumSurfaces, 0);
-        SurfWinSurfDayLightInit.dimension(NumSurfaces, 0);
-        SurfWinDaylFacPoint.dimension(NumSurfaces, 0);
-        SurfWinVisTransSelected.dimension(NumSurfaces, 0);
-        SurfWinSwitchingFactor.dimension(NumSurfaces, 0);
-        SurfWinTheta.dimension(NumSurfaces, 0);
-        SurfWinPhi.dimension(NumSurfaces, 0);
-        SurfWinRhoCeilingWall.dimension(NumSurfaces, 0);
-        SurfWinRhoFloorWall.dimension(NumSurfaces, 0);
-        SurfWinFractionUpgoing.dimension(NumSurfaces, 0);
-        SurfWinVisTransRatio.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinShadingFlag.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinStormWinFlag.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFracTimeShadingDeviceOn.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinExtIntShadePrevTS.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinHasShadeOrBlindLayer.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSurfDayLightInit.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDaylFacPoint.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinVisTransSelected.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSwitchingFactor.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinTheta.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinPhi.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinRhoCeilingWall.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinRhoFloorWall.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFractionUpgoing.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinVisTransRatio.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinIRfromParentZone.dimension(NumSurfaces, 0);
-        SurfWinFrameArea.dimension(NumSurfaces, 0);
-        SurfWinFrameConductance.dimension(NumSurfaces, 0);
-        SurfWinFrameSolAbsorp.dimension(NumSurfaces, 0);
-        SurfWinFrameVisAbsorp.dimension(NumSurfaces, 0);
-        SurfWinFrameEmis.dimension(NumSurfaces, 0);
-        SurfWinFrEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1.0);
-        SurfWinFrameEdgeArea.dimension(NumSurfaces, 0);
-        SurfWinFrameTempSurfIn.dimension(NumSurfaces, 23.0);
-        SurfWinFrameTempSurfInOld.dimension(NumSurfaces, 23.0);
-        SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
-        SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
-        SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);
-        SurfWinDividerType.dimension(NumSurfaces, 0);
-        SurfWinDividerArea.dimension(NumSurfaces, 0);
-        SurfWinDividerConductance.dimension(NumSurfaces, 0);
-        SurfWinDividerSolAbsorp.dimension(NumSurfaces, 0);
-        SurfWinDividerVisAbsorp.dimension(NumSurfaces, 0);
-        SurfWinDividerEmis.dimension(NumSurfaces, 0);
-        SurfWinDivEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1);
-        SurfWinDividerEdgeArea.dimension(NumSurfaces, 0);
-        SurfWinDividerTempSurfIn.dimension(NumSurfaces, 23.0);
-        SurfWinDividerTempSurfInOld.dimension(NumSurfaces, 23.0);
-        SurfWinDividerTempSurfOut.dimension(NumSurfaces, 23.0);
-        SurfWinProjCorrDivOut.dimension(NumSurfaces, 0);
-        SurfWinProjCorrDivIn.dimension(NumSurfaces, 0);
-        SurfWinGlazedFrac.dimension(NumSurfaces, 1);
-        SurfWinCenterGlArea.dimension(NumSurfaces, 0);
-        SurfWinEdgeGlCorrFac.dimension(NumSurfaces, 1);
-        SurfWinOriginalClass.dimension(NumSurfaces, SurfaceClass::None);
-        SurfWinShadeAbsFacFace1.dimension(NumSurfaces, 0.5);
-        SurfWinShadeAbsFacFace2.dimension(NumSurfaces, 0.5);
-        SurfWinConvCoeffWithShade.dimension(NumSurfaces, 0);
-        SurfWinOtherConvHeatGain.dimension(NumSurfaces, 0);
-        SurfWinBlindNumber.dimension(NumSurfaces, 0);
-        SurfWinEffInsSurfTemp.dimension(NumSurfaces, 23.0);
-        SurfWinMovableSlats.dimension(NumSurfaces, 0);
-        SurfWinSlatAngThisTS.dimension(NumSurfaces, 0);
-        SurfWinSlatAngThisTSDeg.dimension(NumSurfaces, 0);
-        SurfWinSlatAngThisTSDegEMSon.dimension(NumSurfaces, 0);
-        SurfWinSlatAngThisTSDegEMSValue.dimension(NumSurfaces, 0);
-        SurfWinSlatsBlockBeam.dimension(NumSurfaces, 0);
-        SurfWinBlindAirFlowPermeability.dimension(NumSurfaces, 0);
-        SurfWinTotGlazingThickness.dimension(NumSurfaces, 0);
-        SurfWinTanProfileAngHor.dimension(NumSurfaces, 0);
-        SurfWinTanProfileAngVert.dimension(NumSurfaces, 0);
-        SurfWinInsideSillDepth.dimension(NumSurfaces, 0);
-        SurfWinInsideReveal.dimension(NumSurfaces, 0);
-        SurfWinInsideSillSolAbs.dimension(NumSurfaces, 0);
-        SurfWinInsideRevealSolAbs.dimension(NumSurfaces, 0);
-        SurfWinOutsideRevealSolAbs.dimension(NumSurfaces, 0);
-        SurfWinScreenNumber.dimension(NumSurfaces, 0);
-        SurfWinAirflowSource.dimension(NumSurfaces, 0);
-        SurfWinAirflowDestination.dimension(NumSurfaces, 0);
-        SurfWinAirflowReturnNodePtr.dimension(NumSurfaces, 0);
-        SurfWinMaxAirflow.dimension(NumSurfaces, 0);
-        SurfWinAirflowControlType.dimension(NumSurfaces, 0);
-        SurfWinAirflowHasSchedule.dimension(NumSurfaces, 0);
-        SurfWinAirflowSchedulePtr.dimension(NumSurfaces, 0);
-        SurfWinAirflowThisTS.dimension(NumSurfaces, 0);
-        SurfWinTAirflowGapOutlet.dimension(NumSurfaces, 0);
-        SurfWinWindowCalcIterationsRep.dimension(NumSurfaces, 0);
-        SurfWinVentingOpenFactorMultRep.dimension(NumSurfaces, 0);
-        SurfWinInsideTempForVentingRep.dimension(NumSurfaces, 0);
-        SurfWinVentingAvailabilityRep.dimension(NumSurfaces, 0);
-        SurfWinSkyGndSolarInc.dimension(NumSurfaces, 0);
-        SurfWinBmGndSolarInc.dimension(NumSurfaces, 0);
-        SurfWinLightWellEff.dimension(NumSurfaces, 1);
-        SurfWinSolarDiffusing.dimension(NumSurfaces, 0);
-        SurfWinFrameHeatGain.dimension(NumSurfaces, 0);
-        SurfWinFrameHeatLoss.dimension(NumSurfaces, 0);
-        SurfWinDividerHeatLoss.dimension(NumSurfaces, 0);
-        SurfWinTCLayerTemp.dimension(NumSurfaces, 0);
-        SurfWinSpecTemp.dimension(NumSurfaces, 0);
-        SurfWinWindowModelType.dimension(NumSurfaces, Window5DetailedModel);
-        SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameArea.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameConductance.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameSolAbsorp.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameVisAbsorp.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameEmis.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1.0);
+        state.dataSurface->SurfWinFrameEdgeArea.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameTempSurfIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFrameTempSurfInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinFrameTempSurfOut.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinProjCorrFrOut.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinProjCorrFrIn.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerType.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerArea.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerConductance.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerSolAbsorp.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerVisAbsorp.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerEmis.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio.dimension(NumSurfaces, 1);
+        state.dataSurface->SurfWinDividerEdgeArea.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerTempSurfIn.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinDividerTempSurfInOld.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinDividerTempSurfOut.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinProjCorrDivOut.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinProjCorrDivIn.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinGlazedFrac.dimension(NumSurfaces, 1);
+        state.dataSurface->SurfWinCenterGlArea.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinEdgeGlCorrFac.dimension(NumSurfaces, 1);
+        state.dataSurface->SurfWinOriginalClass.dimension(NumSurfaces, SurfaceClass::None);
+        state.dataSurface->SurfWinShadeAbsFacFace1.dimension(NumSurfaces, 0.5);
+        state.dataSurface->SurfWinShadeAbsFacFace2.dimension(NumSurfaces, 0.5);
+        state.dataSurface->SurfWinConvCoeffWithShade.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinOtherConvHeatGain.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinBlindNumber.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinEffInsSurfTemp.dimension(NumSurfaces, 23.0);
+        state.dataSurface->SurfWinMovableSlats.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatAngThisTS.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatAngThisTSDeg.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatAngThisTSDegEMSon.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatAngThisTSDegEMSValue.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSlatsBlockBeam.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinBlindAirFlowPermeability.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinTotGlazingThickness.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinTanProfileAngHor.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinTanProfileAngVert.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinInsideSillDepth.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinInsideReveal.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinInsideSillSolAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinInsideRevealSolAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinOutsideRevealSolAbs.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinScreenNumber.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowSource.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowDestination.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowReturnNodePtr.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinMaxAirflow.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowControlType.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowHasSchedule.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowSchedulePtr.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinAirflowThisTS.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinTAirflowGapOutlet.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinWindowCalcIterationsRep.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinVentingOpenFactorMultRep.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinInsideTempForVentingRep.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinVentingAvailabilityRep.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSkyGndSolarInc.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinBmGndSolarInc.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinLightWellEff.dimension(NumSurfaces, 1);
+        state.dataSurface->SurfWinSolarDiffusing.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameHeatGain.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinFrameHeatLoss.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinDividerHeatLoss.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinTCLayerTemp.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinSpecTemp.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinWindowModelType.dimension(NumSurfaces, Window5DetailedModel);
+        state.dataSurface->SurfWinTDDPipeNum.dimension(NumSurfaces, 0);
     }
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound)
@@ -401,7 +401,7 @@ namespace SurfaceGeometry {
             ZoneNum = Surface(SurfNum).Zone;
             state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += Surface(SurfNum).Area;
             if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += SurfWinFrameArea(SurfNum);
+                state.dataHeatBal->Zone(ZoneNum).TotalSurfArea += state.dataSurface->SurfWinFrameArea(SurfNum);
                 state.dataHeatBal->Zone(ZoneNum).HasWindow = true;
             }
             if (Surface(SurfNum).Class == SurfaceClass::Roof) ZoneCeilingArea(ZoneNum) += Surface(SurfNum).Area;
@@ -2011,7 +2011,7 @@ namespace SurfaceGeometry {
             // GLASSDOORs and TDD:DIFFUSERs will be treated as windows in the subsequent heat transfer and daylighting
             // calculations. Reset class to 'Window' after saving the original designation in SurfaceWindow.
 
-            SurfWinOriginalClass(SurfNum) = Surface(SurfNum).Class;
+            state.dataSurface->SurfWinOriginalClass(SurfNum) = Surface(SurfNum).Class;
 
             if (Surface(SurfNum).Class == SurfaceClass::GlassDoor || Surface(SurfNum).Class == SurfaceClass::TDD_Diffuser)
                 Surface(SurfNum).Class = SurfaceClass::Window;
@@ -2029,7 +2029,7 @@ namespace SurfaceGeometry {
                 if (Surface(SurfNum).HasShadeControl) {
                     WinShadingControlPtr = Surface(SurfNum).activeWindowShadingControl; // use first item since others should be identical
                     if (WindowShadingControl(WinShadingControlPtr).SlatAngleControlForBlinds != WSC_SAC_FixedSlatAngle)
-                        SurfWinMovableSlats(SurfNum) = true;
+                        state.dataSurface->SurfWinMovableSlats(SurfNum) = true;
                 }
 
                 ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
@@ -2047,17 +2047,17 @@ namespace SurfaceGeometry {
                         iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
                         if (state.dataMaterial->Material(iTmp2).Group == WindowBlind) {
                             BlNum = state.dataMaterial->Material(iTmp2).BlindDataPtr;
-                            SurfWinBlindNumber(SurfNum) = BlNum;
+                            state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
                             // TH 2/18/2010. CR 8010
                             // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
                             //  the new blind is created only once, it can be shared by multiple windows though.
-                            if (SurfWinMovableSlats(SurfNum) && state.dataHeatBal->Blind(BlNum).SlatAngleType != VariableSlats) {
+                            if (state.dataSurface->SurfWinMovableSlats(SurfNum) && state.dataHeatBal->Blind(BlNum).SlatAngleType != VariableSlats) {
                                 errFlag = false;
                                 AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
                                 // point to the new blind
                                 state.dataMaterial->Material(iTmp2).BlindDataPtr = BlNumNew;
                                 // window surface points to new blind
-                                SurfWinBlindNumber(SurfNum) = BlNumNew;
+                                state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
                             }
                             break;
                         }
@@ -7518,7 +7518,7 @@ namespace SurfaceGeometry {
         for (Item = 1; Item <= state.dataSurface->TotSurfaces; ++Item) {
             if (Surface(Item).Class == SurfaceClass::Window || Surface(Item).Class == SurfaceClass::GlassDoor) {
                 // todo, add complex fenestration switch  HeatTransferModel_ComplexFenestration
-                if (SurfWinWindowModelType(Item) == WindowBSDFModel) {
+                if (state.dataSurface->SurfWinWindowModelType(Item) == WindowBSDFModel) {
                     Surface(Item).HeatTransferAlgorithm = HeatTransferModel_ComplexFenestration;
                 } else {
                     Surface(Item).HeatTransferAlgorithm = HeatTransferModel_Window5;
@@ -8925,7 +8925,7 @@ namespace SurfaceGeometry {
 
             // Error if base window has airflow control
             if (SurfNum > 0) {
-                if (SurfWinAirflowControlType(SurfNum) != 0) {
+                if (state.dataSurface->SurfWinAirflowControlType(SurfNum) != 0) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(state, " cannot be used because it is an airflow window (i.e., has WindowProperty:AirflowControl specified)");
                     ErrorsFound = true;
@@ -9077,16 +9077,16 @@ namespace SurfaceGeometry {
             if (SurfNum > 0) {
                 state.dataSurface->AirflowWindows = true;
                 if (UtilityRoutines::SameString(cAlphaArgs(2), "IndoorAir")) {
-                    SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_IndoorAir;
+                    state.dataSurface->SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_IndoorAir;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(2), "OutdoorAir")) {
-                    SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_OutdoorAir;
+                    state.dataSurface->SurfWinAirflowSource(SurfNum) = AirFlowWindow_Source_OutdoorAir;
                 }
                 if (UtilityRoutines::SameString(cAlphaArgs(3), "IndoorAir")) {
-                    SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_IndoorAir;
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_IndoorAir;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "OutdoorAir")) {
-                    SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_OutdoorAir;
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_OutdoorAir;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "ReturnAir")) {
-                    SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_ReturnAir;
+                    state.dataSurface->SurfWinAirflowDestination(SurfNum) = AirFlowWindow_Destination_ReturnAir;
                     int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
                         state.dataZoneEquip->ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
@@ -9094,15 +9094,15 @@ namespace SurfaceGeometry {
                     }
 
                     // Set return air node number
-                    SurfWinAirflowReturnNodePtr(SurfNum) = 0;
+                    state.dataSurface->SurfWinAirflowReturnNodePtr(SurfNum) = 0;
                     std::string retNodeName = "";
                     if (!lAlphaFieldBlanks(7)) {
                         retNodeName = cAlphaArgs(7);
                     }
                     std::string callDescription = cCurrentModuleObject + "=" + Surface(SurfNum).Name;
-                    SurfWinAirflowReturnNodePtr(SurfNum) =
+                    state.dataSurface->SurfWinAirflowReturnNodePtr(SurfNum) =
                         DataZoneEquipment::GetReturnAirNodeForZone(state, Surface(SurfNum).ZoneName, retNodeName, callDescription);
-                    if (SurfWinAirflowReturnNodePtr(SurfNum) == 0) {
+                    if (state.dataSurface->SurfWinAirflowReturnNodePtr(SurfNum) == 0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + Surface(SurfNum).Name +
                                         "\", airflow window return air node not found for " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                         if (!lAlphaFieldBlanks(7))
@@ -9113,13 +9113,13 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (UtilityRoutines::SameString(cAlphaArgs(4), "AlwaysOnAtMaximumFlow")) {
-                    SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_MaxFlow;
+                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_MaxFlow;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(4), "AlwaysOff")) {
-                    SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_AlwaysOff;
+                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_AlwaysOff;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(4), "ScheduledOnly")) {
-                    SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_Schedule;
+                    state.dataSurface->SurfWinAirflowControlType(SurfNum) = AirFlowWindow_ControlType_Schedule;
                 }
-                SurfWinMaxAirflow(SurfNum) = rNumericArgs(1);
+                state.dataSurface->SurfWinMaxAirflow(SurfNum) = rNumericArgs(1);
                 if (cAlphaArgs(4) == "SCHEDULEDONLY" && cAlphaArgs(5) == "YES") {
                     if (lAlphaFieldBlanks(6)) {
                         ErrorsFound = true;
@@ -9128,9 +9128,9 @@ namespace SurfaceGeometry {
                         ShowContinueError(state, "..and " + cAlphaFieldNames(5) + "=\"" + cAlphaArgs(5) + "\", but no " + cAlphaFieldNames(6) +
                                           " specified.");
                     } else {
-                        SurfWinAirflowHasSchedule(SurfNum) = true;
-                        SurfWinAirflowSchedulePtr(SurfNum) = GetScheduleIndex(state, cAlphaArgs(6));
-                        if (SurfWinAirflowSchedulePtr(SurfNum) == 0) {
+                        state.dataSurface->SurfWinAirflowHasSchedule(SurfNum) = true;
+                        state.dataSurface->SurfWinAirflowSchedulePtr(SurfNum) = GetScheduleIndex(state, cAlphaArgs(6));
+                        if (state.dataSurface->SurfWinAirflowSchedulePtr(SurfNum) == 0) {
                             ErrorsFound = true;
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(6) + "=\"" +
                                             cAlphaArgs(6) + "\"");
@@ -11316,18 +11316,18 @@ namespace SurfaceGeometry {
                         if (FrWidth > 0.0) {
                             FrArea = (Surface(ThisSurf).Height + 2.0 * FrWidth) * (Surface(ThisSurf).Width + 2.0 * FrWidth) -
                                      Surface(ThisSurf).Area / Surface(ThisSurf).Multiplier;
-                            SurfWinFrameArea(ThisSurf) = FrArea * Surface(ThisSurf).Multiplier;
-                            if ((Surface(Surface(ThisSurf).BaseSurf).Area - SurfWinFrameArea(ThisSurf)) <= 0.0) {
+                            state.dataSurface->SurfWinFrameArea(ThisSurf) = FrArea * Surface(ThisSurf).Multiplier;
+                            if ((Surface(Surface(ThisSurf).BaseSurf).Area - state.dataSurface->SurfWinFrameArea(ThisSurf)) <= 0.0) {
                                 ShowSevereError(state, RoutineName + "Base Surface=\"" + Surface(Surface(ThisSurf).BaseSurf).Name + "\", ");
                                 ShowContinueError(state, "Window Surface=\"" + Surface(ThisSurf).Name +
                                                   "\" area (with frame) is too large to fit on the surface.");
                                 ShowContinueError(state,
                                                   format("Base surface area (-windows and doors)=[{:.2T}] m2, frame area=[{:.2T}] m2.",
                                                          Surface(Surface(ThisSurf).BaseSurf).Area,
-                                                         SurfWinFrameArea(ThisSurf)));
+                                                         state.dataSurface->SurfWinFrameArea(ThisSurf)));
                                 ErrorInSurface = true;
                             }
-                            Surface(Surface(ThisSurf).BaseSurf).Area -= SurfWinFrameArea(ThisSurf);
+                            Surface(Surface(ThisSurf).BaseSurf).Area -= state.dataSurface->SurfWinFrameArea(ThisSurf);
                         }
                         // If exterior window has divider, subtract divider area to get glazed area
                         DivWidth = FrameDivider(Surface(ThisSurf).FrameDivider).DividerWidth;
@@ -11335,16 +11335,16 @@ namespace SurfaceGeometry {
                             DivArea = DivWidth * (FrameDivider(FrDivNum).HorDividers * Surface(ThisSurf).Width +
                                                   FrameDivider(FrDivNum).VertDividers * Surface(ThisSurf).Height -
                                                   FrameDivider(FrDivNum).HorDividers * FrameDivider(FrDivNum).VertDividers * DivWidth);
-                            SurfWinDividerArea(ThisSurf) = DivArea * Surface(ThisSurf).Multiplier;
-                            if ((Surface(ThisSurf).Area - SurfWinDividerArea(ThisSurf)) <= 0.0) {
+                            state.dataSurface->SurfWinDividerArea(ThisSurf) = DivArea * Surface(ThisSurf).Multiplier;
+                            if ((Surface(ThisSurf).Area - state.dataSurface->SurfWinDividerArea(ThisSurf)) <= 0.0) {
                                 ShowSevereError(state, RoutineName + "Divider area exceeds glazed opening for window " + Surface(ThisSurf).Name);
                                 ShowContinueError(state,
                                                   format("Window surface area=[{:.2T}] m2, divider area=[{:.2T}] m2.",
                                                          Surface(ThisSurf).Area,
-                                                         SurfWinDividerArea(ThisSurf)));
+                                                         state.dataSurface->SurfWinDividerArea(ThisSurf)));
                                 ErrorInSurface = true;
                             }
-                            Surface(ThisSurf).Area -= SurfWinDividerArea(ThisSurf); // Glazed area
+                            Surface(ThisSurf).Area -= state.dataSurface->SurfWinDividerArea(ThisSurf); // Glazed area
                             if (DivArea <= 0.0) {
                                 ShowWarningError(state, RoutineName + "Calculated Divider Area <= 0.0 for Window=" + Surface(ThisSurf).Name);
                                 if (FrameDivider(FrDivNum).HorDividers == 0) {
@@ -11354,21 +11354,21 @@ namespace SurfaceGeometry {
                                     ShowContinueError(state, "..Number of Vertical Dividers = 0.");
                                 }
                             } else {
-                                SurfWinGlazedFrac(ThisSurf) =
-                                    Surface(ThisSurf).Area / (Surface(ThisSurf).Area + SurfWinDividerArea(ThisSurf));
+                                state.dataSurface->SurfWinGlazedFrac(ThisSurf) =
+                                    Surface(ThisSurf).Area / (Surface(ThisSurf).Area + state.dataSurface->SurfWinDividerArea(ThisSurf));
                                 // Correction factor for portion of divider subject to divider projection correction
                                 DivFrac =
                                     (1.0 - FrameDivider(FrDivNum).HorDividers * FrameDivider(FrDivNum).VertDividers * pow_2(DivWidth) / DivArea);
-                                SurfWinProjCorrDivOut(ThisSurf) = DivFrac * FrameDivider(FrDivNum).DividerProjectionOut / DivWidth;
-                                SurfWinProjCorrDivIn(ThisSurf) = DivFrac * FrameDivider(FrDivNum).DividerProjectionIn / DivWidth;
+                                state.dataSurface->SurfWinProjCorrDivOut(ThisSurf) = DivFrac * FrameDivider(FrDivNum).DividerProjectionOut / DivWidth;
+                                state.dataSurface->SurfWinProjCorrDivIn(ThisSurf) = DivFrac * FrameDivider(FrDivNum).DividerProjectionIn / DivWidth;
                                 // Correction factor for portion of frame subject to frame projection correction
                                 if (FrWidth > 0.0) {
-                                    SurfWinProjCorrFrOut(ThisSurf) =
+                                    state.dataSurface->SurfWinProjCorrFrOut(ThisSurf) =
                                         (FrameDivider(FrDivNum).FrameProjectionOut / FrWidth) *
                                         (ThisHeight + ThisWidth -
                                          (FrameDivider(FrDivNum).HorDividers + FrameDivider(FrDivNum).VertDividers) * DivWidth) /
                                         (ThisHeight + ThisWidth + 2 * FrWidth);
-                                    SurfWinProjCorrFrIn(ThisSurf) =
+                                    state.dataSurface->SurfWinProjCorrFrIn(ThisSurf) =
                                         (FrameDivider(FrDivNum).FrameProjectionIn / FrWidth) *
                                         (ThisHeight + ThisWidth -
                                          (FrameDivider(FrDivNum).HorDividers + FrameDivider(FrDivNum).VertDividers) * DivWidth) /

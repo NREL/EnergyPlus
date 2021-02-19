@@ -653,10 +653,10 @@ void DXFOut(EnergyPlusData &state,
             if (Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass::Window) {
-                if (SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
 
@@ -957,10 +957,10 @@ void DXFOutLines(EnergyPlusData &state, std::string const &ColorScheme)
             if (Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass::Window) {
-                if (SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1153,10 +1153,10 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             if (Surface(surf).Class == SurfaceClass::Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass::Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass::Window) {
-                if (SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::Window) colorindex = ColorNo_Window;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (state.dataSurface->SurfWinOriginalClass(surf) == SurfaceClass::TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1480,7 +1480,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                     if ((Surface(surf).Class == SurfaceClass::Window) || (Surface(surf).Class == SurfaceClass::TDD_Dome)) {
                         // SurfaceClass::Window also covers glass doors and TDD:Diffusers
                         cNominalU = "N/A";
-                        if (SurfWinSolarDiffusing(surf)) {
+                        if (state.dataSurface->SurfWinSolarDiffusing(surf)) {
                             SolarDiffusing = "Yes";
                         } else {
                             SolarDiffusing = "No";
@@ -1623,8 +1623,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                         }
                         *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                    << "Frame," << Surface(surf).Name << "," << AlgoName << ",";
-                        *eiostream << ",N/A,N/A,," << format("{:.2R}", SurfWinFrameArea(surf)) << ","
-                                   << format("{:.2R}", SurfWinFrameArea(surf) / Surface(surf).Multiplier) << ",*"
+                        *eiostream << ",N/A,N/A,," << format("{:.2R}", state.dataSurface->SurfWinFrameArea(surf)) << ","
+                                   << format("{:.2R}", state.dataSurface->SurfWinFrameArea(surf) / Surface(surf).Multiplier) << ",*"
                                    << ",N/A"
                                    << ",N/A," << format("{:.2R}", FrameDivider(fd).FrameWidth) << ",N/A" << '\n';
                     }
@@ -1636,8 +1636,8 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                             *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                        << "Divider:Suspended," << Surface(surf).Name << ",,";
                         }
-                        *eiostream << ",N/A,N/A,," << format("{:.2R}", SurfWinDividerArea(surf)) << ","
-                                   << format("{:.2R}", SurfWinDividerArea(surf) / Surface(surf).Multiplier) << ",*"
+                        *eiostream << ",N/A,N/A,," << format("{:.2R}", state.dataSurface->SurfWinDividerArea(surf)) << ","
+                                   << format("{:.2R}", state.dataSurface->SurfWinDividerArea(surf) / Surface(surf).Multiplier) << ",*"
                                    << ",N/A"
                                    << ",N/A," << format("{:.2R}", FrameDivider(fd).DividerWidth) << ",N/A" << '\n';
                     }

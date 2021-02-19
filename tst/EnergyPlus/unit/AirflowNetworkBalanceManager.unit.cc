@@ -149,8 +149,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -272,9 +272,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     Surface(3).Vertex(3).z = 1.0;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 3);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(3) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -2340,9 +2340,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(2).OpenFactor);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(5).OpenFactor);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(14).OpenFactor);
-    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(2));
-    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(5));
-    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(14));
+    EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(2));
+    EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(5));
+    EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(14));
 
     // Test for #7162
     DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
@@ -2421,8 +2421,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
@@ -2838,15 +2838,15 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     Surface(11).Vertex(3).z = 2.4384;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 14);
-    SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(4) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(5) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(6) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(9) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(10) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(11) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(12) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(13) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(14) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -15669,8 +15669,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     DataSurfaces::Surface(1).Tilt = 180.0;
     DataSurfaces::Surface(1).Sides = 4;
 
-    DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -15737,8 +15737,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     DataSurfaces::Surface(1).Tilt = 180.0;
     DataSurfaces::Surface(1).Sides = 4;
 
-    DataSurfaces::SurfWinOriginalClass.allocate(1);
-    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass.allocate(1);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
@@ -20045,8 +20045,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     Surface(3).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({

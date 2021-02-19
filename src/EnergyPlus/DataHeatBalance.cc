@@ -1058,7 +1058,7 @@ namespace EnergyPlus::DataHeatBalance {
                 ShowFatalError(state, "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
             }
         } else {
-            ScNum = DataSurfaces::SurfWinScreenNumber(SurfaceNum);
+            ScNum = state.dataSurface->SurfWinScreenNumber(SurfaceNum);
         }
 
         if (present(Theta)) {
@@ -1434,7 +1434,7 @@ namespace EnergyPlus::DataHeatBalance {
                     MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue;
                     if (state.dataMaterial->Material(MaterNum).Group == Shade || state.dataMaterial->Material(MaterNum).Group == WindowBlind)
-                        DataSurfaces::SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
+                        state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
                 }
             }
         }

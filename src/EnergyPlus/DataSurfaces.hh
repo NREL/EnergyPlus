@@ -324,115 +324,6 @@ namespace DataSurfaces {
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
 
-    extern Array1D<int> SurfWinShadingFlag;         // -1: window has no shading device
-    extern Array1D<bool> SurfWinShadingFlagEMSOn;   // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    extern Array1D<int> SurfWinShadingFlagEMSValue; // EMS control value for Shading Flag
-    extern Array1D<int>
-        SurfWinStormWinFlag; // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
-    extern Array1D<int> SurfWinStormWinFlagPrevDay; // Previous time step value of StormWinFlag
-    extern Array1D<Real64>
-        SurfWinFracTimeShadingDeviceOn; // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on;
-                                        // For time intervals longer than a time step, = fraction of time that shading device is on.
-    extern Array1D<int> SurfWinExtIntShadePrevTS;     // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
-    extern Array1D<bool> SurfWinHasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
-    extern Array1D<bool> SurfWinSurfDayLightInit;     // surface has been initialized for following 5 arrays
-    extern Array1D<int> SurfWinDaylFacPoint;          // Pointer to daylight factors for the window
-    extern Array1D<Real64> SurfWinVisTransSelected;   // Window vis trans at normal incidence selected for use in dayltg calculation
-    extern Array1D<Real64> SurfWinSwitchingFactor;    // Window switching factor (0.0 = unswitched; 1.0 = fully switched)
-    extern Array1D<Real64> SurfWinTheta;              // Azimuth of window normal (rad)
-    extern Array1D<Real64> SurfWinPhi;                // Altitude of window normal (rad)
-    extern Array1D<Real64>
-        SurfWinRhoCeilingWall;                  // Average interior reflectance seen by light moving up across horizontal plane thru center of window
-    extern Array1D<Real64> SurfWinRhoFloorWall; // Same as above, but for light moving down
-    extern Array1D<Real64> SurfWinFractionUpgoing; // Fraction light entering window that goes upward
-    extern Array1D<Real64>
-        SurfWinVisTransRatio; // For windows with switchable glazing, ratio of normal transmittance in switched state to that in unswitched state
-    extern Array1D<Real64> SurfWinFrameArea;                  // Frame projected area (m2)
-    extern Array1D<Real64> SurfWinFrameConductance;           // Frame conductance [no air films] (W/m2-K)
-    extern Array1D<Real64> SurfWinFrameSolAbsorp;             // Frame solar absorptance (assumed same inside and outside)
-    extern Array1D<Real64> SurfWinFrameVisAbsorp;             // Frame visible absorptance (assumed same inside and outside)
-    extern Array1D<Real64> SurfWinFrameEmis;                  // Frame thermal emissivity (thermal absorptance) (assumed same inside and outside)
-    extern Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass
-                                                              // conductance (without air films)
-    extern Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
-    extern Array1D<Real64> SurfWinFrameTempSurfIn;            // Frame inside surface temperature (C)
-    extern Array1D<Real64> SurfWinFrameTempSurfInOld;         // Previous value of frame inside surface temperature (C)
-    extern Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
-    extern Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
-    extern Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
-    extern Array1D<int> SurfWinDividerType;                   // Divider type (1=DividedLite, 2=Suspended (between-pane))
-    extern Array1D<Real64> SurfWinDividerArea;                // Divider projected area (m2)
-    extern Array1D<Real64> SurfWinDividerConductance;         // Divider conductance [no air films] (W/m2-K)
-    extern Array1D<Real64> SurfWinDividerSolAbsorp;           // Divider solar absorptance (assumed same inside and outside)
-    extern Array1D<Real64> SurfWinDividerVisAbsorp;           // Divider visible absorptance (assumed same inside and outside)
-    extern Array1D<Real64> SurfWinDividerEmis;                // Divider thermal emissivity (thermal absorptance) (assumed same inside and outside)
-    extern Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
-                                                              // conductance (without air films)
-    extern Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
-    extern Array1D<Real64> SurfWinDividerTempSurfIn;          // Divider inside surface temperature (C)
-    extern Array1D<Real64> SurfWinDividerTempSurfInOld;       // Previous value of divider inside surface temperature (C)
-    extern Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
-    extern Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
-    extern Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
-    extern Array1D<Real64> SurfWinGlazedFrac;                 // (Glazed area)/(Glazed area + divider area)
-    extern Array1D<Real64> SurfWinCenterGlArea;               // Center of glass area (m2); area of glass where 1-D conduction dominates
-    extern Array1D<Real64> SurfWinEdgeGlCorrFac;       // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal
-                                                       // bridging effects near frame and divider
-    extern Array1D<SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
-    extern Array1D<Real64> SurfWinShadeAbsFacFace1;    // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed
-                                                       // radiation is apportioned to the two faces
-    extern Array1D<Real64> SurfWinShadeAbsFacFace2;    // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed
-                                                       // radiation is apportioned to the two faces
-    extern Array1D<Real64>
-        SurfWinConvCoeffWithShade; // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
-    extern Array1D<Real64> SurfWinOtherConvHeatGain;   // other convective = total conv - standard model prediction for EQL window model (W)
-    extern Array1D<int> SurfWinBlindNumber;            // Blind number for a window with a blind
-    extern Array1D<Real64> SurfWinEffInsSurfTemp;      // Effective inside surface temperature for window with interior blind or shade; combination of
-                                                       // shade/blind and glass temperatures (C)
-    extern Array1D<bool> SurfWinMovableSlats;          // True if window has a blind with movable slats
-    extern Array1D<Real64> SurfWinSlatAngThisTS;       // Slat angle this time step for window with blind on (radians)
-    extern Array1D<Real64> SurfWinSlatAngThisTSDeg;    // Slat angle this time step for window with blind on (deg)
-    extern Array1D<bool> SurfWinSlatAngThisTSDegEMSon; // flag that indicate EMS system is actuating SlatAngThisTSDeg
-    extern Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
-    extern Array1D<bool> SurfWinSlatsBlockBeam;             // True if blind slats block incident beam solar
-    extern Array1D<Real64>
-        SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
-    extern Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
-    extern Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
-    extern Array1D<Real64> SurfWinTanProfileAngVert;        // Tangent of vertical profile angle
-    extern Array1D<Real64> SurfWinInsideSillDepth;          // Depth of inside sill (m)
-    extern Array1D<Real64> SurfWinInsideReveal;             // Depth of inside reveal (m)
-    extern Array1D<Real64> SurfWinInsideSillSolAbs;         // Solar absorptance of inside sill
-    extern Array1D<Real64> SurfWinInsideRevealSolAbs;       // Solar absorptance of inside reveal
-    extern Array1D<Real64> SurfWinOutsideRevealSolAbs;      // Solar absorptance of outside reveal
-    extern Array1D<int> SurfWinScreenNumber;                // Screen number for a window with a screen (do not confuse with material number)
-    extern Array1D<int> SurfWinAirflowSource;               // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
-    extern Array1D<int> SurfWinAirflowDestination;          // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
-    extern Array1D<int> SurfWinAirflowReturnNodePtr;        // Return node pointer for destination = ReturnAir
-    extern Array1D<Real64> SurfWinMaxAirflow;               // Maximum gap airflow (m3/s per m of glazing width)
-    extern Array1D<int> SurfWinAirflowControlType;          // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
-    extern Array1D<bool> SurfWinAirflowHasSchedule;         // True if gap airflow is scheduled
-    extern Array1D<int> SurfWinAirflowSchedulePtr;          // Gap airflow schedule pointer
-    extern Array1D<Real64> SurfWinAirflowThisTS;            // Gap airflow this timestep (m3/s per m of glazing width)
-    extern Array1D<Real64> SurfWinTAirflowGapOutlet;        // Temperature of air leaving airflow gap between glass panes (C)
-    extern Array1D<int> SurfWinWindowCalcIterationsRep;     // Number of iterations in window heat balance calculation
-    extern Array1D<Real64> SurfWinVentingOpenFactorMultRep; // Window/door opening modulation multiplier on venting open factor, for reporting
-    extern Array1D<Real64> SurfWinInsideTempForVentingRep;  // Inside air temp used to control window/door venting, for reporting (C)
-    extern Array1D<Real64> SurfWinVentingAvailabilityRep;   // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
-    extern Array1D<Real64> SurfWinSkyGndSolarInc; // Incident diffuse solar from ground-reflected sky radiation; used for Complex Fen; if CalcSolRefl
-                                                  // is true, accounts for shadowing of ground by building and obstructions [W/m2]
-    extern Array1D<Real64> SurfWinBmGndSolarInc;  // Incident diffuse solar from ground-reflected beam radiation; used for Complex Fen; if CalcSolRefl
-                                                  // is true, accounts for shadowing of ground by building and obstructions [W/m2]
-    extern Array1D<Real64> SurfWinLightWellEff;   // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
-    extern Array1D<bool> SurfWinSolarDiffusing;   // True if exterior window with a construction that contains a diffusing glass layer
-    extern Array1D<Real64> SurfWinFrameHeatGain;
-    extern Array1D<Real64> SurfWinFrameHeatLoss;
-    extern Array1D<Real64> SurfWinDividerHeatLoss;
-    extern Array1D<Real64> SurfWinTCLayerTemp;     // The temperature of the thermochromic layer of the window
-    extern Array1D<Real64> SurfWinSpecTemp;        // The specification temperature of the TC layer glass Added for W6 integration June 2010
-    extern Array1D<Real64> SurfWinWindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
-    extern Array1D<Real64> SurfWinTDDPipeNum;      // Tubular daylighting device pipe number for TDD domes and diffusers
-
     extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
@@ -1469,6 +1360,112 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinBmSolRefldInsRevealRepEnergy;  // energy of BmSolRefldInsRevealReport [J]
     Array1D<Real64> SurfWinProfileAngHor;                 // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                // Vertical beam solar profile angle (degrees)
+    Array1D<int> SurfWinShadingFlag;                      // -1: window has no shading device
+    Array1D<bool> SurfWinShadingFlagEMSOn;                // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
+    Array1D<int> SurfWinShadingFlagEMSValue;              // EMS control value for Shading Flag
+    Array1D<int>
+        SurfWinStormWinFlag; // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
+    Array1D<int> SurfWinStormWinFlagPrevDay; // Previous time step value of StormWinFlag
+    Array1D<Real64>
+        SurfWinFracTimeShadingDeviceOn; // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on;
+                                        // For time intervals longer than a time step, = fraction of time that shading device is on.
+    Array1D<int> SurfWinExtIntShadePrevTS;     // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    Array1D<bool> SurfWinHasShadeOrBlindLayer; // mark as true if the window construction has a shade or a blind layer
+    Array1D<bool> SurfWinSurfDayLightInit;     // surface has been initialized for following 5 arrays
+    Array1D<int> SurfWinDaylFacPoint;          // Pointer to daylight factors for the window
+    Array1D<Real64> SurfWinVisTransSelected;   // Window vis trans at normal incidence selected for use in dayltg calculation
+    Array1D<Real64> SurfWinSwitchingFactor;    // Window switching factor (0.0 = unswitched; 1.0 = fully switched)
+    Array1D<Real64> SurfWinTheta;              // Azimuth of window normal (rad)
+    Array1D<Real64> SurfWinPhi;                // Altitude of window normal (rad)
+    Array1D<Real64> SurfWinRhoCeilingWall;     // Average interior reflectance seen by light moving up across horizontal plane thru center of window
+    Array1D<Real64> SurfWinRhoFloorWall;       // Same as above, but for light moving down
+    Array1D<Real64> SurfWinFractionUpgoing;    // Fraction light entering window that goes upward
+    Array1D<Real64>
+        SurfWinVisTransRatio; // For windows with switchable glazing, ratio of normal transmittance in switched state to that in unswitched state
+    Array1D<Real64> SurfWinFrameArea;                  // Frame projected area (m2)
+    Array1D<Real64> SurfWinFrameConductance;           // Frame conductance [no air films] (W/m2-K)
+    Array1D<Real64> SurfWinFrameSolAbsorp;             // Frame solar absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinFrameVisAbsorp;             // Frame visible absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinFrameEmis;                  // Frame thermal emissivity (thermal absorptance) (assumed same inside and outside)
+    Array1D<Real64> SurfWinFrEdgeToCenterGlCondRatio;  // Ratio of frame edge of glass conductance (without air films) to center of glass conductance
+                                                       // (without air films)
+    Array1D<Real64> SurfWinFrameEdgeArea;              // Area of glass near frame (m2)
+    Array1D<Real64> SurfWinFrameTempSurfIn;            // Frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempSurfInOld;         // Previous value of frame inside surface temperature (C)
+    Array1D<Real64> SurfWinFrameTempSurfOut;           // Frame outside surface temperature (C)
+    Array1D<Real64> SurfWinProjCorrFrOut;              // Correction factor to absorbed radiation due to frame outside projection
+    Array1D<Real64> SurfWinProjCorrFrIn;               // Correction factor to absorbed radiation due to frame inside projection
+    Array1D<int> SurfWinDividerType;                   // Divider type (1=DividedLite, 2=Suspended (between-pane))
+    Array1D<Real64> SurfWinDividerArea;                // Divider projected area (m2)
+    Array1D<Real64> SurfWinDividerConductance;         // Divider conductance [no air films] (W/m2-K)
+    Array1D<Real64> SurfWinDividerSolAbsorp;           // Divider solar absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinDividerVisAbsorp;           // Divider visible absorptance (assumed same inside and outside)
+    Array1D<Real64> SurfWinDividerEmis;                // Divider thermal emissivity (thermal absorptance) (assumed same inside and outside)
+    Array1D<Real64> SurfWinDivEdgeToCenterGlCondRatio; // Ratio of divider edge of glass conductance (without air films) to center of glass
+                                                       // conductance (without air films)
+    Array1D<Real64> SurfWinDividerEdgeArea;            // Area of glass near dividers (m2)
+    Array1D<Real64> SurfWinDividerTempSurfIn;          // Divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempSurfInOld;       // Previous value of divider inside surface temperature (C)
+    Array1D<Real64> SurfWinDividerTempSurfOut;         // Divider outside surface temperature (C)
+    Array1D<Real64> SurfWinProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
+    Array1D<Real64> SurfWinProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
+    Array1D<Real64> SurfWinGlazedFrac;                 // (Glazed area)/(Glazed area + divider area)
+    Array1D<Real64> SurfWinCenterGlArea;               // Center of glass area (m2); area of glass where 1-D conduction dominates
+    Array1D<Real64> SurfWinEdgeGlCorrFac; // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging
+                                          // effects near frame and divider
+    Array1D<DataSurfaces::SurfaceClass> SurfWinOriginalClass; // 0 or if entered originally as:
+    Array1D<Real64> SurfWinShadeAbsFacFace1; // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is
+                                             // apportioned to the two faces
+    Array1D<Real64> SurfWinShadeAbsFacFace2; // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is
+                                             // apportioned to the two faces
+    Array1D<Real64>
+        SurfWinConvCoeffWithShade; // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
+    Array1D<Real64> SurfWinOtherConvHeatGain; // other convective = total conv - standard model prediction for EQL window model (W)
+    Array1D<int> SurfWinBlindNumber;          // Blind number for a window with a blind
+    Array1D<Real64> SurfWinEffInsSurfTemp; // Effective inside surface temperature for window with interior blind or shade; combination of shade/blind
+                                           // and glass temperatures (C)
+    Array1D<bool> SurfWinMovableSlats;     // True if window has a blind with movable slats
+    Array1D<Real64> SurfWinSlatAngThisTS;  // Slat angle this time step for window with blind on (radians)
+    Array1D<Real64> SurfWinSlatAngThisTSDeg;         // Slat angle this time step for window with blind on (deg)
+    Array1D<bool> SurfWinSlatAngThisTSDegEMSon;      // flag that indicate EMS system is actuating SlatAngThisTSDeg
+    Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
+    Array1D<bool> SurfWinSlatsBlockBeam;             // True if blind slats block incident beam solar
+    Array1D<Real64> SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
+    Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
+    Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
+    Array1D<Real64> SurfWinTanProfileAngVert;        // Tangent of vertical profile angle
+    Array1D<Real64> SurfWinInsideSillDepth;          // Depth of inside sill (m)
+    Array1D<Real64> SurfWinInsideReveal;             // Depth of inside reveal (m)
+    Array1D<Real64> SurfWinInsideSillSolAbs;         // Solar absorptance of inside sill
+    Array1D<Real64> SurfWinInsideRevealSolAbs;       // Solar absorptance of inside reveal
+    Array1D<Real64> SurfWinOutsideRevealSolAbs;      // Solar absorptance of outside reveal
+    Array1D<int> SurfWinScreenNumber;                // Screen number for a window with a screen (do not confuse with material number)
+    Array1D<int> SurfWinAirflowSource;               // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+    Array1D<int> SurfWinAirflowDestination;          // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
+    Array1D<int> SurfWinAirflowReturnNodePtr;        // Return node pointer for destination = ReturnAir
+    Array1D<Real64> SurfWinMaxAirflow;               // Maximum gap airflow (m3/s per m of glazing width)
+    Array1D<int> SurfWinAirflowControlType;          // Gap airflow control type (ALWAYSONATMAXFLOW, etc.)
+    Array1D<bool> SurfWinAirflowHasSchedule;         // True if gap airflow is scheduled
+    Array1D<int> SurfWinAirflowSchedulePtr;          // Gap airflow schedule pointer
+    Array1D<Real64> SurfWinAirflowThisTS;            // Gap airflow this timestep (m3/s per m of glazing width)
+    Array1D<Real64> SurfWinTAirflowGapOutlet;        // Temperature of air leaving airflow gap between glass panes (C)
+    Array1D<int> SurfWinWindowCalcIterationsRep;     // Number of iterations in window heat balance calculation
+    Array1D<Real64> SurfWinVentingOpenFactorMultRep; // Window/door opening modulation multiplier on venting open factor, for reporting
+    Array1D<Real64> SurfWinInsideTempForVentingRep;  // Inside air temp used to control window/door venting, for reporting (C)
+    Array1D<Real64> SurfWinVentingAvailabilityRep;   // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
+    Array1D<Real64> SurfWinSkyGndSolarInc; // Incident diffuse solar from ground-reflected sky radiation; used for Complex Fen; if CalcSolRefl is
+                                           // true, accounts for shadowing of ground by building and obstructions [W/m2]
+    Array1D<Real64> SurfWinBmGndSolarInc;  // Incident diffuse solar from ground-reflected beam radiation; used for Complex Fen; if CalcSolRefl is
+                                           // true, accounts for shadowing of ground by building and obstructions [W/m2]
+    Array1D<Real64> SurfWinLightWellEff;   // Light well efficiency (multiplier on exterior window vis trans due to light well losses)
+    Array1D<bool> SurfWinSolarDiffusing;   // True if exterior window with a construction that contains a diffusing glass layer
+    Array1D<Real64> SurfWinFrameHeatGain;
+    Array1D<Real64> SurfWinFrameHeatLoss;
+    Array1D<Real64> SurfWinDividerHeatLoss;
+    Array1D<Real64> SurfWinTCLayerTemp;     // The temperature of the thermochromic layer of the window
+    Array1D<Real64> SurfWinSpecTemp;        // The specification temperature of the TC layer glass Added for W6 integration June 2010
+    Array1D<Real64> SurfWinWindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
+    Array1D<Real64> SurfWinTDDPipeNum;      // Tubular daylighting device pipe number for TDD domes and diffusers
 
     void clear_state() override
     {
@@ -1619,6 +1616,99 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinBmSolRefldInsRevealRepEnergy.deallocate();
         this->SurfWinProfileAngHor.deallocate();
         this->SurfWinProfileAngVert.deallocate();
+        this->SurfWinShadingFlag.deallocate();
+        this->SurfWinShadingFlagEMSOn.deallocate();
+        this->SurfWinShadingFlagEMSValue.deallocate();
+        this->SurfWinStormWinFlag.deallocate();
+        this->SurfWinStormWinFlagPrevDay.deallocate();
+        this->SurfWinFracTimeShadingDeviceOn.deallocate();
+        this->SurfWinExtIntShadePrevTS.deallocate();
+        this->SurfWinHasShadeOrBlindLayer.deallocate();
+        this->SurfWinSurfDayLightInit.deallocate();
+        this->SurfWinDaylFacPoint.deallocate();
+        this->SurfWinVisTransSelected.deallocate();
+        this->SurfWinSwitchingFactor.deallocate();
+        this->SurfWinTheta.deallocate();
+        this->SurfWinPhi.deallocate();
+        this->SurfWinRhoCeilingWall.deallocate();
+        this->SurfWinRhoFloorWall.deallocate();
+        this->SurfWinFractionUpgoing.deallocate();
+        this->SurfWinVisTransRatio.deallocate();
+        this->SurfWinFrameArea.deallocate();
+        this->SurfWinFrameConductance.deallocate();
+        this->SurfWinFrameSolAbsorp.deallocate();
+        this->SurfWinFrameVisAbsorp.deallocate();
+        this->SurfWinFrameEmis.deallocate();
+        this->SurfWinFrEdgeToCenterGlCondRatio.deallocate();
+        this->SurfWinFrameEdgeArea.deallocate();
+        this->SurfWinFrameTempSurfIn.deallocate();
+        this->SurfWinFrameTempSurfInOld.deallocate();
+        this->SurfWinFrameTempSurfOut.deallocate();
+        this->SurfWinProjCorrFrOut.deallocate();
+        this->SurfWinProjCorrFrIn.deallocate();
+        this->SurfWinDividerType.deallocate();
+        this->SurfWinDividerArea.deallocate();
+        this->SurfWinDividerConductance.deallocate();
+        this->SurfWinDividerSolAbsorp.deallocate();
+        this->SurfWinDividerVisAbsorp.deallocate();
+        this->SurfWinDividerEmis.deallocate();
+        this->SurfWinDivEdgeToCenterGlCondRatio.deallocate();
+        this->SurfWinDividerEdgeArea.deallocate();
+        this->SurfWinDividerTempSurfIn.deallocate();
+        this->SurfWinDividerTempSurfInOld.deallocate();
+        this->SurfWinDividerTempSurfOut.deallocate();
+        this->SurfWinProjCorrDivOut.deallocate();
+        this->SurfWinProjCorrDivIn.deallocate();
+        this->SurfWinGlazedFrac.deallocate();
+        this->SurfWinCenterGlArea.deallocate();
+        this->SurfWinEdgeGlCorrFac.deallocate();
+        this->SurfWinOriginalClass.deallocate();
+        this->SurfWinShadeAbsFacFace1.deallocate();
+        this->SurfWinShadeAbsFacFace2.deallocate();
+        this->SurfWinConvCoeffWithShade.deallocate();
+        this->SurfWinOtherConvHeatGain.deallocate();
+        this->SurfWinBlindNumber.deallocate();
+        this->SurfWinEffInsSurfTemp.deallocate();
+        this->SurfWinMovableSlats.deallocate();
+        this->SurfWinSlatAngThisTS.deallocate();
+        this->SurfWinSlatAngThisTSDeg.deallocate();
+        this->SurfWinSlatAngThisTSDegEMSon.deallocate();
+        this->SurfWinSlatAngThisTSDegEMSValue.deallocate();
+        this->SurfWinSlatsBlockBeam.deallocate();
+        this->SurfWinBlindAirFlowPermeability.deallocate();
+        this->SurfWinTotGlazingThickness.deallocate();
+        this->SurfWinTanProfileAngHor.deallocate();
+        this->SurfWinTanProfileAngVert.deallocate();
+        this->SurfWinInsideSillDepth.deallocate();
+        this->SurfWinInsideReveal.deallocate();
+        this->SurfWinInsideSillSolAbs.deallocate();
+        this->SurfWinInsideRevealSolAbs.deallocate();
+        this->SurfWinOutsideRevealSolAbs.deallocate();
+        this->SurfWinScreenNumber.deallocate();
+        this->SurfWinAirflowSource.deallocate();
+        this->SurfWinAirflowDestination.deallocate();
+        this->SurfWinAirflowReturnNodePtr.deallocate();
+        this->SurfWinMaxAirflow.deallocate();
+        this->SurfWinAirflowControlType.deallocate();
+        this->SurfWinAirflowHasSchedule.deallocate();
+        this->SurfWinAirflowSchedulePtr.deallocate();
+        this->SurfWinAirflowThisTS.deallocate();
+        this->SurfWinTAirflowGapOutlet.deallocate();
+        this->SurfWinWindowCalcIterationsRep.deallocate();
+        this->SurfWinVentingOpenFactorMultRep.deallocate();
+        this->SurfWinInsideTempForVentingRep.deallocate();
+        this->SurfWinVentingAvailabilityRep.deallocate();
+        this->SurfWinSkyGndSolarInc.deallocate();
+        this->SurfWinBmGndSolarInc.deallocate();
+        this->SurfWinLightWellEff.deallocate();
+        this->SurfWinSolarDiffusing.deallocate();
+        this->SurfWinFrameHeatGain.deallocate();
+        this->SurfWinFrameHeatLoss.deallocate();
+        this->SurfWinDividerHeatLoss.deallocate();
+        this->SurfWinTCLayerTemp.deallocate();
+        this->SurfWinSpecTemp.deallocate();
+        this->SurfWinWindowModelType.deallocate();
+        this->SurfWinTDDPipeNum.deallocate();
     }
 };
 

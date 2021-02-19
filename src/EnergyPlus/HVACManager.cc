@@ -2876,7 +2876,7 @@ namespace HVACManager {
                         }
                     }
                     for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                        if (DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                        if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             ShowWarningError(state, "For zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                              " return air heat gain from air flow windows will be applied to the zone air.");
                             ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");

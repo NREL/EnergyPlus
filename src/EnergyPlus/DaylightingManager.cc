@@ -217,21 +217,21 @@ namespace EnergyPlus::DaylightingManager {
                 IType == SurfaceClass::Door) {
                 AREA = Surface(ISurf).Area;
                 // In following, FrameArea and DividerArea can be non-zero only for exterior windows
-                AInsTot += AREA + SurfWinFrameArea(ISurf) * (1.0 + 0.5 * SurfWinProjCorrFrIn(ISurf)) +
-                           SurfWinDividerArea(ISurf) * (1.0 + SurfWinProjCorrDivIn(ISurf));
+                AInsTot += AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
+                           state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf));
                 ARHTOT +=
                     AREA * state.dataConstruction->Construct(Surface(ISurf).Construction).ReflectVisDiffBack +
-                    SurfWinFrameArea(ISurf) * (1.0 + 0.5 * SurfWinProjCorrFrIn(ISurf)) * (1.0 - SurfWinFrameSolAbsorp(ISurf)) +
-                    SurfWinDividerArea(ISurf) * (1.0 + SurfWinProjCorrDivIn(ISurf)) * (1.0 - SurfWinDividerSolAbsorp(ISurf));
+                    state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) * (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(ISurf)) +
+                    state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf)) * (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(ISurf));
                 ITILT = 3;                                                                // Ceiling
                 if (Surface(ISurf).Tilt > 10.0 && Surface(ISurf).Tilt < 170.0) ITILT = 2; // Wall
                 if (Surface(ISurf).Tilt >= 170.0) ITILT = 1;                              // Floor
-                AR(ITILT) += AREA + SurfWinFrameArea(ISurf) * (1.0 + 0.5 * SurfWinProjCorrFrIn(ISurf)) +
-                             SurfWinDividerArea(ISurf) * (1.0 + SurfWinProjCorrDivIn(ISurf));
+                AR(ITILT) += AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
+                             state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf));
                 ARH(ITILT) +=
                     AREA * state.dataConstruction->Construct(Surface(ISurf).Construction).ReflectVisDiffBack +
-                    SurfWinFrameArea(ISurf) * (1.0 + 0.5 * SurfWinProjCorrFrIn(ISurf)) * (1.0 - SurfWinFrameSolAbsorp(ISurf)) +
-                    SurfWinDividerArea(ISurf) * (1.0 + SurfWinProjCorrDivIn(ISurf)) * (1.0 - SurfWinDividerSolAbsorp(ISurf));
+                    state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) * (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(ISurf)) +
+                    state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf)) * (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(ISurf));
             }
         }
 
@@ -263,13 +263,13 @@ namespace EnergyPlus::DaylightingManager {
                 for (int IWinDr : thisEnclosure.SurfacePtr) {
                     if ((Surface(IWinDr).Class == SurfaceClass::Window || Surface(IWinDr).Class == SurfaceClass::Door) &&
                         Surface(IWinDr).BaseSurf == ISurf) {
-                        ATWL += Surface(IWinDr).Area + SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * SurfWinProjCorrFrIn(IWinDr)) +
-                                SurfWinDividerArea(IWinDr) * (1.0 + SurfWinProjCorrDivIn(IWinDr));
+                        ATWL += Surface(IWinDr).Area + state.dataSurface->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(IWinDr)) +
+                                state.dataSurface->SurfWinDividerArea(IWinDr) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(IWinDr));
                         ARHTWL += Surface(IWinDr).Area * state.dataConstruction->Construct(Surface(IWinDr).Construction).ReflectVisDiffBack +
-                                  SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * SurfWinProjCorrFrIn(IWinDr)) *
-                                      (1.0 - SurfWinFrameSolAbsorp(IWinDr)) +
-                                  SurfWinDividerArea(IWinDr) * (1.0 + SurfWinProjCorrDivIn(IWinDr)) *
-                                      (1.0 - SurfWinDividerSolAbsorp(IWinDr));
+                                  state.dataSurface->SurfWinFrameArea(IWinDr) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(IWinDr)) *
+                                      (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(IWinDr)) +
+                                  state.dataSurface->SurfWinDividerArea(IWinDr) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(IWinDr)) *
+                                      (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(IWinDr));
                     }
                 }
                 // Inside surface area of floor, walls and ceilings, minus surface ISurf and its subsurfaces
@@ -296,17 +296,17 @@ namespace EnergyPlus::DaylightingManager {
                 ARHP = SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf;
                 // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
                 // across horizontal plane through center of window
-                SurfWinRhoCeilingWall(IWin) = (ARHP(2) * (1.0 - ETA) + ARHP(3)) / (AP(2) * (1.0 - ETA) + AP(3) + 1.0e-5);
-                SurfWinRhoFloorWall(IWin) = (ARHP(2) * ETA + ARHP(1)) / (AP(2) * ETA + AP(1) + 1.e-9);
+                state.dataSurface->SurfWinRhoCeilingWall(IWin) = (ARHP(2) * (1.0 - ETA) + ARHP(3)) / (AP(2) * (1.0 - ETA) + AP(3) + 1.0e-5);
+                state.dataSurface->SurfWinRhoFloorWall(IWin) = (ARHP(2) * ETA + ARHP(1)) / (AP(2) * ETA + AP(1) + 1.e-9);
 
                 // Angle factor for windows with diffusing shades. SurfaceWindow(IWin)%FractionUpgoing is
                 // fraction of light from the shade that goes up toward ceiling and upper part of walls.
                 // 1 - SurfaceWindow(IWin)%FractionUpgoing is fraction that goes down toward floor and lower part of walls.
-                SurfWinFractionUpgoing(IWin) = Surface(IWin).Tilt / 180.0;
+                state.dataSurface->SurfWinFractionUpgoing(IWin) = Surface(IWin).Tilt / 180.0;
 
                 // Daylighting shelf simplification:  All light goes up to the ceiling regardless of orientation of shelf
                 if (Surface(IWin).Shelf > 0) {
-                    if (state.dataDaylightingDevicesData->Shelf(Surface(IWin).Shelf).InSurf > 0) SurfWinFractionUpgoing(IWin) = 1.0;
+                    if (state.dataDaylightingDevicesData->Shelf(Surface(IWin).Shelf).InSurf > 0) state.dataSurface->SurfWinFractionUpgoing(IWin) = 1.0;
                 }
             }
         }
@@ -659,7 +659,7 @@ namespace EnergyPlus::DaylightingManager {
                 // component will not be calculated for these windows until the time-step loop.
                 if (Surface(IWin).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
 
-                    if (SurfWinMovableSlats(IWin)) {
+                    if (state.dataSurface->SurfWinMovableSlats(IWin)) {
                         // variable slat angle - MaxSlatangle sets
                         ISA = MaxSlatAngs + 1;
                     } else if (Surface(IWin).HasShadeControl) {
@@ -760,9 +760,9 @@ namespace EnergyPlus::DaylightingManager {
             for (TZoneNum = 1; TZoneNum <= state.dataGlobal->NumOfZones; ++TZoneNum) {
                 for (loopwin = 1; loopwin <= state.dataDaylightingData->ZoneDaylight(TZoneNum).NumOfDayltgExtWins; ++loopwin) {
                     IWin = state.dataDaylightingData->ZoneDaylight(TZoneNum).DayltgExtWinSurfNums(loopwin);
-                    if (SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Diffuser) continue;
+                    if (state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Diffuser) continue;
                     // Look up the TDD:DOME object
-                    PipeNum = SurfWinTDDPipeNum(IWin);
+                    PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
                     if (PipeNum == 0) {
                         ShowSevereError(state, "GetTDDInput: Surface=" + Surface(IWin).Name +
                                         ", TDD:Dome object does not reference a valid Diffuser object.");
@@ -1726,7 +1726,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         IConst = Surface(IWin).Construction;
-        if (SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
+        if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
 
         // TH Added 6/29/2009.
         // For thermochromic windows, the daylight and glare factors are calculated for a base window cosntruction
@@ -1743,7 +1743,7 @@ namespace EnergyPlus::DaylightingManager {
         BlNum = 0;
         // ScNum = 0; //Unused Set but never used
         if (Surface(IWin).HasShadeControl) ShType = WindowShadingControl(ICtrl).ShadingType;
-        BlNum = SurfWinBlindNumber(IWin);
+        BlNum = state.dataSurface->SurfWinBlindNumber(IWin);
         // ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
         ShelfNum = Surface(IWin).Shelf;
@@ -1775,14 +1775,14 @@ namespace EnergyPlus::DaylightingManager {
         LSHCAL = 0;
 
         // Visible transmittance at normal incidence
-        SurfWinVisTransSelected(IWin) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
+        state.dataSurface->SurfWinVisTransSelected(IWin) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
         // For windows with switchable glazing, ratio of visible transmittance at normal
         // incidence for fully switched (dark) state to that of unswitched state
-        SurfWinVisTransRatio(IWin) = 1.0;
+        state.dataSurface->SurfWinVisTransRatio(IWin) = 1.0;
         if (ICtrl > 0) {
             if (ShType == WSC_ST_SwitchableGlazing) {
                 IConstShaded = Surface(IWin).activeShadedConstruction;
-                SurfWinVisTransRatio(IWin) =
+                state.dataSurface->SurfWinVisTransRatio(IWin) =
                     SafeDivide(POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef), POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef));
             }
         }
@@ -1872,7 +1872,7 @@ namespace EnergyPlus::DaylightingManager {
         if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
             // Adjust number of exterior window elements to give acceptable number of rays through
             // interior windows in the zone (for accuracy of interior window daylighting calculation)
-            SolidAngExtWin = SafeDivide(((Surface(IWin).Area + SurfWinDividerArea(IWin)) / Surface(IWin).Multiplier), pow_2(ALF));
+            SolidAngExtWin = SafeDivide(((Surface(IWin).Area + state.dataSurface->SurfWinDividerArea(IWin)) / Surface(IWin).Multiplier), pow_2(ALF));
             SolidAngMinIntWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).MinIntWinSolidAng;
             SolidAngRatio = max(1.0, SolidAngExtWin / SolidAngMinIntWin);
             NDIVX *= std::sqrt(SolidAngRatio);
@@ -1893,18 +1893,18 @@ namespace EnergyPlus::DaylightingManager {
         DWY = HW / NWY;
 
         // Azimuth and altitude of window normal
-        SurfWinPhi(IWin) = std::asin(WNORM(3));
+        state.dataSurface->SurfWinPhi(IWin) = std::asin(WNORM(3));
         if (std::abs(WNORM(1)) > 1.0e-5 || std::abs(WNORM(2)) > 1.0e-5) {
-            SurfWinTheta(IWin) = std::atan2(WNORM(2), WNORM(1));
+            state.dataSurface->SurfWinTheta(IWin) = std::atan2(WNORM(2), WNORM(1));
         } else {
-            SurfWinTheta(IWin) = 0.0;
+            state.dataSurface->SurfWinTheta(IWin) = 0.0;
         }
 
         // Recalculation of values for TDD:DOME
-        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
 
             // Look up the TDD:DOME object
-            PipeNum = SurfWinTDDPipeNum(IWin);
+            PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
             IWin2 = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
             // Calculate reference point coords relative to the diffuser coordinate system
@@ -1958,11 +1958,11 @@ namespace EnergyPlus::DaylightingManager {
 
             // Azimuth and altitude of dome normal
             // These are specific to the exterior.
-            SurfWinPhi(IWin2) = std::asin(WNORM2(3));
+            state.dataSurface->SurfWinPhi(IWin2) = std::asin(WNORM2(3));
             if (std::abs(WNORM2(1)) > 1.0e-5 || std::abs(WNORM2(2)) > 1.0e-5) {
-                SurfWinTheta(IWin2) = std::atan2(WNORM2(2), WNORM2(1));
+                state.dataSurface->SurfWinTheta(IWin2) = std::atan2(WNORM2(2), WNORM2(1));
             } else {
-                SurfWinTheta(IWin2) = 0.0;
+                state.dataSurface->SurfWinTheta(IWin2) = 0.0;
             }
 
             // Calculate new virtual reference point coords relative to dome coord system
@@ -1975,10 +1975,10 @@ namespace EnergyPlus::DaylightingManager {
 
             // Copy several values from the diffuser so that DayltgInterReflectedIllum works correctly
             // These are specific to the interior.
-            SurfWinRhoCeilingWall(IWin2) = SurfWinRhoCeilingWall(IWin);
-            SurfWinRhoFloorWall(IWin2) = SurfWinRhoFloorWall(IWin);
-            SurfWinFractionUpgoing(IWin2) = SurfWinFractionUpgoing(IWin);
-            SurfWinGlazedFrac(IWin2) = SurfWinGlazedFrac(IWin);
+            state.dataSurface->SurfWinRhoCeilingWall(IWin2) = state.dataSurface->SurfWinRhoCeilingWall(IWin);
+            state.dataSurface->SurfWinRhoFloorWall(IWin2) = state.dataSurface->SurfWinRhoFloorWall(IWin);
+            state.dataSurface->SurfWinFractionUpgoing(IWin2) = state.dataSurface->SurfWinFractionUpgoing(IWin);
+            state.dataSurface->SurfWinGlazedFrac(IWin2) = state.dataSurface->SurfWinGlazedFrac(IWin);
 
         } else {
             // This is not a TDD:DIFFUSER.  Make sure nothing is messed up for a regular window.
@@ -1993,7 +1993,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Initialize bsdf daylighting coefficients here.  Only one time initialization
-        if (SurfWinWindowModelType(IWin) == WindowBSDFModel) {
+        if (state.dataSurface->SurfWinWindowModelType(IWin) == WindowBSDFModel) {
             if (!state.dataBSDFWindow->ComplexWind(IWin).DaylightingInitialized) {
                 if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
                     NRefPts = state.dataDaylightingData->IllumMapCalc(MapNum).TotalMapRefPoints;
@@ -2222,16 +2222,16 @@ namespace EnergyPlus::DaylightingManager {
             TVISIntWinDisk = 0.0; // Init Value
             TVISIntWin = 0.0;
 
-            if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+            if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
                 // Look up the TDD:DOME object
-                PipeNum = SurfWinTDDPipeNum(IWin);
+                PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
                 // Unshaded visible transmittance of TDD for a single ray from sky/ground element
-                TVISB = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
+                TVISB = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
             } else { // Regular window
-                if (SurfWinWindowModelType(IWin) != WindowBSDFModel) {
+                if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
                     // Vis trans of glass for COSB incidence angle
-                    TVISB = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                    TVISB = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                 } else {
                     // Complex fenestration needs to use different equation for visible transmittance.  That will be calculated later
                     // in the code since it depends on different incoming directions.  For now, just put zero to differentiate from
@@ -2316,7 +2316,7 @@ namespace EnergyPlus::DaylightingManager {
                 // Get product of transmittances of obstructions hit by ray.
                 // ObTrans = 1.0 will be returned if no exterior obstructions are hit.
 
-                if (SurfWinWindowModelType(IWin) != WindowBSDFModel) {
+                if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
                     // the IHR (now HourOfDay) here is/was not correct, this is outside of hour loop
                     // the hour is used to query schedule for transmission , not sure what to do
                     // it will work for detailed and never did work correctly before.
@@ -3381,7 +3381,7 @@ namespace EnergyPlus::DaylightingManager {
         // Rob/TH - Not sure whether this call is necessary for interior zones with interior windows only.
         //  new code would be -
         // IF (LSHCAL == 1 .AND. ExtWinType /= AdjZoneExtWin) CALL DayltgInterReflectedIllum(ISunPos,IHR,ZoneNum,IWin2)
-        if (SurfWinWindowModelType(IWin) != WindowBSDFModel) {
+        if (state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) {
             if (LSHCAL == 1) DayltgInterReflectedIllum(state, ISunPos, iHour, ZoneNum, IWin2);
         } else {
             if (LSHCAL == 1) DayltgInterReflectedIllumComplexFenestration(state, IWin2, WinEl, iHour, ZoneNum, iRefPoint, CalledFrom, MapNum);
@@ -3446,7 +3446,7 @@ namespace EnergyPlus::DaylightingManager {
                         ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                     } else {
                         // Obstruction is a window; assume it is bare
-                        if (SurfWinStormWinFlag(NearestHitSurfNum) == 1) ObsConstrNum = Surface(NearestHitSurfNum).StormWinConstruction;
+                        if (state.dataSurface->SurfWinStormWinFlag(NearestHitSurfNum) == 1) ObsConstrNum = Surface(NearestHitSurfNum).StormWinConstruction;
                         ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                     }
                 } else {
@@ -3490,7 +3490,7 @@ namespace EnergyPlus::DaylightingManager {
         if (ObTrans > 1.e-6) {
             // Ray did not hit an obstruction or the transmittance product of hit obstructions is non-zero.
             // Contribution of sky or ground luminance in cd/m2
-            if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+            if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
                 // Make all transmitted light diffuse for a TDD with a bare diffuser
                 assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->WLUMSK));
                 assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
@@ -3667,13 +3667,13 @@ namespace EnergyPlus::DaylightingManager {
                         // Sun reaches reference point;  increment illuminance.
                         // Direct normal illuminance is normalized to 1.0
 
-                        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
+                        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Diffuser) {
                             // No beam is transmitted.  Takes care of TDD with a bare diffuser and all types of blinds.
                             TVISS = 0.0;
                         } else {
                             // Beam transmittance for bare window and all types of blinds
                             TVISS =
-                                POLYF(COSI, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                                POLYF(COSI, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                             if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin && hitIntWinDisk) TVISS *= TVISIntWinDisk;
                         }
 
@@ -3685,7 +3685,7 @@ namespace EnergyPlus::DaylightingManager {
                             // Contribution of beam passing through slats and reaching reference point
                             for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                 // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-                                if (SurfWinMovableSlats(IWin)) {
+                                if (state.dataSurface->SurfWinMovableSlats(IWin)) {
                                     SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                                 } else {
                                     SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
@@ -3695,14 +3695,14 @@ namespace EnergyPlus::DaylightingManager {
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) = RAYCOS(3) * TVISS * TransBmBmMult(JB) * ObTransDisk;
 
                                 // do this only once for fixed slat blinds
-                                if (!SurfWinMovableSlats(IWin)) break;
+                                if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
                             }
                         } else if (ShType == WSC_ST_ExteriorScreen) {
                             //                          pass angle from sun to window normal here using PHSUN and THSUN from above and surface angles
                             //                          SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                             //                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                            CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - SurfWinTheta(IWin)));
-                            TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
+                            CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
+                            TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTrans;
                             state.dataDaylightingManager->EDIRSUdisk(iHour, 2) = RAYCOS(3) * TVISS * TransBmBmMult(1) * ObTransDisk;
                         }
 
@@ -3738,7 +3738,7 @@ namespace EnergyPlus::DaylightingManager {
                                 for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                     // IF (.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                     state.dataDaylightingManager->AVWLSUdisk(iHour, JB + 1) = XAVWL * TVISS * TransBmBmMult(JB) * ObTransDisk;
-                                    if (!SurfWinMovableSlats(IWin)) break;
+                                    if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
                                 }
                             } else if (ShType == WSC_ST_ExteriorScreen) {
                                 state.dataDaylightingManager->AVWLSUdisk(iHour, 2) = XAVWL * TVISS * TransBmBmMult(1) * ObTransDisk;
@@ -3835,15 +3835,15 @@ namespace EnergyPlus::DaylightingManager {
                                 CosIncAngRefl = std::abs(dot(RAYCOS, ReflNorm));
                                 if (Surface(ReflSurfNum).Class == SurfaceClass::Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
-                                    if (SurfWinStormWinFlag(ReflSurfNum) == 1) ConstrNumRefl = Surface(ReflSurfNum).StormWinConstruction;
+                                    if (state.dataSurface->SurfWinStormWinFlag(ReflSurfNum) == 1) ConstrNumRefl = Surface(ReflSurfNum).StormWinConstruction;
                                     SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (Surface(ReflSurfNum).ShadowingSurf && Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0)
                                     SpecReflectance = Surface(ReflSurfNum).ShadowSurfGlazingFrac *
                                                       POLYF(std::abs(CosIncAngRefl),
                                                             state.dataConstruction->Construct(Surface(ReflSurfNum).ShadowSurfGlazingConstruct).ReflSolBeamFrontCoef);
-                                TVisRefl = POLYF(CosIncAngRec, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) *
-                                           SurfWinLightWellEff(IWin);
+                                TVisRefl = POLYF(CosIncAngRec, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
+                                           state.dataSurface->SurfWinLightWellEff(IWin);
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, 1) += SunVecMir(3) * SpecReflectance * TVisRefl; // Bare window
 
                                 TransBmBmMultRefl = 0.0;
@@ -3853,7 +3853,7 @@ namespace EnergyPlus::DaylightingManager {
                                     Real64 const Pi_SlatAng_fac(DataGlobalConstants::Pi / (MaxSlatAngs - 1));
                                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                         // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
-                                        if (SurfWinMovableSlats(IWin)) {
+                                        if (state.dataSurface->SurfWinMovableSlats(IWin)) {
                                             SlatAng = double(JB - 1) * Pi_SlatAng_fac;
                                         } else {
                                             SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
@@ -3862,14 +3862,14 @@ namespace EnergyPlus::DaylightingManager {
                                             ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                         state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
-                                        if (!SurfWinMovableSlats(IWin)) break;
+                                        if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
                                     }
                                 } else if (ShType == WSC_ST_ExteriorScreen) {
                                     //                             pass angle from sun to window normal here using PHSUN and THSUN from above and
                                     //                             surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                                     //                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
-                                    CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - SurfWinTheta(IWin)));
-                                    TransBmBmMultRefl(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
+                                    CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - state.dataSurface->SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin)));
+                                    TransBmBmMultRefl(1) = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTrans;
                                     state.dataDaylightingManager->EDIRSUdisk(iHour, 2) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(1);
                                 } // End of check if window has a blind or screen
 
@@ -3888,7 +3888,7 @@ namespace EnergyPlus::DaylightingManager {
                                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                             // IF(.NOT. SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                             state.dataDaylightingManager->AVWLSUdisk(iHour, JB + 1) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl(JB);
-                                            if (!SurfWinMovableSlats(IWin)) break;
+                                            if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
                                         }
                                     } else if (ShType == WSC_ST_ExteriorScreen) {
                                         state.dataDaylightingManager->AVWLSUdisk(iHour, 2) += XAVWL * TVisRefl * SpecReflectance * TransBmBmMultRefl(1);
@@ -3906,7 +3906,7 @@ namespace EnergyPlus::DaylightingManager {
         if ((ICtrl > 0 && (ShType == WSC_ST_InteriorShade || ShType == WSC_ST_ExteriorShade || ShType == WSC_ST_BetweenGlassShade ||
                            ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_BetweenGlassBlind ||
                            ShType == WSC_ST_ExteriorScreen)) ||
-            SurfWinSolarDiffusing(IWin)) {
+            state.dataSurface->SurfWinSolarDiffusing(IWin)) {
 
             // ----- CASE II -- WINDOW WITH SCREEN, SHADE, BLIND, OR DIFFUSING WINDOW
 
@@ -3931,7 +3931,7 @@ namespace EnergyPlus::DaylightingManager {
                         state.dataDaylightingManager->EDIRSK(iHour, JB + 1, ISky) += state.dataDaylightingManager->WLUMSK(iHour, JB + 1, ISky) * DOMEGA_Ray_3_TVisIntWinMult;
                         if (ISky == 1) state.dataDaylightingManager->EDIRSU(iHour, JB + 1) += state.dataDaylightingManager->WLUMSU(iHour, JB + 1) * DOMEGA_Ray_3_TVisIntWinMult;
                     }
-                    if (!SurfWinMovableSlats(IWin)) break;
+                    if (!state.dataSurface->SurfWinMovableSlats(IWin)) break;
                 }
             }
         }
@@ -4010,7 +4010,7 @@ namespace EnergyPlus::DaylightingManager {
             //  the assumption behind it is if exterior horizontal surface does not get daylight, spaces do not get daylight.
 
             for (JSH = 1; JSH <= MaxSlatAngs + 1; ++JSH) {
-                if (!SurfWinMovableSlats(IWin) && JSH > 2) break;
+                if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
                 if (state.dataDaylightingManager->GILSK(iHour, ISky) > tmpDFCalc) {
                     state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(iHour, JSH, ISky, iRefPoint, loopwin) =
@@ -4057,7 +4057,7 @@ namespace EnergyPlus::DaylightingManager {
             // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
             if (ICtrl > 0) {
                 if (WindowShadingControl(ICtrl).ShadingType == WSC_ST_SwitchableGlazing) {
-                    VTR = SurfWinVisTransRatio(IWin);
+                    VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
                     state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
                     state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
@@ -4156,7 +4156,7 @@ namespace EnergyPlus::DaylightingManager {
             //  the assumption behind it is if exterior horizontal surface does not get daylight, spaces do not get daylight.
 
             for (JSH = 1; JSH <= MaxSlatAngs + 1; ++JSH) {
-                if (!SurfWinMovableSlats(IWin) && JSH > 2) break;
+                if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
                 if (state.dataDaylightingManager->GILSK(iHour, ISky) > tmpDFCalc) {
                     state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, JSH, ISky, iMapPoint, loopwin) =
@@ -4203,7 +4203,7 @@ namespace EnergyPlus::DaylightingManager {
             // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
             if (ICtrl > 0) {
                 if (WindowShadingControl(ICtrl).ShadingType == WSC_ST_SwitchableGlazing) {
-                    VTR = SurfWinVisTransRatio(IWin);
+                    VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
                     state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, 2, ISky, iMapPoint, loopwin) =
                         state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, 1, ISky, iMapPoint, loopwin) * VTR;
                     state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky(iHour, 2, ISky, iMapPoint, loopwin) =
@@ -4285,7 +4285,7 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingManager->maxNumRefPtInAnyEncl = max(numEnclRefPoints, state.dataDaylightingManager->maxNumRefPtInAnyEncl);
             DataViewFactorInformation::ZoneSolarInfo(surfEnclNum).TotalEnclosureDaylRefPoints = numEnclRefPoints;
             if (numEnclRefPoints > 0) {
-                if (!SurfWinSurfDayLightInit(SurfNum)) {
+                if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
                     SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numEnclRefPoints);
                     SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
                     SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numEnclRefPoints);
@@ -4300,7 +4300,7 @@ namespace EnergyPlus::DaylightingManager {
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
                     SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numEnclRefPoints);
                     SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-                    SurfWinSurfDayLightInit(SurfNum) = true;
+                    state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
                 }
             } else {
                 int SurfNumAdj = Surface(SurfNum).ExtBoundCond;
@@ -4313,7 +4313,7 @@ namespace EnergyPlus::DaylightingManager {
                     }
                     DataViewFactorInformation::ZoneSolarInfo(adjSurfEnclNum).TotalEnclosureDaylRefPoints = numAdjEnclRefPoints;
                     if (numAdjEnclRefPoints > 0) {
-                        if (!SurfWinSurfDayLightInit(SurfNum)) {
+                        if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNum)) {
                             SurfaceWindow(SurfNum).SolidAngAtRefPt.allocate(numAdjEnclRefPoints);
                             SurfaceWindow(SurfNum).SolidAngAtRefPt = 0.0;
                             SurfaceWindow(SurfNum).SolidAngAtRefPtWtd.allocate(numAdjEnclRefPoints);
@@ -4328,7 +4328,7 @@ namespace EnergyPlus::DaylightingManager {
                             SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
                             SurfaceWindow(SurfNum).LumWinFromRefPtRep.allocate(numAdjEnclRefPoints);
                             SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
-                            SurfWinSurfDayLightInit(SurfNum) = true;
+                            state.dataSurface->SurfWinSurfDayLightInit(SurfNum) = true;
                         }
                     }
                 }
@@ -5573,14 +5573,14 @@ namespace EnergyPlus::DaylightingManager {
 
                 // Associated surface is an exterior window; calculate light well efficiency.
 
-                SurfWinLightWellEff(SurfNum) = 1.0;
+                state.dataSurface->SurfWinLightWellEff(SurfNum) = 1.0;
                 HeightWell = rNumericArgs(1);
                 PerimWell = rNumericArgs(2);
                 AreaWell = rNumericArgs(3);
                 VisReflWell = rNumericArgs(4);
 
                 // Warning if light well area is less than window area
-                if (AreaWell < (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum) - 0.1)) {
+                if (AreaWell < (Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum) - 0.1)) {
                     ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + "=\"" + cAlphaArgs(1) + "\" - Areas.");
                     ShowContinueError(
                         state, format("has Area of Bottom of Well={:.1R} that is less than window area={:.1R}", Surface(SurfNum).Area, AreaWell));
@@ -5588,7 +5588,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 if (HeightWell >= 0.0 && PerimWell > 0.0 && AreaWell > 0.0) {
                     WellCavRatio = 2.5 * HeightWell * PerimWell / AreaWell;
-                    SurfWinLightWellEff(SurfNum) = std::exp(-WellCavRatio * (0.16368 - 0.14467 * VisReflWell));
+                    state.dataSurface->SurfWinLightWellEff(SurfNum) = std::exp(-WellCavRatio * (0.16368 - 0.14467 * VisReflWell));
                 }
             }
 
@@ -5655,8 +5655,8 @@ namespace EnergyPlus::DaylightingManager {
         for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
             IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             IS = 1;
-            if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                ((SurfWinShadingFlag(IWin) >= 1 && SurfWinShadingFlag(IWin) <= 9) || SurfWinSolarDiffusing(IWin)))
+            if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                ((state.dataSurface->SurfWinShadingFlag(IWin) >= 1 && state.dataSurface->SurfWinShadingFlag(IWin) <= 9) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                 IS = 2;
             // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
             // below, which is (0.2936)**0.6
@@ -5733,8 +5733,8 @@ namespace EnergyPlus::DaylightingManager {
             for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 IS = 1;
-                if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                    ((SurfWinShadingFlag(IWin) >= 1 && SurfWinShadingFlag(IWin) <= 9) || SurfWinSolarDiffusing(IWin)))
+                if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                    ((state.dataSurface->SurfWinShadingFlag(IWin) >= 1 && state.dataSurface->SurfWinShadingFlag(IWin) <= 9) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                     IS = 2;
                 // Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
                 // below, which is (0.2936)**0.6
@@ -6344,11 +6344,11 @@ namespace EnergyPlus::DaylightingManager {
                                                state.dataGlobal->WeightPreviousHour * (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 1, IL, loop) +
                                                                      state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 1, IL, loop)));
 
-                    if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                        (SurfWinShadingFlag(IWin) >= 1 || SurfWinSolarDiffusing(IWin))) {
+                    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                        (state.dataSurface->SurfWinShadingFlag(IWin) >= 1 || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
 
                         // ===Shaded window or window with diffusing glass===
-                        if (!SurfWinMovableSlats(IWin)) {
+                        if (!state.dataSurface->SurfWinMovableSlats(IWin)) {
                             // Shade, screen, blind with fixed slats, or diffusing glass
                             DFSKHR(2, ISky) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, IL, loop) +
                                                          state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state.dataGlobal->PreviousHour, 2, ISky, IL, loop));
@@ -6357,7 +6357,7 @@ namespace EnergyPlus::DaylightingManager {
                                 DFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                        state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
 
-                                if (!SurfWinSlatsBlockBeam(IWin))
+                                if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                     DFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                             state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                             }
@@ -6368,7 +6368,7 @@ namespace EnergyPlus::DaylightingManager {
                             if (ISky == 1) {
                                 BFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                        state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
-                                if (!SurfWinSlatsBlockBeam(IWin))
+                                if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                     BFSUHR(2) += VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                             state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                             }
@@ -6380,15 +6380,15 @@ namespace EnergyPlus::DaylightingManager {
                             if (ISky == 1) {
                                 SFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                        state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, IL, loop));
-                                if (!SurfWinSlatsBlockBeam(IWin))
+                                if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                     SFSUHR(2) +=
                                         VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, IL, loop) +
                                                    state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, IL, loop));
                             }
 
                         } else { // Blind with movable slats
-                            VarSlats = SurfWinMovableSlats(IWin);
-                            SlatAng = SurfWinSlatAngThisTS(IWin);
+                            VarSlats = state.dataSurface->SurfWinMovableSlats(IWin);
+                            SlatAng = state.dataSurface->SurfWinSlatAngThisTS(IWin);
 
                             DFSKHR(2, ISky) =
                                 VTRatio *
@@ -6411,7 +6411,7 @@ namespace EnergyPlus::DaylightingManager {
 
                                 // We add the contribution from the solar disk if slats do not block beam solar
                                 // TH CR 8010. DaylIllFacSunDisk needs to be interpolated!
-                                if (!SurfWinSlatsBlockBeam(IWin))
+                                if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin))
                                     DFSUHR(2) +=
                                         VTRatio *
                                         (state.dataGlobal->WeightNow *
@@ -6445,7 +6445,7 @@ namespace EnergyPlus::DaylightingManager {
                                              SlatAng, VarSlats, state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylBackFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
                                 // TH CR 8010. DaylBackFacSunDisk needs to be interpolated!
-                                if (!SurfWinSlatsBlockBeam(IWin)) {
+                                if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                     BFSUHR(2) +=
                                         VTRatio *
                                         (state.dataGlobal->WeightNow *
@@ -6481,7 +6481,7 @@ namespace EnergyPlus::DaylightingManager {
                                                        state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, IL, loop)));
 
                                 // TH CR 8010. DaylSourceFacSunDisk needs to be interpolated!
-                                if (!SurfWinSlatsBlockBeam(IWin)) {
+                                if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                     SFSUHR(2) +=
                                         VTRatio *
                                         (state.dataGlobal->WeightNow *
@@ -6516,8 +6516,8 @@ namespace EnergyPlus::DaylightingManager {
                 HorIllSkyFac = state.dataEnvrn->HISKF / ((1 - SkyWeight) * HorIllSky(ISky2) + SkyWeight * HorIllSky(ISky1));
 
                 for (IS = 1; IS <= 2; ++IS) {
-                    if (IS == 2 && (SurfWinWindowModelType(IWin) == WindowBSDFModel)) break;
-                    if (IS == 2 && SurfWinShadingFlag(IWin) <= 0 && !SurfWinSolarDiffusing(IWin)) break;
+                    if (IS == 2 && (state.dataSurface->SurfWinWindowModelType(IWin) == WindowBSDFModel)) break;
+                    if (IS == 2 && state.dataSurface->SurfWinShadingFlag(IWin) <= 0 && !state.dataSurface->SurfWinSolarDiffusing(IWin)) break;
 
                     state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) =
                         DFSUHR(IS) * state.dataEnvrn->HISUNF +
@@ -6558,7 +6558,7 @@ namespace EnergyPlus::DaylightingManager {
             ICtrl = Surface(IWin).activeWindowShadingControl;
             if (Surface(IWin).HasShadeControl && ISWFLG == 0) {
                 if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
-                    SurfWinShadingFlag(IWin) == GlassConditionallyLightened)
+                    state.dataSurface->SurfWinShadingFlag(IWin) == GlassConditionallyLightened)
                     ISWFLG = 1;
             }
 
@@ -6568,8 +6568,8 @@ namespace EnergyPlus::DaylightingManager {
             //   the window is initialized at clear state: IS = 1
             //  For other windows with glare control, the shading flag is initialized at >10, to be determined
             IS = 1;
-            if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                ((SurfWinShadingFlag(IWin) >= 1 && SurfWinShadingFlag(IWin) <= 9) || SurfWinSolarDiffusing(IWin)))
+            if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                ((state.dataSurface->SurfWinShadingFlag(IWin) >= 1 && state.dataSurface->SurfWinShadingFlag(IWin) <= 9) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                 IS = 2;
 
             for (IL = 1; IL <= NREFPT; ++IL) {
@@ -6613,11 +6613,11 @@ namespace EnergyPlus::DaylightingManager {
 
                     ICtrl = Surface(IWin).activeWindowShadingControl;
                     IS = 1;
-                    if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                        ((SurfWinShadingFlag(IWin) >= 1 && SurfWinShadingFlag(IWin) <= 9) || SurfWinSolarDiffusing(IWin)))
+                    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                        ((state.dataSurface->SurfWinShadingFlag(IWin) >= 1 && state.dataSurface->SurfWinShadingFlag(IWin) <= 9) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                         IS = 2;
                     if (Surface(IWin).HasShadeControl) {
-                        if (SurfWinShadingFlag(IWin) == GlassConditionallyLightened &&
+                        if (state.dataSurface->SurfWinShadingFlag(IWin) == GlassConditionallyLightened &&
                             WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
                             DILLSW(igroup) += state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
                             previously_shaded(loop) = true;
@@ -6662,39 +6662,39 @@ namespace EnergyPlus::DaylightingManager {
                             continueOuterLoop = true;
                             continue;
                         }
-                        if (SurfWinShadingFlag(IWin) != GlassConditionallyLightened ||
+                        if (state.dataSurface->SurfWinShadingFlag(IWin) != GlassConditionallyLightened ||
                             WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
                             continueOuterLoop = true;
                             continue;
                         }
 
                         IConst = Surface(IWin).Construction;
-                        if (SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
+                        if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
                         // Vis trans at normal incidence of unswitched glass
-                        TVIS1(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
+                        TVIS1(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
                         // Vis trans at normal incidence of fully switched glass
                         IConstShaded = Surface(IWin).activeShadedConstruction;
-                        TVIS2(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
+                        TVIS2(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
                         // Reset shading flag to indicate that window is shaded by being partially or fully switched
-                        SurfWinShadingFlag(IWin) = SwitchableGlazing;
+                        state.dataSurface->SurfWinShadingFlag(IWin) = SwitchableGlazing;
 
                         // ASETIL < 0 means illuminance from non-daylight-switchable windows exceeds setpoint,
                         // so completely switch all daylight-switchable windows to minimize solar gain
                         if (ASETIL(igroup) <= 0.0) {
-                            SurfWinSwitchingFactor(IWin) = 1.0;
-                            SurfWinVisTransSelected(IWin) = TVIS2(igroup);
+                            state.dataSurface->SurfWinSwitchingFactor(IWin) = 1.0;
+                            state.dataSurface->SurfWinVisTransSelected(IWin) = TVIS2(igroup);
                         } else {
                             // Case where 0 < ASETIL < 1: darken glass in all
                             // daylight-switchable windows to just meet illuminance setpoint
                             // From this equation: SETPNT(1) = DILLUN + DILLSW/TVIS1 * VisTransSelected
-                            SurfWinVisTransSelected(IWin) = max(TVIS2(igroup), ASETIL(igroup) * TVIS1(igroup)) + 0.000001;
-                            SurfWinSwitchingFactor(IWin) =
-                                (TVIS1(igroup) - SurfWinVisTransSelected(IWin)) / (TVIS1(igroup) - TVIS2(igroup) + 0.000001);
+                            state.dataSurface->SurfWinVisTransSelected(IWin) = max(TVIS2(igroup), ASETIL(igroup) * TVIS1(igroup)) + 0.000001;
+                            state.dataSurface->SurfWinSwitchingFactor(IWin) =
+                                (TVIS1(igroup) - state.dataSurface->SurfWinVisTransSelected(IWin)) / (TVIS1(igroup) - TVIS2(igroup) + 0.000001);
                             // bound switching factor between 0 and 1
-                            SurfWinSwitchingFactor(IWin) = min(1.0, SurfWinSwitchingFactor(IWin));
-                            SurfWinSwitchingFactor(IWin) = max(0.0, SurfWinSwitchingFactor(IWin));
+                            state.dataSurface->SurfWinSwitchingFactor(IWin) = min(1.0, state.dataSurface->SurfWinSwitchingFactor(IWin));
+                            state.dataSurface->SurfWinSwitchingFactor(IWin) = max(0.0, state.dataSurface->SurfWinSwitchingFactor(IWin));
                         }
 
                         // Adjust daylight quantities based on ratio between switched and unswitched visible transmittance
@@ -6702,14 +6702,14 @@ namespace EnergyPlus::DaylightingManager {
                             // DaylIllum(IL) and BacLum(IL) were calculated at the clear state: IS = 1,
                             //  and need to adjusted for intermediate switched state at VisTransSelected: IS = 2
                             IS = 1;
-                            VTRAT = SurfWinVisTransSelected(IWin) / (TVIS1(igroup) + 0.000001);
+                            VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (TVIS1(igroup) + 0.000001);
                             state.dataDaylightingManager->DaylIllum(IL) += (VTRAT - 1.0) * state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL);
                             state.dataDaylightingData->ZoneDaylight(ZoneNum).BacLum(IL) += (VTRAT - 1.0) * state.dataDaylightingData->ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL);
 
                             // Adjust illum, background illum and source luminance for this window in intermediate switched state
                             //  for later use in the DayltgGlare calc because SurfaceWindow(IWin)%ShadingFlag = SwitchableGlazing = 2
                             IS = 2;
-                            VTRAT = SurfWinVisTransSelected(IWin) / (TVIS2(igroup) + 0.000001);
+                            VTRAT = state.dataSurface->SurfWinVisTransSelected(IWin) / (TVIS2(igroup) + 0.000001);
                             state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpIllumFromWinAtRefPt(loop, IS, IL);
                             state.dataDaylightingData->ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpBackLumFromWinAtRefPt(loop, IS, IL);
                             state.dataDaylightingData->ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, IS, IL) = VTRAT * tmpSourceLumFromWinAtRefPt(loop, IS, IL);
@@ -6779,7 +6779,7 @@ namespace EnergyPlus::DaylightingManager {
                     // Check if window is eligible for glare control
                     // TH 1/21/2010. Switchable glazings already in partially switched state
                     //  should be allowed to further dim to control glare
-                    if (SurfWinShadingFlag(IWin) < 10 && SurfWinShadingFlag(IWin) != SwitchableGlazing) {
+                    if (state.dataSurface->SurfWinShadingFlag(IWin) < 10 && state.dataSurface->SurfWinShadingFlag(IWin) != SwitchableGlazing) {
                         continueOuterLoop = false;
                         continue;
                     }
@@ -6804,7 +6804,7 @@ namespace EnergyPlus::DaylightingManager {
                         // Recalculate illuminance and glare with shading on this window.
                         //  For switchable glazings, this is the fully switched (dark) state
                         for (IL = 1; IL <= NREFPT; ++IL) {
-                            if (SurfWinShadingFlag(IWin) != SwitchableGlazing) {
+                            if (state.dataSurface->SurfWinShadingFlag(IWin) != SwitchableGlazing) {
                                 // for non switchable glazings or switchable glazings not switched yet (still in clear state)
                                 //  SurfaceWindow(IWin)%ShadingFlag = GlassConditionallyLightened
                                 RDAYIL(IL, igroup) = state.dataDaylightingManager->DaylIllum(IL) - WDAYIL(1, IL, igroup) + WDAYIL(2, IL, igroup);
@@ -6816,11 +6816,11 @@ namespace EnergyPlus::DaylightingManager {
                             }
                         }
 
-                        if (SurfWinShadingFlag(IWin) != SwitchableGlazing) SurfWinShadingFlag(IWin) /= 10;
+                        if (state.dataSurface->SurfWinShadingFlag(IWin) != SwitchableGlazing) state.dataSurface->SurfWinShadingFlag(IWin) /= 10;
 
                         // For switchable glazings, it is switched to fully dark state,
                         // update ZoneDaylight(ZoneNum)%SourceLumFromWinAtRefPt(IL,2,loop) for use in DayltgGlare
-                        if (SurfWinShadingFlag(IWin) == SwitchableGlazing) {
+                        if (state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
                             for (IL = 1; IL <= NREFPT; ++IL) {
                                 state.dataDaylightingData->ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt(loop, 2, IL) = tmpSourceLumFromWinAtRefPt(loop, 2, IL);
                                 state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL);
@@ -6829,11 +6829,11 @@ namespace EnergyPlus::DaylightingManager {
 
                             IConst = Surface(IWin).Construction;
                             // Vis trans at normal incidence of unswitched glass
-                            TVIS1(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
+                            TVIS1(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
                             // Vis trans at normal incidence of fully switched glass
                             IConstShaded = Surface(IWin).activeShadedConstruction;
-                            TVIS2(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
+                            TVIS2(igroup) = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
                         }
                     }
                 }
@@ -6890,7 +6890,7 @@ namespace EnergyPlus::DaylightingManager {
                     ++count;
                     // need to map back to the original order of the "loop" to not change all the other data structures
                     loop = state.dataDaylightingData->ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(count);
-                    if (SurfWinShadingFlag(IWin) < 10 && SurfWinShadingFlag(IWin) != SwitchableGlazing) continue;
+                    if (state.dataSurface->SurfWinShadingFlag(IWin) < 10 && state.dataSurface->SurfWinShadingFlag(IWin) != SwitchableGlazing) continue;
 
                     ICtrl = Surface(IWin).activeWindowShadingControl;
                     if (!Surface(IWin).HasShadeControl) continue;
@@ -6900,9 +6900,9 @@ namespace EnergyPlus::DaylightingManager {
                         // Reset shading flag to no shading condition, go to next window.
                         if (blnCycle) {
                             //  for switchable glazings, reset properties to clear state or partial switched state?
-                            if (SurfWinShadingFlag(IWin) == SwitchableGlazing) {
-                                SurfWinSwitchingFactor(IWin) = 0.0;
-                                SurfWinVisTransSelected(IWin) = TVIS1(igroup);
+                            if (state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
+                                state.dataSurface->SurfWinSwitchingFactor(IWin) = 0.0;
+                                state.dataSurface->SurfWinVisTransSelected(IWin) = TVIS1(igroup);
 
                                 // RESET properties for fully dark state
                                 for (IL = 1; IL <= NREFPT; ++IL) {
@@ -6912,7 +6912,7 @@ namespace EnergyPlus::DaylightingManager {
                                 }
                             }
 
-                            SurfWinShadingFlag(IWin) = ShadeOff;
+                            state.dataSurface->SurfWinShadingFlag(IWin) = ShadeOff;
                             continue;
                         }
 
@@ -6933,12 +6933,12 @@ namespace EnergyPlus::DaylightingManager {
                         //  This was addressed in CR 7984 for E+ 5.0. 1/19/2010
 
                         // If switchable glazing, set switching factor to 1: fully switched.
-                        if (SurfWinShadingFlag(IWin) == SwitchableGlazing) {
+                        if (state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
                             // tmpSWFactor0 = SurfaceWindow( IWin ).SwitchingFactor; // save original
                             // switching  factor
                             ////Unused Set but never used
-                            SurfWinSwitchingFactor(IWin) = 1.0;
-                            SurfWinVisTransSelected(IWin) = TVIS2(igroup);
+                            state.dataSurface->SurfWinSwitchingFactor(IWin) = 1.0;
+                            state.dataSurface->SurfWinVisTransSelected(IWin) = TVIS2(igroup);
 
                             // restore fully dark values
                             for (IL = 1; IL <= NREFPT; ++IL) {
@@ -6960,7 +6960,7 @@ namespace EnergyPlus::DaylightingManager {
                         }
 
                         if (GlareOK) {
-                            if (SurfWinShadingFlag(IWin) == SwitchableGlazing &&
+                            if (state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing &&
                                 WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
                                 // Added TH 1/14/2010
                                 // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
@@ -7050,8 +7050,8 @@ namespace EnergyPlus::DaylightingManager {
                                     state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, 2, IL) = tmpIllumFromWinAtRefPt(loop, 2, IL) * tmpMult;
                                     state.dataDaylightingData->ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt(loop, 2, IL) = tmpBackLumFromWinAtRefPt(loop, 2, IL) * tmpMult;
                                 }
-                                SurfWinSwitchingFactor(IWin) = tmpSWFactor;
-                                SurfWinVisTransSelected(IWin) = TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor;
+                                state.dataSurface->SurfWinSwitchingFactor(IWin) = tmpSWFactor;
+                                state.dataSurface->SurfWinVisTransSelected(IWin) = TVIS1(igroup) - (TVIS1(igroup) - TVIS2(igroup)) * tmpSWFactor;
 
                             } else {
                                 // For un-switchable glazing or switchable glazing but not MeetDaylightIlluminaceSetpoint control,
@@ -7072,7 +7072,7 @@ namespace EnergyPlus::DaylightingManager {
         for (IWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IWin) {
             if (Surface(IWin).Class != SurfaceClass::Window) continue;
             if (Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
-            if (SurfWinShadingFlag(IWin) >= 10) SurfWinShadingFlag(IWin) = ShadeOff;
+            if (state.dataSurface->SurfWinShadingFlag(IWin) >= 10) state.dataSurface->SurfWinShadingFlag(IWin) = ShadeOff;
         }
 
         // Variables for reporting
@@ -7100,7 +7100,7 @@ namespace EnergyPlus::DaylightingManager {
             for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 IS = 1;
-                if (SurfWinShadingFlag(IWin) > 0 || SurfWinSolarDiffusing(IWin)) IS = 2;
+                if (state.dataSurface->SurfWinShadingFlag(IWin) > 0 || state.dataSurface->SurfWinSolarDiffusing(IWin)) IS = 2;
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                     int refPtCount = 0;
                     for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
@@ -7674,13 +7674,13 @@ namespace EnergyPlus::DaylightingManager {
         FLCWSU = 0.0;
 
         IConst = Surface(IWin).Construction;
-        if (SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
+        if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
         BlindOn = false;
         ShadeOn = false;
         ScreenOn = false;
 
-        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
-            PipeNum = SurfWinTDDPipeNum(IWin);
+        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+            PipeNum = state.dataSurface->SurfWinTDDPipeNum(IWin);
         }
 
         ShelfNum = Surface(IWin).Shelf;
@@ -7698,8 +7698,8 @@ namespace EnergyPlus::DaylightingManager {
         // Azimuth ranges over a maximum of 2 Pi radians.
         // Altitude ranges over a maximum of Pi/2 radians between -Pi/2 < PH < +Pi/2, so that elements are not counted twice
         // PH = 0 at the horizon; PH = Pi/2 at the zenith
-        PHMIN = max(-DataGlobalConstants::PiOvr2, SurfWinPhi(IWin) - DataGlobalConstants::PiOvr2);
-        PHMAX = min(DataGlobalConstants::PiOvr2, SurfWinPhi(IWin) + DataGlobalConstants::PiOvr2);
+        PHMIN = max(-DataGlobalConstants::PiOvr2, state.dataSurface->SurfWinPhi(IWin) - DataGlobalConstants::PiOvr2);
+        PHMAX = min(DataGlobalConstants::PiOvr2, state.dataSurface->SurfWinPhi(IWin) + DataGlobalConstants::PiOvr2);
         DPH = (PHMAX - PHMIN) / double(NPHMAX);
 
         // Sky/ground element altitude integration
@@ -7713,8 +7713,8 @@ namespace EnergyPlus::DaylightingManager {
             U(3) = SPH;
 
             // Limits of azimuth integration
-            PhWin = SurfWinPhi(IWin);
-            ThWin = SurfWinTheta(IWin);
+            PhWin = state.dataSurface->SurfWinPhi(IWin);
+            ThWin = state.dataSurface->SurfWinTheta(IWin);
             if (PhWin >= 0.0) {
                 if (PH >= DataGlobalConstants::PiOvr2 - PhWin) {
                     ThMin = -DataGlobalConstants::Pi;
@@ -7740,14 +7740,14 @@ namespace EnergyPlus::DaylightingManager {
             DA = CPH * DTH * DPH;
 
             // Sky/ground element azimuth integration
-            Real64 const sin_window_phi(std::sin(SurfWinPhi(IWin)));
-            Real64 const cos_window_phi(std::cos(SurfWinPhi(IWin)));
+            Real64 const sin_window_phi(std::sin(state.dataSurface->SurfWinPhi(IWin)));
+            Real64 const cos_window_phi(std::cos(state.dataSurface->SurfWinPhi(IWin)));
             for (ITH = 1; ITH <= NTHMAX; ++ITH) {
                 TH = ThMin + (double(ITH) - 0.5) * DTH;
                 U(1) = CPH * std::cos(TH);
                 U(2) = CPH * std::sin(TH);
                 // Cosine of angle of incidence of light from sky or ground element
-                COSB = SPH * sin_window_phi + CPH * cos_window_phi * std::cos(TH - SurfWinTheta(IWin));
+                COSB = SPH * sin_window_phi + CPH * cos_window_phi * std::cos(TH - state.dataSurface->SurfWinTheta(IWin));
                 if (COSB < 0.0) continue; // Sky/ground elements behind window (although there shouldn't be any)
 
                 // Initialize illuminance on window for this sky/ground element
@@ -7834,7 +7834,7 @@ namespace EnergyPlus::DaylightingManager {
                                 ObsVisRefl = 1.0 - state.dataMaterial->Material(state.dataConstruction->Construct(ObsConstrNum).LayerPoint(1)).AbsorpVisible;
                             } else {
                                 // Obstruction is a window; assume it is bare
-                                if (SurfWinStormWinFlag(NearestHitSurfNum) == 1)
+                                if (state.dataSurface->SurfWinStormWinFlag(NearestHitSurfNum) == 1)
                                     ObsConstrNum = Surface(NearestHitSurfNum).StormWinConstruction;
                                 ObsVisRefl = state.dataConstruction->Construct(ObsConstrNum).ReflectVisDiffFront;
                             }
@@ -7877,15 +7877,15 @@ namespace EnergyPlus::DaylightingManager {
                 // FLCW--(I,J) = part of incoming flux (in lumens) that goes up to ceiling and upper part of walls.
                 // FLFW--(I,J) = part that goes down to floor and lower part of walls
 
-                if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                     // Unshaded visible transmittance of TDD for a single ray from sky/ground element
-                    TVISBR = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
+                    TVISBR = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
 
                     // Make all transmitted light diffuse for a TDD with a bare diffuser
                     for (ISky = 1; ISky <= 4; ++ISky) {
                         state.dataDaylightingManager->WLUMSK(IHR, 1, ISky) += ZSK(ISky) * TVISBR / DataGlobalConstants::Pi;
-                        FLFWSK(1, ISky) += ZSK(ISky) * TVISBR * (1.0 - SurfWinFractionUpgoing(IWin));
-                        FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * SurfWinFractionUpgoing(IWin);
+                        FLFWSK(1, ISky) += ZSK(ISky) * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                        FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                         // For later calculation of diffuse visible transmittance
                         state.dataDaylightingManager->TDDFluxInc(IHR, ISky, PipeNum) += ZSK(ISky);
@@ -7893,8 +7893,8 @@ namespace EnergyPlus::DaylightingManager {
 
                         if (ISky == 1) {
                             state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU * TVISBR / DataGlobalConstants::Pi;
-                            FLFWSU(1) += ZSU * TVISBR * (1.0 - SurfWinFractionUpgoing(IWin));
-                            FLCWSU(1) += ZSU * TVISBR * SurfWinFractionUpgoing(IWin);
+                            FLFWSU(1) += ZSU * TVISBR * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                            FLCWSU(1) += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                             // For later calculation of diffuse visible transmittance
                             state.dataDaylightingManager->TDDFluxInc(IHR, ISky, PipeNum) += ZSU;
@@ -7905,16 +7905,16 @@ namespace EnergyPlus::DaylightingManager {
                 } else { // Bare window
 
                     // Transmittance of bare window for this sky/ground element
-                    TVISBR = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                    TVISBR = POLYF(COSB, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                     if (InShelfSurf > 0) { // Inside daylighting shelf
                         // Daylighting shelf simplification:  All light is diffuse
                         // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                         for (ISky = 1; ISky <= 4; ++ISky) {
-                            FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * SurfWinFractionUpgoing(IWin);
+                            FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                             if (ISky == 1) {
-                                FLCWSU(1) += ZSU * TVISBR * SurfWinFractionUpgoing(IWin);
+                                FLCWSU(1) += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
                             }
                         }
 
@@ -7931,8 +7931,8 @@ namespace EnergyPlus::DaylightingManager {
                                 PierceSurface(IntWinNum, SurfaceWindow(IntWinNum).WinCenter, SUNCOS_IHR, ObsHitPt, hitObs);
                                 if (hitObs) { // disk passes thru
                                     // cosine of incidence angle of light from sky or ground element for
-                                    COSBintWin = SPH * std::sin(SurfWinPhi(IntWinNum)) +
-                                                 CPH * std::cos(SurfWinPhi(IntWinNum)) * std::cos(TH - SurfWinTheta(IntWinNum));
+                                    COSBintWin = SPH * std::sin(state.dataSurface->SurfWinPhi(IntWinNum)) +
+                                                 CPH * std::cos(state.dataSurface->SurfWinPhi(IntWinNum)) * std::cos(TH - state.dataSurface->SurfWinTheta(IntWinNum));
                                     TVISBR *= POLYF(COSBintWin, state.dataConstruction->Construct(Surface(IntWinNum).Construction).TransVisBeamCoef);
                                     break;
                                 }
@@ -7960,7 +7960,7 @@ namespace EnergyPlus::DaylightingManager {
                 ICtrl = Surface(IWin).activeWindowShadingControl;
                 if (Surface(IWin).HasShadeControl) {
                     ShType = WindowShadingControl(ICtrl).ShadingType;
-                    BlNum = SurfWinBlindNumber(IWin);
+                    BlNum = state.dataSurface->SurfWinBlindNumber(IWin);
                     //                    ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
                     ShadeOn = (ShType == WSC_ST_InteriorShade || ShType == WSC_ST_ExteriorShade || ShType == WSC_ST_BetweenGlassShade);
@@ -7968,7 +7968,7 @@ namespace EnergyPlus::DaylightingManager {
                     ScreenOn = (ShType == WSC_ST_ExteriorScreen);
                 }
 
-                if (ShadeOn || BlindOn || ScreenOn || SurfWinSolarDiffusing(IWin)) {
+                if (ShadeOn || BlindOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) {
 
                     // ===Window with interior or exterior shade or blind, exterior screen, or with diffusing glass===
 
@@ -7990,31 +7990,31 @@ namespace EnergyPlus::DaylightingManager {
                     // element from which the light came.
 
                     IConstShaded = Surface(IWin).activeShadedConstruction;
-                    if (SurfWinStormWinFlag(IWin) == 1) IConstShaded = Surface(IWin).activeStormWinShadedConstruction;
-                    if (SurfWinSolarDiffusing(IWin)) IConstShaded = Surface(IWin).Construction;
+                    if (state.dataSurface->SurfWinStormWinFlag(IWin) == 1) IConstShaded = Surface(IWin).activeStormWinShadedConstruction;
+                    if (state.dataSurface->SurfWinSolarDiffusing(IWin)) IConstShaded = Surface(IWin).Construction;
 
                     // Transmittance of window including shade, screen or blind
                     TransBmBmMult = 0.0;
                     TransMult = 0.0;
 
                     if (ShadeOn) { // Shade
-                        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             // Shaded visible transmittance of TDD for a single ray from sky/ground element
-                            TransMult(1) = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
+                            TransMult(1) = TransTDD(state, PipeNum, COSB, DataDaylightingDevices::iRadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                         } else { // Shade only, no TDD
                             // Calculate transmittance of the combined window and shading device for this sky/ground element
-                            TransMult(1) = POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) *
-                                           SurfWinLightWellEff(IWin);
+                            TransMult(1) = POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
+                                           state.dataSurface->SurfWinLightWellEff(IWin);
                         }
 
                     } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
-                        CalcScreenTransmittance(state, IWin, (PH - SurfWinPhi(IWin)), (TH - SurfWinTheta(IWin)));
+                        CalcScreenTransmittance(state, IWin, (PH - state.dataSurface->SurfWinPhi(IWin)), (TH - state.dataSurface->SurfWinTheta(IWin)));
                         ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                        ReflScDiffDiffBack = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).DifReflectVis;
-                        TransScBmDiffFront = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmDifTransVis;
-                        TransMult(1) = TransScBmDiffFront * SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
-                                       (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * SurfWinLightWellEff(IWin);
-                        TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis;
+                        ReflScDiffDiffBack = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).DifReflectVis;
+                        TransScBmDiffFront = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).BmDifTransVis;
+                        TransMult(1) = TransScBmDiffFront * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
+                                       (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * state.dataSurface->SurfWinLightWellEff(IWin);
+                        TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTransVis;
 
                     } else if (BlindOn) { // Blind: get beam-diffuse and beam-beam vis trans of blind+glazing system
                         // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
@@ -8023,7 +8023,7 @@ namespace EnergyPlus::DaylightingManager {
                         ProfileAngle(IWin, U, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
-                            if (!SurfWinMovableSlats(IWin) && JB > 1) break;
+                            if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
                             TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
@@ -8038,8 +8038,8 @@ namespace EnergyPlus::DaylightingManager {
                             } else if (ShType == WSC_ST_ExteriorBlind) { // Exterior blind
                                 ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
                                 ReflBlDiffDiffBack = state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB);
-                                TransMult(JB) = TransBlBmDiffFront * SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
-                                                (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * SurfWinLightWellEff(IWin);
+                                TransMult(JB) = TransBlBmDiffFront * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
+                                                (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 1));
@@ -8052,18 +8052,18 @@ namespace EnergyPlus::DaylightingManager {
                                 rbshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
-                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
+                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                                 } else { // 3 glass layers; blind between layers 2 and 3
                                     t2 = POLYF(COSB, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 2));
                                     td3 = state.dataConstruction->Construct(IConst).tBareVisDiff(3);
                                     rfd3 = state.dataConstruction->Construct(IConst).rfBareVisDiff(3);
                                     rbd2 = state.dataConstruction->Construct(IConst).rbBareVisDiff(2);
                                     TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) *
-                                                    td3 * SurfWinLightWellEff(IWin);
+                                                    td3 * state.dataSurface->SurfWinLightWellEff(IWin);
                                 }
                             }
 
-                            if (SurfWinMovableSlats(IWin)) {
+                            if (state.dataSurface->SurfWinMovableSlats(IWin)) {
                                 SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                             } else {
                                 SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
@@ -8075,10 +8075,10 @@ namespace EnergyPlus::DaylightingManager {
 
                     } else { // Diffusing glass
                         TransMult(1) =
-                            POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                            POLYF(COSB, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                     } // End of check if shade, blind or diffusing glass
 
-                    if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                    if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                         // No beam is transmitted.  This takes care of all types of screens and blinds.
                         TransBmBmMult = 0.0;
                     }
@@ -8094,18 +8094,18 @@ namespace EnergyPlus::DaylightingManager {
                     for (ISky = 1; ISky <= 4; ++ISky) {
                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                             // EXIT after first pass if not movable slats or exterior window screen
-                            if (!SurfWinMovableSlats(IWin) && JB > 1) break;
+                            if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
                             state.dataDaylightingManager->WLUMSK(IHR, JB + 1, ISky) += ZSK(ISky) * TransMult(JB) / DataGlobalConstants::Pi;
-                            FLFWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * (1.0 - SurfWinFractionUpgoing(IWin));
+                            FLFWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                             if (PH > 0.0 && (BlindOn || ScreenOn)) FLFWSK(JB + 1, ISky) += ZSK(ISky) * TransBmBmMult(JB);
-                            FLCWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * SurfWinFractionUpgoing(IWin);
+                            FLCWSK(JB + 1, ISky) += ZSK(ISky) * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
                             if (PH <= 0.0 && (BlindOn || ScreenOn)) FLCWSK(JB + 1, ISky) += ZSK(ISky) * TransBmBmMult(JB);
                             if (ISky == 1) {
                                 state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU * TransMult(JB) / DataGlobalConstants::Pi;
-                                FLFWSU(JB + 1) += ZSU * TransMult(JB) * (1.0 - SurfWinFractionUpgoing(IWin));
+                                FLFWSU(JB + 1) += ZSU * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                                 if (PH > 0.0 && (BlindOn || ScreenOn)) FLFWSU(JB + 1) += ZSU * TransBmBmMult(JB);
-                                FLCWSU(JB + 1) += ZSU * TransMult(JB) * SurfWinFractionUpgoing(IWin);
+                                FLCWSU(JB + 1) += ZSU * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
                                 if (PH <= 0.0 && (BlindOn || ScreenOn)) FLCWSU(JB + 1) += ZSU * TransBmBmMult(JB);
                             }
                         }
@@ -8127,11 +8127,11 @@ namespace EnergyPlus::DaylightingManager {
                 ZSK(ISky) = state.dataDaylightingManager->GILSK(IHR, ISky) * 1.0 * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
 
                 // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
-                FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * SurfWinFractionUpgoing(IWin);
+                FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                 if (ISky == 1) {
                     ZSU = state.dataDaylightingManager->GILSU(IHR) * state.dataHeatBal->SunlitFracHR(IHR, OutShelfSurf) * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
-                    FLCWSU(1) += ZSU * TVISBR * SurfWinFractionUpgoing(IWin);
+                    FLCWSU(1) += ZSU * TVISBR * state.dataSurface->SurfWinFractionUpgoing(IWin);
                 }
             } // ISKY
         }
@@ -8142,12 +8142,12 @@ namespace EnergyPlus::DaylightingManager {
 
         for (ISky = 1; ISky <= 4; ++ISky) {
             for (JSH = 1; JSH <= MaxSlatAngs + 1; ++JSH) {
-                if (!SurfWinMovableSlats(IWin) && JSH > 2) break;
+                if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
                 // Full area of window is used in following since effect of dividers on reducing
                 // effective window transmittance has already been accounted for in calc of FLFWSK and FLCWSK.
                 state.dataDaylightingManager->EINTSK(IHR, JSH, ISky) =
-                    (FLFWSK(JSH, ISky) * SurfWinRhoFloorWall(IWin) + FLCWSK(JSH, ISky) * SurfWinRhoCeilingWall(IWin)) *
-                    (Surface(IWin).Area / SurfWinGlazedFrac(IWin)) / (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
+                    (FLFWSK(JSH, ISky) * state.dataSurface->SurfWinRhoFloorWall(IWin) + FLCWSK(JSH, ISky) * state.dataSurface->SurfWinRhoCeilingWall(IWin)) *
+                    (Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) / (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
             } // JSH
         }     // ISKY
 
@@ -8158,7 +8158,7 @@ namespace EnergyPlus::DaylightingManager {
         if (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0) {
             // Cos of angle of incidence
             COSBSun =
-                state.dataDaylightingManager->SPHSUN * std::sin(SurfWinPhi(IWin)) + state.dataDaylightingManager->CPHSUN * std::cos(SurfWinPhi(IWin)) * std::cos(state.dataDaylightingManager->THSUN - SurfWinTheta(IWin));
+                state.dataDaylightingManager->SPHSUN * std::sin(state.dataSurface->SurfWinPhi(IWin)) + state.dataDaylightingManager->CPHSUN * std::cos(state.dataSurface->SurfWinPhi(IWin)) * std::cos(state.dataDaylightingManager->THSUN - state.dataSurface->SurfWinTheta(IWin));
 
             if (COSBSun > 0.0) {
                 // Multiply direct normal illuminance (normalized to 1.0 lux)
@@ -8172,19 +8172,19 @@ namespace EnergyPlus::DaylightingManager {
 
                 // -- Bare window
 
-                if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                     // Unshaded visible transmittance of TDD for collimated beam from the sun
-                    TVISBSun = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
+                    TVISBSun = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                     state.dataDaylightingManager->TDDTransVisBeam(IHR, PipeNum) = TVISBSun;
 
                     FLFWSUdisk(1) = 0.0; // Diffuse light only
 
                     state.dataDaylightingManager->WLUMSU(IHR, 1) += ZSU1 * TVISBSun / DataGlobalConstants::Pi;
-                    FLFWSU(1) += ZSU1 * TVISBSun * (1.0 - SurfWinFractionUpgoing(IWin));
-                    FLCWSU(1) += ZSU1 * TVISBSun * SurfWinFractionUpgoing(IWin);
+                    FLFWSU(1) += ZSU1 * TVISBSun * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                    FLCWSU(1) += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
 
                 } else { // Bare window
-                    TVISBSun = POLYF(COSBSun, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                    TVISBSun = POLYF(COSBSun, state.dataConstruction->Construct(IConst).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                     // Daylighting shelf simplification:  No beam makes it past end of shelf, all light is diffuse
                     if (InShelfSurf > 0) {   // Inside daylighting shelf
@@ -8193,14 +8193,14 @@ namespace EnergyPlus::DaylightingManager {
                         // SurfaceWindow(IWin)%FractionUpgoing is already set to 1.0 earlier
                         // WLUMSU(1,IHR) = WLUMSU(1,IHR) + ZSU1 * TVISBSun / PI
                         // FLFWSU(1) = FLFWSU(1) + ZSU1 * TVISBSun * (1.0 - SurfaceWindow(IWin)%FractionUpgoing)
-                        FLCWSU(1) += ZSU1 * TVISBSun * SurfWinFractionUpgoing(IWin);
+                        FLCWSU(1) += ZSU1 * TVISBSun * state.dataSurface->SurfWinFractionUpgoing(IWin);
                     } else { // Normal window
                         FLFWSUdisk(1) = ZSU1 * TVISBSun;
                     }
                 }
 
                 // -- Window with shade, screen, blind or diffusing glass
-                if (ShadeOn || BlindOn || ScreenOn || SurfWinSolarDiffusing(IWin)) {
+                if (ShadeOn || BlindOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) {
                     TransBmBmMult = 0.0;
                     TransMult = 0.0;
 
@@ -8208,19 +8208,19 @@ namespace EnergyPlus::DaylightingManager {
                     if (BlindOn) ProfileAngle(IWin, state.dataSurface->SUNCOSHR(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
-                        if (!SurfWinMovableSlats(IWin) && JB > 1) break;
+                        if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                        if (ShadeOn || ScreenOn || SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
-                            if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                        if (ShadeOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade or screen on or diffusing glass
+                            if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                                 // Shaded visible transmittance of TDD for collimated beam from the sun
-                                TransMult(1) = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
+                                TransMult(1) = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * state.dataSurface->SurfWinGlazedFrac(IWin);
                             } else {
                                 if (ScreenOn) {
-                                    TransMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis * SurfWinGlazedFrac(IWin) *
-                                                   SurfWinLightWellEff(IWin);
+                                    TransMult(1) = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).BmBmTransVis * state.dataSurface->SurfWinGlazedFrac(IWin) *
+                                                   state.dataSurface->SurfWinLightWellEff(IWin);
                                 } else {
-                                    TransMult(1) = POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) *
-                                                   SurfWinLightWellEff(IWin);
+                                    TransMult(1) = POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin) *
+                                                   state.dataSurface->SurfWinLightWellEff(IWin);
                                 }
                             }
 
@@ -8247,7 +8247,7 @@ namespace EnergyPlus::DaylightingManager {
                                 TransMult(JB) =
                                     TransBlBmDiffFront *
                                     (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
-                                    SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 1));
@@ -8255,14 +8255,14 @@ namespace EnergyPlus::DaylightingManager {
                                 rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
-                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
+                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                                 } else { // 3 glass layers; blind between layers 2 and 3
                                     t2 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 2));
                                     TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) *
-                                                    td3 * SurfWinLightWellEff(IWin);
+                                                    td3 * state.dataSurface->SurfWinLightWellEff(IWin);
                                 }
                             }
-                            if (SurfWinMovableSlats(IWin)) {
+                            if (state.dataSurface->SurfWinMovableSlats(IWin)) {
                                 SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                             } else {
                                 SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
@@ -8272,7 +8272,7 @@ namespace EnergyPlus::DaylightingManager {
                                 BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
-                        if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
+                        if (state.dataSurface->SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
                             TransBmBmMult = 0.0; // No beam, diffuse only
                         }
 
@@ -8284,9 +8284,9 @@ namespace EnergyPlus::DaylightingManager {
 
                         state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1 * TransMult(JB) / DataGlobalConstants::Pi;
                         state.dataDaylightingManager->WLUMSUdisk(IHR, JB + 1) = ZSU1 * TransBmBmMult(JB) / DataGlobalConstants::Pi;
-                        FLFWSU(JB + 1) += ZSU1 * TransMult(JB) * (1.0 - SurfWinFractionUpgoing(IWin));
+                        FLFWSU(JB + 1) += ZSU1 * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                         FLFWSUdisk(JB + 1) = ZSU1 * TransBmBmMult(JB);
-                        FLCWSU(JB + 1) += ZSU1 * TransMult(JB) * SurfWinFractionUpgoing(IWin);
+                        FLCWSU(JB + 1) += ZSU1 * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
                     } // End of loop over slat angles
                 }     // End of window with shade or blind
             }         // COSBSun > 0
@@ -8297,7 +8297,7 @@ namespace EnergyPlus::DaylightingManager {
         // In the following, Beam normal illuminance times ZSU1refl = illuminance on window due to
         // specular reflection from exterior surfaces
 
-        if (state.dataSurface->CalcSolRefl && SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
+        if (state.dataSurface->CalcSolRefl && state.dataSurface->SurfWinOriginalClass(IWin) != SurfaceClass::TDD_Dome) {
             ZSU1refl = state.dataSurface->ReflFacBmToBmSolObs(IHR, IWin);
 
             if (ZSU1refl > 0.0) {
@@ -8306,7 +8306,7 @@ namespace EnergyPlus::DaylightingManager {
                 // -- Bare window. We use diffuse-diffuse transmittance here rather than beam-beam to avoid
                 //    complications due to specular reflection from multiple exterior surfaces
 
-                TVisSunRefl = state.dataConstruction->Construct(IConst).TransDiffVis * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                TVisSunRefl = state.dataConstruction->Construct(IConst).TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
                 // In the following it is assumed that all reflected beam is going downward, as it would be in the
                 // important case of reflection from a highly glazed facade of a neighboring building. However, in
                 // rare cases (such as upward specular reflection from a flat horizontal skylight) it may
@@ -8315,21 +8315,21 @@ namespace EnergyPlus::DaylightingManager {
 
                 // -- Window with shade, blind or diffusing glass
 
-                if (ShadeOn || BlindOn || ScreenOn || SurfWinSolarDiffusing(IWin)) {
+                if (ShadeOn || BlindOn || ScreenOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) {
                     TransBmBmMult = 0.0;
                     TransMult = 0.0;
 
                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
-                        if (!SurfWinMovableSlats(IWin) && JB > 1) break;
+                        if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                        if (ShadeOn || SurfWinSolarDiffusing(IWin)) { // Shade on or diffusing glass
-                            TransMult(1) = state.dataConstruction->Construct(IConstShaded).TransDiffVis * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                        if (ShadeOn || state.dataSurface->SurfWinSolarDiffusing(IWin)) { // Shade on or diffusing glass
+                            TransMult(1) = state.dataConstruction->Construct(IConstShaded).TransDiffVis * state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else if (ScreenOn) { // Exterior screen on
-                            TransScDiffDiffFront = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).DifDifTransVis;
+                            TransScDiffDiffFront = state.dataHeatBal->SurfaceScreens(state.dataSurface->SurfWinScreenNumber(IWin)).DifDifTransVis;
                             TransMult(1) = TransScDiffDiffFront *
                                            (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
-                                           SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                                           state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                         } else { // Blind on
                             TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
@@ -8343,7 +8343,7 @@ namespace EnergyPlus::DaylightingManager {
                                 TransMult(JB) =
                                     TransBlDiffDiffFront *
                                     (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
-                                    SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
+                                    state.dataSurface->SurfWinGlazedFrac(IWin) * state.dataSurface->SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = state.dataConstruction->Construct(IConst).tBareVisDiff(1);
@@ -8351,18 +8351,18 @@ namespace EnergyPlus::DaylightingManager {
                                 rfshB = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
-                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
+                                        t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * state.dataSurface->SurfWinLightWellEff(IWin);
                                 } else { // 3 glass layers; blind between layers 2 and 3
                                     t2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
                                     TransMult(JB) = t1 * t2 * (tfshBd * (1.0 + rfd3 * rbshd) + rfshB * (rbd2 * tfshd + td2 * rbd1 * td2 * tfshd)) *
-                                                    td3 * SurfWinLightWellEff(IWin);
+                                                    td3 * state.dataSurface->SurfWinLightWellEff(IWin);
                                 }
                             } // End of check of interior/exterior/between-glass blind
                         }     // ShadeOn/BlindOn
 
                         state.dataDaylightingManager->WLUMSU(IHR, JB + 1) += ZSU1refl * TransMult(JB) / DataGlobalConstants::Pi;
-                        FLFWSU(JB + 1) += ZSU1refl * TransMult(JB) * (1.0 - SurfWinFractionUpgoing(IWin));
-                        FLCWSU(JB + 1) += ZSU1refl * TransMult(JB) * SurfWinFractionUpgoing(IWin);
+                        FLFWSU(JB + 1) += ZSU1refl * TransMult(JB) * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
+                        FLCWSU(JB + 1) += ZSU1refl * TransMult(JB) * state.dataSurface->SurfWinFractionUpgoing(IWin);
                     } // End of loop over slat angles
                 }     // End of check if window has shade, blind or diffusing glass
             }         // End of check if ZSU1refl > 0.0
@@ -8371,17 +8371,17 @@ namespace EnergyPlus::DaylightingManager {
         // Sun-related portion of internally reflected illuminance
 
         for (JSH = 1; JSH <= MaxSlatAngs + 1; ++JSH) {
-            if (!SurfWinMovableSlats(IWin) && JSH > 2) break;
+            if (!state.dataSurface->SurfWinMovableSlats(IWin) && JSH > 2) break;
 
             // Full area of window is used in following since effect of dividers on reducing
             // effective window transmittance already accounted for in calc of FLFWSU and FLCWSU
             // CR 7869 added effect of intervening interior windows on transmittance and
             // added inside surface area of adjacent zone
-            state.dataDaylightingManager->EINTSU(IHR, JSH) = (FLFWSU(JSH) * SurfWinRhoFloorWall(IWin) + FLCWSU(JSH) * SurfWinRhoCeilingWall(IWin)) *
-                               (Surface(IWin).Area / SurfWinGlazedFrac(IWin)) /
+            state.dataDaylightingManager->EINTSU(IHR, JSH) = (FLFWSU(JSH) * state.dataSurface->SurfWinRhoFloorWall(IWin) + FLCWSU(JSH) * state.dataSurface->SurfWinRhoCeilingWall(IWin)) *
+                               (Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
 
-            state.dataDaylightingManager->EINTSUdisk(IHR, JSH) = FLFWSUdisk(JSH) * SurfWinRhoFloorWall(IWin) * (Surface(IWin).Area / SurfWinGlazedFrac(IWin)) /
+            state.dataDaylightingManager->EINTSUdisk(IHR, JSH) = FLFWSUdisk(JSH) * state.dataSurface->SurfWinRhoFloorWall(IWin) * (Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                    (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
         }
     }
@@ -8694,12 +8694,12 @@ namespace EnergyPlus::DaylightingManager {
 
         ZoneInsideSurfArea = state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea;
         for (iSky = 1; iSky <= 4; ++iSky) {
-            state.dataDaylightingManager->EINTSK(IHR, 1, iSky) = FFSKTot(iSky) * (Surface(IWin).Area / SurfWinGlazedFrac(IWin)) /
+            state.dataDaylightingManager->EINTSK(IHR, 1, iSky) = FFSKTot(iSky) * (Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                                    (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
         }
         state.dataDaylightingManager->EINTSU(IHR, 1) =
-            FFSUTot * (Surface(IWin).Area / SurfWinGlazedFrac(IWin)) / (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
-        state.dataDaylightingManager->EINTSUdisk(IHR, 1) = FFSUdiskTot * (Surface(IWin).Area / SurfWinGlazedFrac(IWin)) /
+            FFSUTot * (Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) / (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
+        state.dataDaylightingManager->EINTSUdisk(IHR, 1) = FFSUdiskTot * (Surface(IWin).Area / state.dataSurface->SurfWinGlazedFrac(IWin)) /
                              (ZoneInsideSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
 
         if (allocated(FLSK)) FLSK.deallocate();
@@ -9539,11 +9539,11 @@ namespace EnergyPlus::DaylightingManager {
                                                                          state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 1, ILB, loop)));
                         }
 
-                        if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                            (SurfWinShadingFlag(IWin) >= 1 || SurfWinSolarDiffusing(IWin))) {
+                        if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                            (state.dataSurface->SurfWinShadingFlag(IWin) >= 1 || state.dataSurface->SurfWinSolarDiffusing(IWin))) {
 
                             //                                 ===Shaded window===
-                            if (!SurfWinMovableSlats(IWin)) {
+                            if (!state.dataSurface->SurfWinMovableSlats(IWin)) {
                                 // Shade, screen, blind with fixed slats, or diffusing glass
                                 DFSKHR(2, ISky) =
                                     VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(state.dataGlobal->HourOfDay, 2, ISky, ILB, loop) +
@@ -9553,7 +9553,7 @@ namespace EnergyPlus::DaylightingManager {
                                     DFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
                                                            state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
 
-                                    if (!SurfWinSlatsBlockBeam(IWin)) {
+                                    if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                         DFSUHR(2) +=
                                             VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
                                                        state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
@@ -9567,7 +9567,7 @@ namespace EnergyPlus::DaylightingManager {
                                 if (ISky == 1) {
                                     BFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
                                                            state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
-                                    if (!SurfWinSlatsBlockBeam(IWin)) {
+                                    if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                         BFSUHR(2) +=
                                             VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
                                                        state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
@@ -9581,7 +9581,7 @@ namespace EnergyPlus::DaylightingManager {
                                 if (ISky == 1) {
                                     SFSUHR(2) = VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->HourOfDay, 2, ILB, loop) +
                                                            state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, 2, ILB, loop));
-                                    if (!SurfWinSlatsBlockBeam(IWin)) {
+                                    if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                         SFSUHR(2) +=
                                             VTRatio * (state.dataGlobal->WeightNow * state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->HourOfDay, 2, ILB, loop) +
                                                        state.dataGlobal->WeightPreviousHour * state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSunDisk(state.dataGlobal->PreviousHour, 2, ILB, loop));
@@ -9589,8 +9589,8 @@ namespace EnergyPlus::DaylightingManager {
                                 }
 
                             } else { // Blind with movable slats
-                                VarSlats = SurfWinMovableSlats(IWin);
-                                SlatAng = SurfWinSlatAngThisTS(IWin);
+                                VarSlats = state.dataSurface->SurfWinMovableSlats(IWin);
+                                SlatAng = state.dataSurface->SurfWinSlatAngThisTS(IWin);
 
                                 DFSKHR(2, ISky) =
                                     VTRatio *
@@ -9615,7 +9615,7 @@ namespace EnergyPlus::DaylightingManager {
 
                                     // We add the contribution from the solar disk if slats do not block beam solar
                                     // TH CR 8010, DaylIllFacSunDisk needs to be interpolated
-                                    if (!SurfWinSlatsBlockBeam(IWin)) {
+                                    if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                         DFSUHR(2) +=
                                             VTRatio * (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                                  VarSlats,
@@ -9651,7 +9651,7 @@ namespace EnergyPlus::DaylightingManager {
                                                            state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
 
                                     // TH CR 8010, DaylBackFacSunDisk needs to be interpolated
-                                    if (!SurfWinSlatsBlockBeam(IWin)) {
+                                    if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                         BFSUHR(2) +=
                                             VTRatio * (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                                  VarSlats,
@@ -9688,7 +9688,7 @@ namespace EnergyPlus::DaylightingManager {
                                                            state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSun(state.dataGlobal->PreviousHour, {2, MaxSlatAngs + 1}, ILB, loop)));
 
                                     // TH CR 8010, DaylSourceFacSunDisk needs to be interpolated
-                                    if (!SurfWinSlatsBlockBeam(IWin)) {
+                                    if (!state.dataSurface->SurfWinSlatsBlockBeam(IWin)) {
                                         SFSUHR(2) +=
                                             VTRatio * (state.dataGlobal->WeightNow * InterpSlatAng(SlatAng,
                                                                                  VarSlats,
@@ -9721,7 +9721,7 @@ namespace EnergyPlus::DaylightingManager {
                     HorIllSkyFac = state.dataEnvrn->HISKF / ((1.0 - SkyWeight) * HorIllSky(ISky2) + SkyWeight * HorIllSky(ISky1));
 
                     for (IS = 1; IS <= 2; ++IS) {
-                        if (IS == 2 && SurfWinShadingFlag(IWin) <= 0 && !SurfWinSolarDiffusing(IWin)) break;
+                        if (IS == 2 && state.dataSurface->SurfWinShadingFlag(IWin) <= 0 && !state.dataSurface->SurfWinSolarDiffusing(IWin)) break;
 
                         state.dataDaylightingData->IllumMapCalc(MapNum).IllumFromWinAtMapPt(loop, IS, ILB) =
                             DFSUHR(IS) * state.dataEnvrn->HISUNF + HorIllSkyFac * (DFSKHR(IS, ISky1) * SkyWeight * HorIllSky(ISky1) +
@@ -9749,8 +9749,8 @@ namespace EnergyPlus::DaylightingManager {
                 IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
 
                 IS = 1;
-                if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                    ((SurfWinShadingFlag(IWin) >= 1 && SurfWinShadingFlag(IWin) <= 9) || SurfWinSolarDiffusing(IWin)))
+                if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                    ((state.dataSurface->SurfWinShadingFlag(IWin) >= 1 && state.dataSurface->SurfWinShadingFlag(IWin) <= 9) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                     IS = 2;
 
                 // CR 8057. 3/17/2010.
@@ -9760,12 +9760,12 @@ namespace EnergyPlus::DaylightingManager {
                 ICtrl = Surface(IWin).activeWindowShadingControl;
                 if (Surface(IWin).HasShadeControl) {
                     if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
-                        SurfWinShadingFlag(IWin) == SwitchableGlazing) {
+                        state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
                         // switchable windows in partial or fully switched state,
                         //  get its intermediate VT calculated in DayltgInteriorIllum
                         IConstShaded = Surface(IWin).activeShadedConstruction;
-                        if (IConstShaded > 0) VTDark = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
-                        if (VTDark > 0) VTMULT = SurfWinVisTransSelected(IWin) / VTDark;
+                        if (IConstShaded > 0) VTDark = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
+                        if (VTDark > 0) VTMULT = state.dataSurface->SurfWinVisTransSelected(IWin) / VTDark;
                     }
                 }
 
@@ -9787,8 +9787,8 @@ namespace EnergyPlus::DaylightingManager {
                 for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                     IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                     IS = 1;
-                    if ((SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
-                        ((SurfWinShadingFlag(IWin) >= 1 && SurfWinShadingFlag(IWin) <= 9) || SurfWinSolarDiffusing(IWin)))
+                    if ((state.dataSurface->SurfWinWindowModelType(IWin) != WindowBSDFModel) &&
+                        ((state.dataSurface->SurfWinShadingFlag(IWin) >= 1 && state.dataSurface->SurfWinShadingFlag(IWin) <= 9) || state.dataSurface->SurfWinSolarDiffusing(IWin)))
                         IS = 2;
 
                     // CR 8057. 3/17/2010
@@ -9797,12 +9797,12 @@ namespace EnergyPlus::DaylightingManager {
                     ICtrl = Surface(IWin).activeWindowShadingControl;
                     if (Surface(IWin).HasShadeControl) {
                         if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
-                            SurfWinShadingFlag(IWin) == SwitchableGlazing) {
+                            state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
                             // switchable windows in partial or fully switched state,
                             //  get its intermediate VT calculated in DayltgInteriorIllum
                             IConstShaded = Surface(IWin).activeShadedConstruction;
-                            if (IConstShaded > 0) VTDark = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin);
-                            if (VTDark > 0) VTMULT = SurfWinVisTransSelected(IWin) / VTDark;
+                            if (IConstShaded > 0) VTDark = POLYF(1.0, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * state.dataSurface->SurfWinGlazedFrac(IWin);
+                            if (VTDark > 0) VTMULT = state.dataSurface->SurfWinVisTransSelected(IWin) / VTDark;
                         }
                     }
 
@@ -10179,7 +10179,7 @@ namespace EnergyPlus::DaylightingManager {
             // Count exterior windows in this zone or shared solar enclosure
             for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                 if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                    SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
+                    state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                     ++state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows;
                 }
             }
@@ -10324,7 +10324,7 @@ namespace EnergyPlus::DaylightingManager {
                 // Get exterior windows in this zone or shared solar enclosure
                 for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                        SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
+                        state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWin(ZoneNum);
                     }
                 }
@@ -10337,7 +10337,7 @@ namespace EnergyPlus::DaylightingManager {
                         // it would not be an "AdjIntWinZone"
                         for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                                SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
+                                state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWin(ZoneNum);
                             }
                         }
@@ -10392,7 +10392,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
-                        SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
+                        state.dataSurface->SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWinCtr;
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = surfNum;
                     }
@@ -10406,13 +10406,13 @@ namespace EnergyPlus::DaylightingManager {
                         // it would not be an "AdjIntWinZone"
                         for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
-                                SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
+                                state.dataSurface->SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
                                 state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(ZoneExtWinCtr) = SurfNumAdj;
 
                                 // If no daylighting in that zone, set up variables anyway:
                                 if (state.dataDaylightingData->ZoneDaylight(ZoneNumAdj).TotalDaylRefPoints == 0) {
-                                    if (!SurfWinSurfDayLightInit(SurfNumAdj)) {
+                                    if (!state.dataSurface->SurfWinSurfDayLightInit(SurfNumAdj)) {
                                         SurfaceWindow(SurfNumAdj).SolidAngAtRefPt.allocate(state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints);
                                         SurfaceWindow(SurfNumAdj).SolidAngAtRefPt = 0.0;
                                         SurfaceWindow(SurfNumAdj).SolidAngAtRefPtWtd.allocate(state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints);
@@ -10423,7 +10423,7 @@ namespace EnergyPlus::DaylightingManager {
                                         SurfaceWindow(SurfNumAdj).BackLumFromWinAtRefPt = 0.0;
                                         SurfaceWindow(SurfNumAdj).SourceLumFromWinAtRefPt.allocate(2, state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints);
                                         SurfaceWindow(SurfNumAdj).SourceLumFromWinAtRefPt = 0.0;
-                                        SurfWinSurfDayLightInit(SurfNumAdj) = true;
+                                        state.dataSurface->SurfWinSurfDayLightInit(SurfNumAdj) = true;
                                     }
                                 }
                             }
@@ -10590,10 +10590,10 @@ namespace EnergyPlus::DaylightingManager {
                 int const ConstrNum = Surface(IWin).Construction;
                 int const adjEnclNum = Surface(Surface(IWin).ExtBoundCond).SolarEnclIndex;
                 QDifTrans = state.dataHeatBal->QSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * state.dataEnvrn->PDIFLW;
-                QDifTransUp = QDifTrans * SurfWinFractionUpgoing(IWin);
-                QDifTransDn = QDifTrans * (1.0 - SurfWinFractionUpgoing(IWin));
+                QDifTransUp = QDifTrans * state.dataSurface->SurfWinFractionUpgoing(IWin);
+                QDifTransDn = QDifTrans * (1.0 - state.dataSurface->SurfWinFractionUpgoing(IWin));
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect) != 0.0) {
-                    DifInterReflIllThisWin = (QDifTransDn * SurfWinRhoFloorWall(IWin) + QDifTransUp * SurfWinRhoCeilingWall(IWin)) /
+                    DifInterReflIllThisWin = (QDifTransDn * state.dataSurface->SurfWinRhoFloorWall(IWin) + QDifTransUp * state.dataSurface->SurfWinRhoCeilingWall(IWin)) /
                                              (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect));
                 } else {
                     DifInterReflIllThisWin = 0.0;
