@@ -577,6 +577,10 @@ namespace DataHeatBalance {
     bool AnyInternalHeatSourceInInput(false); // true if the user has entered any constructions with internal sources
     bool AdaptiveComfortRequested_CEN15251(false); // true if people objects have adaptive comfort requests. CEN15251
     bool AdaptiveComfortRequested_ASH55(false);    // true if people objects have adaptive comfort requests. ASH55
+    bool AnyThermalComfortPierceModel(false);      // true if people objects use pierce thermal comfort model
+    bool AnyThermalComfortKSUModel(false);         // true if people objects use KSU thermal comfort model
+    bool AnyThermalComfortCoolingEffectModel(false);  // true if people objects use ASH55 cooling effect adjusted thermal comfort model
+    bool AnyThermalComfortAnkleDraftModel(false);     // true if people objects use ASH55 ankle draft thermal comfort model
 
     bool NoFfactorConstructionsUsed(true);
     bool NoCfactorConstructionsUsed(true);
@@ -933,6 +937,10 @@ namespace DataHeatBalance {
         AnyInternalHeatSourceInInput = false;
         AdaptiveComfortRequested_CEN15251 = false;
         AdaptiveComfortRequested_ASH55 = false;
+        AnyThermalComfortPierceModel = false;
+        AnyThermalComfortKSUModel = false;
+        AnyThermalComfortCoolingEffectModel = false;
+        AnyThermalComfortAnkleDraftModel = false;
         NoFfactorConstructionsUsed = true;
         NoCfactorConstructionsUsed = true;
         NoRegularMaterialsUsed = true;
