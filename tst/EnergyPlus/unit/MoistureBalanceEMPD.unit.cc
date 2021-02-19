@@ -102,8 +102,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Surface
     state->dataSurface->TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface(1);
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(1);
     surface.Name = "Surface1";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
@@ -227,8 +227,8 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Surface
     state->dataSurface->TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface(1);
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(1);
     surface.Name = "Surface1";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
@@ -316,8 +316,8 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Surface
     int surfNum = 1;
     state->dataSurface->TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface( surfNum );
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface( surfNum );
     surface.Name = "SurfaceWood";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;

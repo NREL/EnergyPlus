@@ -9606,7 +9606,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::GroundFCfactorMethod;
         using DataSurfaces::KivaFoundation;
         using DataSurfaces::OtherSideCondModeledExt;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
         using General::SafeDivide;
         using ScheduleManager::GetScheduleName;
@@ -9879,31 +9878,31 @@ namespace EnergyPlus::OutputReportTabular {
 
             for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
                 // only exterior surfaces including underground
-                if (!Surface(iSurf).HeatTransSurf) continue;
-                isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
-                if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
-                    (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
-                    curAzimuth = Surface(iSurf).Azimuth;
+                if (!state.dataSurface->Surface(iSurf).HeatTransSurf) continue;
+                isAboveGround = (state.dataSurface->Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (state.dataSurface->Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
+                if (isAboveGround || (state.dataSurface->Surface(iSurf).ExtBoundCond == Ground) || (state.dataSurface->Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
+                    (state.dataSurface->Surface(iSurf).ExtBoundCond == KivaFoundation)) {
+                    curAzimuth = state.dataSurface->Surface(iSurf).Azimuth;
                     // Round to two decimals, like the display in tables
                     curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                    curArea = Surface(iSurf).GrossArea;
-                    if (Surface(iSurf).FrameDivider != 0) {
-                        frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
-                        frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
-                                    (Surface(iSurf).Height * Surface(iSurf).Width);
+                    curArea = state.dataSurface->Surface(iSurf).GrossArea;
+                    if (state.dataSurface->Surface(iSurf).FrameDivider != 0) {
+                        frameWidth = FrameDivider(state.dataSurface->Surface(iSurf).FrameDivider).FrameWidth;
+                        frameArea = (state.dataSurface->Surface(iSurf).Height + 2.0 * frameWidth) * (state.dataSurface->Surface(iSurf).Width + 2.0 * frameWidth) -
+                                    (state.dataSurface->Surface(iSurf).Height * state.dataSurface->Surface(iSurf).Width);
                         curArea += frameArea;
                     }
-                    zonePt = Surface(iSurf).Zone;
+                    zonePt = state.dataSurface->Surface(iSurf).Zone;
                     isConditioned = false;
                     if (zonePt > 0) {
                         if (state.dataHeatBal->Zone(zonePt).SystemZoneNodeNumber > 0) {
                             isConditioned = true;
                         }
                     }
-                    if ((Surface(iSurf).Tilt >= 60.0) && (Surface(iSurf).Tilt <= 120.0)) {
+                    if ((state.dataSurface->Surface(iSurf).Tilt >= 60.0) && (state.dataSurface->Surface(iSurf).Tilt <= 120.0)) {
                         // vertical walls and windows
                         {
-                            auto const SELECT_CASE_var(Surface(iSurf).Class);
+                            auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
                             if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
                                 (SELECT_CASE_var == SurfaceClass::Roof)) {
                                 mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
@@ -9937,10 +9936,10 @@ namespace EnergyPlus::OutputReportTabular {
                                     }
                                 }
                                 if (DetailedWWR) {
-                                    print(state.files.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(state.files.debug, "{},Wall,{:.1R},{:.1R}\n", state.dataSurface->Surface(iSurf).Name, curArea * mult, state.dataSurface->Surface(iSurf).Tilt);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
                                 if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
                                     windowAreaN += curArea * mult;
                                     if (isConditioned) windowAreaNcond += curArea * mult;
@@ -9955,28 +9954,28 @@ namespace EnergyPlus::OutputReportTabular {
                                     if (isConditioned) windowAreaWcond += curArea * mult;
                                 }
                                 zoneOpeningArea(zonePt) +=
-                                    curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
-                                zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
+                                    curArea * state.dataSurface->Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
+                                zoneGlassArea(zonePt) += state.dataSurface->Surface(iSurf).GrossArea * state.dataSurface->Surface(iSurf).Multiplier;
                                 if (DetailedWWR) {
-                                    print(state.files.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(state.files.debug, "{},Window,{:.1R},{:.1R}\n", state.dataSurface->Surface(iSurf).Name, curArea * mult, state.dataSurface->Surface(iSurf).Tilt);
                                 }
                             }
                         }
-                    } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
+                    } else if (state.dataSurface->Surface(iSurf).Tilt < 60.0) { // roof and skylights
                         {
-                            auto const SELECT_CASE_var(Surface(iSurf).Class);
+                            auto const SELECT_CASE_var(state.dataSurface->Surface(iSurf).Class);
                             if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
                                 (SELECT_CASE_var == SurfaceClass::Roof)) {
                                 mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier;
                                 roofArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    print(state.files.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(state.files.debug, "{},Roof,{:.1R},{:.1R}\n", state.dataSurface->Surface(iSurf).Name, curArea * mult, state.dataSurface->Surface(iSurf).Tilt);
                                 }
                             } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                mult = state.dataHeatBal->Zone(zonePt).Multiplier * state.dataHeatBal->Zone(zonePt).ListMultiplier * state.dataSurface->Surface(iSurf).Multiplier;
                                 skylightArea += curArea * mult;
                                 if (DetailedWWR) {
-                                    print(state.files.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
+                                    print(state.files.debug, "{},Skylight,{:.1R},{:.1R}\n", state.dataSurface->Surface(iSurf).Name, curArea * mult, state.dataSurface->Surface(iSurf).Tilt);
                                 }
                             }
                         }
@@ -11175,7 +11174,6 @@ namespace EnergyPlus::OutputReportTabular {
         //   Use <br> tag to put multiple rows into a single cell.
 
         // Using/Aliasing
-        using DataSurfaces::Surface;
         using namespace DataShadowingCombinations;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -11233,7 +11231,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iShadRel = 1; iShadRel <= state.dataOutRptPredefined->numShadowRelate; ++iShadRel) {
                     if (state.dataOutRptPredefined->ShadowRelate(iShadRel).recKind == iKindRec) {
                         curRecSurf = state.dataOutRptPredefined->ShadowRelate(iShadRel).recSurf;
-                        std::string const &name(Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
+                        std::string const &name(state.dataSurface->Surface(state.dataOutRptPredefined->ShadowRelate(iShadRel).castSurf).Name);
                         auto &elem(shadow_map[curRecSurf]);            // Creates the entry if not present (and zero-initializes the int in the pair)
                         elem.first += static_cast<int>(name.length()); // Accumulate total of name lengths
                         elem.second.push_back(&name);                  // Add this name
@@ -11252,7 +11250,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (auto const &elem : shadow_map) {
                     ++jUnique;
                     curRecSurf = elem.first;
-                    rowHead(jUnique) = Surface(curRecSurf).Name;
+                    rowHead(jUnique) = state.dataSurface->Surface(curRecSurf).Name;
                     listOfSurf.clear();
                     listOfSurf.reserve(elem.second.first + (3 * numUnique)); // To avoid string allocations during appends
                     for (auto const *p : elem.second.second) {
@@ -11639,7 +11637,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataSizing::CalcFinalZoneSizing;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int ZoneNum(0);
@@ -11653,7 +11650,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            ZoneNum = Surface(SurfNum).Zone;
+            ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
             if (ZoneNum == 0) continue;
             if (!state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) continue;
             CoolDesSelected = CalcFinalZoneSizing(ZoneNum).CoolDDNum;
@@ -11712,8 +11709,8 @@ namespace EnergyPlus::OutputReportTabular {
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
-                    if (Surface(kSurf).Zone != iZone) continue;
-                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", state.dataHeatBal->Zone(iZone).Name, Surface(kSurf).Name);
+                    if (state.dataSurface->Surface(kSurf).Zone != iZone) continue;
+                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", state.dataHeatBal->Zone(iZone).Name, state.dataSurface->Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(state.files.eio, ",{:6.3F}", ort->decayCurveCool(jTime, kSurf));
                     }
@@ -11722,8 +11719,8 @@ namespace EnergyPlus::OutputReportTabular {
                 }
 
                 for (int kSurf : state.dataSurface->AllSurfaceListReportOrder) {
-                    if (Surface(kSurf).Zone != iZone) continue;
-                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", state.dataHeatBal->Zone(iZone).Name, Surface(kSurf).Name);
+                    if (state.dataSurface->Surface(kSurf).Zone != iZone) continue;
+                    print(state.files.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", state.dataHeatBal->Zone(iZone).Name, state.dataSurface->Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(state.dataGlobal->NumOfTimeStepInHour * 24, 36); ++jTime) {
                         print(state.files.eio, ",{:6.3F}", ort->decayCurveHeat(jTime, kSurf));
                     }
@@ -11750,7 +11747,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataSizing::CurOverallSimDay;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iSurf(0);
@@ -11763,9 +11759,9 @@ namespace EnergyPlus::OutputReportTabular {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
             for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
-                ZoneNum = Surface(iSurf).Zone;
+                ZoneNum = state.dataSurface->Surface(iSurf).Zone;
                 if (ZoneNum == 0) continue;
-                if (Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
+                if (state.dataSurface->Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
                 // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
                 ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, ZoneNum) +=
                     state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurf) + state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(iSurf) + state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurf) +
@@ -12495,7 +12491,6 @@ namespace EnergyPlus::OutputReportTabular {
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq)
     {
-        using DataSurfaces::Surface;
 
         // static bool initAdjFenDone(false); moved to anonymous namespace for unit testing
         static Array3D_bool adjFenDone;
@@ -12530,7 +12525,7 @@ namespace EnergyPlus::OutputReportTabular {
 
                 // code from ComputeDelayedComponents starts
                 for (int jSurf = state.dataHeatBal->Zone(zoneIndex).SurfaceFirst; jSurf <= state.dataHeatBal->Zone(zoneIndex).SurfaceLast; ++jSurf) {
-                    if (!Surface(jSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                    if (!state.dataSurface->Surface(jSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
                     // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                     Real64 peopleConvFromSurf = 0.0;
@@ -12544,7 +12539,7 @@ namespace EnergyPlus::OutputReportTabular {
                     for (int mStepBack = 1; mStepBack <= kTimeStep; ++mStepBack) {
                         int sourceStep = kTimeStep - mStepBack + 1;
                         Real64 thisQRadThermInAbsMult = ort->TMULTseq(desDaySelected, sourceStep, radEnclosureNum) *
-                            ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * Surface(jSurf).Area *
+                            ort->ITABSFseq(desDaySelected, sourceStep, jSurf) * state.dataSurface->Surface(jSurf).Area *
                             decayCurve(mStepBack, jSurf);
                         peopleConvFromSurf += ort->peopleRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
                         equipConvFromSurf += ort->equipRadSeq(desDaySelected, sourceStep, zoneIndex) * thisQRadThermInAbsMult;
@@ -12573,7 +12568,7 @@ namespace EnergyPlus::OutputReportTabular {
                          lightSWConvFromSurf +
                          feneSolarConvFromSurf); // remove net radiant for the surface
                                                  // also remove the net radiant component on the instanteous conduction for fenestration
-                    if (Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
+                    if (state.dataSurface->Surface(jSurf).Class == DataSurfaces::SurfaceClass::Window) {
                         adjFeneSurfNetRadSeq += ort->netSurfRadSeq(desDaySelected, kTimeStep, jSurf);
                     }
                 } // for jSurf
@@ -12634,7 +12629,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::OtherSideCoefCalcExt;
         using DataSurfaces::OtherSideCoefNoCalcExt;
         using DataSurfaces::OtherSideCondModeledExt;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
         using General::MovingAvg;
 
@@ -12742,13 +12736,13 @@ namespace EnergyPlus::OutputReportTabular {
             // opaque surfaces - must combine individual surfaces by class and other side conditions
             delayOpaque = 0.0;
             for (int kSurf = state.dataHeatBal->Zone(zoneIndex).SurfaceFirst; kSurf <= state.dataHeatBal->Zone(zoneIndex).SurfaceLast; ++kSurf) {
-                if (!Surface(kSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                if (!state.dataSurface->Surface(kSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-                curExtBoundCond = Surface(kSurf).ExtBoundCond;
+                curExtBoundCond = state.dataSurface->Surface(kSurf).ExtBoundCond;
                 // if exterior is other side coefficients using ground preprocessor terms then
                 // set it to ground instead of other side coefficients
                 if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                    if (has_prefixi(OSC(Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                    if (has_prefixi(OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
                         curExtBoundCond = Ground;
                     }
                 }
@@ -12756,7 +12750,7 @@ namespace EnergyPlus::OutputReportTabular {
                 MovingAvg(seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData);
                 singleSurfDelay = AvgData(timeOfMax);
                 {
-                    auto const SELECT_CASE_var(Surface(kSurf).Class);
+                    auto const SELECT_CASE_var(state.dataSurface->Surface(kSurf).Class);
                     if (SELECT_CASE_var == SurfaceClass::Wall) {
                         {
                             auto const SELECT_CASE_var1(curExtBoundCond);
@@ -13007,7 +13001,7 @@ namespace EnergyPlus::OutputReportTabular {
             areas(iZone).floor = state.dataHeatBal->Zone(iZone).FloorArea;
         }
 
-        for (auto curSurface : Surface) {
+        for (auto curSurface : state.dataSurface->Surface) {
             if (!curSurface.HeatTransSurf) continue;
             bool isExterior = curSurface.ExtBoundCond == ExternalEnvironment || curSurface.ExtBoundCond == OtherSideCondModeledExt;
             bool isTouchingGround =

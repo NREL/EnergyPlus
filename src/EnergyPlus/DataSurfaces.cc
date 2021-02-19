@@ -107,13 +107,7 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
-    bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
-
     // Object Data
-    Array1D<SurfaceData> Surface;
     Array1D<SurfaceWindowCalc> SurfaceWindow;
     Array1D<FrameDividerProperties> FrameDivider;
     Array1D<StormWindowData> StormWindow;
@@ -450,7 +444,7 @@ namespace EnergyPlus::DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
+        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + state.dataHeatBal->QS(state.dataSurface->Surface(t_SurfNum).SolarEnclIndex);
     }
 
     Real64 SurfaceData::getSWBeamIncident(EnergyPlusData &state, const int t_SurfNum)
@@ -478,7 +472,7 @@ namespace EnergyPlus::DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + state.dataHeatBal->QS(state.dataSurface->Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers(EnergyPlusData &state) const
@@ -659,9 +653,6 @@ namespace EnergyPlus::DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        AnyHeatBalanceInsideSourceTerm = false;
-        AnyHeatBalanceOutsideSourceTerm = false;
-        Surface.deallocate();
         SurfaceWindow.deallocate();
         FrameDivider.deallocate();
         StormWindow.deallocate();
@@ -681,7 +672,7 @@ namespace EnergyPlus::DataSurfaces {
 
     void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
     {
-        for (auto &surface : Surface) {
+        for (auto &surface : state.dataSurface->Surface) {
             surface.SetOutBulbTempAt(state);
         }
     }
@@ -692,7 +683,7 @@ namespace EnergyPlus::DataSurfaces {
         using DataEnvironment::SetOutBulbTempAt_error;
 
         Real64 minBulb = 0.0;
-        for (auto &surface : Surface) {
+        for (auto &surface : state.dataSurface->Surface) {
             minBulb = min(minBulb, surface.OutDryBulbTemp, surface.OutWetBulbTemp);
             if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Surface", surface.Centroid.z, surface.Name);
         }
@@ -701,7 +692,7 @@ namespace EnergyPlus::DataSurfaces {
     void SetSurfaceWindSpeedAt(EnergyPlusData &state)
     {
         Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
-        for (auto &surface : Surface) {
+        for (auto &surface : state.dataSurface->Surface) {
             surface.SetWindSpeedAt(state, fac);
         }
     }
@@ -709,7 +700,7 @@ namespace EnergyPlus::DataSurfaces {
     void SetSurfaceWindDirAt(EnergyPlusData &state)
     {
         // Using/Aliasing
-        for (auto &surface : Surface) {
+        for (auto &surface : state.dataSurface->Surface) {
             surface.SetWindDirAt(state.dataEnvrn->WindDir);
         }
     }

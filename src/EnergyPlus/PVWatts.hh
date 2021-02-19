@@ -193,7 +193,7 @@ namespace PVWatts {
         GeometryType getGeometryType();
         Real64 getTilt();
         Real64 getAzimuth();
-        DataSurfaces::SurfaceData &getSurface();
+        DataSurfaces::SurfaceData &getSurface(EnergyPlusData &state);
         Real64 getGroundCoverageRatio();
 
         Real64 getCellTempearture();

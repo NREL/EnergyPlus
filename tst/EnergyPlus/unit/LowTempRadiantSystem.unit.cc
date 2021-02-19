@@ -245,9 +245,9 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     ExpectedResult3 = HydrRadSys(RadSysNum).TotalSurfaceArea / 0.15;
     HydrRadSys(RadSysNum).SurfacePtr.allocate(1);
     HydrRadSys(RadSysNum).SurfacePtr(1) = 1;
-    Surface.allocate(1);
-    Surface(1).Construction = 1;
-    Surface(1).Area = 1500.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).Area = 1500.0;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
@@ -326,9 +326,9 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
 
     HydrRadSys(RadSysNum).SurfacePtr.allocate(1);
     HydrRadSys(RadSysNum).SurfacePtr(1) = 1;
-    Surface.allocate(1);
-    Surface(1).Construction = 1;
-    Surface(1).Area = 1500.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).Area = 1500.0;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
@@ -394,9 +394,9 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
 
     CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
     CFloRadSys(RadSysNum).SurfacePtr(1) = 1;
-    Surface.allocate(1);
-    Surface(1).Construction = 1;
-    Surface(1).Area = 150.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).Area = 150.0;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
@@ -1206,7 +1206,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
                                "AutosizeLowTempRadiantVariableFlowTest");
     ChilledWaterFlowRate = CoolingCapacity / (PlantSizData(2).DeltaT * Cp * Density);
     // tuble length sizing calculation
-    HydrRadSys(RadSysNum).TotalSurfaceArea = Surface(HydrRadSys(RadSysNum).SurfacePtr(1)).Area;
+    HydrRadSys(RadSysNum).TotalSurfaceArea = state->dataSurface->Surface(HydrRadSys(RadSysNum).SurfacePtr(1)).Area;
     TubeLengthDes = HydrRadSys(RadSysNum).TotalSurfaceArea / 0.1524; // tube length uses the construction perpendicular spacing
 
     // do autosize calculations
@@ -2280,23 +2280,23 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     state->dataHeatBal->Zone(2).Name = "EAST ZONE";
 
     state->dataSurface->TotSurfaces = 4;
-    Surface.allocate(4);
-    Surface(1).Name = "ZN001:FLR001";
-    Surface(1).ZoneName = "WEST ZONE";
-    Surface(1).Zone = 1;
-    Surface(1).Construction = 1;
-    Surface(2).Name = "ZN001:FLR002";
-    Surface(2).ZoneName = "WEST ZONE";
-    Surface(2).Zone = 1;
-    Surface(2).Construction = 1;
-    Surface(3).Name = "ZN002:FLR001";
-    Surface(3).ZoneName = "EAST ZONE";
-    Surface(3).Zone = 2;
-    Surface(3).Construction = 1;
-    Surface(4).Name = "ZN002:FLR002";
-    Surface(4).ZoneName = "EAST ZONE";
-    Surface(4).Zone = 2;
-    Surface(4).Construction = 1;
+    state->dataSurface->Surface.allocate(4);
+    state->dataSurface->Surface(1).Name = "ZN001:FLR001";
+    state->dataSurface->Surface(1).ZoneName = "WEST ZONE";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Name = "ZN001:FLR002";
+    state->dataSurface->Surface(2).ZoneName = "WEST ZONE";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataSurface->Surface(3).Name = "ZN002:FLR001";
+    state->dataSurface->Surface(3).ZoneName = "EAST ZONE";
+    state->dataSurface->Surface(3).Zone = 2;
+    state->dataSurface->Surface(3).Construction = 1;
+    state->dataSurface->Surface(4).Name = "ZN002:FLR002";
+    state->dataSurface->Surface(4).ZoneName = "EAST ZONE";
+    state->dataSurface->Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
 
@@ -2465,13 +2465,13 @@ TEST_F(LowTempRadiantSystemTest, SizeRadSysTubeLengthTest)
     CFloRadSys(3).SurfacePtr.allocate(1);
     CFloRadSys(3).SurfacePtr(1) = 3;
 
-    Surface.allocate(3);
-    Surface(1).Construction = 1;
-    Surface(1).Area = 100.0;
-    Surface(2).Construction = 2;
-    Surface(2).Area = 200.0;
-    Surface(3).Construction = 3;
-    Surface(3).Area = 300.0;
+    state->dataSurface->Surface.allocate(3);
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).Area = 100.0;
+    state->dataSurface->Surface(2).Construction = 2;
+    state->dataSurface->Surface(2).Area = 200.0;
+    state->dataSurface->Surface(3).Construction = 3;
+    state->dataSurface->Surface(3).Area = 300.0;
 
     state->dataConstruction->Construct.allocate(3);
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.05;
@@ -2554,9 +2554,9 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadConFlowSystemAutoSizeTempTest)
 
     CFloRadSys(RadSysNum).SurfacePtr.allocate(1);
     CFloRadSys(RadSysNum).SurfacePtr(1) = 1;
-    Surface.allocate(1);
-    Surface(1).Construction = 1;
-    Surface(1).Area = 150.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).Area = 150.0;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.075;
 
@@ -3123,7 +3123,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     thisRadSys.SurfacePtr(2) = 2;
     thisRadSys.SurfacePtr(3) = 3;
     thisRadSys.ZonePtr = 1;
-    Surface.allocate(3);
+    state->dataSurface->Surface.allocate(3);
     state->dataHeatBal->Zone.allocate(3);
     state->dataConstruction->Construct.allocate(2);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
@@ -3132,72 +3132,72 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     // Test 1a: Surfaces are in the same zones, zone multipliers are all the same, and the construct has a source/sink.
     //          Everything is "ok" so the result should be the error flag is FALSE.
     actualErrorsFound = false;
-    Surface(1).Zone = 1;
-    Surface(2).Zone = 1;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(3).Zone = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(3).Multiplier = 1.0;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
-    Surface(1).Construction = 1;
-    Surface(2).Construction = 1;
-    Surface(3).Construction = 1;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataSurface->Surface(3).Construction = 1;
     thisRadSys.errorCheckZonesAndConstructions(*state, actualErrorsFound);
     EXPECT_FALSE(actualErrorsFound);
 
     // Test 1b: Surfaces are in different zones, zone multipliers are all the same, and the construct has a source/sink.
     //          Surfaces being in different zones is "ok" so the result should be the error flag is FALSE.
     actualErrorsFound = false;
-    Surface(1).Zone = 1;
-    Surface(2).Zone = 2;
-    Surface(3).Zone = 3;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 2;
+    state->dataSurface->Surface(3).Zone = 3;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(2).Multiplier = 1.0;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(3).Multiplier = 1.0;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
-    Surface(1).Construction = 1;
-    Surface(2).Construction = 1;
-    Surface(3).Construction = 1;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataSurface->Surface(3).Construction = 1;
     thisRadSys.errorCheckZonesAndConstructions(*state, actualErrorsFound);
     EXPECT_FALSE(actualErrorsFound);
 
     // Test 2: Surfaces are in different zones, zone multipliers are NOT all the same (one is 7 instead of 2), and the construct has a source/sink.
     //         Zone multipliers can NOT be different so the result should be the error flag is TRUE.
     actualErrorsFound = false;
-    Surface(1).Zone = 1;
-    Surface(2).Zone = 2;
-    Surface(3).Zone = 3;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 2;
+    state->dataSurface->Surface(3).Zone = 3;
     state->dataHeatBal->Zone(1).Multiplier = 2.0;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(2).Multiplier = 2.0;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(3).Multiplier = 7.0;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
-    Surface(1).Construction = 1;
-    Surface(2).Construction = 1;
-    Surface(3).Construction = 1;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataSurface->Surface(3).Construction = 1;
     thisRadSys.errorCheckZonesAndConstructions(*state, actualErrorsFound);
     EXPECT_TRUE(actualErrorsFound);
 
     // Test 3: Surfaces are in the same zones, zone multipliers are all the same, and one construct does NOT have a source/sink.
     //         Surface constructions MUST have a source/sink to be used for a radiant system so the result should be the error flag is TRUE.
     actualErrorsFound = false;
-    Surface(1).Zone = 1;
-    Surface(2).Zone = 1;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(3).Zone = 1;
     state->dataHeatBal->Zone(1).Multiplier = 2.0;
     state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(2).Multiplier = 2.0;
     state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
     state->dataHeatBal->Zone(3).Multiplier = 2.0;
     state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
-    Surface(1).Construction = 1;
-    Surface(2).Construction = 1;
-    Surface(3).Construction = 2;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 1;
+    state->dataSurface->Surface(3).Construction = 2;
     thisRadSys.errorCheckZonesAndConstructions(*state, actualErrorsFound);
     EXPECT_TRUE(actualErrorsFound);
 }
@@ -3479,8 +3479,8 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
     // between the fluid being circulated through a radiant system and the radiant system
     // material that the pipe/tube is embedded within
     int SurfNum = 1;
-    DataSurfaces::Surface.allocate(1);
-    Surface(1).Construction = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Construction = 1;
     state->dataConstruction->Construct.allocate(1);
     state->dataConstruction->Construct(1).ThicknessPerpend = 0.5;
     CFloRadSys.allocate(1);

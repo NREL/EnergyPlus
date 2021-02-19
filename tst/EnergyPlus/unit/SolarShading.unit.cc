@@ -668,7 +668,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataHeatBal->DifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataHeatBal->DifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 
@@ -1076,11 +1076,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     ;
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
-    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", DataSurfaces::Surface);
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
-    surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
-    surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", DataSurfaces::Surface);
+    surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SunlitFrac(4, 9, surfNum));
 }
 
@@ -1457,10 +1457,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     SolarShading::GetShadowingInput(*state);
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; SurfNum++) {
-        if (Surface(SurfNum).ExtBoundCond == 0 && Surface(SurfNum).Zone != 0) {
-            int ZoneSize = Surface(SurfNum).DisabledShadowingZoneList.size();
+        if (state->dataSurface->Surface(SurfNum).ExtBoundCond == 0 && state->dataSurface->Surface(SurfNum).Zone != 0) {
+            int ZoneSize = state->dataSurface->Surface(SurfNum).DisabledShadowingZoneList.size();
             EXPECT_EQ(1, ZoneSize);
-            std::vector<int> DisabledZones = Surface(SurfNum).DisabledShadowingZoneList;
+            std::vector<int> DisabledZones = state->dataSurface->Surface(SurfNum).DisabledShadowingZoneList;
             for (int i : DisabledZones) {
                 EXPECT_EQ(1, i);
             }
@@ -1845,7 +1845,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
-    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataHeatBal->DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataHeatBal->DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
@@ -1855,7 +1855,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     int numofsurface;
     numofsurface = 4;
-    Surface.allocate(numofsurface);
+    state->dataSurface->Surface.allocate(numofsurface);
     Vector VtxA1(0.0, 0.0, 5.0);
     Vector VtxA2(0.0, 0.0, 0.0);
     Vector VtxA3(5.0, 0.0, 0.0);
@@ -1868,29 +1868,29 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
     Vector VtxB5(0.0, 0.0, 0.0);
     Vector VtxB6(0.0, 0.0, 5.0);
 
-    Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Sides = 4;
 
-    Surface(1).Vertex.allocate(4);
-    Surface(1).Vertex(1) = VtxA1;
-    Surface(1).Vertex(2) = VtxA2;
-    Surface(1).Vertex(3) = VtxA3;
-    Surface(1).Vertex(4) = VtxA4;
+    state->dataSurface->Surface(1).Vertex.allocate(4);
+    state->dataSurface->Surface(1).Vertex(1) = VtxA1;
+    state->dataSurface->Surface(1).Vertex(2) = VtxA2;
+    state->dataSurface->Surface(1).Vertex(3) = VtxA3;
+    state->dataSurface->Surface(1).Vertex(4) = VtxA4;
 
-    Surface(1).Name = "Surf_Back";
-    Surface(1).ZoneName = "Zone1";
+    state->dataSurface->Surface(1).Name = "Surf_Back";
+    state->dataSurface->Surface(1).ZoneName = "Zone1";
 
-    Surface(2).Sides = 6; // receiving
-    Surface(2).Vertex.allocate(6);
+    state->dataSurface->Surface(2).Sides = 6; // receiving
+    state->dataSurface->Surface(2).Vertex.allocate(6);
 
-    Surface(2).Vertex(1) = VtxB1;
-    Surface(2).Vertex(2) = VtxB2;
-    Surface(2).Vertex(3) = VtxB3;
-    Surface(2).Vertex(4) = VtxB4;
-    Surface(2).Vertex(5) = VtxB5;
-    Surface(2).Vertex(6) = VtxB6;
+    state->dataSurface->Surface(2).Vertex(1) = VtxB1;
+    state->dataSurface->Surface(2).Vertex(2) = VtxB2;
+    state->dataSurface->Surface(2).Vertex(3) = VtxB3;
+    state->dataSurface->Surface(2).Vertex(4) = VtxB4;
+    state->dataSurface->Surface(2).Vertex(5) = VtxB5;
+    state->dataSurface->Surface(2).Vertex(6) = VtxB6;
 
-    Surface(2).Name = "Surf_Recv";
-    Surface(2).ZoneName = "Zone1";
+    state->dataSurface->Surface(2).Name = "Surf_Recv";
+    state->dataSurface->Surface(2).ZoneName = "Zone1";
 
     CHKBKS(*state, 1, 2);
 
@@ -1907,29 +1907,29 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS) {
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    Surface(3).Sides = 4;
+    state->dataSurface->Surface(3).Sides = 4;
 
-    Surface(3).Vertex.allocate(4);
-    Surface(3).Vertex(1) = VtxA1;
-    Surface(3).Vertex(2) = VtxA2;
-    Surface(3).Vertex(3) = VtxA3;
-    Surface(3).Vertex(4) = VtxA4;
+    state->dataSurface->Surface(3).Vertex.allocate(4);
+    state->dataSurface->Surface(3).Vertex(1) = VtxA1;
+    state->dataSurface->Surface(3).Vertex(2) = VtxA2;
+    state->dataSurface->Surface(3).Vertex(3) = VtxA3;
+    state->dataSurface->Surface(3).Vertex(4) = VtxA4;
 
-    Surface(3).Name = "Surf_Back2";
-    Surface(3).ZoneName = "Zone2";
+    state->dataSurface->Surface(3).Name = "Surf_Back2";
+    state->dataSurface->Surface(3).ZoneName = "Zone2";
 
-    Surface(4).Sides = 6; // receiving
-    Surface(4).Vertex.allocate(6);
+    state->dataSurface->Surface(4).Sides = 6; // receiving
+    state->dataSurface->Surface(4).Vertex.allocate(6);
 
-    Surface(4).Vertex(1) = VtxB6;
-    Surface(4).Vertex(2) = VtxB5;
-    Surface(4).Vertex(3) = VtxB4;
-    Surface(4).Vertex(4) = VtxB3;
-    Surface(4).Vertex(5) = VtxB2;
-    Surface(4).Vertex(6) = VtxB1;
+    state->dataSurface->Surface(4).Vertex(1) = VtxB6;
+    state->dataSurface->Surface(4).Vertex(2) = VtxB5;
+    state->dataSurface->Surface(4).Vertex(3) = VtxB4;
+    state->dataSurface->Surface(4).Vertex(4) = VtxB3;
+    state->dataSurface->Surface(4).Vertex(5) = VtxB2;
+    state->dataSurface->Surface(4).Vertex(6) = VtxB1;
 
-    Surface(4).Name = "Surf_Recv2";
-    Surface(4).ZoneName = "Zone2";
+    state->dataSurface->Surface(4).Name = "Surf_Recv2";
+    state->dataSurface->Surface(4).ZoneName = "Zone2";
 
     CHKBKS(*state, 3, 4);
 
@@ -2566,19 +2566,19 @@ if (state->dataSolarShading->penumbra) {
 TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
 {
     state->dataSurface->TotSurfaces = 2;
-    Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     int curSurface = 1;
-    Surface(curSurface).windowShadingControlList.push_back(57);
+    state->dataSurface->Surface(curSurface).windowShadingControlList.push_back(57);
 
     int curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
-    int activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    int activeWindowShadingControl = state->dataSurface->Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 57);
 
     curSurface = 2;
-    Surface(curSurface).windowShadingControlList.push_back(1);
-    Surface(curSurface).windowShadingControlList.push_back(2);
-    Surface(curSurface).windowShadingControlList.push_back(3);
+    state->dataSurface->Surface(curSurface).windowShadingControlList.push_back(1);
+    state->dataSurface->Surface(curSurface).windowShadingControlList.push_back(2);
+    state->dataSurface->Surface(curSurface).windowShadingControlList.push_back(3);
 
     WindowShadingControl.allocate(3);
     WindowShadingControl(1).Schedule = 1;
@@ -2591,7 +2591,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(3).CurrentValue = 1;
 
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
-    activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    activeWindowShadingControl = state->dataSurface->Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 3);
 
     ScheduleManager::Schedule(1).CurrentValue = 0;
@@ -2599,7 +2599,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(3).CurrentValue = 0;
 
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
-    activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    activeWindowShadingControl = state->dataSurface->Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 2);
 
     ScheduleManager::Schedule(1).CurrentValue = 1;
@@ -2607,6 +2607,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     ScheduleManager::Schedule(3).CurrentValue = 0;
 
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
-    activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    activeWindowShadingControl = state->dataSurface->Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 1);
 }

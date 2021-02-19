@@ -101,17 +101,20 @@ namespace SolarShading {
 
     void AnisoSkyViewFactors(EnergyPlusData &state);
 
-    void CHKBKS(EnergyPlusData &state, int const NBS, // Surface Number of the potential back surface
+    void CHKBKS(EnergyPlusData &state,
+                int const NBS, // Surface Number of the potential back surface
                 int const NRS  // Surface Number of the potential shadow receiving surface
     );
 
-    void CHKGSS(int const NRS,     // Surface number of the potential shadow receiving surface
+    void CHKGSS(EnergyPlusData &state,
+                int const NRS,     // Surface number of the potential shadow receiving surface
                 int const NSS,     // Surface number of the potential shadow casting surface
                 Real64 const ZMIN, // Lowest point of the receiving surface
                 bool &CannotShade  // TRUE if shadow casting surface cannot shade receiving surface.
     );
 
-    void CHKSBS(EnergyPlusData &state, int const HTS,   // Heat transfer surface number of the general receiving surf
+    void CHKSBS(EnergyPlusData &state,
+                int const HTS,   // Heat transfer surface number of the general receiving surf
                 int const GRSNR, // Surface number of general receiving surface
                 int const SBSNR  // Surface number of subsurface
     );

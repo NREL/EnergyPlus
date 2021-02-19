@@ -78,9 +78,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     Real64 AbsExt;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulExt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).SchedMovInsulExt = -1;
+    state->dataSurface->Surface(SurfNum).MaterialMovInsulExt = 1;
 
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Resistance = 1.25;
@@ -113,9 +113,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     Real64 AbsExt;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulInt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).SchedMovInsulInt = -1;
+    state->dataSurface->Surface(SurfNum).MaterialMovInsulInt = 1;
 
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Resistance = 1.25;

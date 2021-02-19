@@ -93,7 +93,7 @@ namespace WindowManager {
         // to obtain results
 
         auto &window(SurfaceWindow(SurfNum));
-        auto &surface(Surface(SurfNum));
+        auto &surface(state.dataSurface->Surface(SurfNum));
         auto ConstrNum = surface.Construction;
         auto &construction(state.dataConstruction->Construct(ConstrNum));
 
@@ -160,7 +160,7 @@ namespace WindowManager {
             state.dataWindowManager->nglfacep = state.dataWindowManager->nglface + 2;
             auto aShadeLayer = aLayers[totLayers - 1];
             auto aGlassLayer = aLayers[totLayers - 2];
-            auto ShadeArea = Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
+            auto ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
             auto frontSurface = aShadeLayer->getSurface(Side::Front);
             auto backSurface = aShadeLayer->getSurface(Side::Back);
             auto EpsShIR1 = frontSurface->getEmissivity();
@@ -223,7 +223,7 @@ namespace WindowManager {
         auto TransDiff = construction.TransDiff;
         state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
         state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+        state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
             SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);

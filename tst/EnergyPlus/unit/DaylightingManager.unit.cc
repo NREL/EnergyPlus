@@ -896,9 +896,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 {
 
-    Surface.allocate(1);
-    Surface(1).Tilt = 90.0;
-    Surface(1).Azimuth = 180.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Azimuth = 180.0;
     int horiz = 1;
     int vert = 2;
     Real64 ProfAng;
@@ -908,20 +908,20 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     CosDirSun(2) = 0.470492;
     CosDirSun(3) = 0.003513;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.00747, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
     CosDirSun(1) = 0.92318;
     CosDirSun(2) = 0.36483;
     CosDirSun(3) = 0.12094;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.32010, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(1.94715, ProfAng, 0.00001);
 }
 
@@ -1366,7 +1366,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     int DayltgExtWin = 1;
     int Shaded = 2;
     int Unshaded = 1;
-    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
     EXPECT_GT(IWin, 0);
 
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
@@ -2856,7 +2856,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    state->dataConstruction->Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);
     CalcDayltgCoefficients(*state);
 

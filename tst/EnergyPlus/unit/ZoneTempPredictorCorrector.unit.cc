@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
 
     state->dataHeatBal->Zone(1).SurfaceFirst = 1;
     state->dataHeatBal->Zone(1).SurfaceLast = 2;
-    Surface.allocate(2);
+    state->dataSurface->Surface.allocate(2);
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
@@ -1002,21 +1002,21 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
 
     state->dataHeatBal->Zone(1).SurfaceFirst = 1;
     state->dataHeatBal->Zone(1).SurfaceLast = 3;
-    Surface.allocate(3);
+    state->dataSurface->Surface.allocate(3);
     state->dataHeatBal->HConvIn.allocate(3);
     Node.allocate(4);
     state->dataHeatBal->TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
-    Surface(1).HeatTransSurf = true;
-    Surface(2).HeatTransSurf = true;
-    Surface(3).HeatTransSurf = true;
-    Surface(1).Area = 10.0;
-    Surface(2).Area = 10.0;
-    Surface(3).Area = 10.0;
-    Surface(1).TAirRef = ZoneMeanAirTemp;
-    Surface(2).TAirRef = AdjacentAirTemp;
-    Surface(3).TAirRef = ZoneSupplyAirTemp;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Area = 10.0;
+    state->dataSurface->Surface(2).Area = 10.0;
+    state->dataSurface->Surface(3).Area = 10.0;
+    state->dataSurface->Surface(1).TAirRef = ZoneMeanAirTemp;
+    state->dataSurface->Surface(2).TAirRef = AdjacentAirTemp;
+    state->dataSurface->Surface(3).TAirRef = ZoneSupplyAirTemp;
     DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
     DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
     DataHeatBalSurface::TempSurfInTmp(3) = 25.0;

@@ -1396,11 +1396,11 @@ namespace WindowManager {
 
         // Loop for ordinary windows
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
-            if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
-            ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
+            ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
             IntShade = false;
@@ -1444,9 +1444,9 @@ namespace WindowManager {
         }         // End of surface loop
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).Construction <= 0) continue;
-            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-            ConstrNum = Surface(SurfNum).Construction;
+            if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue;
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
+            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             // Total thickness of glazing system (used in calculation of inside reveal reflection/absorption
             state.dataSurface->SurfWinTotGlazingThickness(SurfNum) = 0.0;
             for (LayNum = 1; LayNum <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++LayNum) {
@@ -1467,18 +1467,18 @@ namespace WindowManager {
             // Window center
             Rectangle = false;
             Triangle = false;
-            if (Surface(SurfNum).Sides == 3) Triangle = true;
-            if (Surface(SurfNum).Sides == 4) Rectangle = true;
+            if (state.dataSurface->Surface(SurfNum).Sides == 3) Triangle = true;
+            if (state.dataSurface->Surface(SurfNum).Sides == 4) Rectangle = true;
             if (Rectangle) {
                 // Vertices of window (numbered counter-clockwise starting at upper left as viewed from inside of room).
                 // Assumes original vertices are numbered counter-clockwise from upper left as viewed from outside.
-                W3 = Surface(SurfNum).Vertex(2);
-                W2 = Surface(SurfNum).Vertex(3);
-                W1 = Surface(SurfNum).Vertex(4);
+                W3 = state.dataSurface->Surface(SurfNum).Vertex(2);
+                W2 = state.dataSurface->Surface(SurfNum).Vertex(3);
+                W1 = state.dataSurface->Surface(SurfNum).Vertex(4);
             } else if (Triangle) {
-                W3 = Surface(SurfNum).Vertex(2);
-                W2 = Surface(SurfNum).Vertex(3);
-                W1 = Surface(SurfNum).Vertex(1);
+                W3 = state.dataSurface->Surface(SurfNum).Vertex(2);
+                W2 = state.dataSurface->Surface(SurfNum).Vertex(3);
+                W1 = state.dataSurface->Surface(SurfNum).Vertex(1);
             }
             W21 = W1 - W2;
             W23 = W3 - W2;
@@ -1542,8 +1542,8 @@ namespace WindowManager {
             // For a window with shading device, get number of shaded construction and, if window
             // has a blind (interior, exterior or between glass), get blind data pointer.
 
-            if (Surface(SurfNum).HasShadeControl) {
-                for (int winShadCtrl : Surface(SurfNum).windowShadingControlList) {
+            if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
+                for (int winShadCtrl : state.dataSurface->Surface(SurfNum).windowShadingControlList) {
                     ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
                     if (ShadingType == WSC_ST_ExteriorScreen) {
                         //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
@@ -1558,14 +1558,14 @@ namespace WindowManager {
         // Set some static exterior-window frame and divider SurfaceWindow values
         // from values in FrameDivider derived type
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            FrDivNum = Surface(SurfNum).FrameDivider;
+            FrDivNum = state.dataSurface->Surface(SurfNum).FrameDivider;
             if (FrDivNum > 0) { // Surface is a window with a frame and/or divider
                 FrWidth = FrameDivider(FrDivNum).FrameWidth;
-                GlHeight = Surface(SurfNum).Height;
-                GlWidth = Surface(SurfNum).Width;
+                GlHeight = state.dataSurface->Surface(SurfNum).Height;
+                GlWidth = state.dataSurface->Surface(SurfNum).Width;
                 NumVertDividers = FrameDivider(FrDivNum).VertDividers;
                 NumHorDividers = FrameDivider(FrDivNum).HorDividers;
-                BaseSurfNum = Surface(SurfNum).BaseSurf;
+                BaseSurfNum = state.dataSurface->Surface(SurfNum).BaseSurf;
                 state.dataSurface->SurfWinFrameConductance(SurfNum) = FrameDivider(FrDivNum).FrameConductance;
                 state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) = FrameDivider(FrDivNum).FrameSolAbsorp;
                 state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = FrameDivider(FrDivNum).FrameVisAbsorp;
@@ -1594,7 +1594,7 @@ namespace WindowManager {
                     2 * DivEdgeWidth * (NumHorDividers * (GlWidth - 2 * FrEdgeWidth) + NumVertDividers * (GlHeight - 2 * FrEdgeWidth)) -
                     NumHorDividers * NumVertDividers * (4 * pow_2(DivEdgeWidth) + 4 * FrEdgeWidth * DivWidth);
                 state.dataSurface->SurfWinCenterGlArea(SurfNum) =
-                    Surface(SurfNum).Area - state.dataSurface->SurfWinFrameEdgeArea(SurfNum) - state.dataSurface->SurfWinDividerEdgeArea(SurfNum);
+                    state.dataSurface->Surface(SurfNum).Area - state.dataSurface->SurfWinFrameEdgeArea(SurfNum) - state.dataSurface->SurfWinDividerEdgeArea(SurfNum);
                 state.dataSurface->SurfWinEdgeGlCorrFac(SurfNum) =
                     (state.dataSurface->SurfWinFrameEdgeArea(SurfNum) * state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) +
                      state.dataSurface->SurfWinDividerEdgeArea(SurfNum) * state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) +
@@ -1607,22 +1607,22 @@ namespace WindowManager {
         DifOverrideCount = 0;
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = false;
-            if (Surface(SurfNum).Class == SurfaceClass::Window && Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
-                Surface(SurfNum).StormWinConstruction == 0) {
-                ConstrNum = Surface(SurfNum).Construction;
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment &&
+                state.dataSurface->Surface(SurfNum).StormWinConstruction == 0) {
+                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
                 if (state.dataMaterial->Material(MatNum).SolarDiffusing) {
-                    if (!Surface(SurfNum).HasShadeControl) {
+                    if (!state.dataSurface->Surface(SurfNum).HasShadeControl) {
                         state.dataSurface->SurfWinSolarDiffusing(SurfNum) = true;
                     } else { // There is a shading control
-                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == SwitchableGlazing) {
+                        if (WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).ShadingType == SwitchableGlazing) {
                             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = true;
                         } else {
                             state.dataSurface->SurfWinSolarDiffusing(SurfNum) = false;
                             ++DifOverrideCount;
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 ShowWarningError(state,
-                                    "W5InitGlassParameters: Window=\"" + Surface(SurfNum).Name +
+                                    "W5InitGlassParameters: Window=\"" + state.dataSurface->Surface(SurfNum).Name +
                                     "\" has interior material with Solar Diffusing=Yes, but existing Window Shading Device sets Diffusing=No.");
                             }
                         }
@@ -2112,7 +2112,7 @@ namespace WindowManager {
 
         // Shorthand refernces
         auto &window(SurfaceWindow(SurfNum));
-        auto &surface(Surface(SurfNum));
+        auto &surface(state.dataSurface->Surface(SurfNum));
 
         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
 
@@ -2439,11 +2439,11 @@ namespace WindowManager {
 
             if (SurfNumAdj > 0) { // Interzone window
 
-                ZoneNumAdj = Surface(SurfNumAdj).Zone;
+                ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
 
                 // determine reference air temperature for this surface
                 {
-                    auto const SELECT_CASE_var(Surface(SurfNumAdj).TAirRef);
+                    auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = MAT(ZoneNumAdj);
                         state.dataHeatBal->TempEffBulkAir(SurfNumAdj) = RefAirTemp;
@@ -2497,8 +2497,8 @@ namespace WindowManager {
                 // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-                        SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+                    if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
+                        SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
 
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
@@ -2635,8 +2635,8 @@ namespace WindowManager {
         Real64 rad_out_lw_srd_per_area = 0;
 
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-            if (Surface(SurfNum).HasSurroundingSurfProperties) {
-                SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+            if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
+                SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
                 for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                     SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs =
@@ -2934,7 +2934,7 @@ namespace WindowManager {
         ConvHeatFlowForced = 0.0;
         state.dataWindowManager->nglfacep = state.dataWindowManager->nglface;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-        ZoneNum = Surface(SurfNum).Zone;
+        ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
         AbsRadShadeFace = 0.0;
         TGapNew = 0.0;
 
@@ -2981,8 +2981,8 @@ namespace WindowManager {
             }
 
             // call for new interior film coeff (since it is temperature dependent) if using Detailed inside coef model
-            if (((Surface(SurfNum).IntConvCoeff == 0) && (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ASHRAETARP)) ||
-                (Surface(SurfNum).IntConvCoeff == -2)) {
+            if (((state.dataSurface->Surface(SurfNum).IntConvCoeff == 0) && (state.dataHeatBal->Zone(ZoneNum).InsideConvectionAlgo == ASHRAETARP)) ||
+                (state.dataSurface->Surface(SurfNum).IntConvCoeff == -2)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
                 if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
@@ -3425,7 +3425,7 @@ namespace WindowManager {
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
-            IncidentSolar = Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
+            IncidentSolar = state.dataSurface->Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
             if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
                 // Interior shade or blind
                 state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
@@ -3434,7 +3434,7 @@ namespace WindowManager {
                 //   zone from the glass adjacent to the shade/blind (zero if shade/blind IR transmittance is zero).
                 // Following assumes glazed area = window area (i.e., dividers ignored) in calculating
                 //   IR to zone from glass when interior shade/blind is present.
-                ShadeArea = Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
+                ShadeArea = state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum);
                 CondHeatGainShade = ShadeArea * sconsh * (state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1) - state.dataWindowManager->thetas(state.dataWindowManager->nglfacep));
                 NetIRHeatGainShade = ShadeArea * EpsShIR2 * (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep)) - state.dataWindowManager->Rmir) +
                                      EpsShIR1 * (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(state.dataWindowManager->nglfacep - 1)) - state.dataWindowManager->Rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
@@ -3450,9 +3450,9 @@ namespace WindowManager {
                 state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
             } else {
                 // Interior shade or blind not present; innermost layer is glass
-                CondHeatGainGlass = Surface(SurfNum).Area * state.dataWindowManager->scon(state.dataWindowManager->ngllayer) * (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 1) - state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer));
-                NetIRHeatGainGlass = Surface(SurfNum).Area * state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer) * (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer)) - state.dataWindowManager->Rmir);
-                ConvHeatGainFrZoneSideOfGlass = Surface(SurfNum).Area * state.dataWindowManager->hcin * (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->tin);
+                CondHeatGainGlass = state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->scon(state.dataWindowManager->ngllayer) * (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer - 1) - state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer));
+                NetIRHeatGainGlass = state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer) * (state.dataWindowManager->sigma * pow_4(state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer)) - state.dataWindowManager->Rmir);
+                ConvHeatGainFrZoneSideOfGlass = state.dataSurface->Surface(SurfNum).Area * state.dataWindowManager->hcin * (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->tin);
                 state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
                 state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
                 // store components for reporting
@@ -3466,7 +3466,7 @@ namespace WindowManager {
 
             state.dataSurface->SurfWinGapConvHtFlowRep(SurfNum) = 0.0;
             state.dataSurface->SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
-            TotAirflowGap = state.dataSurface->SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
+            TotAirflowGap = state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
             TAirflowGapOutletC = TAirflowGapOutlet - state.dataWindowManager->TKelvin;
             state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
             if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
@@ -3499,11 +3499,11 @@ namespace WindowManager {
 
             // Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
             // back out window
-            ConstrNum = Surface(SurfNum).Construction;
-            ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+            ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
             if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) {
-                ConstrNum = Surface(SurfNum).StormWinConstruction;
-                ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+                ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
+                ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
             }
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
@@ -3517,23 +3517,23 @@ namespace WindowManager {
             } else if (ShadeFlag == SwitchableGlazing) {
                 TransDiff = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum), state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
             }
-            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
+            state.dataSurface->SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
-            state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) = (state.dataSurface->SurfWinExtBeamAbsByShade(SurfNum) + state.dataSurface->SurfWinExtDiffAbsByShade(SurfNum)) *
-                                                   (Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum));
+                                                   (state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum));
                 state.dataSurface->SurfWinShadingAbsorbedSolarEnergy(SurfNum) = state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
             if (state.dataEnvrn->SunIsUp) {
 
                 state.dataSurface->SurfWinSysSolTransmittance(SurfNum) =
-                        state.dataSurface->SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum)) + 0.0001);
+                        state.dataSurface->SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum)) + 0.0001);
                 state.dataSurface->SurfWinSysSolAbsorptance(SurfNum) = (state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) + state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum)) /
-                                                (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum)) + 0.0001);
+                                                (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum)) + 0.0001);
                 state.dataSurface->SurfWinSysSolReflectance(SurfNum) = 1.0 - state.dataSurface->SurfWinSysSolTransmittance(SurfNum) - state.dataSurface->SurfWinSysSolAbsorptance(SurfNum);
             } else {
                 state.dataSurface->SurfWinSysSolTransmittance(SurfNum) = 0.0;
@@ -3546,7 +3546,7 @@ namespace WindowManager {
                 state.dataSurface->SurfWinConvCoeffWithShade(SurfNum) = hcv;
         } else {
             // No convergence after MaxIterations even with relaxed error tolerance
-            ShowSevereError(state, "Convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
+            ShowSevereError(state, "Convergence error in SolveForWindowTemperatures for window " + state.dataSurface->Surface(SurfNum).Name);
             ShowContinueErrorTimeStamp(state, "");
 
             if (state.dataGlobal->DisplayExtraWarnings) {
@@ -3560,7 +3560,7 @@ namespace WindowManager {
                 }
             }
 
-            ShowFatalError(state, "Program halted because of convergence error in SolveForWindowTemperatures for window " + Surface(SurfNum).Name);
+            ShowFatalError(state, "Program halted because of convergence error in SolveForWindowTemperatures for window " + state.dataSurface->Surface(SurfNum).Name);
         }
     }
 
@@ -3644,8 +3644,8 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
-        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
+        ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
+        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNumSh = state.dataSurface->Surface(SurfNum).activeStormWinShadedConstruction;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
@@ -3677,7 +3677,7 @@ namespace WindowManager {
         // For near-horizontal windows (i.e., no more than 5 deg from horizontal) assume
         // there is no air flow thru gap
 
-        if (std::abs(Surface(SurfNum).SinTilt) < 0.0872) {
+        if (std::abs(state.dataSurface->Surface(SurfNum).SinTilt) < 0.0872) {
             VGap = 0.0;
             hcv = 2.0 * hGapStill;
             QConvGap = 0.0;
@@ -3686,27 +3686,27 @@ namespace WindowManager {
             return;
         }
 
-        GapHeight = Surface(SurfNum).Height;
+        GapHeight = state.dataSurface->Surface(SurfNum).Height;
 
         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == ExtScreenOn) {
             // Shade or Screen on
             GapDepth = state.dataMaterial->Material(MatNumSh).WinShadeToGlassDist;
-            AGap = GapDepth * Surface(SurfNum).Width;
+            AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
             ATopGap = state.dataMaterial->Material(MatNumSh).WinShadeTopOpeningMult * AGap;
             ABotGap = state.dataMaterial->Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
             ALeftGap = state.dataMaterial->Material(MatNumSh).WinShadeLeftOpeningMult * GapHeight * GapDepth;
             ARightGap = state.dataMaterial->Material(MatNumSh).WinShadeRightOpeningMult * GapHeight * GapDepth;
-            AHolesGap = state.dataMaterial->Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * Surface(SurfNum).Width;
+            AHolesGap = state.dataMaterial->Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         } else {
             // Blind on
             BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
             GapDepth = state.dataHeatBal->Blind(BlNum).BlindToGlassDist;
-            AGap = GapDepth * Surface(SurfNum).Width;
+            AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
             ATopGap = state.dataHeatBal->Blind(BlNum).BlindTopOpeningMult * AGap;
             ABotGap = state.dataHeatBal->Blind(BlNum).BlindBottomOpeningMult * AGap;
             ALeftGap = state.dataHeatBal->Blind(BlNum).BlindLeftOpeningMult * GapHeight * GapDepth;
             ARightGap = state.dataHeatBal->Blind(BlNum).BlindRightOpeningMult * GapHeight * GapDepth;
-            AHolesGap = state.dataSurface->SurfWinBlindAirFlowPermeability(SurfNum) * GapHeight * Surface(SurfNum).Width;
+            AHolesGap = state.dataSurface->SurfWinBlindAirFlowPermeability(SurfNum) * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         }
 
         RhoAir = state.dataWindowManager->AirProps(1) + state.dataWindowManager->AirProps(2) * (TGapOld - state.dataWindowManager->TKelvin);
@@ -3735,7 +3735,7 @@ namespace WindowManager {
         Zoutlet = pow_2(AGap / (0.6 * AEqOutlet + 0.000001) - 1.0);
         AVGap = 0.5 * RhoAir * (1 + Zinlet + Zoutlet);
         RhoTRef = state.dataWindowManager->AirProps(1) * state.dataWindowManager->TKelvin;
-        CVGap = RhoTRef * 9.81 * GapHeight * Surface(SurfNum).SinTilt * (TGapOld - TGapInlet) / (TGapOld * TGapInlet);
+        CVGap = RhoTRef * 9.81 * GapHeight * state.dataSurface->Surface(SurfNum).SinTilt * (TGapOld - TGapInlet) / (TGapOld * TGapInlet);
 
         // Solution of quadratic equation in VGap
         VGap = (std::sqrt(pow_2(BVGap) + std::abs(4.0 * AVGap * CVGap)) - BVGap) / (2.0 * AVGap);
@@ -3757,7 +3757,7 @@ namespace WindowManager {
             QConvGap = RhoAir * AGap * VGap * 1008.0 * (TGapOutlet - TGapInlet);
             // Exclude convection to gap due to divider, if present; divider convection handled
             // separately in CalcWinFrameAndDividerTemps
-            QConvGap *= 0.5 * (1.0 + Surface(SurfNum).Area / (Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum)));
+            QConvGap *= 0.5 * (1.0 + state.dataSurface->Surface(SurfNum).Area / (state.dataSurface->Surface(SurfNum).Area + state.dataSurface->SurfWinDividerArea(SurfNum)));
         }
     }
 
@@ -3842,7 +3842,7 @@ namespace WindowManager {
         int IGap;                         // Gap counter; 1 = gap on outer side of shade/blind, 2 = gap on inner side.
         int IGapInc;                      // Gap increment (0 or 1)
 
-        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+        ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
         nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
 
@@ -3878,7 +3878,7 @@ namespace WindowManager {
         // For near-horizontal windows (i.e., no more than 5 deg from horizontal) assume
         // there is no air flow thru gap
 
-        if (std::abs(Surface(SurfNum).SinTilt) < 0.0872) {
+        if (std::abs(state.dataSurface->Surface(SurfNum).SinTilt) < 0.0872) {
             VGap = 0.0;
             for (IGap = 1; IGap <= 2; ++IGap) {
                 hcv(IGap) = 2.0 * hGapStill(IGap);
@@ -3887,9 +3887,9 @@ namespace WindowManager {
             return;
         }
 
-        GapHeight = Surface(SurfNum).Height;
+        GapHeight = state.dataSurface->Surface(SurfNum).Height;
         GapDepth = state.dataWindowManager->gap(1 + IGapInc);
-        AGap = GapDepth * Surface(SurfNum).Width;
+        AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
 
         if (ShadeFlag == BGShadeOn) {
             // Shade on
@@ -3897,7 +3897,7 @@ namespace WindowManager {
             ABotGap = state.dataMaterial->Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
             ALeftGap = state.dataMaterial->Material(MatNumSh).WinShadeLeftOpeningMult * GapHeight * GapDepth;
             ARightGap = state.dataMaterial->Material(MatNumSh).WinShadeRightOpeningMult * GapHeight * GapDepth;
-            AHolesGap = state.dataMaterial->Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * Surface(SurfNum).Width;
+            AHolesGap = state.dataMaterial->Material(MatNumSh).WinShadeAirFlowPermeability * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         } else {
             // Blind on
             BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
@@ -3905,7 +3905,7 @@ namespace WindowManager {
             ABotGap = state.dataHeatBal->Blind(BlNum).BlindBottomOpeningMult * AGap;
             ALeftGap = state.dataHeatBal->Blind(BlNum).BlindLeftOpeningMult * GapHeight * GapDepth;
             ARightGap = state.dataHeatBal->Blind(BlNum).BlindRightOpeningMult * GapHeight * GapDepth;
-            AHolesGap = state.dataSurface->SurfWinBlindAirFlowPermeability(SurfNum) * GapHeight * Surface(SurfNum).Width;
+            AHolesGap = state.dataSurface->SurfWinBlindAirFlowPermeability(SurfNum) * GapHeight * state.dataSurface->Surface(SurfNum).Width;
         }
 
         for (IGap = 1; IGap <= 2; ++IGap) {
@@ -3930,7 +3930,7 @@ namespace WindowManager {
         AVGap = 0.5 * (RhoGas(1) + RhoGas(2)) * (1.0 + Zinlet + Zoutlet);
         WindowGasPropertiesAtTemp(state, state.dataWindowManager->TKelvin, 1 + IGapInc, RhoGasZero, ViscGasZero);
         RhoTRef = RhoGasZero * state.dataWindowManager->TKelvin;
-        CVGap = RhoTRef * 9.81 * GapHeight * Surface(SurfNum).SinTilt * (TGapOld(1) - TGapOld(2)) / (TGapOld(1) * TGapOld(2));
+        CVGap = RhoTRef * 9.81 * GapHeight * state.dataSurface->Surface(SurfNum).SinTilt * (TGapOld(1) - TGapOld(2)) / (TGapOld(1) * TGapOld(2));
 
         // Solution of quadratic equation in VGap
 
@@ -4022,7 +4022,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNum = Surface(SurfNum).Construction;
+        ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
         NGlass = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
         TGlassFace1 = state.dataWindowManager->thetas(2 * NGlass - 2);
         TGlassFace2 = state.dataWindowManager->thetas(2 * NGlass - 1);
@@ -4045,9 +4045,9 @@ namespace WindowManager {
         WindowGasConductance(state, TGlassFace1, TGlassFace2, GapNum, con, pr, gr);
         NusseltNumber(state, SurfNum, TGlassFace1, TGlassFace2, GapNum, gr, pr, nu);
         hGapStill = con / state.dataWindowManager->gap(GapNum) * nu;
-        GapHeight = Surface(SurfNum).Height;
+        GapHeight = state.dataSurface->Surface(SurfNum).Height;
         GapDepth = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2 * NGlass - 2)).Thickness;
-        AGap = GapDepth * Surface(SurfNum).Width;
+        AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
         VGap = state.dataSurface->SurfWinAirflowThisTS(SurfNum) / GapDepth;
         hcv = 2.0 * hGapStill + 4.0 * VGap;
         RhoAir = state.dataWindowManager->AirProps(1) + state.dataWindowManager->AirProps(2) * (TGapOld - state.dataWindowManager->TKelvin);
@@ -4136,7 +4136,7 @@ namespace WindowManager {
         //               Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
         // DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
-        ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+        ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
 
         if (state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers == 2) { // Double glazing
@@ -4161,9 +4161,9 @@ namespace WindowManager {
             TGapInlet = state.dataWindowManager->tout;
         }
 
-        GapHeight = Surface(SurfNum).Height;
+        GapHeight = state.dataSurface->Surface(SurfNum).Height;
         GapDepth = state.dataWindowManager->gap(1 + IGapInc);
-        AGap = GapDepth * Surface(SurfNum).Width;
+        AGap = GapDepth * state.dataSurface->Surface(SurfNum).Width;
         // Factor of 2 below assumes gaps on either side of shade/blind have same depth
         VGap = state.dataSurface->SurfWinAirflowThisTS(SurfNum) / (2.0 * GapDepth);
 
@@ -4769,7 +4769,7 @@ namespace WindowManager {
         Real64 ang;
 
         if (SurfNum > 0) {
-            asp = Surface(SurfNum).Height / state.dataWindowManager->gap(IGap);
+            asp = state.dataSurface->Surface(SurfNum).Height / state.dataWindowManager->gap(IGap);
         } else { // SurfNum = 0 when NusseltNumber is called from CalcNominalWindowCond, which applies to a
             // particular construction. So window height is not known and we assume 5 ft (1.524 m)
             asp = 1.524 / state.dataWindowManager->gap(IGap);
@@ -5471,7 +5471,7 @@ namespace WindowManager {
                    int const N,                    // Order of polynomial
                    int const N1,                   // First and last data points used
                    int const N2,
-                   Array1A<Real64> CoeffsCurve // Polynomial coeffients from fit
+                   Array1A<Real64> CoeffsCurve // Polynomial coefficients from fit
     )
     {
 
@@ -5776,7 +5776,7 @@ namespace WindowManager {
         TInRad = root_4(state.dataSurface->SurfWinIRfromParentZone(SurfNum) / state.dataWindowManager->sigma);
         TOutRad = root_4(Outir / state.dataWindowManager->sigma);
         ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
-        FrDivNum = Surface(SurfNum).FrameDivider;
+        FrDivNum = state.dataSurface->Surface(SurfNum).FrameDivider;
         TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
         TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
         EmisGlassOut = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
@@ -7466,10 +7466,10 @@ namespace WindowManager {
         PrintTransMap = false;
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-            if (Surface(SurfNum).HasShadeControl) {
-                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+            if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
+                ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
                 MatNum = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1);
-                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
+                ShadingType = WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).ShadingType;
                 if (ShadingType == WSC_ST_ExteriorScreen) {
 
                     if (state.dataMaterial->Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;

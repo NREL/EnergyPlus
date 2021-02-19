@@ -224,7 +224,7 @@ namespace EnergyPlus::SwimmingPool {
             state.dataSwimmingPools->Pool(Item).SurfaceName = Alphas(2);
             state.dataSwimmingPools->Pool(Item).SurfacePtr = 0;
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                if (UtilityRoutines::SameString(DataSurfaces::Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
+                if (UtilityRoutines::SameString(state.dataSurface->Surface(SurfNum).Name, state.dataSwimmingPools->Pool(Item).SurfaceName)) {
                     state.dataSwimmingPools->Pool(Item).SurfacePtr = SurfNum;
                     break;
                 }
@@ -405,38 +405,38 @@ namespace EnergyPlus::SwimmingPool {
             ShowSevereError(state, RoutineName + "Invalid " + cAlphaField2 + " = " + Alpha2);
             ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alpha1);
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
+        } else if (state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool) {
             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + "\", Invalid Surface");
             ShowContinueError(state, cAlphaField2 + "=\"" + Alpha2 + "\" has been used in another radiant system, ventilated slab, or pool.");
             ShowContinueError(state,
                 "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these.");
             ErrorsFound = true;
             // Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-        } else if (DataSurfaces::Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel_CTF) {
-            ShowSevereError(state, DataSurfaces::Surface(this->SurfacePtr).Name +
+        } else if (state.dataSurface->Surface(this->SurfacePtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel_CTF) {
+            ShowSevereError(state, state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is attempting to use a non-CTF solution algorithm.  This is "
                             "not allowed.  Use the CTF solution algorithm for this surface.");
             ErrorsFound = true;
 
-        } else if (DataSurfaces::Surface(this->SurfacePtr).Class == DataSurfaces::SurfaceClass::Window) {
-            ShowSevereError(state, DataSurfaces::Surface(this->SurfacePtr).Name +
+        } else if (state.dataSurface->Surface(this->SurfacePtr).Class == DataSurfaces::SurfaceClass::Window) {
+            ShowSevereError(state, state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and is defined as a window.  This is not allowed.  A pool must be a floor that is NOT a window.");
             ErrorsFound = true;
-        } else if (DataSurfaces::Surface(this->SurfacePtr).MaterialMovInsulInt > 0) {
-            ShowSevereError(state, DataSurfaces::Surface(this->SurfacePtr).Name +
+        } else if (state.dataSurface->Surface(this->SurfacePtr).MaterialMovInsulInt > 0) {
+            ShowSevereError(state, state.dataSurface->Surface(this->SurfacePtr).Name +
                             " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface.");
             ErrorsFound = true;
-        } else if (state.dataConstruction->Construct(DataSurfaces::Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
+        } else if (state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfacePtr).Construction).SourceSinkPresent) {
             ShowSevereError(state,
-                DataSurfaces::Surface(this->SurfacePtr).Name +
+                state.dataSurface->Surface(this->SurfacePtr).Name +
                 " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface.");
             ErrorsFound = true;
         } else { // ( Pool( Item ).SurfacePtr > 0 )
-            DataSurfaces::Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
-            DataSurfaces::Surface(this->SurfacePtr).IsPool = true;
-            this->ZonePtr = DataSurfaces::Surface(this->SurfacePtr).Zone;
+            state.dataSurface->Surface(this->SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
+            state.dataSurface->Surface(this->SurfacePtr).IsPool = true;
+            this->ZonePtr = state.dataSurface->Surface(this->SurfacePtr).Zone;
             // Check to make sure pool surface is a floor
-            if (DataSurfaces::Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
+            if (state.dataSurface->Surface(this->SurfacePtr).Class != DataSurfaces::SurfaceClass::Floor) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha1 + " contains a surface name that is NOT a floor.");
                 ShowContinueError(state,
                     "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
@@ -509,7 +509,7 @@ namespace EnergyPlus::SwimmingPool {
             this->WaterMassFlowRate = 0.0;
             this->PeopleHeatGain = 0.0;
             Real64 Density = FluidProperties::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
-            this->WaterMass = DataSurfaces::Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
+            this->WaterMass = state.dataSurface->Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
             this->WaterMassFlowRateMax = this->WaterVolFlowMax * Density;
             this->initSwimmingPoolPlantNodeFlow();
         }
@@ -790,7 +790,7 @@ namespace EnergyPlus::SwimmingPool {
 
         // initialize local variables
         int SurfNum = this->SurfacePtr;                    // surface number of floor that is the pool
-        int ZoneNum = DataSurfaces::Surface(SurfNum).Zone; // index to zone array
+        int ZoneNum = state.dataSurface->Surface(SurfNum).Zone; // index to zone array
 
         // Convection coefficient calculation
         Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - DataHeatBalFanSys::MAT(ZoneNum)), 1.0 / 3.0) *
@@ -799,8 +799,8 @@ namespace EnergyPlus::SwimmingPool {
         this->MakeUpWaterMassFlowRate = EvapRate;
         Real64 EvapEnergyLossPerArea = -EvapRate *
                                        Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum)) /
-                                       DataSurfaces::Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
-        this->EvapHeatLossRate = EvapEnergyLossPerArea * DataSurfaces::Surface(SurfNum).Area;
+                                       state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
+        this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
         Real64 LWsum =
@@ -814,7 +814,7 @@ namespace EnergyPlus::SwimmingPool {
 
         // Heat gain from people (assumed to be all convective to pool water)
         Real64 PeopleGain =
-            this->PeopleHeatGain / DataSurfaces::Surface(SurfNum).Area; // heat gain from people in pool (assumed to be all convective)
+            this->PeopleHeatGain / state.dataSurface->Surface(SurfNum).Area; // heat gain from people in pool (assumed to be all convective)
 
         // Get an estimate of the pool water specific heat
         Real64 Cp =
@@ -846,9 +846,9 @@ namespace EnergyPlus::SwimmingPool {
         DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
             SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * DataHeatBalFanSys::MAT(ZoneNum) +
             (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
-                DataSurfaces::Surface(SurfNum).Area;
+                state.dataSurface->Surface(SurfNum).Area;
         DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
-            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / state.dataGlobal->TimeStepZoneSec)) * Cp / DataSurfaces::Surface(SurfNum).Area;
+            HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / state.dataGlobal->TimeStepZoneSec)) * Cp / state.dataSurface->Surface(SurfNum).Area;
 
         // Finally take care of the latent and convective gains resulting from the pool
         DataHeatBalFanSys::SumConvPool(ZoneNum) += this->RadConvertToConvect;
@@ -875,7 +875,7 @@ namespace EnergyPlus::SwimmingPool {
         if (PSatPool < PParAir) PSatPool = PParAir;
         this->SatPressPoolWaterTemp = PSatPool;
         this->PartPressZoneAirTemp = PParAir;
-        EvapRate = (0.1 * (DataSurfaces::Surface(SurfNum).Area / DataConversions::CFA) * this->CurActivityFactor * ((PSatPool - PParAir) * CFinHg)) *
+        EvapRate = (0.1 * (state.dataSurface->Surface(SurfNum).Area / DataConversions::CFA) * this->CurActivityFactor * ((PSatPool - PParAir) * CFinHg)) *
                    DataConversions::CFMF * this->CurCoverEvapFac;
     }
 
@@ -956,16 +956,16 @@ namespace EnergyPlus::SwimmingPool {
         // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (DataSurfaces::Surface(SurfNum).ExtBoundCond > 0 && DataSurfaces::Surface(SurfNum).ExtBoundCond != SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) -
-                             DataHeatBalFanSys::QPoolSurfNumerator(DataSurfaces::Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
+                             DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
                     if (std::abs(DataHeatBalFanSys::QPoolSurfNumerator(SurfNum)) >
-                        std::abs(DataHeatBalFanSys::QPoolSurfNumerator(DataSurfaces::Surface(SurfNum).ExtBoundCond))) {
-                        DataHeatBalFanSys::QPoolSurfNumerator(DataSurfaces::Surface(SurfNum).ExtBoundCond) =
+                        std::abs(DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
+                        DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond) =
                             DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
                     } else {
                         DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
-                            DataHeatBalFanSys::QPoolSurfNumerator(DataSurfaces::Surface(SurfNum).ExtBoundCond);
+                            DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                     }
                 }
             }
@@ -973,16 +973,16 @@ namespace EnergyPlus::SwimmingPool {
         // For interzone surfaces, PoolHeatTransCoefs was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (DataSurfaces::Surface(SurfNum).ExtBoundCond > 0 && DataSurfaces::Surface(SurfNum).ExtBoundCond != SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) -
-                             DataHeatBalFanSys::PoolHeatTransCoefs(DataSurfaces::Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
+                             DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
                     if (std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum)) >
-                        std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(DataSurfaces::Surface(SurfNum).ExtBoundCond))) {
-                        DataHeatBalFanSys::PoolHeatTransCoefs(DataSurfaces::Surface(SurfNum).ExtBoundCond) =
+                        std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
+                        DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond) =
                             DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
                     } else {
                         DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
-                            DataHeatBalFanSys::PoolHeatTransCoefs(DataSurfaces::Surface(SurfNum).ExtBoundCond);
+                            DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                     }
                 }
             }
@@ -1002,11 +1002,11 @@ namespace EnergyPlus::SwimmingPool {
         Real64 SumHATsurf = 0.0; // Return value
 
         for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!DataSurfaces::Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-            Real64 Area = DataSurfaces::Surface(SurfNum).Area; // Effective surface area
+            Real64 Area = state.dataSurface->Surface(SurfNum).Area; // Effective surface area
 
-            if (DataSurfaces::Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
                 if (state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::IntShadeOn ||
                     state.dataSurface->SurfWinShadingFlag(SurfNum) == DataSurfaces::IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
@@ -1070,7 +1070,7 @@ namespace EnergyPlus::SwimmingPool {
             }
 
             // Also the radiant exchange converted to convection by the pool cover
-            state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvectRep = state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvect * DataSurfaces::Surface(SurfNum).Area;
+            state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvectRep = state.dataSwimmingPools->Pool(PoolNum).RadConvertToConvect * state.dataSurface->Surface(SurfNum).Area;
 
             // Finally calculate the summed up report variables
             state.dataSwimmingPools->Pool(PoolNum).MiscEquipEnergy = state.dataSwimmingPools->Pool(PoolNum).MiscEquipPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;

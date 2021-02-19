@@ -1162,9 +1162,9 @@ namespace EMSManager {
 
                 // Warn if actuator applied to an air boundary surface
                 if (UtilityRoutines::SameString(state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).ComponentTypeName, "AIRFLOW NETWORK WINDOW/DOOR OPENING")) {
-                    int actuatedSurfNum = UtilityRoutines::FindItemInList(state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName, DataSurfaces::Surface);
+                    int actuatedSurfNum = UtilityRoutines::FindItemInList(state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).UniqueIDName, state.dataSurface->Surface);
                     if (actuatedSurfNum > 0) {
-                        if (DataSurfaces::Surface(actuatedSurfNum).IsAirBoundarySurf) {
+                        if (state.dataSurface->Surface(actuatedSurfNum).IsAirBoundarySurf) {
                             ShowWarningError(state,
                                 "GetEMSInput: EnergyManagementSystem:Actuator=" + state.dataRuntimeLang->EMSActuatorUsed(ActuatorNum).Name +
                                 " actuates an opening attached to an air boundary surface.");
@@ -1837,7 +1837,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::Surface;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
         using DataSurfaces::WSC_ST_ExteriorScreen;
@@ -1847,37 +1846,37 @@ namespace EMSManager {
 
         for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
-            if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (!Surface(loopSurfNum).HasShadeControl) continue;
+            if (state.dataSurface->Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
+            if (!state.dataSurface->Surface(loopSurfNum).HasShadeControl) continue;
 
             if (state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum)) {
                 SetupEMSActuator(state, "Window Shading Control",
-                                 Surface(loopSurfNum).Name,
+                                 state.dataSurface->Surface(loopSurfNum).Name,
                                  "Control Status",
                                  "[ShadeStatus]",
                                  state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
                                  state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
                 if (state.dataSurface->SurfWinMovableSlats(loopSurfNum)) {
                     SetupEMSActuator(state, "Window Shading Control",
-                                     Surface(loopSurfNum).Name,
+                                     state.dataSurface->Surface(loopSurfNum).Name,
                                      "Slat Angle",
                                      "[degrees]",
                                      state.dataSurface->SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
                                      state.dataSurface->SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
-            } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator(state, "Window Shading Control",
-                                 Surface(loopSurfNum).Name,
+                                 state.dataSurface->Surface(loopSurfNum).Name,
                                  "Control Status",
                                  "[ShadeStatus]",
                                  state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
                                  state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
-                if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +
-                                    state.dataConstruction->Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
-                                    Surface(loopSurfNum).Name + "'.");
+                                    state.dataConstruction->Construct(state.dataSurface->Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
+                                    state.dataSurface->Surface(loopSurfNum).Name + "'.");
                     ShowContinueError(state, "...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");
                     ShowContinueError(state, "...Add shade or blind layer to this construction in order to be able to apply EMS Actuator.");
@@ -1981,28 +1980,22 @@ namespace EMSManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Setup EMS actuators available for surface convection coefficients
 
-        // METHODOLOGY EMPLOYED:
-        // access public data and loop over it.
-
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             SetupEMSActuator(state, "Surface",
-                             Surface(SurfNum).Name,
+                             state.dataSurface->Surface(SurfNum).Name,
                              "Interior Surface Convection Heat Transfer Coefficient",
                              "[W/m2-K]",
-                             Surface(SurfNum).EMSOverrideIntConvCoef,
-                             Surface(SurfNum).EMSValueForIntConvCoef);
+                             state.dataSurface->Surface(SurfNum).EMSOverrideIntConvCoef,
+                             state.dataSurface->Surface(SurfNum).EMSValueForIntConvCoef);
             SetupEMSActuator(state, "Surface",
-                             Surface(SurfNum).Name,
+                             state.dataSurface->Surface(SurfNum).Name,
                              "Exterior Surface Convection Heat Transfer Coefficient",
                              "[W/m2-K]",
-                             Surface(SurfNum).EMSOverrideExtConvCoef,
-                             Surface(SurfNum).EMSValueForExtConvCoef);
+                             state.dataSurface->Surface(SurfNum).EMSOverrideExtConvCoef,
+                             state.dataSurface->Surface(SurfNum).EMSValueForExtConvCoef);
         }
     }
 
@@ -2018,22 +2011,19 @@ namespace EMSManager {
         // PURPOSE OF THIS SUBROUTINE:
         // setup EMS actuators available for surface construction
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue;
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
 
             SetupEMSActuator(state, "Surface",
-                             Surface(SurfNum).Name,
+                             state.dataSurface->Surface(SurfNum).Name,
                              "Construction State",
                              "[ ]",
-                             Surface(SurfNum).EMSConstructionOverrideON,
-                             Surface(SurfNum).EMSConstructionOverrideValue);
+                             state.dataSurface->Surface(SurfNum).EMSConstructionOverrideON,
+                             state.dataSurface->Surface(SurfNum).EMSConstructionOverrideValue);
         }
 
         // Setup error checking storage
@@ -2062,50 +2052,49 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (Surface(SurfNum).ExtBoundCond != ExternalEnvironment) continue;
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond != ExternalEnvironment) continue;
 
             SetupEMSActuator(state,
                              "Surface",
-                             Surface(SurfNum).Name,
+                             state.dataSurface->Surface(SurfNum).Name,
                              "View Factor To Ground",
                              "[ ]",
-                             Surface(SurfNum).ViewFactorGroundEMSOverrideOn,
-                             Surface(SurfNum).ViewFactorGroundEMSOverrideValue);
+                             state.dataSurface->Surface(SurfNum).ViewFactorGroundEMSOverrideOn,
+                             state.dataSurface->Surface(SurfNum).ViewFactorGroundEMSOverrideValue);
 
             SetupEMSActuator(state, "Surface",
-                             Surface(SurfNum).Name,
+                             state.dataSurface->Surface(SurfNum).Name,
                              "Outdoor Air Drybulb Temperature",
                              "[C]",
-                             Surface(SurfNum).OutDryBulbTempEMSOverrideOn,
-                             Surface(SurfNum).OutDryBulbTempEMSOverrideValue);
+                             state.dataSurface->Surface(SurfNum).OutDryBulbTempEMSOverrideOn,
+                             state.dataSurface->Surface(SurfNum).OutDryBulbTempEMSOverrideValue);
 
             SetupEMSActuator(state, "Surface",
-                             Surface(SurfNum).Name,
+                             state.dataSurface->Surface(SurfNum).Name,
                              "Outdoor Air Wetbulb Temperature",
                              "[C]",
-                             Surface(SurfNum).OutWetBulbTempEMSOverrideOn,
-                             Surface(SurfNum).OutWetBulbTempEMSOverrideValue);
-            if (Surface(SurfNum).ExtWind) {
+                             state.dataSurface->Surface(SurfNum).OutWetBulbTempEMSOverrideOn,
+                             state.dataSurface->Surface(SurfNum).OutWetBulbTempEMSOverrideValue);
+            if (state.dataSurface->Surface(SurfNum).ExtWind) {
                 SetupEMSActuator(state, "Surface",
-                                 Surface(SurfNum).Name,
+                                 state.dataSurface->Surface(SurfNum).Name,
                                  "Outdoor Air Wind Speed",
                                  "[m/s]",
-                                 Surface(SurfNum).WindSpeedEMSOverrideOn,
-                                 Surface(SurfNum).WindSpeedEMSOverrideValue);
+                                 state.dataSurface->Surface(SurfNum).WindSpeedEMSOverrideOn,
+                                 state.dataSurface->Surface(SurfNum).WindSpeedEMSOverrideValue);
                 SetupEMSActuator(state, "Surface",
-                                 Surface(SurfNum).Name,
+                                 state.dataSurface->Surface(SurfNum).Name,
                                  "Outdoor Air Wind Direction",
                                  "[degree]",
-                                 Surface(SurfNum).WindDirEMSOverrideOn,
-                                 Surface(SurfNum).WindDirEMSOverrideValue);
+                                 state.dataSurface->Surface(SurfNum).WindDirEMSOverrideOn,
+                                 state.dataSurface->Surface(SurfNum).WindDirEMSOverrideValue);
             }
         }
     }

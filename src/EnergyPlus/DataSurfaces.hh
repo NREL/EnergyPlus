@@ -324,13 +324,6 @@ namespace DataSurfaces {
     // Parameters for PierceSurface
     constexpr std::size_t nVerticesBig(20); // Number of convex surface vertices at which to switch to PierceSurface O( log N ) method
 
-    extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
-    extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
-
-    // Types
-
     // Y Slab for Surface2D for PierceSurface support of Nonconvex and Many-Vertex Surfaces
     struct Surface2DSlab
     {
@@ -1141,7 +1134,6 @@ namespace DataSurfaces {
     };
 
     // Object Data
-    extern Array1D<SurfaceData> Surface;
     extern Array1D<SurfaceWindowCalc> SurfaceWindow;
     extern Array1D<FrameDividerProperties> FrameDivider;
     extern Array1D<StormWindowData> StormWindow;
@@ -1467,6 +1459,11 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinWindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
     Array1D<Real64> SurfWinTDDPipeNum;      // Tubular daylighting device pipe number for TDD domes and diffusers
 
+    bool AnyHeatBalanceInsideSourceTerm = false;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
+    bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
+    Array1D<DataSurfaces::SurfaceData> Surface;
+
     void clear_state() override
     {
         this->TotSurfaces = 0;
@@ -1709,6 +1706,9 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinSpecTemp.deallocate();
         this->SurfWinWindowModelType.deallocate();
         this->SurfWinTDDPipeNum.deallocate();
+        this->AnyHeatBalanceInsideSourceTerm = false;
+        this->AnyHeatBalanceOutsideSourceTerm = false;
+        this->Surface.deallocate();
     }
 };
 

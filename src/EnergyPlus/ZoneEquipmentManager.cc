@@ -4308,7 +4308,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-        using DataSurfaces::Surface;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
 
@@ -4377,7 +4376,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                             state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
-                                         state.dataSurface->SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
+                                         state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                             WinGapFlowToRA += FlowThisTS;
                             WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
                         }

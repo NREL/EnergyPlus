@@ -95,24 +95,24 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     SurfNum = 1;
     ConstrNum = 1;
     // allocate surface variable data
-    Surface.allocate(NumOfSurf);
-    Surface(SurfNum).Area = 10.0;
-    Surface(SurfNum).OutDryBulbTemp = 20.0;
-    Surface(SurfNum).OutWetBulbTemp = 15.0;
-    Surface(SurfNum).WindSpeed = 3.0;
-    Surface(SurfNum).Construction = ConstrNum;
-    Surface(SurfNum).BaseSurf = SurfNum;
-    Surface(SurfNum).Zone = ZoneNum;
-    Surface(SurfNum).IsICS = true;
-    Surface(SurfNum).ExtConvCoeff = 0;
-    Surface(SurfNum).ExtWind = false;
+    state->dataSurface->Surface.allocate(NumOfSurf);
+    state->dataSurface->Surface(SurfNum).Area = 10.0;
+    state->dataSurface->Surface(SurfNum).OutDryBulbTemp = 20.0;
+    state->dataSurface->Surface(SurfNum).OutWetBulbTemp = 15.0;
+    state->dataSurface->Surface(SurfNum).WindSpeed = 3.0;
+    state->dataSurface->Surface(SurfNum).Construction = ConstrNum;
+    state->dataSurface->Surface(SurfNum).BaseSurf = SurfNum;
+    state->dataSurface->Surface(SurfNum).Zone = ZoneNum;
+    state->dataSurface->Surface(SurfNum).IsICS = true;
+    state->dataSurface->Surface(SurfNum).ExtConvCoeff = 0;
+    state->dataSurface->Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
     state->dataMaterial->Material.allocate(MatNum);
     state->dataMaterial->Material(MatNum).AbsorpThermal = 0.8;
-    // allocate exterior vented cavaity variable data
+    // allocate exterior vented cavity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
     ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     EXPECT_NEAR(0.036, MdotVentRpt, 0.001);
 
     // deallocated variables
-    Surface.deallocate();
+    state->dataSurface->Surface.deallocate();
     state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
     state->dataConstruction->Construct.deallocate();
     state->dataMaterial->Material.deallocate();

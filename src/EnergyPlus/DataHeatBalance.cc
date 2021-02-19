@@ -1001,7 +1001,6 @@ namespace EnergyPlus::DataHeatBalance {
         using DataSurfaces::DoNotModel;
         using DataSurfaces::ModelAsDiffuse;
         using DataSurfaces::ModelAsDirectBeam;
-        using DataSurfaces::Surface;
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1074,7 +1073,7 @@ namespace EnergyPlus::DataHeatBalance {
         } else {
             SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
             if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi;
-            SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians;
+            SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians;
             NormalAzimuth = SunAzimuth - SurfaceAzimuth;
             //   Calculate the transmittance whether sun is in front of or behind screen, place result in BmBmTrans or BmBmTransBack
             if (std::abs(SunAzimuth - SurfaceAzimuth) > DataGlobalConstants::PiOvr2) {
@@ -1092,7 +1091,7 @@ namespace EnergyPlus::DataHeatBalance {
             SunAltitude = SunAltitudeToScreenNormal;
         } else {
             SunAltitude = (DataGlobalConstants::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
-            SurfaceTilt = Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians;
+            SurfaceTilt = state.dataSurface->Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians;
             SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2));
             if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
                 SunAltitudeToScreenNormal -= DataGlobalConstants::PiOvr2;
@@ -1333,7 +1332,6 @@ namespace EnergyPlus::DataHeatBalance {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass;
 
         // Return value
@@ -1345,16 +1343,16 @@ namespace EnergyPlus::DataHeatBalance {
         isValid = true;
         // exterior conditions
         {
-            auto const SELECT_CASE_var(Surface(numSurf).ExtBoundCond);
+            auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).ExtBoundCond);
             if (SELECT_CASE_var == ExternalEnvironment) {
                 outsideFilm = 0.0299387; // All exterior conditions
             } else if ((SELECT_CASE_var == Ground) || (SELECT_CASE_var == GroundFCfactorMethod)) {
                 outsideFilm = 0.0; // No outside film when underground
             } else {
-                if (Surface(numSurf).ExtBoundCond > 0) { // interzone partition
+                if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
                     // use companion surface in adjacent zone
                     {
-                        auto const SELECT_CASE_var1(Surface(Surface(numSurf).ExtBoundCond).Class);
+                        auto const SELECT_CASE_var1(state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class);
                         if ((SELECT_CASE_var1 == SurfaceClass::Wall) ||
                             (SELECT_CASE_var1 == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                             outsideFilm = 0.1197548;
@@ -1374,9 +1372,9 @@ namespace EnergyPlus::DataHeatBalance {
             }
         }
         // interior conditions
-        if (state.dataHeatBal->NominalU(Surface(numSurf).Construction) > 0.0) {
+        if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
             {
-                auto const SELECT_CASE_var(Surface(numSurf).Class);
+                auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).Class);
                 if ((SELECT_CASE_var == SurfaceClass::Wall) ||
                     (SELECT_CASE_var == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                     insideFilm = 0.1197548;
@@ -1389,10 +1387,10 @@ namespace EnergyPlus::DataHeatBalance {
                     outsideFilm = 0.0;
                 }
             }
-            NominalUwithConvCoeffs = 1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(Surface(numSurf).Construction)) + outsideFilm);
+            NominalUwithConvCoeffs = 1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);
         } else {
             isValid = false;
-            NominalUwithConvCoeffs = state.dataHeatBal->NominalU(Surface(numSurf).Construction);
+            NominalUwithConvCoeffs = state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction);
         }
 
         return NominalUwithConvCoeffs;
@@ -1411,7 +1409,6 @@ namespace EnergyPlus::DataHeatBalance {
 
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int loopSurfNum(0); // surface index
@@ -1422,12 +1419,12 @@ namespace EnergyPlus::DataHeatBalance {
 
         for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
-            if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (!Surface(loopSurfNum).HasShadeControl) continue;
-            if (Surface(loopSurfNum).activeShadedConstruction == 0) continue;
+            if (state.dataSurface->Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
+            if (!state.dataSurface->Surface(loopSurfNum).HasShadeControl) continue;
+            if (state.dataSurface->Surface(loopSurfNum).activeShadedConstruction == 0) continue;
 
-            ConstrNum = Surface(loopSurfNum).activeShadedConstruction;
+            ConstrNum = state.dataSurface->Surface(loopSurfNum).activeShadedConstruction;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
                 NumLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                 for (Layer = 1; Layer <= NumLayers; ++Layer) {

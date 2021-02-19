@@ -95,9 +95,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus {
-
-namespace ZoneTempPredictorCorrector {
+namespace EnergyPlus::ZoneTempPredictorCorrector {
 
     // MODULE INFORMATION:
     //       AUTHOR         Russell D. Taylor
@@ -2627,9 +2625,6 @@ namespace ZoneTempPredictorCorrector {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto RoutineName("InitZoneAirSetpoints: ");
 
@@ -2723,15 +2718,15 @@ namespace ZoneTempPredictorCorrector {
                 FirstSurfFlag = true;
                 if (state.dataHeatBal->Zone(Loop).SurfaceFirst > 0) {
                     for (SurfNum = state.dataHeatBal->Zone(Loop).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(Loop).SurfaceLast; ++SurfNum) {
-                        if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                        if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
                         if (FirstSurfFlag) {
-                            TRefFlag = Surface(SurfNum).TAirRef;
+                            TRefFlag = state.dataSurface->Surface(SurfNum).TAirRef;
                             FirstSurfFlag = false;
                         }
                         // for each particular zone, the reference air temperature(s) should be the same
                         // (either mean air, bulk air, or supply air temp).
-                        if (Surface(SurfNum).TAirRef != TRefFlag) {
+                        if (state.dataSurface->Surface(SurfNum).TAirRef != TRefFlag) {
                             ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + state.dataHeatBal->Zone(Loop).Name);
                         }
                     }
@@ -4349,8 +4344,6 @@ namespace ZoneTempPredictorCorrector {
         // Using/Aliasing
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
-        using DataSurfaces::Surface;
-
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4543,7 +4536,7 @@ namespace ZoneTempPredictorCorrector {
             // if no surface in the zone uses EMPD or HAMT then zero
             bool no_ht_EMPD_or_HAMT(true);
             for (int i = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).SurfaceLast; i <= e; ++i) {
-                auto const &htAlgo(Surface(i).HeatTransferAlgorithm);
+                auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
                 if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
                     no_ht_EMPD_or_HAMT = false;
                     break;
@@ -5386,8 +5379,6 @@ namespace ZoneTempPredictorCorrector {
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
-        using DataSurfaces::Surface;
-
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5492,7 +5483,7 @@ namespace ZoneTempPredictorCorrector {
         // are currently set to zero to remind us where they need to be in the future
         bool no_ht_EMPD_or_HAMT(true);
         for (int i = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).SurfaceLast; i <= e; ++i) {
-            auto const &htAlgo(Surface(i).HeatTransferAlgorithm);
+            auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
             if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
                 no_ht_EMPD_or_HAMT = false;
                 break;
@@ -6248,12 +6239,12 @@ namespace ZoneTempPredictorCorrector {
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
         for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             HA = 0.0;
-            Area = Surface(SurfNum).Area; // For windows, this is the glazing area
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
                 auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
 
                 // Add to the convective internal gains
@@ -6268,7 +6259,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
@@ -6313,7 +6304,7 @@ namespace ZoneTempPredictorCorrector {
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
                     RefAirTemp = MAT(ZoneNum);
@@ -6544,12 +6535,12 @@ namespace ZoneTempPredictorCorrector {
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
         for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-            Area = Surface(SurfNum).Area; // For windows, this is the glazing area
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
             // determine reference air temperature for this surface's convective heat transfer model
             {
-                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     // The zone air is the reference temperature
                     RefAirTemp = MAT(ZoneNum);
@@ -6585,7 +6576,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
 
-            if (Surface(SurfNum).Class == SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
                 // Add to the convective internal gains
                 if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn) {
@@ -6599,7 +6590,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
                 if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn)
@@ -6633,7 +6624,7 @@ namespace ZoneTempPredictorCorrector {
             SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-            if (DataSurfaces::Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
                 state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
                 state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
             }
@@ -7824,5 +7815,3 @@ namespace ZoneTempPredictorCorrector {
     }
 
 } // namespace ZoneTempPredictorCorrector
-
-} // namespace EnergyPlus

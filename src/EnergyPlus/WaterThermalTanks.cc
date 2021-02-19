@@ -90,9 +90,7 @@
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 
-namespace EnergyPlus {
-
-namespace WaterThermalTanks {
+namespace EnergyPlus::WaterThermalTanks {
 
     // MODULE INFORMATION:
     //       AUTHOR         Brandon Anderson
@@ -10770,7 +10768,7 @@ namespace WaterThermalTanks {
 
                 this->Sizing.TotalSolarCollectorArea = 0.0;
                 for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-                    this->Sizing.TotalSolarCollectorArea += DataSurfaces::Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+                    this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
                 }
 
                 if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
@@ -11287,7 +11285,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
                     this->Sizing.TotalSolarCollectorArea = 0.0;
                     for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-                        this->Sizing.TotalSolarCollectorArea += DataSurfaces::Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+                        this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
                     }
 
                     if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
@@ -11854,7 +11852,5 @@ namespace WaterThermalTanks {
             return (this->SetPointTemp - this->DeadBandDeltaTemp);
         }
     }
-
-} // namespace WaterThermalTanks
 
 } // namespace EnergyPlus

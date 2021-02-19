@@ -1599,7 +1599,6 @@ namespace ThermalComfort {
 
         // Using/Aliasing
         using namespace DataHeatBalance;
-        using DataSurfaces::Surface;
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1665,7 +1664,7 @@ namespace ThermalComfort {
 
             for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
                 thisAngFacList.SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 2);
-                thisAngFacList.SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 2), Surface);
+                thisAngFacList.SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 2), state.dataSurface->Surface);
                 thisAngFacList.AngleFactor(SurfNum) = rNumericArgs(SurfNum);
                 // Error trap for surfaces that do not exist or surfaces not in the zone
                 if (thisAngFacList.SurfacePtr(SurfNum) == 0) {
@@ -1676,11 +1675,11 @@ namespace ThermalComfort {
                     ErrorsFound = true;
                 } else if (thisAngFacList.ZonePtr != 0) { // don't look at invalid zones
                     // Found Surface, is it in same zone tagged for Angle Factor List?
-                    if (thisAngFacList.ZonePtr != Surface(thisAngFacList.SurfacePtr(SurfNum)).Zone) {
+                    if (thisAngFacList.ZonePtr != state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Zone) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid - mismatch " + cAlphaFieldNames(2) + "=\"" +
                                         cAlphaArgs(2) + "\"");
                         ShowContinueError(state, "... does not match " + cAlphaFieldNames(2) + "=\"" +
-                                          state.dataHeatBal->Zone(Surface(state.dataThermalComforts->AngleFactorList(Item).SurfacePtr(SurfNum)).Zone).Name + "\" for " +
+                                          state.dataHeatBal->Zone(state.dataSurface->Surface(state.dataThermalComforts->AngleFactorList(Item).SurfacePtr(SurfNum)).Zone).Name + "\" for " +
                                           cAlphaFieldNames(SurfNum + 2) + "=\"" + cAlphaArgs(SurfNum + 2) + "\".");
                         ErrorsFound = true;
                     }
@@ -1735,7 +1734,6 @@ namespace ThermalComfort {
 
         // Using/Aliasing
         using DataHeatBalSurface::TH;
-        using DataSurfaces::Surface;
 
         // Return value
         Real64 CalcAngleFactorMRT;
@@ -1757,7 +1755,7 @@ namespace ThermalComfort {
 
         for (SurfNum = 1; SurfNum <= thisAngFacList.TotAngleFacSurfaces; ++SurfNum) {
             SurfaceTemp = TH(2, 1, thisAngFacList.SurfacePtr(SurfNum)) + DataGlobalConstants::KelvinConv;
-            SurfEAF = state.dataConstruction->Construct(Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
+            SurfEAF = state.dataConstruction->Construct(state.dataSurface->Surface(thisAngFacList.SurfacePtr(SurfNum)).Construction).InsideAbsorpThermal * thisAngFacList.AngleFactor(SurfNum);
             SurfTempEmissAngleFacSummed += SurfEAF * pow_4(SurfaceTemp);
             SumSurfaceEmissAngleFactor += SurfEAF;
         }
@@ -1781,7 +1779,6 @@ namespace ThermalComfort {
 
         // Using/Aliasing
         using DataHeatBalSurface::TH;
-        using DataSurfaces::Surface;
 
         // Return value
         Real64 CalcSurfaceWeightedMRT = 0.0;
@@ -1803,9 +1800,9 @@ namespace ThermalComfort {
             SurfaceAE = 0.0;
             ZoneAESum = 0.0;
             for (SurfNum2 = 1; SurfNum2 <= state.dataSurface->TotSurfaces; ++SurfNum2) {
-                if (Surface(SurfNum2).HeatTransSurf) {
-                    SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
-                    ZoneNum2 = Surface(SurfNum2).Zone;
+                if (state.dataSurface->Surface(SurfNum2).HeatTransSurf) {
+                    SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
+                    ZoneNum2 = state.dataSurface->Surface(SurfNum2).Zone;
                     // Do NOT include the contribution of the Surface that is being surface weighted in this calculation since it will already be
                     // accounted for
                     if ((ZoneNum2 > 0) && (SurfNum2 != SurfNum)) ZoneAESum(ZoneNum2) += SurfaceAE(SurfNum2);
@@ -1818,8 +1815,8 @@ namespace ThermalComfort {
         SumAET = 0.0;
         ZoneAESum(ZoneNum) = 0.0;
         for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum2) {
-            if ((Surface(SurfNum2).HeatTransSurf) && (SurfNum2 != SurfNum)) {
-                SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
+            if ((state.dataSurface->Surface(SurfNum2).HeatTransSurf) && (SurfNum2 != SurfNum)) {
+                SurfaceAE(SurfNum2) = state.dataSurface->Surface(SurfNum2).Area * state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum2).Construction).InsideAbsorpThermal;
                 SumAET += SurfaceAE(SurfNum2) * TH(2, 1, SurfNum2);
                 ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);
             }

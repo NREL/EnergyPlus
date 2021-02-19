@@ -296,7 +296,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSurfaces::Surface;
         using namespace DataHeatBalance;
 
         using ScheduleManager::GetScheduleIndex;
@@ -350,7 +349,7 @@ namespace Photovoltaics {
             PVarray(PVnum).Name = cAlphaArgs(1);
 
             PVarray(PVnum).SurfaceName = cAlphaArgs(2);
-            PVarray(PVnum).SurfacePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
+            PVarray(PVnum).SurfacePtr = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
             // required-surface
             if (lAlphaFieldBlanks(2)) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
@@ -365,9 +364,9 @@ namespace Photovoltaics {
             } else {
                 // Found one -- make sure has right parameters for PV
                 SurfNum = PVarray(PVnum).SurfacePtr;
-                Surface(SurfNum).IsPV = true;
+                state.dataSurface->Surface(SurfNum).IsPV = true;
 
-                if (!Surface(SurfNum).ExtSolar) {
+                if (!state.dataSurface->Surface(SurfNum).ExtSolar) {
                     ShowWarningError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Surface is not exposed to solar, check surface bounday condition");
@@ -375,11 +374,11 @@ namespace Photovoltaics {
                 PVarray(PVnum).Zone = GetPVZone(state, PVarray(PVnum).SurfacePtr);
 
                 // check surface orientation, warn if upside down
-                if ((Surface(SurfNum).Tilt < -95.0) || (Surface(SurfNum).Tilt > 95.0)) {
+                if ((state.dataSurface->Surface(SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(SurfNum).Tilt > 95.0)) {
                     ShowWarningError(state, "Suspected input problem with " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", Surface(SurfNum).Tilt));
+                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(SurfNum).Tilt));
                 }
             }
 
@@ -659,7 +658,7 @@ namespace Photovoltaics {
 
                         // do one-time setups on input data
                         PVarray(PVnum).SimplePVModule.AreaCol =
-                            Surface(PVarray(PVnum).SurfacePtr).Area * PVarray(PVnum).SimplePVModule.ActiveFraction;
+                            state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).Area * PVarray(PVnum).SimplePVModule.ActiveFraction;
                     } else {
                         ShowSevereError(state, "Invalid PV performance object name of " + PVarray(PVnum).PerfObjName);
                         ShowContinueError(state, "Entered in " + cPVGeneratorObjectName + " = " + PVarray(PVnum).Name);
@@ -741,10 +740,10 @@ namespace Photovoltaics {
             // do some checks and setup
             if (PVarray(PVnum).PVModelType == iSurfaceOutsideFaceCellIntegration) {
                 // check that surface is HeatTransfer and a Construction with Internal Source was used
-                if (!Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
+                if (!state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
                     ShowSevereError(state, "Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray(PVnum).Name);
                     ErrorsFound = true;
-                } else if (!state.dataConstruction->Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
+                } else if (!state.dataConstruction->Construct(state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
                     ShowSevereError(state, "Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
                                     PVarray(PVnum).Name);
                     ErrorsFound = true;
@@ -778,14 +777,12 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the zone number for this PV array for use when zone multipliers are applied
 
-        using DataSurfaces::Surface;
-
         int GetPVZone(0);
 
         if (SurfNum > 0) {
-            GetPVZone = Surface(SurfNum).Zone;
+            GetPVZone = state.dataSurface->Surface(SurfNum).Zone;
             if (GetPVZone == 0) { // might need to get the zone number from the name
-                GetPVZone = UtilityRoutines::FindItemInList(Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+                GetPVZone = UtilityRoutines::FindItemInList(state.dataSurface->Surface(SurfNum).ZoneName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             }
         }
 
@@ -806,36 +803,13 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate the electricity production using a simple PV model
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataSurfaces::Surface;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisSurf; // working index ptr to Surface arrays
         Real64 Eff;   // working variable for solar electric efficiency
-        // unused1208    REAL(r64) :: ArrayEnergy !working variable for PV energy this system time step
-        // first get surface index to use as a pointer
 
         ThisSurf = PVarray(thisPV).SurfacePtr;
 
@@ -892,7 +866,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataHeatBalFanSys::QPVSysSource;
-        using DataSurfaces::Surface;
         using TranspiredCollector::SetUTSCQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -957,11 +930,9 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataHeatBalSurface::SurfTempOut;
-        using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
 
         int ThisSurf; // working variable for indexing surfaces
-        // unused1208    INTEGER :: thisMod  ! working variable for indexing module parameters
         Real64 Ee;
 
         ThisSurf = PVarray(PVnum).SurfacePtr;
@@ -971,8 +942,8 @@ namespace Photovoltaics {
         PVarray(PVnum).SNLPVinto.IcDiffuse = state.dataHeatBal->SurfQRadSWOutIncident(ThisSurf) - state.dataHeatBal->SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
         PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(state.dataHeatBal->SurfCosIncidenceAngle(ThisSurf)) / DataGlobalConstants::DegToRadians;    // (deg) from dataHeatBalance
         PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(state.dataEnvrn->SOLCOS(3)) / DataGlobalConstants::DegToRadians;                         //(degrees),
-        PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
-        PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
+        PVarray(PVnum).SNLPVinto.Tamb = state.dataSurface->Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
+        PVarray(PVnum).SNLPVinto.WindSpeed = state.dataSurface->Surface(ThisSurf).WindSpeed;                                   // (m/s)
         PVarray(PVnum).SNLPVinto.Altitude = state.dataEnvrn->Elevation;                                                      // from DataEnvironment via USE
 
         if (((PVarray(PVnum).SNLPVinto.IcBeam + PVarray(PVnum).SNLPVinto.IcDiffuse) > MinIrradiance) && (RunFlag)) {
@@ -1185,7 +1156,6 @@ namespace Photovoltaics {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag;
@@ -1201,8 +1171,8 @@ namespace Photovoltaics {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(PVnum)) {
 
-            PVarray(PVnum).TRNSYSPVcalc.CellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
-            PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+            PVarray(PVnum).TRNSYSPVcalc.CellTempK = state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+            PVarray(PVnum).TRNSYSPVcalc.LastCellTempK = state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
             MyEnvrnFlag(PVnum) = false;
         }
 
@@ -1245,8 +1215,6 @@ namespace Photovoltaics {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the PV performance.
 
-        using DataSurfaces::Surface;
-        //  USE DataPhotovoltaics, ONLY:CellTemp,LastCellTemp
         using DataHeatBalSurface::SurfTempOut;
         using TranspiredCollector::GetUTSCTsColl;
 
@@ -1298,7 +1266,7 @@ namespace Photovoltaics {
         ShuntResistance = PVarray(PVnum).TRNSYSPVModule.ShuntResistance;
 
         // convert ambient temperature from C to K
-        Tambient = Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+        Tambient = state.dataSurface->Surface(PVarray(PVnum).SurfacePtr).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
 
         if ((PVarray(PVnum).TRNSYSPVcalc.Insolation > MinInsolation) && (RunFlag)) {
 
@@ -2635,7 +2603,6 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataSurfaces::ExtVentedCavity;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CavNum;   // temporary
@@ -2661,7 +2628,7 @@ namespace Photovoltaics {
 
         if (!Found) {
             ShowFatalError(state, "Did not find surface in Exterior Vented Cavity description in GetExtVentedCavityIndex, Surface name = " +
-                           Surface(SurfacePtr).Name);
+                           state.dataSurface->Surface(SurfacePtr).Name);
         } else {
 
             VentCavIndex = CavNum;

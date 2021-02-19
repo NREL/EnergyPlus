@@ -142,7 +142,6 @@ namespace LowTempRadiantSystem {
     using DataHeatBalFanSys::TCondFDSourceNode;
     using DataHVACGlobals::SmallLoad;
     using DataSurfaces::HeatTransferModel_CTF;
-    using DataSurfaces::Surface;
     using Psychrometrics::PsyTdpFnWPb;
 
     // Data
@@ -539,7 +538,7 @@ namespace LowTempRadiantSystem {
                     thisRadSys.SurfaceName(SurfNum) = SurfList(SurfListNum).SurfName(SurfNum);
                     thisRadSys.SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     if (thisRadSys.SurfacePtr(SurfNum) > 0) {
-                        Surface(thisRadSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
+                        state.dataSurface->Surface(thisRadSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -549,7 +548,7 @@ namespace LowTempRadiantSystem {
                 thisRadSys.SurfaceFrac.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.NumCircuits.allocate(thisRadSys.NumOfSurfaces);
                 thisRadSys.SurfaceName(1) = thisRadSys.SurfListName;
-                thisRadSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisRadSys.SurfaceName(1), Surface);
+                thisRadSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisRadSys.SurfaceName(1), state.dataSurface->Surface);
                 thisRadSys.SurfaceFrac(1) = 1.0;
                 thisRadSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
@@ -557,14 +556,14 @@ namespace LowTempRadiantSystem {
                     ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
-                } else if (Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
+                } else if (state.dataSurface->Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (thisRadSys.SurfacePtr(1) != 0) {
-                    Surface(thisRadSys.SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->Surface(thisRadSys.SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
+                    state.dataSurface->Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 
@@ -862,7 +861,7 @@ namespace LowTempRadiantSystem {
                     thisCFloSys.SurfaceFrac(SurfNum) = SurfList(SurfListNum).SurfFlowFrac(SurfNum);
                     thisCFloSys.NumCircuits(SurfNum) = 0.0;
                     if (thisCFloSys.SurfacePtr(SurfNum) != 0) {
-                        Surface(thisCFloSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
+                        state.dataSurface->Surface(thisCFloSys.SurfacePtr(SurfNum)).IntConvSurfHasActiveInIt = true;
                     }
                 }
             } else { // User entered a single surface name rather than a surface list
@@ -873,7 +872,7 @@ namespace LowTempRadiantSystem {
                 thisCFloSys.NumCircuits.allocate(thisCFloSys.NumOfSurfaces);
                 MaxCloNumOfSurfaces = max(MaxCloNumOfSurfaces, thisCFloSys.NumOfSurfaces);
                 thisCFloSys.SurfaceName(1) = thisCFloSys.SurfListName;
-                thisCFloSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisCFloSys.SurfaceName(1), Surface);
+                thisCFloSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisCFloSys.SurfaceName(1), state.dataSurface->Surface);
                 thisCFloSys.SurfaceFrac(1) = 1.0;
                 thisCFloSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
@@ -881,14 +880,14 @@ namespace LowTempRadiantSystem {
                     ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
-                } else if (Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
+                } else if (state.dataSurface->Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (thisCFloSys.SurfacePtr(1) != 0) {
-                    Surface(thisCFloSys.SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
-                    Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->Surface(thisCFloSys.SurfacePtr(1)).IntConvSurfHasActiveInIt = true;
+                    state.dataSurface->Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 
@@ -1109,20 +1108,20 @@ namespace LowTempRadiantSystem {
                 thisElecSys.SurfaceName.allocate(thisElecSys.NumOfSurfaces);
                 thisElecSys.SurfaceFrac.allocate(thisElecSys.NumOfSurfaces);
                 thisElecSys.SurfaceName(1) = thisElecSys.SurfListName;
-                thisElecSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisElecSys.SurfaceName(1), Surface);
+                thisElecSys.SurfacePtr(1) = UtilityRoutines::FindItemInList(thisElecSys.SurfaceName(1), state.dataSurface->Surface);
                 thisElecSys.SurfaceFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (thisElecSys.SurfacePtr(1) == 0) {
                     ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
-                } else if (Surface(thisElecSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
+                } else if (state.dataSurface->Surface(thisElecSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Invalid Surface");
                     ShowContinueError(state, cAlphaFields(4) + "=\"" + Alphas(4) + "\" has been used in another radiant system or ventilated slab.");
                     ErrorsFound = true;
                 }
                 if (thisElecSys.SurfacePtr(1) != 0) {
-                    Surface(ElecRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
+                    state.dataSurface->Surface(ElecRadSys(Item).SurfacePtr(1)).IsRadSurfOrVentSlabOrPool = true;
                 }
             }
 
@@ -1231,19 +1230,19 @@ namespace LowTempRadiantSystem {
                 CheckSurfNum = HydrRadSys(Item).SurfacePtr(SurfNum);
                 if (CheckSurfNum == 0) continue;
                 if (AssignedAsRadiantSurface(CheckSurfNum)) {
-                    ShowSevereError(state, "Surface " + Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
+                    ShowSevereError(state, "Surface " + state.dataSurface->Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
                     ErrorsFound = true;
                 } else {
                     AssignedAsRadiantSurface(CheckSurfNum) = true;
                 }
                 // Also check the other side of interzone partitions
-                if ((Surface(CheckSurfNum).ExtBoundCond > 0) && (Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
-                    if (AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond)) {
-                        ShowSevereError(state, "Interzone surface " + Surface(Surface(CheckSurfNum).ExtBoundCond).Name +
+                if ((state.dataSurface->Surface(CheckSurfNum).ExtBoundCond > 0) && (state.dataSurface->Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
+                    if (AssignedAsRadiantSurface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond)) {
+                        ShowSevereError(state, "Interzone surface " + state.dataSurface->Surface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond).Name +
                                         " is referenced by more than one radiant system--this is not allowed");
                         ErrorsFound = true;
                     } else {
-                        AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond) = true;
+                        AssignedAsRadiantSurface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond) = true;
                     }
                 }
             }
@@ -1254,19 +1253,19 @@ namespace LowTempRadiantSystem {
                 CheckSurfNum = CFloRadSys(Item).SurfacePtr(SurfNum);
                 if (CheckSurfNum == 0) continue;
                 if (AssignedAsRadiantSurface(CheckSurfNum)) {
-                    ShowSevereError(state, "Surface " + Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
+                    ShowSevereError(state, "Surface " + state.dataSurface->Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
                     ErrorsFound = true;
                 } else {
                     AssignedAsRadiantSurface(CheckSurfNum) = true;
                 }
                 // Also check the other side of interzone partitions
-                if ((Surface(CheckSurfNum).ExtBoundCond > 0) && (Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
-                    if (AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond)) {
-                        ShowSevereError(state, "Interzone surface " + Surface(Surface(CheckSurfNum).ExtBoundCond).Name +
+                if ((state.dataSurface->Surface(CheckSurfNum).ExtBoundCond > 0) && (state.dataSurface->Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
+                    if (AssignedAsRadiantSurface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond)) {
+                        ShowSevereError(state, "Interzone surface " + state.dataSurface->Surface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond).Name +
                                         " is referenced by more than one radiant system--this is not allowed");
                         ErrorsFound = true;
                     } else {
-                        AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond) = true;
+                        AssignedAsRadiantSurface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond) = true;
                     }
                 }
             }
@@ -1277,19 +1276,19 @@ namespace LowTempRadiantSystem {
                 CheckSurfNum = ElecRadSys(Item).SurfacePtr(SurfNum);
                 if (CheckSurfNum == 0) continue;
                 if (AssignedAsRadiantSurface(CheckSurfNum)) {
-                    ShowSevereError(state, "Surface " + Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
+                    ShowSevereError(state, "Surface " + state.dataSurface->Surface(CheckSurfNum).Name + " is referenced by more than one radiant system--this is not allowed");
                     ErrorsFound = true;
                 } else {
                     AssignedAsRadiantSurface(CheckSurfNum) = true;
                 }
                 // Also check the other side of interzone partitions
-                if ((Surface(CheckSurfNum).ExtBoundCond > 0) && (Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
-                    if (AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond)) {
-                        ShowSevereError(state, "Interzone surface " + Surface(Surface(CheckSurfNum).ExtBoundCond).Name +
+                if ((state.dataSurface->Surface(CheckSurfNum).ExtBoundCond > 0) && (state.dataSurface->Surface(CheckSurfNum).ExtBoundCond != CheckSurfNum)) {
+                    if (AssignedAsRadiantSurface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond)) {
+                        ShowSevereError(state, "Interzone surface " + state.dataSurface->Surface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond).Name +
                                         " is referenced by more than one radiant system--this is not allowed");
                         ErrorsFound = true;
                     } else {
-                        AssignedAsRadiantSurface(Surface(CheckSurfNum).ExtBoundCond) = true;
+                        AssignedAsRadiantSurface(state.dataSurface->Surface(CheckSurfNum).ExtBoundCond) = true;
                     }
                 }
             }
@@ -1658,10 +1657,10 @@ namespace LowTempRadiantSystem {
             if (state.dataGlobal->DisplayExtraWarnings) {
                 // check zone numbers--ok if they are not the same
                 // group warning issued earlier, show detailed warning here
-                if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
+                if (state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
                     ShowWarningError(state, "A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
-                    ShowContinueError(state, "Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
-                    ShowContinueError(state, "Surface in Zone = " + state.dataHeatBal->Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
+                    ShowContinueError(state, "Surface = " + state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Name);
+                    ShowContinueError(state, "Surface in Zone = " + state.dataHeatBal->Zone(state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Zone).Name +
                                       ". Radiant System in Zone = " + this->ZoneName);
                     ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
                     ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
@@ -1673,8 +1672,8 @@ namespace LowTempRadiantSystem {
             if (SurfNum == 1)
                 zoneMultipliers =
                     double(state.dataHeatBal->Zone(this->ZonePtr).Multiplier) * double(state.dataHeatBal->Zone(this->ZonePtr).ListMultiplier);
-            zoneMultipliersSurface = double(state.dataHeatBal->Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier) *
-                                     double(state.dataHeatBal->Zone(Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
+            zoneMultipliersSurface = double(state.dataHeatBal->Zone(state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier) *
+                                     double(state.dataHeatBal->Zone(state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
             if (std::abs(zoneMultipliers - zoneMultipliersSurface) > zoneMultiplersTolerance) {
                 ShowSevereError(state, "The zone multipliers are not the same for all surfaces contained in this radiant system");
                 ShowContinueError(state, "This is not allowed and must be fixed for the simulation to run.");
@@ -1683,10 +1682,10 @@ namespace LowTempRadiantSystem {
             }
 
             // make sure that this construction is defined with a source/sink--this must be the case or it can't serve as a radiant system surface
-            if (!state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                 ShowSevereError(state, "Construction referenced in Radiant System Surface does not have a source/sink present");
-                ShowContinueError(state, "Surface name= " + Surface(this->SurfacePtr(SurfNum)).Name +
-                                  "  Construction name = " + state.dataConstruction->Construct(Surface(this->SurfacePtr(SurfNum)).Construction).Name);
+                ShowContinueError(state, "Surface name= " + state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Name +
+                                  "  Construction name = " + state.dataConstruction->Construct(state.dataSurface->Surface(this->SurfacePtr(SurfNum)).Construction).Name);
                 ShowContinueError(state, "Construction needs to be defined with a \"Construction:InternalSource\" object.");
                 errorsFound = true;
             }
@@ -1771,19 +1770,19 @@ namespace LowTempRadiantSystem {
             for (RadNum = 1; RadNum <= NumOfHydrLowTempRadSys; ++RadNum) {
                 HydrRadSys(RadNum).TotalSurfaceArea = 0.0;
                 for (SurfNum = 1; SurfNum <= HydrRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
-                    HydrRadSys(RadNum).TotalSurfaceArea += Surface(HydrRadSys(RadNum).SurfacePtr(SurfNum)).Area;
+                    HydrRadSys(RadNum).TotalSurfaceArea += state.dataSurface->Surface(HydrRadSys(RadNum).SurfacePtr(SurfNum)).Area;
                 }
             }
             for (RadNum = 1; RadNum <= NumOfCFloLowTempRadSys; ++RadNum) {
                 CFloRadSys(RadNum).TotalSurfaceArea = 0.0;
                 for (SurfNum = 1; SurfNum <= CFloRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
-                    CFloRadSys(RadNum).TotalSurfaceArea += Surface(CFloRadSys(RadNum).SurfacePtr(SurfNum)).Area;
+                    CFloRadSys(RadNum).TotalSurfaceArea += state.dataSurface->Surface(CFloRadSys(RadNum).SurfacePtr(SurfNum)).Area;
                 }
             }
             for (RadNum = 1; RadNum <= NumOfElecLowTempRadSys; ++RadNum) {
                 ElecRadSys(RadNum).TotalSurfaceArea = 0.0;
                 for (SurfNum = 1; SurfNum <= ElecRadSys(RadNum).NumOfSurfaces; ++SurfNum) {
-                    ElecRadSys(RadNum).TotalSurfaceArea += Surface(ElecRadSys(RadNum).SurfacePtr(SurfNum)).Area;
+                    ElecRadSys(RadNum).TotalSurfaceArea += state.dataSurface->Surface(ElecRadSys(RadNum).SurfacePtr(SurfNum)).Area;
                 }
             }
 
@@ -3163,7 +3162,7 @@ namespace LowTempRadiantSystem {
         Real64 tubeLength(0.0); // temporary holding place for the function calculation
 
         for (int surfNum = 1; surfNum <= this->NumOfSurfaces; ++surfNum) {
-            auto &thisHydrSysSurf(Surface(this->SurfacePtr(surfNum)));
+            auto &thisHydrSysSurf(state.dataSurface->Surface(this->SurfacePtr(surfNum)));
             auto &thisHydrSpacing(state.dataConstruction->Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
             if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
                 tubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
@@ -3239,8 +3238,8 @@ namespace LowTempRadiantSystem {
             for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
                 SurfNum2 = this->SurfacePtr(SurfNum);
                 QRadSysSource(SurfNum2) = 0.0;
-                if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                    QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                    QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
             if (this->HeatingSystem) {
                 mdot = 0.0;
@@ -3376,7 +3375,6 @@ namespace LowTempRadiantSystem {
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
-        using DataSurfaces::Surface;
 
         using PlantUtilities::SetComponentFlowRate;
 
@@ -3446,8 +3444,8 @@ namespace LowTempRadiantSystem {
             for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = this->SurfacePtr(RadSurfNum);
                 QRadSysSource(SurfNum) = 0.0;
-                if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                    QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                    QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
         } else {
@@ -3518,9 +3516,9 @@ namespace LowTempRadiantSystem {
                 // which is the desired result, that is the heat source or sink to the radiant
                 // system as a function of the water inlet temperature (flow rate is also in there
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
-                ConstrNum = Surface(SurfNum).Construction;
+                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
 
-                if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
 
                     Ca = RadSysTiHBConstCoef(SurfNum);
                     Cb = RadSysTiHBToutCoef(SurfNum);
@@ -3538,15 +3536,15 @@ namespace LowTempRadiantSystem {
                     Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
-                    QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
+                    QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / state.dataSurface->Surface(SurfNum).Area));
 
-                } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                } else if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
 
                     QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - TCondFDSourceNode(SurfNum));
                 }
 
-                if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                    QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                    QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
             }
 
             // "Temperature Comparison" Cut-off:
@@ -3586,8 +3584,8 @@ namespace LowTempRadiantSystem {
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                         SurfNum2 = this->SurfacePtr(RadSurfNum2);
                         QRadSysSource(SurfNum2) = 0.0;
-                        if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                            QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                        if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                            QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     break; // outer do loop
                 }
@@ -3620,14 +3618,14 @@ namespace LowTempRadiantSystem {
                         for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                             SurfNum2 = this->SurfacePtr(RadSurfNum3);
                             QRadSysSource(SurfNum2) = 0.0;
-                            if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                                QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                            if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                                QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, cHydronicSystem + " [" + this->Name + ']');
-                                ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
+                                ShowContinueError(state, "Surface [" + state.dataSurface->Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(
@@ -3694,8 +3692,8 @@ namespace LowTempRadiantSystem {
                     for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                         SurfNum2 = this->SurfacePtr(RadSurfNum3);
                         QRadSysSource(SurfNum2) = 0.0;
-                        if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                            QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                        if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                            QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
@@ -3735,7 +3733,7 @@ namespace LowTempRadiantSystem {
                             EpsMdotCp = calculateHXEffectivenessTerm(
                                 state, SurfNum, WaterTempIn, WaterMassFlow, this->SurfaceFrac(RadSurfNum3), this->NumCircuits(RadSurfNum3));
 
-                            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
+                            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF) {
                                 // For documentation on coefficients, see code earlier in this subroutine
                                 Ca = RadSysTiHBConstCoef(SurfNum);
                                 Cb = RadSysTiHBToutCoef(SurfNum);
@@ -3749,12 +3747,12 @@ namespace LowTempRadiantSystem {
                                 Cj = state.dataConstruction->Construct(ConstrNum).CTFTSourceOut(0);
                                 Ck = Cg + ((Ci * (Ca + Cb * Cd) + Cj * (Cd + Ce * Ca)) / (1.0 - Ce * Cb));
                                 Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
-                                QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
-                            } else if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
+                                QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / state.dataSurface->Surface(SurfNum).Area));
+                            } else if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD) {
                                 QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - TCondFDSourceNode(SurfNum));
                             }
-                            if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                                QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
+                            if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                                QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                         }
 
                         // Redo the heat balances since we have changed the heat source
@@ -3782,8 +3780,8 @@ namespace LowTempRadiantSystem {
                                 for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                                     SurfNum2 = this->SurfacePtr(RadSurfNum3);
                                     QRadSysSource(SurfNum2) = 0.0;
-                                    if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                                        QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                                    if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                                        QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                                 }
                             }
                         }
@@ -3794,7 +3792,7 @@ namespace LowTempRadiantSystem {
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, cHydronicSystem + " [" + this->Name + ']');
-                                ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(CondSurfNum)).Name +
+                                ShowContinueError(state, "Surface [" + state.dataSurface->Surface(this->SurfacePtr(CondSurfNum)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(
@@ -4039,8 +4037,8 @@ namespace LowTempRadiantSystem {
             for (SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
                 SurfNum2 = this->SurfacePtr(SurfNum);
                 QRadSysSource(SurfNum2) = 0.0;
-                if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                    QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                    QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
             // turn off flow requests made during init because it is not actually running
@@ -4375,7 +4373,6 @@ namespace LowTempRadiantSystem {
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
-        using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -4468,8 +4465,8 @@ namespace LowTempRadiantSystem {
             for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = this->SurfacePtr(RadSurfNum);
                 QRadSysSource(SurfNum) = 0.0;
-                if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                    QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                    QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
             this->WaterOutletTemp = this->WaterInletTemp;
@@ -4542,7 +4539,7 @@ namespace LowTempRadiantSystem {
                 // system as a function of the water inlet temperature (flow rate is also in there
                 // as well as all of the heat balance terms "hidden" in Ck and Cl).
 
-                ConstrNum = Surface(SurfNum).Construction;
+                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
 
                 Ca = RadSysTiHBConstCoef(SurfNum);
                 Cb = RadSysTiHBToutCoef(SurfNum);
@@ -4565,14 +4562,14 @@ namespace LowTempRadiantSystem {
 
                 if (!Iteration) {
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF)
-                        QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
+                    if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF)
+                        QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - Ck) / (1.0 + (EpsMdotCp * Cl / state.dataSurface->Surface(SurfNum).Area));
 
-                    if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD)
+                    if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CondFD)
                         QRadSysSource(SurfNum) = EpsMdotCp * (WaterTempIn - TCondFDSourceNode(SurfNum));
 
-                    if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                        QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
+                    if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                        QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                     WaterTempOut(RadSurfNum) = WaterTempIn - (QRadSysSource(SurfNum) / (Mdot * Cp));
                 } else { // (Iteration)
                     // In this case, we did not know the inlet temperature directly and have
@@ -4608,7 +4605,7 @@ namespace LowTempRadiantSystem {
                     // surfaces in the system first and then coming up with a calculation for Twaterin.
                     // After than, individual Twaterout,j can be calculated along with QRadSysSource.
                     Ckj(RadSurfNum) = Ck;
-                    Cmj(RadSurfNum) = (EpsMdotCp / (Mdot * Cp)) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
+                    Cmj(RadSurfNum) = (EpsMdotCp / (Mdot * Cp)) / (1.0 + (EpsMdotCp * Cl / state.dataSurface->Surface(SurfNum).Area));
 
                     if (RadSurfNum == this->NumOfSurfaces) { // Last one so we can now do the other calculations
                         // Equation for Twaterin is:
@@ -4640,8 +4637,8 @@ namespace LowTempRadiantSystem {
                             Mdot = WaterMassFlow * this->SurfaceFrac(RadSurfNum2);
                             SurfNum = this->SurfacePtr(RadSurfNum2);
                             QRadSysSource(SurfNum) = Mdot * Cp * (WaterTempIn - WaterTempOut(RadSurfNum2));
-                            if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                                QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
+                            if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                                QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                         }
                     }
                 }
@@ -4681,8 +4678,8 @@ namespace LowTempRadiantSystem {
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
                         SurfNum2 = this->SurfacePtr(RadSurfNum2);
                         QRadSysSource(SurfNum2) = 0.0;
-                        if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                            QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                        if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                            QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     break; // outer do loop
                 }
@@ -4714,14 +4711,14 @@ namespace LowTempRadiantSystem {
                         for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                             SurfNum2 = this->SurfacePtr(RadSurfNum3);
                             QRadSysSource(SurfNum2) = 0.0;
-                            if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                                QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                            if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                                QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                         }
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                 ShowWarningMessage(state, cConstantFlowSystem + " [" + this->Name + ']');
-                                ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
+                                ShowContinueError(state, "Surface [" + state.dataSurface->Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                 ShowContinueError(
@@ -4776,14 +4773,14 @@ namespace LowTempRadiantSystem {
                             for (RadSurfNum3 = 1; RadSurfNum3 <= this->NumOfSurfaces; ++RadSurfNum3) {
                                 SurfNum2 = this->SurfacePtr(RadSurfNum3);
                                 QRadSysSource(SurfNum2) = 0.0;
-                                if (Surface(SurfNum2).ExtBoundCond > 0 && Surface(SurfNum2).ExtBoundCond != SurfNum2)
-                                    QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                                if (state.dataSurface->Surface(SurfNum2).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum2).ExtBoundCond != SurfNum2)
+                                    QRadSysSource(state.dataSurface->Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                             }
                             // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
                                     ShowWarningMessage(state, cConstantFlowSystem + " [" + this->Name + ']');
-                                    ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
+                                    ShowContinueError(state, "Surface [" + state.dataSurface->Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                       "] temperature below dew-point temperature--potential for condensation exists");
                                     ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
                                     ShowContinueError(
@@ -4936,8 +4933,8 @@ namespace LowTempRadiantSystem {
             for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = this->SurfacePtr(RadSurfNum);
                 QRadSysSource(SurfNum) = 0.0;
-                if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                    QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                    QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
             }
 
         } else { // Unit might be on-->this section is intended to determine whether the controls say
@@ -4960,8 +4957,8 @@ namespace LowTempRadiantSystem {
                 for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = this->SurfacePtr(RadSurfNum);
                     QRadSysSource(SurfNum) = HeatFrac * this->MaxElecPower * this->SurfaceFrac(RadSurfNum);
-                    if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                        QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
+                    if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                        QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                 }
 
                 // Now "simulate" the system by recalculating the heat balances
@@ -4975,8 +4972,8 @@ namespace LowTempRadiantSystem {
                 for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                     SurfNum = this->SurfacePtr(RadSurfNum);
                     QRadSysSource(SurfNum) = 0.0;
-                    if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
-                        QRadSysSource(Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
+                    if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum)
+                        QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                 }
             }
         }
@@ -5458,7 +5455,7 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 calculateUFromISOStandard;
 
-        int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
+        int constructionNumber = state.dataSurface->Surface(SurfNum).Construction;
 
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * state.dataConstruction->Construct(constructionNumber).ThicknessPerpend;
@@ -5517,12 +5514,12 @@ namespace LowTempRadiantSystem {
         // For interzone surfaces, QRadSysSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) {
-                if (std::abs(QRadSysSource(SurfNum) - QRadSysSource(Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
-                    if (std::abs(QRadSysSource(SurfNum)) > std::abs(QRadSysSource(Surface(SurfNum).ExtBoundCond))) {
-                        QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum);
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
+                if (std::abs(QRadSysSource(SurfNum) - QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
+                    if (std::abs(QRadSysSource(SurfNum)) > std::abs(QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
+                        QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum);
                     } else {
-                        QRadSysSource(SurfNum) = QRadSysSource(Surface(SurfNum).ExtBoundCond);
+                        QRadSysSource(SurfNum) = QRadSysSource(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                     }
                 }
             }
@@ -5550,11 +5547,11 @@ namespace LowTempRadiantSystem {
         Real64 sumHATsurf(0.0);
 
         for (int surfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; surfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++surfNum) {
-            if (!Surface(surfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            if (!state.dataSurface->Surface(surfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
-            Real64 Area = Surface(surfNum).Area;
+            Real64 Area = state.dataSurface->Surface(surfNum).Area;
 
-            if (Surface(surfNum).Class == SurfaceClass::Window) {
+            if (state.dataSurface->Surface(surfNum).Class == SurfaceClass::Window) {
                 if (state.dataSurface->SurfWinShadingFlag(surfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(surfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
                     Area += state.dataSurface->SurfWinDividerArea(surfNum);
@@ -5631,7 +5628,6 @@ namespace LowTempRadiantSystem {
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
 
         static std::string const routineName("ReportConstantFlowSystem");

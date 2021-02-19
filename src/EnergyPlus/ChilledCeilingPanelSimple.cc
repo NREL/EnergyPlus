@@ -226,8 +226,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataLoopNode::NodeType_Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
-        using DataSurfaces::Surface;
-
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
@@ -575,7 +573,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                     ThisCP.TotSurfToDistrib = MinFraction;
                 }
                 if (ThisCP.SurfacePtr(SurfNum) != 0) {
-                    Surface(ThisCP.SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->Surface(ThisCP.SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
                 }
 
                 AllFracsSummed += ThisCP.FracDistribToSurf(SurfNum);
@@ -1590,7 +1588,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QCoolingPanelSurf;
         using DataHeatBalFanSys::QCoolingPanelToPerson;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1601,7 +1598,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         int SurfNum;              // Pointer to the Surface derived type
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
-
 
         // Initialize arrays
         QCoolingPanelSurf = 0.0;
@@ -1617,7 +1613,7 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = ThisCP.SurfacePtr(RadSurfNum);
-                auto &ThisSurf(Surface(SurfNum));
+                auto &ThisSurf(state.dataSurface->Surface(SurfNum));
                 if (ThisSurf.Area > SmallestArea) {
                     ThisSurfIntensity = (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
                     QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
@@ -1690,7 +1686,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataHeatBalSurface::TempSurfInTmp;
         using DataSurfaces::IntBlindOn;
         using DataSurfaces::IntShadeOn;
-        using DataSurfaces::Surface;
 
         // Return value
         Real64 SumHATsurf;
@@ -1702,7 +1697,7 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
-            auto &ThisSurf(Surface(SurfNum));
+            auto &ThisSurf(state.dataSurface->Surface(SurfNum));
 
             if (!ThisSurf.HeatTransSurf) continue; // Skip non-heat transfer surfaces
 

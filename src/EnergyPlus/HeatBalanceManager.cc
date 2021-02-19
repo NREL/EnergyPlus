@@ -318,11 +318,11 @@ namespace HeatBalanceManager {
             //   if in the future surfaces are altered after this point
             if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                 // Octree can be active
                 if (inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
-                    surfaceOctree.init(DataSurfaces::Surface);                        // Set up surface octree
+                    surfaceOctree.init(state.dataSurface->Surface);                        // Set up surface octree
                 }
             }
 
-            for (auto &surface : DataSurfaces::Surface)
+            for (auto &surface : state.dataSurface->Surface)
                 surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
 
             ManageHeatBalanceGetInputFlag = false;
@@ -5621,7 +5621,7 @@ namespace HeatBalanceManager {
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
+            state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS = state.dataSurface->Surface(SurfNum).MovInsulIntPresent;
         }
 
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero
@@ -5915,7 +5915,7 @@ namespace HeatBalanceManager {
         int SurfNum;
 
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            auto &thisSurface(DataSurfaces::Surface(SurfNum));
+            auto &thisSurface(state.dataSurface->Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
@@ -6039,16 +6039,13 @@ namespace HeatBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Open and set up headers for a external shading fraction export file.
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
         state.files.shade.ensure_open(state, "OpenOutputFiles", state.files.outputControl.extshd);
         print(state.files.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            print(state.files.shade, "{},", Surface(SurfNum).Name);
+            print(state.files.shade, "{},", state.dataSurface->Surface(SurfNum).Name);
         }
         print(state.files.shade, "()\n");
     }
@@ -7483,7 +7480,6 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using DataSurfaces::FenLayAbsSSG;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfIncSolSSG;
         using ScheduleManager::GetScheduleIndex;
 
@@ -7546,7 +7542,7 @@ namespace HeatBalanceManager {
                 SurfIncSolSSG(Loop).Name = cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
+                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
@@ -7616,7 +7612,7 @@ namespace HeatBalanceManager {
                 FenLayAbsSSG(Loop).Name = cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
+                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
                                     cAlphaFieldNames(2) + " has been found.");
@@ -7736,8 +7732,8 @@ namespace HeatBalanceManager {
         ZoneScheduled = false;
 
         for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
-            iConst = Surface(iSurf).Construction;
-            if (Surface(iSurf).Class == SurfaceClass::Window) {
+            iConst = state.dataSurface->Surface(iSurf).Construction;
+            if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
                 SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
             } else {
                 SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
@@ -7769,15 +7765,15 @@ namespace HeatBalanceManager {
 
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
             for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
-                iConst = Surface(iSurf).Construction;
-                if (Surface(iSurf).Class == SurfaceClass::Window) {
+                iConst = state.dataSurface->Surface(iSurf).Construction;
+                if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
                 } else {
                     SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
                 }
 
                 if (SchedPtr == 0) {
-                    ShowContinueError(state, "Surface " + Surface(iSurf).Name + " does not have scheduled surface gains.");
+                    ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
                 }
             }
         }
