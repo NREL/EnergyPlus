@@ -386,6 +386,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with A, insert the rules here
 
               ! If your original object starts with C, insert the rules here
+              
              CASE('CONSTRUCTION:AIRBOUNDARY')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
@@ -630,6 +631,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
+             CASE('ZONEAIRMASSFLOWCONSERVATION')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(1) == "YES" .OR. OutArgs(1) == "Yes" .OR. OutArgs(1) == "yes") THEN
+                     OutArgs(1) = "AdjustMixingOnly"
+                 END IF
+                 IF (OutArgs(1) == "NO" .OR. OutArgs(1) == "No" .OR. OutArgs(1) == "no") THEN
+                     OutArgs(1) = "None"
+                 END IF
+				 
               CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1)=InArgs(1)

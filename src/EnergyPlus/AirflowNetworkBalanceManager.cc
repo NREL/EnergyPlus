@@ -101,6 +101,8 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 
 namespace EnergyPlus {
 
@@ -1810,6 +1812,12 @@ namespace AirflowNetworkBalanceManager {
         AirflowNetworkSimu.WPCCntr = Alphas(3);
         AirflowNetworkSimu.HeightOption = Alphas(4);
         AirflowNetworkSimu.BldgType = Alphas(5);
+
+        // Retrieve flag allowing the support of zone equipment
+        AirflowNetworkSimu.AllowSupportZoneEqp = false;
+        if (UtilityRoutines::SameString(Alphas(9), "Yes")) {
+            AirflowNetworkSimu.AllowSupportZoneEqp = true;
+        }
 
         // Find a flag for possible combination of vent and distribution system
         {
@@ -9483,6 +9491,8 @@ namespace AirflowNetworkBalanceManager {
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
+        using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
+        using HVACStandAloneERV::GetStandAloneERVNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ValidateDistributionSystem: "); // include trailing blank space
@@ -9504,6 +9514,9 @@ namespace AirflowNetworkBalanceManager {
         bool errFlag(false);
         Array1D_int NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
+
+        bool HPWHFound(false);          // Flag for HPWH identification
+        bool StandaloneERVFound(false); // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
 
         // Validate supply and return connections
         NodeFound.dimension(NumOfNodes, false);
@@ -9590,6 +9603,20 @@ namespace AirflowNetworkBalanceManager {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
             if (GetZoneDehumidifierNodeNumber(state, i)) NodeFound(i) = true;
+
+            if (AirflowNetworkSimu.AllowSupportZoneEqp) {
+                // Skip HPWH nodes that don't have to be included in the AFN
+                if (GetHeatPumpWaterHeaterNodeNumber(state, i)) {
+                    NodeFound(i) = true;
+                    HPWHFound = true;
+                }
+
+                // Skip Standalone ERV nodes that don't have to be included in the AFN
+                if (GetStandAloneERVNodeNumber(state, i)) {
+                    NodeFound(i) = true;
+                    StandaloneERVFound = true;
+                }
+            }
 
             for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
@@ -9700,6 +9727,12 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
             }
+        }
+        if (HPWHFound) {
+            ShowWarningError(state, "ValidateDistributionSystem: Heat pump water heater is simulated along with an AirflowNetwork but is not included in the AirflowNetwork.");
+        }
+        if (StandaloneERVFound) {
+            ShowWarningError(state, "ValidateDistributionSystem: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an AirflowNetwork but is not included in the AirflowNetwork.");
         }
         NodeFound.deallocate();
 
