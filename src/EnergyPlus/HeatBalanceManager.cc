@@ -7477,8 +7477,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSurfaces::FenLayAbsSSG;
-        using DataSurfaces::SurfIncSolSSG;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -7514,8 +7512,8 @@ namespace HeatBalanceManager {
 
         state.dataSurface->TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotSurfIncSolSSG > 0) {
-            if (!allocated(SurfIncSolSSG)) {
-                SurfIncSolSSG.allocate(state.dataSurface->TotSurfIncSolSSG);
+            if (!allocated(state.dataSurface->SurfIncSolSSG)) {
+                state.dataSurface->SurfIncSolSSG.allocate(state.dataSurface->TotSurfIncSolSSG);
             }
 
             for (Loop = 1; Loop <= state.dataSurface->TotSurfIncSolSSG; ++Loop) {
@@ -7537,7 +7535,7 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
-                SurfIncSolSSG(Loop).Name = cAlphaArgs(1);
+                state.dataSurface->SurfIncSolSSG(Loop).Name = cAlphaArgs(1);
 
                 // Assign surface number
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
@@ -7548,7 +7546,7 @@ namespace HeatBalanceManager {
                                       "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    SurfIncSolSSG(Loop).SurfPtr = SurfNum;
+                    state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
                 }
 
                 // Assign construction number
@@ -7560,7 +7558,7 @@ namespace HeatBalanceManager {
                                       "\" no corresponding construction (ref Construction) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    SurfIncSolSSG(Loop).ConstrPtr = ConstrNum;
+                    state.dataSurface->SurfIncSolSSG(Loop).ConstrPtr = ConstrNum;
                 }
 
                 // Assign schedule number
@@ -7572,7 +7570,7 @@ namespace HeatBalanceManager {
                                       "\" no corresponding schedule has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    SurfIncSolSSG(Loop).SchedPtr = ScheduleNum;
+                    state.dataSurface->SurfIncSolSSG(Loop).SchedPtr = ScheduleNum;
                 }
             }
         }
@@ -7584,8 +7582,8 @@ namespace HeatBalanceManager {
 
         state.dataSurface->TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotFenLayAbsSSG > 0) {
-            if (!allocated(FenLayAbsSSG)) {
-                FenLayAbsSSG.allocate(state.dataSurface->TotFenLayAbsSSG);
+            if (!allocated(state.dataSurface->FenLayAbsSSG)) {
+                state.dataSurface->FenLayAbsSSG.allocate(state.dataSurface->TotFenLayAbsSSG);
             }
 
             for (Loop = 1; Loop <= state.dataSurface->TotFenLayAbsSSG; ++Loop) {
@@ -7607,7 +7605,7 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
-                FenLayAbsSSG(Loop).Name = cAlphaArgs(1);
+                state.dataSurface->FenLayAbsSSG(Loop).Name = cAlphaArgs(1);
 
                 // Assign surface number
                 SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
@@ -7618,7 +7616,7 @@ namespace HeatBalanceManager {
                                       "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    FenLayAbsSSG(Loop).SurfPtr = SurfNum;
+                    state.dataSurface->FenLayAbsSSG(Loop).SurfPtr = SurfNum;
                 }
 
                 // Assign construction number
@@ -7630,7 +7628,7 @@ namespace HeatBalanceManager {
                                       "\" no corresponding construction (ref Construction) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    FenLayAbsSSG(Loop).ConstrPtr = ConstrNum;
+                    state.dataSurface->FenLayAbsSSG(Loop).ConstrPtr = ConstrNum;
                     NumOfScheduledLayers = NumAlpha - 3;
                     NumOfLayersMatch = false;
                     // Check if number of layers in construction matches number of layers in schedule surface gains object
@@ -7651,11 +7649,11 @@ namespace HeatBalanceManager {
                         ErrorsFound = true;
                     }
 
-                    if (!allocated(FenLayAbsSSG(Loop).SchedPtrs)) {
-                        FenLayAbsSSG(Loop).SchedPtrs.allocate(NumOfScheduledLayers);
+                    if (!allocated(state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs)) {
+                        state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs.allocate(NumOfScheduledLayers);
                     }
 
-                    FenLayAbsSSG(Loop).NumOfSched = NumOfScheduledLayers;
+                    state.dataSurface->FenLayAbsSSG(Loop).NumOfSched = NumOfScheduledLayers;
 
                     for (i = 1; i <= NumOfScheduledLayers; ++i) {
                         ScheduleNum = GetScheduleIndex(state, cAlphaArgs(i + 3));
@@ -7667,7 +7665,7 @@ namespace HeatBalanceManager {
                                               "\" no corresponding schedule has been found in the input file.");
                             ErrorsFound = true;
                         } else {
-                            FenLayAbsSSG(Loop).SchedPtrs(i) = ScheduleNum;
+                            state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs(i) = ScheduleNum;
                         }
                     }
                 }

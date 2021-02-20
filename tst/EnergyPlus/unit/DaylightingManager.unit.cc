@@ -935,59 +935,59 @@ TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
     state->dataDaylightingData->ZoneDaylight(4).Name = "ZD4";
 
     state->dataSurface->TotWinShadingControl = 3;
-    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).DaylightingControlName = "ZD3";
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).DaylightingControlName = "ZD3";
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).DaylightingControlName = "ZD1";
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).DaylightingControlName = "ZD1";
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
 
     AssociateWindowShadingControlWithDaylighting(*state);
 
-    EXPECT_EQ(WindowShadingControl(1).DaylightControlIndex, 3);
-    EXPECT_EQ(WindowShadingControl(2).DaylightControlIndex, 1);
-    EXPECT_EQ(WindowShadingControl(3).DaylightControlIndex, 0);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).DaylightControlIndex, 3);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).DaylightControlIndex, 1);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(3).DaylightControlIndex, 0);
 }
 
 TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 {
     state->dataSurface->TotWinShadingControl = 3;
-    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
@@ -1027,38 +1027,38 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
 {
     state->dataSurface->TotWinShadingControl = 3;
-    WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);

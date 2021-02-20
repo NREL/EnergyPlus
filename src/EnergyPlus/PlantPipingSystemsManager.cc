@@ -705,7 +705,7 @@ namespace EnergyPlus {
                     thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                     thisDomain.BasementZone.WallBoundaryOSCMIndex =
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
-                                                            DataSurfaces::OSCM);
+                                                            state.dataSurface->OSCM);
                     if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
@@ -735,7 +735,7 @@ namespace EnergyPlus {
                     thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                     thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                             UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
-                                                            DataSurfaces::OSCM);
+                                                            state.dataSurface->OSCM);
                     if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                         IssueSevereInputFieldError(state, RoutineName,
                                                    ObjName_ug_GeneralDomain,
@@ -1022,7 +1022,7 @@ namespace EnergyPlus {
                 thisDomain.HasZoneCoupledSlab = true;
 
                 // get boundary condition model names and indices -- error check
-                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataSurfaces::OSCM);
+                thisDomain.ZoneCoupledOSCMIndex = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataSurface->OSCM);
                 if (thisDomain.ZoneCoupledOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Slab,
@@ -1212,7 +1212,7 @@ namespace EnergyPlus {
                 thisDomain.BasementZone.FloorBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.FloorBoundaryOSCMIndex =
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.FloorBoundaryOSCMName,
-                                                        DataSurfaces::OSCM);
+                                                        state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.FloorBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
@@ -1244,7 +1244,7 @@ namespace EnergyPlus {
                 thisDomain.BasementZone.WallBoundaryOSCMName = DataIPShortCuts::cAlphaArgs(CurIndex);
                 thisDomain.BasementZone.WallBoundaryOSCMIndex =
                         UtilityRoutines::FindItemInList(thisDomain.BasementZone.WallBoundaryOSCMName,
-                                                        DataSurfaces::OSCM);
+                                                        state.dataSurface->OSCM);
                 if (thisDomain.BasementZone.WallBoundaryOSCMIndex <= 0) {
                     IssueSevereInputFieldError(state, RoutineName,
                                                ObjName_ZoneCoupled_Basement,
@@ -4846,18 +4846,18 @@ namespace EnergyPlus {
             // First the wall
             this->BasementWallTemp = this->GetAverageTempByType(state, CellType::BasementWall);
             int OSCMIndex = this->BasementZone.WallBoundaryOSCMIndex;
-            DataSurfaces::OSCM(OSCMIndex).TConv = this->BasementWallTemp;
-            DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
-            DataSurfaces::OSCM(OSCMIndex).TRad = this->BasementWallTemp;
-            DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(OSCMIndex).TConv = this->BasementWallTemp;
+            state.dataSurface->OSCM(OSCMIndex).HConv = BigNumber;
+            state.dataSurface->OSCM(OSCMIndex).TRad = this->BasementWallTemp;
+            state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
 
             // Then the floor
             this->BasementFloorTemp = this->GetAverageTempByType(state, CellType::BasementFloor);
             OSCMIndex = this->BasementZone.FloorBoundaryOSCMIndex;
-            DataSurfaces::OSCM(OSCMIndex).TConv = this->BasementFloorTemp;
-            DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
-            DataSurfaces::OSCM(OSCMIndex).TRad = this->BasementFloorTemp;
-            DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(OSCMIndex).TConv = this->BasementFloorTemp;
+            state.dataSurface->OSCM(OSCMIndex).HConv = BigNumber;
+            state.dataSurface->OSCM(OSCMIndex).TRad = this->BasementFloorTemp;
+            state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
         }
 
         Real64 Domain::GetZoneInterfaceHeatFlux() {
@@ -4889,10 +4889,10 @@ namespace EnergyPlus {
 
             this->ZoneCoupledSurfaceTemp = this->GetAverageTempByType(state, CellType::ZoneGroundInterface);
             int OSCMIndex = this->ZoneCoupledOSCMIndex;
-            DataSurfaces::OSCM(OSCMIndex).TConv = this->ZoneCoupledSurfaceTemp;
-            DataSurfaces::OSCM(OSCMIndex).HConv = BigNumber;
-            DataSurfaces::OSCM(OSCMIndex).TRad = this->ZoneCoupledSurfaceTemp;
-            DataSurfaces::OSCM(OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(OSCMIndex).TConv = this->ZoneCoupledSurfaceTemp;
+            state.dataSurface->OSCM(OSCMIndex).HConv = BigNumber;
+            state.dataSurface->OSCM(OSCMIndex).TRad = this->ZoneCoupledSurfaceTemp;
+            state.dataSurface->OSCM(OSCMIndex).HRad = 0.0;
 
             // Reset the interface heat flux after iteration
             this->ResetHeatFluxFlag = true;

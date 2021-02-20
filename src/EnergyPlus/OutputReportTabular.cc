@@ -12624,7 +12624,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
         using DataSurfaces::KivaFoundation;
-        using DataSurfaces::OSC;
         using DataSurfaces::OtherSideCoefCalcExt;
         using DataSurfaces::OtherSideCoefNoCalcExt;
         using DataSurfaces::OtherSideCondModeledExt;
@@ -12741,7 +12740,7 @@ namespace EnergyPlus::OutputReportTabular {
                 // if exterior is other side coefficients using ground preprocessor terms then
                 // set it to ground instead of other side coefficients
                 if (curExtBoundCond == OtherSideCoefNoCalcExt || curExtBoundCond == OtherSideCoefCalcExt) {
-                    if (has_prefixi(OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
+                    if (has_prefixi(state.dataSurface->OSC(state.dataSurface->Surface(kSurf).OSCPtr).Name, "surfPropOthSdCoef")) {
                         curExtBoundCond = Ground;
                     }
                 }

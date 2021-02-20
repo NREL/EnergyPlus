@@ -1470,7 +1470,6 @@ namespace HeatBalFiniteDiffManager {
         using DataHeatBalSurface::QdotRadOutRepPerArea;
         using DataHeatBalSurface::QRadOutReport;
         using DataSurfaces::HeatTransferModel_CondFD;
-        using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
 
         auto const &surface(state.dataSurface->Surface(Surf));
@@ -1481,7 +1480,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 QRadSWOutMvInsulFD(0.0); // SW radiation at outside of Movable Insulation
         if (surface_ExtBoundCond == OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
-            Tsky = OSCM(surface.OSCMPtr).TRad;
+            Tsky = state.dataSurface->OSCM(surface.OSCMPtr).TRad;
             QRadSWOutFD = 0.0; // eliminate incident shortwave on underlying surface
         } else {               // Set the external conditions to local variables
             QRadSWOutFD = SurfOpaqQRadSWOutAbs(Surf);

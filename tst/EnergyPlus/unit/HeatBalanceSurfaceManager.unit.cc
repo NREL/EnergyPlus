@@ -2490,9 +2490,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestReportIntMovInsInsideSur
     Real64 ExpectedResult2;
     Real64 ExpectedResult3;
 
-    DataSurfaces::clear_state();
-    DataHeatBalSurface::clear_state();
-
     state->dataSurface->TotSurfaces = 3;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     DataHeatBalSurface::TempSurfIn.allocate(state->dataSurface->TotSurfaces);

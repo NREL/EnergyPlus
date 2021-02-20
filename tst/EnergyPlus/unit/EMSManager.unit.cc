@@ -1599,7 +1599,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     state->dataSurface->Surface.allocate(2);
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
-    DataSurfaces::WindowShadingControl.allocate(2);
+    state->dataSurface->WindowShadingControl.allocate(2);
     state->dataDaylightingData->ZoneDaylight.allocate(1);
     state->dataSurface->Surface(1).Name = "Surface1";
     state->dataSurface->Surface(2).Name = "Surface2";
@@ -1621,8 +1621,8 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     state->dataConstruction->Construct(1).Name = "Construction1";
 
-    DataSurfaces::WindowShadingControl(1).ShadingType = 0;
-    DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
+    state->dataSurface->WindowShadingControl(1).ShadingType = 0;
+    state->dataSurface->WindowShadingControl(2).ShadingType = DataSurfaces::WSC_ST_ExteriorScreen;
 
     state->dataSurface->TotSurfaces = 2;
 

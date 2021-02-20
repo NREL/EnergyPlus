@@ -239,7 +239,6 @@ namespace TranspiredCollector {
         using DataLoopNode::NodeConnectionType_Sensor;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsNotParent;
-        using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;
         using NodeInputManager::GetOnlySingleNode;
@@ -403,7 +402,7 @@ namespace TranspiredCollector {
             }         // any UTSC Multisystem present
 
             state.dataTranspiredCollector->UTSC(Item).OSCMName = Alphas(2);
-            Found = UtilityRoutines::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, OSCM);
+            Found = UtilityRoutines::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
                 ShowSevereError(state, cAlphaFieldNames(2) + " not found=" + state.dataTranspiredCollector->UTSC(Item).OSCMName + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
@@ -1247,7 +1246,6 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         using DataLoopNode::Node;
-        using DataSurfaces::OSCM;
 
         int OutletNode;
         int InletNode;
@@ -1299,10 +1297,10 @@ namespace TranspiredCollector {
         // update the OtherSideConditionsModel coefficients.
         thisOSCM = state.dataTranspiredCollector->UTSC(UTSCNum).OSCMPtr;
 
-        OSCM(thisOSCM).TConv = state.dataTranspiredCollector->UTSC(UTSCNum).Tplen;
-        OSCM(thisOSCM).HConv = state.dataTranspiredCollector->UTSC(UTSCNum).HcPlen;
-        OSCM(thisOSCM).TRad = state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll;
-        OSCM(thisOSCM).HRad = state.dataTranspiredCollector->UTSC(UTSCNum).HrPlen;
+        state.dataSurface->OSCM(thisOSCM).TConv = state.dataTranspiredCollector->UTSC(UTSCNum).Tplen;
+        state.dataSurface->OSCM(thisOSCM).HConv = state.dataTranspiredCollector->UTSC(UTSCNum).HcPlen;
+        state.dataSurface->OSCM(thisOSCM).TRad = state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll;
+        state.dataSurface->OSCM(thisOSCM).HRad = state.dataTranspiredCollector->UTSC(UTSCNum).HrPlen;
     }
 
     void SetUTSCQdotSource(EnergyPlusData &state, int const UTSCNum,

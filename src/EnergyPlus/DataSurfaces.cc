@@ -107,22 +107,6 @@ namespace EnergyPlus::DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    // Object Data
-    Array1D<WindowShadingControlData> WindowShadingControl;
-    Array1D<OSCData> OSC;
-    Array1D<OSCMData> OSCM;
-    Array1D<ConvectionCoefficient> UserIntConvectionCoeffs;
-    Array1D<ConvectionCoefficient> UserExtConvectionCoeffs;
-    Array1D<ShadingVertexData> ShadeV;
-    Array1D<ExtVentedCavityStruct> ExtVentedCavity;
-    Array1D<SurfaceSolarIncident> SurfIncSolSSG;
-    Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
-    Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
-    Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
-    Array1D<IntMassObject> IntMassObjects;
-
-    // Class Methods
-
     // Constructor
     Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)
         : axis(axis), vertices(v), vl(vl), vu(vu)
@@ -645,24 +629,6 @@ namespace EnergyPlus::DataSurfaces {
     }
 
     // Functions
-
-    // Clears the global data in DataSurfaces.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        WindowShadingControl.deallocate();
-        OSC.deallocate();
-        OSCM.deallocate();
-        UserIntConvectionCoeffs.deallocate();
-        UserExtConvectionCoeffs.deallocate();
-        ShadeV.deallocate();
-        ExtVentedCavity.deallocate();
-        SurfIncSolSSG.deallocate();
-        FenLayAbsSSG.deallocate();
-        SurfLocalEnvironment.deallocate();
-        SurroundingSurfsProperty.deallocate();
-        IntMassObjects.deallocate();
-    }
 
     void SetSurfaceOutBulbTempAt(EnergyPlusData &state)
     {

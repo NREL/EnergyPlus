@@ -1344,7 +1344,7 @@ namespace EnergyPlus::SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (state.dataSurface->Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(state.dataSurface->Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable(state, "Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
@@ -2630,8 +2630,8 @@ namespace EnergyPlus::SolarShading {
 
         state.dataSolarShading->NVS = state.dataSurface->Surface(SBSNR).Sides;
         for (N = 1; N <= state.dataSolarShading->NVS; ++N) {
-            state.dataSolarShading->XVS(N) = ShadeV(SBSNR).XV(state.dataSolarShading->NVS + 1 - N);
-            state.dataSolarShading->YVS(N) = ShadeV(SBSNR).YV(state.dataSolarShading->NVS + 1 - N);
+            state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).XV(state.dataSolarShading->NVS + 1 - N);
+            state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).YV(state.dataSolarShading->NVS + 1 - N);
         }
         HTRANS1(state, NS1, state.dataSolarShading->NVS);
 
@@ -5613,9 +5613,9 @@ namespace EnergyPlus::SolarShading {
                     // project shadow to the receiving surface
 
                     state.dataSolarShading->NVS = surface.Sides;
-                    auto const &XV(ShadeV(GSSNR).XV);
-                    auto const &YV(ShadeV(GSSNR).YV);
-                    auto const &ZV(ShadeV(GSSNR).ZV);
+                    auto const &XV(state.dataSurface->ShadeV(GSSNR).XV);
+                    auto const &YV(state.dataSurface->ShadeV(GSSNR).YV);
+                    auto const &ZV(state.dataSurface->ShadeV(GSSNR).ZV);
                     for (int N = 1; N <= state.dataSolarShading->NVS; ++N) {
                         state.dataSolarShading->XVS(N) = XV(N) - state.dataSolarShading->XShadowProjection * ZV(N);
                         state.dataSolarShading->YVS(N) = YV(N) - state.dataSolarShading->YShadowProjection * ZV(N);
@@ -7514,13 +7514,13 @@ namespace EnergyPlus::SolarShading {
             Real64 BABSZoneSSG = 0.0; // Beam radiation from exterior windows absorbed in a zone (only for scheduled surface gains)
             Real64 BTOTZoneSSG = 0.0; // Solar entering a zone in case of scheduled surface gains
             for (int iSSG = 1; iSSG <= state.dataSurface->TotSurfIncSolSSG; ++iSSG) {
-                int SurfNum = SurfIncSolSSG(iSSG).SurfPtr;
+                int SurfNum = state.dataSurface->SurfIncSolSSG(iSSG).SurfPtr;
                 // do calculation only if construction number match.
-                if (SurfIncSolSSG(iSSG).ConstrPtr == state.dataSurface->Surface(SurfNum).Construction) {
+                if (state.dataSurface->SurfIncSolSSG(iSSG).ConstrPtr == state.dataSurface->Surface(SurfNum).Construction) {
                     if (state.dataSurface->Surface(SurfNum).SolarEnclIndex == enclosureNum) {
                         Real64 AbsIntSurf = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).InsideAbsorpSolar;
                         // SolarIntoZone = GetCurrentScheduleValue(SurfIncSolSSG(iSSG)%SchedPtr) * Surface(SurfNum)%Area
-                        Real64 SolarIntoZone = GetCurrentScheduleValue(state, SurfIncSolSSG(iSSG).SchedPtr); // Solar radiation into zone to current surface
+                        Real64 SolarIntoZone = GetCurrentScheduleValue(state, state.dataSurface->SurfIncSolSSG(iSSG).SchedPtr); // Solar radiation into zone to current surface
                         state.dataSurface->SurfOpaqAI(SurfNum) = SolarIntoZone * AbsIntSurf;
                         BABSZoneSSG += state.dataSurface->SurfOpaqAI(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
                         BTOTZoneSSG += SolarIntoZone * state.dataSurface->Surface(SurfNum).Area;
@@ -7966,7 +7966,7 @@ namespace EnergyPlus::SolarShading {
         WindowScheduledSolarAbs = 0;
 
         for (int i = 1; i <= state.dataSurface->TotFenLayAbsSSG; ++i) {
-            if ((FenLayAbsSSG(i).SurfPtr == SurfNum) && (FenLayAbsSSG(i).ConstrPtr == ConstNum)) {
+            if ((state.dataSurface->FenLayAbsSSG(i).SurfPtr == SurfNum) && (state.dataSurface->FenLayAbsSSG(i).ConstrPtr == ConstNum)) {
                 WindowScheduledSolarAbs = i;
                 return WindowScheduledSolarAbs;
             }
@@ -7993,7 +7993,7 @@ namespace EnergyPlus::SolarShading {
         SurfaceScheduledSolarInc = 0;
 
         for (int i = 1; i <= state.dataSurface->TotSurfIncSolSSG; ++i) {
-            if ((SurfIncSolSSG(i).SurfPtr == SurfNum) && (SurfIncSolSSG(i).ConstrPtr == ConstNum)) {
+            if ((state.dataSurface->SurfIncSolSSG(i).SurfPtr == SurfNum) && (state.dataSurface->SurfIncSolSSG(i).ConstrPtr == ConstNum)) {
                 SurfaceScheduledSolarInc = i;
                 return SurfaceScheduledSolarInc;
             }
@@ -8202,14 +8202,14 @@ namespace EnergyPlus::SolarShading {
                 // Determine vertices of reveal.
                 // Project the subsurface up to the plane of the wall.
 
-                XVT(1) = ShadeV(SBSNR).XV(1) + R * max(state.dataSolarShading->XShadowProjection, 0.0);
-                XVT(2) = ShadeV(SBSNR).XV(2) + R * max(state.dataSolarShading->XShadowProjection, 0.0);
-                XVT(3) = ShadeV(SBSNR).XV(3) + R * min(state.dataSolarShading->XShadowProjection, 0.0);
-                XVT(4) = ShadeV(SBSNR).XV(4) + R * min(state.dataSolarShading->XShadowProjection, 0.0);
-                YVT(1) = ShadeV(SBSNR).YV(1) + R * min(state.dataSolarShading->YShadowProjection, 0.0);
-                YVT(2) = ShadeV(SBSNR).YV(2) + R * max(state.dataSolarShading->YShadowProjection, 0.0);
-                YVT(3) = ShadeV(SBSNR).YV(3) + R * max(state.dataSolarShading->YShadowProjection, 0.0);
-                YVT(4) = ShadeV(SBSNR).YV(4) + R * min(state.dataSolarShading->YShadowProjection, 0.0);
+                XVT(1) = state.dataSurface->ShadeV(SBSNR).XV(1) + R * max(state.dataSolarShading->XShadowProjection, 0.0);
+                XVT(2) = state.dataSurface->ShadeV(SBSNR).XV(2) + R * max(state.dataSolarShading->XShadowProjection, 0.0);
+                XVT(3) = state.dataSurface->ShadeV(SBSNR).XV(3) + R * min(state.dataSolarShading->XShadowProjection, 0.0);
+                XVT(4) = state.dataSurface->ShadeV(SBSNR).XV(4) + R * min(state.dataSolarShading->XShadowProjection, 0.0);
+                YVT(1) = state.dataSurface->ShadeV(SBSNR).YV(1) + R * min(state.dataSolarShading->YShadowProjection, 0.0);
+                YVT(2) = state.dataSurface->ShadeV(SBSNR).YV(2) + R * max(state.dataSolarShading->YShadowProjection, 0.0);
+                YVT(3) = state.dataSurface->ShadeV(SBSNR).YV(3) + R * max(state.dataSolarShading->YShadowProjection, 0.0);
+                YVT(4) = state.dataSurface->ShadeV(SBSNR).YV(4) + R * min(state.dataSolarShading->YShadowProjection, 0.0);
 
                 // Check for complete shadowing.
 
@@ -8243,8 +8243,8 @@ namespace EnergyPlus::SolarShading {
                 // Project window to outside plane of parent surface
 
                 for (N = 1; N <= 3; ++N) {
-                    XVT(N) = ShadeV(SBSNR).XV(N) + R * state.dataSolarShading->XShadowProjection;
-                    YVT(N) = ShadeV(SBSNR).YV(N) + R * state.dataSolarShading->YShadowProjection;
+                    XVT(N) = state.dataSurface->ShadeV(SBSNR).XV(N) + R * state.dataSolarShading->XShadowProjection;
+                    YVT(N) = state.dataSurface->ShadeV(SBSNR).YV(N) + R * state.dataSolarShading->YShadowProjection;
                 }
 
                 // Find the overlap between the original window and the projected window
@@ -8264,8 +8264,8 @@ namespace EnergyPlus::SolarShading {
                 // Put XV,YV in clockwise order
 
                 for (N = 1; N <= NVS; ++N) {
-                    state.dataSolarShading->XVS(N) = ShadeV(SBSNR).XV(NVS + 1 - N);
-                    state.dataSolarShading->YVS(N) = ShadeV(SBSNR).YV(NVS + 1 - N);
+                    state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).XV(NVS + 1 - N);
+                    state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).YV(NVS + 1 - N);
                 }
 
                 // Transform to homogenous coordinates
@@ -8387,8 +8387,8 @@ namespace EnergyPlus::SolarShading {
                         // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
                         state.dataSolarShading->NVS = state.dataSurface->Surface(SBSNR).Sides;
                         for (N = 1; N <= state.dataSolarShading->NVS; ++N) {
-                            state.dataSolarShading->XVS(N) = ShadeV(SBSNR).XV(state.dataSolarShading->NVS + 1 - N);
-                            state.dataSolarShading->YVS(N) = ShadeV(SBSNR).YV(state.dataSolarShading->NVS + 1 - N);
+                            state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).XV(state.dataSolarShading->NVS + 1 - N);
+                            state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).YV(state.dataSolarShading->NVS + 1 - N);
                         }
                         state.dataSolarShading->LOCHCA = state.dataSolarShading->FSBSHC;
                         HTRANS1(state, state.dataSolarShading->LOCHCA, state.dataSolarShading->NVS);
@@ -8746,13 +8746,13 @@ namespace EnergyPlus::SolarShading {
                 }
                 int IShadingCtrl = state.dataSurface->Surface(ISurf).activeWindowShadingControl;
 
-                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
+                int ShadingType = state.dataSurface->WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
                 state.dataSurface->SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
 
                 int IZone = state.dataSurface->Surface(ISurf).Zone;
                 // Setpoint for shading
-                Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
-                Real64 SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2; // Second control setpoint
+                Real64 SetPoint = state.dataSurface->WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
+                Real64 SetPoint2 = state.dataSurface->WindowShadingControl(IShadingCtrl).SetPoint2; // Second control setpoint
 
 
                 // ShType = NoShade           ! =-1 (see DataHeatBalance)
@@ -8777,15 +8777,15 @@ namespace EnergyPlus::SolarShading {
                 if (ShadingType == WSC_ST_BetweenGlassBlind) ShType = BGBlindOn;         // =9
 
                 bool SchedAllowsControl = true; // True if control schedule is not specified or is specified and schedule value = 1
-                int SchedulePtr = WindowShadingControl(IShadingCtrl).Schedule;
+                int SchedulePtr = state.dataSurface->WindowShadingControl(IShadingCtrl).Schedule;
                 if (SchedulePtr != 0) {
-                    if (WindowShadingControl(IShadingCtrl).ShadingControlIsScheduled &&
+                    if (state.dataSurface->WindowShadingControl(IShadingCtrl).ShadingControlIsScheduled &&
                         GetCurrentScheduleValue(state, SchedulePtr) <= 0.0)
                         SchedAllowsControl = false;
                 }
 
                 Real64 GlareControlIsActive = (state.dataDaylightingData->ZoneDaylight(IZone).TotalDaylRefPoints > 0 && state.dataEnvrn->SunIsUp &&
-                                        WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
+                                        state.dataSurface->WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
 
                 Real64 SolarOnWindow = 0.0; // Direct plus diffuse solar intensity on window (W/m2)
                 Real64 BeamSolarOnWindow = 0.0; // Direct solar intensity on window (W/m2)
@@ -8802,7 +8802,7 @@ namespace EnergyPlus::SolarShading {
                 // Determine whether to deploy shading depending on type of control
 
 
-                auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).ShadingControlType);
+                auto const SELECT_CASE_var(state.dataSurface->WindowShadingControl(IShadingCtrl).ShadingControlType);
 
                 if (SELECT_CASE_var == WSCT_AlwaysOn) { // 'ALWAYSON'
                     state.dataSurface->SurfWinShadingFlag(ISurf) = ShType;
@@ -9036,7 +9036,7 @@ namespace EnergyPlus::SolarShading {
 
                         // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
                         if (state.dataHeatBal->Blind(BlNum).SlatWidth <= state.dataHeatBal->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
-                            if (WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds == WSC_SAC_BlockBeamSolar) {
+                            if (state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds == WSC_SAC_BlockBeamSolar) {
 
                                 ProfileAngle(state, ISurf, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
@@ -9060,7 +9060,7 @@ namespace EnergyPlus::SolarShading {
                             }
                         }
 
-                        auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds);
+                        auto const SELECT_CASE_var(state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds);
 
                         if (SELECT_CASE_var == WSC_SAC_FixedSlatAngle) { // 'FIXEDSLATANGLE'
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) = InputSlatAngle;
@@ -9071,7 +9071,7 @@ namespace EnergyPlus::SolarShading {
 
                         } else if (SELECT_CASE_var == WSC_SAC_ScheduledSlatAngle) { // 'SCHEDULEDSLATANGLE'
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) = GetCurrentScheduleValue(state,
-                                    WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
+                                    state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleSchedule);
                             state.dataSurface->SurfWinSlatAngThisTS(ISurf) = max(state.dataHeatBal->Blind(BlNum).MinSlatAngle,
                                                               min(state.dataSurface->SurfWinSlatAngThisTS(ISurf),
                                                                   state.dataHeatBal->Blind(BlNum).MaxSlatAngle)) * DataGlobalConstants::DegToRadians;
@@ -9159,7 +9159,7 @@ namespace EnergyPlus::SolarShading {
             for (std::size_t listIndex = 0; listIndex < state.dataSurface->Surface(curSurface).windowShadingControlList.size(); ++listIndex) {
                 int wsc = state.dataSurface->Surface(curSurface).windowShadingControlList[listIndex];
                 //pick the first WindowShadingControl that has a non-zero schedule value
-                if (ScheduleManager::GetCurrentScheduleValue(state, WindowShadingControl(wsc).Schedule) > 0.0) {
+                if (ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->WindowShadingControl(wsc).Schedule) > 0.0) {
                     selected = listIndex;
                     break;
                 }
@@ -9436,11 +9436,11 @@ namespace EnergyPlus::SolarShading {
 
             if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
                 SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
-                if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                    state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+                if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
+                    state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                 }
-                if (SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor != -1) {
-                    state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
+                if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor != -1) {
+                    state.dataSurface->Surface(SurfNum).ViewFactorGroundIR *= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
                 }
             }
         }
@@ -10517,18 +10517,18 @@ namespace EnergyPlus::SolarShading {
                     Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
                     //  of incident radiation remaining after reflected portion is
                     //  removed that is absorbed
-                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                    if (state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
+                        state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
+                        state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
                         int ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
                         int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 
 
-                        if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade) {
+                        if (state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade) {
                             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay); // Interior shade
-                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade) {
+                        } else if (state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade) {
                             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1); // Exterior shade
-                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                        } else if (state.dataSurface->WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
                             if (state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers == 2) {
                                 // Double pane with between-glass shade
                                 MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(3);

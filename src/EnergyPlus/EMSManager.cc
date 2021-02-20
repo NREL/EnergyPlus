@@ -1837,7 +1837,6 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
         using DataSurfaces::WSC_ST_ExteriorScreen;
 
@@ -1865,7 +1864,7 @@ namespace EMSManager {
                                      state.dataSurface->SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
                                      state.dataSurface->SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
-            } else if (WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator(state, "Window Shading Control",
                                  state.dataSurface->Surface(loopSurfNum).Name,
                                  "Control Status",
@@ -1873,7 +1872,7 @@ namespace EMSManager {
                                  state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
                                  state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
-                if (WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +
                                     state.dataConstruction->Construct(state.dataSurface->Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     state.dataSurface->Surface(loopSurfNum).Name + "'.");

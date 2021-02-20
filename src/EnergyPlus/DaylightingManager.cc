@@ -1742,7 +1742,7 @@ namespace EnergyPlus::DaylightingManager {
         ShType = WSC_ST_NoShade; // 'NOSHADE'
         BlNum = 0;
         // ScNum = 0; //Unused Set but never used
-        if (state.dataSurface->Surface(IWin).HasShadeControl) ShType = WindowShadingControl(ICtrl).ShadingType;
+        if (state.dataSurface->Surface(IWin).HasShadeControl) ShType = state.dataSurface->WindowShadingControl(ICtrl).ShadingType;
         BlNum = state.dataSurface->SurfWinBlindNumber(IWin);
         // ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
@@ -4056,7 +4056,7 @@ namespace EnergyPlus::DaylightingManager {
 
             // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
             if (ICtrl > 0) {
-                if (WindowShadingControl(ICtrl).ShadingType == WSC_ST_SwitchableGlazing) {
+                if (state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WSC_ST_SwitchableGlazing) {
                     VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
                     state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(iHour, 2, ISky, iRefPoint, loopwin) =
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(iHour, 1, ISky, iRefPoint, loopwin) * VTR;
@@ -4202,7 +4202,7 @@ namespace EnergyPlus::DaylightingManager {
 
             // For switchable glazing put daylighting factors for switched (dark) state in IS=2 location
             if (ICtrl > 0) {
-                if (WindowShadingControl(ICtrl).ShadingType == WSC_ST_SwitchableGlazing) {
+                if (state.dataSurface->WindowShadingControl(ICtrl).ShadingType == WSC_ST_SwitchableGlazing) {
                     VTR = state.dataSurface->SurfWinVisTransRatio(IWin);
                     state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, 2, ISky, iMapPoint, loopwin) =
                         state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky(iHour, 1, ISky, iMapPoint, loopwin) * VTR;
@@ -4338,7 +4338,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                     auto & thisSurfEnclosure(DataViewFactorInformation::ZoneSolarInfo(state.dataSurface->Surface(SurfNum).SolarEnclIndex));
-                    if (WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).GlareControlIsActive) {
+                    if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).GlareControlIsActive) {
                         // Error if GlareControlIsActive but window is not in a Daylighting:Detailed zone
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
                             ShowSevereError(state, "Window=" + state.dataSurface->Surface(SurfNum).Name + " has Window Shading Control with");
@@ -4365,7 +4365,7 @@ namespace EnergyPlus::DaylightingManager {
                         }
                     }
 
-                    if (WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
+                    if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(SurfNum).activeWindowShadingControl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
                         // Error if window has ShadingControlType = MeetDaylightingIlluminanceSetpoint &
                         // but is not in a Daylighting:Detailed zone
                         if (thisSurfEnclosure.TotalEnclosureDaylRefPoints == 0) {
@@ -5479,17 +5479,17 @@ namespace EnergyPlus::DaylightingManager {
         for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
             int found = -1;
             for (int jZone = 1; jZone <= state.dataGlobal->NumOfZones; ++jZone) {
-                if (UtilityRoutines::SameString(WindowShadingControl(iShadeCtrl).DaylightingControlName, state.dataDaylightingData->ZoneDaylight(jZone).Name)) {
+                if (UtilityRoutines::SameString(state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName, state.dataDaylightingData->ZoneDaylight(jZone).Name)) {
                     found = jZone;
                     break;
                 }
             }
             if (found > 0) {
-                WindowShadingControl(iShadeCtrl).DaylightControlIndex = found;
+                state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightControlIndex = found;
             } else {
                 ShowWarningError(state, "AssociateWindowShadingControlWithDaylighting: Daylighting object name used in WindowShadingControl not found.");
-                ShowContinueError(state, "..The WindowShadingControl object=\"" + WindowShadingControl(iShadeCtrl).Name +
-                                  "\" and referenes an object named: \"" + WindowShadingControl(iShadeCtrl).DaylightingControlName + "\"");
+                ShowContinueError(state, "..The WindowShadingControl object=\"" + state.dataSurface->WindowShadingControl(iShadeCtrl).Name +
+                                  "\" and referenes an object named: \"" + state.dataSurface->WindowShadingControl(iShadeCtrl).DaylightingControlName + "\"");
             }
         }
     }
@@ -6557,7 +6557,7 @@ namespace EnergyPlus::DaylightingManager {
             IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
             ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
             if (state.dataSurface->Surface(IWin).HasShadeControl && ISWFLG == 0) {
-                if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
+                if (state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                     state.dataSurface->SurfWinShadingFlag(IWin) == GlassConditionallyLightened)
                     ISWFLG = 1;
             }
@@ -6618,7 +6618,7 @@ namespace EnergyPlus::DaylightingManager {
                         IS = 2;
                     if (state.dataSurface->Surface(IWin).HasShadeControl) {
                         if (state.dataSurface->SurfWinShadingFlag(IWin) == GlassConditionallyLightened &&
-                            WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
+                            state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp && !previously_shaded(loop)) {
                             DILLSW(igroup) += state.dataDaylightingData->ZoneDaylight(ZoneNum).IllumFromWinAtRefPt(loop, IS, 1);
                             previously_shaded(loop) = true;
                         } else {
@@ -6663,7 +6663,7 @@ namespace EnergyPlus::DaylightingManager {
                             continue;
                         }
                         if (state.dataSurface->SurfWinShadingFlag(IWin) != GlassConditionallyLightened ||
-                            WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
+                            state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType != WSCT_MeetDaylIlumSetp) {
                             continueOuterLoop = true;
                             continue;
                         }
@@ -6788,7 +6788,7 @@ namespace EnergyPlus::DaylightingManager {
                         continueOuterLoop = false;
                         continue;
                     }
-                    if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+                    if (state.dataSurface->WindowShadingControl(ICtrl).GlareControlIsActive) {
                         atLeastOneGlareControlIsActive = true;
 
                         // Illuminance (WDAYIL) and background luminance (WBACLU) contribution from this
@@ -6894,7 +6894,7 @@ namespace EnergyPlus::DaylightingManager {
 
                     ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                     if (!state.dataSurface->Surface(IWin).HasShadeControl) continue;
-                    if (WindowShadingControl(ICtrl).GlareControlIsActive) {
+                    if (state.dataSurface->WindowShadingControl(ICtrl).GlareControlIsActive) {
 
                         // Shading this window has not improved the glare situation.
                         // Reset shading flag to no shading condition, go to next window.
@@ -6961,7 +6961,7 @@ namespace EnergyPlus::DaylightingManager {
 
                         if (GlareOK) {
                             if (state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing &&
-                                WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
+                                state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp) {
                                 // Added TH 1/14/2010
                                 // Only for switchable glazings with MeetDaylightIlluminanceSetpoint control
                                 // The glazing is in fully dark state, it might lighten a bit to provide more daylight
@@ -7959,7 +7959,7 @@ namespace EnergyPlus::DaylightingManager {
                 // Check if window has shade or blind
                 ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                 if (state.dataSurface->Surface(IWin).HasShadeControl) {
-                    ShType = WindowShadingControl(ICtrl).ShadingType;
+                    ShType = state.dataSurface->WindowShadingControl(ICtrl).ShadingType;
                     BlNum = state.dataSurface->SurfWinBlindNumber(IWin);
                     //                    ScNum = SurfaceWindow( IWin ).ScreenNumber; //Unused Set but never used
 
@@ -9760,7 +9760,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                 if (state.dataSurface->Surface(IWin).HasShadeControl) {
-                    if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
+                    if (state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                         state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
                         // switchable windows in partial or fully switched state,
                         //  get its intermediate VT calculated in DayltgInteriorIllum
@@ -9797,7 +9797,7 @@ namespace EnergyPlus::DaylightingManager {
 
                     ICtrl = state.dataSurface->Surface(IWin).activeWindowShadingControl;
                     if (state.dataSurface->Surface(IWin).HasShadeControl) {
-                        if (WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
+                        if (state.dataSurface->WindowShadingControl(ICtrl).ShadingControlType == WSCT_MeetDaylIlumSetp &&
                             state.dataSurface->SurfWinShadingFlag(IWin) == SwitchableGlazing) {
                             // switchable windows in partial or fully switched state,
                             //  get its intermediate VT calculated in DayltgInteriorIllum
@@ -10498,8 +10498,8 @@ namespace EnergyPlus::DaylightingManager {
         // first step is to create a sortable list of WindowShadingControl objects by sequence
         std::vector<std::pair<int, int>> shadeControlSequence; // sequence, WindowShadingControl
         for (int iShadeCtrl = 1; iShadeCtrl <= state.dataSurface->TotWinShadingControl; ++iShadeCtrl) {
-            if (WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
-                shadeControlSequence.push_back(std::make_pair(WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
+            if (state.dataSurface->WindowShadingControl(iShadeCtrl).ZoneIndex == ZoneNum) {
+                shadeControlSequence.push_back(std::make_pair(state.dataSurface->WindowShadingControl(iShadeCtrl).SequenceNumber, iShadeCtrl));
             }
         }
         // sort the WindowShadingControl objects based on sequence number
@@ -10509,18 +10509,18 @@ namespace EnergyPlus::DaylightingManager {
         // often the sublist is just a single item.
         for (auto sequence : shadeControlSequence) {
             int curShadeControl = sequence.second;
-            if (WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {
+            if (state.dataSurface->WindowShadingControl(curShadeControl).MultiSurfaceCtrlIsGroup) {
                 // add a group of surfaces since they should be deployed as a group
                 std::vector<int> group;
-                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
-                    group.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                for (int i = 1; i <= state.dataSurface->WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                    group.push_back(state.dataSurface->WindowShadingControl(curShadeControl).FenestrationIndex(i));
                 }
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(group);
             } else {
                 // add each individial surface as a separate list so they are deployed individually
-                for (int i = 1; i <= WindowShadingControl(curShadeControl).FenestrationCount; i++) {
+                for (int i = 1; i <= state.dataSurface->WindowShadingControl(curShadeControl).FenestrationCount; i++) {
                     std::vector<int> singleMemberVector;
-                    singleMemberVector.push_back(WindowShadingControl(curShadeControl).FenestrationIndex(i));
+                    singleMemberVector.push_back(state.dataSurface->WindowShadingControl(curShadeControl).FenestrationIndex(i));
                     state.dataDaylightingData->ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.push_back(singleMemberVector);
                 }
             }

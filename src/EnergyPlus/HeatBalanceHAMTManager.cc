@@ -1092,7 +1092,6 @@ namespace HeatBalanceHAMTManager {
 
         // Using/Aliasing
         using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
-        using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
 
         // Locals
@@ -1185,7 +1184,7 @@ namespace HeatBalanceHAMTManager {
         cells(ExtConcell(sid)).temp = TempOutsideAirFD(sid);
         if (state.dataSurface->Surface(sid).ExtBoundCond == OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
-            cells(ExtSkycell(sid)).temp = OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
+            cells(ExtSkycell(sid)).temp = state.dataSurface->OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
             cells(ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;

@@ -1133,22 +1133,6 @@ namespace DataSurfaces {
         }
     };
 
-    // Object Data
-    extern Array1D<WindowShadingControlData> WindowShadingControl;
-    extern Array1D<OSCData> OSC;
-    extern Array1D<OSCMData> OSCM;
-    extern Array1D<ConvectionCoefficient> UserIntConvectionCoeffs;
-    extern Array1D<ConvectionCoefficient> UserExtConvectionCoeffs;
-    extern Array1D<ShadingVertexData> ShadeV;
-    extern Array1D<ExtVentedCavityStruct> ExtVentedCavity;
-    extern Array1D<SurfaceSolarIncident> SurfIncSolSSG;
-    extern Array1D<FenestrationSolarAbsorbed> FenLayAbsSSG;
-    extern Array1D<SurfaceLocalEnvironment> SurfLocalEnvironment;
-    extern Array1D<SurroundingSurfacesProperty> SurroundingSurfsProperty;
-    extern Array1D<IntMassObject> IntMassObjects;
-
-    // Functions
-
     // Clears the global data in DataSurfaces.
     // Needed for unit tests, should not be normally called.
     void clear_state();
@@ -1463,6 +1447,18 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
     Array1D<DataSurfaces::FrameDividerProperties> FrameDivider;
     Array1D<DataSurfaces::StormWindowData> StormWindow;
+    Array1D<DataSurfaces::WindowShadingControlData> WindowShadingControl;
+    Array1D<DataSurfaces::OSCData> OSC;
+    Array1D<DataSurfaces::OSCMData> OSCM;
+    Array1D<DataSurfaces::ConvectionCoefficient> UserIntConvectionCoeffs;
+    Array1D<DataSurfaces::ConvectionCoefficient> UserExtConvectionCoeffs;
+    Array1D<DataSurfaces::ShadingVertexData> ShadeV;
+    Array1D<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
+    Array1D<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
+    Array1D<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
+    Array1D<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
+    Array1D<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    Array1D<DataSurfaces::IntMassObject> IntMassObjects;
 
     void clear_state() override
     {
@@ -1712,6 +1708,18 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfaceWindow.deallocate();
         this->FrameDivider.deallocate();
         this->StormWindow.deallocate();
+        this->WindowShadingControl.deallocate();
+        this->OSC.deallocate();
+        this->OSCM.deallocate();
+        this->UserIntConvectionCoeffs.deallocate();
+        this->UserExtConvectionCoeffs.deallocate();
+        this->ShadeV.deallocate();
+        this->ExtVentedCavity.deallocate();
+        this->SurfIncSolSSG.deallocate();
+        this->FenLayAbsSSG.deallocate();
+        this->SurfLocalEnvironment.deallocate();
+        this->SurroundingSurfsProperty.deallocate();
+        this->IntMassObjects.deallocate();
     }
 };
 

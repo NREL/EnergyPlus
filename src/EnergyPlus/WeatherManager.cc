@@ -178,7 +178,7 @@ namespace WeatherManager {
             auto &underwaterBoundary{state.dataWeatherManager->underwaterBoundaries[i - 1]};
             underwaterBoundary.Name = DataIPShortCuts::cAlphaArgs(1);
             underwaterBoundary.distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs(1);
-            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, DataSurfaces::OSCM);
+            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
             if (underwaterBoundary.OSCMIndex <= 0) {
                 ShowSevereError(state, "Could not match underwater boundary condition object with an Other Side Conditions Model input object.");
                 errorsFound = true;
@@ -242,11 +242,11 @@ namespace WeatherManager {
             if (thisBoundary.VelocityScheduleIndex > 0) {
                 freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue(state, thisBoundary.VelocityScheduleIndex); // m/s
             }
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).TConv = curWaterTemp;
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).HConv =
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).TConv = curWaterTemp;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).HConv =
                 WeatherManager::calculateWaterBoundaryConvectionCoefficient(curWaterTemp, freeStreamVelocity, thisBoundary.distanceFromLeadingEdge);
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).TRad = curWaterTemp;
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).TRad = curWaterTemp;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).HRad = 0.0;
         }
     }
 

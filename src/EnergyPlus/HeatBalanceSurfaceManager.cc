@@ -387,33 +387,33 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 if (InitSurfaceHeatBalancefirstTime && state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
                     Real64 SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
                     Real64 SrdSurfsViewFactor = 0;
-                    if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
-                        SrdSurfsViewFactor += SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0) {
+                        SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                     }
-                    if (SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
-                        SrdSurfsViewFactor += SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
+                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
+                        SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
                     }
-                    for (int SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                        SrdSurfsViewFactor += SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                    for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+                        SrdSurfsViewFactor += state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     }
                     // Check if the sum of all defined view factors > 1.0
                     if (SrdSurfsViewFactor > 1.0) {
                         ShowSevereError(state, "Illegal surrounding surfaces view factors for " + state.dataSurface->Surface(SurfNum).Name + ".");
                         ShowContinueError(state, " The sum of sky, ground, and all surrounding surfaces view factors should be less than 1.0.");
                     }
-                    if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 && SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
+                    if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 && state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
                         // If both surface sky and ground view factor defined, overwrite with the defined value
-                        state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
-                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
-                    } else if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 &&
-                               SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor < 0) {
+                        state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
+                    } else if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor >= 0 &&
+                               state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor < 0) {
                         // If only sky view factor defined, ground view factor = 1 - all other defined view factors.
-                        state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+                        state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = 1 - SrdSurfsViewFactor;
-                    } else if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor < 0 &&
-                               SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
+                    } else if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor < 0 &&
+                               state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor >= 0) {
                         // If only ground view factor defined, sky view factor = 1 - all other defined view factors.
-                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
+                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
                         state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = 1 - SrdSurfsViewFactor;
                     } else {
                         // If neither ground or sky view factor define, continue to use the original proportion.
@@ -1047,9 +1047,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         if (state.dataSurface->Surface(iSurf).HasShadeControl) {
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenSwitchable, surfName, "Yes");
                             // shading report
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, WindowShadingControl(curWSC).Name);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscName, surfName, state.dataSurface->WindowShadingControl(curWSC).Name);
                             {
-                                auto const SELECT_CASE_var1(WindowShadingControl(curWSC).ShadingType);
+                                auto const SELECT_CASE_var1(state.dataSurface->WindowShadingControl(curWSC).ShadingType);
                                 if (SELECT_CASE_var1 == WSC_ST_NoShade) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShading, surfName, "No Shade");
                                 } else if (SELECT_CASE_var1 == WSC_ST_InteriorShade) {
@@ -1071,7 +1071,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 }
                             }
                             {
-                                auto const SELECT_CASE_var1(WindowShadingControl(curWSC).ShadingControlType);
+                                auto const SELECT_CASE_var1(state.dataSurface->WindowShadingControl(curWSC).ShadingControlType);
                                 if (SELECT_CASE_var1 == WSCT_AlwaysOn) {
                                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscControl, surfName, "AlwaysOn");
                                 } else if (SELECT_CASE_var1 == WSCT_AlwaysOff) {
@@ -1129,7 +1129,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             }
                             PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscShadCons, surfName, names);
 
-                            if (WindowShadingControl(curWSC).GlareControlIsActive) {
+                            if (state.dataSurface->WindowShadingControl(curWSC).GlareControlIsActive) {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "Yes");
                             } else {
                                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchWscGlare, surfName, "No");
@@ -2218,8 +2218,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
 
             if (state.dataSurface->Surface(SurfNum).ExtCavityPresent) {
-                ExtVentedCavity(state.dataSurface->Surface(SurfNum).ExtCavNum).TbaffleLast = 20.0;
-                ExtVentedCavity(state.dataSurface->Surface(SurfNum).ExtCavNum).TairLast = 20.0;
+                state.dataSurface->ExtVentedCavity(state.dataSurface->Surface(SurfNum).ExtCavNum).TbaffleLast = 20.0;
+                state.dataSurface->ExtVentedCavity(state.dataSurface->Surface(SurfNum).ExtCavNum).TairLast = 20.0;
             }
 
             // Initialize Kiva convection algorithms
@@ -2239,10 +2239,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         if (state.dataSurface->TotOSCM >= 1) {
             for (OSCMnum = 1; OSCMnum <= state.dataSurface->TotOSCM; ++OSCMnum) {
-                OSCM(OSCMnum).TConv = 20.0;
-                OSCM(OSCMnum).HConv = 4.0;
-                OSCM(OSCMnum).TRad = 20.0;
-                OSCM(OSCMnum).HRad = 4.0;
+                state.dataSurface->OSCM(OSCMnum).TConv = 20.0;
+                state.dataSurface->OSCM(OSCMnum).HConv = 4.0;
+                state.dataSurface->OSCM(OSCMnum).TRad = 20.0;
+                state.dataSurface->OSCM(OSCMnum).HRad = 4.0;
             }
         }
     }
@@ -2996,7 +2996,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                                 for (int Lay = 1; Lay <= TotSolidLay; ++Lay) {
                                     if (SurfSolAbs != 0) {
-                                        state.dataSurface->SurfWinA(Lay, SurfNum) = GetCurrentScheduleValue(state, FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
+                                        state.dataSurface->SurfWinA(Lay, SurfNum) = GetCurrentScheduleValue(state, state.dataSurface->FenLayAbsSSG(SurfSolAbs).SchedPtrs(Lay));
                                         // ABWin(Lay) = SurfWinA(SurfNum,Lay)
                                         state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) = state.dataSurface->SurfWinA(Lay, SurfNum);
                                     } else {
@@ -5692,36 +5692,36 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         int OPtr = state.dataSurface->Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
                         if (state.dataGlobal->BeginTimeStepFlag) {
-                            OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
+                            state.dataSurface->OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
-                        if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, OSC(OPtr).ConstTempScheduleIndex);
+                        if (state.dataSurface->OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
+                            state.dataSurface->OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, state.dataSurface->OSC(OPtr).ConstTempScheduleIndex);
                         }
 
                         //  Allow for modification of TemperatureCoefficient with unitary sine wave.
                         Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
-                        if (OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
-                            ConstantTempCoef = std::sin(2 * DataGlobalConstants::Pi * state.dataGlobal->CurrentTime / OSC(OPtr).SinusoidPeriod);
+                        if (state.dataSurface->OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
+                            ConstantTempCoef = std::sin(2 * DataGlobalConstants::Pi * state.dataGlobal->CurrentTime / state.dataSurface->OSC(OPtr).SinusoidPeriod);
                         } else {
-                            ConstantTempCoef = OSC(OPtr).ConstTempCoef;
+                            ConstantTempCoef = state.dataSurface->OSC(OPtr).ConstTempCoef;
                         }
 
-                        OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
-                                                 OSC(OPtr).ExtDryBulbCoef * state.dataSurface->Surface(SurfNum).OutDryBulbTemp +
-                                                 ConstantTempCoef * OSC(OPtr).ConstTemp +
-                                                 OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
-                                                 OSC(OPtr).WindSpeedCoef * state.dataSurface->Surface(SurfNum).WindSpeed *
+                        state.dataSurface->OSC(OPtr).OSCTempCalc = (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
+                                                 state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->Surface(SurfNum).OutDryBulbTemp +
+                                                 ConstantTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
+                                                 state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
+                                                 state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->Surface(SurfNum).WindSpeed *
                                                  state.dataSurface->Surface(SurfNum).OutDryBulbTemp +
-                                                 OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
+                                                 state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
 
                         // Enforce max/min limits if applicable
-                        if (OSC(OPtr).MinLimitPresent)
-                            OSC(OPtr).OSCTempCalc = max(OSC(OPtr).MinTempLimit, OSC(OPtr).OSCTempCalc);
-                        if (OSC(OPtr).MaxLimitPresent)
-                            OSC(OPtr).OSCTempCalc = min(OSC(OPtr).MaxTempLimit, OSC(OPtr).OSCTempCalc);
+                        if (state.dataSurface->OSC(OPtr).MinLimitPresent)
+                            state.dataSurface->OSC(OPtr).OSCTempCalc = max(state.dataSurface->OSC(OPtr).MinTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
+                        if (state.dataSurface->OSC(OPtr).MaxLimitPresent)
+                            state.dataSurface->OSC(OPtr).OSCTempCalc = min(state.dataSurface->OSC(OPtr).MaxTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
 
-                        TH(1, 1, SurfNum) = OSC(OPtr).OSCTempCalc;
+                        TH(1, 1, SurfNum) = state.dataSurface->OSC(OPtr).OSCTempCalc;
 
                         // Set the only radiant system heat balance coefficient that is non-zero for this case
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
@@ -5755,30 +5755,30 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         int OPtr = state.dataSurface->Surface(SurfNum).OSCPtr;
                         // Set surface temp from previous timestep
                         if (state.dataGlobal->BeginTimeStepFlag) {
-                            OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
+                            state.dataSurface->OSC(OPtr).TOutsideSurfPast = TH(1, 1, SurfNum);
                         }
 
-                        if (OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
-                            OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, OSC(OPtr).ConstTempScheduleIndex);
+                        if (state.dataSurface->OSC(OPtr).ConstTempScheduleIndex != 0) { // Determine outside temperature from schedule
+                            state.dataSurface->OSC(OPtr).ConstTemp = GetCurrentScheduleValue(state, state.dataSurface->OSC(OPtr).ConstTempScheduleIndex);
                         }
 
-                        HcExtSurf(SurfNum) = OSC(OPtr).SurfFilmCoef;
+                        HcExtSurf(SurfNum) = state.dataSurface->OSC(OPtr).SurfFilmCoef;
 
-                        OSC(OPtr).OSCTempCalc = (OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
-                                                 OSC(OPtr).ExtDryBulbCoef * state.dataSurface->Surface(SurfNum).OutDryBulbTemp +
-                                                 OSC(OPtr).ConstTempCoef * OSC(OPtr).ConstTemp +
-                                                 OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
-                                                 OSC(OPtr).WindSpeedCoef * state.dataSurface->Surface(SurfNum).WindSpeed *
+                        state.dataSurface->OSC(OPtr).OSCTempCalc = (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * MAT(zoneNum) +
+                                                 state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->Surface(SurfNum).OutDryBulbTemp +
+                                                 state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
+                                                 state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
+                                                 state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->Surface(SurfNum).WindSpeed *
                                                  state.dataSurface->Surface(SurfNum).OutDryBulbTemp +
-                                                 OSC(OPtr).TPreviousCoef * OSC(OPtr).TOutsideSurfPast);
+                                                 state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
 
                         // Enforce max/min limits if applicable
-                        if (OSC(OPtr).MinLimitPresent)
-                            OSC(OPtr).OSCTempCalc = max(OSC(OPtr).MinTempLimit, OSC(OPtr).OSCTempCalc);
-                        if (OSC(OPtr).MaxLimitPresent)
-                            OSC(OPtr).OSCTempCalc = min(OSC(OPtr).MaxTempLimit, OSC(OPtr).OSCTempCalc);
+                        if (state.dataSurface->OSC(OPtr).MinLimitPresent)
+                            state.dataSurface->OSC(OPtr).OSCTempCalc = max(state.dataSurface->OSC(OPtr).MinTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
+                        if (state.dataSurface->OSC(OPtr).MaxLimitPresent)
+                            state.dataSurface->OSC(OPtr).OSCTempCalc = min(state.dataSurface->OSC(OPtr).MaxTempLimit, state.dataSurface->OSC(OPtr).OSCTempCalc);
 
-                        Real64 TempExt = OSC(OPtr).OSCTempCalc;
+                        Real64 TempExt = state.dataSurface->OSC(OPtr).OSCTempCalc;
 
                         // Set the only radiant system heat balance coefficient that is non-zero for this case
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
@@ -5820,13 +5820,13 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         // boundary condition for the surface
                         int OPtr = state.dataSurface->Surface(SurfNum).OSCMPtr;
                         // EMS overrides
-                        if (OSCM(OPtr).EMSOverrideOnTConv) OSCM(OPtr).TConv = OSCM(OPtr).EMSOverrideTConvValue;
-                        if (OSCM(OPtr).EMSOverrideOnHConv) OSCM(OPtr).HConv = OSCM(OPtr).EMSOverrideHConvValue;
-                        if (OSCM(OPtr).EMSOverrideOnTRad) OSCM(OPtr).TRad = OSCM(OPtr).EMSOverrideTRadValue;
-                        if (OSCM(OPtr).EMSOverrideOnHrad) OSCM(OPtr).HRad = OSCM(OPtr).EMSOverrideHradValue;
-                        HcExtSurf(SurfNum) = OSCM(OPtr).HConv;
+                        if (state.dataSurface->OSCM(OPtr).EMSOverrideOnTConv) state.dataSurface->OSCM(OPtr).TConv = state.dataSurface->OSCM(OPtr).EMSOverrideTConvValue;
+                        if (state.dataSurface->OSCM(OPtr).EMSOverrideOnHConv) state.dataSurface->OSCM(OPtr).HConv = state.dataSurface->OSCM(OPtr).EMSOverrideHConvValue;
+                        if (state.dataSurface->OSCM(OPtr).EMSOverrideOnTRad) state.dataSurface->OSCM(OPtr).TRad = state.dataSurface->OSCM(OPtr).EMSOverrideTRadValue;
+                        if (state.dataSurface->OSCM(OPtr).EMSOverrideOnHrad) state.dataSurface->OSCM(OPtr).HRad = state.dataSurface->OSCM(OPtr).EMSOverrideHradValue;
+                        HcExtSurf(SurfNum) = state.dataSurface->OSCM(OPtr).HConv;
 
-                        Real64 TempExt = OSCM(OPtr).TConv;
+                        Real64 TempExt = state.dataSurface->OSCM(OPtr).TConv;
 
                         // Set the only radiant system heat balance coefficient that is non-zero for this case
                         if (state.dataConstruction->Construct(ConstrNum).SourceSinkPresent)
@@ -5845,7 +5845,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                                                         state.dataEnvrn->OutBaroPress,
                                                                                         RoutineNameOSCM)) +
                                                         RhoVaporAirOut(SurfNum)) * PsyCpAirFnW(state.dataEnvrn->OutHumRat));
-                            HSkyFD(SurfNum) = OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
+                            HSkyFD(SurfNum) = state.dataSurface->OSCM(OPtr).HRad; // CR 8046, use sky term for surface to baffle IR
                             HGrndFD(SurfNum) = 0.0;            // CR 8046, null out and use only sky term for surface to baffle IR
                             HAirFD(SurfNum) = 0.0;             // CR 8046, null out and use only sky term for surface to baffle IR
                         }
@@ -6016,11 +6016,11 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
                             // Absolute temperature of the outside surface of an exterior surface
                             Real64 TSurf = TH(1, 1, SurfNum) + DataGlobalConstants::KelvinConv;
-                            for (int SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+                            for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
                                 // View factor of a surrounding surface
-                                Real64 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                                Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                                 // Absolute temperature of a surrounding surface
-                                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
+                                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
                                 SurfQRadLWOutSrdSurfs(SurfNum) += DataGlobalConstants::StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
                             }
                         }
@@ -6114,7 +6114,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
     {
         int OPtr = state.dataSurface->Surface(SurfNum).OSCMPtr;
         if (state.dataSurface->Surface(SurfNum).OSCMPtr > 0) { // Optr is set above in this case, use OSCM boundary data
-            return -OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - OSCM(OPtr).TConv);
+            return -state.dataSurface->OSCM(OPtr).HConv * (TH(1, 1, SurfNum) - state.dataSurface->OSCM(OPtr).TConv);
         } else {
             if (state.dataEnvrn->IsRain) {
                 return -HcExtSurf(SurfNum) * (TH(1, 1, SurfNum) - state.dataSurface->Surface(SurfNum).OutWetBulbTemp);
@@ -7958,11 +7958,11 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
             int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
-            if (SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
-                TSky = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
+            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
+                TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum);
             }
-            if (SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
-                TGround = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
+            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
+                TGround = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum);
             }
         }
 
@@ -8020,8 +8020,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             } else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
                 // local copies of variables for clarity in radiation terms
                 // TODO: - int OSCMPtr; // "Pointer" to OSCM data structure (other side conditions from a model)
-                Real64 RadTemp = OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).TRad; // local value for Effective radiation temperature for OtherSideConditions model
-                Real64 HRad = OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).HRad; // local value for effective (linearized) radiation coefficient
+                Real64 RadTemp = state.dataSurface->OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).TRad; // local value for Effective radiation temperature for OtherSideConditions model
+                Real64 HRad = state.dataSurface->OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).HRad; // local value for effective (linearized) radiation coefficient
 
                 // patterned after "No movable insulation, slow conduction," but with new radiation terms and no sun,
                 if (construct.SourceSinkPresent) {
@@ -8057,8 +8057,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 // Outside Heat Balance case: Other Side Conditions Model
             } else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
                 // local copies of variables for clarity in radiation terms
-                Real64 RadTemp = OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).TRad;
-                Real64 HRad = OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).HRad;
+                Real64 RadTemp = state.dataSurface->OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).TRad;
+                Real64 HRad = state.dataSurface->OSCM(state.dataSurface->Surface(SurfNum).OSCMPtr).HRad;
                 // patterned after "No movable insulation, quick conduction," but with new radiation terms and no sun,
                 if (construct.SourceSinkPresent) {
                     TH11 = (-CTFConstOutPart(SurfNum) + HcExtSurf(SurfNum) * TempExt + SurfQAdditionalHeatSourceOutside(SurfNum) + HRad * RadTemp +
@@ -8108,9 +8108,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // Current exterior surf temp would be used for the next step LWR calculation.
         if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
             int SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
-            for (int SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                Real64 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
-                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
+            for (int SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+                Real64 SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                Real64 SrdSurfTempAbs = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
                 QRadLWOutSrdSurfsRep += DataGlobalConstants::StefanBoltzmann * state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal *
                                         SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TH11 + DataGlobalConstants::KelvinConv));
             }
@@ -8169,8 +8169,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // derived from CalcPassiveTranspiredCollector
 
         // Using/Aliasing
-        using DataSurfaces::ExtVentedCavity;
-        using DataSurfaces::OSCM;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -8205,29 +8203,29 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, TempExt, OutHumRatExt);
 
-        holeArea = ExtVentedCavity(CavNum).ActualArea * ExtVentedCavity(CavNum).Porosity;
+        holeArea = state.dataSurface->ExtVentedCavity(CavNum).ActualArea * state.dataSurface->ExtVentedCavity(CavNum).Porosity;
 
-        AspRat = ExtVentedCavity(CavNum).HdeltaNPL * 2.0 / ExtVentedCavity(CavNum).PlenGapThick;
-        TmpTscoll = ExtVentedCavity(CavNum).TbaffleLast;
-        TmpTaPlen = ExtVentedCavity(CavNum).TairLast;
+        AspRat = state.dataSurface->ExtVentedCavity(CavNum).HdeltaNPL * 2.0 / state.dataSurface->ExtVentedCavity(CavNum).PlenGapThick;
+        TmpTscoll = state.dataSurface->ExtVentedCavity(CavNum).TbaffleLast;
+        TmpTaPlen = state.dataSurface->ExtVentedCavity(CavNum).TairLast;
 
         // all the work is done in this routine located in GeneralRoutines.cc
 
         for (iter = 1; iter <= 3; ++iter) { // this is a sequential solution approach.
 
             CalcPassiveExteriorBaffleGap(state,
-                                         ExtVentedCavity(CavNum).SurfPtrs,
+                                         state.dataSurface->ExtVentedCavity(CavNum).SurfPtrs,
                                          holeArea,
-                                         ExtVentedCavity(CavNum).Cv,
-                                         ExtVentedCavity(CavNum).Cd,
-                                         ExtVentedCavity(CavNum).HdeltaNPL,
-                                         ExtVentedCavity(CavNum).SolAbsorp,
-                                         ExtVentedCavity(CavNum).LWEmitt,
-                                         ExtVentedCavity(CavNum).Tilt,
+                                         state.dataSurface->ExtVentedCavity(CavNum).Cv,
+                                         state.dataSurface->ExtVentedCavity(CavNum).Cd,
+                                         state.dataSurface->ExtVentedCavity(CavNum).HdeltaNPL,
+                                         state.dataSurface->ExtVentedCavity(CavNum).SolAbsorp,
+                                         state.dataSurface->ExtVentedCavity(CavNum).LWEmitt,
+                                         state.dataSurface->ExtVentedCavity(CavNum).Tilt,
                                          AspRat,
-                                         ExtVentedCavity(CavNum).PlenGapThick,
-                                         ExtVentedCavity(CavNum).BaffleRoughness,
-                                         ExtVentedCavity(CavNum).QdotSource,
+                                         state.dataSurface->ExtVentedCavity(CavNum).PlenGapThick,
+                                         state.dataSurface->ExtVentedCavity(CavNum).BaffleRoughness,
+                                         state.dataSurface->ExtVentedCavity(CavNum).QdotSource,
                                          TmpTscoll,
                                          TmpTaPlen,
                                          HcPlen,
@@ -8239,28 +8237,28 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         } // sequential solution
         // now fill results into derived types
-        ExtVentedCavity(CavNum).Isc = Isc;
-        ExtVentedCavity(CavNum).TAirCav = TmpTaPlen;
-        ExtVentedCavity(CavNum).Tbaffle = TmpTscoll;
-        ExtVentedCavity(CavNum).HrPlen = HrPlen;
-        ExtVentedCavity(CavNum).HcPlen = HcPlen;
-        ExtVentedCavity(CavNum).PassiveACH =
-            (MdotVent / RhoAir) * (1.0 / (ExtVentedCavity(CavNum).ProjArea * ExtVentedCavity(CavNum).PlenGapThick)) * DataGlobalConstants::SecInHour;
-        ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
-        ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
-        ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;
+        state.dataSurface->ExtVentedCavity(CavNum).Isc = Isc;
+        state.dataSurface->ExtVentedCavity(CavNum).TAirCav = TmpTaPlen;
+        state.dataSurface->ExtVentedCavity(CavNum).Tbaffle = TmpTscoll;
+        state.dataSurface->ExtVentedCavity(CavNum).HrPlen = HrPlen;
+        state.dataSurface->ExtVentedCavity(CavNum).HcPlen = HcPlen;
+        state.dataSurface->ExtVentedCavity(CavNum).PassiveACH =
+            (MdotVent / RhoAir) * (1.0 / (state.dataSurface->ExtVentedCavity(CavNum).ProjArea * state.dataSurface->ExtVentedCavity(CavNum).PlenGapThick)) * DataGlobalConstants::SecInHour;
+        state.dataSurface->ExtVentedCavity(CavNum).PassiveMdotVent = MdotVent;
+        state.dataSurface->ExtVentedCavity(CavNum).PassiveMdotWind = VdotWind * RhoAir;
+        state.dataSurface->ExtVentedCavity(CavNum).PassiveMdotTherm = VdotThermal * RhoAir;
 
         // now do some updates
-        ExtVentedCavity(CavNum).TairLast = ExtVentedCavity(CavNum).TAirCav;
-        ExtVentedCavity(CavNum).TbaffleLast = ExtVentedCavity(CavNum).Tbaffle;
+        state.dataSurface->ExtVentedCavity(CavNum).TairLast = state.dataSurface->ExtVentedCavity(CavNum).TAirCav;
+        state.dataSurface->ExtVentedCavity(CavNum).TbaffleLast = state.dataSurface->ExtVentedCavity(CavNum).Tbaffle;
 
         // update the OtherSideConditionsModel coefficients.
-        thisOSCM = ExtVentedCavity(CavNum).OSCMPtr;
+        thisOSCM = state.dataSurface->ExtVentedCavity(CavNum).OSCMPtr;
 
-        OSCM(thisOSCM).TConv = ExtVentedCavity(CavNum).TAirCav;
-        OSCM(thisOSCM).HConv = ExtVentedCavity(CavNum).HcPlen;
-        OSCM(thisOSCM).TRad = ExtVentedCavity(CavNum).Tbaffle;
-        OSCM(thisOSCM).HRad = ExtVentedCavity(CavNum).HrPlen;
+        state.dataSurface->OSCM(thisOSCM).TConv = state.dataSurface->ExtVentedCavity(CavNum).TAirCav;
+        state.dataSurface->OSCM(thisOSCM).HConv = state.dataSurface->ExtVentedCavity(CavNum).HcPlen;
+        state.dataSurface->OSCM(thisOSCM).TRad = state.dataSurface->ExtVentedCavity(CavNum).Tbaffle;
+        state.dataSurface->OSCM(thisOSCM).HRad = state.dataSurface->ExtVentedCavity(CavNum).HrPlen;
     }
 
     void GatherComponentLoadsSurfAbsFact(EnergyPlusData &state)

@@ -266,7 +266,7 @@ namespace SurfaceGeometry {
 
     void CheckWindowShadingControlSimilarForWindow(EnergyPlusData &state, bool& ErrorsFound);
 
-    bool isWindowShadingControlSimilar(int a, int b);
+    bool isWindowShadingControlSimilar(EnergyPlusData &state, int a, int b);
 
     void GetStormWindowData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 

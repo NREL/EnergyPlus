@@ -113,9 +113,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataMaterial->Material.allocate(MatNum);
     state->dataMaterial->Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavity variable data
-    ExtVentedCavity.allocate(1);
-    ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
-    ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
+    state->dataSurface->ExtVentedCavity.allocate(1);
+    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
+    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
     state->dataHeatBal->Zone.allocate(ZoneNum);
     state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap buoyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(*state, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+    CalcPassiveExteriorBaffleGap(*state, state->dataSurface->ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
                                  AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
                                  MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 
@@ -164,8 +164,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
     state->dataConstruction->Construct.deallocate();
     state->dataMaterial->Material.deallocate();
-    ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
-    ExtVentedCavity.deallocate();
+    state->dataSurface->ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
+    state->dataSurface->ExtVentedCavity.deallocate();
     state->dataHeatBal->Zone.deallocate();
     TH.deallocate();
     state->dataHeatBal->SurfQRadSWOutIncident.deallocate();

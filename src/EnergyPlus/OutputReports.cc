@@ -1501,7 +1501,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                            << format("{:.2R}", state.dataSurface->Surface(surf).Height) << "," << format("{:.2R}", state.dataSurface->Surface(surf).Reveal) << ",";
                 if (state.dataSurface->Surface(surf).IntConvCoeff > 0) {
                     {
-                        auto const SELECT_CASE_var(UserIntConvectionCoeffs(state.dataSurface->Surface(surf).IntConvCoeff).OverrideType);
+                        auto const SELECT_CASE_var(state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->Surface(surf).IntConvCoeff).OverrideType);
                         if (SELECT_CASE_var == ConvCoefValue) {
                             IntConvCoeffCalc = "User Supplied Value";
                         } else if (SELECT_CASE_var == ConvCoefSchedule) {
@@ -1517,7 +1517,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 }
                 if (state.dataSurface->Surface(surf).ExtConvCoeff > 0) {
                     {
-                        auto const SELECT_CASE_var(UserExtConvectionCoeffs(state.dataSurface->Surface(surf).ExtConvCoeff).OverrideType);
+                        auto const SELECT_CASE_var(state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->Surface(surf).ExtConvCoeff).OverrideType);
                         if (SELECT_CASE_var == ConvCoefValue) {
                             ExtConvCoeffCalc = "User Supplied Value";
                         } else if (SELECT_CASE_var == ConvCoefSchedule) {
@@ -1550,11 +1550,11 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                                << "N/A-Foundation"
                                << "," << IntConvCoeffCalc << ",";
                 } else if (state.dataSurface->Surface(surf).ExtBoundCond == OtherSideCoefNoCalcExt || state.dataSurface->Surface(surf).ExtBoundCond == OtherSideCoefCalcExt) {
-                    *eiostream << OSC(state.dataSurface->Surface(surf).OSCPtr).Name << ","
+                    *eiostream << state.dataSurface->OSC(state.dataSurface->Surface(surf).OSCPtr).Name << ","
                                << "N/A-OSC"
                                << "," << IntConvCoeffCalc << ",";
                 } else if (state.dataSurface->Surface(surf).ExtBoundCond == OtherSideCondModeledExt) {
-                    *eiostream << OSCM(state.dataSurface->Surface(surf).OSCMPtr).Name << ","
+                    *eiostream << state.dataSurface->OSCM(state.dataSurface->Surface(surf).OSCMPtr).Name << ","
                                << "N/A-OSCM"
                                << "," << IntConvCoeffCalc << ",";
                 } else {

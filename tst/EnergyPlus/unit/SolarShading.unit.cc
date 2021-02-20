@@ -164,15 +164,15 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
 {
     int SurfSolIncPtr;
     state->dataSurface->TotSurfIncSolSSG = 4;
-    SurfIncSolSSG.allocate(state->dataSurface->TotSurfIncSolSSG);
-    SurfIncSolSSG(1).SurfPtr = 1;
-    SurfIncSolSSG(1).ConstrPtr = 1;
-    SurfIncSolSSG(2).SurfPtr = 1;
-    SurfIncSolSSG(2).ConstrPtr = 2;
-    SurfIncSolSSG(3).SurfPtr = 4;
-    SurfIncSolSSG(3).ConstrPtr = 10;
-    SurfIncSolSSG(4).SurfPtr = 5;
-    SurfIncSolSSG(4).ConstrPtr = 1;
+    state->dataSurface->SurfIncSolSSG.allocate(state->dataSurface->TotSurfIncSolSSG);
+    state->dataSurface->SurfIncSolSSG(1).SurfPtr = 1;
+    state->dataSurface->SurfIncSolSSG(1).ConstrPtr = 1;
+    state->dataSurface->SurfIncSolSSG(2).SurfPtr = 1;
+    state->dataSurface->SurfIncSolSSG(2).ConstrPtr = 2;
+    state->dataSurface->SurfIncSolSSG(3).SurfPtr = 4;
+    state->dataSurface->SurfIncSolSSG(3).ConstrPtr = 10;
+    state->dataSurface->SurfIncSolSSG(4).SurfPtr = 5;
+    state->dataSurface->SurfIncSolSSG(4).ConstrPtr = 1;
 
     // Test retrieving pointer for surface incident solar schedule
 
@@ -196,7 +196,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
     SurfSolIncPtr = SurfaceScheduledSolarInc(*state, 5, 10);
     EXPECT_EQ(0, SurfSolIncPtr);
 
-    SurfIncSolSSG.deallocate();
+    state->dataSurface->SurfIncSolSSG.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_polygon_contains_point)
@@ -2580,10 +2580,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     state->dataSurface->Surface(curSurface).windowShadingControlList.push_back(2);
     state->dataSurface->Surface(curSurface).windowShadingControlList.push_back(3);
 
-    WindowShadingControl.allocate(3);
-    WindowShadingControl(1).Schedule = 1;
-    WindowShadingControl(2).Schedule = 2;
-    WindowShadingControl(3).Schedule = 3;
+    state->dataSurface->WindowShadingControl.allocate(3);
+    state->dataSurface->WindowShadingControl(1).Schedule = 1;
+    state->dataSurface->WindowShadingControl(2).Schedule = 2;
+    state->dataSurface->WindowShadingControl(3).Schedule = 3;
 
     ScheduleManager::Schedule.allocate(3);
     ScheduleManager::Schedule(1).CurrentValue = 0;
