@@ -273,7 +273,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataMaterial->Material.allocate(state->dataHeatBal->TotMaterials);
@@ -302,7 +302,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyConstructInternalSourceInInput = true;
 
@@ -1944,7 +1944,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     state->dataHeatBal->TotConstructs = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
     state->dataHeatBal->AnyConstructInternalSourceInInput = true;
 

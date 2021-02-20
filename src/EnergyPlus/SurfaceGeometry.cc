@@ -1162,7 +1162,7 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp.redimension(state.dataSurface->TotSurfaces);
         }
 
-        SurfaceWindow.allocate(state.dataSurface->TotSurfaces);
+        state.dataSurface->SurfaceWindow.allocate(state.dataSurface->TotSurfaces);
 
         AllocateSurfaceWindows(state, state.dataSurface->TotSurfaces);
 
@@ -4842,11 +4842,11 @@ namespace SurfaceGeometry {
                     WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
                     // Divider not allowed with between-glass shade or blind
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider > 0) {
-                        if (FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
+                        if (state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
                             ShowWarningError(state, "A divider cannot be specified for window " + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
                             ShowContinueError(state, ", which has a between-glass shade or blind.");
                             ShowContinueError(state, "Calculation will proceed without the divider for this window.");
-                            FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
+                            state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
                         }
                     }
                     // Check consistency of gap widths between unshaded and shaded constructions
@@ -4955,7 +4955,7 @@ namespace SurfaceGeometry {
                 }
 
                 if (!lAlphaFieldBlanks(FrameField) && state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider == 0) {
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider = UtilityRoutines::FindItemInList(cAlphaArgs(FrameField), FrameDivider);
+                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider = UtilityRoutines::FindItemInList(cAlphaArgs(FrameField), state.dataSurface->FrameDivider);
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider == 0) {
                         if (!state.dataConstruction->Construct(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
                             ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
@@ -4973,7 +4973,7 @@ namespace SurfaceGeometry {
                             if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
                                 WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
                                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider > 0) {
-                                    if (FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
+                                    if (state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
                                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
                                                         cAlphaFieldNames(FrameField) + "=\"" + cAlphaArgs(FrameField) + "\"");
                                         ShowContinueError(state, "Divider cannot be specified because the construction has a between-glass shade or blind.");
@@ -4981,8 +4981,8 @@ namespace SurfaceGeometry {
                                         ShowContinueError(
                                             state,
                                             format("Divider width = [{:.2R}].",
-                                                   FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth));
-                                        FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
+                                                   state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth));
+                                        state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
                                     }
                                 } // End of check if window has divider
                             }     // End of check if window has a between-glass shade or blind
@@ -8767,7 +8767,7 @@ namespace SurfaceGeometry {
         state.dataSurface->TotStormWin = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         if (state.dataSurface->TotStormWin == 0) return;
 
-        StormWindow.allocate(state.dataSurface->TotStormWin);
+        state.dataSurface->StormWindow.allocate(state.dataSurface->TotStormWin);
 
         StormWinNum = 0;
         for (loop = 1; loop <= state.dataSurface->TotStormWin; ++loop) {
@@ -8785,17 +8785,17 @@ namespace SurfaceGeometry {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             ++StormWinNum;
-            StormWindow(StormWinNum).BaseWindowNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
-            StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
-            StormWindow(StormWinNum).StormWinDistance = rNumericArgs(1);
-            StormWindow(StormWinNum).MonthOn = rNumericArgs(2);
-            StormWindow(StormWinNum).DayOfMonthOn = rNumericArgs(3);
-            StormWindow(StormWinNum).DateOn = General::OrdinalDay(StormWindow(StormWinNum).MonthOn, StormWindow(StormWinNum).DayOfMonthOn, 1);
-            StormWindow(StormWinNum).MonthOff = rNumericArgs(4);
-            StormWindow(StormWinNum).DayOfMonthOff = rNumericArgs(5);
-            StormWindow(StormWinNum).DateOff = General::OrdinalDay(StormWindow(StormWinNum).MonthOff, StormWindow(StormWinNum).DayOfMonthOff, 1);
+            state.dataSurface->StormWindow(StormWinNum).BaseWindowNum = UtilityRoutines::FindItemInList(cAlphaArgs(1), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
+            state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataMaterial->Material, state.dataHeatBal->TotMaterials);
+            state.dataSurface->StormWindow(StormWinNum).StormWinDistance = rNumericArgs(1);
+            state.dataSurface->StormWindow(StormWinNum).MonthOn = rNumericArgs(2);
+            state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn = rNumericArgs(3);
+            state.dataSurface->StormWindow(StormWinNum).DateOn = General::OrdinalDay(state.dataSurface->StormWindow(StormWinNum).MonthOn, state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn, 1);
+            state.dataSurface->StormWindow(StormWinNum).MonthOff = rNumericArgs(4);
+            state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff = rNumericArgs(5);
+            state.dataSurface->StormWindow(StormWinNum).DateOff = General::OrdinalDay(state.dataSurface->StormWindow(StormWinNum).MonthOff, state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff, 1);
 
-            if (StormWindow(StormWinNum).DateOn == StormWindow(StormWinNum).DateOff) {
+            if (state.dataSurface->StormWindow(StormWinNum).DateOn == state.dataSurface->StormWindow(StormWinNum).DateOff) {
                 ShowSevereError(state,
                                 format("{}: Date On = Date Off -- not allowed, occurred in WindowProperty:StormWindow Input #{}",
                                        cCurrentModuleObject,
@@ -8804,33 +8804,33 @@ namespace SurfaceGeometry {
             }
 
             {
-                auto const SELECT_CASE_var(StormWindow(StormWinNum).MonthOn);
+                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOn);
 
                 if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
                     (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (StormWindow(StormWinNum).DayOfMonthOn > 31) {
+                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 31) {
                         ShowSevereError(state,
                                         format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                                cCurrentModuleObject,
-                                               StormWindow(StormWinNum).DayOfMonthOn,
+                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
                                                StormWinNum));
                         ErrorsFound = true;
                     }
                 } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (StormWindow(StormWinNum).DayOfMonthOn > 30) {
+                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 30) {
                         ShowSevereError(state,
                                         format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                                cCurrentModuleObject,
-                                               StormWindow(StormWinNum).DayOfMonthOn,
+                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
                                                StormWinNum));
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == 2) {
-                    if (StormWindow(StormWinNum).DayOfMonthOn > 29) {
+                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn > 29) {
                         ShowSevereError(state,
                                         format("{}: Date On (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                                cCurrentModuleObject,
-                                               StormWindow(StormWinNum).DayOfMonthOn,
+                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
                                                StormWinNum));
                         ErrorsFound = true;
                     }
@@ -8838,39 +8838,39 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}: Date On Month [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           StormWindow(StormWinNum).MonthOn,
+                                           state.dataSurface->StormWindow(StormWinNum).MonthOn,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
             }
             {
-                auto const SELECT_CASE_var(StormWindow(StormWinNum).MonthOff);
+                auto const SELECT_CASE_var(state.dataSurface->StormWindow(StormWinNum).MonthOff);
 
                 if ((SELECT_CASE_var == 1) || (SELECT_CASE_var == 3) || (SELECT_CASE_var == 5) || (SELECT_CASE_var == 7) || (SELECT_CASE_var == 8) ||
                     (SELECT_CASE_var == 10) || (SELECT_CASE_var == 12)) {
-                    if (StormWindow(StormWinNum).DayOfMonthOff > 31) {
+                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 31) {
                         ShowSevereError(state,
                                         format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                                cCurrentModuleObject,
-                                               StormWindow(StormWinNum).DayOfMonthOff,
+                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
                                                StormWinNum));
                         ErrorsFound = true;
                     }
                 } else if ((SELECT_CASE_var == 4) || (SELECT_CASE_var == 6) || (SELECT_CASE_var == 9) || (SELECT_CASE_var == 11)) {
-                    if (StormWindow(StormWinNum).DayOfMonthOff > 30) {
+                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 30) {
                         ShowSevereError(state,
                                         format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                                cCurrentModuleObject,
-                                               StormWindow(StormWinNum).DayOfMonthOff,
+                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
                                                StormWinNum));
                         ErrorsFound = true;
                     }
                 } else if (SELECT_CASE_var == 2) {
-                    if (StormWindow(StormWinNum).DayOfMonthOff > 29) {
+                    if (state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff > 29) {
                         ShowSevereError(state,
                                         format("{}: Date Off (Day of Month) [{}], invalid for WindowProperty:StormWindow Input #{}",
                                                cCurrentModuleObject,
-                                               StormWindow(StormWinNum).DayOfMonthOff,
+                                               state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff,
                                                StormWinNum));
                         ErrorsFound = true;
                     }
@@ -8878,7 +8878,7 @@ namespace SurfaceGeometry {
                     ShowSevereError(state,
                                     format("{}: Date Off Month [{}], invalid for WindowProperty:StormWindow Input #{}",
                                            cCurrentModuleObject,
-                                           StormWindow(StormWinNum).MonthOff,
+                                           state.dataSurface->StormWindow(StormWinNum).MonthOff,
                                            StormWinNum));
                     ErrorsFound = true;
                 }
@@ -8889,7 +8889,7 @@ namespace SurfaceGeometry {
 
         for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
             // Require BaseWindowNum be that of an exterior window
-            SurfNum = StormWindow(StormWinNum).BaseWindowNum;
+            SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
             if (SurfNum == 0) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid.");
                 ErrorsFound = true;
@@ -8903,7 +8903,7 @@ namespace SurfaceGeometry {
             }
 
             // Require that storm window material be glass
-            MatNum = StormWindow(StormWinNum).StormWinMaterialNum;
+            MatNum = state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum;
             if (SurfNum > 0) {
                 if (MatNum == 0) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
@@ -8930,15 +8930,15 @@ namespace SurfaceGeometry {
 
             // Check for reversal of on and off times
             if (SurfNum > 0) {
-                if ((state.dataEnvrn->Latitude > 0.0 && (StormWindow(StormWinNum).MonthOn < StormWindow(StormWinNum).MonthOff)) ||
-                    (state.dataEnvrn->Latitude <= 0.0 && (StormWindow(StormWinNum).MonthOn > StormWindow(StormWinNum).MonthOff))) {
+                if ((state.dataEnvrn->Latitude > 0.0 && (state.dataSurface->StormWindow(StormWinNum).MonthOn < state.dataSurface->StormWindow(StormWinNum).MonthOff)) ||
+                    (state.dataEnvrn->Latitude <= 0.0 && (state.dataSurface->StormWindow(StormWinNum).MonthOn > state.dataSurface->StormWindow(StormWinNum).MonthOff))) {
                     ShowWarningError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" check times that storm window");
                     ShowContinueError(state,
                                       format("is put on (month={}, day={}) and taken off (month={}, day={});",
-                                             StormWindow(StormWinNum).MonthOn,
-                                             StormWindow(StormWinNum).DayOfMonthOn,
-                                             StormWindow(StormWinNum).MonthOff,
-                                             StormWindow(StormWinNum).DayOfMonthOff));
+                                             state.dataSurface->StormWindow(StormWinNum).MonthOn,
+                                             state.dataSurface->StormWindow(StormWinNum).DayOfMonthOn,
+                                             state.dataSurface->StormWindow(StormWinNum).MonthOff,
+                                             state.dataSurface->StormWindow(StormWinNum).DayOfMonthOff));
                     ShowContinueError(state, format("these times may be reversed for your building latitude={:.2R} deg.", state.dataEnvrn->Latitude));
                 }
             }
@@ -11301,15 +11301,15 @@ namespace SurfaceGeometry {
                         state.dataSurface->Surface(ThisSurf).FrameDivider > 0) {
                         FrDivNum = state.dataSurface->Surface(ThisSurf).FrameDivider;
                         // Set flag for calculating beam solar reflection from outside and/or inside window reveal
-                        if ((state.dataSurface->Surface(ThisSurf).Reveal > 0.0 && FrameDivider(FrDivNum).OutsideRevealSolAbs > 0.0) ||
-                            (FrameDivider(FrDivNum).InsideSillDepth > 0.0 && FrameDivider(FrDivNum).InsideSillSolAbs > 0.0) ||
-                            (FrameDivider(FrDivNum).InsideReveal > 0.0 && FrameDivider(FrDivNum).InsideRevealSolAbs > 0.0))
+                        if ((state.dataSurface->Surface(ThisSurf).Reveal > 0.0 && state.dataSurface->FrameDivider(FrDivNum).OutsideRevealSolAbs > 0.0) ||
+                            (state.dataSurface->FrameDivider(FrDivNum).InsideSillDepth > 0.0 && state.dataSurface->FrameDivider(FrDivNum).InsideSillSolAbs > 0.0) ||
+                            (state.dataSurface->FrameDivider(FrDivNum).InsideReveal > 0.0 && state.dataSurface->FrameDivider(FrDivNum).InsideRevealSolAbs > 0.0))
                             state.dataHeatBal->CalcWindowRevealReflection = true;
 
                         // For exterior window with frame, subtract frame area from base surface
                         // (only rectangular windows are allowed to have a frame and/or divider;
                         // Surface(ThisSurf)%FrameDivider will be 0 for triangular windows)
-                        FrWidth = FrameDivider(FrDivNum).FrameWidth;
+                        FrWidth = state.dataSurface->FrameDivider(FrDivNum).FrameWidth;
                         if (FrWidth > 0.0) {
                             FrArea = (state.dataSurface->Surface(ThisSurf).Height + 2.0 * FrWidth) * (state.dataSurface->Surface(ThisSurf).Width + 2.0 * FrWidth) -
                                      state.dataSurface->Surface(ThisSurf).Area / state.dataSurface->Surface(ThisSurf).Multiplier;
@@ -11327,11 +11327,11 @@ namespace SurfaceGeometry {
                             state.dataSurface->Surface(state.dataSurface->Surface(ThisSurf).BaseSurf).Area -= state.dataSurface->SurfWinFrameArea(ThisSurf);
                         }
                         // If exterior window has divider, subtract divider area to get glazed area
-                        DivWidth = FrameDivider(state.dataSurface->Surface(ThisSurf).FrameDivider).DividerWidth;
+                        DivWidth = state.dataSurface->FrameDivider(state.dataSurface->Surface(ThisSurf).FrameDivider).DividerWidth;
                         if (DivWidth > 0.0 && !ErrorInSurface) {
-                            DivArea = DivWidth * (FrameDivider(FrDivNum).HorDividers * state.dataSurface->Surface(ThisSurf).Width +
-                                                  FrameDivider(FrDivNum).VertDividers * state.dataSurface->Surface(ThisSurf).Height -
-                                                  FrameDivider(FrDivNum).HorDividers * FrameDivider(FrDivNum).VertDividers * DivWidth);
+                            DivArea = DivWidth * (state.dataSurface->FrameDivider(FrDivNum).HorDividers * state.dataSurface->Surface(ThisSurf).Width +
+                                                  state.dataSurface->FrameDivider(FrDivNum).VertDividers * state.dataSurface->Surface(ThisSurf).Height -
+                                                  state.dataSurface->FrameDivider(FrDivNum).HorDividers * state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth);
                             state.dataSurface->SurfWinDividerArea(ThisSurf) = DivArea * state.dataSurface->Surface(ThisSurf).Multiplier;
                             if ((state.dataSurface->Surface(ThisSurf).Area - state.dataSurface->SurfWinDividerArea(ThisSurf)) <= 0.0) {
                                 ShowSevereError(state, RoutineName + "Divider area exceeds glazed opening for window " + state.dataSurface->Surface(ThisSurf).Name);
@@ -11344,10 +11344,10 @@ namespace SurfaceGeometry {
                             state.dataSurface->Surface(ThisSurf).Area -= state.dataSurface->SurfWinDividerArea(ThisSurf); // Glazed area
                             if (DivArea <= 0.0) {
                                 ShowWarningError(state, RoutineName + "Calculated Divider Area <= 0.0 for Window=" + state.dataSurface->Surface(ThisSurf).Name);
-                                if (FrameDivider(FrDivNum).HorDividers == 0) {
+                                if (state.dataSurface->FrameDivider(FrDivNum).HorDividers == 0) {
                                     ShowContinueError(state, "..Number of Horizontal Dividers = 0.");
                                 }
-                                if (FrameDivider(FrDivNum).VertDividers == 0) {
+                                if (state.dataSurface->FrameDivider(FrDivNum).VertDividers == 0) {
                                     ShowContinueError(state, "..Number of Vertical Dividers = 0.");
                                 }
                             } else {
@@ -11355,20 +11355,20 @@ namespace SurfaceGeometry {
                                     state.dataSurface->Surface(ThisSurf).Area / (state.dataSurface->Surface(ThisSurf).Area + state.dataSurface->SurfWinDividerArea(ThisSurf));
                                 // Correction factor for portion of divider subject to divider projection correction
                                 DivFrac =
-                                    (1.0 - FrameDivider(FrDivNum).HorDividers * FrameDivider(FrDivNum).VertDividers * pow_2(DivWidth) / DivArea);
-                                state.dataSurface->SurfWinProjCorrDivOut(ThisSurf) = DivFrac * FrameDivider(FrDivNum).DividerProjectionOut / DivWidth;
-                                state.dataSurface->SurfWinProjCorrDivIn(ThisSurf) = DivFrac * FrameDivider(FrDivNum).DividerProjectionIn / DivWidth;
+                                    (1.0 - state.dataSurface->FrameDivider(FrDivNum).HorDividers * state.dataSurface->FrameDivider(FrDivNum).VertDividers * pow_2(DivWidth) / DivArea);
+                                state.dataSurface->SurfWinProjCorrDivOut(ThisSurf) = DivFrac * state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut / DivWidth;
+                                state.dataSurface->SurfWinProjCorrDivIn(ThisSurf) = DivFrac * state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn / DivWidth;
                                 // Correction factor for portion of frame subject to frame projection correction
                                 if (FrWidth > 0.0) {
                                     state.dataSurface->SurfWinProjCorrFrOut(ThisSurf) =
-                                        (FrameDivider(FrDivNum).FrameProjectionOut / FrWidth) *
+                                        (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut / FrWidth) *
                                         (ThisHeight + ThisWidth -
-                                         (FrameDivider(FrDivNum).HorDividers + FrameDivider(FrDivNum).VertDividers) * DivWidth) /
+                                         (state.dataSurface->FrameDivider(FrDivNum).HorDividers + state.dataSurface->FrameDivider(FrDivNum).VertDividers) * DivWidth) /
                                         (ThisHeight + ThisWidth + 2 * FrWidth);
                                     state.dataSurface->SurfWinProjCorrFrIn(ThisSurf) =
-                                        (FrameDivider(FrDivNum).FrameProjectionIn / FrWidth) *
+                                        (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn / FrWidth) *
                                         (ThisHeight + ThisWidth -
-                                         (FrameDivider(FrDivNum).HorDividers + FrameDivider(FrDivNum).VertDividers) * DivWidth) /
+                                         (state.dataSurface->FrameDivider(FrDivNum).HorDividers + state.dataSurface->FrameDivider(FrDivNum).VertDividers) * DivWidth) /
                                         (ThisHeight + ThisWidth + 2 * FrWidth);
                                 }
                             }
@@ -11788,7 +11788,7 @@ namespace SurfaceGeometry {
         DisplayString(state, "Creating Storm Window Constructions");
 
         for (int StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
-            int SurfNum = StormWindow(StormWinNum).BaseWindowNum; // Surface number
+            int SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum; // Surface number
             int ConstrNum = state.dataSurface->Surface(SurfNum).Construction; // Number of unshaded construction
             // Fatal error if base construction has more than three glass layers
             if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers > 3) {
@@ -11801,9 +11801,9 @@ namespace SurfaceGeometry {
             // If this construction name already exists, set the surface's storm window construction number to it
             int ConstrNewSt = UtilityRoutines::FindItemInList(ConstrNameSt, state.dataConstruction->Construct, state.dataHeatBal->TotConstructs); // Number of unshaded storm window construction that is created
             // If necessary, create new material corresponding to the air layer between the storm winddow and the rest of the window
-            int MatNewStAir = createAirMaterialFromDistance(state, StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
+            int MatNewStAir = createAirMaterialFromDistance(state, state.dataSurface->StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
             if (ConstrNewSt == 0) {
-                ConstrNewSt = createConstructionWithStorm(state, ConstrNum, ConstrNameSt, StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
+                ConstrNewSt = createConstructionWithStorm(state, ConstrNum, ConstrNameSt, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
             }
             state.dataSurface->Surface(SurfNum).StormWinConstruction = ConstrNewSt;
 
@@ -11834,7 +11834,7 @@ namespace SurfaceGeometry {
                 }
                 if (ShAndSt) {
                     std::string ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + state.dataConstruction->Construct(iConstruction).Name + ":" + ChrNum  ; // Name of shaded construction with storm window
-                    int ConstrNewStSh = createConstructionWithStorm(state, ConstrNum, ConstrNameStSh, StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
+                    int ConstrNewStSh = createConstructionWithStorm(state, ConstrNum, ConstrNameStSh, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
                     state.dataSurface->Surface(SurfNum).shadedStormWinConstructionList[iConstruction] = ConstrNewStSh; // put in same index as the shaded constuction
                 }
             } // end of loop for shaded constructions

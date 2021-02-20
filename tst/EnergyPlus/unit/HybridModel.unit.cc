@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTE(1) = 0.0;
     MCPTC.allocate(1);
     MCPTC(1) = 0.0;
-    SurfaceWindow.allocate(1);
+    state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBal->HConvIn.allocate(1);
     state->dataHeatBal->SNLoadHeatRate.allocate(1);
@@ -581,7 +581,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTM.deallocate();
     MCPTE.deallocate();
     MCPTC.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
     state->dataSurface->Surface.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
@@ -668,7 +668,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     MCPTE(1) = 0.0;
     MCPTC.allocate(1);
     MCPTC(1) = 0.0;
-    SurfaceWindow.allocate(1);
+    state->dataSurface->SurfaceWindow.allocate(1);
     state->dataSurface->Surface.allocate(2);
     state->dataHeatBal->HConvIn.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
@@ -909,7 +909,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     MCPTM.deallocate();
     MCPTE.deallocate();
     MCPTC.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
     state->dataSurface->Surface.deallocate();
     state->dataHeatBal->HConvIn.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();

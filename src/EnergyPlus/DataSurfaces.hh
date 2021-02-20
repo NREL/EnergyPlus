@@ -1134,9 +1134,6 @@ namespace DataSurfaces {
     };
 
     // Object Data
-    extern Array1D<SurfaceWindowCalc> SurfaceWindow;
-    extern Array1D<FrameDividerProperties> FrameDivider;
-    extern Array1D<StormWindowData> StormWindow;
     extern Array1D<WindowShadingControlData> WindowShadingControl;
     extern Array1D<OSCData> OSC;
     extern Array1D<OSCMData> OSCM;
@@ -1463,6 +1460,9 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
     Array1D<DataSurfaces::SurfaceData> Surface;
+    Array1D<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
+    Array1D<DataSurfaces::FrameDividerProperties> FrameDivider;
+    Array1D<DataSurfaces::StormWindowData> StormWindow;
 
     void clear_state() override
     {
@@ -1709,6 +1709,9 @@ struct SurfacesData : BaseGlobalStruct
         this->AnyHeatBalanceInsideSourceTerm = false;
         this->AnyHeatBalanceOutsideSourceTerm = false;
         this->Surface.deallocate();
+        this->SurfaceWindow.deallocate();
+        this->FrameDivider.deallocate();
+        this->StormWindow.deallocate();
     }
 };
 

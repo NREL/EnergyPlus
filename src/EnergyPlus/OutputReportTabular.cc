@@ -9601,7 +9601,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHeatBalance::ZoneData;
         using DataStringGlobals::VerString;
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::FrameDivider;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
         using DataSurfaces::KivaFoundation;
@@ -9887,7 +9886,7 @@ namespace EnergyPlus::OutputReportTabular {
                     curAzimuth = round(curAzimuth * 100.0) / 100.0;
                     curArea = state.dataSurface->Surface(iSurf).GrossArea;
                     if (state.dataSurface->Surface(iSurf).FrameDivider != 0) {
-                        frameWidth = FrameDivider(state.dataSurface->Surface(iSurf).FrameDivider).FrameWidth;
+                        frameWidth = state.dataSurface->FrameDivider(state.dataSurface->Surface(iSurf).FrameDivider).FrameWidth;
                         frameArea = (state.dataSurface->Surface(iSurf).Height + 2.0 * frameWidth) * (state.dataSurface->Surface(iSurf).Width + 2.0 * frameWidth) -
                                     (state.dataSurface->Surface(iSurf).Height * state.dataSurface->Surface(iSurf).Width);
                         curArea += frameArea;

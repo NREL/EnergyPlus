@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarning)
@@ -352,7 +352,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     AirflowNetwork::MultizoneExternalNodeData.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
@@ -2492,7 +2492,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
     state->dataHeatBal->People.deallocate();
 }
 
@@ -3055,7 +3055,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_UserDefinedDuctViewFactors)

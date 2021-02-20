@@ -108,9 +108,6 @@ namespace EnergyPlus::DataSurfaces {
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
     // Object Data
-    Array1D<SurfaceWindowCalc> SurfaceWindow;
-    Array1D<FrameDividerProperties> FrameDivider;
-    Array1D<StormWindowData> StormWindow;
     Array1D<WindowShadingControlData> WindowShadingControl;
     Array1D<OSCData> OSC;
     Array1D<OSCMData> OSCM;
@@ -653,9 +650,6 @@ namespace EnergyPlus::DataSurfaces {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        SurfaceWindow.deallocate();
-        FrameDivider.deallocate();
-        StormWindow.deallocate();
         WindowShadingControl.deallocate();
         OSC.deallocate();
         OSCM.deallocate();

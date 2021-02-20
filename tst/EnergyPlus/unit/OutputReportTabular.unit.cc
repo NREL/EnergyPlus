@@ -6099,9 +6099,9 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
 
     // frames
     state->dataHeatBal->TotFrameDivider = 2;
-    FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
-    FrameDivider(1).FrameWidth = 0.3;
-    FrameDivider(2).FrameWidth = 0.2;
+    state->dataSurface->FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
+    state->dataSurface->FrameDivider(1).FrameWidth = 0.3;
+    state->dataSurface->FrameDivider(2).FrameWidth = 0.2;
 
     // zone
     state->dataGlobal->NumOfZones = 1;
@@ -7390,7 +7390,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 
     state->dataSurface->TotSurfaces = 2 * nTests ;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {

@@ -92,7 +92,7 @@ namespace WindowManager {
         // Main wrapper routine to pick-up data from EnergyPlus and then call Windows-CalcEngine routines
         // to obtain results
 
-        auto &window(SurfaceWindow(SurfNum));
+        auto &window(state.dataSurface->SurfaceWindow(SurfNum));
         auto &surface(state.dataSurface->Surface(SurfNum));
         auto ConstrNum = surface.Construction;
         auto &construction(state.dataConstruction->Construct(ConstrNum));
@@ -117,7 +117,7 @@ namespace WindowManager {
         }
 
         for (auto k = 1; k <= 2 * totSolidLayers; ++k) {
-            Guess.push_back(SurfaceWindow(SurfNum).ThetaFace(k));
+            Guess.push_back(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(k));
         }
 
         try {
@@ -185,10 +185,10 @@ namespace WindowManager {
             // Effective shade and glass emissivities that are used later for energy calculations.
             // This needs to be checked as well. (Simon)
             auto EffShBlEmiss = EpsShIR1 * (1.0 + RhoGlIR2 * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2));
-            SurfaceWindow(SurfNum).EffShBlindEmiss = EffShBlEmiss;
+            state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss = EffShBlEmiss;
 
             auto EffGlEmiss = glassEmiss * TauShIR / (1.0 - RhoGlIR2 * RhoShIR2);
-            SurfaceWindow(SurfNum).EffGlassEmiss = EffGlEmiss;
+            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = EffGlEmiss;
 
             auto glassTemperature = aGlassLayer->getSurface(Side::Back)->getTemperature();
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
@@ -211,7 +211,7 @@ namespace WindowManager {
             auto NetIRHeatGainGlass = surface.Area * backSurface->getEmissivity() * (state.dataWindowManager->sigma * pow(backSurface->getTemperature(), 4) - rmir);
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(Side::Back) - state.dataWindowManager->TKelvin;
-            SurfaceWindow(SurfNum).EffGlassEmiss = aLayers[totLayers - 1]->getSurface(Side::Back)->getEmissivity();
+            state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss = aLayers[totLayers - 1]->getSurface(Side::Back)->getEmissivity();
 
             state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
             state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
@@ -226,8 +226,8 @@ namespace WindowManager {
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(state); ++k) {
-            SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
-            SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
+            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = state.dataWindowManager->thetas(2 * k - 1);
+            state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * k) = state.dataWindowManager->thetas(2 * k);
 
             // temperatures for reporting
             state.dataHeatBal->SurfWinFenLaySurfTempFront(k, SurfNum) = state.dataWindowManager->thetas(2 * k - 1) - DataGlobalConstants::KelvinConv;
@@ -242,7 +242,7 @@ namespace WindowManager {
     CWCEHeatTransferFactory::CWCEHeatTransferFactory(EnergyPlusData &state, SurfaceData const &surface, int const t_SurfNum)
         : m_Surface(surface), m_SurfNum(t_SurfNum), m_SolidLayerIndex(0), m_InteriorBSDFShade(false), m_ExteriorShade(false)
     {
-        m_Window = SurfaceWindow(t_SurfNum);
+        m_Window = state.dataSurface->SurfaceWindow(t_SurfNum);
         auto ShadeFlag = state.dataSurface->SurfWinShadingFlag(t_SurfNum);
 
         m_ConstructionNumber = m_Surface.Construction;

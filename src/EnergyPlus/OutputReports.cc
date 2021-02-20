@@ -1598,7 +1598,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                 // if window, report frame/divider as appropriate
                 if (state.dataSurface->Surface(surf).FrameDivider > 0) {
                     fd = state.dataSurface->Surface(surf).FrameDivider;
-                    if (FrameDivider(fd).FrameWidth > 0.0) {
+                    if (state.dataSurface->FrameDivider(fd).FrameWidth > 0.0) {
                         {
                             auto const SELECT_CASE_var(state.dataSurface->Surface(surf).HeatTransferAlgorithm);
                             if (SELECT_CASE_var == HeatTransferModel_None) {
@@ -1621,25 +1621,25 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
                                 AlgoName = "Tubular Daylighting Device";
                             }
                         }
-                        *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
+                        *eiostream << "Frame/Divider Surface," << state.dataSurface->FrameDivider(fd).Name << ","
                                    << "Frame," << state.dataSurface->Surface(surf).Name << "," << AlgoName << ",";
                         *eiostream << ",N/A,N/A,," << format("{:.2R}", state.dataSurface->SurfWinFrameArea(surf)) << ","
                                    << format("{:.2R}", state.dataSurface->SurfWinFrameArea(surf) / state.dataSurface->Surface(surf).Multiplier) << ",*"
                                    << ",N/A"
-                                   << ",N/A," << format("{:.2R}", FrameDivider(fd).FrameWidth) << ",N/A" << '\n';
+                                   << ",N/A," << format("{:.2R}", state.dataSurface->FrameDivider(fd).FrameWidth) << ",N/A" << '\n';
                     }
-                    if (FrameDivider(fd).DividerWidth > 0.0) {
-                        if (FrameDivider(fd).DividerType == DividedLite) {
-                            *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
+                    if (state.dataSurface->FrameDivider(fd).DividerWidth > 0.0) {
+                        if (state.dataSurface->FrameDivider(fd).DividerType == DividedLite) {
+                            *eiostream << "Frame/Divider Surface," << state.dataSurface->FrameDivider(fd).Name << ","
                                        << "Divider:DividedLite," << state.dataSurface->Surface(surf).Name << ",,";
                         } else {
-                            *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
+                            *eiostream << "Frame/Divider Surface," << state.dataSurface->FrameDivider(fd).Name << ","
                                        << "Divider:Suspended," << state.dataSurface->Surface(surf).Name << ",,";
                         }
                         *eiostream << ",N/A,N/A,," << format("{:.2R}", state.dataSurface->SurfWinDividerArea(surf)) << ","
                                    << format("{:.2R}", state.dataSurface->SurfWinDividerArea(surf) / state.dataSurface->Surface(surf).Multiplier) << ",*"
                                    << ",N/A"
-                                   << ",N/A," << format("{:.2R}", FrameDivider(fd).DividerWidth) << ",N/A" << '\n';
+                                   << ",N/A," << format("{:.2R}", state.dataSurface->FrameDivider(fd).DividerWidth) << ",N/A" << '\n';
                     }
                 }
             } else { // RptType=1  Vertices only

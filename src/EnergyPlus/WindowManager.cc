@@ -1424,15 +1424,15 @@ namespace WindowManager {
                         TauShIR = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
                         EpsShIR = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
                         TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
                         EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
                         RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
@@ -1483,9 +1483,9 @@ namespace WindowManager {
             W21 = W1 - W2;
             W23 = W3 - W2;
             if (Rectangle) {
-                SurfaceWindow(SurfNum).WinCenter = W2 + (W23 + W21) / 2.0;
+                state.dataSurface->SurfaceWindow(SurfNum).WinCenter = W2 + (W23 + W21) / 2.0;
             } else if (Triangle) {
-                SurfaceWindow(SurfNum).WinCenter = W2 + (W23 + W21) / 3.0;
+                state.dataSurface->SurfaceWindow(SurfNum).WinCenter = W2 + (W23 + W21) / 3.0;
             }
         } // End of surface loop
 
@@ -1560,34 +1560,34 @@ namespace WindowManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             FrDivNum = state.dataSurface->Surface(SurfNum).FrameDivider;
             if (FrDivNum > 0) { // Surface is a window with a frame and/or divider
-                FrWidth = FrameDivider(FrDivNum).FrameWidth;
+                FrWidth = state.dataSurface->FrameDivider(FrDivNum).FrameWidth;
                 GlHeight = state.dataSurface->Surface(SurfNum).Height;
                 GlWidth = state.dataSurface->Surface(SurfNum).Width;
-                NumVertDividers = FrameDivider(FrDivNum).VertDividers;
-                NumHorDividers = FrameDivider(FrDivNum).HorDividers;
+                NumVertDividers = state.dataSurface->FrameDivider(FrDivNum).VertDividers;
+                NumHorDividers = state.dataSurface->FrameDivider(FrDivNum).HorDividers;
                 BaseSurfNum = state.dataSurface->Surface(SurfNum).BaseSurf;
-                state.dataSurface->SurfWinFrameConductance(SurfNum) = FrameDivider(FrDivNum).FrameConductance;
-                state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) = FrameDivider(FrDivNum).FrameSolAbsorp;
-                state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = FrameDivider(FrDivNum).FrameVisAbsorp;
-                state.dataSurface->SurfWinFrameEmis(SurfNum) = FrameDivider(FrDivNum).FrameEmis;
-                state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) = FrameDivider(FrDivNum).FrEdgeToCenterGlCondRatio;
+                state.dataSurface->SurfWinFrameConductance(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameConductance;
+                state.dataSurface->SurfWinFrameSolAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameSolAbsorp;
+                state.dataSurface->SurfWinFrameVisAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameVisAbsorp;
+                state.dataSurface->SurfWinFrameEmis(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrameEmis;
+                state.dataSurface->SurfWinFrEdgeToCenterGlCondRatio(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).FrEdgeToCenterGlCondRatio;
                 state.dataSurface->SurfWinDividerType(SurfNum) = DividedLite;
-                if (FrameDivider(FrDivNum).DividerType == Suspended) state.dataSurface->SurfWinDividerType(SurfNum) = Suspended;
-                DivWidth = FrameDivider(FrDivNum).DividerWidth;
-                state.dataSurface->SurfWinDividerConductance(SurfNum) = FrameDivider(FrDivNum).DividerConductance;
-                state.dataSurface->SurfWinDividerSolAbsorp(SurfNum) = FrameDivider(FrDivNum).DividerSolAbsorp;
-                state.dataSurface->SurfWinDividerVisAbsorp(SurfNum) = FrameDivider(FrDivNum).DividerVisAbsorp;
-                state.dataSurface->SurfWinDividerEmis(SurfNum) = FrameDivider(FrDivNum).DividerEmis;
-                state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) = FrameDivider(FrDivNum).DivEdgeToCenterGlCondRatio;
+                if (state.dataSurface->FrameDivider(FrDivNum).DividerType == Suspended) state.dataSurface->SurfWinDividerType(SurfNum) = Suspended;
+                DivWidth = state.dataSurface->FrameDivider(FrDivNum).DividerWidth;
+                state.dataSurface->SurfWinDividerConductance(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerConductance;
+                state.dataSurface->SurfWinDividerSolAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerSolAbsorp;
+                state.dataSurface->SurfWinDividerVisAbsorp(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerVisAbsorp;
+                state.dataSurface->SurfWinDividerEmis(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DividerEmis;
+                state.dataSurface->SurfWinDivEdgeToCenterGlCondRatio(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).DivEdgeToCenterGlCondRatio;
 
-                state.dataSurface->SurfWinOutsideRevealSolAbs(SurfNum) = FrameDivider(FrDivNum).OutsideRevealSolAbs;
-                state.dataSurface->SurfWinInsideSillDepth(SurfNum) = FrameDivider(FrDivNum).InsideSillDepth;
-                state.dataSurface->SurfWinInsideReveal(SurfNum) = FrameDivider(FrDivNum).InsideReveal;
-                state.dataSurface->SurfWinInsideSillSolAbs(SurfNum) = FrameDivider(FrDivNum).InsideSillSolAbs;
-                state.dataSurface->SurfWinInsideRevealSolAbs(SurfNum) = FrameDivider(FrDivNum).InsideRevealSolAbs;
+                state.dataSurface->SurfWinOutsideRevealSolAbs(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).OutsideRevealSolAbs;
+                state.dataSurface->SurfWinInsideSillDepth(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideSillDepth;
+                state.dataSurface->SurfWinInsideReveal(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideReveal;
+                state.dataSurface->SurfWinInsideSillSolAbs(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideSillSolAbs;
+                state.dataSurface->SurfWinInsideRevealSolAbs(SurfNum) = state.dataSurface->FrameDivider(FrDivNum).InsideRevealSolAbs;
 
-                FrEdgeWidth = FrameDivider(FrDivNum).FrameEdgeWidth;
-                DivEdgeWidth = FrameDivider(FrDivNum).DividerEdgeWidth;
+                FrEdgeWidth = state.dataSurface->FrameDivider(FrDivNum).FrameEdgeWidth;
+                DivEdgeWidth = state.dataSurface->FrameDivider(FrDivNum).DividerEdgeWidth;
                 state.dataSurface->SurfWinFrameEdgeArea(SurfNum) =
                     2 * FrEdgeWidth * (GlHeight - FrEdgeWidth - NumHorDividers * DivWidth + GlWidth - FrEdgeWidth - NumVertDividers * DivWidth);
                 state.dataSurface->SurfWinDividerEdgeArea(SurfNum) =
@@ -2111,7 +2111,7 @@ namespace WindowManager {
         // CurrentThermalAlgorithm = -1
 
         // Shorthand refernces
-        auto &window(SurfaceWindow(SurfNum));
+        auto &window(state.dataSurface->SurfaceWindow(SurfNum));
         auto &surface(state.dataSurface->Surface(SurfNum));
 
         if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
@@ -4667,7 +4667,7 @@ namespace WindowManager {
         } else {
             // Use previous time step values
             for (i = 1; i <= state.dataWindowManager->nglface; ++i) {
-                state.dataWindowManager->thetas(i) = SurfaceWindow(SurfNum).ThetaFace(i);
+                state.dataWindowManager->thetas(i) = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(i);
             }
         }
 
@@ -4685,8 +4685,8 @@ namespace WindowManager {
             nglfacePrevDay = state.dataWindowManager->nglface;
             if (StormWinFlagPrevDay == 0 && StormWinFlagThisDay == 1) nglfacePrevDay = state.dataWindowManager->nglface - 2;
             if (StormWinFlagPrevDay == 1 && StormWinFlagThisDay == 0) nglfacePrevDay = state.dataWindowManager->nglface + 2;
-            state.dataWindowManager->thetas(state.dataWindowManager->nglface + 1) = SurfaceWindow(SurfNum).ThetaFace(nglfacePrevDay + 1);
-            state.dataWindowManager->thetas(state.dataWindowManager->nglface + 2) = SurfaceWindow(SurfNum).ThetaFace(nglfacePrevDay + 2);
+            state.dataWindowManager->thetas(state.dataWindowManager->nglface + 1) = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(nglfacePrevDay + 1);
+            state.dataWindowManager->thetas(state.dataWindowManager->nglface + 2) = state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(nglfacePrevDay + 2);
         } else {
             // No shade or blind previous time step; guess starting values of shade/blind
             // taking into account short- and long-wave radiation (from solar, lights and zone equipment)
@@ -5800,19 +5800,19 @@ namespace WindowManager {
             HInConvFr = HInConv;
             HOutRad = 0.5 * state.dataSurface->SurfWinFrameEmis(SurfNum) * state.dataWindowManager->sigma * pow_3(TOutRadFr + state.dataSurface->SurfWinFrameTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin);
             HOutConvFr = HOutConv;
-            if (FrameDivider(FrDivNum).FrameProjectionOut > 0.0) {
+            if (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut > 0.0) {
                 HOutRad *= (1.0 + ProjCorrFrOut);
                 HOutConvFr = HOutConv * (1.0 + ProjCorrFrOut);
                 // Add long-wave from outside window surface absorbed by frame outside projection
-                state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) += 0.5 * state.dataSurface->SurfWinProjCorrFrOut(SurfNum) * FrameDivider(FrDivNum).FrameEmis *
-                                                          EmisGlassOut * state.dataWindowManager->sigma * pow_4(SurfaceWindow(SurfNum).ThetaFace(1));
+                state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum) += 0.5 * state.dataSurface->SurfWinProjCorrFrOut(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).FrameEmis *
+                                                          EmisGlassOut * state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(1));
             }
-            if (FrameDivider(FrDivNum).FrameProjectionIn > 0.0) {
+            if (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn > 0.0) {
                 HInRad *= (1.0 + ProjCorrFrIn);
                 HInConvFr = HInConv * (1.0 + ProjCorrFrIn);
                 // Add long-wave from inside window surface absorbed by frame inside projection
-                state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) += 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum) * FrameDivider(FrDivNum).FrameEmis * EmisGlassIn *
-                    state.dataWindowManager->sigma * pow_4(SurfaceWindow(SurfNum).ThetaFace(2 * TotGlassLayers));
+                state.dataSurface->SurfWinFrameQRadInAbs(SurfNum) += 0.5 * state.dataSurface->SurfWinProjCorrFrIn(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).FrameEmis * EmisGlassIn *
+                    state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * TotGlassLayers));
             }
             Afac = (HOutRad * TOutRadFr + HOutConvFr * tout + state.dataSurface->SurfWinFrameQRadOutAbs(SurfNum)) / (HOutRad + FrameCon + HOutConvFr);
             Bfac = FrameCon / (HOutRad + FrameCon + HOutConvFr);
@@ -5859,24 +5859,24 @@ namespace WindowManager {
             HOutRad = 0.5 * DivEmisOut * state.dataWindowManager->sigma * pow_3(TOutRadDiv + state.dataSurface->SurfWinDividerTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin);
             HOutConvDiv = HOutConv;
 
-            if (FrameDivider(FrDivNum).DividerProjectionOut > 0.0) {
+            if (state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut > 0.0) {
                 HOutRad *= (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivOut(SurfNum));
                 if (state.dataSurface->SurfWinShadingFlag(SurfNum) == ExtShadeOn) HOutConvDiv = state.dataSurface->SurfWinConvCoeffWithShade(SurfNum);
                 HOutConvDiv *= (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivOut(SurfNum));
                 // Add long-wave from outside window surface absorbed by divider outside projection
-                state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) += state.dataSurface->SurfWinProjCorrDivOut(SurfNum) * FrameDivider(FrDivNum).DividerEmis *
-                                                            EmisGlassOut * state.dataWindowManager->sigma * pow_4(SurfaceWindow(SurfNum).ThetaFace(1));
+                state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) += state.dataSurface->SurfWinProjCorrDivOut(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).DividerEmis *
+                                                            EmisGlassOut * state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(1));
             }
 
             HInConvDiv = HInConv;
 
-            if (FrameDivider(FrDivNum).DividerProjectionIn > 0.0) {
+            if (state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn > 0.0) {
                 HInRad *= (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum));
                 if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn) HInConvDiv = state.dataSurface->SurfWinConvCoeffWithShade(SurfNum);
                 HInConvDiv *= (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum));
                 // Add long-wave from inside window surface absorbed by divider inside projection
-                state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) += state.dataSurface->SurfWinProjCorrDivIn(SurfNum) * FrameDivider(FrDivNum).DividerEmis * EmisGlassIn *
-                                                           state.dataWindowManager->sigma * pow_4(SurfaceWindow(SurfNum).ThetaFace(2 * TotGlassLayers));
+                state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) += state.dataSurface->SurfWinProjCorrDivIn(SurfNum) * state.dataSurface->FrameDivider(FrDivNum).DividerEmis * EmisGlassIn *
+                                                           state.dataWindowManager->sigma * pow_4(state.dataSurface->SurfaceWindow(SurfNum).ThetaFace(2 * TotGlassLayers));
             }
             Afac = (HOutRad * TOutRadDiv + HOutConvDiv * tout + state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum)) / (HOutRad + DivCon + HOutConvDiv);
             Bfac = DivCon / (HOutRad + DivCon + HOutConvDiv);

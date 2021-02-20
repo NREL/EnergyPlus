@@ -290,7 +290,7 @@ namespace HeatBalanceIntRadExchange {
                         int const SurfNum = zone_SurfacePtr(ZoneSurfNum);
                         int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                         zone_info.Emissivity(ZoneSurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
-                        auto const &surface_window(SurfaceWindow(SurfNum));
+                        auto const &surface_window(state.dataSurface->SurfaceWindow(SurfNum));
                         if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow &&
                             (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn)) {
                             zone_info.Emissivity(ZoneSurfNum) =
@@ -325,7 +325,7 @@ namespace HeatBalanceIntRadExchange {
             Real64 CarrollMRTInKTo4th;  // Carroll MRT
             for (size_type ZoneSurfNum = 0; ZoneSurfNum < s_zone_Surfaces; ++ZoneSurfNum) {
                 int const SurfNum = zone_SurfacePtr[ZoneSurfNum];
-                auto const &surface_window(SurfaceWindow(SurfNum));
+                auto const &surface_window(state.dataSurface->SurfaceWindow(SurfNum));
                 int const ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
                 if (construct.WindowTypeEQL) {

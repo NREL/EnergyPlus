@@ -507,8 +507,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).ExtSolar) {
-                    SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
-                    SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
+                    state.dataSurface->SurfaceWindow(SurfNum).LumWinFromRefPtRep = 0.0;
                 }
             }
         }
@@ -973,17 +973,17 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         dividerArea = 0.0;
                         frameDivNum = state.dataSurface->Surface(iSurf).FrameDivider;
                         if (frameDivNum != 0) {
-                            frameWidth = FrameDivider(frameDivNum).FrameWidth;
+                            frameWidth = state.dataSurface->FrameDivider(frameDivNum).FrameWidth;
                             frameArea = (state.dataSurface->Surface(iSurf).Height + 2.0 * frameWidth) * (state.dataSurface->Surface(iSurf).Width + 2.0 * frameWidth) -
                                         (state.dataSurface->Surface(iSurf).Height * state.dataSurface->Surface(iSurf).Width);
                             windowArea += frameArea;
-                            dividerArea = FrameDivider(frameDivNum).DividerWidth *
-                                          (FrameDivider(frameDivNum).HorDividers * state.dataSurface->Surface(iSurf).Width +
-                                           FrameDivider(frameDivNum).VertDividers * state.dataSurface->Surface(iSurf).Height -
-                                           FrameDivider(frameDivNum).HorDividers * FrameDivider(frameDivNum).VertDividers *
-                                               FrameDivider(frameDivNum).DividerWidth);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameConductance, surfName, FrameDivider(frameDivNum).FrameConductance, 3);
-                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDividerConductance, surfName, FrameDivider(frameDivNum).DividerConductance, 3);
+                            dividerArea = state.dataSurface->FrameDivider(frameDivNum).DividerWidth *
+                                          (state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->Surface(iSurf).Width +
+                                           state.dataSurface->FrameDivider(frameDivNum).VertDividers * state.dataSurface->Surface(iSurf).Height -
+                                           state.dataSurface->FrameDivider(frameDivNum).HorDividers * state.dataSurface->FrameDivider(frameDivNum).VertDividers *
+                                               state.dataSurface->FrameDivider(frameDivNum).DividerWidth);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenFrameConductance, surfName, state.dataSurface->FrameDivider(frameDivNum).FrameConductance, 3);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenDividerConductance, surfName, state.dataSurface->FrameDivider(frameDivNum).DividerConductance, 3);
                         }
                         windowAreaWMult = windowArea * mult;
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchFenAreaOf1, surfName, windowArea);
@@ -1189,7 +1189,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         // include the frame area if present
                         windowArea = state.dataSurface->Surface(iSurf).GrossArea;
                         if (state.dataSurface->Surface(iSurf).FrameDivider != 0) {
-                            frameWidth = FrameDivider(state.dataSurface->Surface(iSurf).FrameDivider).FrameWidth;
+                            frameWidth = state.dataSurface->FrameDivider(state.dataSurface->Surface(iSurf).FrameDivider).FrameWidth;
                             frameArea = (state.dataSurface->Surface(iSurf).Height + 2 * frameWidth) * (state.dataSurface->Surface(iSurf).Width + 2 * frameWidth) -
                                         (state.dataSurface->Surface(iSurf).Height * state.dataSurface->Surface(iSurf).Width);
                             windowArea += frameArea;
@@ -2987,7 +2987,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             } else if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) {
                                 int TotSolidLay = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
                                 // Number of solid layers in fenestration system (glass + shading)
-                                int CurrentState = SurfaceWindow(SurfNum).ComplexFen.CurrentState;
+                                int CurrentState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.CurrentState;
                                 // Current state for Complex Fenestration
                                 // Examine for schedule surface gain
                                 Real64 SurfSolAbs = WindowScheduledSolarAbs(state,
@@ -3006,8 +3006,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                         // accounting for absorptances from beam hitting back of the window which passes through rest of exterior
                                         // windows
                                         state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) =
-                                                SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
-                                                SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
+                                                state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyFtAbs(Lay) * SkySolarInc +
+                                                state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(CurrentState).WinSkyGndAbs(Lay) * GndSolarInc +
                                                 state.dataSurface->SurfWinA(Lay, SurfNum) * BeamSolar +
                                                 state.dataSurface->SurfWinACFOverlap(Lay, SurfNum) * BeamSolar;
                                     }
@@ -3085,12 +3085,12 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             int FrDivNum = state.dataSurface->Surface(SurfNum).FrameDivider; // Frame/divider number
                             if (FrDivNum > 0) {
                                 Real64 FrArea = state.dataSurface->SurfWinFrameArea(SurfNum); // Frame, divider area (m2)
-                                Real64 FrProjOut = FrameDivider(FrDivNum).FrameProjectionOut; // Frame, divider outside projection (m)
-                                Real64 FrProjIn = FrameDivider(FrDivNum).FrameProjectionIn;
+                                Real64 FrProjOut = state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut; // Frame, divider outside projection (m)
+                                Real64 FrProjIn = state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn;
                                 Real64 DivArea = state.dataSurface->SurfWinDividerArea(SurfNum);
-                                Real64 DivWidth = FrameDivider(FrDivNum).DividerWidth;
-                                Real64 DivProjOut = FrameDivider(FrDivNum).DividerProjectionOut;
-                                Real64 DivProjIn = FrameDivider(FrDivNum).DividerProjectionIn;
+                                Real64 DivWidth = state.dataSurface->FrameDivider(FrDivNum).DividerWidth;
+                                Real64 DivProjOut = state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut;
+                                Real64 DivProjIn = state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn;
                                 Real64 CosIncAngHorProj = 0.0; // Cosine of incidence angle of sun on horizontal faces of a frame or divider projection
                                 Real64 CosIncAngVertProj = 0.0; // Cosine of incidence angle of sun on vertical faces of a frame or divider projection
                                 Real64 FracSunLit = 0.0; // Fraction of window sunlit this time step
@@ -3135,11 +3135,11 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                     if (FrProjOut > 0.0 || FrProjIn > 0.0) {
                                         Real64 BeamFrHorFaceInc = state.dataEnvrn->BeamSolarRad * CosIncAngHorProj *
                                                                   (state.dataSurface->Surface(SurfNum).Width -
-                                                                   FrameDivider(FrDivNum).VertDividers *
+                                                                   state.dataSurface->FrameDivider(FrDivNum).VertDividers *
                                                                    DivWidth) * FracSunLit / FrArea;
                                         Real64 BeamFrVertFaceInc = state.dataEnvrn->BeamSolarRad * CosIncAngVertProj *
                                                                    (state.dataSurface->Surface(SurfNum).Height -
-                                                                    FrameDivider(FrDivNum).HorDividers *
+                                                                    state.dataSurface->FrameDivider(FrDivNum).HorDividers *
                                                                     DivWidth) * FracSunLit / FrArea;
                                         // Beam solar on outside of frame
                                         FrIncSolarOut += (BeamFrHorFaceInc + BeamFrVertFaceInc) * FrProjOut;
@@ -3224,14 +3224,14 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                     if (DivProjOut > 0.0 && ShadeFlag != ExtShadeOn &&
                                         ShadeFlag != ExtBlindOn && ShadeFlag != ExtScreenOn) {
                                         BeamDivHorFaceInc = state.dataEnvrn->BeamSolarRad * CosIncAngHorProj *
-                                                            FrameDivider(FrDivNum).HorDividers * DivProjOut *
+                                                            state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivProjOut *
                                                             (state.dataSurface->Surface(SurfNum).Width -
-                                                             FrameDivider(FrDivNum).VertDividers * DivWidth) *
+                                                             state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivWidth) *
                                                             FracSunLit / DivArea;
                                         BeamDivVertFaceInc = state.dataEnvrn->BeamSolarRad * CosIncAngVertProj *
-                                                             FrameDivider(FrDivNum).VertDividers * DivProjOut *
+                                                             state.dataSurface->FrameDivider(FrDivNum).VertDividers * DivProjOut *
                                                              (state.dataSurface->Surface(SurfNum).Height -
-                                                              FrameDivider(FrDivNum).HorDividers * DivWidth) *
+                                                              state.dataSurface->FrameDivider(FrDivNum).HorDividers * DivWidth) *
                                                              FracSunLit / DivArea;
                                     }
                                     Real64 DivIncSolarOutBm = 0.0; // Diffuse solar incident on outside of divider including beam on divider projection (W/m2)
@@ -3265,16 +3265,16 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                             // BeamDivHorFaceIncIn - Beam solar on divider's horizontal inside projection faces (W/m2)
                                             // BeamDivVertFaceIncIn - Beam solar on divider's vertical inside projection faces (W/m2)
                                             Real64 BeamDivHorFaceIncIn = state.dataEnvrn->BeamSolarRad * CosIncAngHorProj *
-                                                                         FrameDivider(FrDivNum).HorDividers *
+                                                                         state.dataSurface->FrameDivider(FrDivNum).HorDividers *
                                                                          DivProjIn * (state.dataSurface->Surface(SurfNum).Width -
-                                                                                      FrameDivider(
+                                                                                      state.dataSurface->FrameDivider(
                                                                                               FrDivNum).VertDividers *
                                                                                       DivWidth) * FracSunLit /
                                                                          DivArea;
                                             Real64 BeamDivVertFaceIncIn = state.dataEnvrn->BeamSolarRad * CosIncAngVertProj *
-                                                                          FrameDivider(FrDivNum).VertDividers *
+                                                                          state.dataSurface->FrameDivider(FrDivNum).VertDividers *
                                                                           DivProjIn * (state.dataSurface->Surface(SurfNum).Height -
-                                                                                       FrameDivider(
+                                                                                       state.dataSurface->FrameDivider(
                                                                                                FrDivNum).HorDividers *
                                                                                        DivWidth) * FracSunLit /
                                                                           DivArea;
@@ -3590,7 +3590,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                     state.dataHeatBal->TMULT(radEnclosureNum);
                         if (ShadeFlag == IntBlindOn) {
                             Real64 EffBlEmiss = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum),
-                                                       SurfaceWindow(SurfNum).EffShBlindEmiss); // Blind emissivity (thermal absorptance) as part of glazing system
+                                                       state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss); // Blind emissivity (thermal absorptance) as part of glazing system
                             state.dataSurface->SurfWinIntLWAbsByShade(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * EffBlEmiss * state.dataHeatBal->TMULT(radEnclosureNum);
                         }
                         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn ||
@@ -3883,9 +3883,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 int ShadeFlag = state.dataSurface->SurfWinShadingFlag(SurfNum);
                 if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn)
                     state.dataHeatBal->ITABSF(SurfNum) = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum),
-                                                    SurfaceWindow(SurfNum).EffShBlindEmiss) +
+                                                    state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss) +
                                       InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum),
-                                                    SurfaceWindow(SurfNum).EffGlassEmiss);
+                                                    state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss);
                     // For shades, following interpolation just returns value of first element in array
             }
         }
@@ -3924,14 +3924,14 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             // Shade or blind IR transmittance
                             Real64 TauShIR = state.dataMaterial->Material(MatNumSh).TransThermal;
                             // Effective emissivity of shade or blind
-                            Real64 EffShDevEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                            Real64 EffShDevEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                             if (ShadeFlag == IntBlindOn) {
                                 TauShIR = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum),
                                                         state.dataSurface->SurfWinMovableSlats(SurfNum),
                                                         state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(SurfNum)).IRBackTrans);
                                 EffShDevEmiss = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum),
                                                               state.dataSurface->SurfWinMovableSlats(SurfNum),
-                                                              SurfaceWindow(SurfNum).EffShBlindEmiss);
+                                                              state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss);
                             }
                             SUM1 += state.dataSurface->SurfWinDividerArea(SurfNum) * (EffShDevEmiss + DividerThermAbs * TauShIR);
                         } else {

@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     state->dataGlobal->TimeStep = 1;
     state->dataSurface->TotSurfaces = 3;
     state->dataBSDFWindow->MaxBkSurf = 3;
-    SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->SunlitFracHR.allocate(24, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SunlitFrac.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
     state->dataHeatBal->SunlitFracWithoutReveal.allocate(NumTimeSteps, 24, state->dataSurface->TotSurfaces);
@@ -107,8 +107,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
-            SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
-            SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
+            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
+            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
         }
     }
 
@@ -117,8 +117,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
-            EXPECT_EQ(1.0, SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-            EXPECT_EQ(1.0, SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
+            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
         }
     }
 
@@ -126,8 +126,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Re-initialize to new values
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
-            SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
-            SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
+            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
+            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
         }
     }
 
@@ -138,17 +138,17 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
             if (Hour == state->dataGlobal->HourOfDay) {
-                EXPECT_EQ(1.0, SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-                EXPECT_EQ(1.0, SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
+                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
             } else {
-                EXPECT_EQ(555.0, SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-                EXPECT_EQ(444.0, SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+                EXPECT_EQ(555.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
+                EXPECT_EQ(444.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
             }
         }
     }
 
     // Clean up
-    SurfaceWindow.deallocate();
+    state->dataSurface->SurfaceWindow.deallocate();
     state->dataHeatBal->SunlitFracHR.deallocate();
     state->dataHeatBal->SunlitFrac.deallocate();
     state->dataHeatBal->SunlitFracWithoutReveal.deallocate();

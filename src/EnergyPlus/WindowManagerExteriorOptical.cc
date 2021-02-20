@@ -243,15 +243,15 @@ namespace WindowManager {
                         auto TauShIR = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
                         auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
                         auto TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
                         auto EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
