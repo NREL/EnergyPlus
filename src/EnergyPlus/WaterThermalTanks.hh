@@ -897,6 +897,8 @@ namespace WaterThermalTanks {
 
     void SetTankVolume(EnergyPlusData &state, std::string sType, std::string sName, const Real64 dVolume); 
 
+    bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumber);
+
 } // namespace WaterThermalTanks
 
     struct WaterThermalTanksData : BaseGlobalStruct {
