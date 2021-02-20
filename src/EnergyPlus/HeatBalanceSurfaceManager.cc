@@ -5270,8 +5270,6 @@ namespace HeatBalanceSurfaceManager {
 
         ReportSurfaceShading(state);
 
-        // TODO: ZONE SURFACE LOOP
-
         // update inside face radiation reports
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Real64 const surfaceArea(Surface(SurfNum).Area);
@@ -5326,10 +5324,6 @@ namespace HeatBalanceSurfaceManager {
             int const firstSurfOpaq = Zone(ZoneNum).NonWindowSurfaceFirst;
             int const lastSurfOpaq = Zone(ZoneNum).NonWindowSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-//            if (Surface(SurfNum).Class == SurfaceClass::Floor || Surface(SurfNum).Class == SurfaceClass::Wall ||
-//                Surface(SurfNum).Class == SurfaceClass::IntMass || Surface(SurfNum).Class == SurfaceClass::Roof ||
-//                Surface(SurfNum).Class == SurfaceClass::Door) {
-
                 // inside face conduction updates
                 SurfOpaqInsFaceConductionEnergy(SurfNum) = SurfOpaqInsFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 ZoneOpaqSurfInsFaceCond(ZoneNum) += SurfOpaqInsFaceConduction(SurfNum);
@@ -7492,10 +7486,8 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
 
-                // TODO: loop over all HT surface except TDD Dome.
-//                int const lastSurf = Zone(zoneNum).NonDomeLast;
                 int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-                int const lastSurf = Zone(zoneNum).SurfaceLast;
+                int const lastSurf = Zone(zoneNum).NonDomeLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     auto &surface(Surface(surfNum));
                     auto &zone(Zone(zoneNum));
@@ -7503,7 +7495,6 @@ namespace HeatBalanceSurfaceManager {
                     Real64 &TH12(TH(2, 1, surfNum));
                     TH12 = TempSurfInRep(surfNum) = TempSurfIn(surfNum);
                     SurfTempOut(surfNum) = TH11; // For reporting
-                    if (SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Dome) continue;
                     if (SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         // Tubular daylighting devices are treated as one big object with an effective R value.
                         // The outside face temperature of the TDD:DOME and the inside face temperature of the

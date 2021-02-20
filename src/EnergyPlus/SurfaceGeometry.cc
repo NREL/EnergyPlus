@@ -2166,7 +2166,6 @@ namespace SurfaceGeometry {
         // Also set associated surfaces for Kiva foundations and build heat transfer surface lists
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             Surface(SurfNum).ShadowSurfPossibleObstruction = false;
-//            if (Surface(SurfNum).HeatTransSurf && Surface(SurfNum).Class != DataSurfaces::SurfaceClass::TDD_Dome) {
             if (Surface(SurfNum).HeatTransSurf) {
                 DataSurfaces::AllHTSurfaceList.push_back(SurfNum);
                 int const zoneNum(Surface(SurfNum).Zone);
