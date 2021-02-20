@@ -271,6 +271,7 @@ namespace AirflowNetwork {
         int OpenFactorErrIndex;      // Large opening error error index at Open factor > 1.0
         std::string InitType;        // Initialization flag type:
         bool TExtHeightDep;          // Choice of height dependence of external node temperature
+        bool AllowSupportZoneEqp;    // Allow unsupported zone equipment
         // "ZeroNodePressures", or "LinearInitializationMethod"
 
         // Default Constructor

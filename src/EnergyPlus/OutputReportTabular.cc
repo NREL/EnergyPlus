@@ -76,6 +76,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -5107,7 +5108,8 @@ namespace EnergyPlus::OutputReportTabular {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2003
-        //       MODIFIED       na
+        //       MODIFIED       January 2021, J. Yuan 
+        //                      Modified to accommodate dual-unit reporting
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -5119,7 +5121,14 @@ namespace EnergyPlus::OutputReportTabular {
         FillRemainingPredefinedEntries(state);
         auto &ort(state.dataOutRptTab);
 
+        // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc) 
+        // when ort->unitsStyle inputs should have been concretely processed and assigned.
+        if (ort->unitsStyle_SQLite == iUnitsStyle::NotFound) {
+            ort->unitsStyle_SQLite = ort->unitsStyle; // This is the default UseOutputControlTableStyles
+        }
+
         if (ort->WriteTabularFiles) {
+
             // call each type of report in turn
             WriteBEPSTable(state);
             WriteTableOfContents(state);
@@ -5166,6 +5175,42 @@ namespace EnergyPlus::OutputReportTabular {
         print(state.files.audit, variable_fmt, "numTableEntry", state.dataOutRptPredefined->numTableEntry);
         print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", state.dataOutRptPredefined->sizeCompSizeTableEntry);
         print(state.files.audit, variable_fmt, "numCompSizeTableEntry", state.dataOutRptPredefined->numCompSizeTableEntry);
+    }
+
+    bool produceDualUnitsFlags(const int& iUnit_Sys, const iUnitsStyle& unitsStyle_Tab, const iUnitsStyle& unitsStyle_Sql, 
+        iUnitsStyle& unitsStyle_Cur, bool& produce_Tab, bool& produce_Sql)
+    {
+        // January 2021:
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine sets the order and flags for tabular data and sqlite writing for a Dual-Unit reporting. 
+        // It will set the unit styles to used, a flag for tabular data writing, and a flag for sqlite writing.
+        // The function will return a false flag if only a second round of (SQLite) writing is needed 
+        // and will return a true flag if a second round SQLite writing is not needed.
+
+        bool brkflag(false);
+
+        if (iUnit_Sys == 0) {
+            unitsStyle_Cur = unitsStyle_Tab;
+            produce_Tab = true;
+            if (unitsStyle_Sql == unitsStyle_Tab) {
+                produce_Sql = true;
+            } else {
+                produce_Sql = false;
+            }
+        } else { // iUnit_Sys == 1 
+            unitsStyle_Cur = unitsStyle_Sql;
+            produce_Tab = false;
+            produce_Sql = true;
+            if (unitsStyle_Sql == unitsStyle_Tab) {
+                //flag true if a separate SQLite round writing is not needed
+                brkflag = true;
+                produce_Sql = false;
+            }
+        }
+
+        // False if a separate sqlite round is needed;
+        // true if not
+        return brkflag;
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -5942,56 +5987,124 @@ namespace EnergyPlus::OutputReportTabular {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchExLtConsump, "Exterior Lighting Total", consumptionTotal);
 
         // outside air ventilation
+        Real64 totalOccupants = 0.;
+        Real64 totalAverageOccupants = 0.;
+        Real64 totalArea = 0.;
+        Real64 totalVozMin = 0;
+        Real64 totalMechVentVol = 0;
+        Real64 totalNatVentVol = 0;
+        Real64 totalInfilVol = 0;
+        Real64 totalVozDyn = 0;
+        Real64 totalMechVentRateOcc = 0;
+        Real64 totalNatVentRateOcc = 0;
+        Real64 totalInfilRateOcc = 0;
+        Real64 totalVozDynOcc = 0;
+
+        // Outdoor Air Summary and Outdoor Air Details
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+            int const zoneMult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
-                if (Zone(iZone).isNominalOccupied) {
-                    // occupants
-                    if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
-                        PreDefTableEntry(state,
-                            state.dataOutRptPredefined->pdchOaoAvgNumOcc1, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
-                        PreDefTableEntry(state,
-                            state.dataOutRptPredefined->pdchOaoAvgNumOcc2, Zone(iZone).Name, ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime);
+
+                // AFN infiltration -- check that afn sim is being done.
+                if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
+                    AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
+                    ZonePreDefRep(iZone).AFNInfilVolTotalStdDen = 0.0;
+                    ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
+                    ZonePreDefRep(iZone).AFNInfilVolTotalOcc = 0.0;
+                }
+
+                // air loop name
+                std::string airLoopName = "";
+                int ctrlZoneNum = DataHeatBalance::Zone(iZone).ZoneEqNum;
+                if (ctrlZoneNum > 0) {
+                    for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).NumInletNodes; ++zoneInNode) {
+                        int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(ctrlZoneNum).InletNodeAirLoopNum(zoneInNode);
+                        if (airLoopNumber > 0) {
+                            if (airLoopName.empty()) {
+                                airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
+                            }
+                            else {
+                                airLoopName += "; " + state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
+                            }
+                        }
                     }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAirLpNm, Zone(iZone).Name, airLoopName);
+
+                    // occupants
+                    if (Zone(iZone).isNominalOccupied) {
+                        if (ZonePreDefRep(iZone).NumOccAccumTime > 0) {
+                            Real64 const avgOcc = ZonePreDefRep(iZone).NumOccAccum / ZonePreDefRep(iZone).NumOccAccumTime;
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgNumOcc1, Zone(iZone).Name, avgOcc);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgNumOcc2, Zone(iZone).Name, avgOcc);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAvgNumOcc, Zone(iZone).Name, avgOcc);
+                            totalAverageOccupants += avgOcc * zoneMult;
+                        }
+                    }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvNomNumOcc, Zone(iZone).Name, Zone(iZone).TotOccupants);
+                    totalOccupants += Zone(iZone).TotOccupants * zoneMult;
+
+                    // Zone volume and area
+
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol1, Zone(iZone).Name, Zone(iZone).Volume);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol2, Zone(iZone).Name, Zone(iZone).Volume);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, Zone(iZone).Name, Zone(iZone).Volume);
+                    totalVolume += Zone(iZone).Volume * zoneMult;
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, Zone(iZone).Name, Zone(iZone).FloorArea);
+                    totalArea += Zone(iZone).FloorArea * zoneMult;
+
+                    // minimum dynamic target ventilation Voz-dyn-min
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvMinDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozMin, 3);
+                    totalVozMin += ZonePreDefRep(iZone).VozMin * zoneMult;
+
                     // Mechanical ventilation
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgMechVent,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).MechVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
-                                                                                  Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
-                                         3);
+                            Zone(iZone).Name,
+                            ZonePreDefRep(iZone).MechVentVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume *
+                                Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                            3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinMechVent,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).MechVentVolMin /
-                                             (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
-                                         3);
+                            Zone(iZone).Name,
+                            ZonePreDefRep(iZone).MechVentVolMin /
+                            (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
+                            3);
                     }
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotalStdDen, 0);
+                    totalMechVentVol += ZonePreDefRep(iZone).MechVentVolTotalStdDen * zoneMult;
+
+                    // Natural ventilation
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchOaTaBzNatVent,
+                                     Zone(iZone).Name,
+                                     ZonePreDefRep(iZone).SimpVentVolTotalStdDen + ZonePreDefRep(iZone).AFNVentVolTotalStdDen,
+                                     0);
+                    totalNatVentVol += (ZonePreDefRep(iZone).SimpVentVolTotalStdDen + ZonePreDefRep(iZone).AFNVentVolTotalStdDen) * zoneMult;
+
+                    // Total ventilation 
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchOaTaBzTotVent,
+                                     Zone(iZone).Name,
+                                     ZonePreDefRep(iZone).MechVentVolTotalStdDen + ZonePreDefRep(iZone).SimpVentVolTotalStdDen +
+                                         ZonePreDefRep(iZone).AFNVentVolTotalStdDen,
+                                     0);
+
                     // infiltration
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgInfil,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).InfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                         3);
+                            Zone(iZone).Name,
+                            ZonePreDefRep(iZone).InfilVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
+                            3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolMin / (Zone(iZone).Volume), 3);
                     }
-                    // AFN infiltration -- check that afn sim is being done.
-                    if (AirflowNetwork::SimulateAirflowNetwork < AirflowNetwork::AirflowNetworkControlMultizone) {
-                        ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
-                        ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
-                        if (!(AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
-                              AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS)) {
-                            ZonePreDefRep(iZone).AFNInfilVolMin = 0.0;
-                            ZonePreDefRep(iZone).AFNInfilVolTotal = 0.0;
-                        }
-                    }
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgAFNInfil,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).AFNInfilVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                         3);
+                            Zone(iZone).Name,
+                            ZonePreDefRep(iZone).AFNInfilVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
+                            3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinAFNInfil, Zone(iZone).Name, ZonePreDefRep(iZone).AFNInfilVolMin / (Zone(iZone).Volume), 3);
@@ -5999,21 +6112,199 @@ namespace EnergyPlus::OutputReportTabular {
                     // simple 'ZoneVentilation'
                     if (Zone(iZone).Volume > 0 && ZonePreDefRep(iZone).TotTimeOcc > 0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoAvgSimpVent,
-                                         Zone(iZone).Name,
-                                         ZonePreDefRep(iZone).SimpVentVolTotal / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
-                                         3);
+                            Zone(iZone).Name,
+                            ZonePreDefRep(iZone).SimpVentVolTotalOcc / (ZonePreDefRep(iZone).TotTimeOcc * Zone(iZone).Volume),
+                            3);
                     }
                     if ((Zone(iZone).Volume > 0) && (ZonePreDefRep(iZone).TotTimeOcc > 0)) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
 
-                    // Zone volume
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol1, Zone(iZone).Name, Zone(iZone).Volume);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoZoneVol2, Zone(iZone).Name, Zone(iZone).Volume);
-                    totalVolume += Zone(iZone).Volume;
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen, 0);
+                    totalInfilVol += ZonePreDefRep(iZone).InfilVolTotalStdDen * zoneMult;
+
+                    // Total ventilation and infiltration
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchOaTaBzTotVentInfil,
+                                     Zone(iZone).Name,
+                                     ZonePreDefRep(iZone).MechVentVolTotalStdDen + ZonePreDefRep(iZone).SimpVentVolTotalStdDen +
+                                         ZonePreDefRep(iZone).AFNInfilVolTotalStdDen + ZonePreDefRep(iZone).InfilVolTotalStdDen,
+                                     0);
+
+                    // Dynamic target ventilation Voz-dyn
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal, 0);
+                    totalVozDyn += ZonePreDefRep(iZone).VozTargetTotal * zoneMult;
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc, 0);
+
+                    if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
+                        Real64 totTimeOccSec = ZonePreDefRep(iZone).TotTimeOcc * SecInHour;
+                        // Mechanical ventilation
+                        Real64 mechVent = ZonePreDefRep(iZone).MechVentVolTotalOccStdDen / totTimeOccSec;
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, Zone(iZone).Name, mechVent, 4);
+                        totalMechVentRateOcc += mechVent * zoneMult;
+
+                        // Natural ventilation
+                        Real64 natVent = (ZonePreDefRep(iZone).SimpVentVolTotalOccStdDen + ZonePreDefRep(iZone).AFNVentVolTotalOccStdDen) / totTimeOccSec;
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, Zone(iZone).Name, natVent);
+                        totalNatVentRateOcc += natVent * zoneMult;
+
+                        // Total ventilation
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, Zone(iZone).Name, mechVent + natVent, 4);
+
+                        // infiltration
+                        Real64 infil = (ZonePreDefRep(iZone).InfilVolTotalOccStdDen+ ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen) / totTimeOccSec;
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, Zone(iZone).Name, infil, 4);
+                        totalInfilRateOcc += infil * zoneMult;
+
+                        // Total ventilation and infiltration
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVentInfil, Zone(iZone).Name, mechVent + natVent + infil, 4);
+
+                        // Dynamic target ventilation Voz-dyn
+                        Real64 avgVoz = ZonePreDefRep(iZone).VozTargetTotalOcc / totTimeOccSec;
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, Zone(iZone).Name, avgVoz, 4);
+                        totalVozDynOcc += avgVoz * zoneMult;
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc, 0);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc, 0);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc, 0);
+                    }
                 }
             }
         }
+
+        for (int iSys = 1; iSys <= DataHVACGlobals::NumPrimaryAirSys; ++iSys) {
+            // Total Outdoor Air by Airloop
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlMechVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlNatVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTotVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotal + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlSumDynTrgVent,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVoz,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmBelow,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmAt,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmAbove,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotal,
+                0);
+            PreDefTableEntry(state,
+                state.dataOutRptPredefined->pdchOaTaAlTmAboveUnocc,
+                state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal,
+                0);
+            // Average Outdoor Air During Occupancy by Airloop
+            if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlMechVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc /
+                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlNatVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc /
+                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 4);
+                PreDefTableEntry(
+                    state,
+                    state.dataOutRptPredefined->pdchOaOccAlTotVent,
+                    state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                    (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
+                        state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                    4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc /
+                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 4);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlTmBelow,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeBelowVozDynTotalOcc,
+                                 0);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlTmAt,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAtVozDynTotalOcc,
+                                 0);
+                PreDefTableEntry(state,
+                                 state.dataOutRptPredefined->pdchOaOccAlTmAbove,
+                                 state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeAboveVozDynTotalOcc,
+                                 0);
+            }
+        }
+        // add total rows for outdoor air details
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaMvDesZnOa, "Total Facility", state.dataOutRptPredefined->TotalVozMax, 4);
+
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneVol, "Total Facility", totalVolume);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvZoneArea, "Total Facility", totalArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvNomNumOcc, "Total Facility", totalOccupants);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAvgNumOcc, "Total Facility", totalAverageOccupants);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvMinDynTrgVent, "Total Facility", totalVozMin, 3);
+
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total Facility", totalMechVentVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total Facility", totalNatVentVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
+
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total Facility", totalMechVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total Facility", totalNatVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzTotVent, "Total Facility", totalMechVentRateOcc + totalNatVentRateOcc, 4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzInfil, "Total Facility", totalInfilRateOcc, 4);
+        PreDefTableEntry(state,
+                         state.dataOutRptPredefined->pdchOaOccBzTotVentInfil,
+                         "Total Facility",
+                         totalMechVentRateOcc + totalNatVentRateOcc + totalInfilRateOcc,
+                         4);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, "Total Facility", totalVozDynOcc, 4);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
+        PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
@@ -6230,6 +6521,8 @@ namespace EnergyPlus::OutputReportTabular {
         //       DATE WRITTEN   August 2003
         //       MODIFIED       January 2010, Kyle Benne
         //                      Added SQLite output
+        //                      January 2021, J. Yuan
+        //                      Modified to accommodate dual-unit reporting
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -6311,303 +6604,327 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        // set the unit conversion
-        if (ort->unitsStyle == iUnitsStyle::None) {
-            energyUnitsString = "J";
-            energyUnitsConversionFactor = 1.0;
-        } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
-            energyUnitsString = "kWh";
-            energyUnitsConversionFactor = 1.0 / 3600000.0;
-        } else if (ort->unitsStyle == iUnitsStyle::JtoMJ) {
-            energyUnitsString = "MJ";
-            energyUnitsConversionFactor = 1.0 / 1000000.0;
-        } else if (ort->unitsStyle == iUnitsStyle::JtoGJ) {
-            energyUnitsString = "GJ";
-            energyUnitsConversionFactor = 1.0 / 1000000000.0;
-        } else { // Should never happen but assures compilers of initialization
-            energyUnitsString = "J";
-            energyUnitsConversionFactor = 1.0;
-        }
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-        // loop through each input to get the name of the tables
-        for (iInput = 1; iInput <= ort->MonthlyInputCount; ++iInput) {
-            // loop through each report and
-            digitsShown = ort->MonthlyInput(iInput).showDigits;
-            for (jTable = 1; jTable <= ort->MonthlyInput(iInput).numTables; ++jTable) {
-                curTable = jTable + ort->MonthlyInput(iInput).firstTable - 1;
-                // first loop through and count how many 'columns' are defined
-                // since max and min actually define two columns (the value
-                // and the timestamp).
-                columnUsedCount = 0;
-                for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
-                        if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::ValueWhenMaxMin) ||
-                            (SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
-                            (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
-                            (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative) ||
-                            (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
-                            ++columnUsedCount;
-                        } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
-                                   (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) || (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
-                            columnUsedCount += 2;
+            // set the unit conversion
+            if (unitsStyle_cur == iUnitsStyle::None) {
+                energyUnitsString = "J";
+                energyUnitsConversionFactor = 1.0;
+            } else if (unitsStyle_cur == iUnitsStyle::JtoKWH) {
+                energyUnitsString = "kWh";
+                energyUnitsConversionFactor = 1.0 / 3600000.0;
+            } else if (unitsStyle_cur == iUnitsStyle::JtoMJ) {
+                energyUnitsString = "MJ";
+                energyUnitsConversionFactor = 1.0 / 1000000.0;
+            } else if (unitsStyle_cur == iUnitsStyle::JtoGJ) {
+                energyUnitsString = "GJ";
+                energyUnitsConversionFactor = 1.0 / 1000000000.0;
+            } else { // Should never happen but assures compilers of initialization
+                energyUnitsString = "J";
+                energyUnitsConversionFactor = 1.0;
+            }
+
+            // loop through each input to get the name of the tables
+            for (iInput = 1; iInput <= ort->MonthlyInputCount; ++iInput) {
+                // loop through each report and
+                digitsShown = ort->MonthlyInput(iInput).showDigits;
+                for (jTable = 1; jTable <= ort->MonthlyInput(iInput).numTables; ++jTable) {
+                    curTable = jTable + ort->MonthlyInput(iInput).firstTable - 1;
+                    // first loop through and count how many 'columns' are defined
+                    // since max and min actually define two columns (the value
+                    // and the timestamp).
+                    columnUsedCount = 0;
+                    for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
+                        curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
+                        {
+                            auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
+                            if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::ValueWhenMaxMin) ||
+                                (SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
+                                (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
+                                (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative) ||
+                                (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
+                                ++columnUsedCount;
+                            } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
+                                       (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) ||
+                                       (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
+                                columnUsedCount += 2;
+                            }
                         }
-                    }
-                } // jColumn
-                columnHead.allocate(columnUsedCount);
-                columnWidth.dimension(columnUsedCount, 14); // array assignment - same for all columns
-                tableBody.allocate(columnUsedCount, 16);
-                tableBody = ""; // set entire table to blank as default
-                columnRecount = 0;
-                for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
-                    curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
-                    curAggString = aggString.at(ort->MonthlyColumns(curCol).aggType);
-                    if (len(curAggString) > 0) {
-                        curAggString = " {" + stripped(curAggString) + '}';
-                    }
-                    // do the unit conversions
-                    if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
-                        LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
-                        GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
-                    } else { // just do the Joule conversion
-                        // if units is in Joules, convert if specified
-                        if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
-                            curUnits = energyUnitsString;
-                            curConversionFactor = energyUnitsConversionFactor;
-                            curConversionOffset = 0.0;
-                        } else { // if not joules don't perform conversion
-                            curUnits = unitEnumToString(ort->MonthlyColumns(curCol).units);
-                            curConversionFactor = 1.0;
-                            curConversionOffset = 0.0;
+                    } // jColumn
+                    columnHead.allocate(columnUsedCount);
+                    columnWidth.dimension(columnUsedCount, 14); // array assignment - same for all columns
+                    tableBody.allocate(columnUsedCount, 16);
+                    tableBody = ""; // set entire table to blank as default
+                    columnRecount = 0;
+                    for (kColumn = 1; kColumn <= ort->MonthlyTables(curTable).numColumns; ++kColumn) {
+                        curCol = kColumn + ort->MonthlyTables(curTable).firstColumn - 1;
+                        curAggString = aggString.at(ort->MonthlyColumns(curCol).aggType);
+                        if (len(curAggString) > 0) {
+                            curAggString = " {" + stripped(curAggString) + '}';
                         }
-                    }
-                    {
-                        auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
-                        if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
-                            ++columnRecount;
-                            // put in the name of the variable for the column
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            sumVal = 0.0;
-                            sumDuration = 0.0;
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (ort->MonthlyColumns(curCol).avgSum ==
-                                    OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                    if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
-                                        curVal =
-                                            ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) * curConversionFactor) +
-                                            curConversionOffset;
+                        // do the unit conversions
+                        if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                            varNameWithUnits = ort->MonthlyColumns(curCol).varName + unitEnumToStringBrackets(ort->MonthlyColumns(curCol).units);
+                            LookupSItoIP(state, varNameWithUnits, indexUnitConv, curUnits);
+                            GetUnitConversion(state, indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
+                        } else { // just do the Joule conversion
+                            // if units is in Joules, convert if specified
+                            if (UtilityRoutines::SameString(unitEnumToString(ort->MonthlyColumns(curCol).units), "J")) {
+                                curUnits = energyUnitsString;
+                                curConversionFactor = energyUnitsConversionFactor;
+                                curConversionOffset = 0.0;
+                            } else { // if not joules don't perform conversion
+                                curUnits = unitEnumToString(ort->MonthlyColumns(curCol).units);
+                                curConversionFactor = 1.0;
+                                curConversionOffset = 0.0;
+                            }
+                        }
+                        {
+                            auto const SELECT_CASE_var(ort->MonthlyColumns(curCol).aggType);
+                            if ((SELECT_CASE_var == iAggType::SumOrAvg) || (SELECT_CASE_var == iAggType::SumOrAverageHoursShown)) {
+                                ++columnRecount;
+                                // put in the name of the variable for the column
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                                sumVal = 0.0;
+                                sumDuration = 0.0;
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    if (ort->MonthlyColumns(curCol).avgSum ==
+                                        OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                                        if (ort->MonthlyColumns(curCol).duration(lMonth) != 0) {
+                                            curVal = ((ort->MonthlyColumns(curCol).reslt(lMonth) / ort->MonthlyColumns(curCol).duration(lMonth)) *
+                                                      curConversionFactor) +
+                                                     curConversionOffset;
+                                        } else {
+                                            curVal = 0.0;
+                                        }
+                                        sumVal += (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                        sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
                                     } else {
-                                        curVal = 0.0;
+                                        curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
+                                        sumVal += curVal;
                                     }
-                                    sumVal += (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
-                                    sumDuration += ort->MonthlyColumns(curCol).duration(lMonth);
-                                } else {
-                                    curVal = (ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor) + curConversionOffset;
-                                    sumVal += curVal;
-                                }
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            if (ort->MonthlyColumns(curCol).avgSum ==
-                                OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
-                                if (sumDuration > 0) {
-                                    tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
-                                } else {
-                                    tableBody(columnRecount, 14) = "";
-                                }
-                            } else {
-                                tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
-                            }
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if ((SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
-                                   (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
-                                   (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative)) {
-
-                            ++columnRecount;
-                            // put in the name of the variable for the column
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
-                            sumVal = 0.0;
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    sumVal += curVal;
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
-                            ++columnRecount;
-                            if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
-                                curUnits += "/s";
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "J/s")) {
-                                curUnits = "W";
-                            }
-                            // CR7783 fix
-                            if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
-                                curUnits = "W";
-                                curConversionFactor *= 3600000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "therm/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 360000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 3600.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
-                                curUnits = "ton";
-                                curConversionFactor *= 3600.0;
-                            }
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
-                                    if (curVal > maxVal) maxVal = curVal;
-                                    if (curVal < minVal) minVal = curVal;
-                                } else {
-                                    tableBody(columnRecount, lMonth) = "-";
-                                }
-                            } // lMonth
-                            // add the summary to bottom
-                            if (minVal != storedMaxVal) {
-                                tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
-                            }
-                            if (maxVal != storedMinVal) {
-                                tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
-                            }
-                        } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
-                                   (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) || (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
-                            columnRecount += 2;
-                            // put in the name of the variable for the column
-                            if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                curUnits += "/s";
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "J/s")) {
-                                curUnits = "W";
-                            }
-                            // CR7783 fix
-                            if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
-                                curUnits = "W";
-                                curConversionFactor *= 3600000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
-                                curUnits = "kW";
-                                curConversionFactor *= 1000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "therm/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 360000.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
-                                curUnits = "kBtu/h";
-                                curConversionFactor *= 3600.0;
-                            }
-                            if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
-                                curUnits = "ton";
-                                curConversionFactor *= 3600.0;
-                            }
-                            columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
-                            columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
-                            minVal = storedMaxVal;
-                            maxVal = storedMinVal;
-                            for (lMonth = 1; lMonth <= 12; ++lMonth) {
-                                if (ort->IsMonthGathered(lMonth)) {
-                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
-                                    // CR7788 the conversion factors were causing an overflow for the InchPound case since the
-                                    // value was very small
-                                    // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
-                                    if ((curVal < veryLarge) && (curVal > verySmall)) {
-                                        curVal = curVal * curConversionFactor + curConversionOffset;
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
                                         if (curVal > maxVal) maxVal = curVal;
                                         if (curVal < minVal) minVal = curVal;
-                                        if (curVal < veryLarge && curVal > verySmall) {
-                                            tableBody(columnRecount - 1, lMonth) = RealToStr(curVal, digitsShown);
+                                    } else {
+                                        tableBody(columnRecount, lMonth) = "-";
+                                    }
+                                } // lMonth
+                                // add the summary to bottom
+                                if (ort->MonthlyColumns(curCol).avgSum ==
+                                    OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                                    if (sumDuration > 0) {
+                                        tableBody(columnRecount, 14) = RealToStr(sumVal / sumDuration, digitsShown);
+                                    } else {
+                                        tableBody(columnRecount, 14) = "";
+                                    }
+                                } else {
+                                    tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
+                                }
+                                if (minVal != storedMaxVal) {
+                                    tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                                }
+                                if (maxVal != storedMinVal) {
+                                    tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                                }
+                            } else if ((SELECT_CASE_var == iAggType::HoursZero) || (SELECT_CASE_var == iAggType::HoursNonZero) ||
+                                       (SELECT_CASE_var == iAggType::HoursPositive) || (SELECT_CASE_var == iAggType::HoursNonPositive) ||
+                                       (SELECT_CASE_var == iAggType::HoursNegative) || (SELECT_CASE_var == iAggType::HoursNonNegative)) {
+
+                                ++columnRecount;
+                                // put in the name of the variable for the column
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [HOURS]";
+                                sumVal = 0.0;
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                        sumVal += curVal;
+                                        if (curVal > maxVal) maxVal = curVal;
+                                        if (curVal < minVal) minVal = curVal;
+                                    } else {
+                                        tableBody(columnRecount, lMonth) = "-";
+                                    }
+                                } // lMonth
+                                // add the summary to bottom
+                                tableBody(columnRecount, 14) = RealToStr(sumVal, digitsShown);
+                                if (minVal != storedMaxVal) {
+                                    tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                                }
+                                if (maxVal != storedMinVal) {
+                                    tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                                }
+                            } else if (SELECT_CASE_var == iAggType::ValueWhenMaxMin) {
+                                ++columnRecount;
+                                if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) {
+                                    curUnits += "/s";
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                                    curUnits = "W";
+                                }
+                                // CR7783 fix
+                                if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                                    curUnits = "W";
+                                    curConversionFactor *= 3600000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 360000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                                    curUnits = "ton";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + curAggString + " [" + curUnits + ']';
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    curVal = ort->MonthlyColumns(curCol).reslt(lMonth) * curConversionFactor + curConversionOffset;
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        tableBody(columnRecount, lMonth) = RealToStr(curVal, digitsShown);
+                                        if (curVal > maxVal) maxVal = curVal;
+                                        if (curVal < minVal) minVal = curVal;
+                                    } else {
+                                        tableBody(columnRecount, lMonth) = "-";
+                                    }
+                                } // lMonth
+                                // add the summary to bottom
+                                if (minVal != storedMaxVal) {
+                                    tableBody(columnRecount, 15) = RealToStr(minVal, digitsShown);
+                                }
+                                if (maxVal != storedMinVal) {
+                                    tableBody(columnRecount, 16) = RealToStr(maxVal, digitsShown);
+                                }
+                            } else if ((SELECT_CASE_var == iAggType::Maximum) || (SELECT_CASE_var == iAggType::Minimum) ||
+                                       (SELECT_CASE_var == iAggType::MaximumDuringHoursShown) ||
+                                       (SELECT_CASE_var == iAggType::MinimumDuringHoursShown)) {
+                                columnRecount += 2;
+                                // put in the name of the variable for the column
+                                if (ort->MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    curUnits += "/s";
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "J/s")) {
+                                    curUnits = "W";
+                                }
+                                // CR7783 fix
+                                if (UtilityRoutines::SameString(curUnits, "kWh/s")) {
+                                    curUnits = "W";
+                                    curConversionFactor *= 3600000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "GJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "MJ/s")) {
+                                    curUnits = "kW";
+                                    curConversionFactor *= 1000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "therm/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 360000.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "kBtu/s")) {
+                                    curUnits = "kBtu/h";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                if (UtilityRoutines::SameString(curUnits, "ton-hrs/s")) {
+                                    curUnits = "ton";
+                                    curConversionFactor *= 3600.0;
+                                }
+                                columnHead(columnRecount - 1) = ort->MonthlyColumns(curCol).varName + curAggString + '[' + curUnits + ']';
+                                columnHead(columnRecount) = ort->MonthlyColumns(curCol).varName + " {TIMESTAMP} ";
+                                minVal = storedMaxVal;
+                                maxVal = storedMinVal;
+                                for (lMonth = 1; lMonth <= 12; ++lMonth) {
+                                    if (ort->IsMonthGathered(lMonth)) {
+                                        curVal = ort->MonthlyColumns(curCol).reslt(lMonth);
+                                        // CR7788 the conversion factors were causing an overflow for the InchPound case since the
+                                        // value was very small
+                                        // restructured the following lines to hide showing HUGE and -HUGE values in output table CR8154 Glazer
+                                        if ((curVal < veryLarge) && (curVal > verySmall)) {
+                                            curVal = curVal * curConversionFactor + curConversionOffset;
+                                            if (curVal > maxVal) maxVal = curVal;
+                                            if (curVal < minVal) minVal = curVal;
+                                            if (curVal < veryLarge && curVal > verySmall) {
+                                                tableBody(columnRecount - 1, lMonth) = RealToStr(curVal, digitsShown);
+                                            } else {
+                                                tableBody(columnRecount - 1, lMonth) = "-";
+                                            }
+                                            tableBody(columnRecount, lMonth) = DateToString(ort->MonthlyColumns(curCol).timeStamp(lMonth));
                                         } else {
                                             tableBody(columnRecount - 1, lMonth) = "-";
+                                            tableBody(columnRecount, lMonth) = "-";
                                         }
-                                        tableBody(columnRecount, lMonth) = DateToString(ort->MonthlyColumns(curCol).timeStamp(lMonth));
                                     } else {
                                         tableBody(columnRecount - 1, lMonth) = "-";
                                         tableBody(columnRecount, lMonth) = "-";
                                     }
+                                } // lMonth
+                                // add the summary to bottom
+                                // Don't include if the original min and max values are still present
+                                if (minVal < veryLarge) {
+                                    tableBody(columnRecount - 1, 15) = RealToStr(minVal, digitsShown);
                                 } else {
-                                    tableBody(columnRecount - 1, lMonth) = "-";
-                                    tableBody(columnRecount, lMonth) = "-";
+                                    tableBody(columnRecount - 1, 15) = "-";
                                 }
-                            } // lMonth
-                            // add the summary to bottom
-                            // Don't include if the original min and max values are still present
-                            if (minVal < veryLarge) {
-                                tableBody(columnRecount - 1, 15) = RealToStr(minVal, digitsShown);
-                            } else {
-                                tableBody(columnRecount - 1, 15) = "-";
-                            }
-                            if (maxVal > verySmall) {
-                                tableBody(columnRecount - 1, 16) = RealToStr(maxVal, digitsShown);
-                            } else {
-                                tableBody(columnRecount - 1, 15) = "-";
+                                if (maxVal > verySmall) {
+                                    tableBody(columnRecount - 1, 16) = RealToStr(maxVal, digitsShown);
+                                } else {
+                                    tableBody(columnRecount - 1, 15) = "-";
+                                }
                             }
                         }
+                    } // KColumn
+                    if (produceTabular) {
+                        WriteReportHeaders(
+                            state, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
+                        WriteSubtitle(state, "Custom Monthly Report");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
                     }
-                } // KColumn
-                WriteReportHeaders(state, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, OutputProcessor::StoreType::Averaged);
-                WriteSubtitle(state, "Custom Monthly Report");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose monthly XML tables.
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, ort->MonthlyInput(iInput).name, ort->MonthlyTables(curTable).keyValue, "Custom Monthly Report");
-                }
-            } // jTables
-        }     // iInput
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   ort->MonthlyInput(iInput).name,
+                                                                   ort->MonthlyTables(curTable).keyValue,
+                                                                   "Custom Monthly Report");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        ort->MonthlyInput(iInput).name,
+                                                                                                        ort->MonthlyTables(curTable).keyValue,
+                                                                                                        "Custom Monthly Report");
+                        }
+                    }
+                } // jTables
+            }     // iInput
+        }
     }
 
     void WriteTimeBinTables(EnergyPlusData &state)
@@ -6667,196 +6984,228 @@ namespace EnergyPlus::OutputReportTabular {
 
         auto &ort(state.dataOutRptTab);
 
-        rowHead(1) = "Interval Start";
-        rowHead(2) = "Interval End";
-        rowHead(3) = "January";
-        rowHead(4) = "February";
-        rowHead(5) = "March";
-        rowHead(6) = "April";
-        rowHead(7) = "May";
-        rowHead(8) = "June";
-        rowHead(9) = "July";
-        rowHead(10) = "August";
-        rowHead(11) = "September";
-        rowHead(12) = "October";
-        rowHead(13) = "November";
-        rowHead(14) = "December";
-        rowHead(15) = "12:01 to  1:00 am";
-        rowHead(16) = " 1:01 to  2:00 am";
-        rowHead(17) = " 2:01 to  3:00 am";
-        rowHead(18) = " 3:01 to  4:00 am";
-        rowHead(19) = " 4:01 to  5:00 am";
-        rowHead(20) = " 5:01 to  6:00 am";
-        rowHead(21) = " 6:01 to  7:00 am";
-        rowHead(22) = " 7:01 to  8:00 am";
-        rowHead(23) = " 8:01 to  9:00 am";
-        rowHead(24) = " 9:01 to 10:00 am";
-        rowHead(25) = "10:01 to 11:00 am";
-        rowHead(26) = "11:01 to 12:00 pm";
-        rowHead(27) = "12:01 to  1:00 pm";
-        rowHead(28) = " 1:01 to  2:00 pm";
-        rowHead(29) = " 2:01 to  3:00 pm";
-        rowHead(30) = " 3:01 to  4:00 pm";
-        rowHead(31) = " 4:01 to  5:00 pm";
-        rowHead(32) = " 5:01 to  6:00 pm";
-        rowHead(33) = " 6:01 to  7:00 pm";
-        rowHead(34) = " 7:01 to  8:00 pm";
-        rowHead(35) = " 8:01 to  9:00 pm";
-        rowHead(36) = " 9:01 to 10:00 pm";
-        rowHead(37) = "10:01 to 11:00 pm";
-        rowHead(38) = "11:01 to 12:00 am";
-        rowHead(39) = "Total";
-        for (iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
-            firstReport = ort->OutputTableBinned(iInObj).resIndex;
-            curNameWithSIUnits = ort->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInObj).units);
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
-                curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
-                curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
-            } else {
-                curNameAndUnits = curNameWithSIUnits;
-                curIntervalStart = ort->OutputTableBinned(iInObj).intervalStart;
-                curIntervalSize = ort->OutputTableBinned(iInObj).intervalSize;
-            }
-            curIntervalCount = ort->OutputTableBinned(iInObj).intervalCount;
-            curResIndex = ort->OutputTableBinned(iInObj).resIndex;
-            curNumTables = ort->OutputTableBinned(iInObj).numTables;
-            topValue = curIntervalStart + curIntervalSize * curIntervalCount;
-            if (curIntervalSize < 1) {
-                numIntervalDigits = 4;
-            } else if (curIntervalSize >= 10) {
-                numIntervalDigits = 0;
-            } else {
-                numIntervalDigits = 2;
-            }
-            // make arrays two columns wider for below and above bin range
-            columnHead.allocate(curIntervalCount + 3);
-            columnWidth.allocate(curIntervalCount + 3);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(curIntervalCount + 3, 39);
-            tableBody = "";
-            columnHead = "- [hr]";
-            tableBody(1, 1) = "less than";
-            tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
-            for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                columnHead(nCol + 1) = format("{} [hr]", nCol);
-                // beginning of interval
-                tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
-                // end of interval
-                tableBody(nCol + 1, 2) = RealToStr(curIntervalStart + nCol * curIntervalSize, numIntervalDigits) + '>';
-            }
-            tableBody(curIntervalCount + 2, 1) = "equal to or more than";
-            tableBody(curIntervalCount + 2, 2) = RealToStr(topValue, numIntervalDigits);
-            tableBody(curIntervalCount + 3, 1) = "Row";
-            tableBody(curIntervalCount + 3, 2) = "Total";
-            for (iTable = 1; iTable <= curNumTables; ++iTable) {
-                repIndex = firstReport + (iTable - 1);
-                if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
-                    repNameWithUnitsandscheduleName = curNameAndUnits;
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
+
+            rowHead(1) = "Interval Start";
+            rowHead(2) = "Interval End";
+            rowHead(3) = "January";
+            rowHead(4) = "February";
+            rowHead(5) = "March";
+            rowHead(6) = "April";
+            rowHead(7) = "May";
+            rowHead(8) = "June";
+            rowHead(9) = "July";
+            rowHead(10) = "August";
+            rowHead(11) = "September";
+            rowHead(12) = "October";
+            rowHead(13) = "November";
+            rowHead(14) = "December";
+            rowHead(15) = "12:01 to  1:00 am";
+            rowHead(16) = " 1:01 to  2:00 am";
+            rowHead(17) = " 2:01 to  3:00 am";
+            rowHead(18) = " 3:01 to  4:00 am";
+            rowHead(19) = " 4:01 to  5:00 am";
+            rowHead(20) = " 5:01 to  6:00 am";
+            rowHead(21) = " 6:01 to  7:00 am";
+            rowHead(22) = " 7:01 to  8:00 am";
+            rowHead(23) = " 8:01 to  9:00 am";
+            rowHead(24) = " 9:01 to 10:00 am";
+            rowHead(25) = "10:01 to 11:00 am";
+            rowHead(26) = "11:01 to 12:00 pm";
+            rowHead(27) = "12:01 to  1:00 pm";
+            rowHead(28) = " 1:01 to  2:00 pm";
+            rowHead(29) = " 2:01 to  3:00 pm";
+            rowHead(30) = " 3:01 to  4:00 pm";
+            rowHead(31) = " 4:01 to  5:00 pm";
+            rowHead(32) = " 5:01 to  6:00 pm";
+            rowHead(33) = " 6:01 to  7:00 pm";
+            rowHead(34) = " 7:01 to  8:00 pm";
+            rowHead(35) = " 8:01 to  9:00 pm";
+            rowHead(36) = " 9:01 to 10:00 pm";
+            rowHead(37) = "10:01 to 11:00 pm";
+            rowHead(38) = "11:01 to 12:00 am";
+            rowHead(39) = "Total";
+
+            for (iInObj = 1; iInObj <= ort->OutputTableBinnedCount; ++iInObj) {
+                firstReport = ort->OutputTableBinned(iInObj).resIndex;
+                curNameWithSIUnits = ort->OutputTableBinned(iInObj).varOrMeter + unitEnumToStringBrackets(ort->OutputTableBinned(iInObj).units);
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    curIntervalStart = ConvertIP(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalStart);
+                    curIntervalSize = ConvertIPdelta(state, indexUnitConv, ort->OutputTableBinned(iInObj).intervalSize);
                 } else {
-                    repNameWithUnitsandscheduleName = curNameAndUnits + " [" + ort->OutputTableBinned(iInObj).ScheduleName + ']';
+                    curNameAndUnits = curNameWithSIUnits;
+                    curIntervalStart = ort->OutputTableBinned(iInObj).intervalStart;
+                    curIntervalSize = ort->OutputTableBinned(iInObj).intervalSize;
                 }
-                WriteReportHeaders(state, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, ort->OutputTableBinned(iInObj).avgSum);
-                for (kHour = 1; kHour <= 24; ++kHour) {
-                    tableBody(1, 14 + kHour) = RealToStr(ort->BinResultsBelow(repIndex).hrly(kHour), 2);
-                    tableBody(curIntervalCount + 2, 14 + kHour) = RealToStr(ort->BinResultsAbove(repIndex).hrly(kHour), 2);
-                    rowTotal = ort->BinResultsBelow(repIndex).hrly(kHour) + ort->BinResultsAbove(repIndex).hrly(kHour);
-                    for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                        tableBody(nCol + 1, 14 + kHour) = RealToStr(ort->BinResults(nCol, repIndex).hrly(kHour), 2);
-                        // sum the total for all columns
-                        rowTotal += ort->BinResults(nCol, repIndex).hrly(kHour);
-                    }
-                    tableBody(nCol + 2, 14 + kHour) = RealToStr(rowTotal, 2);
+                curIntervalCount = ort->OutputTableBinned(iInObj).intervalCount;
+                curResIndex = ort->OutputTableBinned(iInObj).resIndex;
+                curNumTables = ort->OutputTableBinned(iInObj).numTables;
+                topValue = curIntervalStart + curIntervalSize * curIntervalCount;
+                if (curIntervalSize < 1) {
+                    numIntervalDigits = 4;
+                } else if (curIntervalSize >= 10) {
+                    numIntervalDigits = 0;
+                } else {
+                    numIntervalDigits = 2;
                 }
-                tableTotal = 0.0;
-                for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    tableBody(1, 2 + kMonth) = RealToStr(ort->BinResultsBelow(repIndex).mnth(kMonth), 2);
-                    tableBody(curIntervalCount + 2, 2 + kMonth) = RealToStr(ort->BinResultsAbove(repIndex).mnth(kMonth), 2);
-                    rowTotal = ort->BinResultsBelow(repIndex).mnth(kMonth) + ort->BinResultsAbove(repIndex).mnth(kMonth);
-                    for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                        tableBody(nCol + 1, 2 + kMonth) = RealToStr(ort->BinResults(nCol, repIndex).mnth(kMonth), 2);
-                        // sum the total for all columns
-                        rowTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
-                    }
-                    tableBody(nCol + 2, 2 + kMonth) = RealToStr(rowTotal, 2);
-                    tableTotal += rowTotal;
-                }
-                // compute total row
+                // make arrays two columns wider for below and above bin range
+                columnHead.allocate(curIntervalCount + 3);
+                columnWidth.allocate(curIntervalCount + 3);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(curIntervalCount + 3, 39);
+                tableBody = "";
+                columnHead = "- [hr]";
+                tableBody(1, 1) = "less than";
+                tableBody(1, 2) = RealToStr(curIntervalStart, numIntervalDigits);
                 for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
-                    colTotal = 0.0;
-                    for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                        colTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
+                    columnHead(nCol + 1) = format("{} [hr]", nCol);
+                    // beginning of interval
+                    tableBody(nCol + 1, 1) = RealToStr(curIntervalStart + (nCol - 1) * curIntervalSize, numIntervalDigits) + "<=";
+                    // end of interval
+                    tableBody(nCol + 1, 2) = RealToStr(curIntervalStart + nCol * curIntervalSize, numIntervalDigits) + '>';
+                }
+                tableBody(curIntervalCount + 2, 1) = "equal to or more than";
+                tableBody(curIntervalCount + 2, 2) = RealToStr(topValue, numIntervalDigits);
+                tableBody(curIntervalCount + 3, 1) = "Row";
+                tableBody(curIntervalCount + 3, 2) = "Total";
+                for (iTable = 1; iTable <= curNumTables; ++iTable) {
+                    repIndex = firstReport + (iTable - 1);
+                    if (ort->OutputTableBinned(iInObj).scheduleIndex == 0) {
+                        repNameWithUnitsandscheduleName = curNameAndUnits;
+                    } else {
+                        repNameWithUnitsandscheduleName = curNameAndUnits + " [" + ort->OutputTableBinned(iInObj).ScheduleName + ']';
                     }
-                    tableBody(nCol + 1, 39) = RealToStr(colTotal, 2);
-                }
-                aboveTotal = 0.0;
-                belowTotal = 0.0;
-                for (kMonth = 1; kMonth <= 12; ++kMonth) {
-                    aboveTotal += ort->BinResultsAbove(repIndex).mnth(kMonth);
-                    belowTotal += ort->BinResultsBelow(repIndex).mnth(kMonth);
-                }
-                tableBody(1, 39) = RealToStr(belowTotal, 2);
-                tableBody(curIntervalCount + 2, 39) = RealToStr(aboveTotal, 2);
-                tableBody(curIntervalCount + 3, 39) = RealToStr(tableTotal, 2);
-                WriteTextLine(state, "Values in table are in hours.");
-                WriteTextLine(state, "");
-                WriteSubtitle(state, "Time Bin Results");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
-                }
-                // create statistics table
-                rowHeadStat(1) = "Minimum";
-                rowHeadStat(2) = "Mean minus two standard deviations";
-                rowHeadStat(3) = "Mean";
-                rowHeadStat(4) = "Mean plus two standard deviations";
-                rowHeadStat(5) = "Maximum";
-                rowHeadStat(6) = "Standard deviation";
-                columnHeadStat(1) = "Statistic";
-                columnWidthStat(1) = 14;
-                // per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
-                // first check if very large constant number has caused the second part to be larger than the first
-                if (ort->BinStatistics(repIndex).n > 1) {
-                    if (ort->BinStatistics(repIndex).sum2 > (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) {
-                        repStDev = std::sqrt((ort->BinStatistics(repIndex).sum2 - (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) /
-                                             (ort->BinStatistics(repIndex).n - 1));
+                    if (produceTabular) {
+                        WriteReportHeaders(
+                            state, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, ort->OutputTableBinned(iInObj).avgSum);
+                    }
+                    for (kHour = 1; kHour <= 24; ++kHour) {
+                        tableBody(1, 14 + kHour) = RealToStr(ort->BinResultsBelow(repIndex).hrly(kHour), 2);
+                        tableBody(curIntervalCount + 2, 14 + kHour) = RealToStr(ort->BinResultsAbove(repIndex).hrly(kHour), 2);
+                        rowTotal = ort->BinResultsBelow(repIndex).hrly(kHour) + ort->BinResultsAbove(repIndex).hrly(kHour);
+                        for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
+                            tableBody(nCol + 1, 14 + kHour) = RealToStr(ort->BinResults(nCol, repIndex).hrly(kHour), 2);
+                            // sum the total for all columns
+                            rowTotal += ort->BinResults(nCol, repIndex).hrly(kHour);
+                        }
+                        tableBody(nCol + 2, 14 + kHour) = RealToStr(rowTotal, 2);
+                    }
+                    tableTotal = 0.0;
+                    for (kMonth = 1; kMonth <= 12; ++kMonth) {
+                        tableBody(1, 2 + kMonth) = RealToStr(ort->BinResultsBelow(repIndex).mnth(kMonth), 2);
+                        tableBody(curIntervalCount + 2, 2 + kMonth) = RealToStr(ort->BinResultsAbove(repIndex).mnth(kMonth), 2);
+                        rowTotal = ort->BinResultsBelow(repIndex).mnth(kMonth) + ort->BinResultsAbove(repIndex).mnth(kMonth);
+                        for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
+                            tableBody(nCol + 1, 2 + kMonth) = RealToStr(ort->BinResults(nCol, repIndex).mnth(kMonth), 2);
+                            // sum the total for all columns
+                            rowTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
+                        }
+                        tableBody(nCol + 2, 2 + kMonth) = RealToStr(rowTotal, 2);
+                        tableTotal += rowTotal;
+                    }
+                    // compute total row
+                    for (nCol = 1; nCol <= curIntervalCount; ++nCol) {
+                        colTotal = 0.0;
+                        for (kMonth = 1; kMonth <= 12; ++kMonth) {
+                            colTotal += ort->BinResults(nCol, repIndex).mnth(kMonth);
+                        }
+                        tableBody(nCol + 1, 39) = RealToStr(colTotal, 2);
+                    }
+                    aboveTotal = 0.0;
+                    belowTotal = 0.0;
+                    for (kMonth = 1; kMonth <= 12; ++kMonth) {
+                        aboveTotal += ort->BinResultsAbove(repIndex).mnth(kMonth);
+                        belowTotal += ort->BinResultsBelow(repIndex).mnth(kMonth);
+                    }
+                    tableBody(1, 39) = RealToStr(belowTotal, 2);
+                    tableBody(curIntervalCount + 2, 39) = RealToStr(aboveTotal, 2);
+                    tableBody(curIntervalCount + 3, 39) = RealToStr(tableTotal, 2);
+                    if (produceTabular) {
+                        WriteTextLine(state, "Values in table are in hours.");
+                        WriteTextLine(state, "");
+                        WriteSubtitle(state, "Time Bin Results");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose XML tables
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   repNameWithUnitsandscheduleName,
+                                                                   ort->BinObjVarID(repIndex).namesOfObj,
+                                                                   "Time Bin Results");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        repNameWithUnitsandscheduleName,
+                                                                                                        ort->BinObjVarID(repIndex).namesOfObj,
+                                                                                                        "Time Bin Results");
+                        }
+                    }
+                    // create statistics table
+                    rowHeadStat(1) = "Minimum";
+                    rowHeadStat(2) = "Mean minus two standard deviations";
+                    rowHeadStat(3) = "Mean";
+                    rowHeadStat(4) = "Mean plus two standard deviations";
+                    rowHeadStat(5) = "Maximum";
+                    rowHeadStat(6) = "Standard deviation";
+                    columnHeadStat(1) = "Statistic";
+                    columnWidthStat(1) = 14;
+                    // per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
+                    // first check if very large constant number has caused the second part to be larger than the first
+                    if (ort->BinStatistics(repIndex).n > 1) {
+                        if (ort->BinStatistics(repIndex).sum2 > (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) {
+                            repStDev = std::sqrt(
+                                (ort->BinStatistics(repIndex).sum2 - (pow_2(ort->BinStatistics(repIndex).sum) / ort->BinStatistics(repIndex).n)) /
+                                (ort->BinStatistics(repIndex).n - 1));
+                        } else {
+                            repStDev = 0.0;
+                        }
+                        repMean = ort->BinStatistics(repIndex).sum / ort->BinStatistics(repIndex).n;
                     } else {
                         repStDev = 0.0;
+                        repMean = 0.0;
                     }
-                    repMean = ort->BinStatistics(repIndex).sum / ort->BinStatistics(repIndex).n;
-                } else {
-                    repStDev = 0.0;
-                    repMean = 0.0;
-                }
-                if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                    tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
-                    tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
-                    tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
-                    tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
-                    tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
-                    tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
-                } else {
-                    tableBodyStat(1, 1) = RealToStr(ort->BinStatistics(repIndex).minimum, 2);
-                    tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
-                    tableBodyStat(1, 3) = RealToStr(repMean, 2);
-                    tableBodyStat(1, 4) = RealToStr(repMean + 2 * repStDev, 2);
-                    tableBodyStat(1, 5) = RealToStr(ort->BinStatistics(repIndex).maximum, 2);
-                    tableBodyStat(1, 6) = RealToStr(repStDev, 2);
-                }
-                WriteSubtitle(state, "Statistics");
-                WriteTable(state, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
+                    if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                        tableBodyStat(1, 1) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).minimum), 2);
+                        tableBodyStat(1, 2) = RealToStr(ConvertIP(state, indexUnitConv, repMean - 2 * repStDev), 2);
+                        tableBodyStat(1, 3) = RealToStr(ConvertIP(state, indexUnitConv, repMean), 2);
+                        tableBodyStat(1, 4) = RealToStr(ConvertIP(state, indexUnitConv, repMean + 2 * repStDev), 2);
+                        tableBodyStat(1, 5) = RealToStr(ConvertIP(state, indexUnitConv, ort->BinStatistics(repIndex).maximum), 2);
+                        tableBodyStat(1, 6) = RealToStr(ConvertIPdelta(state, indexUnitConv, repStDev), 2);
+                    } else {
+                        tableBodyStat(1, 1) = RealToStr(ort->BinStatistics(repIndex).minimum, 2);
+                        tableBodyStat(1, 2) = RealToStr(repMean - 2 * repStDev, 2);
+                        tableBodyStat(1, 3) = RealToStr(repMean, 2);
+                        tableBodyStat(1, 4) = RealToStr(repMean + 2 * repStDev, 2);
+                        tableBodyStat(1, 5) = RealToStr(ort->BinStatistics(repIndex).maximum, 2);
+                        tableBodyStat(1, 6) = RealToStr(repStDev, 2);
+                    }
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Statistics");
+                        WriteTable(state, tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true); // transpose XML table
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, ort->BinObjVarID(repIndex).namesOfObj, "Statistics");
+                        }
+                    }
                 }
             }
         }
@@ -6972,6 +7321,23 @@ namespace EnergyPlus::OutputReportTabular {
         static Real64 leedSiteTotal(0.0);
         Real64 unconvert;
 
+        // Jan 2021: Added temp storage
+        Real64 gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
+        Real64 gtPowerPV = ort->gatherPowerPV;
+        Real64 gtPowerWind = ort->gatherPowerWind;
+        Real64 gtPowerHTGeothermal = ort->gatherPowerHTGeothermal;
+        Real64 gtPowerConversion = ort->gatherPowerConversion;
+        Real64 gtElecProduced = ort->gatherElecProduced;
+        Real64 gtElecPUrchased = ort->gatherElecPurchased;
+        Real64 gtElecSurplusSold = ort->gatherElecSurplusSold;
+
+        Real64 gtWaterHeatRecovery = ort->gatherWaterHeatRecovery;
+        Real64 gtAirHeatRecoveryCool = ort->gatherAirHeatRecoveryCool;
+        Real64 gtAirHeatRecoveryHeat = ort->gatherAirHeatRecoveryHeat;
+        Real64 gtHeatHTGeothermal = ort->gatherHeatHTGeothermal;
+        Real64 gtHeatSolarWater = ort->gatherHeatSolarWater;
+        Real64 gtHeatSolarAir = ort->gatherHeatSolarAir;
+
         if (ort->displayTabularBEPS || ort->displayLEEDSummary) {
             // show the headers of the report
             if (ort->displayTabularBEPS) {
@@ -6983,1558 +7349,1869 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 WriteTextLine(state, "", true);
             }
-            // determine building floor areas
-            DetermineBuildingFloorArea(state);
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = ort->gatherEndUseBEPS(1, jEndUse);   // electricity
-                collapsedEndUse(2, jEndUse) = ort->gatherEndUseBEPS(2, jEndUse);   // natural gas
-                collapsedEndUse(3, jEndUse) = ort->gatherEndUseBEPS(6, jEndUse);   // gasoline
-                collapsedEndUse(4, jEndUse) = ort->gatherEndUseBEPS(8, jEndUse);   // diesel
-                collapsedEndUse(5, jEndUse) = ort->gatherEndUseBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = ort->gatherEndUseBEPS(10, jEndUse);  // Fuel Oil No1
-                collapsedEndUse(7, jEndUse) = ort->gatherEndUseBEPS(11, jEndUse);  // Fuel Oil No2
-                collapsedEndUse(8, jEndUse) = ort->gatherEndUseBEPS(12, jEndUse);  // propane
-                collapsedEndUse(9, jEndUse) = ort->gatherEndUseBEPS(13, jEndUse);  // otherfuel1
-                collapsedEndUse(10, jEndUse) = ort->gatherEndUseBEPS(14, jEndUse); // otherfuel2
-                collapsedEndUse(11, jEndUse) = ort->gatherEndUseBEPS(3, jEndUse);  // district cooling <- purchased cooling
-                collapsedEndUse(12, jEndUse) =
-                    ort->gatherEndUseBEPS(4, jEndUse) + ort->gatherEndUseBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
-                collapsedEndUse(13, jEndUse) = ort->gatherEndUseBEPS(7, jEndUse);     // water
-            }
-            // repeat with totals
-            collapsedTotal(1) = ort->gatherTotalsBEPS(1);                        // electricity
-            collapsedTotal(2) = ort->gatherTotalsBEPS(2);                        // natural gas
-            collapsedTotal(3) = ort->gatherTotalsBEPS(6);                        // gasoline
-            collapsedTotal(4) = ort->gatherTotalsBEPS(8);                        // diesel
-            collapsedTotal(5) = ort->gatherTotalsBEPS(9);                        // coal
-            collapsedTotal(6) = ort->gatherTotalsBEPS(10);                       // Fuel Oil No1
-            collapsedTotal(7) = ort->gatherTotalsBEPS(11);                       // Fuel Oil No2
-            collapsedTotal(8) = ort->gatherTotalsBEPS(12);                       // propane
-            collapsedTotal(9) = ort->gatherTotalsBEPS(13);                       // other fuel 1
-            collapsedTotal(10) = ort->gatherTotalsBEPS(14);                      // other fuel 2
-            collapsedTotal(11) = ort->gatherTotalsBEPS(3);                       // district cooling <- purchased cooling
-            collapsedTotal(12) = ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
-            collapsedTotal(13) = ort->gatherTotalsBEPS(7);                       // water
 
-            if (state.dataGlobal->createPerfLog) {
-                UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
-                UtilityRoutines::appendPerfLog(state, "Natural Gas ABUPS Total [J]", format("{:.3R}", collapsedTotal(2)));
-                UtilityRoutines::appendPerfLog(state, "Gasoline ABUPS Total [J]", format("{:.3R}", collapsedTotal(3)));
-                UtilityRoutines::appendPerfLog(state, "Diesel ABUPS Total [J]", format("{:.3R}", collapsedTotal(4)));
-                UtilityRoutines::appendPerfLog(state, "Coal ABUPS Total [J]", format("{:.3R}", collapsedTotal(5)));
-                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(6)));
-                UtilityRoutines::appendPerfLog(state, "Fuel Oil No 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(7)));
-                UtilityRoutines::appendPerfLog(state, "Propane ABUPS Total [J]", format("{:.3R}", collapsedTotal(8)));
-                UtilityRoutines::appendPerfLog(state, "Other Fuel 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(9)));
-                UtilityRoutines::appendPerfLog(state, "Other Fuel 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(10)));
-                UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
-                UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
-                UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(13)));
-                UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", ort->gatherElapsedTimeBEPS));
-                UtilityRoutines::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
-                UtilityRoutines::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
-                UtilityRoutines::appendPerfLog(state,
-                                               "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
-                                               format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
-            }
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 8);   // diesel
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 9);   // coal
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 10);  // Fuel Oil No1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 11);  // Fuel Oil No2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 12);  // propane
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 13);  // otherfuel1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 14); // otherfuel2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 3);  // district cooling <- purch cooling
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
-                        ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 4) +
-                        ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
-                }
-            }
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite))
+                    break;
 
-            // unit conversion - all values are used as divisors
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    kConversionFactor = 1.0;
-                    waterConversionFactor = 1.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    kConversionFactor = 1.0;
-                    waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000000.0;
-                    kConversionFactor = 1000.0;
-                    waterConversionFactor = 1.0;
-                    areaConversionFactor = 1.0;
-                }
-            }
-
-            // convert floor areas
-            convBldgGrossFloorArea = ort->buildingGrossFloorArea / areaConversionFactor;
-            convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
-
-            // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                // determine building floor areas
+                DetermineBuildingFloorArea(state);
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                    collapsedEndUse(1, jEndUse) = ort->gatherEndUseBEPS(1, jEndUse);   // electricity
+                    collapsedEndUse(2, jEndUse) = ort->gatherEndUseBEPS(2, jEndUse);   // natural gas
+                    collapsedEndUse(3, jEndUse) = ort->gatherEndUseBEPS(6, jEndUse);   // gasoline
+                    collapsedEndUse(4, jEndUse) = ort->gatherEndUseBEPS(8, jEndUse);   // diesel
+                    collapsedEndUse(5, jEndUse) = ort->gatherEndUseBEPS(9, jEndUse);   // coal
+                    collapsedEndUse(6, jEndUse) = ort->gatherEndUseBEPS(10, jEndUse);  // Fuel Oil No1
+                    collapsedEndUse(7, jEndUse) = ort->gatherEndUseBEPS(11, jEndUse);  // Fuel Oil No2
+                    collapsedEndUse(8, jEndUse) = ort->gatherEndUseBEPS(12, jEndUse);  // propane
+                    collapsedEndUse(9, jEndUse) = ort->gatherEndUseBEPS(13, jEndUse);  // otherfuel1
+                    collapsedEndUse(10, jEndUse) = ort->gatherEndUseBEPS(14, jEndUse); // otherfuel2
+                    collapsedEndUse(11, jEndUse) = ort->gatherEndUseBEPS(3, jEndUse);  // district cooling <- purchased cooling
+                    collapsedEndUse(12, jEndUse) =
+                        ort->gatherEndUseBEPS(4, jEndUse) + ort->gatherEndUseBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
+                    collapsedEndUse(13, jEndUse) = ort->gatherEndUseBEPS(7, jEndUse);          // water
+                }
+                // repeat with totals
+                collapsedTotal(1) = ort->gatherTotalsBEPS(1);                             // electricity
+                collapsedTotal(2) = ort->gatherTotalsBEPS(2);                             // natural gas
+                collapsedTotal(3) = ort->gatherTotalsBEPS(6);                             // gasoline
+                collapsedTotal(4) = ort->gatherTotalsBEPS(8);                             // diesel
+                collapsedTotal(5) = ort->gatherTotalsBEPS(9);                             // coal
+                collapsedTotal(6) = ort->gatherTotalsBEPS(10);                            // Fuel Oil No1
+                collapsedTotal(7) = ort->gatherTotalsBEPS(11);                            // Fuel Oil No2
+                collapsedTotal(8) = ort->gatherTotalsBEPS(12);                            // propane
+                collapsedTotal(9) = ort->gatherTotalsBEPS(13);                            // other fuel 1
+                collapsedTotal(10) = ort->gatherTotalsBEPS(14);                           // other fuel 2
+                collapsedTotal(11) = ort->gatherTotalsBEPS(3);                            // district cooling <- purchased cooling
+                collapsedTotal(12) = ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
+                collapsedTotal(13) = ort->gatherTotalsBEPS(7);                            // water
+
+                if (produceTabular) {
+                    if (state.dataGlobal->createPerfLog) {
+                        UtilityRoutines::appendPerfLog(state, "Electricity ABUPS Total [J]", format("{:.3R}", collapsedTotal(1)));
+                        UtilityRoutines::appendPerfLog(state, "Natural Gas ABUPS Total [J]", format("{:.3R}", collapsedTotal(2)));
+                        UtilityRoutines::appendPerfLog(state, "Gasoline ABUPS Total [J]", format("{:.3R}", collapsedTotal(3)));
+                        UtilityRoutines::appendPerfLog(state, "Diesel ABUPS Total [J]", format("{:.3R}", collapsedTotal(4)));
+                        UtilityRoutines::appendPerfLog(state, "Coal ABUPS Total [J]", format("{:.3R}", collapsedTotal(5)));
+                        UtilityRoutines::appendPerfLog(state, "Fuel Oil No 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(6)));
+                        UtilityRoutines::appendPerfLog(state, "Fuel Oil No 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(7)));
+                        UtilityRoutines::appendPerfLog(state, "Propane ABUPS Total [J]", format("{:.3R}", collapsedTotal(8)));
+                        UtilityRoutines::appendPerfLog(state, "Other Fuel 1 ABUPS Total [J]", format("{:.3R}", collapsedTotal(9)));
+                        UtilityRoutines::appendPerfLog(state, "Other Fuel 2 ABUPS Total [J]", format("{:.3R}", collapsedTotal(10)));
+                        UtilityRoutines::appendPerfLog(state, "District Cooling ABUPS Total [J]", format("{:.3R}", collapsedTotal(11)));
+                        UtilityRoutines::appendPerfLog(state, "District Heating ABUPS Total [J]", format("{:.3R}", collapsedTotal(12)));
+                        UtilityRoutines::appendPerfLog(state, "Water ABUPS Total [m3]", format("{:.3R}", collapsedTotal(13)));
+                        UtilityRoutines::appendPerfLog(state, "Values Gathered Over [hours]", format("{:.2R}", ort->gatherElapsedTimeBEPS));
+                        UtilityRoutines::appendPerfLog(state,
+                                                       "Facility Any Zone Oscillating Temperatures Time [hours]",
+                                                       format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillate));
+                        UtilityRoutines::appendPerfLog(
+                            state,
+                            "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                            format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateDuringOccupancy));
+                        UtilityRoutines::appendPerfLog(state,
+                                                       "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                                                       format("{:.2R}", state.dataZoneTempPredictorCorrector->AnnualAnyZoneTempOscillateInDeadband));
+                    }
+                }
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1);   // electricity
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 2);   // natural gas
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 8);   // diesel
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 5) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 9);   // coal
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 6) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 10);  // Fuel Oil No1
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 7) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 11);  // Fuel Oil No2
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 8) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 12);  // propane
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 9) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 13);  // otherfuel1
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 10) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 14); // otherfuel2
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 11) =
+                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 3); // district cooling <- purch cooling
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
+                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 4) +
+                            ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 5); // district heating <- purch heating | <- steam
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherEndUseSubBEPS(kEndUseSub, jEndUse, 7); // water
                     }
                 }
-                collapsedTotal(iResource) /= largeConversionFactor;
-            }
-            // do water
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(13, jEndUse) /= waterConversionFactor;
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
-                }
-            }
 
-            collapsedTotal(13) = WaterConversionFunct(collapsedTotal(13), waterConversionFactor);
-
-            // convert to GJ
-            ort->gatherPowerFuelFireGen /= largeConversionFactor;
-            ort->gatherPowerPV /= largeConversionFactor;
-            ort->gatherPowerWind /= largeConversionFactor;
-            ort->gatherPowerHTGeothermal /= largeConversionFactor;
-            ort->gatherPowerConversion /= largeConversionFactor;
-            ort->gatherElecProduced /= largeConversionFactor;
-            ort->gatherElecPurchased /= largeConversionFactor;
-            ort->gatherElecSurplusSold /= largeConversionFactor;
-
-            // get change in overall state of charge for electrical storage devices.
-            if (facilityElectricServiceObj->numElecStorageDevices > 0) {
-                // All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not
-                // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum( ElecStorage.ThisTimeStepStateOfCharge()
-                // ) ) + gatherElecStorage;
-                ort->OverallNetEnergyFromStorage = ort->gatherElecStorage;
-                ort->OverallNetEnergyFromStorage /= largeConversionFactor;
-            } else {
-                ort->OverallNetEnergyFromStorage = 0.0;
-            }
-            // determine which resource is the primary heating resourse
-            resourcePrimaryHeating = 0;
-            heatingMaximum = 0.0;
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
-                if (collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
-                    heatingMaximum = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                    resourcePrimaryHeating = iResource;
-                }
-            }
-
-            //---- Source and Site Energy Sub-Table
-            rowHead.allocate(4);
-            columnHead.allocate(3);
-            columnWidth.allocate(3);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(3, 4);
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Total Energy [kWh]";
-                    columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Total Energy [kBtu]";
-                    columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Total Energy [GJ]";
-                    columnHead(2) = "Energy Per Total Building Area [MJ/m2]";
-                    columnHead(3) = "Energy Per Conditioned Building Area [MJ/m2]";
-                }
-            }
-
-            rowHead(1) = "Total Site Energy";
-            rowHead(2) = "Net Site Energy";
-            rowHead(3) = "Total Source Energy";
-            rowHead(4) = "Net Source Energy";
-
-            tableBody = "";
-
-            // compute the net amount of electricity received from the utility which
-            // is the amount purchased less the amount sold to the utility. Note that
-            // previously these variables were converted into GJ so now we don't need
-            // to do any conversion
-            // water is not included   gatherTotalsBEPS(7)    !water
-            totalSiteEnergyUse = (ort->gatherTotalsBEPS(1) + ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5) +
-                                  ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) + ort->gatherTotalsBEPS(10) + ort->gatherTotalsBEPS(11) +
-                                  ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) + ort->gatherTotalsBEPS(14)) /
-                                 largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline | diesel
-                                                        // | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
-
-            netElecPurchasedSold = ort->gatherElecPurchased - ort->gatherElecSurplusSold;
-
-            // water is not included   gatherTotalsBEPS(7)    !water
-            netSiteEnergyUse = netElecPurchasedSold + (ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5) +
-                                                       ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) + ort->gatherTotalsBEPS(10) +
-                                                       ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) + ort->gatherTotalsBEPS(14)) /
-                                                          largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
-                                                                                 // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
-                                                                                 // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
-
-            if (ort->efficiencyDistrictCooling == 0) ort->efficiencyDistrictCooling = 1.0;
-            if (ort->efficiencyDistrictHeating == 0) ort->efficiencyDistrictHeating = 1.0;
-
-            // source emissions already have the source factors included in the calcs.
-            totalSourceEnergyUse = 0.0;
-            //  electricity
-            if (ort->fuelfactorsused(1)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(1);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(1) * ort->sourceFactorElectric;
-            }
-            //  natural gas
-            if (ort->fuelfactorsused(2)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(2);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(2) * ort->sourceFactorNaturalGas;
-            }
-            // gasoline
-            if (ort->fuelfactorsused(3)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(3);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(6) * ort->sourceFactorGasoline;
-            }
-            // diesel
-            if (ort->fuelfactorsused(4)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(4);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(8) * ort->sourceFactorDiesel;
-            }
-            // coal
-            if (ort->fuelfactorsused(5)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(5);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(9) * ort->sourceFactorCoal;
-            }
-            // Fuel Oil No1
-            if (ort->fuelfactorsused(6)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(6);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(10) * ort->sourceFactorFuelOil1;
-            }
-            // Fuel Oil No2
-            if (ort->fuelfactorsused(7)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(7);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(11) * ort->sourceFactorFuelOil2;
-            }
-            // propane
-            if (ort->fuelfactorsused(8)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(8);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(12) * ort->sourceFactorPropane;
-            }
-            // otherfuel1
-            if (ort->fuelfactorsused(11)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(11);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(13) * ort->sourceFactorOtherFuel1;
-            }
-            // otherfuel2
-            if (ort->fuelfactorsused(12)) {
-                totalSourceEnergyUse += ort->gatherTotalsSource(12);
-            } else {
-                totalSourceEnergyUse += ort->gatherTotalsBEPS(14) * ort->sourceFactorOtherFuel2;
-            }
-
-            totalSourceEnergyUse =
-                (totalSourceEnergyUse + ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
-                 ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating + ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam) /
-                largeConversionFactor; // district cooling | district heating | steam
-
-            // now determine "net" source from purchased and surplus sold (still in J)
-
-            if (ort->fuelfactorsused(1)) {
-                netSourceElecPurchasedSold = ort->gatherTotalsSource(9) - ort->gatherTotalsSource(10);
-            } else {
-                netSourceElecPurchasedSold = netElecPurchasedSold * ort->sourceFactorElectric * largeConversionFactor; // back to J
-            }
-
-            netSourceEnergyUse = 0.0;
-            //  natural gas
-            if (ort->fuelfactorsused(2)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(2);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(2) * ort->sourceFactorNaturalGas;
-            }
-            // gasoline
-            if (ort->fuelfactorsused(3)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(3);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(6) * ort->sourceFactorGasoline;
-            }
-            // diesel
-            if (ort->fuelfactorsused(4)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(4);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(8) * ort->sourceFactorDiesel;
-            }
-            // coal
-            if (ort->fuelfactorsused(5)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(5);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(9) * ort->sourceFactorCoal;
-            }
-            // Fuel Oil No1
-            if (ort->fuelfactorsused(6)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(6);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(10) * ort->sourceFactorFuelOil1;
-            }
-            // Fuel Oil No2
-            if (ort->fuelfactorsused(7)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(7);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(11) * ort->sourceFactorFuelOil2;
-            }
-            // propane
-            if (ort->fuelfactorsused(8)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(8);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(12) * ort->sourceFactorPropane;
-            }
-            // otherfuel1
-            if (ort->fuelfactorsused(11)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(11);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(13) * ort->sourceFactorOtherFuel1;
-            }
-            // otherfuel2
-            if (ort->fuelfactorsused(12)) {
-                netSourceEnergyUse += ort->gatherTotalsSource(12);
-            } else {
-                netSourceEnergyUse += ort->gatherTotalsBEPS(14) * ort->sourceFactorOtherFuel2;
-            }
-
-            netSourceEnergyUse =
-                (netSourceEnergyUse + netSourceElecPurchasedSold + ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
-                 ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating + ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam) /
-                largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating | steam
-
-            // show annual values
-            tableBody(1, 1) = RealToStr(totalSiteEnergyUse, 2);
-            tableBody(1, 2) = RealToStr(netSiteEnergyUse, 2);
-            tableBody(1, 3) = RealToStr(totalSourceEnergyUse, 2);
-            tableBody(1, 4) = RealToStr(netSourceEnergyUse, 2);
-            // show  per building area
-            if (convBldgGrossFloorArea > 0) {
-                tableBody(2, 1) = RealToStr(totalSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
-                tableBody(2, 2) = RealToStr(netSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
-                tableBody(2, 3) = RealToStr(totalSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
-                tableBody(2, 4) = RealToStr(netSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
-            }
-            // show  per conditioned building area
-            if (convBldgCondFloorArea > 0) {
-                tableBody(3, 1) = RealToStr(totalSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
-                tableBody(3, 2) = RealToStr(netSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
-                tableBody(3, 3) = RealToStr(totalSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
-                tableBody(3, 4) = RealToStr(netSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
-            }
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Site and Source Energy");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
-                }
-
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site and Source Energy");
-                }
-            }
-
-            //---- Source and Site Energy Sub-Table
-            rowHead.allocate(13);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 50; // array assignment
-            tableBody.allocate(1, 13);
-
-            columnHead(1) = "Site=>Source Conversion Factor";
-
-            rowHead(1) = "Electricity";
-            rowHead(2) = "Natural Gas";
-            rowHead(3) = "District Cooling";
-            rowHead(4) = "District Heating";
-            rowHead(5) = "Steam";
-            rowHead(6) = "Gasoline";
-            rowHead(7) = "Diesel";
-            rowHead(8) = "Coal";
-            rowHead(9) = "Fuel Oil No 1";
-            rowHead(10) = "Fuel Oil No 2";
-            rowHead(11) = "Propane";
-            rowHead(12) = "Other Fuel 1";
-            rowHead(13) = "Other Fuel 2";
-
-            tableBody = "";
-
-            // set columns to conversion factors
-            // show values
-            //  tableBody(1,1)  = TRIM(RealToStr(sourceFactorElectric,3))
-            //  tableBody(2,1)  = TRIM(RealToStr(sourceFactorNaturalGas, 3))
-            //  tableBody(3,1)  = TRIM(RealToStr(sourceFactorElectric/ efficiencyDistrictCooling,3))
-            //  tableBody(4,1)  = TRIM(RealToStr(sourceFactorNaturalGas/ efficiencyDistrictHeating ,3))
-            //  tableBody(5,1)  = TRIM(RealToStr(sourceFactorSteam ,3))
-            //  tableBody(6,1)  = TRIM(RealToStr(sourceFactorGasoline ,3))
-            //  tableBody(7,1)  = TRIM(RealToStr(sourceFactorDiesel ,3))
-            //  tableBody(8,1)  = TRIM(RealToStr(sourceFactorCoal ,3))
-            //  tableBody(9,1)  = TRIM(RealToStr(sourceFactorFuelOil1 ,3))
-            //  tableBody(10,1) = TRIM(RealToStr(sourceFactorFuelOil2 ,3))
-            //  tableBody(11,1) = TRIM(RealToStr(sourceFactorPropane ,3))
-
-            if (!ort->ffSchedUsed(1)) {
-                tableBody(1, 1) = RealToStr(ort->sourceFactorElectric, 3);
-            } else if (ort->gatherTotalsBEPS(1) > SmallValue) {
-                tableBody(1, 1) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(1) / ort->gatherTotalsBEPS(1), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(1)) + "\")";
-            } else {
-                tableBody(1, 1) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(2)) {
-                tableBody(1, 2) = RealToStr(ort->sourceFactorNaturalGas, 3);
-            } else if (ort->gatherTotalsBEPS(2) > SmallValue) {
-                tableBody(1, 2) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(2) / ort->gatherTotalsBEPS(2), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(2)) + "\")";
-            } else {
-                tableBody(1, 2) = "N/A";
-            }
-
-            tableBody(1, 3) = RealToStr(ort->sourceFactorElectric / ort->efficiencyDistrictCooling, 3); // District Cooling
-
-            tableBody(1, 4) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating, 3); // District Heating
-
-            tableBody(1, 5) = RealToStr(ort->sourceFactorSteam, 3); // Steam
-
-            if (!ort->ffSchedUsed(6)) {
-                tableBody(1, 6) = RealToStr(ort->sourceFactorGasoline, 3);
-            } else if (ort->gatherTotalsBEPS(6) > SmallValue) {
-                tableBody(1, 6) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(6) / ort->gatherTotalsBEPS(6), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(6)) + "\")";
-            } else {
-                tableBody(1, 6) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(8)) {
-                tableBody(1, 7) = RealToStr(ort->sourceFactorDiesel, 3);
-            } else if (ort->gatherTotalsBEPS(8) > SmallValue) {
-                tableBody(1, 7) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(8) / ort->gatherTotalsBEPS(8), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(8)) + "\")";
-            } else {
-                tableBody(1, 7) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(9)) {
-                tableBody(1, 8) = RealToStr(ort->sourceFactorCoal, 3);
-            } else if (ort->gatherTotalsBEPS(9) > SmallValue) {
-                tableBody(1, 8) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(9) / ort->gatherTotalsBEPS(9), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(9)) + "\")";
-            } else {
-                tableBody(1, 8) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(10)) {
-                tableBody(1, 9) = RealToStr(ort->sourceFactorFuelOil1, 3);
-            } else if (ort->gatherTotalsBEPS(10) > SmallValue) {
-                tableBody(1, 9) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(10) / ort->gatherTotalsBEPS(10), 3) +
-                                  " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(10)) + "\")";
-            } else {
-                tableBody(1, 9) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(11)) {
-                tableBody(1, 10) = RealToStr(ort->sourceFactorFuelOil2, 3);
-            } else if (ort->gatherTotalsBEPS(11) > SmallValue) {
-                tableBody(1, 10) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(11) / ort->gatherTotalsBEPS(11), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(11)) + "\")";
-            } else {
-                tableBody(1, 10) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(12)) {
-                tableBody(1, 11) = RealToStr(ort->sourceFactorPropane, 3);
-            } else if (ort->gatherTotalsBEPS(12) > SmallValue) {
-                tableBody(1, 11) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(12) / ort->gatherTotalsBEPS(12), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(12)) + "\")";
-            } else {
-                tableBody(1, 11) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(13)) {
-                tableBody(1, 12) = RealToStr(ort->sourceFactorOtherFuel1, 3);
-            } else if (ort->gatherTotalsBEPS(13) > SmallValue) {
-                tableBody(1, 12) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(13) / ort->gatherTotalsBEPS(13), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(13)) + "\")";
-            } else {
-                tableBody(1, 12) = "N/A";
-            }
-
-            if (!ort->ffSchedUsed(14)) {
-                tableBody(1, 13) = RealToStr(ort->sourceFactorOtherFuel2, 3);
-            } else if (ort->gatherTotalsBEPS(14) > SmallValue) {
-                tableBody(1, 13) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(14) / ort->gatherTotalsBEPS(14), 3) +
-                                   " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(14)) + "\")";
-            } else {
-                tableBody(1, 13) = "N/A";
-            }
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Site to Source Energy Conversion Factors");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility",
-                                                           "Site to Source Energy Conversion Factors");
-                }
-
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Annual Building Utility Performance Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Site to Source Energy Conversion Factors");
-                }
-            }
-
-            //---- Building Area Sub-Table
-            rowHead.allocate(3);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(1, 3);
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Area [m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Area [ft2]";
-                } else {
-                    columnHead(1) = "Area [m2]";
-                }
-            }
-
-            rowHead(1) = "Total Building Area";
-            rowHead(2) = "Net Conditioned Building Area";
-            rowHead(3) = "Unconditioned Building Area";
-
-            tableBody = "";
-            tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
-            } else {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
-            }
-            tableBody(1, 2) = RealToStr(convBldgCondFloorArea, 2);
-            tableBody(1, 3) = RealToStr(convBldgGrossFloorArea - convBldgCondFloorArea, 2);
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Building Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
-                }
-
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
-                }
-            }
-
-            //---- End Use Sub-Table
-            rowHead.allocate(16);
-            columnHead.allocate(13);
-            columnWidth.allocate(13);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(13, 16);
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
-
-                useVal(iResource, 15) = collapsedTotal(iResource); // totals
-            }
-
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
-            rowHead(15) = "";
-            rowHead(16) = "Total End Uses";
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity [kWh]";
-                    columnHead(2) = "Natural Gas [kWh]";
-                    columnHead(3) = "Gasoline [kWh]";
-                    columnHead(4) = "Diesel [kWh]";
-                    columnHead(5) = "Coal [kWh]";
-                    columnHead(6) = "Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Propane [kWh]";
-                    columnHead(9) = "Other Fuel 1 [kWh]";
-                    columnHead(10) = "Other Fuel 2 [kWh]";
-                    columnHead(11) = "District Cooling [kWh]";
-                    columnHead(12) = "District Heating [kWh]";
-                    columnHead(13) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity [kBtu]";
-                    columnHead(2) = "Natural Gas [kBtu]";
-                    columnHead(3) = "Gasoline [kBtu]";
-                    columnHead(4) = "Diesel [kBtu]";
-                    columnHead(5) = "Coal [kBtu]";
-                    columnHead(6) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Propane [kBtu]";
-                    columnHead(9) = "Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Other Fuel 2 [kBtu]";
-                    columnHead(11) = "District Cooling [kBtu]";
-                    columnHead(12) = "District Heating [kBtu]";
-                    columnHead(13) = "Water [gal]";
-                } else {
-                    columnHead(1) = "Electricity [GJ]";
-                    columnHead(2) = "Natural Gas [GJ]";
-                    columnHead(3) = "Gasoline [GJ]";
-                    columnHead(4) = "Diesel [GJ]";
-                    columnHead(5) = "Coal [GJ]";
-                    columnHead(6) = "Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Propane [GJ]";
-                    columnHead(9) = "Other Fuel 1 [GJ]";
-                    columnHead(10) = "Other Fuel 2 [GJ]";
-                    columnHead(11) = "District Cooling [GJ]";
-                    columnHead(12) = "District Heating [GJ]";
-                    columnHead(13) = "Water [m3]";
-                }
-            }
-
-            tableBody = "";
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                    tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
-                }
-                tableBody(iResource, 16) = RealToStr(useVal(iResource, 15), 2);
-            }
-            // add warning message if end use values do not add up to total
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                Real64 curTotal = 0.0;
-                for (int jUse = 1; jUse <= 14; ++jUse) {
-                    curTotal += useVal(iResource, jUse);
-                }
-                if (std::abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
-                    ShowWarningError(state, ResourceWarningMessage(columnHead(iResource)));
-                }
-            }
-
-            unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
-            //  Energy Use Intensities - Electricity
-            if (ort->buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state,
-                    state.dataOutRptPredefined->pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Heating", unconvert * 1000 * useVal(colElectricity, 1) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Space Cooling", unconvert * 1000 * useVal(colElectricity, 2) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Fans (All)", unconvert * 1000 * useVal(colElectricity, 7) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Service Water Heating", unconvert * 1000 * useVal(colElectricity, 12) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Receptacle Equipment", unconvert * 1000 * useVal(colElectricity, 5) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Miscellaneous (All)", unconvert * 1000 * (useVal(colElectricity, 15)) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiElec, "Subtotal", unconvert * 1000 * useVal(colElectricity, 15) / ort->buildingGrossFloorArea, 2);
-            }
-
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert * useVal(colElectricity, 15), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc, "Electricity", unconvert * (useVal(colElectricity, 5) + useVal(colElectricity, 13)), 2);
-            if (useVal(colElectricity, 15) != 0) {
-                processFraction = (useVal(colElectricity, 5) + useVal(colElectricity, 13)) / useVal(colElectricity, 15);
-                processElecCost = state.dataOutRptPredefined->LEEDelecCostTotal * processFraction;
-            } else {
-                processElecCost = 0.0;
-            }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Electricity", processElecCost, 2);
-            addFootNoteSubTable(state, state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
-
-            //  Energy Use Intensities- Natural Gas
-            if (ort->buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal(colGas, 1) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal(colGas, 12) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Miscellaneous (All)", unconvert * 1000 * useVal(colGas, 15) / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiNatG, "Subtotal", unconvert * 1000 * useVal(colGas, 15) / ort->buildingGrossFloorArea, 2);
-            }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Natural Gas", unconvert * useVal(colGas, 15), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc, "Natural Gas", unconvert * (useVal(colGas, 5) + useVal(colGas, 13)), 2);
-            if (useVal(colGas, 15) != 0) {
-                processFraction = (useVal(colGas, 5) + useVal(colGas, 13)) / useVal(colGas, 15);
-                processGasCost = state.dataOutRptPredefined->LEEDgasCostTotal * processFraction;
-            } else {
-                processGasCost = 0.0;
-            }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Natural Gas", processGasCost, 2);
-
-            //  Energy Use Intensities  - Additional Fuel
-            useValColAddFuel15 =
-                useVal(3, 15) + useVal(4, 15) + useVal(5, 15) + useVal(6, 15) + useVal(7, 15) + useVal(8, 15) + useVal(9, 15) + useVal(10, 15);
-            useValColAddFuel5 =
-                useVal(3, 5) + useVal(4, 5) + useVal(5, 5) + useVal(6, 5) + useVal(7, 5) + useVal(8, 5) + useVal(9, 5) + useVal(10, 5);
-            useValColAddFuel13 =
-                useVal(3, 13) + useVal(4, 13) + useVal(5, 13) + useVal(6, 13) + useVal(7, 13) + useVal(8, 13) + useVal(9, 13) + useVal(10, 13);
-            if (ort->buildingGrossFloorArea > 0) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / ort->buildingGrossFloorArea, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useValColAddFuel15 / ort->buildingGrossFloorArea, 2);
-            }
-            PreDefTableEntry(state,
-                state.dataOutRptPredefined->pdchLeedEusTotal, "Additional", unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc,
-                             "Additional",
-                             unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) +
-                                          useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)),
-                             2);
-            if ((useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)) > 0.001) {
-                processFraction = (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
-                                   useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)) /
-                                  (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15));
-            } else {
-                processFraction = 0.0;
-            }
-            processOthrCost = state.dataOutRptPredefined->LEEDothrCostTotal * processFraction;
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Additional", processOthrCost, 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Total", processElecCost + processGasCost + processOthrCost, 2);
-            // accumulate for percentage table
-            leedSiteIntLite = 0.0;
-            leedSiteSpHeat = 0.0;
-            leedSiteSpCool = 0.0;
-            leedSiteFanInt = 0.0;
-            leedSiteSrvWatr = 0.0;
-            leedSiteRecept = 0.0;
-            leedSiteTotal = 0.0;
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't bother with water
-                leedSiteIntLite += useVal(iResource, 3);
-                leedSiteSpHeat += useVal(iResource, 1);
-                leedSiteSpCool += useVal(iResource, 2);
-                leedSiteFanInt += useVal(iResource, 7);
-                leedSiteSrvWatr += useVal(iResource, 12);
-                leedSiteRecept += useVal(iResource, 5);
-                leedSiteTotal += useVal(iResource, 15);
-            }
-            if (leedSiteTotal != 0) {
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Interior Lighting (All)", 100 * leedSiteIntLite / leedSiteTotal, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Heating", 100 * leedSiteSpHeat / leedSiteTotal, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Cooling", 100 * leedSiteSpCool / leedSiteTotal, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Fans (All)", 100 * leedSiteFanInt / leedSiteTotal, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2);
-                PreDefTableEntry(state,
-                    state.dataOutRptPredefined->pdchLeedEupPerc,
-                    "Miscellaneous",
-                    100 * (leedSiteTotal - (leedSiteIntLite + leedSiteSpHeat + leedSiteSpCool + leedSiteFanInt + leedSiteSrvWatr + leedSiteRecept)) /
-                        leedSiteTotal,
-                    2);
-            }
-            // totals across energy source
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal,
-                             "Total",
-                             unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) +
-                                          useVal(colElectricity, 15) + useVal(colGas, 15)),
-                             2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusProc,
-                             "Total",
-                             unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) +
-                                          useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13) + useVal(colElectricity, 5) +
-                                          useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
-                             2);
-
-            footnote = "";
-            {
-                auto const SELECT_CASE_var(resourcePrimaryHeating);
-                if (SELECT_CASE_var == colElectricity) {
-                    footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
-                } else if (SELECT_CASE_var == colGas) {
-                    footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
-                } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
-                           SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
-                    footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
-                    // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
-                    // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
-                } else if (SELECT_CASE_var == colPurchHeat) {
-                    footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
-                }
-            }
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "End Uses");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
-                }
-            }
-
-            //---- End Uses By Subcategory Sub-Table
-
-            // determine if subcategories add up to the total and
-            // if not, determine the difference for the 'other' row
-            ort->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        // set the value to the total for the end use
-                        endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
-                        // subtract off each sub end use category value
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            endUseSubOther(iResource, jEndUse) -= collapsedEndUseSub(kEndUseSub, jEndUse, iResource);
-                        }
-                        // if just a small value remains set it to zero
-                        if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
-                            ort->needOtherRowLEED45(jEndUse) = true;
-                        } else {
-                            endUseSubOther(iResource, jEndUse) = 0.0;
-                        }
+                // unit conversion - all values are used as divisors
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        largeConversionFactor = 3600000.0;
+                        kConversionFactor = 1.0;
+                        waterConversionFactor = 1.0;
+                        areaConversionFactor = 1.0;
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                        kConversionFactor = 1.0;
+                        waterConversionFactor = getSpecificUnitDivider(state, "m3", "gal"); // 0.003785413 m3 to gal
+                        areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
                     } else {
-                        endUseSubOther(iResource, jEndUse) = 0.0;
+                        largeConversionFactor = 1000000000.0;
+                        kConversionFactor = 1000.0;
+                        waterConversionFactor = 1.0;
+                        areaConversionFactor = 1.0;
                     }
                 }
-            }
 
-            // determine the number of rows needed for sub-table
-            numRows = 0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                // convert floor areas
+                convBldgGrossFloorArea = ort->buildingGrossFloorArea / areaConversionFactor;
+                convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
+
+                // convert units into GJ (divide by 1,000,000,000) if J otherwise kWh
+                for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                            collapsedEndUseSub(kEndUseSub, jEndUse, iResource) /= largeConversionFactor;
+                        }
+                    }
+                    collapsedTotal(iResource) /= largeConversionFactor;
+                }
+                // do water
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    collapsedEndUse(13, jEndUse) /= waterConversionFactor;
                     for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        ++numRows;
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 13) /= waterConversionFactor;
                     }
-                    // check if an 'other' row is needed
-                    if (ort->needOtherRowLEED45(jEndUse)) {
-                        ++numRows;
-                    }
-                } else {
-                    ++numRows;
                 }
-            }
 
-            rowHead.allocate(numRows);
-            columnHead.allocate(14);
-            columnWidth.allocate(14);
-            columnWidth = 10;                 // array assignment - same for all columns
-            tableBody.allocate(14, numRows); // TODO: this appears to be (column, row)...
-            rowHead = "";
-            tableBody = "";
+                collapsedTotal(13) = WaterConversionFunct(collapsedTotal(13), waterConversionFactor);
 
-            // Build row head and subcategories columns
-            i = 1;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
-                        ++i;
-                    }
-                    // check if an 'other' row is needed
-                    if (ort->needOtherRowLEED45(jEndUse)) {
-                        tableBody(1, i) = "Other";
-                        ++i;
-                    }
-                } else {
-                    tableBody(1, i) = "General";
-                    ++i;
+                if (iUnitSystem == 0) {
+                    gtPowerFuelFireGen = ort->gatherPowerFuelFireGen;
+                    gtPowerPV = ort->gatherPowerPV;
+                    gtPowerWind = ort->gatherPowerWind;
+                    gtPowerHTGeothermal = ort->gatherPowerHTGeothermal;
+                    gtPowerConversion = ort->gatherPowerConversion;
+                    gtElecProduced = ort->gatherElecProduced;
+                    gtElecPUrchased = ort->gatherElecPurchased;
+                    gtElecSurplusSold = ort->gatherElecSurplusSold;
+                } else { // if(iUnitSystem == 1)
+                    ort->gatherPowerFuelFireGen = gtPowerFuelFireGen;
+                    ort->gatherPowerPV = gtPowerPV;
+                    ort->gatherPowerWind = gtPowerWind;
+                    ort->gatherPowerHTGeothermal = gtPowerHTGeothermal;
+                    ort->gatherPowerConversion = gtPowerConversion;
+                    ort->gatherElecProduced = gtElecProduced;
+                    ort->gatherElecPurchased = gtElecPUrchased;
+                    ort->gatherElecSurplusSold = gtElecSurplusSold;
                 }
-            }
+                // convert to GJ
+                ort->gatherPowerFuelFireGen /= largeConversionFactor;
+                ort->gatherPowerPV /= largeConversionFactor;
+                ort->gatherPowerWind /= largeConversionFactor;
+                ort->gatherPowerHTGeothermal /= largeConversionFactor;
+                ort->gatherPowerConversion /= largeConversionFactor;
+                ort->gatherElecProduced /= largeConversionFactor;
+                ort->gatherElecPurchased /= largeConversionFactor;
+                ort->gatherElecSurplusSold /= largeConversionFactor;
 
-            columnHead(1) = "Subcategory";
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(2) = "Electricity [kWh]";
-                    columnHead(3) = "Natural Gas [kWh]";
-                    columnHead(4) = "Gasoline [kWh]";
-                    columnHead(5) = "Diesel [kWh]";
-                    columnHead(6) = "Coal [kWh]";
-                    columnHead(7) = "Fuel Oil No 1 [kWh]";
-                    columnHead(8) = "Fuel Oil No 2 [kWh]";
-                    columnHead(9) = "Propane [kWh]";
-                    columnHead(10) = "Other Fuel 1 [kWh]";
-                    columnHead(11) = "Other Fuel 2 [kWh]";
-                    columnHead(12) = "District Cooling [kWh]";
-                    columnHead(13) = "District Heating [kWh]";
-                    columnHead(14) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(2) = "Electricity [kBtu]";
-                    columnHead(3) = "Natural Gas [kBtu]";
-                    columnHead(4) = "Gasoline [kBtu]";
-                    columnHead(5) = "Diesel [kBtu]";
-                    columnHead(6) = "Coal [kBtu]";
-                    columnHead(7) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(8) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(9) = "Propane [kBtu]";
-                    columnHead(10) = "Other Fuel 1 [kBtu]";
-                    columnHead(11) = "Other Fuel 2 [kBtu]";
-                    columnHead(12) = "District Cooling [kBtu]";
-                    columnHead(13) = "District Heating [kBtu]";
-                    columnHead(14) = "Water [gal]";
+                // get change in overall state of charge for electrical storage devices.
+                if (facilityElectricServiceObj->numElecStorageDevices > 0) {
+                    // All flow in/out of storage is accounted for in gatherElecStorage, so separate calculation of change in state of charge is not
+                    // necessary OverallNetEnergyFromStorage = ( sum( ElecStorage.StartingEnergyStored() ) - sum(
+                    // ElecStorage.ThisTimeStepStateOfCharge() ) ) + gatherElecStorage;
+                    ort->OverallNetEnergyFromStorage = ort->gatherElecStorage;
+                    ort->OverallNetEnergyFromStorage /= largeConversionFactor;
                 } else {
-                    columnHead(2) = "Electricity [GJ]";
-                    columnHead(3) = "Natural Gas [GJ]";
-                    columnHead(4) = "Gasoline [GJ]";
-                    columnHead(5) = "Diesel [GJ]";
-                    columnHead(6) = "Coal [GJ]";
-                    columnHead(7) = "Fuel Oil No 1 [GJ]";
-                    columnHead(8) = "Fuel Oil No 2 [GJ]";
-                    columnHead(9) = "Propane [GJ]";
-                    columnHead(10) = "Other Fuel 1 [GJ]";
-                    columnHead(11) = "Other Fuel 2 [GJ]";
-                    columnHead(12) = "District Cooling [GJ]";
-                    columnHead(13) = "District Heating [GJ]";
-                    columnHead(14) = "Water [m3]";
+                    ort->OverallNetEnergyFromStorage = 0.0;
                 }
-            }
+                // determine which resource is the primary heating resourse
+                resourcePrimaryHeating = 0;
+                heatingMaximum = 0.0;
+                for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                    if (collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) > heatingMaximum) {
+                        heatingMaximum = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                        resourcePrimaryHeating = iResource;
+                    }
+                }
 
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
-                            ++i;
-                        }
-                        // put other
-                        if (ort->needOtherRowLEED45(jEndUse)) {
-                            tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
-                            ++i;
-                        }
+                //---- Source and Site Energy Sub-Table
+                rowHead.allocate(4);
+                columnHead.allocate(3);
+                columnWidth.allocate(3);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(3, 4);
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Total Energy [kWh]";
+                        columnHead(2) = "Energy Per Total Building Area [kWh/m2]";
+                        columnHead(3) = "Energy Per Conditioned Building Area [kWh/m2]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Total Energy [kBtu]";
+                        columnHead(2) = "Energy Per Total Building Area [kBtu/ft2]";
+                        columnHead(3) = "Energy Per Conditioned Building Area [kBtu/ft2]";
                     } else {
-                        tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
-                        ++i;
+                        columnHead(1) = "Total Energy [GJ]";
+                        columnHead(2) = "Energy Per Total Building Area [MJ/m2]";
+                        columnHead(3) = "Energy Per Conditioned Building Area [MJ/m2]";
                     }
                 }
-            }
 
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "End Uses By Subcategory");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                rowHead(1) = "Total Site Energy";
+                rowHead(2) = "Net Site Energy";
+                rowHead(3) = "Total Source Energy";
+                rowHead(4) = "Net Source Energy";
 
-                Array1D_string rowHeadTemp(rowHead);
-                // Before outputing to SQL, we forward fill the End use column (rowHead)
-                // for better sql queries
-                FillRowHead(rowHeadTemp);
+                tableBody = "";
 
-                for (int i = 1; i <= numRows; ++i) {
-                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                // compute the net amount of electricity received from the utility which
+                // is the amount purchased less the amount sold to the utility. Note that
+                // previously these variables were converted into GJ so now we don't need
+                // to do any conversion
+                // water is not included   gatherTotalsBEPS(7)    !water
+                totalSiteEnergyUse = (ort->gatherTotalsBEPS(1) + ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) +
+                                      ort->gatherTotalsBEPS(5) + ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) +
+                                      ort->gatherTotalsBEPS(10) + ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) +
+                                      ort->gatherTotalsBEPS(14)) /
+                                     largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline |
+                                                            // diesel | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
+
+                netElecPurchasedSold = ort->gatherElecPurchased - ort->gatherElecSurplusSold;
+
+                // water is not included   gatherTotalsBEPS(7)    !water
+                netSiteEnergyUse = netElecPurchasedSold +
+                                   (ort->gatherTotalsBEPS(2) + ort->gatherTotalsBEPS(3) + ort->gatherTotalsBEPS(4) + ort->gatherTotalsBEPS(5) +
+                                    ort->gatherTotalsBEPS(6) + ort->gatherTotalsBEPS(8) + ort->gatherTotalsBEPS(9) + ort->gatherTotalsBEPS(10) +
+                                    ort->gatherTotalsBEPS(11) + ort->gatherTotalsBEPS(12) + ort->gatherTotalsBEPS(13) + ort->gatherTotalsBEPS(14)) /
+                                       largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
+                                                              // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
+                                                              // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
+
+                if (ort->efficiencyDistrictCooling == 0) ort->efficiencyDistrictCooling = 1.0;
+                if (ort->efficiencyDistrictHeating == 0) ort->efficiencyDistrictHeating = 1.0;
+
+                // source emissions already have the source factors included in the calcs.
+                totalSourceEnergyUse = 0.0;
+                //  electricity
+                if (ort->fuelfactorsused(1)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(1);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(1) * ort->sourceFactorElectric;
+                }
+                //  natural gas
+                if (ort->fuelfactorsused(2)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(2);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(2) * ort->sourceFactorNaturalGas;
+                }
+                // gasoline
+                if (ort->fuelfactorsused(3)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(3);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(6) * ort->sourceFactorGasoline;
+                }
+                // diesel
+                if (ort->fuelfactorsused(4)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(4);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(8) * ort->sourceFactorDiesel;
+                }
+                // coal
+                if (ort->fuelfactorsused(5)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(5);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(9) * ort->sourceFactorCoal;
+                }
+                // Fuel Oil No1
+                if (ort->fuelfactorsused(6)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(6);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(10) * ort->sourceFactorFuelOil1;
+                }
+                // Fuel Oil No2
+                if (ort->fuelfactorsused(7)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(7);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(11) * ort->sourceFactorFuelOil2;
+                }
+                // propane
+                if (ort->fuelfactorsused(8)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(8);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(12) * ort->sourceFactorPropane;
+                }
+                // otherfuel1
+                if (ort->fuelfactorsused(11)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(11);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(13) * ort->sourceFactorOtherFuel1;
+                }
+                // otherfuel2
+                if (ort->fuelfactorsused(12)) {
+                    totalSourceEnergyUse += ort->gatherTotalsSource(12);
+                } else {
+                    totalSourceEnergyUse += ort->gatherTotalsBEPS(14) * ort->sourceFactorOtherFuel2;
                 }
 
-                // Erase the SubCategory (first column), using slicing
-                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-                Array1D_string columnHeadTemp(columnHead({2, _, _}));
+                totalSourceEnergyUse = (totalSourceEnergyUse + ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
+                                        ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating +
+                                        ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam) /
+                                       largeConversionFactor; // district cooling | district heating | steam
 
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
-                                                           rowHeadTemp,
-                                                           columnHeadTemp,
-                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility",
-                                                           "End Uses By Subcategory");
+                // now determine "net" source from purchased and surplus sold (still in J)
+
+                if (ort->fuelfactorsused(1)) {
+                    netSourceElecPurchasedSold = ort->gatherTotalsSource(9) - ort->gatherTotalsSource(10);
+                } else {
+                    netSourceElecPurchasedSold = netElecPurchasedSold * ort->sourceFactorElectric * largeConversionFactor; // back to J
                 }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
-                                                                                                rowHeadTemp,
-                                                                                                columnHeadTemp,
-                                                                                                "Annual Building Utility Performance Summary",
-                                                                                                "Entire Facility",
-                                                                                                "End Uses By Subcategory");
+
+                netSourceEnergyUse = 0.0;
+                //  natural gas
+                if (ort->fuelfactorsused(2)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(2);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(2) * ort->sourceFactorNaturalGas;
                 }
-                rowHeadTemp.deallocate();
-                tableBodyTemp.deallocate();
-                columnHeadTemp.deallocate();
-            }
+                // gasoline
+                if (ort->fuelfactorsused(3)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(3);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(6) * ort->sourceFactorGasoline;
+                }
+                // diesel
+                if (ort->fuelfactorsused(4)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(4);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(8) * ort->sourceFactorDiesel;
+                }
+                // coal
+                if (ort->fuelfactorsused(5)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(5);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(9) * ort->sourceFactorCoal;
+                }
+                // Fuel Oil No1
+                if (ort->fuelfactorsused(6)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(6);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(10) * ort->sourceFactorFuelOil1;
+                }
+                // Fuel Oil No2
+                if (ort->fuelfactorsused(7)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(7);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(11) * ort->sourceFactorFuelOil2;
+                }
+                // propane
+                if (ort->fuelfactorsused(8)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(8);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(12) * ort->sourceFactorPropane;
+                }
+                // otherfuel1
+                if (ort->fuelfactorsused(11)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(11);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(13) * ort->sourceFactorOtherFuel1;
+                }
+                // otherfuel2
+                if (ort->fuelfactorsused(12)) {
+                    netSourceEnergyUse += ort->gatherTotalsSource(12);
+                } else {
+                    netSourceEnergyUse += ort->gatherTotalsBEPS(14) * ort->sourceFactorOtherFuel2;
+                }
 
-            // EAp2-4/5. Performance Rating Method Compliance
-            // repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
+                netSourceEnergyUse =
+                    (netSourceEnergyUse + netSourceElecPurchasedSold +
+                     ort->gatherTotalsBEPS(3) * ort->sourceFactorElectric / ort->efficiencyDistrictCooling +
+                     ort->gatherTotalsBEPS(4) * ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating +
+                     ort->gatherTotalsBEPS(5) * ort->sourceFactorSteam) /
+                    largeConversionFactor; // from other fuels | net source from electricity | district cooling | district heating | steam
 
-            Array1D_int resource_entry_map;
-            resource_entry_map.allocate(12);
-            resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElEneUse;          // electricity
-            resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasEneUse;         // natural gas
-            resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineEneUse;    // gasoline
-            resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselEneUse;      // diesel
-            resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalEneUse;        // coal
-            resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
-            resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
-            resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneEneUse;     // propane
-            resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1EneUse;  // other fuel 1
-            resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2EneUse; // other fuel 2
-            resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClEneUse;      // district cooling
-            resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtEneUse;      // district heating
+                // show annual values
+                tableBody(1, 1) = RealToStr(totalSiteEnergyUse, 2);
+                tableBody(1, 2) = RealToStr(netSiteEnergyUse, 2);
+                tableBody(1, 3) = RealToStr(totalSourceEnergyUse, 2);
+                tableBody(1, 4) = RealToStr(netSourceEnergyUse, 2);
+                // show  per building area
+                if (convBldgGrossFloorArea > 0) {
+                    tableBody(2, 1) = RealToStr(totalSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
+                    tableBody(2, 2) = RealToStr(netSiteEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
+                    tableBody(2, 3) = RealToStr(totalSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
+                    tableBody(2, 4) = RealToStr(netSourceEnergyUse * kConversionFactor / convBldgGrossFloorArea, 2);
+                }
+                // show  per conditioned building area
+                if (convBldgCondFloorArea > 0) {
+                    tableBody(3, 1) = RealToStr(totalSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
+                    tableBody(3, 2) = RealToStr(netSiteEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
+                    tableBody(3, 3) = RealToStr(totalSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
+                    tableBody(3, 4) = RealToStr(netSourceEnergyUse * kConversionFactor / convBldgCondFloorArea, 2);
+                }
 
-            for (iResource = 1; iResource <= 12; ++iResource) {
-                i = 1;
-                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            PreDefTableEntry(state, resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " + state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
-                                             unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
-                            ++i;
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Site and Source Energy");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Site and Source Energy");
                         }
-                        // put other
-                        if (ort->needOtherRowLEED45(jEndUse)) {
-                            PreDefTableEntry(state, resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
-                                             unconvert * endUseSubOther(iResource, jEndUse));
-                            ++i;
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Site and Source Energy");
                         }
-                    } else {
-                        PreDefTableEntry(state, resource_entry_map(iResource),
-                                         state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
-                                         unconvert * collapsedEndUse(iResource, jEndUse));
-                        ++i;
                     }
                 }
-            }
 
-            //---- Normalized by Conditioned Area Sub-Table
-            // Calculations for both normalized tables are first
-            rowHead.allocate(4);
-            columnHead.allocate(13);
-            columnWidth.allocate(13);
-            columnWidth = 7; // array assignment - same for all columns
-            tableBody.allocate(13, 4);
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                normalVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
-                                          collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights)); // Lights     <- InteriorLights | <- ExteriorLights
+                //---- Source and Site Energy Sub-Table
+                rowHead.allocate(13);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 50; // array assignment
+                tableBody.allocate(1, 13);
 
-                normalVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) + collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
-                                          collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) + collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
-                                          collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) + collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
-                                          collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem)); // HVAC       <- fans | <- pumps | <- heating | <- cooling |
-                                                                                         // <- heat rejection | <- humidification | <- water system
-                                                                                         // domestic hot water
+                columnHead(1) = "Site=>Source Conversion Factor";
 
-                normalVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) + collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
-                                          collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) + collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
-                                          collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration)); // Other      <- InteriorEquipment | <- ExteriorEquipment |
-                                                                                           // <- generator fuel | <- Heat Recovery (parasitics) | <-
-                                                                                           // Refrigeration
+                rowHead(1) = "Electricity";
+                rowHead(2) = "Natural Gas";
+                rowHead(3) = "District Cooling";
+                rowHead(4) = "District Heating";
+                rowHead(5) = "Steam";
+                rowHead(6) = "Gasoline";
+                rowHead(7) = "Diesel";
+                rowHead(8) = "Coal";
+                rowHead(9) = "Fuel Oil No 1";
+                rowHead(10) = "Fuel Oil No 2";
+                rowHead(11) = "Propane";
+                rowHead(12) = "Other Fuel 1";
+                rowHead(13) = "Other Fuel 2";
 
-                normalVal(iResource, 4) = collapsedTotal(iResource); // totals
-            }
-            // convert the normalized end use values to MJ from GJ if using J
-            for (iResource = 1; iResource <= 12; ++iResource) { // not including resource=13 water
-                for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
-                    normalVal(iResource, jEndUse) *= kConversionFactor;
-                }
-            }
+                tableBody = "";
 
-            rowHead(1) = "Lighting"; // typo fixed 5-17-04 BTG
-            rowHead(2) = "HVAC";
-            rowHead(3) = "Other";
-            rowHead(4) = "Total";
+                // set columns to conversion factors
+                // show values
+                //  tableBody(1,1)  = TRIM(RealToStr(sourceFactorElectric,3))
+                //  tableBody(2,1)  = TRIM(RealToStr(sourceFactorNaturalGas, 3))
+                //  tableBody(3,1)  = TRIM(RealToStr(sourceFactorElectric/ efficiencyDistrictCooling,3))
+                //  tableBody(4,1)  = TRIM(RealToStr(sourceFactorNaturalGas/ efficiencyDistrictHeating ,3))
+                //  tableBody(5,1)  = TRIM(RealToStr(sourceFactorSteam ,3))
+                //  tableBody(6,1)  = TRIM(RealToStr(sourceFactorGasoline ,3))
+                //  tableBody(7,1)  = TRIM(RealToStr(sourceFactorDiesel ,3))
+                //  tableBody(8,1)  = TRIM(RealToStr(sourceFactorCoal ,3))
+                //  tableBody(9,1)  = TRIM(RealToStr(sourceFactorFuelOil1 ,3))
+                //  tableBody(10,1) = TRIM(RealToStr(sourceFactorFuelOil2 ,3))
+                //  tableBody(11,1) = TRIM(RealToStr(sourceFactorPropane ,3))
 
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity Intensity [kWh/m2]";
-                    columnHead(2) = "Natural Gas Intensity [kWh/m2]";
-                    columnHead(3) = "Gasoline Intensity [kWh/m2]";
-                    columnHead(4) = "Diesel Intensity [kWh/m2]";
-                    columnHead(5) = "Coal Intensity [kWh/m2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
-                    columnHead(8) = "Propane Intensity [kWh/m2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
-                    columnHead(11) = "District Cooling Intensity [kWh/m2]";
-                    columnHead(12) = "District Heating Intensity [kWh/m2]";
-                    columnHead(13) = "Water Intensity [m3/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity Intensity [kBtu/ft2]";
-                    columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
-                    columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
-                    columnHead(4) = "Diesel Intensity [kBtu/ft2]";
-                    columnHead(5) = "Coal Intensity [kBtu/ft2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
-                    columnHead(8) = "Propane Intensity [kBtu/ft2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
-                    columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
-                    columnHead(12) = "District Heating Intensity [kBtu/ft2]";
-                    columnHead(13) = "Water Intensity [gal/ft2]";
+                if (!ort->ffSchedUsed(1)) {
+                    tableBody(1, 1) = RealToStr(ort->sourceFactorElectric, 3);
+                } else if (ort->gatherTotalsBEPS(1) > SmallValue) {
+                    tableBody(1, 1) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(1) / ort->gatherTotalsBEPS(1), 3) +
+                                      " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(1)) + "\")";
                 } else {
-                    columnHead(1) = "Electricity Intensity [MJ/m2]";
-                    columnHead(2) = "Natural Gas Intensity [MJ/m2]";
-                    columnHead(3) = "Gasoline Intensity [MJ/m2]";
-                    columnHead(4) = "Diesel Intensity [MJ/m2]";
-                    columnHead(5) = "Coal Intensity [MJ/m2]";
-                    columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
-                    columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
-                    columnHead(8) = "Propane Intensity [MJ/m2]";
-                    columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
-                    columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
-                    columnHead(11) = "District Cooling Intensity [MJ/m2]";
-                    columnHead(12) = "District Heating Intensity [MJ/m2]";
-                    columnHead(13) = "Water Intensity [m3/m2]";
+                    tableBody(1, 1) = "N/A";
                 }
-            }
 
-            WriteTextLine(state, "Normalized Metrics", true);
+                if (!ort->ffSchedUsed(2)) {
+                    tableBody(1, 2) = RealToStr(ort->sourceFactorNaturalGas, 3);
+                } else if (ort->gatherTotalsBEPS(2) > SmallValue) {
+                    tableBody(1, 2) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(2) / ort->gatherTotalsBEPS(2), 3) +
+                                      " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(2)) + "\")";
+                } else {
+                    tableBody(1, 2) = "N/A";
+                }
 
-            // write the conditioned area based table
-            tableBody = "";
-            if (convBldgCondFloorArea > 0) {
-                for (iResource = 1; iResource <= 13; ++iResource) {
-                    for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
-                        tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+                tableBody(1, 3) = RealToStr(ort->sourceFactorElectric / ort->efficiencyDistrictCooling, 3); // District Cooling
+
+                tableBody(1, 4) = RealToStr(ort->sourceFactorNaturalGas / ort->efficiencyDistrictHeating, 3); // District Heating
+
+                tableBody(1, 5) = RealToStr(ort->sourceFactorSteam, 3); // Steam
+
+                if (!ort->ffSchedUsed(6)) {
+                    tableBody(1, 6) = RealToStr(ort->sourceFactorGasoline, 3);
+                } else if (ort->gatherTotalsBEPS(6) > SmallValue) {
+                    tableBody(1, 6) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(6) / ort->gatherTotalsBEPS(6), 3) +
+                                      " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(6)) + "\")";
+                } else {
+                    tableBody(1, 6) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(8)) {
+                    tableBody(1, 7) = RealToStr(ort->sourceFactorDiesel, 3);
+                } else if (ort->gatherTotalsBEPS(8) > SmallValue) {
+                    tableBody(1, 7) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(8) / ort->gatherTotalsBEPS(8), 3) +
+                                      " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(8)) + "\")";
+                } else {
+                    tableBody(1, 7) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(9)) {
+                    tableBody(1, 8) = RealToStr(ort->sourceFactorCoal, 3);
+                } else if (ort->gatherTotalsBEPS(9) > SmallValue) {
+                    tableBody(1, 8) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(9) / ort->gatherTotalsBEPS(9), 3) +
+                                      " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(9)) + "\")";
+                } else {
+                    tableBody(1, 8) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(10)) {
+                    tableBody(1, 9) = RealToStr(ort->sourceFactorFuelOil1, 3);
+                } else if (ort->gatherTotalsBEPS(10) > SmallValue) {
+                    tableBody(1, 9) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(10) / ort->gatherTotalsBEPS(10), 3) +
+                                      " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(10)) + "\")";
+                } else {
+                    tableBody(1, 9) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(11)) {
+                    tableBody(1, 10) = RealToStr(ort->sourceFactorFuelOil2, 3);
+                } else if (ort->gatherTotalsBEPS(11) > SmallValue) {
+                    tableBody(1, 10) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(11) / ort->gatherTotalsBEPS(11), 3) +
+                                       " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(11)) + "\")";
+                } else {
+                    tableBody(1, 10) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(12)) {
+                    tableBody(1, 11) = RealToStr(ort->sourceFactorPropane, 3);
+                } else if (ort->gatherTotalsBEPS(12) > SmallValue) {
+                    tableBody(1, 11) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(12) / ort->gatherTotalsBEPS(12), 3) +
+                                       " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(12)) + "\")";
+                } else {
+                    tableBody(1, 11) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(13)) {
+                    tableBody(1, 12) = RealToStr(ort->sourceFactorOtherFuel1, 3);
+                } else if (ort->gatherTotalsBEPS(13) > SmallValue) {
+                    tableBody(1, 12) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(13) / ort->gatherTotalsBEPS(13), 3) +
+                                       " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(13)) + "\")";
+                } else {
+                    tableBody(1, 12) = "N/A";
+                }
+
+                if (!ort->ffSchedUsed(14)) {
+                    tableBody(1, 13) = RealToStr(ort->sourceFactorOtherFuel2, 3);
+                } else if (ort->gatherTotalsBEPS(14) > SmallValue) {
+                    tableBody(1, 13) = "Effective Factor = " + RealToStr(ort->gatherTotalsBySourceBEPS(14) / ort->gatherTotalsBEPS(14), 3) +
+                                       " (calculated using schedule \"" + GetScheduleName(state, ort->ffSchedIndex(14)) + "\")";
+                } else {
+                    tableBody(1, 13) = "N/A";
+                }
+
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Site to Source Energy Conversion Factors");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Site to Source Energy Conversion Factors");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Site to Source Energy Conversion Factors");
+                        }
                     }
                 }
-            }
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Utility Use Per Conditioned Floor Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility",
-                                                           "Utility Use Per Conditioned Floor Area");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Annual Building Utility Performance Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Utility Use Per Conditioned Floor Area");
-                }
-            }
-            //---- Normalized by Total Area Sub-Table
-            tableBody = "";
-            if (convBldgGrossFloorArea > 0) {
-                for (iResource = 1; iResource <= 13; ++iResource) {
-                    for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
-                        tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
-                    }
-                }
-            }
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Utility Use Per Total Floor Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility",
-                                                           "Utility Use Per Total Floor Area");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Annual Building Utility Performance Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Utility Use Per Total Floor Area");
-                }
-            }
 
-            //---- Electric Loads Satisfied Sub-Table
-            rowHead.allocate(14);
-            columnHead.allocate(2);
-            columnWidth.allocate(2);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(2, 14);
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Electricity [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Electricity [kBtu]";
-                } else {
-                    columnHead(1) = "Electricity [GJ]";
-                }
-            }
-            columnHead(2) = "Percent Electricity [%]";
-
-            rowHead(1) = "Fuel-Fired Power Generation";
-            rowHead(2) = "High Temperature Geothermal*";
-            rowHead(3) = "Photovoltaic Power";
-            rowHead(4) = "Wind Power";
-            rowHead(5) = "Power Conversion";
-            rowHead(6) = "Net Decrease in On-Site Storage";
-            rowHead(7) = "Total On-Site Electric Sources";
-            rowHead(8) = "";
-            rowHead(9) = "Electricity Coming From Utility";
-            rowHead(10) = "Surplus Electricity Going To Utility";
-            rowHead(11) = "Net Electricity From Utility";
-            rowHead(12) = "";
-            rowHead(13) = "Total On-Site and Utility Electric Sources";
-            rowHead(14) = "Total Electricity End Uses";
-
-            tableBody = "";
-
-            // show annual values
-            unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
-
-            tableBody(1, 1) = RealToStr(ort->gatherPowerFuelFireGen, 3);
-            tableBody(1, 2) = RealToStr(ort->gatherPowerHTGeothermal, 3);
-            tableBody(1, 3) = RealToStr(ort->gatherPowerPV, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * ort->gatherPowerPV, 2);
-            tableBody(1, 4) = RealToStr(ort->gatherPowerWind, 3);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * ort->gatherPowerWind, 2);
-            tableBody(1, 5) = RealToStr(ort->gatherPowerConversion, 3);
-            tableBody(1, 6) = RealToStr(ort->OverallNetEnergyFromStorage, 3);
-            tableBody(1, 7) = RealToStr(ort->gatherElecProduced, 3);
-            tableBody(1, 9) = RealToStr(ort->gatherElecPurchased, 3);
-            tableBody(1, 10) = RealToStr(ort->gatherElecSurplusSold, 3);
-            tableBody(1, 11) = RealToStr(ort->gatherElecPurchased - ort->gatherElecSurplusSold, 3);
-            tableBody(1, 13) = RealToStr(ort->gatherElecProduced + (ort->gatherElecPurchased - ort->gatherElecSurplusSold), 3);
-            tableBody(1, 14) = RealToStr(collapsedTotal(1), 3);
-
-            // show annual percentages
-            if (collapsedTotal(1) > 0) {
-                tableBody(2, 1) = RealToStr(100.0 * ort->gatherPowerFuelFireGen / collapsedTotal(1), 2);
-                tableBody(2, 2) = RealToStr(100.0 * ort->gatherPowerHTGeothermal / collapsedTotal(1), 2);
-                tableBody(2, 3) = RealToStr(100.0 * ort->gatherPowerPV / collapsedTotal(1), 2);
-                tableBody(2, 4) = RealToStr(100.0 * ort->gatherPowerWind / collapsedTotal(1), 2);
-                tableBody(2, 5) = RealToStr(100.0 * ort->gatherPowerConversion / collapsedTotal(1), 2);
-                tableBody(2, 6) = RealToStr(100.0 * ort->OverallNetEnergyFromStorage / collapsedTotal(1), 2);
-                tableBody(2, 7) = RealToStr(100.0 * ort->gatherElecProduced / collapsedTotal(1), 2);
-                tableBody(2, 9) = RealToStr(100.0 * ort->gatherElecPurchased / collapsedTotal(1), 2);
-                tableBody(2, 10) = RealToStr(100.0 * ort->gatherElecSurplusSold / collapsedTotal(1), 2);
-                tableBody(2, 11) = RealToStr(100.0 * (ort->gatherElecPurchased - ort->gatherElecSurplusSold) / collapsedTotal(1), 2);
-                tableBody(2, 13) = RealToStr(100.0 * (ort->gatherElecProduced + (ort->gatherElecPurchased - ort->gatherElecSurplusSold)) / collapsedTotal(1), 2);
-                tableBody(2, 14) = RealToStr(100.0, 2);
-            }
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Electric Loads Satisfied");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Electric Loads Satisfied");
-                }
-            }
-
-            //---- On-Site Thermal Sources Sub-Table
-            rowHead.allocate(7);
-            columnHead.allocate(2);
-            columnWidth.allocate(2);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(2, 7);
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Heat [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Heat [kBtu]";
-                } else {
-                    columnHead(1) = "Heat [GJ]";
-                }
-            }
-
-            columnHead(2) = "Percent Heat [%]";
-
-            rowHead(1) = "Water-Side Heat Recovery";
-            rowHead(2) = "Air to Air Heat Recovery for Cooling";
-            rowHead(3) = "Air to Air Heat Recovery for Heating";
-            rowHead(4) = "High-Temperature Geothermal*";
-            rowHead(5) = "Solar Water Thermal";
-            rowHead(6) = "Solar Air Thermal";
-            rowHead(7) = "Total On-Site Thermal Sources";
-
-            tableBody = "";
-
-            // convert to GJ
-
-            ort->gatherWaterHeatRecovery /= largeConversionFactor;
-            ort->gatherAirHeatRecoveryCool /= largeConversionFactor;
-            ort->gatherAirHeatRecoveryHeat /= largeConversionFactor;
-            ort->gatherHeatHTGeothermal /= largeConversionFactor;
-            ort->gatherHeatSolarWater /= largeConversionFactor;
-            ort->gatherHeatSolarAir /= largeConversionFactor;
-
-            // determine total on site heat
-            totalOnsiteHeat = ort->gatherWaterHeatRecovery + ort->gatherAirHeatRecoveryCool + ort->gatherAirHeatRecoveryHeat + ort->gatherHeatHTGeothermal +
-                              ort->gatherHeatSolarWater + ort->gatherHeatSolarAir;
-
-            // show annual values
-            tableBody(1, 1) = RealToStr(ort->gatherWaterHeatRecovery, 2);
-            tableBody(1, 2) = RealToStr(ort->gatherAirHeatRecoveryCool, 2);
-            tableBody(1, 3) = RealToStr(ort->gatherAirHeatRecoveryHeat, 2);
-            tableBody(1, 4) = RealToStr(ort->gatherHeatHTGeothermal, 2);
-            tableBody(1, 5) = RealToStr(ort->gatherHeatSolarWater, 2);
-            tableBody(1, 6) = RealToStr(ort->gatherHeatSolarAir, 2);
-            tableBody(1, 7) = RealToStr(totalOnsiteHeat, 2);
-
-            if (totalOnsiteHeat > 0) {
-                tableBody(2, 1) = RealToStr(100.0 * ort->gatherWaterHeatRecovery / totalOnsiteHeat, 2);
-                tableBody(2, 2) = RealToStr(100.0 * ort->gatherAirHeatRecoveryCool / totalOnsiteHeat, 2);
-                tableBody(2, 3) = RealToStr(100.0 * ort->gatherAirHeatRecoveryHeat / totalOnsiteHeat, 2);
-                tableBody(2, 4) = RealToStr(100.0 * ort->gatherHeatHTGeothermal / totalOnsiteHeat, 2);
-                tableBody(2, 5) = RealToStr(100.0 * ort->gatherHeatSolarWater / totalOnsiteHeat, 2);
-                tableBody(2, 6) = RealToStr(100.0 * ort->gatherHeatSolarAir / totalOnsiteHeat, 2);
-                tableBody(2, 7) = RealToStr(100.0, 2);
-            }
-
-            // heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "On-Site Thermal Sources");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "On-Site Thermal Sources");
-                }
-            }
-
-            //---- Water Loads Sub-Table
-            // As of 12/8/2003 decided to not include this sub-table to wait
-            // until water use is implemented in EnergyPlus before displaying
-            // the table. Implementing water end-uses makes sense for EnergyPlus
-            // but since they are not really implemented as of December 2003 the
-            // table would be all zeros.  Recommendation to exclude this table
-            // for now made by Glazer and Crawley.
-            // Aug 2006, adding table in with implementation of water system, BGriffith
-            rowHead.allocate(13);
-            columnHead.allocate(2);
-            columnWidth.allocate(2);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(2, 13);
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Water [m3]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Water [gal]";
-                } else {
-                    columnHead(1) = "Water [m3]";
-                }
-            }
-            columnHead(2) = "Percent Water [%]";
-            rowHead(1) = "Rainwater Collection";
-            rowHead(2) = "Condensate Collection";
-            rowHead(3) = "Groundwater Well";
-            rowHead(4) = "Total On Site Water Sources";
-            rowHead(5) = "-";
-            rowHead(6) = "Initial Storage";
-            rowHead(7) = "Final Storage";
-            rowHead(8) = "Change in Storage";
-            rowHead(9) = "-";
-            rowHead(10) = "Water Supplied by Utility";
-            rowHead(11) = "-";
-            rowHead(12) = "Total On Site, Change in Storage, and Utility Water Sources";
-            rowHead(13) = "Total Water End Uses";
-            tableBody = "-";
-
-            totalOnsiteWater = ort->gatherRainWater + ort->gatherCondensate + ort->gatherWellwater;
-
-            //  ! show annual values
-            tableBody(1, 1) = RealToStr(ort->gatherRainWater / waterConversionFactor, 2);
-            tableBody(1, 2) = RealToStr(ort->gatherCondensate / waterConversionFactor, 2);
-            tableBody(1, 3) = RealToStr(ort->gatherWellwater / waterConversionFactor, 2);
-            tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
-
-            if (allocated(state.dataWaterData->WaterStorage)) {
-                initialStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::InitialVolume);
-                finalStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
-                StorageChange = initialStorage - finalStorage;
-            } else {
-                initialStorage = 0.0;
-                finalStorage = 0.0;
-                StorageChange = 0.0;
-            }
-            tableBody(1, 6) = RealToStr(initialStorage / waterConversionFactor, 2);
-            tableBody(1, 7) = RealToStr(finalStorage / waterConversionFactor, 2);
-            tableBody(1, 8) = RealToStr(StorageChange / waterConversionFactor, 2);
-
-            totalWater = totalOnsiteWater + ort->gatherMains + StorageChange;
-
-            tableBody(1, 10) = RealToStr(ort->gatherMains / waterConversionFactor, 2);
-            tableBody(1, 12) = RealToStr(totalWater / waterConversionFactor, 2);
-            tableBody(1, 13) = RealToStr(ort->gatherWaterEndUseTotal / waterConversionFactor, 2);
-
-            if (ort->gatherWaterEndUseTotal > 0) {
-                tableBody(2, 1) = RealToStr(100.0 * ort->gatherRainWater / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 2) = RealToStr(100.0 * ort->gatherCondensate / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 3) = RealToStr(100.0 * ort->gatherWellwater / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 4) = RealToStr(100.0 * totalOnsiteWater / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 6) = RealToStr(100.0 * initialStorage / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 7) = RealToStr(100.0 * finalStorage / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 8) = RealToStr(100.0 * StorageChange / ort->gatherWaterEndUseTotal, 2);
-
-                tableBody(2, 10) = RealToStr(100.0 * ort->gatherMains / ort->gatherWaterEndUseTotal, 2);
-
-                tableBody(2, 12) = RealToStr(100.0 * totalWater / ort->gatherWaterEndUseTotal, 2);
-                tableBody(2, 13) = RealToStr(100.0, 2);
-            }
-
-            //  ! heading for the entire sub-table
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Water Source Summary");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
-                }
-            }
-
-            //---- Comfort and Setpoint Not Met Sub-Table
-            if (ort->displayTabularBEPS) {
-                rowHead.allocate(2);
+                //---- Building Area Sub-Table
+                rowHead.allocate(3);
                 columnHead.allocate(1);
                 columnWidth.allocate(1);
                 columnWidth = 14; // array assignment - same for all columns
-                tableBody.allocate(1, 2);
+                tableBody.allocate(1, 3);
 
-                WriteSubtitle(state, "Setpoint Not Met Criteria");
-
-                curNameWithSIUnits = "Degrees [deltaC]";
-                curNameAndUnits = curNameWithSIUnits;
-                if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                    LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Area [m2]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Area [ft2]";
+                    } else {
+                        columnHead(1) = "Area [m2]";
+                    }
                 }
-                columnHead(1) = curNameAndUnits;
 
-                rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
-                rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
+                rowHead(1) = "Total Building Area";
+                rowHead(2) = "Net Conditioned Building Area";
+                rowHead(3) = "Unconditioned Building Area";
 
-                if (ort->unitsStyle != iUnitsStyle::InchPound) {
-                    tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
-                    tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
+                tableBody = "";
+                tableBody(1, 1) = RealToStr(convBldgGrossFloorArea, 2);
+
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    if (produceTabular) {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [ft2]", RealToStr(convBldgGrossFloorArea, 2));
+                    }
                 } else {
-                    tableBody(1, 1) = RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(deviationFromSetPtThresholdHtg)), 2);
-                    tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, deviationFromSetPtThresholdClg), 2);
+                    if (produceTabular) {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedGenData, "Total gross floor area [m2]", RealToStr(convBldgGrossFloorArea, 2));
+                    }
+                }
+                
+                tableBody(1, 2) = RealToStr(convBldgCondFloorArea, 2);
+                tableBody(1, 3) = RealToStr(convBldgGrossFloorArea - convBldgCondFloorArea, 2);
+
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Building Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
+                        }
+                    }
                 }
 
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
+                //---- End Use Sub-Table
+                rowHead.allocate(16);
+                columnHead.allocate(13);
+                columnWidth.allocate(13);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(13, 16);
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 5) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                    useVal(iResource, 6) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+
+                    useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Annual Building Utility Performance Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Setpoint Not Met Criteria");
+
+                rowHead(1) = "Heating";
+                rowHead(2) = "Cooling";
+                rowHead(3) = "Interior Lighting";
+                rowHead(4) = "Exterior Lighting";
+                rowHead(5) = "Interior Equipment";
+                rowHead(6) = "Exterior Equipment";
+                rowHead(7) = "Fans";
+                rowHead(8) = "Pumps";
+                rowHead(9) = "Heat Rejection";
+                rowHead(10) = "Humidification";
+                rowHead(11) = "Heat Recovery";
+                rowHead(12) = "Water Systems";
+                rowHead(13) = "Refrigeration";
+                rowHead(14) = "Generators";
+                rowHead(15) = "";
+                rowHead(16) = "Total End Uses";
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Electricity [kWh]";
+                        columnHead(2) = "Natural Gas [kWh]";
+                        columnHead(3) = "Gasoline [kWh]";
+                        columnHead(4) = "Diesel [kWh]";
+                        columnHead(5) = "Coal [kWh]";
+                        columnHead(6) = "Fuel Oil No 1 [kWh]";
+                        columnHead(7) = "Fuel Oil No 2 [kWh]";
+                        columnHead(8) = "Propane [kWh]";
+                        columnHead(9) = "Other Fuel 1 [kWh]";
+                        columnHead(10) = "Other Fuel 2 [kWh]";
+                        columnHead(11) = "District Cooling [kWh]";
+                        columnHead(12) = "District Heating [kWh]";
+                        columnHead(13) = "Water [m3]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Electricity [kBtu]";
+                        columnHead(2) = "Natural Gas [kBtu]";
+                        columnHead(3) = "Gasoline [kBtu]";
+                        columnHead(4) = "Diesel [kBtu]";
+                        columnHead(5) = "Coal [kBtu]";
+                        columnHead(6) = "Fuel Oil No 1 [kBtu]";
+                        columnHead(7) = "Fuel Oil No 2 [kBtu]";
+                        columnHead(8) = "Propane [kBtu]";
+                        columnHead(9) = "Other Fuel 1 [kBtu]";
+                        columnHead(10) = "Other Fuel 2 [kBtu]";
+                        columnHead(11) = "District Cooling [kBtu]";
+                        columnHead(12) = "District Heating [kBtu]";
+                        columnHead(13) = "Water [gal]";
+                    } else {
+                        columnHead(1) = "Electricity [GJ]";
+                        columnHead(2) = "Natural Gas [GJ]";
+                        columnHead(3) = "Gasoline [GJ]";
+                        columnHead(4) = "Diesel [GJ]";
+                        columnHead(5) = "Coal [GJ]";
+                        columnHead(6) = "Fuel Oil No 1 [GJ]";
+                        columnHead(7) = "Fuel Oil No 2 [GJ]";
+                        columnHead(8) = "Propane [GJ]";
+                        columnHead(9) = "Other Fuel 1 [GJ]";
+                        columnHead(10) = "Other Fuel 2 [GJ]";
+                        columnHead(11) = "District Cooling [GJ]";
+                        columnHead(12) = "District Heating [GJ]";
+                        columnHead(13) = "Water [m3]";
+                    }
+                }
+
+                tableBody = "";
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
+                    }
+                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15), 2);
+                }
+                // add warning message if end use values do not add up to total
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    Real64 curTotal = 0.0;
+                    for (int jUse = 1; jUse <= 14; ++jUse) {
+                        curTotal += useVal(iResource, jUse);
+                    }
+                    if (std::abs(curTotal - collapsedTotal(iResource)) > (collapsedTotal(iResource) * 0.001)) {
+                        ShowWarningError(state, ResourceWarningMessage(columnHead(iResource)));
+                    }
+                }
+
+                unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
+                //  Energy Use Intensities - Electricity
+                if (ort->buildingGrossFloorArea > 0) {
+                    if (produceTabular) {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Interior Lighting (All)",
+                                         unconvert * 1000 * useVal(colElectricity, 3) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Space Heating",
+                                         unconvert * 1000 * useVal(colElectricity, 1) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Space Cooling",
+                                         unconvert * 1000 * useVal(colElectricity, 2) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Fans (All)",
+                                         unconvert * 1000 * useVal(colElectricity, 7) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Service Water Heating",
+                                         unconvert * 1000 * useVal(colElectricity, 12) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Receptacle Equipment",
+                                         unconvert * 1000 * useVal(colElectricity, 5) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Miscellaneous (All)",
+                                         unconvert * 1000 * (useVal(colElectricity, 15)) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiElec,
+                                         "Subtotal",
+                                         unconvert * 1000 * useVal(colElectricity, 15) / ort->buildingGrossFloorArea,
+                                         2);
+                    }
+                }
+
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Electricity", unconvert * useVal(colElectricity, 15), 2);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedEusProc,
+                                     "Electricity",
+                                     unconvert * (useVal(colElectricity, 5) + useVal(colElectricity, 13)),
+                                     2);
+                }
+                if (useVal(colElectricity, 15) != 0) {
+                    processFraction = (useVal(colElectricity, 5) + useVal(colElectricity, 13)) / useVal(colElectricity, 15);
+                    processElecCost = state.dataOutRptPredefined->LEEDelecCostTotal * processFraction;
+                } else {
+                    processElecCost = 0.0;
+                }
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Electricity", processElecCost, 2);
+                }
+                if (produceTabular) {
+                    addFootNoteSubTable(
+                        state, state.dataOutRptPredefined->pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
+                }
+
+                //  Energy Use Intensities- Natural Gas
+                if (ort->buildingGrossFloorArea > 0) {
+                    if (produceTabular) {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiNatG,
+                                         "Space Heating",
+                                         unconvert * 1000 * useVal(colGas, 1) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiNatG,
+                                         "Service Water Heating",
+                                         unconvert * 1000 * useVal(colGas, 12) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiNatG,
+                                         "Miscellaneous (All)",
+                                         unconvert * 1000 * useVal(colGas, 15) / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiNatG,
+                                         "Subtotal",
+                                         unconvert * 1000 * useVal(colGas, 15) / ort->buildingGrossFloorArea,
+                                         2);
+                    }
+                }
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEusTotal, "Natural Gas", unconvert * useVal(colGas, 15), 2);
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchLeedEusProc, "Natural Gas", unconvert * (useVal(colGas, 5) + useVal(colGas, 13)), 2);
+                }
+                if (useVal(colGas, 15) != 0) {
+                    processFraction = (useVal(colGas, 5) + useVal(colGas, 13)) / useVal(colGas, 15);
+                    processGasCost = state.dataOutRptPredefined->LEEDgasCostTotal * processFraction;
+                } else {
+                    processGasCost = 0.0;
+                }
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Natural Gas", processGasCost, 2);
+                }
+                //  Energy Use Intensities  - Additional Fuel
+                useValColAddFuel15 =
+                    useVal(3, 15) + useVal(4, 15) + useVal(5, 15) + useVal(6, 15) + useVal(7, 15) + useVal(8, 15) + useVal(9, 15) + useVal(10, 15);
+                useValColAddFuel5 =
+                    useVal(3, 5) + useVal(4, 5) + useVal(5, 5) + useVal(6, 5) + useVal(7, 5) + useVal(8, 5) + useVal(9, 5) + useVal(10, 5);
+                useValColAddFuel13 =
+                    useVal(3, 13) + useVal(4, 13) + useVal(5, 13) + useVal(6, 13) + useVal(7, 13) + useVal(8, 13) + useVal(9, 13) + useVal(10, 13);
+                if (ort->buildingGrossFloorArea > 0) {
+                    if (produceTabular) {
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiOthr,
+                                         "Miscellaneous",
+                                         unconvert * 1000 * useValColAddFuel15 / ort->buildingGrossFloorArea,
+                                         2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEuiOthr,
+                                         "Subtotal",
+                                         unconvert * 1000 * useValColAddFuel15 / ort->buildingGrossFloorArea,
+                                         2);
+                    }
+                }
+                if (produceTabular) {
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedEusTotal,
+                                     "Additional",
+                                     unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)),
+                                     2);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedEusProc,
+                                     "Additional",
+                                     unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+                                                  useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)),
+                                     2);
+                }
+                if ((useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)) > 0.001) {
+                    processFraction = (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+                                       useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)) /
+                                      (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15));
+                } else {
+                    processFraction = 0.0;
+                }
+                processOthrCost = state.dataOutRptPredefined->LEEDothrCostTotal * processFraction;
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEcsProc, "Additional", processOthrCost, 2);
+                    PreDefTableEntry(
+                        state, state.dataOutRptPredefined->pdchLeedEcsProc, "Total", processElecCost + processGasCost + processOthrCost, 2);
+                }
+                // accumulate for percentage table
+                leedSiteIntLite = 0.0;
+                leedSiteSpHeat = 0.0;
+                leedSiteSpCool = 0.0;
+                leedSiteFanInt = 0.0;
+                leedSiteSrvWatr = 0.0;
+                leedSiteRecept = 0.0;
+                leedSiteTotal = 0.0;
+                for (iResource = 1; iResource <= 12; ++iResource) { // don't bother with water
+                    leedSiteIntLite += useVal(iResource, 3);
+                    leedSiteSpHeat += useVal(iResource, 1);
+                    leedSiteSpCool += useVal(iResource, 2);
+                    leedSiteFanInt += useVal(iResource, 7);
+                    leedSiteSrvWatr += useVal(iResource, 12);
+                    leedSiteRecept += useVal(iResource, 5);
+                    leedSiteTotal += useVal(iResource, 15);
+                }
+                if (leedSiteTotal != 0) {
+                    if (produceTabular) {
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Interior Lighting (All)", 100 * leedSiteIntLite / leedSiteTotal, 2);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Heating", 100 * leedSiteSpHeat / leedSiteTotal, 2);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Space Cooling", 100 * leedSiteSpCool / leedSiteTotal, 2);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedEupPerc, "Fans (All)", 100 * leedSiteFanInt / leedSiteTotal, 2);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Service Water Heating", 100 * leedSiteSrvWatr / leedSiteTotal, 2);
+                        PreDefTableEntry(
+                            state, state.dataOutRptPredefined->pdchLeedEupPerc, "Receptacle Equipment", 100 * leedSiteRecept / leedSiteTotal, 2);
+                        PreDefTableEntry(state,
+                                         state.dataOutRptPredefined->pdchLeedEupPerc,
+                                         "Miscellaneous",
+                                         100 *
+                                             (leedSiteTotal - (leedSiteIntLite + leedSiteSpHeat + leedSiteSpCool + leedSiteFanInt + leedSiteSrvWatr +
+                                                               leedSiteRecept)) /
+                                             leedSiteTotal,
+                                         2);
+                    }
+                }
+                // totals across energy source
+                if (produceTabular) {
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedEusTotal,
+                                     "Total",
+                                     unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) +
+                                                  useVal(colElectricity, 15) + useVal(colGas, 15)),
+                                     2);
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedEusProc,
+                                     "Total",
+                                     unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+                                                  useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13) + useVal(colElectricity, 5) +
+                                                  useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
+                                     2);
+                }
+
+                footnote = "";
+                {
+                    auto const SELECT_CASE_var(resourcePrimaryHeating);
+                    if (SELECT_CASE_var == colElectricity) {
+                        if (produceTabular) {
+                            footnote = "Note: Electricity appears to be the principal heating source based on energy usage.";
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Electricity");
+                        }
+                    } else if (SELECT_CASE_var == colGas) {
+                        if (produceTabular) {
+                            footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Natural Gas");
+                        }
+                    } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
+                               SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
+                        if (produceTabular) {
+                            footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
+                        }
+                        // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
+                        // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
+                    } else if (SELECT_CASE_var == colPurchHeat) {
+                        if (produceTabular) {
+                            footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedGenData, "Principal Heating Source", "District Heat");
+                        }
+                    }
+                }
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "End Uses");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
+                        }
+                    }
+                }
+
+                //---- End Uses By Subcategory Sub-Table
+
+                // determine if subcategories add up to the total and
+                // if not, determine the difference for the 'other' row
+                ort->needOtherRowLEED45 = false; // set array to all false assuming no other rows are needed
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                            // set the value to the total for the end use
+                            endUseSubOther(iResource, jEndUse) = collapsedEndUse(iResource, jEndUse);
+                            // subtract off each sub end use category value
+                            for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                                endUseSubOther(iResource, jEndUse) -= collapsedEndUseSub(kEndUseSub, jEndUse, iResource);
+                            }
+                            // if just a small value remains set it to zero
+                            if (std::abs(endUseSubOther(iResource, jEndUse)) > 0.01) {
+                                ort->needOtherRowLEED45(jEndUse) = true;
+                            } else {
+                                endUseSubOther(iResource, jEndUse) = 0.0;
+                            }
+                        } else {
+                            endUseSubOther(iResource, jEndUse) = 0.0;
+                        }
+                    }
+                }
+
+                // determine the number of rows needed for sub-table
+                numRows = 0;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                            ++numRows;
+                        }
+                        // check if an 'other' row is needed
+                        if (ort->needOtherRowLEED45(jEndUse)) {
+                            ++numRows;
+                        }
+                    } else {
+                        ++numRows;
+                    }
+                }
+
+                rowHead.allocate(numRows);
+                columnHead.allocate(14);
+                columnWidth.allocate(14);
+                columnWidth = 10;                // array assignment - same for all columns
+                tableBody.allocate(14, numRows); // TODO: this appears to be (column, row)...
+                rowHead = "";
+                tableBody = "";
+
+                // Build row head and subcategories columns
+                i = 1;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                            tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
+                            ++i;
+                        }
+                        // check if an 'other' row is needed
+                        if (ort->needOtherRowLEED45(jEndUse)) {
+                            tableBody(1, i) = "Other";
+                            ++i;
+                        }
+                    } else {
+                        tableBody(1, i) = "General";
+                        ++i;
+                    }
+                }
+
+                columnHead(1) = "Subcategory";
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(2) = "Electricity [kWh]";
+                        columnHead(3) = "Natural Gas [kWh]";
+                        columnHead(4) = "Gasoline [kWh]";
+                        columnHead(5) = "Diesel [kWh]";
+                        columnHead(6) = "Coal [kWh]";
+                        columnHead(7) = "Fuel Oil No 1 [kWh]";
+                        columnHead(8) = "Fuel Oil No 2 [kWh]";
+                        columnHead(9) = "Propane [kWh]";
+                        columnHead(10) = "Other Fuel 1 [kWh]";
+                        columnHead(11) = "Other Fuel 2 [kWh]";
+                        columnHead(12) = "District Cooling [kWh]";
+                        columnHead(13) = "District Heating [kWh]";
+                        columnHead(14) = "Water [m3]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(2) = "Electricity [kBtu]";
+                        columnHead(3) = "Natural Gas [kBtu]";
+                        columnHead(4) = "Gasoline [kBtu]";
+                        columnHead(5) = "Diesel [kBtu]";
+                        columnHead(6) = "Coal [kBtu]";
+                        columnHead(7) = "Fuel Oil No 1 [kBtu]";
+                        columnHead(8) = "Fuel Oil No 2 [kBtu]";
+                        columnHead(9) = "Propane [kBtu]";
+                        columnHead(10) = "Other Fuel 1 [kBtu]";
+                        columnHead(11) = "Other Fuel 2 [kBtu]";
+                        columnHead(12) = "District Cooling [kBtu]";
+                        columnHead(13) = "District Heating [kBtu]";
+                        columnHead(14) = "Water [gal]";
+                    } else {
+                        columnHead(2) = "Electricity [GJ]";
+                        columnHead(3) = "Natural Gas [GJ]";
+                        columnHead(4) = "Gasoline [GJ]";
+                        columnHead(5) = "Diesel [GJ]";
+                        columnHead(6) = "Coal [GJ]";
+                        columnHead(7) = "Fuel Oil No 1 [GJ]";
+                        columnHead(8) = "Fuel Oil No 2 [GJ]";
+                        columnHead(9) = "Propane [GJ]";
+                        columnHead(10) = "Other Fuel 1 [GJ]";
+                        columnHead(11) = "Other Fuel 2 [GJ]";
+                        columnHead(12) = "District Cooling [GJ]";
+                        columnHead(13) = "District Heating [GJ]";
+                        columnHead(14) = "Water [m3]";
+                    }
+                }
+
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    i = 1;
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                            for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                                tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
+                                ++i;
+                            }
+                            // put other
+                            if (ort->needOtherRowLEED45(jEndUse)) {
+                                tableBody(iResource + 1, i) = RealToStr(endUseSubOther(iResource, jEndUse), 2);
+                                ++i;
+                            }
+                        } else {
+                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                            ++i;
+                        }
+                    }
+                }
+
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "End Uses By Subcategory");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    Array1D_string rowHeadTemp(rowHead);
+                    // Before outputing to SQL, we forward fill the End use column (rowHead)
+                    // for better sql queries
+                    FillRowHead(rowHeadTemp);
+
+                    for (int i = 1; i <= numRows; ++i) {
+                        rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                    }
+
+                    // Erase the SubCategory (first column), using slicing
+                    Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+                    Array1D_string columnHeadTemp(columnHead({2, _, _}));
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                                                                   rowHeadTemp,
+                                                                   columnHeadTemp,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "End Uses By Subcategory");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                                        rowHeadTemp,
+                                                                                                        columnHeadTemp,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "End Uses By Subcategory");
+                        }
+                    }
+                    rowHeadTemp.deallocate();
+                    tableBodyTemp.deallocate();
+                    columnHeadTemp.deallocate();
+                }
+
+                // EAp2-4/5. Performance Rating Method Compliance
+                // repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
+
+                Array1D_int resource_entry_map;
+                resource_entry_map.allocate(12);
+                resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElEneUse;          // electricity
+                resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasEneUse;         // natural gas
+                resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineEneUse;    // gasoline
+                resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselEneUse;      // diesel
+                resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalEneUse;        // coal
+                resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
+                resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
+                resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneEneUse;     // propane
+                resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1EneUse;  // other fuel 1
+                resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2EneUse; // other fuel 2
+                resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClEneUse;      // district cooling
+                resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtEneUse;      // district heating
+
+                for (iResource = 1; iResource <= 12; ++iResource) {
+                    i = 1;
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                            for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                                if (produceTabular) {
+                                    PreDefTableEntry(state,
+                                                     resource_entry_map(iResource),
+                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
+                                                         state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                                     unconvert * collapsedEndUseSub(kEndUseSub, jEndUse, iResource));
+                                }
+                                ++i;
+                            }
+                            // put other
+                            if (ort->needOtherRowLEED45(jEndUse)) {
+                                if (produceTabular) {
+                                    PreDefTableEntry(state,
+                                                     resource_entry_map(iResource),
+                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                                     unconvert * endUseSubOther(iResource, jEndUse));
+                                }
+                                ++i;
+                            }
+                        } else {
+                            if (produceTabular) {
+                                PreDefTableEntry(state,
+                                                 resource_entry_map(iResource),
+                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
+                                                 unconvert * collapsedEndUse(iResource, jEndUse));
+                            }
+                            ++i;
+                        }
+                    }
+                }
+
+                //---- Normalized by Conditioned Area Sub-Table
+                // Calculations for both normalized tables are first
+                rowHead.allocate(4);
+                columnHead.allocate(13);
+                columnWidth.allocate(13);
+                columnWidth = 7; // array assignment - same for all columns
+                tableBody.allocate(13, 4);
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    normalVal(iResource, 1) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights)) +
+                        collapsedEndUse(iResource,
+                                        DataGlobalConstants::iEndUse.at(
+                                            DataGlobalConstants::EndUse::ExteriorLights)); // Lights     <- InteriorLights | <- ExteriorLights
+
+                    normalVal(iResource, 2) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification)) +
+                        collapsedEndUse(iResource,
+                                        DataGlobalConstants::iEndUse.at(
+                                            DataGlobalConstants::EndUse::WaterSystem)); // HVAC       <- fans | <- pumps | <- heating | <- cooling |
+                                                                                        // <- heat rejection | <- humidification | <- water system
+                                                                                        // domestic hot water
+
+                    normalVal(iResource, 3) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration)) +
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery)) +
+                        collapsedEndUse(iResource,
+                                        DataGlobalConstants::iEndUse.at(
+                                            DataGlobalConstants::EndUse::Refrigeration)); // Other      <- InteriorEquipment | <- ExteriorEquipment |
+                                                                                          // <- generator fuel | <- Heat Recovery (parasitics) | <-
+                                                                                          // Refrigeration
+
+                    normalVal(iResource, 4) = collapsedTotal(iResource); // totals
+                }
+                // convert the normalized end use values to MJ from GJ if using J
+                for (iResource = 1; iResource <= 12; ++iResource) { // not including resource=13 water
+                    for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
+                        normalVal(iResource, jEndUse) *= kConversionFactor;
+                    }
+                }
+
+                rowHead(1) = "Lighting"; // typo fixed 5-17-04 BTG
+                rowHead(2) = "HVAC";
+                rowHead(3) = "Other";
+                rowHead(4) = "Total";
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Electricity Intensity [kWh/m2]";
+                        columnHead(2) = "Natural Gas Intensity [kWh/m2]";
+                        columnHead(3) = "Gasoline Intensity [kWh/m2]";
+                        columnHead(4) = "Diesel Intensity [kWh/m2]";
+                        columnHead(5) = "Coal Intensity [kWh/m2]";
+                        columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
+                        columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
+                        columnHead(8) = "Propane Intensity [kWh/m2]";
+                        columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
+                        columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
+                        columnHead(11) = "District Cooling Intensity [kWh/m2]";
+                        columnHead(12) = "District Heating Intensity [kWh/m2]";
+                        columnHead(13) = "Water Intensity [m3/m2]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Electricity Intensity [kBtu/ft2]";
+                        columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
+                        columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
+                        columnHead(4) = "Diesel Intensity [kBtu/ft2]";
+                        columnHead(5) = "Coal Intensity [kBtu/ft2]";
+                        columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
+                        columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
+                        columnHead(8) = "Propane Intensity [kBtu/ft2]";
+                        columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
+                        columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
+                        columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
+                        columnHead(12) = "District Heating Intensity [kBtu/ft2]";
+                        columnHead(13) = "Water Intensity [gal/ft2]";
+                    } else {
+                        columnHead(1) = "Electricity Intensity [MJ/m2]";
+                        columnHead(2) = "Natural Gas Intensity [MJ/m2]";
+                        columnHead(3) = "Gasoline Intensity [MJ/m2]";
+                        columnHead(4) = "Diesel Intensity [MJ/m2]";
+                        columnHead(5) = "Coal Intensity [MJ/m2]";
+                        columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
+                        columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
+                        columnHead(8) = "Propane Intensity [MJ/m2]";
+                        columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
+                        columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
+                        columnHead(11) = "District Cooling Intensity [MJ/m2]";
+                        columnHead(12) = "District Heating Intensity [MJ/m2]";
+                        columnHead(13) = "Water Intensity [m3/m2]";
+                    }
+                }
+
+                if (produceTabular) {
+                    WriteTextLine(state, "Normalized Metrics", true);
+                }
+
+                // write the conditioned area based table
+                tableBody = "";
+                if (convBldgCondFloorArea > 0) {
+                    for (iResource = 1; iResource <= 13; ++iResource) {
+                        for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
+                            tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+                        }
+                    }
+                }
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Utility Use Per Conditioned Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Utility Use Per Conditioned Floor Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Utility Use Per Conditioned Floor Area");
+                        }
+                    }
+                }
+                //---- Normalized by Total Area Sub-Table
+                tableBody = "";
+                if (convBldgGrossFloorArea > 0) {
+                    for (iResource = 1; iResource <= 13; ++iResource) {
+                        for (size_t jEndUse = 1; jEndUse <= 4; ++jEndUse) {
+                            tableBody(iResource, jEndUse) = RealToStr(normalVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
+                        }
+                    }
+                }
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Utility Use Per Total Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Utility Use Per Total Floor Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Utility Use Per Total Floor Area");
+                        }
+                    }
+                }
+
+                //---- Electric Loads Satisfied Sub-Table
+                rowHead.allocate(14);
+                columnHead.allocate(2);
+                columnWidth.allocate(2);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(2, 14);
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Electricity [kWh]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Electricity [kBtu]";
+                    } else {
+                        columnHead(1) = "Electricity [GJ]";
+                    }
+                }
+                columnHead(2) = "Percent Electricity [%]";
+
+                rowHead(1) = "Fuel-Fired Power Generation";
+                rowHead(2) = "High Temperature Geothermal*";
+                rowHead(3) = "Photovoltaic Power";
+                rowHead(4) = "Wind Power";
+                rowHead(5) = "Power Conversion";
+                rowHead(6) = "Net Decrease in On-Site Storage";
+                rowHead(7) = "Total On-Site Electric Sources";
+                rowHead(8) = "";
+                rowHead(9) = "Electricity Coming From Utility";
+                rowHead(10) = "Surplus Electricity Going To Utility";
+                rowHead(11) = "Net Electricity From Utility";
+                rowHead(12) = "";
+                rowHead(13) = "Total On-Site and Utility Electric Sources";
+                rowHead(14) = "Total Electricity End Uses";
+
+                tableBody = "";
+
+                // show annual values
+                unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
+
+                tableBody(1, 1) = RealToStr(ort->gatherPowerFuelFireGen, 3);
+                tableBody(1, 2) = RealToStr(ort->gatherPowerHTGeothermal, 3);
+                tableBody(1, 3) = RealToStr(ort->gatherPowerPV, 3);
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Photovoltaic", unconvert * ort->gatherPowerPV, 2);
+                }
+                tableBody(1, 4) = RealToStr(ort->gatherPowerWind, 3);
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedRenAnGen, "Wind", unconvert * ort->gatherPowerWind, 2);
+                }
+                tableBody(1, 5) = RealToStr(ort->gatherPowerConversion, 3);
+                tableBody(1, 6) = RealToStr(ort->OverallNetEnergyFromStorage, 3);
+                tableBody(1, 7) = RealToStr(ort->gatherElecProduced, 3);
+                tableBody(1, 9) = RealToStr(ort->gatherElecPurchased, 3);
+                tableBody(1, 10) = RealToStr(ort->gatherElecSurplusSold, 3);
+                tableBody(1, 11) = RealToStr(ort->gatherElecPurchased - ort->gatherElecSurplusSold, 3);
+                tableBody(1, 13) = RealToStr(ort->gatherElecProduced + (ort->gatherElecPurchased - ort->gatherElecSurplusSold), 3);
+                tableBody(1, 14) = RealToStr(collapsedTotal(1), 3);
+
+                // show annual percentages
+                if (collapsedTotal(1) > 0) {
+                    tableBody(2, 1) = RealToStr(100.0 * ort->gatherPowerFuelFireGen / collapsedTotal(1), 2);
+                    tableBody(2, 2) = RealToStr(100.0 * ort->gatherPowerHTGeothermal / collapsedTotal(1), 2);
+                    tableBody(2, 3) = RealToStr(100.0 * ort->gatherPowerPV / collapsedTotal(1), 2);
+                    tableBody(2, 4) = RealToStr(100.0 * ort->gatherPowerWind / collapsedTotal(1), 2);
+                    tableBody(2, 5) = RealToStr(100.0 * ort->gatherPowerConversion / collapsedTotal(1), 2);
+                    tableBody(2, 6) = RealToStr(100.0 * ort->OverallNetEnergyFromStorage / collapsedTotal(1), 2);
+                    tableBody(2, 7) = RealToStr(100.0 * ort->gatherElecProduced / collapsedTotal(1), 2);
+                    tableBody(2, 9) = RealToStr(100.0 * ort->gatherElecPurchased / collapsedTotal(1), 2);
+                    tableBody(2, 10) = RealToStr(100.0 * ort->gatherElecSurplusSold / collapsedTotal(1), 2);
+                    tableBody(2, 11) = RealToStr(100.0 * (ort->gatherElecPurchased - ort->gatherElecSurplusSold) / collapsedTotal(1), 2);
+                    tableBody(2, 13) =
+                        RealToStr(100.0 * (ort->gatherElecProduced + (ort->gatherElecPurchased - ort->gatherElecSurplusSold)) / collapsedTotal(1), 2);
+                    tableBody(2, 14) = RealToStr(100.0, 2);
+                }
+
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Electric Loads Satisfied");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Electric Loads Satisfied");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Electric Loads Satisfied");
+                        }
+                    }
+                }
+
+                //---- On-Site Thermal Sources Sub-Table
+                rowHead.allocate(7);
+                columnHead.allocate(2);
+                columnWidth.allocate(2);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(2, 7);
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Heat [kWh]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Heat [kBtu]";
+                    } else {
+                        columnHead(1) = "Heat [GJ]";
+                    }
+                }
+
+                columnHead(2) = "Percent Heat [%]";
+
+                rowHead(1) = "Water-Side Heat Recovery";
+                rowHead(2) = "Air to Air Heat Recovery for Cooling";
+                rowHead(3) = "Air to Air Heat Recovery for Heating";
+                rowHead(4) = "High-Temperature Geothermal*";
+                rowHead(5) = "Solar Water Thermal";
+                rowHead(6) = "Solar Air Thermal";
+                rowHead(7) = "Total On-Site Thermal Sources";
+
+                tableBody = "";
+
+                if (iUnitSystem == 0) {
+                    gtWaterHeatRecovery = ort->gatherWaterHeatRecovery;
+                    gtAirHeatRecoveryCool = ort->gatherAirHeatRecoveryCool;
+                    gtAirHeatRecoveryHeat = ort->gatherAirHeatRecoveryHeat;
+                    gtHeatHTGeothermal = ort->gatherHeatHTGeothermal;
+                    gtHeatSolarWater = ort->gatherHeatSolarWater;
+                    gtHeatSolarAir = ort->gatherHeatSolarAir;
+                } else {
+                    ort->gatherWaterHeatRecovery = gtWaterHeatRecovery;
+                    ort->gatherAirHeatRecoveryCool = gtAirHeatRecoveryCool;
+                    ort->gatherAirHeatRecoveryHeat = gtAirHeatRecoveryHeat;
+                    ort->gatherHeatHTGeothermal = gtHeatHTGeothermal;
+                    ort->gatherHeatSolarWater = gtHeatSolarWater;
+                    ort->gatherHeatSolarAir = gtHeatSolarAir;
+                }
+
+                // convert to GJ
+                ort->gatherWaterHeatRecovery /= largeConversionFactor;
+                ort->gatherAirHeatRecoveryCool /= largeConversionFactor;
+                ort->gatherAirHeatRecoveryHeat /= largeConversionFactor;
+                ort->gatherHeatHTGeothermal /= largeConversionFactor;
+                ort->gatherHeatSolarWater /= largeConversionFactor;
+                ort->gatherHeatSolarAir /= largeConversionFactor;
+
+                // determine total on site heat
+                totalOnsiteHeat = ort->gatherWaterHeatRecovery + ort->gatherAirHeatRecoveryCool + ort->gatherAirHeatRecoveryHeat +
+                                  ort->gatherHeatHTGeothermal + ort->gatherHeatSolarWater + ort->gatherHeatSolarAir;
+
+                // show annual values
+                tableBody(1, 1) = RealToStr(ort->gatherWaterHeatRecovery, 2);
+                tableBody(1, 2) = RealToStr(ort->gatherAirHeatRecoveryCool, 2);
+                tableBody(1, 3) = RealToStr(ort->gatherAirHeatRecoveryHeat, 2);
+                tableBody(1, 4) = RealToStr(ort->gatherHeatHTGeothermal, 2);
+                tableBody(1, 5) = RealToStr(ort->gatherHeatSolarWater, 2);
+                tableBody(1, 6) = RealToStr(ort->gatherHeatSolarAir, 2);
+                tableBody(1, 7) = RealToStr(totalOnsiteHeat, 2);
+
+                if (totalOnsiteHeat > 0) {
+                    tableBody(2, 1) = RealToStr(100.0 * ort->gatherWaterHeatRecovery / totalOnsiteHeat, 2);
+                    tableBody(2, 2) = RealToStr(100.0 * ort->gatherAirHeatRecoveryCool / totalOnsiteHeat, 2);
+                    tableBody(2, 3) = RealToStr(100.0 * ort->gatherAirHeatRecoveryHeat / totalOnsiteHeat, 2);
+                    tableBody(2, 4) = RealToStr(100.0 * ort->gatherHeatHTGeothermal / totalOnsiteHeat, 2);
+                    tableBody(2, 5) = RealToStr(100.0 * ort->gatherHeatSolarWater / totalOnsiteHeat, 2);
+                    tableBody(2, 6) = RealToStr(100.0 * ort->gatherHeatSolarAir / totalOnsiteHeat, 2);
+                    tableBody(2, 7) = RealToStr(100.0, 2);
+                }
+
+                // heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "On-Site Thermal Sources");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "On-Site Thermal Sources");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "On-Site Thermal Sources");
+                        }
+                    }
+                }
+
+                //---- Water Loads Sub-Table
+                // As of 12/8/2003 decided to not include this sub-table to wait
+                // until water use is implemented in EnergyPlus before displaying
+                // the table. Implementing water end-uses makes sense for EnergyPlus
+                // but since they are not really implemented as of December 2003 the
+                // table would be all zeros.  Recommendation to exclude this table
+                // for now made by Glazer and Crawley.
+                // Aug 2006, adding table in with implementation of water system, BGriffith
+                rowHead.allocate(13);
+                columnHead.allocate(2);
+                columnWidth.allocate(2);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(2, 13);
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Water [m3]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Water [gal]";
+                    } else {
+                        columnHead(1) = "Water [m3]";
+                    }
+                }
+                columnHead(2) = "Percent Water [%]";
+                rowHead(1) = "Rainwater Collection";
+                rowHead(2) = "Condensate Collection";
+                rowHead(3) = "Groundwater Well";
+                rowHead(4) = "Total On Site Water Sources";
+                rowHead(5) = "-";
+                rowHead(6) = "Initial Storage";
+                rowHead(7) = "Final Storage";
+                rowHead(8) = "Change in Storage";
+                rowHead(9) = "-";
+                rowHead(10) = "Water Supplied by Utility";
+                rowHead(11) = "-";
+                rowHead(12) = "Total On Site, Change in Storage, and Utility Water Sources";
+                rowHead(13) = "Total Water End Uses";
+                tableBody = "-";
+
+                totalOnsiteWater = ort->gatherRainWater + ort->gatherCondensate + ort->gatherWellwater;
+
+                //  ! show annual values
+                tableBody(1, 1) = RealToStr(ort->gatherRainWater / waterConversionFactor, 2);
+                tableBody(1, 2) = RealToStr(ort->gatherCondensate / waterConversionFactor, 2);
+                tableBody(1, 3) = RealToStr(ort->gatherWellwater / waterConversionFactor, 2);
+                tableBody(1, 4) = RealToStr(totalOnsiteWater / waterConversionFactor, 2);
+
+                if (allocated(state.dataWaterData->WaterStorage)) {
+                    initialStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::InitialVolume);
+                    finalStorage = sum(state.dataWaterData->WaterStorage, &StorageTankDataStruct::ThisTimeStepVolume);
+                    StorageChange = initialStorage - finalStorage;
+                } else {
+                    initialStorage = 0.0;
+                    finalStorage = 0.0;
+                    StorageChange = 0.0;
+                }
+                tableBody(1, 6) = RealToStr(initialStorage / waterConversionFactor, 2);
+                tableBody(1, 7) = RealToStr(finalStorage / waterConversionFactor, 2);
+                tableBody(1, 8) = RealToStr(StorageChange / waterConversionFactor, 2);
+
+                totalWater = totalOnsiteWater + ort->gatherMains + StorageChange;
+
+                tableBody(1, 10) = RealToStr(ort->gatherMains / waterConversionFactor, 2);
+                tableBody(1, 12) = RealToStr(totalWater / waterConversionFactor, 2);
+                tableBody(1, 13) = RealToStr(ort->gatherWaterEndUseTotal / waterConversionFactor, 2);
+
+                if (ort->gatherWaterEndUseTotal > 0) {
+                    tableBody(2, 1) = RealToStr(100.0 * ort->gatherRainWater / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 2) = RealToStr(100.0 * ort->gatherCondensate / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 3) = RealToStr(100.0 * ort->gatherWellwater / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 4) = RealToStr(100.0 * totalOnsiteWater / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 6) = RealToStr(100.0 * initialStorage / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 7) = RealToStr(100.0 * finalStorage / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 8) = RealToStr(100.0 * StorageChange / ort->gatherWaterEndUseTotal, 2);
+
+                    tableBody(2, 10) = RealToStr(100.0 * ort->gatherMains / ort->gatherWaterEndUseTotal, 2);
+
+                    tableBody(2, 12) = RealToStr(100.0 * totalWater / ort->gatherWaterEndUseTotal, 2);
+                    tableBody(2, 13) = RealToStr(100.0, 2);
+                }
+
+                //  ! heading for the entire sub-table
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Water Source Summary");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Water Source Summary");
+                        }
+                    }
+                }
+
+                //---- Comfort and Setpoint Not Met Sub-Table
+                if (ort->displayTabularBEPS) {
+                    rowHead.allocate(2);
+                    columnHead.allocate(1);
+                    columnWidth.allocate(1);
+                    columnWidth = 14; // array assignment - same for all columns
+                    tableBody.allocate(1, 2);
+
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Setpoint Not Met Criteria");
+                    }
+
+                    curNameWithSIUnits = "Degrees [deltaC]";
+                    curNameAndUnits = curNameWithSIUnits;
+                    if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                            LookupSItoIP(state, curNameWithSIUnits, indexUnitConv, curNameAndUnits);
+                    }
+                    columnHead(1) = curNameAndUnits;
+
+                    rowHead(1) = "Tolerance for Zone Heating Setpoint Not Met Time";
+                    rowHead(2) = "Tolerance for Zone Cooling Setpoint Not Met Time";
+
+                    if (unitsStyle_cur != iUnitsStyle::InchPound) {
+                            tableBody(1, 1) = RealToStr(std::abs(deviationFromSetPtThresholdHtg), 2);
+                        tableBody(1, 2) = RealToStr(deviationFromSetPtThresholdClg, 2);
+                    } else {
+                        tableBody(1, 1) = RealToStr(ConvertIPdelta(state, indexUnitConv, std::abs(deviationFromSetPtThresholdHtg)), 2);
+                        tableBody(1, 2) = RealToStr(ConvertIPdelta(state, indexUnitConv, deviationFromSetPtThresholdClg), 2);
+                    }
+
+                    if (produceTabular) {
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Setpoint Not Met Criteria");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Setpoint Not Met Criteria");
+                        }
+                    }
+                }
+
+                rowHead.allocate(3);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(1, 3);
+
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Comfort and Setpoint Not Met Summary");
+                    }
+                }
+
+                columnHead(1) = "Facility [Hours]";
+
+                rowHead(1) = "Time Setpoint Not Met During Occupied Heating";
+                rowHead(2) = "Time Setpoint Not Met During Occupied Cooling";
+                rowHead(3) = "Time Not Comfortable Based on Simple ASHRAE 55-2004";
+
+                tableBody(1, 1) = RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2);
+                tableBody(1, 2) = RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2);
+                if (produceTabular) {
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedAmData,
+                                     "Number of hours heating loads not met",
+                                     RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2));
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedAmData,
+                                     "Number of hours cooling loads not met",
+                                     RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2));
+                    PreDefTableEntry(state,
+                                     state.dataOutRptPredefined->pdchLeedAmData,
+                                     "Number of hours not met",
+                                     RealToStr(state.dataOutRptPredefined->TotalNotMetOccupiedForABUPS, 2));
+                }
+                tableBody(1, 3) = RealToStr(state.dataOutRptPredefined->TotalTimeNotSimpleASH55EitherForABUPS, 2);
+
+                if (ort->displayTabularBEPS) {
+                    if (produceTabular) {
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "AnnualBuildingUtilityPerformanceSummary",
+                                                                   "Entire Facility",
+                                                                   "Comfort and Setpoint Not Met Summary");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                        rowHead,
+                                                                                                        columnHead,
+                                                                                                        "Annual Building Utility Performance Summary",
+                                                                                                        "Entire Facility",
+                                                                                                        "Comfort and Setpoint Not Met Summary");
+                        }
+                    }
                 }
             }
-
-            rowHead.allocate(3);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(1, 3);
-
-            if (ort->displayTabularBEPS) {
-                WriteSubtitle(state, "Comfort and Setpoint Not Met Summary");
-            }
-
-            columnHead(1) = "Facility [Hours]";
-
-            rowHead(1) = "Time Setpoint Not Met During Occupied Heating";
-            rowHead(2) = "Time Setpoint Not Met During Occupied Cooling";
-            rowHead(3) = "Time Not Comfortable Based on Simple ASHRAE 55-2004";
-
-            tableBody(1, 1) = RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2);
-            tableBody(1, 2) = RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours heating loads not met", RealToStr(state.dataOutRptPredefined->TotalNotMetHeatingOccupiedForABUPS, 2));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours cooling loads not met", RealToStr(state.dataOutRptPredefined->TotalNotMetCoolingOccupiedForABUPS, 2));
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedAmData, "Number of hours not met", RealToStr(state.dataOutRptPredefined->TotalNotMetOccupiedForABUPS, 2));
-            tableBody(1, 3) = RealToStr(state.dataOutRptPredefined->TotalTimeNotSimpleASH55EitherForABUPS, 2);
-
-            if (ort->displayTabularBEPS) {
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "AnnualBuildingUtilityPerformanceSummary",
-                                                           "Entire Facility",
-                                                           "Comfort and Setpoint Not Met Summary");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Annual Building Utility Performance Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Comfort and Setpoint Not Met Summary");
-                }
-            }
-
             //---- Control Summary Sub-Table
 
             //---- End Notes
@@ -8586,6 +9263,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displaySourceEnergyEndUseSummary) {
+
             // show the headers of the report
             WriteReportHeaders(state, "Source Energy End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
             // show the number of hours that the table applies to
@@ -8594,301 +9272,333 @@ namespace EnergyPlus::OutputReportTabular {
                 WriteTextLine(state, "WARNING: THE REPORT DOES NOT REPRESENT A FULL ANNUAL SIMULATION.", true);
             }
             WriteTextLine(state, "", true);
+
             // determine building floor areas
             DetermineBuildingFloorArea(state);
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
-                collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
-                collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
-                collapsedEndUse(4, jEndUse) = ort->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
-                collapsedEndUse(5, jEndUse) = ort->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = ort->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
-                collapsedEndUse(7, jEndUse) = ort->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
-                collapsedEndUse(8, jEndUse) = ort->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
-                collapsedEndUse(9, jEndUse) = ort->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
-                collapsedEndUse(10, jEndUse) = ort->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
-                collapsedEndUse(11, jEndUse) = ort->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
-                collapsedEndUse(12, jEndUse) =
-                    ort->gatherEndUseBySourceBEPS(4, jEndUse) + ort->gatherEndUseBySourceBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
-                collapsedEndUse(13, jEndUse) = ort->gatherEndUseBySourceBEPS(7, jEndUse);             // water
-            }
-            // repeat with totals
-            collapsedTotal(1) = ort->gatherTotalsBySourceBEPS(1);                                // electricity
-            collapsedTotal(2) = ort->gatherTotalsBySourceBEPS(2);                                // natural gas
-            collapsedTotal(3) = ort->gatherTotalsBySourceBEPS(6);                                // gasoline
-            collapsedTotal(4) = ort->gatherTotalsBySourceBEPS(8);                                // diesel
-            collapsedTotal(5) = ort->gatherTotalsBySourceBEPS(9);                                // coal
-            collapsedTotal(6) = ort->gatherTotalsBySourceBEPS(10);                               // Fuel Oil No1
-            collapsedTotal(7) = ort->gatherTotalsBySourceBEPS(11);                               // Fuel Oil No2
-            collapsedTotal(8) = ort->gatherTotalsBySourceBEPS(12);                               // propane
-            collapsedTotal(9) = ort->gatherTotalsBySourceBEPS(13);                               // otherfuel1
-            collapsedTotal(10) = ort->gatherTotalsBySourceBEPS(14);                              // otherfuel2
-            collapsedTotal(11) = ort->gatherTotalsBySourceBEPS(3);                               // district cooling <- purchased cooling
-            collapsedTotal(12) = ort->gatherTotalsBySourceBEPS(4) + ort->gatherTotalsBySourceBEPS(5); // district heating <- purchased heating | <- steam
-            collapsedTotal(13) = ort->gatherTotalsBySourceBEPS(7);                               // water
 
-            // unit conversion - all values are used as divisors
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    largeConversionFactor = 3600000.0;
-                    areaConversionFactor = 1.0;
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
-                    areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
-                } else {
-                    largeConversionFactor = 1000000.0; // to MJ
-                    areaConversionFactor = 1.0;
-                }
-            }
-
-            // convert units into MJ (divide by 1,000,000) if J otherwise kWh
-            for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                    collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                    collapsedEndUse(1, jEndUse) = ort->gatherEndUseBySourceBEPS(1, jEndUse);   // electricity
+                    collapsedEndUse(2, jEndUse) = ort->gatherEndUseBySourceBEPS(2, jEndUse);   // natural gas
+                    collapsedEndUse(3, jEndUse) = ort->gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
+                    collapsedEndUse(4, jEndUse) = ort->gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
+                    collapsedEndUse(5, jEndUse) = ort->gatherEndUseBySourceBEPS(9, jEndUse);   // coal
+                    collapsedEndUse(6, jEndUse) = ort->gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
+                    collapsedEndUse(7, jEndUse) = ort->gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
+                    collapsedEndUse(8, jEndUse) = ort->gatherEndUseBySourceBEPS(12, jEndUse);  // propane
+                    collapsedEndUse(9, jEndUse) = ort->gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
+                    collapsedEndUse(10, jEndUse) = ort->gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
+                    collapsedEndUse(11, jEndUse) = ort->gatherEndUseBySourceBEPS(3, jEndUse);  // district cooling <- purchased cooling
+                    collapsedEndUse(12, jEndUse) = ort->gatherEndUseBySourceBEPS(4, jEndUse) +
+                                                   ort->gatherEndUseBySourceBEPS(5, jEndUse); // district heating <- purchased heating | <- steam
+                    collapsedEndUse(13, jEndUse) = ort->gatherEndUseBySourceBEPS(7, jEndUse); // water
                 }
-                collapsedTotal(iResource) /= largeConversionFactor;
-            }
+                // repeat with totals
+                collapsedTotal(1) = ort->gatherTotalsBySourceBEPS(1);   // electricity
+                collapsedTotal(2) = ort->gatherTotalsBySourceBEPS(2);   // natural gas
+                collapsedTotal(3) = ort->gatherTotalsBySourceBEPS(6);   // gasoline
+                collapsedTotal(4) = ort->gatherTotalsBySourceBEPS(8);   // diesel
+                collapsedTotal(5) = ort->gatherTotalsBySourceBEPS(9);   // coal
+                collapsedTotal(6) = ort->gatherTotalsBySourceBEPS(10);  // Fuel Oil No1
+                collapsedTotal(7) = ort->gatherTotalsBySourceBEPS(11);  // Fuel Oil No2
+                collapsedTotal(8) = ort->gatherTotalsBySourceBEPS(12);  // propane
+                collapsedTotal(9) = ort->gatherTotalsBySourceBEPS(13);  // otherfuel1
+                collapsedTotal(10) = ort->gatherTotalsBySourceBEPS(14); // otherfuel2
+                collapsedTotal(11) = ort->gatherTotalsBySourceBEPS(3);  // district cooling <- purchased cooling
+                collapsedTotal(12) =
+                    ort->gatherTotalsBySourceBEPS(4) + ort->gatherTotalsBySourceBEPS(5); // district heating <- purchased heating | <- steam
+                collapsedTotal(13) = ort->gatherTotalsBySourceBEPS(7);                   // water
 
-            rowHead.allocate(16);
-            columnHead.allocate(12);
-            columnWidth.allocate(12);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(12, 16);
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                // unit conversion - all values are used as divisors
 
-                useVal(iResource, 15) = collapsedTotal(iResource); // totals
-            }
-
-            rowHead(1) = "Heating";
-            rowHead(2) = "Cooling";
-            rowHead(3) = "Interior Lighting";
-            rowHead(4) = "Exterior Lighting";
-            rowHead(5) = "Interior Equipment";
-            rowHead(6) = "Exterior Equipment";
-            rowHead(7) = "Fans";
-            rowHead(8) = "Pumps";
-            rowHead(9) = "Heat Rejection";
-            rowHead(10) = "Humidification";
-            rowHead(11) = "Heat Recovery";
-            rowHead(12) = "Water Systems";
-            rowHead(13) = "Refrigeration";
-            rowHead(14) = "Generators";
-            rowHead(15) = "";
-            rowHead(16) = "Total Source Energy End Use Components";
-
-            largeConversionFactor = 1.0;
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh]";
-                    columnHead(2) = "Source Natural Gas [kWh]";
-                    columnHead(3) = "Source Gasoline [kWh]";
-                    columnHead(4) = "Source Diesel [kWh]";
-                    columnHead(5) = "Source Coal [kWh]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Source Propane [kWh]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh]";
-                    columnHead(11) = "Source District Cooling [kWh]";
-                    columnHead(12) = "Source District Heating [kWh]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu]";
-                    columnHead(2) = "Source Natural Gas [kBtu]";
-                    columnHead(3) = "Source Gasoline [kBtu]";
-                    columnHead(4) = "Source Diesel [kBtu]";
-                    columnHead(5) = "Source Coal [kBtu]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Source Propane [kBtu]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu]";
-                    columnHead(11) = "Source District Cooling [kBtu]";
-                    columnHead(12) = "Source District Heating [kBtu]";
-                } else {
-                    columnHead(1) = "Source Electricity [GJ]";
-                    columnHead(2) = "Source Natural Gas [GJ]";
-                    columnHead(3) = "Source Gasoline [GJ]";
-                    columnHead(4) = "Source Diesel [GJ]";
-                    columnHead(5) = "Source Coal [GJ]";
-                    columnHead(6) = "Source Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Source Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Source Propane [GJ]";
-                    columnHead(9) = "Source Other Fuel 1 [GJ]";
-                    columnHead(10) = "Source Other Fuel 2 [GJ]";
-                    columnHead(11) = "Source District Cooling [GJ]";
-                    columnHead(12) = "Source District Heating [GJ]";
-                    largeConversionFactor = 1000.0; // for converting MJ to GJ
-                }
-            }
-
-            //---- End Uses by Source Energy Sub-Table
-
-            tableBody = "";
-            for (iResource = 1; iResource <= 12; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                    tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
-                }
-                tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
-            }
-
-            // heading for the entire sub-table
-            WriteSubtitle(state, "Source Energy End Use Components Summary");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                       rowHead,
-                                                       columnHead,
-                                                       "SourceEnergyEndUseComponentsSummary",
-                                                       "Entire Facility",
-                                                       "Source Energy End Use Components Summary");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Source Energy End Use Components Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Source Energy End Use Components Summary");
-            }
-
-            // Normalized by Area tables
-
-            {
-                auto const SELECT_CASE_var(ort->unitsStyle);
-                if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
-                    columnHead(1) = "Source Electricity [kWh/m2]";
-                    columnHead(2) = "Source Natural Gas [kWh/m2]";
-                    columnHead(3) = "Source Gasoline [kWh/m2]";
-                    columnHead(4) = "Source Diesel [kWh/m2]";
-                    columnHead(5) = "Source Coal [kWh/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
-                    columnHead(8) = "Source Propane [kWh/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
-                    columnHead(11) = "Source District Cooling [kWh/m2]";
-                    columnHead(12) = "Source District Heating [kWh/m2]";
-                } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
-                    columnHead(1) = "Source Electricity [kBtu/ft2]";
-                    columnHead(2) = "Source Natural Gas [kBtu/ft2]";
-                    columnHead(3) = "Source Gasoline [kBtu/ft2]";
-                    columnHead(4) = "Source Diesel [kBtu/ft2]";
-                    columnHead(5) = "Source Coal [kBtu/ft2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
-                    columnHead(8) = "Source Propane [kBtu/ft2]";
-                    columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
-                    columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
-                    columnHead(11) = "Source District Cooling [kBtu/ft2]";
-                    columnHead(12) = "Source District Heating [kBtu/ft2]";
-                } else {
-                    columnHead(1) = "Source Electricity [MJ/m2]";
-                    columnHead(2) = "Source Natural Gas [MJ/m2]";
-                    columnHead(3) = "Source Gasoline [MJ/m2]";
-                    columnHead(4) = "Source Diesel [MJ/m2]";
-                    columnHead(5) = "Source Coal [MJ/m2]";
-                    columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
-                    columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
-                    columnHead(8) = "Source Propane [MJ/m2]";
-                    columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
-                    columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
-                    columnHead(11) = "Source District Cooling [MJ/m2]";
-                    columnHead(12) = "Source District Heating [MJ/m2]";
-                }
-            }
-
-            //---- Normalized by Conditioned Area Sub-Table
-            {
-                tableBody = "";
-                // convert floor area
-                Real64 convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
-                if (convBldgCondFloorArea > 0) {
-                    for (iResource = 1; iResource <= 12; ++iResource) {
-                        for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
-                        }
-                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        largeConversionFactor = 3600000.0;
+                        areaConversionFactor = 1.0;
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        largeConversionFactor = getSpecificUnitDivider(state, "J", "kBtu"); // 1054351.84 J to kBtu
+                        areaConversionFactor = getSpecificUnitDivider(state, "m2", "ft2");  // 0.092893973 m2 to ft2
+                    } else {
+                        largeConversionFactor = 1000000.0; // to MJ
+                        areaConversionFactor = 1.0;
                     }
                 }
 
-                WriteTextLine(state, "Normalized Metrics", true);
-
-                // heading for the entire sub-table
-                WriteSubtitle(state, "Source Energy End Use Components Per Conditioned Floor Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "SourceEnergyEndUseComponentsSummary",
-                                                           "Entire Facility",
-                                                           "Source Energy End Use Component Per Conditioned Floor Area");
+                // convert units into MJ (divide by 1,000,000) if J otherwise kWh
+                for (iResource = 1; iResource <= 12; ++iResource) { // don't do water
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        collapsedEndUse(iResource, jEndUse) /= largeConversionFactor;
+                    }
+                    collapsedTotal(iResource) /= largeConversionFactor;
                 }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody,
-                        rowHead,
-                        columnHead,
-                        "Source Energy End Use Components Summary",
-                        "Entire Facility",
-                        "Source Energy End Use Component Per Conditioned Floor Area");
+
+                rowHead.allocate(16);
+                columnHead.allocate(12);
+                columnWidth.allocate(12);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(12, 16);
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 5) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                    useVal(iResource, 6) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+
+                    useVal(iResource, 15) = collapsedTotal(iResource); // totals
                 }
-            } // End of Normalized by Conditioned Area
 
-            //---- Normalized by Total Area Sub-Table
-            {
-                tableBody = "";
-                Real64 convBldgGrossFloorArea = ort->buildingGrossFloorArea / areaConversionFactor;
+                rowHead(1) = "Heating";
+                rowHead(2) = "Cooling";
+                rowHead(3) = "Interior Lighting";
+                rowHead(4) = "Exterior Lighting";
+                rowHead(5) = "Interior Equipment";
+                rowHead(6) = "Exterior Equipment";
+                rowHead(7) = "Fans";
+                rowHead(8) = "Pumps";
+                rowHead(9) = "Heat Rejection";
+                rowHead(10) = "Humidification";
+                rowHead(11) = "Heat Recovery";
+                rowHead(12) = "Water Systems";
+                rowHead(13) = "Refrigeration";
+                rowHead(14) = "Generators";
+                rowHead(15) = "";
+                rowHead(16) = "Total Source Energy End Use Components";
 
-                if (convBldgGrossFloorArea > 0) {
-                    for (iResource = 1; iResource <= 12; ++iResource) {
-                        for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
-                        }
-                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
+                largeConversionFactor = 1.0;
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Source Electricity [kWh]";
+                        columnHead(2) = "Source Natural Gas [kWh]";
+                        columnHead(3) = "Source Gasoline [kWh]";
+                        columnHead(4) = "Source Diesel [kWh]";
+                        columnHead(5) = "Source Coal [kWh]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kWh]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kWh]";
+                        columnHead(8) = "Source Propane [kWh]";
+                        columnHead(9) = "Source Other Fuel 1 [kWh]";
+                        columnHead(10) = "Source Other Fuel 2 [kWh]";
+                        columnHead(11) = "Source District Cooling [kWh]";
+                        columnHead(12) = "Source District Heating [kWh]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Source Electricity [kBtu]";
+                        columnHead(2) = "Source Natural Gas [kBtu]";
+                        columnHead(3) = "Source Gasoline [kBtu]";
+                        columnHead(4) = "Source Diesel [kBtu]";
+                        columnHead(5) = "Source Coal [kBtu]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+                        columnHead(8) = "Source Propane [kBtu]";
+                        columnHead(9) = "Source Other Fuel 1 [kBtu]";
+                        columnHead(10) = "Source Other Fuel 2 [kBtu]";
+                        columnHead(11) = "Source District Cooling [kBtu]";
+                        columnHead(12) = "Source District Heating [kBtu]";
+                    } else {
+                        columnHead(1) = "Source Electricity [GJ]";
+                        columnHead(2) = "Source Natural Gas [GJ]";
+                        columnHead(3) = "Source Gasoline [GJ]";
+                        columnHead(4) = "Source Diesel [GJ]";
+                        columnHead(5) = "Source Coal [GJ]";
+                        columnHead(6) = "Source Fuel Oil No 1 [GJ]";
+                        columnHead(7) = "Source Fuel Oil No 2 [GJ]";
+                        columnHead(8) = "Source Propane [GJ]";
+                        columnHead(9) = "Source Other Fuel 1 [GJ]";
+                        columnHead(10) = "Source Other Fuel 2 [GJ]";
+                        columnHead(11) = "Source District Cooling [GJ]";
+                        columnHead(12) = "Source District Heating [GJ]";
+                        largeConversionFactor = 1000.0; // for converting MJ to GJ
                     }
                 }
 
-                // heading for the entire sub-table
-                WriteSubtitle(state, "Source Energy End Use Components Per Total Floor Area");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "SourceEnergyEndUseComponentsSummary",
-                                                           "Entire Facility",
-                                                           "Source Energy End Use Components Per Total Floor Area");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
-                                                                                                rowHead,
-                                                                                                columnHead,
-                                                                                                "Source Energy End Use Components Summary",
-                                                                                                "Entire Facility",
-                                                                                                "Source Energy End Use Components Per Total Floor Area");
-                }
-            } // End of Normalized by Total Area
+                //---- End Uses by Source Energy Sub-Table
 
+                tableBody = "";
+                for (iResource = 1; iResource <= 12; ++iResource) {
+                    for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / largeConversionFactor, 2);
+                    }
+                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / largeConversionFactor, 2);
+                }
+
+                // heading for the entire sub-table
+                if (produceTabular) {
+                    WriteSubtitle(state, "Source Energy End Use Components Summary");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                               rowHead,
+                                                               columnHead,
+                                                               "SourceEnergyEndUseComponentsSummary",
+                                                               "Entire Facility",
+                                                               "Source Energy End Use Components Summary");
+                    }
+                }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                    rowHead,
+                                                                                                    columnHead,
+                                                                                                    "Source Energy End Use Components Summary",
+                                                                                                    "Entire Facility",
+                                                                                                    "Source Energy End Use Components Summary");
+                    }
+                }
+
+                // Normalized by Area tables
+
+                {
+                    auto const SELECT_CASE_var(unitsStyle_cur);
+                    if (SELECT_CASE_var == iUnitsStyle::JtoKWH) {
+                        columnHead(1) = "Source Electricity [kWh/m2]";
+                        columnHead(2) = "Source Natural Gas [kWh/m2]";
+                        columnHead(3) = "Source Gasoline [kWh/m2]";
+                        columnHead(4) = "Source Diesel [kWh/m2]";
+                        columnHead(5) = "Source Coal [kWh/m2]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kWh/m2]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kWh/m2]";
+                        columnHead(8) = "Source Propane [kWh/m2]";
+                        columnHead(9) = "Source Other Fuel 1 [kWh/m2]";
+                        columnHead(10) = "Source Other Fuel 2 [kWh/m2]";
+                        columnHead(11) = "Source District Cooling [kWh/m2]";
+                        columnHead(12) = "Source District Heating [kWh/m2]";
+                    } else if (SELECT_CASE_var == iUnitsStyle::InchPound) {
+                        columnHead(1) = "Source Electricity [kBtu/ft2]";
+                        columnHead(2) = "Source Natural Gas [kBtu/ft2]";
+                        columnHead(3) = "Source Gasoline [kBtu/ft2]";
+                        columnHead(4) = "Source Diesel [kBtu/ft2]";
+                        columnHead(5) = "Source Coal [kBtu/ft2]";
+                        columnHead(6) = "Source Fuel Oil No 1 [kBtu/ft2]";
+                        columnHead(7) = "Source Fuel Oil No 2 [kBtu/ft2]";
+                        columnHead(8) = "Source Propane [kBtu/ft2]";
+                        columnHead(9) = "Source Other Fuel 1 [kBtu/ft2]";
+                        columnHead(10) = "Source Other Fuel 2 [kBtu/ft2]";
+                        columnHead(11) = "Source District Cooling [kBtu/ft2]";
+                        columnHead(12) = "Source District Heating [kBtu/ft2]";
+                    } else {
+                        columnHead(1) = "Source Electricity [MJ/m2]";
+                        columnHead(2) = "Source Natural Gas [MJ/m2]";
+                        columnHead(3) = "Source Gasoline [MJ/m2]";
+                        columnHead(4) = "Source Diesel [MJ/m2]";
+                        columnHead(5) = "Source Coal [MJ/m2]";
+                        columnHead(6) = "Source Fuel Oil No 1 [MJ/m2]";
+                        columnHead(7) = "Source Fuel Oil No 2 [MJ/m2]";
+                        columnHead(8) = "Source Propane [MJ/m2]";
+                        columnHead(9) = "Source Other Fuel 1 [MJ/m2]";
+                        columnHead(10) = "Source Other Fuel 2 [MJ/m2]";
+                        columnHead(11) = "Source District Cooling [MJ/m2]";
+                        columnHead(12) = "Source District Heating [MJ/m2]";
+                    }
+                }
+
+                //---- Normalized by Conditioned Area Sub-Table
+                {
+                    tableBody = "";
+                    // convert floor area
+                    Real64 convBldgCondFloorArea = ort->buildingConditionedFloorArea / areaConversionFactor;
+                    if (convBldgCondFloorArea > 0) {
+                        for (iResource = 1; iResource <= 12; ++iResource) {
+                            for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                                tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+                            }
+                            tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
+                        }
+                    }
+
+                    if (produceTabular) {
+                        WriteTextLine(state, "Normalized Metrics", true);
+                    }
+
+                    // heading for the entire sub-table
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Source Energy End Use Components Per Conditioned Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "SourceEnergyEndUseComponentsSummary",
+                                                                   "Entire Facility",
+                                                                   "Source Energy End Use Component Per Conditioned Floor Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody,
+                                rowHead,
+                                columnHead,
+                                "Source Energy End Use Components Summary",
+                                "Entire Facility",
+                                "Source Energy End Use Component Per Conditioned Floor Area");
+                        }
+                    }
+                } // End of Normalized by Conditioned Area
+
+                //---- Normalized by Total Area Sub-Table
+                {
+                    tableBody = "";
+                    Real64 convBldgGrossFloorArea = ort->buildingGrossFloorArea / areaConversionFactor;
+
+                    if (convBldgGrossFloorArea > 0) {
+                        for (iResource = 1; iResource <= 12; ++iResource) {
+                            for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                                tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
+                            }
+                            tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
+                        }
+                    }
+
+                    // heading for the entire sub-table
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Source Energy End Use Components Per Total Floor Area");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "SourceEnergyEndUseComponentsSummary",
+                                                                   "Entire Facility",
+                                                                   "Source Energy End Use Components Per Total Floor Area");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody,
+                                rowHead,
+                                columnHead,
+                                "Source Energy End Use Components Summary",
+                                "Entire Facility",
+                                "Source Energy End Use Components Per Total Floor Area");
+                        }
+                    }
+                } // End of Normalized by Total Area
+            } // End of Dual Units reporting
         } // end if displaySourceEnergyEndUseSummary
     }
 
@@ -8942,381 +9652,419 @@ namespace EnergyPlus::OutputReportTabular {
         if (ort->displayDemandEndUse) {
             // show the headers of the report
             WriteReportHeaders(state, "Demand End Use Components Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            // totals - select which additional fuel to display and which other district heating
-            collapsedTotal = 0.0;
-            collapsedTotal(1) = ort->gatherDemandTotal(1); // electricity
-            collapsedTimeStep(1) = ort->gatherDemandTimeStamp(1);
-            collapsedTotal(2) = ort->gatherDemandTotal(2); // natural gas
-            collapsedTimeStep(2) = ort->gatherDemandTimeStamp(2);
-            collapsedTotal(3) = ort->gatherDemandTotal(6); // gasoline
-            collapsedTimeStep(3) = ort->gatherDemandTimeStamp(6);
-            collapsedTotal(4) = ort->gatherDemandTotal(8); // diesel
-            collapsedTimeStep(4) = ort->gatherDemandTimeStamp(8);
-            collapsedTotal(5) = ort->gatherDemandTotal(9); // coal
-            collapsedTimeStep(5) = ort->gatherDemandTimeStamp(9);
-            collapsedTotal(6) = ort->gatherDemandTotal(10); // fuel oil no 1
-            collapsedTimeStep(6) = ort->gatherDemandTimeStamp(10);
-            collapsedTotal(7) = ort->gatherDemandTotal(11); // fuel oil no 2
-            collapsedTimeStep(7) = ort->gatherDemandTimeStamp(11);
-            collapsedTotal(8) = ort->gatherDemandTotal(12); // propane
-            collapsedTimeStep(8) = ort->gatherDemandTimeStamp(12);
-            collapsedTotal(9) = ort->gatherDemandTotal(13); // other fuel 1
-            collapsedTimeStep(9) = ort->gatherDemandTimeStamp(13);
-            collapsedTotal(10) = ort->gatherDemandTotal(14); // other fuel 2
-            collapsedTimeStep(10) = ort->gatherDemandTimeStamp(14);
-            collapsedTotal(11) = ort->gatherDemandTotal(3); // district cooling <- purchased cooling
-            collapsedTimeStep(11) = ort->gatherDemandTimeStamp(3);
-            collapsedTotal(13) = ort->gatherDemandTotal(7); // water
-            collapsedTimeStep(13) = ort->gatherDemandTimeStamp(7);
 
-            // set flag if both puchased heating and steam both have positive demand
-            bothDistrHeatNonZero = (ort->gatherDemandTotal(4) > 0.0) && (ort->gatherDemandTotal(5) > 0.0);
-            // select the district heating source that has a larger demand
-            if (ort->gatherDemandTotal(4) > ort->gatherDemandTotal(5)) {
-                distrHeatSelected = 4; // purchased heating
-                if (bothDistrHeatNonZero) {
-                    footnote += " Steam has non-zero demand but is not shown on this report.";
-                }
-            } else {
-                distrHeatSelected = 5; // steam
-                if (bothDistrHeatNonZero) {
-                    footnote += " District heating has non-zero demand but is not shown on this report.";
-                }
-            }
-            // set the time of peak demand and total demand for the purchased heating/steam
-            collapsedTimeStep(12) = ort->gatherDemandTimeStamp(distrHeatSelected);
-            collapsedTotal(12) = ort->gatherDemandTotal(distrHeatSelected);
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;                
 
-            // establish unit conversion factors
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
-                flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
-            } else {
-                powerConversion = 1.0;
-                flowConversion = 1.0;
-            }
+                // totals - select which additional fuel to display and which other district heating
+                collapsedTotal = 0.0;
+                collapsedTotal(1) = ort->gatherDemandTotal(1); // electricity
+                collapsedTimeStep(1) = ort->gatherDemandTimeStamp(1);
+                collapsedTotal(2) = ort->gatherDemandTotal(2); // natural gas
+                collapsedTimeStep(2) = ort->gatherDemandTimeStamp(2);
+                collapsedTotal(3) = ort->gatherDemandTotal(6); // gasoline
+                collapsedTimeStep(3) = ort->gatherDemandTimeStamp(6);
+                collapsedTotal(4) = ort->gatherDemandTotal(8); // diesel
+                collapsedTimeStep(4) = ort->gatherDemandTimeStamp(8);
+                collapsedTotal(5) = ort->gatherDemandTotal(9); // coal
+                collapsedTimeStep(5) = ort->gatherDemandTimeStamp(9);
+                collapsedTotal(6) = ort->gatherDemandTotal(10); // fuel oil no 1
+                collapsedTimeStep(6) = ort->gatherDemandTimeStamp(10);
+                collapsedTotal(7) = ort->gatherDemandTotal(11); // fuel oil no 2
+                collapsedTimeStep(7) = ort->gatherDemandTimeStamp(11);
+                collapsedTotal(8) = ort->gatherDemandTotal(12); // propane
+                collapsedTimeStep(8) = ort->gatherDemandTimeStamp(12);
+                collapsedTotal(9) = ort->gatherDemandTotal(13); // other fuel 1
+                collapsedTimeStep(9) = ort->gatherDemandTimeStamp(13);
+                collapsedTotal(10) = ort->gatherDemandTotal(14); // other fuel 2
+                collapsedTimeStep(10) = ort->gatherDemandTimeStamp(14);
+                collapsedTotal(11) = ort->gatherDemandTotal(3); // district cooling <- purchased cooling
+                collapsedTimeStep(11) = ort->gatherDemandTimeStamp(3);
+                collapsedTotal(13) = ort->gatherDemandTotal(7); // water
+                collapsedTimeStep(13) = ort->gatherDemandTimeStamp(7);
 
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            collapsedEndUse = 0.0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
-                collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
-                collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
-                collapsedEndUse(4, jEndUse) = ort->gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
-                collapsedEndUse(5, jEndUse) = ort->gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
-                collapsedEndUse(6, jEndUse) = ort->gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
-                collapsedEndUse(7, jEndUse) = ort->gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
-                collapsedEndUse(8, jEndUse) = ort->gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
-                collapsedEndUse(9, jEndUse) = ort->gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
-                collapsedEndUse(10, jEndUse) = ort->gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
-                collapsedEndUse(11, jEndUse) = ort->gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
-                collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
-                collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
-            }
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion;   // electricity
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion;   // natural gas
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion;   // gasoline
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion;   // diesel
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 5) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion;   // coal
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion;  // fuel oil no 1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 11) * powerConversion;  // fuel oil no 2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 8) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 12) * powerConversion;  // propane
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 9) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 13) * powerConversion;  // otherfuel1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 10) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 14) * powerConversion; // otherfuel2
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 11) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 3) * powerConversion;  // purch cooling
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
-                        ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, distrHeatSelected) * powerConversion;                            // district heating
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 7) * flowConversion;   // water
-                }
-            }
-            // collapse the individual peaks for the end use subcategories for the LEED report
-            // collapse the gatherEndUseBEPS array to the resource groups displayed
-            // no unit conversion, it is done at the reporting stage if necessary
-            collapsedIndEndUse = 0.0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
-                collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
-                collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
-                collapsedIndEndUse(4, jEndUse) = ort->gatherDemandIndEndUse(8, jEndUse);                  // diesel
-                collapsedIndEndUse(5, jEndUse) = ort->gatherDemandIndEndUse(9, jEndUse);                  // coal
-                collapsedIndEndUse(6, jEndUse) = ort->gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
-                collapsedIndEndUse(7, jEndUse) = ort->gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
-                collapsedIndEndUse(8, jEndUse) = ort->gatherDemandIndEndUse(12, jEndUse);                 // propane
-                collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
-                collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
-                collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
-                collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
-                collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
-            }
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 5) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 9);   // coal
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 6) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 10);  // fuel oil no 1
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 7) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 11);  // fuel oil no 2
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 8) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 12);  // propane
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 9) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 13);  // otherfuel1
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 10) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 14); // otherfuel2
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 11) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 3);  // purch cooling
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 12) =
-                        ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, distrHeatSelected);                               // district heating
-                    collapsedIndEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 7);  // water
-                }
-            }
-
-            // convert totals
-            collapsedTotal(1) *= powerConversion;  // electricity
-            collapsedTotal(2) *= powerConversion;  // natural gas
-            collapsedTotal(3) *= powerConversion;  // gasoline
-            collapsedTotal(4) *= powerConversion;  // diesel
-            collapsedTotal(5) *= powerConversion;  // coal
-            collapsedTotal(6) *= powerConversion;  // fuel oil no 1
-            collapsedTotal(7) *= powerConversion;  // fuel oil no 2
-            collapsedTotal(8) *= powerConversion;  // propane
-            collapsedTotal(9) *= powerConversion;  // otherfuel1
-            collapsedTotal(10) *= powerConversion; // otherfuel2
-            collapsedTotal(11) *= powerConversion; // purchased cooling
-            collapsedTotal(12) *= powerConversion; // district heating
-            collapsedTotal(13) *= flowConversion;  // water
-            //---- End Use Sub-Table
-            rowHead.allocate(17);
-            columnHead.allocate(13);
-            columnWidth.allocate(13);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(13, 17);
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
-                useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
-                useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
-                useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
-                useVal(iResource, 5) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
-                useVal(iResource, 6) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
-                useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
-                useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
-                useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
-                useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
-                useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
-                useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
-                useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
-                useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
-                useVal(iResource, 15) = collapsedTotal(iResource); // totals
-            }
-
-            rowHead(1) = "Time of Peak";
-            rowHead(2) = "Heating";
-            rowHead(3) = "Cooling";
-            rowHead(4) = "Interior Lighting";
-            rowHead(5) = "Exterior Lighting";
-            rowHead(6) = "Interior Equipment";
-            rowHead(7) = "Exterior Equipment";
-            rowHead(8) = "Fans";
-            rowHead(9) = "Pumps";
-            rowHead(10) = "Heat Rejection";
-            rowHead(11) = "Humidification";
-            rowHead(12) = "Heat Recovery";
-            rowHead(13) = "Water Systems";
-            rowHead(14) = "Refrigeration";
-            rowHead(15) = "Generators";
-            rowHead(16) = "";
-            rowHead(17) = "Total End Uses";
-
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                columnHead(1) = "Electricity [kBtuh]";
-                columnHead(2) = "Natural Gas [kBtuh]";
-                columnHead(3) = "Gasoline [kBtuh]";
-                columnHead(4) = "Diesel [kBtuh]";
-                columnHead(5) = "Coal [kBtuh]";
-                columnHead(6) = "Fuel Oil No 1 [kBtuh]";
-                columnHead(7) = "Fuel Oil No 2 [kBtuh]";
-                columnHead(8) = "Propane [kBtuh]";
-                columnHead(9) = "Other Fuel 1 [kBtuh]";
-                columnHead(10) = "Other Fuel 2 [kBtuh]";
-                columnHead(11) = "District Cooling [kBtuh]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(12) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(12) = "Steam [kBtuh]";
-                    }
-                }
-                columnHead(13) = "Water [gal/min]";
-            } else {
-                columnHead(1) = "Electricity [W]";
-                columnHead(2) = "Natural Gas [W]";
-                columnHead(3) = "Gasoline [W]";
-                columnHead(4) = "Diesel [W]";
-                columnHead(5) = "Coal [W]";
-                columnHead(6) = "Fuel Oil No 1 [W]";
-                columnHead(7) = "Fuel Oil No 2 [W]";
-                columnHead(8) = "Propane [W]";
-                columnHead(9) = "Other Fuel 1 [W]";
-                columnHead(10) = "Other Fuel 2 [W]";
-                columnHead(11) = "District Cooling [W]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(12) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(12) = "Steam [W]";
-                    }
-                }
-                columnHead(13) = "Water [m3/s]";
-            }
-
-            tableBody = "";
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                    tableBody(iResource, 1 + jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
-                }
-                tableBody(iResource, 1) = DateToString(collapsedTimeStep(iResource));
-                tableBody(iResource, 17) = RealToStr(collapsedTotal(iResource), 2);
-            }
-
-            // complete the LEED end use table using the same values
-            unconvert = 1 / powerConversion;
-
-            WriteSubtitle(state, "End Uses");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
-            }
-
-            //---- End Uses By Subcategory Sub-Table
-            numRows = 0;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        ++numRows;
+                // set flag if both puchased heating and steam both have positive demand
+                bothDistrHeatNonZero = (ort->gatherDemandTotal(4) > 0.0) && (ort->gatherDemandTotal(5) > 0.0);
+                // select the district heating source that has a larger demand
+                if (ort->gatherDemandTotal(4) > ort->gatherDemandTotal(5)) {
+                    distrHeatSelected = 4; // purchased heating
+                    if (bothDistrHeatNonZero) {
+                        footnote += " Steam has non-zero demand but is not shown on this report.";
                     }
                 } else {
-                    ++numRows;
-                }
-            }
-
-            rowHead.allocate(numRows);
-            columnHead.allocate(14);
-            columnWidth.allocate(14);
-            columnWidth = 10; // array assignment - same for all columns
-            tableBody.allocate(14, numRows);
-
-            rowHead = "";
-            tableBody = "";
-
-            // Build row head and subcategories columns
-            i = 1;
-            for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
-                rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
-                if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
-                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                        tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
-                        ++i;
+                    distrHeatSelected = 5; // steam
+                    if (bothDistrHeatNonZero) {
+                        footnote += " District heating has non-zero demand but is not shown on this report.";
                     }
+                }
+                // set the time of peak demand and total demand for the purchased heating/steam
+                collapsedTimeStep(12) = ort->gatherDemandTimeStamp(distrHeatSelected);
+                collapsedTotal(12) = ort->gatherDemandTotal(distrHeatSelected);
+
+                // establish unit conversion factors
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    powerConversion = getSpecificUnitMultiplier(state, "W", "kBtuh");
+                    flowConversion = getSpecificUnitMultiplier(state, "m3/s", "gal/min");
                 } else {
-                    tableBody(1, i) = "General";
-                    ++i;
+                    powerConversion = 1.0;
+                    flowConversion = 1.0;
                 }
-            }
 
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                columnHead(1) = "Subcategory";
-                columnHead(2) = "Electricity [kBtuh]";
-                columnHead(3) = "Natural Gas [kBtuh]";
-                columnHead(4) = "Gasoline [kBtuh]";
-                columnHead(5) = "Diesel [kBtuh]";
-                columnHead(6) = "Coal [kBtuh]";
-                columnHead(7) = "Fuel Oil No 1 [kBtuh]";
-                columnHead(8) = "Fuel Oil No 2 [kBtuh]";
-                columnHead(9) = "Propane [kBtuh]";
-                columnHead(10) = "Other Fuel 1 [kBtuh]";
-                columnHead(11) = "Other Fuel 2 [kBtuh]";
-                columnHead(12) = "District Cooling [kBtuh]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(13) = "District Heating [kBtuh]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(13) = "Steam [kBtuh]";
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
+                collapsedEndUse = 0.0;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    collapsedEndUse(1, jEndUse) = ort->gatherDemandEndUse(1, jEndUse) * powerConversion;                  // electricity
+                    collapsedEndUse(2, jEndUse) = ort->gatherDemandEndUse(2, jEndUse) * powerConversion;                  // natural gas
+                    collapsedEndUse(3, jEndUse) = ort->gatherDemandEndUse(6, jEndUse) * powerConversion;                  // gasoline
+                    collapsedEndUse(4, jEndUse) = ort->gatherDemandEndUse(8, jEndUse) * powerConversion;                  // diesel
+                    collapsedEndUse(5, jEndUse) = ort->gatherDemandEndUse(9, jEndUse) * powerConversion;                  // coal
+                    collapsedEndUse(6, jEndUse) = ort->gatherDemandEndUse(10, jEndUse) * powerConversion;                 // fuel oil no 1
+                    collapsedEndUse(7, jEndUse) = ort->gatherDemandEndUse(11, jEndUse) * powerConversion;                 // fuel oil no 2
+                    collapsedEndUse(8, jEndUse) = ort->gatherDemandEndUse(12, jEndUse) * powerConversion;                 // propane
+                    collapsedEndUse(9, jEndUse) = ort->gatherDemandEndUse(13, jEndUse) * powerConversion;                 // otherfuel1
+                    collapsedEndUse(10, jEndUse) = ort->gatherDemandEndUse(14, jEndUse) * powerConversion;                // otherfuel2
+                    collapsedEndUse(11, jEndUse) = ort->gatherDemandEndUse(3, jEndUse) * powerConversion;                 // purchased cooling
+                    collapsedEndUse(12, jEndUse) = ort->gatherDemandEndUse(distrHeatSelected, jEndUse) * powerConversion; // district heating
+                    collapsedEndUse(13, jEndUse) = ort->gatherDemandEndUse(7, jEndUse) * flowConversion;                  // water
+                }
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 1) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 1) * powerConversion; // electricity
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 2) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 2) * powerConversion; // natural gas
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 6) * powerConversion; // gasoline
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 8) * powerConversion; // diesel
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 5) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 9) * powerConversion; // coal
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 6) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 10) * powerConversion; // fuel oil no 1
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 7) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 11) * powerConversion; // fuel oil no 2
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 8) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 12) * powerConversion; // propane
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 9) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 13) * powerConversion; // otherfuel1
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 10) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 14) * powerConversion; // otherfuel2
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 11) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 3) * powerConversion; // purch cooling
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 12) =
+                            ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, distrHeatSelected) * powerConversion; // district heating
+                        collapsedEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherDemandEndUseSub(kEndUseSub, jEndUse, 7) * flowConversion; // water
                     }
                 }
-                columnHead(14) = "Water [gal/min]";
-            } else {
-                columnHead(1) = "Subcategory";
-                columnHead(2) = "Electricity [W]";
-                columnHead(3) = "Natural Gas [W]";
-                columnHead(4) = "Gasoline [W]";
-                columnHead(5) = "Diesel [W]";
-                columnHead(6) = "Coal [W]";
-                columnHead(7) = "Fuel Oil No 1 [W]";
-                columnHead(8) = "Fuel Oil No 2 [W]";
-                columnHead(9) = "Propane [W]";
-                columnHead(10) = "Other Fuel 1 [W]";
-                columnHead(11) = "Other Fuel 2 [W]";
-                columnHead(12) = "District Cooling [W]";
-                {
-                    auto const SELECT_CASE_var(distrHeatSelected);
-                    if (SELECT_CASE_var == 4) {
-                        columnHead(13) = "District Heating [W]";
-                    } else if (SELECT_CASE_var == 5) {
-                        columnHead(13) = "Steam [W]";
+                // collapse the individual peaks for the end use subcategories for the LEED report
+                // collapse the gatherEndUseBEPS array to the resource groups displayed
+                // no unit conversion, it is done at the reporting stage if necessary
+                collapsedIndEndUse = 0.0;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    collapsedIndEndUse(1, jEndUse) = ort->gatherDemandIndEndUse(1, jEndUse);                  // electricity
+                    collapsedIndEndUse(2, jEndUse) = ort->gatherDemandIndEndUse(2, jEndUse);                  // natural gas
+                    collapsedIndEndUse(3, jEndUse) = ort->gatherDemandIndEndUse(6, jEndUse);                  // gasoline
+                    collapsedIndEndUse(4, jEndUse) = ort->gatherDemandIndEndUse(8, jEndUse);                  // diesel
+                    collapsedIndEndUse(5, jEndUse) = ort->gatherDemandIndEndUse(9, jEndUse);                  // coal
+                    collapsedIndEndUse(6, jEndUse) = ort->gatherDemandIndEndUse(10, jEndUse);                 // fuel oil no 1
+                    collapsedIndEndUse(7, jEndUse) = ort->gatherDemandIndEndUse(11, jEndUse);                 // fuel oil no 2
+                    collapsedIndEndUse(8, jEndUse) = ort->gatherDemandIndEndUse(12, jEndUse);                 // propane
+                    collapsedIndEndUse(9, jEndUse) = ort->gatherDemandIndEndUse(13, jEndUse);                 // otherfuel1
+                    collapsedIndEndUse(10, jEndUse) = ort->gatherDemandIndEndUse(14, jEndUse);                // otherfuel2
+                    collapsedIndEndUse(11, jEndUse) = ort->gatherDemandIndEndUse(3, jEndUse);                 // purchased cooling
+                    collapsedIndEndUse(12, jEndUse) = ort->gatherDemandIndEndUse(distrHeatSelected, jEndUse); // district heating
+                    collapsedIndEndUse(13, jEndUse) = ort->gatherDemandIndEndUse(7, jEndUse);                 // water
+                }
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 1) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 1);   // electricity
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 2) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 2);   // natural gas
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 3) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 6);   // gasoline
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 4) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 8);   // diesel
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 5) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 9);   // coal
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 6) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 10);  // fuel oil no 1
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 7) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 11);  // fuel oil no 2
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 8) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 12);  // propane
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 9) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 13);  // otherfuel1
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 10) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 14); // otherfuel2
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 11) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 3);  // purch cooling
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 12) =
+                            ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, distrHeatSelected);                              // district heating
+                        collapsedIndEndUseSub(kEndUseSub, jEndUse, 13) = ort->gatherDemandIndEndUseSub(kEndUseSub, jEndUse, 7); // water
                     }
                 }
-                columnHead(14) = "Water [m3/s]";
-            }
 
-            for (iResource = 1; iResource <= 13; ++iResource) {
-                i = 1;
+                // convert totals
+                collapsedTotal(1) *= powerConversion;  // electricity
+                collapsedTotal(2) *= powerConversion;  // natural gas
+                collapsedTotal(3) *= powerConversion;  // gasoline
+                collapsedTotal(4) *= powerConversion;  // diesel
+                collapsedTotal(5) *= powerConversion;  // coal
+                collapsedTotal(6) *= powerConversion;  // fuel oil no 1
+                collapsedTotal(7) *= powerConversion;  // fuel oil no 2
+                collapsedTotal(8) *= powerConversion;  // propane
+                collapsedTotal(9) *= powerConversion;  // otherfuel1
+                collapsedTotal(10) *= powerConversion; // otherfuel2
+                collapsedTotal(11) *= powerConversion; // purchased cooling
+                collapsedTotal(12) *= powerConversion; // district heating
+                collapsedTotal(13) *= flowConversion;  // water
+                //---- End Use Sub-Table
+                rowHead.allocate(17);
+                columnHead.allocate(13);
+                columnWidth.allocate(13);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(13, 17);
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    useVal(iResource, 1) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Heating));
+                    useVal(iResource, 2) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cooling));
+                    useVal(iResource, 3) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorLights));
+                    useVal(iResource, 4) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorLights));
+                    useVal(iResource, 5) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::InteriorEquipment));
+                    useVal(iResource, 6) =
+                        collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::ExteriorEquipment));
+                    useVal(iResource, 7) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Fans));
+                    useVal(iResource, 8) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Pumps));
+                    useVal(iResource, 9) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRejection));
+                    useVal(iResource, 10) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Humidification));
+                    useVal(iResource, 11) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::HeatRecovery));
+                    useVal(iResource, 12) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::WaterSystem));
+                    useVal(iResource, 13) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Refrigeration));
+                    useVal(iResource, 14) = collapsedEndUse(iResource, DataGlobalConstants::iEndUse.at(DataGlobalConstants::EndUse::Cogeneration));
+                    useVal(iResource, 15) = collapsedTotal(iResource); // totals
+                }
+
+                rowHead(1) = "Time of Peak";
+                rowHead(2) = "Heating";
+                rowHead(3) = "Cooling";
+                rowHead(4) = "Interior Lighting";
+                rowHead(5) = "Exterior Lighting";
+                rowHead(6) = "Interior Equipment";
+                rowHead(7) = "Exterior Equipment";
+                rowHead(8) = "Fans";
+                rowHead(9) = "Pumps";
+                rowHead(10) = "Heat Rejection";
+                rowHead(11) = "Humidification";
+                rowHead(12) = "Heat Recovery";
+                rowHead(13) = "Water Systems";
+                rowHead(14) = "Refrigeration";
+                rowHead(15) = "Generators";
+                rowHead(16) = "";
+                rowHead(17) = "Total End Uses";
+
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    columnHead(1) = "Electricity [kBtuh]";
+                    columnHead(2) = "Natural Gas [kBtuh]";
+                    columnHead(3) = "Gasoline [kBtuh]";
+                    columnHead(4) = "Diesel [kBtuh]";
+                    columnHead(5) = "Coal [kBtuh]";
+                    columnHead(6) = "Fuel Oil No 1 [kBtuh]";
+                    columnHead(7) = "Fuel Oil No 2 [kBtuh]";
+                    columnHead(8) = "Propane [kBtuh]";
+                    columnHead(9) = "Other Fuel 1 [kBtuh]";
+                    columnHead(10) = "Other Fuel 2 [kBtuh]";
+                    columnHead(11) = "District Cooling [kBtuh]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(12) = "District Heating [kBtuh]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(12) = "Steam [kBtuh]";
+                        }
+                    }
+                    columnHead(13) = "Water [gal/min]";
+                } else {
+                    columnHead(1) = "Electricity [W]";
+                    columnHead(2) = "Natural Gas [W]";
+                    columnHead(3) = "Gasoline [W]";
+                    columnHead(4) = "Diesel [W]";
+                    columnHead(5) = "Coal [W]";
+                    columnHead(6) = "Fuel Oil No 1 [W]";
+                    columnHead(7) = "Fuel Oil No 2 [W]";
+                    columnHead(8) = "Propane [W]";
+                    columnHead(9) = "Other Fuel 1 [W]";
+                    columnHead(10) = "Other Fuel 2 [W]";
+                    columnHead(11) = "District Cooling [W]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(12) = "District Heating [W]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(12) = "Steam [W]";
+                        }
+                    }
+                    columnHead(13) = "Water [m3/s]";
+                }
+
+                tableBody = "";
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    for (size_t jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                        tableBody(iResource, 1 + jEndUse) = RealToStr(useVal(iResource, jEndUse), 2);
+                    }
+                    tableBody(iResource, 1) = DateToString(collapsedTimeStep(iResource));
+                    tableBody(iResource, 17) = RealToStr(collapsedTotal(iResource), 2);
+                }
+
+                // complete the LEED end use table using the same values
+                unconvert = 1 / powerConversion;
+
+                if (produceTabular) {
+                    WriteSubtitle(state, "End Uses");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
+                    }
+                }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
+                    }
+                }
+
+                //---- End Uses By Subcategory Sub-Table
+                numRows = 0;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
+                            ++numRows;
+                        }
+                    } else {
+                        ++numRows;
+                    }
+                }
+
+                rowHead.allocate(numRows);
+                columnHead.allocate(14);
+                columnWidth.allocate(14);
+                columnWidth = 10; // array assignment - same for all columns
+                tableBody.allocate(14, numRows);
+
+                rowHead = "";
+                tableBody = "";
+
+                // Build row head and subcategories columns
+                i = 1;
+                for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                    rowHead(i) = state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName;
+                    if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                        for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                            tableBody(1, i) = state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub);
                             ++i;
                         }
                     } else {
-                        tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                        tableBody(1, i) = "General";
                         ++i;
                     }
                 }
+
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    columnHead(1) = "Subcategory";
+                    columnHead(2) = "Electricity [kBtuh]";
+                    columnHead(3) = "Natural Gas [kBtuh]";
+                    columnHead(4) = "Gasoline [kBtuh]";
+                    columnHead(5) = "Diesel [kBtuh]";
+                    columnHead(6) = "Coal [kBtuh]";
+                    columnHead(7) = "Fuel Oil No 1 [kBtuh]";
+                    columnHead(8) = "Fuel Oil No 2 [kBtuh]";
+                    columnHead(9) = "Propane [kBtuh]";
+                    columnHead(10) = "Other Fuel 1 [kBtuh]";
+                    columnHead(11) = "Other Fuel 2 [kBtuh]";
+                    columnHead(12) = "District Cooling [kBtuh]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(13) = "District Heating [kBtuh]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(13) = "Steam [kBtuh]";
+                        }
+                    }
+                    columnHead(14) = "Water [gal/min]";
+                } else {
+                    columnHead(1) = "Subcategory";
+                    columnHead(2) = "Electricity [W]";
+                    columnHead(3) = "Natural Gas [W]";
+                    columnHead(4) = "Gasoline [W]";
+                    columnHead(5) = "Diesel [W]";
+                    columnHead(6) = "Coal [W]";
+                    columnHead(7) = "Fuel Oil No 1 [W]";
+                    columnHead(8) = "Fuel Oil No 2 [W]";
+                    columnHead(9) = "Propane [W]";
+                    columnHead(10) = "Other Fuel 1 [W]";
+                    columnHead(11) = "Other Fuel 2 [W]";
+                    columnHead(12) = "District Cooling [W]";
+                    {
+                        auto const SELECT_CASE_var(distrHeatSelected);
+                        if (SELECT_CASE_var == 4) {
+                            columnHead(13) = "District Heating [W]";
+                        } else if (SELECT_CASE_var == 5) {
+                            columnHead(13) = "Steam [W]";
+                        }
+                    }
+                    columnHead(14) = "Water [m3/s]";
+                }
+
+                for (iResource = 1; iResource <= 13; ++iResource) {
+                    i = 1;
+                    for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
+                        if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
+                            for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
+                                tableBody(iResource + 1, i) = RealToStr(collapsedEndUseSub(kEndUseSub, jEndUse, iResource), 2);
+                                ++i;
+                            }
+                        } else {
+                            tableBody(iResource + 1, i) = RealToStr(collapsedEndUse(iResource, jEndUse), 2);
+                            ++i;
+                        }
+                    }
+                }
+
+                // heading for the entire sub-table
+                if (produceTabular) {
+                    WriteSubtitle(state, "End Uses By Subcategory");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                }
+
+                Array1D_string rowHeadTemp(rowHead);
+                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // for better sql queries
+                FillRowHead(rowHeadTemp);
+
+                for (int i = 1; i <= numRows; ++i) {
+                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                }
+
+                // Erase the SubCategory (first column), using slicing
+                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+                Array1D_string columnHeadTemp(columnHead({2, _, _}));
+
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                                                               rowHeadTemp,
+                                                               columnHeadTemp,
+                                                               "DemandEndUseComponentsSummary",
+                                                               "Entire Facility",
+                                                               "End Uses By Subcategory");
+                    }
+                }
+
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                                    rowHeadTemp,
+                                                                                                    columnHeadTemp,
+                                                                                                    "Demand End Use Components Summary",
+                                                                                                    "Entire Facility",
+                                                                                                    "End Uses By Subcategory");
+                    }
+                }
+                rowHeadTemp.deallocate();
+                tableBodyTemp.deallocate();
+                columnHeadTemp.deallocate();
             }
-
-            // heading for the entire sub-table
-            WriteSubtitle(state, "End Uses By Subcategory");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-
-            Array1D_string rowHeadTemp(rowHead);
-            // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
-            // for better sql queries
-            FillRowHead(rowHeadTemp);
-
-            for (int i = 1; i <= numRows; ++i) {
-                rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
-            }
-
-            // Erase the SubCategory (first column), using slicing
-            Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
-            Array1D_string columnHeadTemp(columnHead({2, _, _}));
-
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
-            }
-            rowHeadTemp.deallocate();
-            tableBodyTemp.deallocate();
-            columnHeadTemp.deallocate();
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 13; ++iResource) {
@@ -9341,37 +10089,42 @@ namespace EnergyPlus::OutputReportTabular {
 
             Array1D_int resource_entry_map;
             resource_entry_map.allocate(12);
-            resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElDem;      // electricity
-            resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasDem;     // natural gas
-            resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineDem;       // gasoline
-            resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselDem;         // diesel
-            resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalDem;           // coal
-            resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1Dem;       // fuel oil no 1
-            resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2Dem;       // fuel oil no 2
-            resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneDem;        // propane
-            resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1Dem;     // other fuel 1
-            resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2Dem;    // other fuel 2
-            resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClDem;   // district cooling
-            resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtDem;   // district heating
+            resource_entry_map(1) = state.dataOutRptPredefined->pdchLeedPerfElDem;          // electricity
+            resource_entry_map(2) = state.dataOutRptPredefined->pdchLeedPerfGasDem;         // natural gas
+            resource_entry_map(3) = state.dataOutRptPredefined->pdchLeedPerfGasolineDem;    // gasoline
+            resource_entry_map(4) = state.dataOutRptPredefined->pdchLeedPerfDieselDem;      // diesel
+            resource_entry_map(5) = state.dataOutRptPredefined->pdchLeedPerfCoalDem;        // coal
+            resource_entry_map(6) = state.dataOutRptPredefined->pdchLeedPerfFuelOil1Dem;    // fuel oil no 1
+            resource_entry_map(7) = state.dataOutRptPredefined->pdchLeedPerfFuelOil2Dem;    // fuel oil no 2
+            resource_entry_map(8) = state.dataOutRptPredefined->pdchLeedPerfPropaneDem;     // propane
+            resource_entry_map(9) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel1Dem;  // other fuel 1
+            resource_entry_map(10) = state.dataOutRptPredefined->pdchLeedPerfOtherFuel2Dem; // other fuel 2
+            resource_entry_map(11) = state.dataOutRptPredefined->pdchLeedPerfDisClDem;      // district cooling
+            resource_entry_map(12) = state.dataOutRptPredefined->pdchLeedPerfDisHtDem;      // district heating
 
             for (iResource = 1; iResource <= 12; ++iResource) {
                 i = 1;
                 for (size_t jEndUse = 1; jEndUse <= DataGlobalConstants::iEndUse.size(); ++jEndUse) {
                     if (state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories > 0) {
                         for (kEndUseSub = 1; kEndUseSub <= state.dataOutputProcessor->EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
-                            PreDefTableEntry(state, resource_entry_map(iResource),
-                                             state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " + state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
-                                             collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
+                            PreDefTableEntry(state,
+                                                 resource_entry_map(iResource),
+                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- " +
+                                                     state.dataOutputProcessor->EndUseCategory(jEndUse).SubcategoryName(kEndUseSub),
+                                                 collapsedIndEndUseSub(kEndUseSub, jEndUse, iResource));
                             ++i;
                         }
                         // put other
                         if (ort->needOtherRowLEED45(jEndUse)) {
                             PreDefTableEntry(state,
-                                resource_entry_map(iResource), state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other", endUseSubOther(iResource, jEndUse));
+                                                 resource_entry_map(iResource),
+                                                 state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Other",
+                                                 endUseSubOther(iResource, jEndUse));
                             ++i;
                         }
                     } else {
-                        PreDefTableEntry(state, resource_entry_map(iResource),
+                        PreDefTableEntry(state,
+                                         resource_entry_map(iResource),
                                          state.dataOutputProcessor->EndUseCategory(jEndUse).DisplayName + " -- Not Subdivided",
                                          collapsedIndEndUse(iResource, jEndUse));
                         ++i;
@@ -9381,7 +10134,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
-     void WriteCompCostTable(EnergyPlusData &state)
+    void WriteCompCostTable(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9446,183 +10199,212 @@ namespace EnergyPlus::OutputReportTabular {
             DetermineBuildingFloorArea(state);
         }
 
-        // 1st sub-table with total Costs and normalized with area
-        rowHead.allocate(10);
-        columnHead.allocate(3);
-        columnWidth.allocate(3);
-        columnWidth = 14; // array assignment - same for all columns
-        tableBody.allocate(3, 10);
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-        columnHead(1) = "Reference Bldg.";
-        columnHead(2) = "Current Bldg. Model";
-        columnHead(3) = "Difference";
+            // 1st sub-table with total Costs and normalized with area
+            rowHead.allocate(10);
+            columnHead.allocate(3);
+            columnWidth.allocate(3);
+            columnWidth = 14; // array assignment - same for all columns
+            tableBody.allocate(3, 10);
 
-        rowHead(1) = "Line Item SubTotal (~~$~~)";
-        rowHead(2) = "Misc. Costs (~~$~~)";
-        rowHead(3) = "Regional Adjustment (~~$~~)";
-        rowHead(4) = "Design Fee (~~$~~)";
-        rowHead(5) = "Contractor Fee (~~$~~)";
-        rowHead(6) = "Contingency (~~$~~)";
-        rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
-        rowHead(8) = "Commissioning (~~$~~)";
-        rowHead(9) = "Cost Estimate Total (~~$~~)";
-        if (ort->unitsStyle == iUnitsStyle::InchPound) {
-            SIunit = "[m2]";
-            LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
-            m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-            rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
-        } else {
-            rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/m2)";
-            m2_unitConv = 1.0;
-        }
-        TableBodyData = 0.0;
-        tableBody = "";
+            columnHead(1) = "Reference Bldg.";
+            columnHead(2) = "Current Bldg. Model";
+            columnHead(3) = "Difference";
 
-        TableBodyData(1, 1) = state.dataCostEstimateManager->RefrncBldg.LineItemTot;
-        tableBody(1, 1) = RealToStr(TableBodyData(1, 1), 2);
-        TableBodyData(1, 2) = state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
-        tableBody(1, 2) = RealToStr(TableBodyData(1, 2), 2);
+            rowHead(1) = "Line Item SubTotal (~~$~~)";
+            rowHead(2) = "Misc. Costs (~~$~~)";
+            rowHead(3) = "Regional Adjustment (~~$~~)";
+            rowHead(4) = "Design Fee (~~$~~)";
+            rowHead(5) = "Contractor Fee (~~$~~)";
+            rowHead(6) = "Contingency (~~$~~)";
+            rowHead(7) = "Permits, Bonds, Insurance (~~$~~)";
+            rowHead(8) = "Commissioning (~~$~~)";
+            rowHead(9) = "Cost Estimate Total (~~$~~)";
+            if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    SIunit = "[m2]";
+                LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
+                m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/ft2)";
+            } else {
+                rowHead(10) = "Cost Per Conditioned Building Area (~~$~~/m2)";
+                m2_unitConv = 1.0;
+            }
+            TableBodyData = 0.0;
+            tableBody = "";
 
-        if (state.dataCostEstimateManager->RefrncBldg.RegionalModifier != 1.0) {
-            TableBodyData(1, 3) =
-                (state.dataCostEstimateManager->RefrncBldg.LineItemTot + state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) * (state.dataCostEstimateManager->RefrncBldg.RegionalModifier - 1.0);
-        } else {
-            TableBodyData(1, 3) = 0.0;
-        }
+            TableBodyData(1, 1) = state.dataCostEstimateManager->RefrncBldg.LineItemTot;
+            tableBody(1, 1) = RealToStr(TableBodyData(1, 1), 2);
+            TableBodyData(1, 2) = state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
+            tableBody(1, 2) = RealToStr(TableBodyData(1, 2), 2);
 
-        RefBldgConstCost = sum(TableBodyData(1, {1, 3}));
+            if (state.dataCostEstimateManager->RefrncBldg.RegionalModifier != 1.0) {
+                TableBodyData(1, 3) = (state.dataCostEstimateManager->RefrncBldg.LineItemTot +
+                                       state.dataCostEstimateManager->RefrncBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) *
+                                      (state.dataCostEstimateManager->RefrncBldg.RegionalModifier - 1.0);
+            } else {
+                TableBodyData(1, 3) = 0.0;
+            }
 
-        tableBody(1, 3) = RealToStr(TableBodyData(1, 3), 2);
-        TableBodyData(1, 4) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac;
-        tableBody(1, 4) = RealToStr(TableBodyData(1, 4), 2);
-        TableBodyData(1, 5) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac;
-        tableBody(1, 5) = RealToStr(TableBodyData(1, 5), 2);
-        TableBodyData(1, 6) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContingencyFrac;
-        tableBody(1, 6) = RealToStr(TableBodyData(1, 6), 2);
-        TableBodyData(1, 7) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.BondCostFrac;
-        tableBody(1, 7) = RealToStr(TableBodyData(1, 7), 2);
-        TableBodyData(1, 8) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.CommissioningFrac;
-        tableBody(1, 8) = RealToStr(TableBodyData(1, 8), 2);
-        state.dataCostEstimateManager->RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
-        TableBodyData(1, 9) = state.dataCostEstimateManager->RefrncBldg.GrandTotal;
-        tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
-        if (ort->buildingConditionedFloorArea > 0.0) {
-            TableBodyData(1, 10) = TableBodyData(1, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
-        }
-        tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
+            RefBldgConstCost = sum(TableBodyData(1, {1, 3}));
 
-        TableBodyData(2, 1) = state.dataCostEstimateManager->CurntBldg.LineItemTot;
-        tableBody(2, 1) = RealToStr(TableBodyData(2, 1), 2);
-        TableBodyData(2, 2) = state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
-        tableBody(2, 2) = RealToStr(TableBodyData(2, 2), 2);
-        if (state.dataCostEstimateManager->CurntBldg.RegionalModifier != 1.0) {
-            TableBodyData(2, 3) =
-                (state.dataCostEstimateManager->CurntBldg.LineItemTot + state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) * (state.dataCostEstimateManager->CurntBldg.RegionalModifier - 1.0);
-        } else {
-            TableBodyData(2, 3) = 0.0;
-        }
-        tableBody(2, 3) = RealToStr(TableBodyData(2, 3), 2);
+            tableBody(1, 3) = RealToStr(TableBodyData(1, 3), 2);
+            TableBodyData(1, 4) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.DesignFeeFrac;
+            tableBody(1, 4) = RealToStr(TableBodyData(1, 4), 2);
+            TableBodyData(1, 5) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContractorFeeFrac;
+            tableBody(1, 5) = RealToStr(TableBodyData(1, 5), 2);
+            TableBodyData(1, 6) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.ContingencyFrac;
+            tableBody(1, 6) = RealToStr(TableBodyData(1, 6), 2);
+            TableBodyData(1, 7) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.BondCostFrac;
+            tableBody(1, 7) = RealToStr(TableBodyData(1, 7), 2);
+            TableBodyData(1, 8) = RefBldgConstCost * state.dataCostEstimateManager->RefrncBldg.CommissioningFrac;
+            tableBody(1, 8) = RealToStr(TableBodyData(1, 8), 2);
+            state.dataCostEstimateManager->RefrncBldg.GrandTotal = sum(TableBodyData(1, {1, 8}));
+            TableBodyData(1, 9) = state.dataCostEstimateManager->RefrncBldg.GrandTotal;
+            tableBody(1, 9) = RealToStr(TableBodyData(1, 9), 2);
+            if (ort->buildingConditionedFloorArea > 0.0) {
+                TableBodyData(1, 10) = TableBodyData(1, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
+            }
+            tableBody(1, 10) = RealToStr(TableBodyData(1, 10), 2);
 
-        CurntBldgConstCost = sum(TableBodyData(2, {1, 3}));
+            TableBodyData(2, 1) = state.dataCostEstimateManager->CurntBldg.LineItemTot;
+            tableBody(2, 1) = RealToStr(TableBodyData(2, 1), 2);
+            TableBodyData(2, 2) = state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea;
+            tableBody(2, 2) = RealToStr(TableBodyData(2, 2), 2);
+            if (state.dataCostEstimateManager->CurntBldg.RegionalModifier != 1.0) {
+                TableBodyData(2, 3) = (state.dataCostEstimateManager->CurntBldg.LineItemTot +
+                                       state.dataCostEstimateManager->CurntBldg.MiscCostperSqMeter * ort->buildingConditionedFloorArea) *
+                                      (state.dataCostEstimateManager->CurntBldg.RegionalModifier - 1.0);
+            } else {
+                TableBodyData(2, 3) = 0.0;
+            }
+            tableBody(2, 3) = RealToStr(TableBodyData(2, 3), 2);
 
-        TableBodyData(2, 4) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.DesignFeeFrac;
-        tableBody(2, 4) = RealToStr(TableBodyData(2, 4), 2);
+            CurntBldgConstCost = sum(TableBodyData(2, {1, 3}));
 
-        TableBodyData(2, 5) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac;
-        tableBody(2, 5) = RealToStr(TableBodyData(2, 5), 2);
-        TableBodyData(2, 6) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContingencyFrac;
-        tableBody(2, 6) = RealToStr(TableBodyData(2, 6), 2);
-        TableBodyData(2, 7) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.BondCostFrac;
-        tableBody(2, 7) = RealToStr(TableBodyData(2, 7), 2);
-        TableBodyData(2, 8) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.CommissioningFrac;
-        tableBody(2, 8) = RealToStr(TableBodyData(2, 8), 2);
+            TableBodyData(2, 4) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.DesignFeeFrac;
+            tableBody(2, 4) = RealToStr(TableBodyData(2, 4), 2);
 
-        state.dataCostEstimateManager->CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
-        TableBodyData(2, 9) = state.dataCostEstimateManager->CurntBldg.GrandTotal;
-        tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
-        if (ort->buildingConditionedFloorArea > 0) {
-            TableBodyData(2, 10) = TableBodyData(2, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
-        }
-        tableBody(2, 10) = RealToStr(TableBodyData(2, 10), 2);
+            TableBodyData(2, 5) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContractorFeeFrac;
+            tableBody(2, 5) = RealToStr(TableBodyData(2, 5), 2);
+            TableBodyData(2, 6) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.ContingencyFrac;
+            tableBody(2, 6) = RealToStr(TableBodyData(2, 6), 2);
+            TableBodyData(2, 7) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.BondCostFrac;
+            tableBody(2, 7) = RealToStr(TableBodyData(2, 7), 2);
+            TableBodyData(2, 8) = CurntBldgConstCost * state.dataCostEstimateManager->CurntBldg.CommissioningFrac;
+            tableBody(2, 8) = RealToStr(TableBodyData(2, 8), 2);
 
-        TableBodyData(3, {1, 10}) = TableBodyData(2, {1, 10}) - TableBodyData(1, {1, 10});
-        tableBody(3, 1) = RealToStr(TableBodyData(3, 1), 2);
-        tableBody(3, 2) = RealToStr(TableBodyData(3, 2), 2);
-        tableBody(3, 3) = RealToStr(TableBodyData(3, 3), 2);
-        tableBody(3, 4) = RealToStr(TableBodyData(3, 4), 2);
-        tableBody(3, 5) = RealToStr(TableBodyData(3, 5), 2);
-        tableBody(3, 6) = RealToStr(TableBodyData(3, 6), 2);
-        tableBody(3, 7) = RealToStr(TableBodyData(3, 7), 2);
-        tableBody(3, 8) = RealToStr(TableBodyData(3, 8), 2);
-        tableBody(3, 9) = RealToStr(TableBodyData(3, 9), 2);
-        tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
+            state.dataCostEstimateManager->CurntBldg.GrandTotal = sum(TableBodyData(2, {1, 8}));
+            TableBodyData(2, 9) = state.dataCostEstimateManager->CurntBldg.GrandTotal;
+            tableBody(2, 9) = RealToStr(TableBodyData(2, 9), 2);
+            if (ort->buildingConditionedFloorArea > 0) {
+                TableBodyData(2, 10) = TableBodyData(2, 9) / (ort->buildingConditionedFloorArea * m2_unitConv);
+            }
+            tableBody(2, 10) = RealToStr(TableBodyData(2, 10), 2);
 
-        WriteSubtitle(state, "Construction Cost Estimate Summary");
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
-        }
-        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
-        }
+            TableBodyData(3, {1, 10}) = TableBodyData(2, {1, 10}) - TableBodyData(1, {1, 10});
+            tableBody(3, 1) = RealToStr(TableBodyData(3, 1), 2);
+            tableBody(3, 2) = RealToStr(TableBodyData(3, 2), 2);
+            tableBody(3, 3) = RealToStr(TableBodyData(3, 3), 2);
+            tableBody(3, 4) = RealToStr(TableBodyData(3, 4), 2);
+            tableBody(3, 5) = RealToStr(TableBodyData(3, 5), 2);
+            tableBody(3, 6) = RealToStr(TableBodyData(3, 6), 2);
+            tableBody(3, 7) = RealToStr(TableBodyData(3, 7), 2);
+            tableBody(3, 8) = RealToStr(TableBodyData(3, 8), 2);
+            tableBody(3, 9) = RealToStr(TableBodyData(3, 9), 2);
+            tableBody(3, 10) = RealToStr(TableBodyData(3, 10), 2);
+            
+            if (produceTabular) {
+                WriteSubtitle(state, "Construction Cost Estimate Summary");
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            }
+            if (produceSQLite) {
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "Construction Cost Estimate Summary",
+                                                           "Entire Facility",
+                                                           "Construction Cost Estimate Summary");
+                }
+            }
+            if (produceTabular) {
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Construction Cost Estimate Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Construction Cost Estimate Summary");
+                }
+            }
 
-        NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
-        NumCols = 6;                // Line no., Line name, Qty, Units, ValperQty, Subtotal
-        rowHead.allocate(NumRows);
-        columnHead.allocate(NumCols);
-        columnWidth.dimension(NumCols, 14); // array assignment - same for all columns
-        tableBody.allocate(NumCols, NumRows);
-        tableBody = "--";                        // array init
-        rowHead = "--";                          // array init
-        rowHead(NumRows) = "Line Item SubTotal"; // last line in table will be a total
-        // setup up column headers
-        columnHead(1) = "Line No.";
-        columnHead(2) = "Item Name";
-        columnHead(3) = "Quantity.";
-        columnHead(4) = "Units";
-        columnHead(5) = "~~$~~ per Qty.";
-        columnHead(6) = "SubTotal ~~$~~";
+            NumRows = state.dataCostEstimateManager->NumLineItems + 1; // body will have the total and line items
+            NumCols = 6;                                               // Line no., Line name, Qty, Units, ValperQty, Subtotal
+            rowHead.allocate(NumRows);
+            columnHead.allocate(NumCols);
+            columnWidth.dimension(NumCols, 14); // array assignment - same for all columns
+            tableBody.allocate(NumCols, NumRows);
+            tableBody = "--";                        // array init
+            rowHead = "--";                          // array init
+            rowHead(NumRows) = "Line Item SubTotal"; // last line in table will be a total
+            // setup up column headers
+            columnHead(1) = "Line No.";
+            columnHead(2) = "Item Name";
+            columnHead(3) = "Quantity.";
+            columnHead(4) = "Units";
+            columnHead(5) = "~~$~~ per Qty.";
+            columnHead(6) = "SubTotal ~~$~~";
 
-        columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
+            columnWidth = {7, 30, 16, 10, 16, 16}; // array assignment - for all columns
 
-        for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
-            tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
-            tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
-                if (unitConvIndex != 0) {
-                    IPqty = ConvertIP(state, unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
-                    tableBody(3, item) = RealToStr(IPqty, 2);
-                    tableBody(4, item) = IPunitName;
-                    IPsingleValue = ConvertIP(state, unitConvIndex, 1.0);
-                    if (IPsingleValue != 0.0) {
-                        IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
-                        tableBody(5, item) = RealToStr(IPvaluePer, 2);
+            for (item = 1; item <= state.dataCostEstimateManager->NumLineItems; ++item) {
+                tableBody(1, item) = fmt::to_string(state.dataCostEstimateManager->CostLineItem(item).LineNumber);
+                tableBody(2, item) = state.dataCostEstimateManager->CostLineItem(item).LineName;
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    LookupSItoIP(state, state.dataCostEstimateManager->CostLineItem(item).Units, unitConvIndex, IPunitName);
+                    if (unitConvIndex != 0) {
+                        IPqty = ConvertIP(state, unitConvIndex, state.dataCostEstimateManager->CostLineItem(item).Qty);
+                        tableBody(3, item) = RealToStr(IPqty, 2);
+                        tableBody(4, item) = IPunitName;
+                        IPsingleValue = ConvertIP(state, unitConvIndex, 1.0);
+                        if (IPsingleValue != 0.0) {
+                            IPvaluePer = state.dataCostEstimateManager->CostLineItem(item).ValuePer / IPsingleValue;
+                            tableBody(5, item) = RealToStr(IPvaluePer, 2);
+                        }
+                    } else {
+                        tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
+                        tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
+                        tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
                     }
                 } else {
                     tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
                     tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
                     tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
                 }
-            } else {
-                tableBody(3, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).Qty, 2);
-                tableBody(4, item) = state.dataCostEstimateManager->CostLineItem(item).Units;
-                tableBody(5, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).ValuePer, 2);
+                tableBody(6, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).LineSubTotal, 2);
             }
-            tableBody(6, item) = RealToStr(state.dataCostEstimateManager->CostLineItem(item).LineSubTotal, 2);
-        }
-        tableBody(6, NumRows) = RealToStr(state.dataCostEstimateManager->CurntBldg.LineItemTot, 2);
-        WriteSubtitle(state, "Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
-        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
-        }
-        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+            tableBody(6, NumRows) = RealToStr(state.dataCostEstimateManager->CurntBldg.LineItemTot, 2);
+            if (produceTabular) {
+                WriteSubtitle(state, "Cost Line Item Details"); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
+                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+            }
+            if (produceSQLite) {
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(
+                        tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+                }
+            }
+            if (produceTabular) {
+                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
+                }
+            }
         }
     }
 
@@ -9785,15 +10567,15 @@ namespace EnergyPlus::OutputReportTabular {
         static Array1D<Real64> zstPeople(4);
         static Array1D<Real64> zstPlug(4);
 
-        zstArea = 0.0;
-        zstVolume = 0.0;
-        zstWallArea = 0.0;
-        zstUndWallArea = 0.0;
-        zstWindowArea = 0.0;
-        zstOpeningArea = 0.0;
-        zstLight = 0.0;
-        zstPeople = 0.0;
-        zstPlug = 0.0;
+        //zstArea = 0.0;
+        //zstVolume = 0.0;
+        //zstWallArea = 0.0;
+        //zstUndWallArea = 0.0;
+        //zstWindowArea = 0.0;
+        //zstOpeningArea = 0.0;
+        //zstLight = 0.0;
+        //zstPeople = 0.0;
+        //zstPlug = 0.0;
 
         // misc
         Real64 pdiff;
@@ -9804,667 +10586,783 @@ namespace EnergyPlus::OutputReportTabular {
 
         Array1D<Real64> zoneOpeningArea;
         zoneOpeningArea.allocate(state.dataGlobal->NumOfZones);
-        zoneOpeningArea = 0.0;
+        // zoneOpeningArea = 0.0;
 
         Array1D<Real64> zoneGlassArea;
         zoneGlassArea.allocate(state.dataGlobal->NumOfZones);
-        zoneGlassArea = 0.0;
+        // zoneGlassArea = 0.0;
         auto &ort(state.dataOutRptTab);
 
         // all arrays are in the format: (row, columnm)
         if (ort->displayTabularVeriSum) {
-            // show the headers of the report
-            WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
-            // do unit conversions if necessary
-            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                SIunit = "[m]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
-                m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-                SIunit = "[m2]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
-                m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-                SIunit = "[m3]";
-                LookupSItoIP(state, SIunit, unitConvIndex, m3_unitName);
-                m3_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-                SIunit = "[W/m2]";
-                LookupSItoIP(state, SIunit, unitConvIndex, Wm2_unitName);
-                Wm2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
-            } else {
-                m_unitName = "[m]";
-                m_unitConv = 1.0;
-                m2_unitName = "[m2]";
-                m2_unitConv = 1.0;
-                m3_unitName = "[m3]";
-                m3_unitConv = 1.0;
-                Wm2_unitName = "[W/m2]";
-                Wm2_unitConv = 1.0;
-            }
-            //---- General Sub-Table
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-            // since a variable number of design days is possible, first read them before sizing the arrays
-            rowHead.allocate(10);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(1, 10);
+                // show the headers of the report
+                if (produceTabular) {
+                    WriteReportHeaders(state, "Input Verification and Results Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                }
 
-            columnHead(1) = "Value";
-            rowHead(1) = "Program Version and Build";
-            rowHead(2) = "RunPeriod";
-            rowHead(3) = "Weather File";
-            rowHead(4) = "Latitude [deg]";
-            rowHead(5) = "Longitude [deg]";
+                // Moved these initializations into the loop
+                zstArea = 0.0;
+                zstVolume = 0.0;
+                zstWallArea = 0.0;
+                zstUndWallArea = 0.0;
+                zstWindowArea = 0.0;
+                zstOpeningArea = 0.0;
+                zstLight = 0.0;
+                zstPeople = 0.0;
+                zstPlug = 0.0;
 
-            rowHead(6) = "Elevation " + m_unitName;
-            rowHead(7) = "Time Zone";
-            rowHead(8) = "North Axis Angle [deg]";
-            rowHead(9) = "Rotation for Appendix G [deg]";
-            rowHead(10) = "Hours Simulated [hrs]";
-            //  rowHead(9)  = 'Num Table Entries' !used for debugging
+                zoneOpeningArea = 0.0;
 
-            tableBody = "";
+                zoneGlassArea = 0.0;
 
-            tableBody(1, 1) = VerString;                               // program
-            tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                         // runperiod name
-            tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;                // weather
-            tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);                  // latitude
-            tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);                 // longitude
-            tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2);    // Elevation
-            tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);            // Time Zone
-            tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);           // north axis angle
-            tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2); // Rotation for Appendix G
-            tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);    // hours simulated
-            //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
+                // do unit conversions if necessary
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    SIunit = "[m]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, m_unitName);
+                    m_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    SIunit = "[m2]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, m2_unitName);
+                    m2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    SIunit = "[m3]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, m3_unitName);
+                    m3_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    SIunit = "[W/m2]";
+                    LookupSItoIP(state, SIunit, unitConvIndex, Wm2_unitName);
+                    Wm2_unitConv = ConvertIP(state, unitConvIndex, 1.0);
+                } else {
+                    m_unitName = "[m]";
+                    m_unitConv = 1.0;
+                    m2_unitName = "[m2]";
+                    m2_unitConv = 1.0;
+                    m3_unitName = "[m3]";
+                    m3_unitConv = 1.0;
+                    Wm2_unitName = "[W/m2]";
+                    Wm2_unitConv = 1.0;
+                }
+                //---- General Sub-Table
 
-            WriteSubtitle(state, "General");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
-            }
+                // since a variable number of design days is possible, first read them before sizing the arrays
+                rowHead.allocate(10);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(1, 10);
 
-            //---- Window Wall Ratio Sub-Table
-            WriteTextLine(state, "ENVELOPE", true);
+                columnHead(1) = "Value";
+                rowHead(1) = "Program Version and Build";
+                rowHead(2) = "RunPeriod";
+                rowHead(3) = "Weather File";
+                rowHead(4) = "Latitude [deg]";
+                rowHead(5) = "Longitude [deg]";
 
-            rowHead.allocate(5);
-            columnHead.allocate(5);
-            columnWidth.allocate(5);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(5, 5);
+                rowHead(6) = "Elevation " + m_unitName;
+                rowHead(7) = "Time Zone";
+                rowHead(8) = "North Axis Angle [deg]";
+                rowHead(9) = "Rotation for Appendix G [deg]";
+                rowHead(10) = "Hours Simulated [hrs]";
+                //  rowHead(9)  = 'Num Table Entries' !used for debugging
 
-            columnHead(wwrcTotal) = "Total";
-            columnHead(wwrcNorth) = "North (315 to 45 deg)";
-            columnHead(wwrcEast) = "East (45 to 135 deg)";
-            columnHead(wwrcSouth) = "South (135 to 225 deg)";
-            columnHead(wwrcWest) = "West (225 to 315 deg)";
+                tableBody = "";
 
-            rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
-            rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
-            rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
-            rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
-            rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
+                tableBody(1, 1) = VerString;                                             // program
+                tableBody(1, 2) = state.dataEnvrn->EnvironmentName;                      // runperiod name
+                tableBody(1, 3) = state.dataEnvrn->WeatherFileLocationTitle;             // weather
+                tableBody(1, 4) = RealToStr(state.dataEnvrn->Latitude, 2);               // latitude
+                tableBody(1, 5) = RealToStr(state.dataEnvrn->Longitude, 2);              // longitude
+                tableBody(1, 6) = RealToStr(state.dataEnvrn->Elevation * m_unitConv, 2); // Elevation
+                tableBody(1, 7) = RealToStr(state.dataEnvrn->TimeZoneNumber, 2);         // Time Zone
+                tableBody(1, 8) = RealToStr(BuildingAzimuth, 2);                         // north axis angle
+                tableBody(1, 9) = RealToStr(BuildingRotationAppendixG, 2);               // Rotation for Appendix G
+                tableBody(1, 10) = RealToStr(ort->gatherElapsedTimeBEPS, 2);             // hours simulated
+                //  tableBody(9,1) = TRIM(fmt::to_string(state.dataOutRptPredefined->numTableEntry)) !number of table entries for predefined tables
 
-            wallAreaN = 0.0;
-            wallAreaS = 0.0;
-            wallAreaE = 0.0;
-            wallAreaW = 0.0;
-            aboveGroundWallAreaN = 0.0;
-            aboveGroundWallAreaS = 0.0;
-            aboveGroundWallAreaE = 0.0;
-            aboveGroundWallAreaW = 0.0;
-            windowAreaN = 0.0;
-            windowAreaS = 0.0;
-            windowAreaE = 0.0;
-            windowAreaW = 0.0;
-            wallAreaNcond = 0.0;
-            wallAreaScond = 0.0;
-            wallAreaEcond = 0.0;
-            wallAreaWcond = 0.0;
-            aboveGroundWallAreaNcond = 0.0;
-            aboveGroundWallAreaScond = 0.0;
-            aboveGroundWallAreaEcond = 0.0;
-            aboveGroundWallAreaWcond = 0.0;
-            windowAreaNcond = 0.0;
-            windowAreaScond = 0.0;
-            windowAreaEcond = 0.0;
-            windowAreaWcond = 0.0;
-            roofArea = 0.0;
-            skylightArea = 0.0;
-            totLightPower = 0.0;
-            totNumPeople = 0.0;
-            totPlugProcess = 0.0;
-            kOpaque = 0;
-
-            DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
-
-            if (DetailedWWR) {
-                print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
-                print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
-            }
-
-            for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
-                // only exterior surfaces including underground
-                if (!Surface(iSurf).HeatTransSurf) continue;
-                isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
-                if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
-                    (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
-                    curAzimuth = Surface(iSurf).Azimuth;
-                    // Round to two decimals, like the display in tables
-                    curAzimuth = round(curAzimuth * 100.0) / 100.0;
-                    curArea = Surface(iSurf).GrossArea;
-                    if (Surface(iSurf).FrameDivider != 0) {
-                        frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
-                        frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
-                                    (Surface(iSurf).Height * Surface(iSurf).Width);
-                        curArea += frameArea;
-                    }
-                    zonePt = Surface(iSurf).Zone;
-                    isConditioned = false;
-                    if (zonePt > 0) {
-                        if (Zone(zonePt).SystemZoneNodeNumber > 0) {
-                            isConditioned = true;
-                        }
-                    }
-                    if ((Surface(iSurf).Tilt >= 60.0) && (Surface(iSurf).Tilt <= 120.0)) {
-                        // vertical walls and windows
-                        {
-                            auto const SELECT_CASE_var(Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    wallAreaN += curArea * mult;
-                                    if (isConditioned) wallAreaNcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaN += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    wallAreaE += curArea * mult;
-                                    if (isConditioned) wallAreaEcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaE += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    wallAreaS += curArea * mult;
-                                    if (isConditioned) wallAreaScond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaS += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
-                                    }
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    wallAreaW += curArea * mult;
-                                    if (isConditioned) wallAreaWcond += curArea * mult;
-                                    if (isAboveGround) {
-                                        aboveGroundWallAreaW += curArea * mult;
-                                        if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
-                                    }
-                                }
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Wall,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
-                                if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
-                                    windowAreaN += curArea * mult;
-                                    if (isConditioned) windowAreaNcond += curArea * mult;
-                                } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
-                                    windowAreaE += curArea * mult;
-                                    if (isConditioned) windowAreaEcond += curArea * mult;
-                                } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
-                                    windowAreaS += curArea * mult;
-                                    if (isConditioned) windowAreaScond += curArea * mult;
-                                } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
-                                    windowAreaW += curArea * mult;
-                                    if (isConditioned) windowAreaWcond += curArea * mult;
-                                }
-                                zoneOpeningArea(zonePt) +=
-                                    curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
-                                zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Window,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            }
-                        }
-                    } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
-                        {
-                            auto const SELECT_CASE_var(Surface(iSurf).Class);
-                            if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
-                                (SELECT_CASE_var == SurfaceClass::Roof)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
-                                roofArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Roof,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
-                                mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
-                                skylightArea += curArea * mult;
-                                if (DetailedWWR) {
-                                    print(state.files.debug, "{},Skylight,{:.1R},{:.1R}\n", Surface(iSurf).Name, curArea * mult, Surface(iSurf).Tilt);
-                                }
-                            }
-                        }
-                    } else { // floors
-                             // ignored
+                if (produceTabular) {
+                    WriteSubtitle(state, "General");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
                     }
                 }
-            }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
+                    }
+                }
 
-            TotalWallArea = wallAreaN + wallAreaS + wallAreaE + wallAreaW;
-            TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
-            TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
-            if (DetailedWWR) {
-                print(state.files.debug, "{}\n", "========================");
-                print(state.files.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
-                print(state.files.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
-                print(state.files.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
-                print(state.files.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWindowArea, windowAreaN, windowAreaS, windowAreaE, windowAreaW);
-            }
+                //---- Window Wall Ratio Sub-Table
+                if (produceTabular) {
+                    WriteTextLine(state, "ENVELOPE", true);
+                }
 
-            tableBody = "";
+                rowHead.allocate(5);
+                columnHead.allocate(5);
+                columnWidth.allocate(5);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(5, 5);
 
-            tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaN * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
+                columnHead(wwrcTotal) = "Total";
+                columnHead(wwrcNorth) = "North (315 to 45 deg)";
+                columnHead(wwrcEast) = "East (45 to 135 deg)";
+                columnHead(wwrcSouth) = "South (135 to 225 deg)";
+                columnHead(wwrcWest) = "West (225 to 315 deg)";
 
-            tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
+                rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
+                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
+                rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
+                rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
+                rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
 
-            tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
+                wallAreaN = 0.0;
+                wallAreaS = 0.0;
+                wallAreaE = 0.0;
+                wallAreaW = 0.0;
+                aboveGroundWallAreaN = 0.0;
+                aboveGroundWallAreaS = 0.0;
+                aboveGroundWallAreaE = 0.0;
+                aboveGroundWallAreaW = 0.0;
+                windowAreaN = 0.0;
+                windowAreaS = 0.0;
+                windowAreaE = 0.0;
+                windowAreaW = 0.0;
+                wallAreaNcond = 0.0;
+                wallAreaScond = 0.0;
+                wallAreaEcond = 0.0;
+                wallAreaWcond = 0.0;
+                aboveGroundWallAreaNcond = 0.0;
+                aboveGroundWallAreaScond = 0.0;
+                aboveGroundWallAreaEcond = 0.0;
+                aboveGroundWallAreaWcond = 0.0;
+                windowAreaNcond = 0.0;
+                windowAreaScond = 0.0;
+                windowAreaEcond = 0.0;
+                windowAreaWcond = 0.0;
+                roofArea = 0.0;
+                skylightArea = 0.0;
+                totLightPower = 0.0;
+                totNumPeople = 0.0;
+                totPlugProcess = 0.0;
+                kOpaque = 0;
 
-            tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
-            tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
-            tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, wallAreaE), 2);
-            tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, wallAreaW), 2);
-            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+                DetailedWWR = (inputProcessor->getNumSectionsFound("DETAILEDWWR_DEBUG") > 0);
+                if (DetailedWWR) {
+                    if (produceTabular) {
+                        print(state.files.debug, "{}\n", "======90.1 Classification [>=60 & <=120] tilt = wall==================");
+                        print(state.files.debug, "{}\n", "SurfName,Class,Area,Tilt");
+                    }
+                }
 
-            tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, aboveGroundWallAreaN), 2);
-            tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, aboveGroundWallAreaS), 2);
-            tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, aboveGroundWallAreaE), 2);
-            tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
-            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+                for (iSurf = 1; iSurf <= TotSurfaces; ++iSurf) {
+                    // only exterior surfaces including underground
+                    if (!Surface(iSurf).HeatTransSurf) continue;
+                    isAboveGround = (Surface(iSurf).ExtBoundCond == ExternalEnvironment) || (Surface(iSurf).ExtBoundCond == OtherSideCondModeledExt);
+                    if (isAboveGround || (Surface(iSurf).ExtBoundCond == Ground) || (Surface(iSurf).ExtBoundCond == GroundFCfactorMethod) ||
+                        (Surface(iSurf).ExtBoundCond == KivaFoundation)) {
+                        curAzimuth = Surface(iSurf).Azimuth;
+                        // Round to two decimals, like the display in tables
+                        curAzimuth = round(curAzimuth * 100.0) / 100.0;
+                        curArea = Surface(iSurf).GrossArea;
+                        if (Surface(iSurf).FrameDivider != 0) {
+                            frameWidth = FrameDivider(Surface(iSurf).FrameDivider).FrameWidth;
+                            frameArea = (Surface(iSurf).Height + 2.0 * frameWidth) * (Surface(iSurf).Width + 2.0 * frameWidth) -
+                                        (Surface(iSurf).Height * Surface(iSurf).Width);
+                            curArea += frameArea;
+                        }
+                        zonePt = Surface(iSurf).Zone;
+                        isConditioned = false;
+                        if (zonePt > 0) {
+                            if (Zone(zonePt).SystemZoneNodeNumber > 0) {
+                                isConditioned = true;
+                            }
+                        }
+                        if ((Surface(iSurf).Tilt >= 60.0) && (Surface(iSurf).Tilt <= 120.0)) {
+                            // vertical walls and windows
+                            {
+                                auto const SELECT_CASE_var(Surface(iSurf).Class);
+                                if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
+                                    (SELECT_CASE_var == SurfaceClass::Roof)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                                    if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                        wallAreaN += curArea * mult;
+                                        if (isConditioned) wallAreaNcond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaN += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaNcond += curArea * mult;
+                                        }
+                                    } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                        wallAreaE += curArea * mult;
+                                        if (isConditioned) wallAreaEcond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaE += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaEcond += curArea * mult;
+                                        }
+                                    } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                        wallAreaS += curArea * mult;
+                                        if (isConditioned) wallAreaScond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaS += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaScond += curArea * mult;
+                                        }
+                                    } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                        wallAreaW += curArea * mult;
+                                        if (isConditioned) wallAreaWcond += curArea * mult;
+                                        if (isAboveGround) {
+                                            aboveGroundWallAreaW += curArea * mult;
+                                            if (isConditioned) aboveGroundWallAreaWcond += curArea * mult;
+                                        }
+                                    }
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
+                                            print(state.files.debug,
+                                                  "{},Wall,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                    if ((curAzimuth >= 315.0) || (curAzimuth < 45.0)) {
+                                        windowAreaN += curArea * mult;
+                                        if (isConditioned) windowAreaNcond += curArea * mult;
+                                    } else if ((curAzimuth >= 45.0) && (curAzimuth < 135.0)) {
+                                        windowAreaE += curArea * mult;
+                                        if (isConditioned) windowAreaEcond += curArea * mult;
+                                    } else if ((curAzimuth >= 135.0) && (curAzimuth < 225.0)) {
+                                        windowAreaS += curArea * mult;
+                                        if (isConditioned) windowAreaScond += curArea * mult;
+                                    } else if ((curAzimuth >= 225.0) && (curAzimuth < 315.0)) {
+                                        windowAreaW += curArea * mult;
+                                        if (isConditioned) windowAreaWcond += curArea * mult;
+                                    }
+                                    zoneOpeningArea(zonePt) +=
+                                        curArea * Surface(iSurf).Multiplier; // total window opening area for each zone (glass plus frame area)
+                                    zoneGlassArea(zonePt) += Surface(iSurf).GrossArea * Surface(iSurf).Multiplier;
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
+                                            print(state.files.debug,
+                                                  "{},Window,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                }
+                            }
+                        } else if (Surface(iSurf).Tilt < 60.0) { // roof and skylights
+                            {
+                                auto const SELECT_CASE_var(Surface(iSurf).Class);
+                                if ((SELECT_CASE_var == SurfaceClass::Wall) || (SELECT_CASE_var == SurfaceClass::Floor) ||
+                                    (SELECT_CASE_var == SurfaceClass::Roof)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
+                                    roofArea += curArea * mult;
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
+                                            print(state.files.debug,
+                                                  "{},Roof,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                } else if ((SELECT_CASE_var == SurfaceClass::Window) || (SELECT_CASE_var == SurfaceClass::TDD_Dome)) {
+                                    mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier * Surface(iSurf).Multiplier;
+                                    skylightArea += curArea * mult;
+                                    if (DetailedWWR) {
+                                        if (produceTabular) {
+                                            print(state.files.debug,
+                                                  "{},Skylight,{:.1R},{:.1R}\n",
+                                                  Surface(iSurf).Name,
+                                                  curArea * mult,
+                                                  Surface(iSurf).Tilt);
+                                        }
+                                    }
+                                }
+                            }
+                        } else { // floors
+                                 // ignored
+                        }
+                    }
+                }
 
-            WriteSubtitle(state, "Window-Wall Ratio");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
-            }
+                TotalWallArea = wallAreaN + wallAreaS + wallAreaE + wallAreaW;
+                TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
+                TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
+                if (DetailedWWR) {
+                    if (produceTabular) {
+                        print(state.files.debug, "{}\n", "========================");
+                        print(state.files.debug, "{}\n", "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW");
+                        print(state.files.debug, "{}\n", "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW");
+                        print(state.files.debug, "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n", TotalWallArea, wallAreaN, wallAreaS, wallAreaE, wallAreaW);
+                        print(state.files.debug,
+                              "{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n",
+                              TotalWindowArea,
+                              windowAreaN,
+                              windowAreaS,
+                              windowAreaE,
+                              windowAreaW);
+                    }
+                }
 
-            //---- Conditioned Window Wall Ratio Sub-Table
-            rowHead.allocate(5);
-            columnHead.allocate(5);
-            columnWidth.allocate(5);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(5, 5);
+                tableBody = "";
 
-            columnHead(wwrcTotal) = "Total";
-            columnHead(wwrcNorth) = "North (315 to 45 deg)";
-            columnHead(wwrcEast) = "East (45 to 135 deg)";
-            columnHead(wwrcSouth) = "South (135 to 225 deg)";
-            columnHead(wwrcWest) = "West (225 to 315 deg)";
+                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaN * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaS * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaE * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaW * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
 
-            rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
-            rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
-            rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
-            rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
-            rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
+                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaN * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaS * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaE * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaW * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
 
-            // calculations appear in last block with normal window-wall ratio table
+                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaN * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaS * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaE * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaW * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
 
-            TotalWallArea = wallAreaNcond + wallAreaScond + wallAreaEcond + wallAreaWcond;
-            TotalAboveGroundWallArea = aboveGroundWallAreaNcond + aboveGroundWallAreaScond + aboveGroundWallAreaEcond + aboveGroundWallAreaWcond;
-            TotalWindowArea = windowAreaNcond + windowAreaScond + windowAreaEcond + windowAreaWcond;
+                tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, wallAreaN), 2);
+                tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, wallAreaS), 2);
+                tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, wallAreaE), 2);
+                tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, wallAreaW), 2);
+                tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
-            tableBody = "";
+                tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaN, aboveGroundWallAreaN), 2);
+                tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaS, aboveGroundWallAreaS), 2);
+                tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaE, aboveGroundWallAreaE), 2);
+                tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaW, aboveGroundWallAreaW), 2);
+                tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
-            tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaNcond * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
+                if (produceTabular) {
+                    WriteSubtitle(state, "Window-Wall Ratio");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
+                    }
+                }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
+                    }
+                }
 
-            tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
+                //---- Conditioned Window Wall Ratio Sub-Table
+                rowHead.allocate(5);
+                columnHead.allocate(5);
+                columnWidth.allocate(5);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(5, 5);
 
-            tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * m2_unitConv, 2);
-            tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * m2_unitConv, 2);
-            tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * m2_unitConv, 2);
-            tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * m2_unitConv, 2);
-            tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
+                columnHead(wwrcTotal) = "Total";
+                columnHead(wwrcNorth) = "North (315 to 45 deg)";
+                columnHead(wwrcEast) = "East (45 to 135 deg)";
+                columnHead(wwrcSouth) = "South (135 to 225 deg)";
+                columnHead(wwrcWest) = "West (225 to 315 deg)";
 
-            tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
-            tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
-            tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, wallAreaEcond), 2);
-            tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, wallAreaWcond), 2);
-            tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
+                rowHead(wwrrWall) = "Gross Wall Area " + m2_unitName;
+                rowHead(wwrrAbvGndWall) = "Above Ground Wall Area " + m2_unitName;
+                rowHead(wwrrWindow) = "Window Opening Area " + m2_unitName;
+                rowHead(wwrrWWR) = "Gross Window-Wall Ratio [%]";
+                rowHead(wwrrAbvGndWWR) = "Above Ground Window-Wall Ratio [%]";
 
-            tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, aboveGroundWallAreaNcond), 2);
-            tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, aboveGroundWallAreaScond), 2);
-            tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, aboveGroundWallAreaEcond), 2);
-            tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
-            tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
+                // calculations appear in last block with normal window-wall ratio table
 
-            WriteSubtitle(state, "Conditioned Window-Wall Ratio");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
-            }
+                TotalWallArea = wallAreaNcond + wallAreaScond + wallAreaEcond + wallAreaWcond;
+                TotalAboveGroundWallArea = aboveGroundWallAreaNcond + aboveGroundWallAreaScond + aboveGroundWallAreaEcond + aboveGroundWallAreaWcond;
+                TotalWindowArea = windowAreaNcond + windowAreaScond + windowAreaEcond + windowAreaWcond;
 
-            //---- Skylight Roof Ratio Sub-Table
-            rowHead.allocate(3);
-            columnHead.allocate(1);
-            columnWidth.allocate(1);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(1, 3);
+                tableBody = "";
 
-            columnHead(1) = "Total";
+                tableBody(wwrcNorth, wwrrWall) = RealToStr(wallAreaNcond * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWall) = RealToStr(wallAreaScond * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWall) = RealToStr(wallAreaEcond * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWall) = RealToStr(wallAreaWcond * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWall) = RealToStr(TotalWallArea * m2_unitConv, 2);
 
-            rowHead(1) = "Gross Roof Area " + m2_unitName;
-            rowHead(2) = "Skylight Area " + m2_unitName;
-            rowHead(3) = "Skylight-Roof Ratio [%]";
+                tableBody(wwrcNorth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaNcond * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaScond * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaEcond * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrAbvGndWall) = RealToStr(aboveGroundWallAreaWcond * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrAbvGndWall) = RealToStr(TotalAboveGroundWallArea * m2_unitConv, 2);
 
-            if (DetailedWWR) {
-                print(state.files.debug, "{}\n", "========================");
-                print(state.files.debug, "{}\n", "TotalRoofArea,SkylightArea");
-                print(state.files.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
-            }
+                tableBody(wwrcNorth, wwrrWindow) = RealToStr(windowAreaNcond * m2_unitConv, 2);
+                tableBody(wwrcSouth, wwrrWindow) = RealToStr(windowAreaScond * m2_unitConv, 2);
+                tableBody(wwrcEast, wwrrWindow) = RealToStr(windowAreaEcond * m2_unitConv, 2);
+                tableBody(wwrcWest, wwrrWindow) = RealToStr(windowAreaWcond * m2_unitConv, 2);
+                tableBody(wwrcTotal, wwrrWindow) = RealToStr(TotalWindowArea * m2_unitConv, 2);
 
-            tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
-            tableBody(1, 2) = RealToStr(skylightArea * m2_unitConv, 2);
-            tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
+                tableBody(wwrcNorth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, wallAreaNcond), 2);
+                tableBody(wwrcSouth, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, wallAreaScond), 2);
+                tableBody(wwrcEast, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, wallAreaEcond), 2);
+                tableBody(wwrcWest, wwrrWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, wallAreaWcond), 2);
+                tableBody(wwrcTotal, wwrrWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalWallArea), 2);
 
-            WriteSubtitle(state, "Skylight-Roof Ratio");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
-            }
+                tableBody(wwrcNorth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaNcond, aboveGroundWallAreaNcond), 2);
+                tableBody(wwrcSouth, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaScond, aboveGroundWallAreaScond), 2);
+                tableBody(wwrcEast, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaEcond, aboveGroundWallAreaEcond), 2);
+                tableBody(wwrcWest, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(windowAreaWcond, aboveGroundWallAreaWcond), 2);
+                tableBody(wwrcTotal, wwrrAbvGndWWR) = RealToStr(100.0 * SafeDivide(TotalWindowArea, TotalAboveGroundWallArea), 2);
 
-            //---- Hybrid Model: Internal Thermal Mass Sub-Table
-            if (FlagHybridModel_TM) {
-                rowHead.allocate(state.dataGlobal->NumOfZones);
-                NumOfCol = 2;
+                if (produceTabular) {
+                    WriteSubtitle(state, "Conditioned Window-Wall Ratio");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
+                    }
+                }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                    rowHead,
+                                                                                                    columnHead,
+                                                                                                    "Input Verification and Results Summary",
+                                                                                                    "Entire Facility",
+                                                                                                    "Conditioned Window-Wall Ratio");
+                    }
+                }
+
+                //---- Skylight Roof Ratio Sub-Table
+                rowHead.allocate(3);
+                columnHead.allocate(1);
+                columnWidth.allocate(1);
+                columnWidth = 14; // array assignment - same for all columns
+                tableBody.allocate(1, 3);
+
+                columnHead(1) = "Total";
+
+                rowHead(1) = "Gross Roof Area " + m2_unitName;
+                rowHead(2) = "Skylight Area " + m2_unitName;
+                rowHead(3) = "Skylight-Roof Ratio [%]";
+
+                if (DetailedWWR) {
+                    if (produceTabular) {
+                        print(state.files.debug, "{}\n", "========================");
+                        print(state.files.debug, "{}\n", "TotalRoofArea,SkylightArea");
+                        print(state.files.debug, "{:.2R},{:.2R}\n", roofArea, skylightArea);
+                    }
+                }
+
+                tableBody(1, 1) = RealToStr(roofArea * m2_unitConv, 2);
+                tableBody(1, 2) = RealToStr(skylightArea * m2_unitConv, 2);
+                tableBody(1, 3) = RealToStr(100.0 * SafeDivide(skylightArea, roofArea), 2);
+
+                if (produceTabular) {
+                    WriteSubtitle(state, "Skylight-Roof Ratio");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
+                    }
+                }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
+                    }
+                }
+
+                //---- Hybrid Model: Internal Thermal Mass Sub-Table
+                if (FlagHybridModel_TM) {
+                    rowHead.allocate(state.dataGlobal->NumOfZones);
+                    NumOfCol = 2;
+                    columnHead.allocate(NumOfCol);
+                    columnWidth.allocate(NumOfCol);
+                    columnWidth = 14; // array assignment - same for all columns
+                    tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones);
+
+                    columnHead(1) = "Hybrid Modeling (Y/N)";
+                    columnHead(2) = "Temperature Capacitance Multiplier ";
+
+                    rowHead = "";
+                    tableBody = "";
+
+                    for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                        rowHead(iZone) = Zone(iZone).Name;
+                        if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
+                            tableBody(1, iZone) = "Yes";
+                        } else {
+                            tableBody(1, iZone) = "No";
+                        }
+                        tableBody(2, iZone) = RealToStr(Zone(iZone).ZoneVolCapMultpSensHMAverage, 2);
+                    }
+
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Hybrid Model: Internal Thermal Mass");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "InputVerificationandResultsSummary",
+                                                                   "Entire Facility",
+                                                                   "Hybrid Model: Internal Thermal Mass");
+                        }
+                    }
+                }
+
+                Real64 const totExtGrossWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossWallArea_Multiplied));
+                Real64 const totExtGrossGroundWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied));
+                if (totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0) {
+                    pdiff = std::abs((wallAreaN + wallAreaS + wallAreaE + wallAreaW) -
+                                     (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
+                            (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
+                    if (pdiff > 0.019) {
+                        if (produceTabular) {
+                            ShowWarningError(
+                                state,
+                                "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
+                            ShowContinueError(state,
+                                              format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE "
+                                                     "90.1 wall definitions.",
+                                                     pdiff * 100.0));
+                            //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
+                            //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
+                            //         '] m2, Calculated from user entered Wall class surfaces=['//  &
+                            //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:state.dataGlobal->NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
+                            ShowContinueError(state, "Check classes of surfaces and tilts for discrepancies.");
+                            ShowContinueError(state,
+                                              "Total wall area by ASHRAE 90.1 definition=" +
+                                                  stripped(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW), 3)) + " m2.");
+                            ShowContinueError(state,
+                                              "Total exterior wall area from user entered classes=" +
+                                                  stripped(RealToStr(totExtGrossWallArea_Multiplied, 3)) + " m2.");
+                            ShowContinueError(state,
+                                              "Total ground contact wall area from user entered classes=" +
+                                                  stripped(RealToStr(totExtGrossGroundWallArea_Multiplied, 3)) + " m2.");
+                        }
+                    }
+                }
+                //---- Space Summary Sub-Table
+                if (produceTabular) {
+                    WriteTextLine(state, "PERFORMANCE", true);
+                }
+
+                rowHead.allocate(state.dataGlobal->NumOfZones + 4);
+                NumOfCol = 12;
                 columnHead.allocate(NumOfCol);
                 columnWidth.allocate(NumOfCol);
                 columnWidth = 14; // array assignment - same for all columns
-                tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones);
+                tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones + 4);
 
-                columnHead(1) = "Hybrid Modeling (Y/N)";
-                columnHead(2) = "Temperature Capacitance Multiplier ";
+                columnHead(1) = "Area " + m2_unitName;
+                columnHead(2) = "Conditioned (Y/N)";
+                columnHead(3) = "Part of Total Floor Area (Y/N)";
+                columnHead(4) = "Volume " + m3_unitName;
+                columnHead(5) = "Multipliers";
+                columnHead(6) = "Above Ground Gross Wall Area " + m2_unitName;
+                columnHead(7) = "Underground Gross Wall Area " + m2_unitName;
+                columnHead(8) = "Window Glass Area " + m2_unitName;
+                columnHead(9) = "Opening Area " + m2_unitName;
+                columnHead(10) = "Lighting " + Wm2_unitName;
+                columnHead(11) = "People " + m2_unitName.substr(0, len(m2_unitName) - 1) + " per person" + m2_unitName[len(m2_unitName) - 1];
+                columnHead(12) = "Plug and Process " + Wm2_unitName;
 
                 rowHead = "";
+                rowHead(state.dataGlobal->NumOfZones + grandTotal) = "Total";
+                rowHead(state.dataGlobal->NumOfZones + condTotal) = "Conditioned Total";
+                rowHead(state.dataGlobal->NumOfZones + uncondTotal) = "Unconditioned Total";
+                rowHead(state.dataGlobal->NumOfZones + notpartTotal) = "Not Part of Total";
+
                 tableBody = "";
 
                 for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                    mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
                     rowHead(iZone) = Zone(iZone).Name;
-                    if (HybridModelZone(iZone).InternalThermalMassCalc_T) {
-                        tableBody(1, iZone) = "Yes";
+                    // Conditioned or not
+                    if (Zone(iZone).SystemZoneNodeNumber > 0) {
+                        tableBody(2, iZone) = "Yes";
+                        zoneIsCond = true;
                     } else {
-                        tableBody(1, iZone) = "No";
+                        tableBody(2, iZone) = "No";
+                        zoneIsCond = false;
                     }
-                    tableBody(2, iZone) = RealToStr(Zone(iZone).ZoneVolCapMultpSensHMAverage, 2);
-                }
-
-                WriteSubtitle(state, "Hybrid Model: Internal Thermal Mass");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                           rowHead,
-                                                           columnHead,
-                                                           "InputVerificationandResultsSummary",
-                                                           "Entire Facility",
-                                                           "Hybrid Model: Internal Thermal Mass");
-                }
-            }
-
-            Real64 const totExtGrossWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossWallArea_Multiplied));
-            Real64 const totExtGrossGroundWallArea_Multiplied(sum(Zone, &ZoneData::ExtGrossGroundWallArea_Multiplied));
-            if (totExtGrossWallArea_Multiplied > 0.0 || totExtGrossGroundWallArea_Multiplied > 0.0) {
-                pdiff = std::abs((wallAreaN + wallAreaS + wallAreaE + wallAreaW) -
-                                 (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied)) /
-                        (totExtGrossWallArea_Multiplied + totExtGrossGroundWallArea_Multiplied);
-                if (pdiff > 0.019) {
-                    ShowWarningError(state,
-                        "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls");
-                    ShowContinueError(
-                        state,
-                        format("differs ~{:.1R}% from user entered Wall class surfaces. Degree calculation based on ASHRAE 90.1 wall definitions.",
-                               pdiff * 100.0));
-                    //      CALL ShowContinueError(state, 'Calculated based on degrees=['//  &
-                    //         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
-                    //         '] m2, Calculated from user entered Wall class surfaces=['//  &
-                    //         TRIM(ADJUSTL(RealToStr(SUM(Zone(1:state.dataGlobal->NumOfZones)%ExtGrossWallArea_Multiplied),3)))//' m2.')
-                    ShowContinueError(state, "Check classes of surfaces and tilts for discrepancies.");
-                    ShowContinueError(state, "Total wall area by ASHRAE 90.1 definition=" +
-                                      stripped(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW), 3)) + " m2.");
-                    ShowContinueError(state, "Total exterior wall area from user entered classes=" + stripped(RealToStr(totExtGrossWallArea_Multiplied, 3)) +
-                                      " m2.");
-                    ShowContinueError(state, "Total ground contact wall area from user entered classes=" +
-                                      stripped(RealToStr(totExtGrossGroundWallArea_Multiplied, 3)) + " m2.");
-                }
-            }
-            //---- Space Summary Sub-Table
-            WriteTextLine(state, "PERFORMANCE", true);
-
-            rowHead.allocate(state.dataGlobal->NumOfZones + 4);
-            NumOfCol = 12;
-            columnHead.allocate(NumOfCol);
-            columnWidth.allocate(NumOfCol);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(NumOfCol, state.dataGlobal->NumOfZones + 4);
-
-            columnHead(1) = "Area " + m2_unitName;
-            columnHead(2) = "Conditioned (Y/N)";
-            columnHead(3) = "Part of Total Floor Area (Y/N)";
-            columnHead(4) = "Volume " + m3_unitName;
-            columnHead(5) = "Multipliers";
-            columnHead(6) = "Above Ground Gross Wall Area " + m2_unitName;
-            columnHead(7) = "Underground Gross Wall Area " + m2_unitName;
-            columnHead(8) = "Window Glass Area " + m2_unitName;
-            columnHead(9) = "Opening Area " + m2_unitName;
-            columnHead(10) = "Lighting " + Wm2_unitName;
-            columnHead(11) = "People " + m2_unitName.substr(0, len(m2_unitName) - 1) + " per person" + m2_unitName[len(m2_unitName) - 1];
-            columnHead(12) = "Plug and Process " + Wm2_unitName;
-
-            rowHead = "";
-            rowHead(state.dataGlobal->NumOfZones + grandTotal) = "Total";
-            rowHead(state.dataGlobal->NumOfZones + condTotal) = "Conditioned Total";
-            rowHead(state.dataGlobal->NumOfZones + uncondTotal) = "Unconditioned Total";
-            rowHead(state.dataGlobal->NumOfZones + notpartTotal) = "Not Part of Total";
-
-            tableBody = "";
-
-            for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                rowHead(iZone) = Zone(iZone).Name;
-                // Conditioned or not
-                if (Zone(iZone).SystemZoneNodeNumber > 0) {
-                    tableBody(2, iZone) = "Yes";
-                    zoneIsCond = true;
-                } else {
-                    tableBody(2, iZone) = "No";
-                    zoneIsCond = false;
-                }
-                // Part of Total Floor Area or not
-                if (Zone(iZone).isPartOfTotalArea) {
-                    tableBody(3, iZone) = "Yes";
-                    usezoneFloorArea = true;
-                } else {
-                    tableBody(3, iZone) = "No";
-                    usezoneFloorArea = false;
-                }
-                tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
-                tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
-                // no unit conversion necessary since done automatically
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                if (zoneIsCond) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
-                } else {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
-                }
-                tableBody(5, iZone) = RealToStr(mult, 2);
-                tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * m2_unitConv, 2);
-                tableBody(7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
-                tableBody(8, iZone) = RealToStr(zoneGlassArea(iZone) * m2_unitConv, 2);
-                tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * m2_unitConv, 2);
-                // lighting density
-                totLightPower = 0.0;
-                for (iLight = 1; iLight <= TotLights; ++iLight) {
-                    if (iZone == Lights(iLight).ZonePtr) {
-                        totLightPower += Lights(iLight).DesignLevel;
+                    // Part of Total Floor Area or not
+                    if (Zone(iZone).isPartOfTotalArea) {
+                        tableBody(3, iZone) = "Yes";
+                        usezoneFloorArea = true;
+                    } else {
+                        tableBody(3, iZone) = "No";
+                        usezoneFloorArea = false;
                     }
-                }
-                if (Zone(iZone).FloorArea > 0) {
-                    tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
-                }
-                // people density
-                totNumPeople = 0.0;
-                for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
-                    if (iZone == People(iPeople).ZonePtr) {
-                        totNumPeople += People(iPeople).NumberOfPeople;
+                    tableBody(1, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv, 2);
+                    tableBody(4, iZone) = RealToStr(Zone(iZone).Volume * m3_unitConv, 2);
+                    // no unit conversion necessary since done automatically
+                    if (produceTabular) {
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
                     }
-                }
-                if (totNumPeople > 0) {
-                    tableBody(11, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv / totNumPeople, 2);
-                }
-                // plug and process density
-                totPlugProcess = 0.0;
-                for (iPlugProc = 1; iPlugProc <= TotElecEquip; ++iPlugProc) {
-                    if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
-                    }
-                }
-                for (iPlugProc = 1; iPlugProc <= TotGasEquip; ++iPlugProc) {
-                    if (iZone == ZoneGas(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
-                    }
-                }
-                for (iPlugProc = 1; iPlugProc <= TotOthEquip; ++iPlugProc) {
-                    if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
-                    }
-                }
-                for (iPlugProc = 1; iPlugProc <= TotHWEquip; ++iPlugProc) {
-                    if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
-                        totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
-                    }
-                }
-                if (Zone(iZone).FloorArea > 0) {
-                    tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
-                }
-
-                // total rows for Total / Not Part of Total
-                // In "Total": break between conditioned/unconditioned
-
-                // If not part of total, goes directly to this row
-                if (!usezoneFloorArea) {
-                    zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(notpartTotal) += mult * totLightPower;
-                    zstPeople(notpartTotal) += mult * totNumPeople;
-                    zstPlug(notpartTotal) += mult * totPlugProcess;
-                } else {
-                    // Add it to the 'Total'
-                    zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
-                    zstVolume(grandTotal) += mult * Zone(iZone).Volume;
-                    zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                    zstUndWallArea(grandTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                    zstWindowArea(grandTotal) += mult * zoneGlassArea(iZone);
-                    zstOpeningArea(grandTotal) += mult * zoneOpeningArea(iZone);
-                    zstLight(grandTotal) += mult * totLightPower;
-                    zstPeople(grandTotal) += mult * totNumPeople;
-                    zstPlug(grandTotal) += mult * totPlugProcess;
-
-                    // Subtotal between cond/unconditioned
                     if (zoneIsCond) {
-                        zstArea(condTotal) += mult * Zone(iZone).FloorArea;
-                        zstVolume(condTotal) += mult * Zone(iZone).Volume;
-                        zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                        zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                        zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
-                        zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
-                        zstLight(condTotal) += mult * totLightPower;
-                        zstPeople(condTotal) += mult * totNumPeople;
-                        zstPlug(condTotal) += mult * totPlugProcess;
-                    } else if (!zoneIsCond) {
-                        zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
-                        zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
-                        zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
-                        zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
-                        zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
-                        zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
-                        zstLight(uncondTotal) += mult * totLightPower;
-                        zstPeople(uncondTotal) += mult * totNumPeople;
-                        zstPlug(uncondTotal) += mult * totPlugProcess;
+                        if (produceTabular) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, "0.00");
+                        }
+                    } else {
+                        if (produceTabular) {
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, Zone(iZone).Name, "0.00");
+                            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, Zone(iZone).Name, Zone(iZone).FloorArea, 2);
+                        }
+                    }
+                    tableBody(5, iZone) = RealToStr(mult, 2);
+                    tableBody(6, iZone) = RealToStr(Zone(iZone).ExtGrossWallArea * m2_unitConv, 2);
+                    tableBody(7, iZone) = RealToStr(Zone(iZone).ExtGrossGroundWallArea * m2_unitConv, 2);
+                    tableBody(8, iZone) = RealToStr(zoneGlassArea(iZone) * m2_unitConv, 2);
+                    tableBody(9, iZone) = RealToStr(zoneOpeningArea(iZone) * m2_unitConv, 2);
+                    // lighting density
+                    totLightPower = 0.0;
+                    for (iLight = 1; iLight <= TotLights; ++iLight) {
+                        if (iZone == Lights(iLight).ZonePtr) {
+                            totLightPower += Lights(iLight).DesignLevel;
+                        }
+                    }
+                    if (Zone(iZone).FloorArea > 0) {
+                        tableBody(10, iZone) = RealToStr(Wm2_unitConv * totLightPower / Zone(iZone).FloorArea, 4);
+                    }
+                    // people density
+                    totNumPeople = 0.0;
+                    for (iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                        if (iZone == People(iPeople).ZonePtr) {
+                            totNumPeople += People(iPeople).NumberOfPeople;
+                        }
+                    }
+                    if (totNumPeople > 0) {
+                        tableBody(11, iZone) = RealToStr(Zone(iZone).FloorArea * m2_unitConv / totNumPeople, 2);
+                    }
+                    // plug and process density
+                    totPlugProcess = 0.0;
+                    for (iPlugProc = 1; iPlugProc <= TotElecEquip; ++iPlugProc) {
+                        if (iZone == ZoneElectric(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneElectric(iPlugProc).DesignLevel;
+                        }
+                    }
+                    for (iPlugProc = 1; iPlugProc <= TotGasEquip; ++iPlugProc) {
+                        if (iZone == ZoneGas(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneGas(iPlugProc).DesignLevel;
+                        }
+                    }
+                    for (iPlugProc = 1; iPlugProc <= TotOthEquip; ++iPlugProc) {
+                        if (iZone == ZoneOtherEq(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneOtherEq(iPlugProc).DesignLevel;
+                        }
+                    }
+                    for (iPlugProc = 1; iPlugProc <= TotHWEquip; ++iPlugProc) {
+                        if (iZone == ZoneHWEq(iPlugProc).ZonePtr) {
+                            totPlugProcess += ZoneHWEq(iPlugProc).DesignLevel;
+                        }
+                    }
+                    if (Zone(iZone).FloorArea > 0) {
+                        tableBody(12, iZone) = RealToStr(totPlugProcess * Wm2_unitConv / Zone(iZone).FloorArea, 4);
+                    }
+
+                    // total rows for Total / Not Part of Total
+                    // In "Total": break between conditioned/unconditioned
+
+                    // If not part of total, goes directly to this row
+                    if (!usezoneFloorArea) {
+                        zstArea(notpartTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(notpartTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(notpartTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(notpartTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(notpartTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(notpartTotal) += mult * totLightPower;
+                        zstPeople(notpartTotal) += mult * totNumPeople;
+                        zstPlug(notpartTotal) += mult * totPlugProcess;
+                    } else {
+                        // Add it to the 'Total'
+                        zstArea(grandTotal) += mult * Zone(iZone).FloorArea;
+                        zstVolume(grandTotal) += mult * Zone(iZone).Volume;
+                        zstWallArea(grandTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                        zstUndWallArea(grandTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                        zstWindowArea(grandTotal) += mult * zoneGlassArea(iZone);
+                        zstOpeningArea(grandTotal) += mult * zoneOpeningArea(iZone);
+                        zstLight(grandTotal) += mult * totLightPower;
+                        zstPeople(grandTotal) += mult * totNumPeople;
+                        zstPlug(grandTotal) += mult * totPlugProcess;
+
+                        // Subtotal between cond/unconditioned
+                        if (zoneIsCond) {
+                            zstArea(condTotal) += mult * Zone(iZone).FloorArea;
+                            zstVolume(condTotal) += mult * Zone(iZone).Volume;
+                            zstWallArea(condTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                            zstUndWallArea(condTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                            zstWindowArea(condTotal) += mult * zoneGlassArea(iZone);
+                            zstOpeningArea(condTotal) += mult * zoneOpeningArea(iZone);
+                            zstLight(condTotal) += mult * totLightPower;
+                            zstPeople(condTotal) += mult * totNumPeople;
+                            zstPlug(condTotal) += mult * totPlugProcess;
+                        } else if (!zoneIsCond) {
+                            zstArea(uncondTotal) += mult * Zone(iZone).FloorArea;
+                            zstVolume(uncondTotal) += mult * Zone(iZone).Volume;
+                            zstWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossWallArea;
+                            zstUndWallArea(uncondTotal) += mult * Zone(iZone).ExtGrossGroundWallArea;
+                            zstWindowArea(uncondTotal) += mult * zoneGlassArea(iZone);
+                            zstOpeningArea(uncondTotal) += mult * zoneOpeningArea(iZone);
+                            zstLight(uncondTotal) += mult * totLightPower;
+                            zstPeople(uncondTotal) += mult * totNumPeople;
+                            zstPlug(uncondTotal) += mult * totPlugProcess;
+                        }
                     }
                 }
-            }
-            for (iTotal = 1; iTotal <= 4; ++iTotal) {
-                tableBody(1, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv, 2);
-                tableBody(4, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstVolume(iTotal) * m3_unitConv, 2);
-                tableBody(6, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWallArea(iTotal) * m2_unitConv, 2);
-                tableBody(7, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstUndWallArea(iTotal) * m2_unitConv, 2);
-                tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWindowArea(iTotal) * m2_unitConv, 2);
-                tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstOpeningArea(iTotal) * m2_unitConv, 2);
-                if (zstArea(iTotal) != 0) {
-                    tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstLight(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
-                    tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstPlug(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                for (iTotal = 1; iTotal <= 4; ++iTotal) {
+                    tableBody(1, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv, 2);
+                    tableBody(4, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstVolume(iTotal) * m3_unitConv, 2);
+                    tableBody(6, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWallArea(iTotal) * m2_unitConv, 2);
+                    tableBody(7, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstUndWallArea(iTotal) * m2_unitConv, 2);
+                    tableBody(8, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstWindowArea(iTotal) * m2_unitConv, 2);
+                    tableBody(9, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstOpeningArea(iTotal) * m2_unitConv, 2);
+                    if (zstArea(iTotal) != 0) {
+                        tableBody(10, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstLight(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                        tableBody(12, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstPlug(iTotal) * Wm2_unitConv / zstArea(iTotal), 4);
+                    }
+                    if (zstPeople(iTotal) != 0) {
+                        tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
+                    }
                 }
-                if (zstPeople(iTotal) != 0) {
-                    tableBody(11, state.dataGlobal->NumOfZones + iTotal) = RealToStr(zstArea(iTotal) * m2_unitConv / zstPeople(iTotal), 2);
+                if (produceTabular) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
                 }
-            }
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutSpArea, "Totals", zstArea(grandTotal), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutOcArea, "Totals", zstArea(condTotal), 2);
-            PreDefTableEntry(state, state.dataOutRptPredefined->pdchLeedSutUnArea, "Totals", zstArea(uncondTotal), 2);
 
-            WriteSubtitle(state, "Zone Summary");
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
-            }
-            if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+                if (produceTabular) {
+                    WriteSubtitle(state, "Zone Summary");
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
+                    }
+                }
+                if (produceTabular) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
+                    }
+                }
             }
         }
     }
@@ -10766,38 +11664,72 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D_int columnWidth;
         Array1D_string rowHead;
         Array2D_string tableBody;
+        auto &ort(state.dataOutRptTab);
 
         if (state.dataOutRptTab->displayHeatEmissionsSummary) {
 
-            WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            WriteSubtitle(state, "Heat Emission by Components");
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-            columnWidth.allocate(6);
-            columnWidth = 10;
+                if (produceTabular) {
+                    WriteReportHeaders(state, "Annual Heat Emissions Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                    WriteSubtitle(state, "Heat Emission by Components");
+                }
 
-            rowHead.allocate(1);
-            tableBody.allocate(6, 1);
+                columnWidth.allocate(6);
+                columnWidth = 10;
 
-            rowHead(1) = "Heat Emissions [GJ]";
-            columnHead(1) = "Envelope Convection";
-            columnHead(2) = "Zone Exfiltration";
-            columnHead(3) = "Zone Exhaust Air";
-            columnHead(4) = "HVAC Relief Air";
-            columnHead(5) = "HVAC Reject Heat";
-            columnHead(6) = "Total";
+                rowHead.allocate(1);
+                tableBody.allocate(6, 1);
 
-            tableBody = "";
-            tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv, 2);
-            tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration, 2);
-            tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust, 2);
-            tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief, 2);
-            tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject, 2);
-            tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat, 2);
+                Real64 energyconversion = 1.0;
+                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                    rowHead(1) = "Heat Emissions [kBtu]";
+                    energyconversion = 1.0 / getSpecificUnitDivider(state, "GJ", "kBtu"); // 1054351.84 J to kBtu
+                } else if (unitsStyle_cur == iUnitsStyle::JtoGJ) {
+                    rowHead(1) = "Heat Emissions [GJ]";
+                    energyconversion = 1.0;
+                } else if (unitsStyle_cur == iUnitsStyle::JtoKWH) {
+                    rowHead(1) = "Heat Emissions [kWh]";
+                    energyconversion = 1.0e3 / 3.6;
+                } else if (unitsStyle_cur == iUnitsStyle::JtoMJ) {
+                    rowHead(1) = "Heat Emissions [MJ]";
+                    energyconversion = 1.0e3;
+                } else if (unitsStyle_cur == iUnitsStyle::None) {
+                    rowHead(1) = "Heat Emissions [GJ]"; 
+                    energyconversion = 1.0;
+                } else {
+                    rowHead(1) = "Heat Emissions [GJ]";
+                    energyconversion = 1.0;
+                }
 
-            WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                columnHead(1) = "Envelope Convection";
+                columnHead(2) = "Zone Exfiltration";
+                columnHead(3) = "Zone Exhaust Air";
+                columnHead(4) = "HVAC Relief Air";
+                columnHead(5) = "HVAC Reject Heat";
+                columnHead(6) = "Total";
+
+                tableBody = "";
+                tableBody(1, 1) = RealToStr(BuildingPreDefRep.emiEnvelopConv * energyconversion, 2);
+                tableBody(2, 1) = RealToStr(BuildingPreDefRep.emiZoneExfiltration * energyconversion, 2);
+                tableBody(3, 1) = RealToStr(BuildingPreDefRep.emiZoneExhaust * energyconversion, 2);
+                tableBody(4, 1) = RealToStr(BuildingPreDefRep.emiHVACRelief * energyconversion, 2);
+                tableBody(5, 1) = RealToStr(BuildingPreDefRep.emiHVACReject * energyconversion, 2);
+                tableBody(6, 1) = RealToStr(BuildingPreDefRep.emiTotHeat * energyconversion, 2);
+
+                if (produceTabular) {
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                }
+                if (produceSQLite) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, "AnnualHeatEmissionsReport", "Entire Facility", "Annual Heat Emissions Summary");
+                    }
+                }
             }
         }
     }
@@ -10861,161 +11793,201 @@ namespace EnergyPlus::OutputReportTabular {
         Real64 IPvalue;
         auto &ort(state.dataOutRptTab);
 
-        // loop through the entries and associate them with the subtable and create
-        // list of unique object names
-        // Much of this code is to allow for integer compares instead of string
-        // compares that are nested three levels in a loop.
-        uniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
-        useUniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
-        numUnqObjName = 0;
-        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-            // associate the subtable with each column
-            curColumn = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
-            if ((curColumn >= 1) && (curColumn <= state.dataOutRptPredefined->numColumnTag)) {
-                state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex = state.dataOutRptPredefined->columnTag(curColumn).indexSubTable;
-            }
-            // make a list of unique object names
-            curObjectName = state.dataOutRptPredefined->tableEntry(lTableEntry).objectName;
-            found = 0;
-            for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
-                if (curObjectName == uniqueObjectName(mUnqObjNames)) {
-                    found = mUnqObjNames;
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
+
+            // loop through the entries and associate them with the subtable and create
+            // list of unique object names
+            // Much of this code is to allow for integer compares instead of string
+            // compares that are nested three levels in a loop.
+            uniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
+            useUniqueObjectName.allocate(state.dataOutRptPredefined->numTableEntry);
+            numUnqObjName = 0;
+            for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
+                // associate the subtable with each column
+                curColumn = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
+                if ((curColumn >= 1) && (curColumn <= state.dataOutRptPredefined->numColumnTag)) {
+                    state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex =
+                        state.dataOutRptPredefined->columnTag(curColumn).indexSubTable;
+                }
+                // make a list of unique object names
+                curObjectName = state.dataOutRptPredefined->tableEntry(lTableEntry).objectName;
+                found = 0;
+                for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
+                    if (curObjectName == uniqueObjectName(mUnqObjNames)) {
+                        found = mUnqObjNames;
+                    }
+                }
+                // if found then point to the unique object
+                if (found > 0) {
+                    state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = found;
+                    // if not found add to the unique object list
+                } else {
+                    ++numUnqObjName;
+                    uniqueObjectName(numUnqObjName) = curObjectName;
+                    state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = numUnqObjName;
                 }
             }
-            // if found then point to the unique object
-            if (found > 0) {
-                state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = found;
-                // if not found add to the unique object list
-            } else {
-                ++numUnqObjName;
-                uniqueObjectName(numUnqObjName) = curObjectName;
-                state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName = numUnqObjName;
-            }
-        }
-        // loop through all reports and include those that have been flagged as 'show'
-        for (iReportName = 1; iReportName <= state.dataOutRptPredefined->numReportName; ++iReportName) {
-            if (state.dataOutRptPredefined->reportName(iReportName).show) {
-                WriteReportHeaders(state, state.dataOutRptPredefined->reportName(iReportName).namewithspaces, "Entire Facility", OutputProcessor::StoreType::Averaged);
-                // loop through the subtables and include those that are associated with this report
-                for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
-                    if (state.dataOutRptPredefined->subTable(jSubTable).indexReportName == iReportName) {
-                        // determine how many columns
-                        curNumColumns = 0;
-                        for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
-                            if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
-                                ++curNumColumns;
-                            }
-                        }
-                        // determine how many rows by going through table entries and setting
-                        // flag in useUniqueObjectName to true, then count number of true's.
-                        useUniqueObjectName = false; // array assignment
-                        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-                            if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
-                                useUniqueObjectName(state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName) = true;
-                            }
-                        }
-                        curNumRows = 0;
-                        for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
-                            if (useUniqueObjectName(mUnqObjNames)) {
-                                ++curNumRows;
-                            }
-                        }
-                        if (curNumRows == 0) curNumRows = 1;
-                        // now create the arrays that are filled with values
-                        rowHead.allocate(curNumRows);
-                        columnHead.allocate(curNumColumns);
-                        columnWidth.dimension(curNumColumns, 14); // array assignment - same for all columns
-                        tableBody.allocate(curNumColumns, curNumRows);
-                        rowHead = "";
-                        columnHead = "";
-                        tableBody = "";
-                        // this array stores the unique object name index for each row
-                        rowToUnqObjName.allocate(curNumRows);
-                        // this array stores the columnHead index for each column
-                        colHeadToColTag.allocate(curNumColumns);
-                        colUnitConv.allocate(curNumColumns);
-                        // set row headings
-                        countRow = 0;
-                        rowHead(1) = "None";
-                        for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
-                            if (useUniqueObjectName(mUnqObjNames)) {
-                                ++countRow;
-                                rowHead(countRow) = uniqueObjectName(mUnqObjNames);
-                                rowToUnqObjName(countRow) = mUnqObjNames;
-                            }
-                        }
-                        // set column headings
-                        countColumn = 0;
-                        for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
-                            if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
-                                ++countColumn;
-                                // do the unit conversions
-                                colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
-                                if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                                    LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
-                                    colUnitConv(countColumn) = indexUnitConv;
-                                } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                    LookupJtokWH(state, colTagWithSI, indexUnitConv, curColTag);
-                                    colUnitConv(countColumn) = indexUnitConv;
-                                } else {
-                                    curColTag = colTagWithSI;
-                                    colUnitConv(countColumn) = 0;
+            // loop through all reports and include those that have been flagged as 'show'
+            for (iReportName = 1; iReportName <= state.dataOutRptPredefined->numReportName; ++iReportName) {
+                if (state.dataOutRptPredefined->reportName(iReportName).show) {
+                    if (produceTabular) {
+                        WriteReportHeaders(state,
+                                           state.dataOutRptPredefined->reportName(iReportName).namewithspaces,
+                                           "Entire Facility",
+                                           OutputProcessor::StoreType::Averaged);
+                    }
+                    // loop through the subtables and include those that are associated with this report
+                    for (int jSubTable = 1, jSubTable_end = state.dataOutRptPredefined->numSubTable; jSubTable <= jSubTable_end; ++jSubTable) {
+                        if (state.dataOutRptPredefined->subTable(jSubTable).indexReportName == iReportName) {
+                            // determine how many columns
+                            curNumColumns = 0;
+                            for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
+                                if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
+                                    ++curNumColumns;
                                 }
-                                columnHead(countColumn) = curColTag;
-                                colHeadToColTag(countColumn) = kColumnTag;
                             }
-                        }
-                        // fill the body of the table from the entries
-                        // find the entries associated with the current subtable
-                        for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
-                            if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
-                                // determine what column the current entry is in
-                                curColTagIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
-                                for (nColHead = 1; nColHead <= curNumColumns; ++nColHead) {
-                                    if (curColTagIndex == colHeadToColTag(nColHead)) {
-                                        colCurrent = nColHead;
-                                        break;
+                            // determine how many rows by going through table entries and setting
+                            // flag in useUniqueObjectName to true, then count number of true's.
+                            useUniqueObjectName = false; // array assignment
+                            for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
+                                if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
+                                    useUniqueObjectName(state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName) = true;
+                                }
+                            }
+                            curNumRows = 0;
+                            for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
+                                if (useUniqueObjectName(mUnqObjNames)) {
+                                    ++curNumRows;
+                                }
+                            }
+                            if (curNumRows == 0) curNumRows = 1;
+                            // now create the arrays that are filled with values
+                            rowHead.allocate(curNumRows);
+                            columnHead.allocate(curNumColumns);
+                            columnWidth.dimension(curNumColumns, 14); // array assignment - same for all columns
+                            tableBody.allocate(curNumColumns, curNumRows);
+                            rowHead = "";
+                            columnHead = "";
+                            tableBody = "";
+                            // this array stores the unique object name index for each row
+                            rowToUnqObjName.allocate(curNumRows);
+                            // this array stores the columnHead index for each column
+                            colHeadToColTag.allocate(curNumColumns);
+                            colUnitConv.allocate(curNumColumns);
+                            // set row headings
+                            countRow = 0;
+                            rowHead(1) = "None";
+                            for (mUnqObjNames = 1; mUnqObjNames <= numUnqObjName; ++mUnqObjNames) {
+                                if (useUniqueObjectName(mUnqObjNames)) {
+                                    ++countRow;
+                                    rowHead(countRow) = uniqueObjectName(mUnqObjNames);
+                                    rowToUnqObjName(countRow) = mUnqObjNames;
+                                }
+                            }
+                            // set column headings
+                            countColumn = 0;
+                            for (kColumnTag = 1; kColumnTag <= state.dataOutRptPredefined->numColumnTag; ++kColumnTag) {
+                                if (state.dataOutRptPredefined->columnTag(kColumnTag).indexSubTable == jSubTable) {
+                                    ++countColumn;
+                                    // do the unit conversions
+                                    colTagWithSI = state.dataOutRptPredefined->columnTag(kColumnTag).heading;
+                                    if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                                            LookupSItoIP(state, colTagWithSI, indexUnitConv, curColTag);
+                                        colUnitConv(countColumn) = indexUnitConv;
+                                    } else if (unitsStyle_cur == iUnitsStyle::JtoKWH) {
+                                        LookupJtokWH(state, colTagWithSI, indexUnitConv, curColTag);
+                                        colUnitConv(countColumn) = indexUnitConv;
+                                    } else {
+                                        curColTag = colTagWithSI;
+                                        colUnitConv(countColumn) = 0;
                                     }
+                                    columnHead(countColumn) = curColTag;
+                                    colHeadToColTag(countColumn) = kColumnTag;
                                 }
-                                // determine what row the current entry is in
-                                curRowUnqObjIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName;
-                                for (oRowHead = 1; oRowHead <= curNumRows; ++oRowHead) {
-                                    if (curRowUnqObjIndex == rowToUnqObjName(oRowHead)) {
-                                        rowCurrent = oRowHead;
-                                        break;
-                                    }
-                                }
-                                // finally assign the entry to the place in the table body
-                                if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                    columnUnitConv = colUnitConv(colCurrent);
-                                    if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name, "SizingPeriod:DesignDay") &&
-                                        ort->unitsStyle == iUnitsStyle::InchPound) {
-                                        if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
-                                            LookupSItoIP(state, state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry, columnUnitConv, repTableTag);
-                                            state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry = repTableTag;
+                            }
+                            // fill the body of the table from the entries
+                            // find the entries associated with the current subtable
+                            for (lTableEntry = 1; lTableEntry <= state.dataOutRptPredefined->numTableEntry; ++lTableEntry) {
+                                if (state.dataOutRptPredefined->tableEntry(lTableEntry).subTableIndex == jSubTable) {
+                                    // determine what column the current entry is in
+                                    curColTagIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).indexColumn;
+                                    for (nColHead = 1; nColHead <= curNumColumns; ++nColHead) {
+                                        if (curColTagIndex == colHeadToColTag(nColHead)) {
+                                            colCurrent = nColHead;
+                                            break;
                                         }
                                     }
-                                    if (state.dataOutRptPredefined->tableEntry(lTableEntry).origEntryIsReal && (columnUnitConv != 0)) {
-                                        IPvalue = ConvertIP(state, columnUnitConv, state.dataOutRptPredefined->tableEntry(lTableEntry).origRealEntry);
-                                        tableBody(colCurrent, rowCurrent) = RealToStr(IPvalue, state.dataOutRptPredefined->tableEntry(lTableEntry).significantDigits);
+                                    // determine what row the current entry is in
+                                    curRowUnqObjIndex = state.dataOutRptPredefined->tableEntry(lTableEntry).uniqueObjName;
+                                    for (oRowHead = 1; oRowHead <= curNumRows; ++oRowHead) {
+                                        if (curRowUnqObjIndex == rowToUnqObjName(oRowHead)) {
+                                            rowCurrent = oRowHead;
+                                            break;
+                                        }
+                                    }
+                                    // finally assign the entry to the place in the table body
+                                    if (unitsStyle_cur == iUnitsStyle::InchPound || unitsStyle_cur == iUnitsStyle::JtoKWH) {
+                                        columnUnitConv = colUnitConv(colCurrent);
+                                        if (UtilityRoutines::SameString(state.dataOutRptPredefined->subTable(jSubTable).name,
+                                                                        "SizingPeriod:DesignDay") &&
+                                                unitsStyle_cur == iUnitsStyle::InchPound) {
+                                            if (UtilityRoutines::SameString(columnHead(colCurrent), "Humidity Value")) {
+                                                LookupSItoIP(state,
+                                                             state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry,
+                                                             columnUnitConv,
+                                                             repTableTag);
+                                                state.dataOutRptPredefined->tableEntry(lTableEntry + 1).charEntry = repTableTag;
+                                            }
+                                        }
+                                        if (state.dataOutRptPredefined->tableEntry(lTableEntry).origEntryIsReal && (columnUnitConv != 0)) {
+                                            IPvalue =
+                                                ConvertIP(state, columnUnitConv, state.dataOutRptPredefined->tableEntry(lTableEntry).origRealEntry);
+                                            tableBody(colCurrent, rowCurrent) =
+                                                RealToStr(IPvalue, state.dataOutRptPredefined->tableEntry(lTableEntry).significantDigits);
+                                        } else {
+                                            tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
+                                        }
                                     } else {
                                         tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
                                     }
-                                } else {
-                                    tableBody(colCurrent, rowCurrent) = state.dataOutRptPredefined->tableEntry(lTableEntry).charEntry;
                                 }
                             }
-                        }
-                        // create the actual output table
-                        WriteSubtitle(state, state.dataOutRptPredefined->subTable(jSubTable).name);
-                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, state.dataOutRptPredefined->subTable(jSubTable).footnote);
-                        if (sqlite) {
-                            sqlite->createSQLiteTabularDataRecords(
-                                tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
-                        }
-                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                                tableBody, rowHead, columnHead, state.dataOutRptPredefined->reportName(iReportName).name, "Entire Facility", state.dataOutRptPredefined->subTable(jSubTable).name);
+                            // create the actual output table
+                            if (produceTabular) {
+                                WriteSubtitle(state, state.dataOutRptPredefined->subTable(jSubTable).name);
+                                WriteTable(state,
+                                           tableBody,
+                                           rowHead,
+                                           columnHead,
+                                           columnWidth,
+                                           false,
+                                           state.dataOutRptPredefined->subTable(jSubTable).footnote);
+                            }
+                            if (produceSQLite) {
+                                if (sqlite) {
+                                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                           rowHead,
+                                                                           columnHead,
+                                                                           state.dataOutRptPredefined->reportName(iReportName).name,
+                                                                           "Entire Facility",
+                                                                           state.dataOutRptPredefined->subTable(jSubTable).name);
+                                }
+                            }
+                            if (produceTabular) {
+                                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                        tableBody,
+                                        rowHead,
+                                        columnHead,
+                                        state.dataOutRptPredefined->reportName(iReportName).name,
+                                        "Entire Facility",
+                                        state.dataOutRptPredefined->subTable(jSubTable).name);
+                                }
+                            }
                         }
                     }
                 }
@@ -11073,179 +12045,207 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (ort->displayComponentSizing) {
             WriteReportHeaders(state, "Component Sizing Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
-            // The arrays that look for unique headers are dimensioned in the
-            // running program since the size of the number of entries is
-            // not previouslly known. Use the size of all entries since that
-            // is the maximum possible.
-            uniqueDesc.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
-            uniqueObj.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
-            // initially clear the written flags for entire array
-            // The following line is not really necessary and it is possible that the array has
-            // not been allocated when this is first called.
-            //  CompSizeTableEntry%written = .FALSE.
-            // repeat the following loop until everything in array has been
-            // written into a table
-            loopLimit = 0;
-            while (loopLimit <= 100) { // put a maximum count since complex loop that could run indefinitely if error
-                foundEntry = 0;
-                ++loopLimit;
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
-                        foundEntry = iTableEntry;
-                        break;
-                    }
-                }
-                if (foundEntry == 0) break; // leave main loop - all items put into tables
-                // clear active items
-                for (auto &e : state.dataOutRptPredefined->CompSizeTableEntry)
-                    e.active = false;
-                // make an unwritten item that is of the same type active - these will be the
-                // entries for the particular subtable.
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
-                        if (UtilityRoutines::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
-                            state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
+
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
+
+                // The arrays that look for unique headers are dimensioned in the
+                // running program since the size of the number of entries is
+                // not previouslly known. Use the size of all entries since that
+                // is the maximum possible.
+                uniqueDesc.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
+                uniqueObj.allocate(state.dataOutRptPredefined->numCompSizeTableEntry);
+                // initially clear the written flags for entire array
+                // The following line is not really necessary and it is possible that the array has
+                // not been allocated when this is first called.
+                //  CompSizeTableEntry%written = .FALSE.
+                // repeat the following loop until everything in array has been
+                // written into a table
+                loopLimit = 0;
+                while (loopLimit <= 100) { // put a maximum count since complex loop that could run indefinitely if error
+                    foundEntry = 0;
+                    ++loopLimit;
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
+                            foundEntry = iTableEntry;
+                            break;
                         }
                     }
-                }
-                // identify unique descriptions and objects (columns and rows) in order
-                // to size the table arrays properly.
-                // reset the counters for the arrays looking for unique rows and columns
-                numUniqueDesc = 0;
-                numUniqueObj = 0;
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    // search for descriptions
-                    foundDesc = 0;
-                    if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
-                        curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
-                        // look through the list of unique items to see if it matches
-                        for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                            if (UtilityRoutines::SameString(curDesc, uniqueDesc(jUnique))) {
-                                foundDesc = jUnique;
-                                break;
+                    if (foundEntry == 0) break; // leave main loop - all items put into tables
+                    // clear active items
+                    for (auto &e : state.dataOutRptPredefined->CompSizeTableEntry)
+                        e.active = false;
+                    // make an unwritten item that is of the same type active - these will be the
+                    // entries for the particular subtable.
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        if (!state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written) {
+                            if (UtilityRoutines::SameString(state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).typeField,
+                                                            state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField)) {
+                                state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active = true;
                             }
                         }
-                        // if not found add to the list
-                        if (foundDesc == 0) {
-                            ++numUniqueDesc;
-                            uniqueDesc(numUniqueDesc) = curDesc;
-                        }
-                        // search for objects
-                        foundObj = 0;
-                        curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
-                        for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                            if (UtilityRoutines::SameString(curObj, uniqueObj(jUnique))) {
-                                foundObj = jUnique;
-                                break;
-                            }
-                        }
-                        // if not found add to the list
-                        if (foundObj == 0) {
-                            ++numUniqueObj;
-                            uniqueObj(numUniqueObj) = curObj;
-                        }
                     }
-                }
-                // make sure the table has at least one row and columns
-                if (numUniqueDesc == 0) numUniqueDesc = 1;
-                if (numUniqueObj == 0) numUniqueObj = 1;
-                // now that the unique row and column headers are known the array
-                // sizes can be set for the table arrays
-                rowHead.allocate(numUniqueObj);
-                columnHead.allocate(numUniqueDesc);
-                columnWidth.dimension(numUniqueDesc, 14); // array assignment - same for all columns
-                colUnitConv.allocate(numUniqueDesc);
-                tableBody.allocate(numUniqueDesc, numUniqueObj);
-                // initialize table body to blanks (in case entries are incomplete)
-                tableBody = "";
-                // transfer the row and column headings first
-                for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                    // do the unit conversions
-                    curColHeadWithSI = uniqueDesc(jUnique);
-                    if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                        LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
-                        colUnitConv(jUnique) = indexUnitConv;
-                    } else {
-                        curColHead = curColHeadWithSI;
-                        colUnitConv(jUnique) = 0;
-                    }
-                    columnHead(jUnique) = curColHead;
-                }
-                for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                    rowHead(jUnique) = uniqueObj(jUnique);
-                }
-                // fill the table
-                for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
-                    // find the row and column for the specific entry
-                    if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
-                        curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
+                    // identify unique descriptions and objects (columns and rows) in order
+                    // to size the table arrays properly.
+                    // reset the counters for the arrays looking for unique rows and columns
+                    numUniqueDesc = 0;
+                    numUniqueObj = 0;
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        // search for descriptions
                         foundDesc = 0;
-                        for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
-                            if (UtilityRoutines::SameString(uniqueDesc(jUnique), curDesc)) {
-                                foundDesc = jUnique;
-                                break;
+                        if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
+                            curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
+                            // look through the list of unique items to see if it matches
+                            for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
+                                if (UtilityRoutines::SameString(curDesc, uniqueDesc(jUnique))) {
+                                    foundDesc = jUnique;
+                                    break;
+                                }
+                            }
+                            // if not found add to the list
+                            if (foundDesc == 0) {
+                                ++numUniqueDesc;
+                                uniqueDesc(numUniqueDesc) = curDesc;
+                            }
+                            // search for objects
+                            foundObj = 0;
+                            curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
+                            for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
+                                if (UtilityRoutines::SameString(curObj, uniqueObj(jUnique))) {
+                                    foundObj = jUnique;
+                                    break;
+                                }
+                            }
+                            // if not found add to the list
+                            if (foundObj == 0) {
+                                ++numUniqueObj;
+                                uniqueObj(numUniqueObj) = curObj;
                             }
                         }
-                        curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
-                        foundObj = 0;
-                        for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
-                            if (UtilityRoutines::SameString(rowHead(jUnique), curObj)) {
-                                foundObj = jUnique;
-                                break;
-                            }
+                    }
+                    // make sure the table has at least one row and columns
+                    if (numUniqueDesc == 0) numUniqueDesc = 1;
+                    if (numUniqueObj == 0) numUniqueObj = 1;
+                    // now that the unique row and column headers are known the array
+                    // sizes can be set for the table arrays
+                    rowHead.allocate(numUniqueObj);
+                    columnHead.allocate(numUniqueDesc);
+                    columnWidth.dimension(numUniqueDesc, 14); // array assignment - same for all columns
+                    colUnitConv.allocate(numUniqueDesc);
+                    tableBody.allocate(numUniqueDesc, numUniqueObj);
+                    // initialize table body to blanks (in case entries are incomplete)
+                    tableBody = "";
+                    // transfer the row and column headings first
+                    for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
+                        // do the unit conversions
+                        curColHeadWithSI = uniqueDesc(jUnique);
+                        if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                            LookupSItoIP(state, curColHeadWithSI, indexUnitConv, curColHead);
+                            colUnitConv(jUnique) = indexUnitConv;
+                        } else {
+                            curColHead = curColHeadWithSI;
+                            colUnitConv(jUnique) = 0;
                         }
-                        if ((foundDesc >= 1) && (foundObj >= 1)) {
-                            curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
-                            if (ort->unitsStyle == iUnitsStyle::InchPound) {
-                                if (colUnitConv(foundDesc) != 0) {
-                                    curValue = ConvertIP(state, colUnitConv(foundDesc), curValueSI);
+                        columnHead(jUnique) = curColHead;
+                    }
+                    for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
+                        rowHead(jUnique) = uniqueObj(jUnique);
+                    }
+                    // fill the table
+                    for (iTableEntry = 1; iTableEntry <= state.dataOutRptPredefined->numCompSizeTableEntry; ++iTableEntry) {
+                        // find the row and column for the specific entry
+                        if (state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).active) {
+                            curDesc = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).description;
+                            foundDesc = 0;
+                            for (jUnique = 1; jUnique <= numUniqueDesc; ++jUnique) {
+                                if (UtilityRoutines::SameString(uniqueDesc(jUnique), curDesc)) {
+                                    foundDesc = jUnique;
+                                    break;
+                                }
+                            }
+                            curObj = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).nameField;
+                            foundObj = 0;
+                            for (jUnique = 1; jUnique <= numUniqueObj; ++jUnique) {
+                                if (UtilityRoutines::SameString(rowHead(jUnique), curObj)) {
+                                    foundObj = jUnique;
+                                    break;
+                                }
+                            }
+                            if ((foundDesc >= 1) && (foundObj >= 1)) {
+                                curValueSI = state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).valField;
+                                if (unitsStyle_cur == iUnitsStyle::InchPound) {
+                                    if (colUnitConv(foundDesc) != 0) {
+                                        curValue = ConvertIP(state, colUnitConv(foundDesc), curValueSI);
+                                    } else {
+                                        curValue = curValueSI;
+                                    }
                                 } else {
                                     curValue = curValueSI;
                                 }
-                            } else {
-                                curValue = curValueSI;
+                                if (std::abs(curValue) >= 1.0) {
+                                    tableBody(foundDesc, foundObj) = RealToStr(curValue, 2);
+                                } else {
+                                    tableBody(foundDesc, foundObj) = RealToStr(curValue, 6);
+                                }
+                                state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written = true;
                             }
-                            if (std::abs(curValue) >= 1.0) {
-                                tableBody(foundDesc, foundObj) = RealToStr(curValue, 2);
-                            } else {
-                                tableBody(foundDesc, foundObj) = RealToStr(curValue, 6);
-                            }
-                            state.dataOutRptPredefined->CompSizeTableEntry(iTableEntry).written = true;
                         }
                     }
-                }
-                // write the table
-                WriteSubtitle(state, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
-                if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
-                    state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
-                    WriteTable(state, tableBody,
-                               rowHead,
-                               columnHead,
-                               columnWidth,
-                               false,
-                               "User-Specified values were used. Design Size values were used if no User-Specified values were provided. Design Size "
-                               "values may be derived from alternate User-Specified values.");
-                } else {
-                    WriteTable(state, tableBody,
-                               rowHead,
-                               columnHead,
-                               columnWidth,
-                               false,
-                               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
-                }
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody,
-                        rowHead,
-                        columnHead,
-                        "Component Sizing Summary",
-                        "Entire Facility",
-                        state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
-                        "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                    // write the table
+                    if (produceTabular) {
+                        WriteSubtitle(state, state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
+                    }
+                    
+                    if (state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:Reheat" ||
+                            state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField == "AirTerminal:SingleDuct:VAV:NoReheat") {
+                            if (produceTabular) {
+                                WriteTable(state,
+                                           tableBody,
+                                           rowHead,
+                                           columnHead,
+                                           columnWidth,
+                                           false,
+                                           "User-Specified values were used. Design Size values were used if no User-Specified values were provided. "
+                                           "Design Size "
+                                           "values may be derived from alternate User-Specified values.");
+                            }
+                    } else {
+                        if (produceTabular) {
+                            WriteTable(state,
+                                       tableBody,
+                                       rowHead,
+                                       columnHead,
+                                       columnWidth,
+                                       false,
+                                       "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                        }
+                    }
+                    
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                                   rowHead,
+                                                                   columnHead,
+                                                                   "ComponentSizingSummary",
+                                                                   "Entire Facility",
+                                                                   state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField);
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody,
+                                rowHead,
+                                columnHead,
+                                "Component Sizing Summary",
+                                "Entire Facility",
+                                state.dataOutRptPredefined->CompSizeTableEntry(foundEntry).typeField,
+                                "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
+                        }
+                    }
                 }
             }
         }
@@ -11425,6 +12425,7 @@ namespace EnergyPlus::OutputReportTabular {
         auto &ort(state.dataOutRptTab);
 
         if (ort->displayEioSummary) {
+
             Array1D_string columnHead;
             Array1D_int columnWidth;
             Array1D_string rowHead;
@@ -11448,79 +12449,97 @@ namespace EnergyPlus::OutputReportTabular {
                 }
             }
 
-            // now go through each header and create a report for each one
-            for (auto headerLine : headerLines) {
-                std::vector<std::string> headerFields = splitCommaString(headerLine);
-                std::string tableNameWithSigns = headerFields.at(0);
-                std::string tableName =
-                    tableNameWithSigns.substr(3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
-                // first count the number of matching lines
-                int countOfMatchingLines = 0;
-                for (auto bodyLine : bodyLines) {
-                    if (bodyLine.size() > tableName.size()) {
-                        if (bodyLine.substr(0, tableName.size() + 1) ==
-                            tableName + ",") { // this needs to match the test used to populate the body of table below
-                            ++countOfMatchingLines;
-                        }
-                    }
-                }
-                int numRows = countOfMatchingLines;
-                int numCols = headerFields.size() - 1;
+            for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+                bool produceTabular = true;
+                bool produceSQLite = false;
+                if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-                if (numRows >= 1) {
-                    rowHead.allocate(numRows);
-                    columnHead.allocate(numCols);
-                    columnWidth.allocate(numCols);
-                    columnWidth = 14; // array assignment - same for all columns
-                    tableBody.allocate(numCols, numRows);
-                    tableBody = ""; // make sure everything is blank
-                    std::string footnote = "";
-                    colUnitConv.allocate(numCols);
-                    // transfer the header row into column headings
-                    for (int iCol = 1; iCol <= numCols; ++iCol) {
-                        columnHead(iCol) = headerFields.at(iCol);
-                        // set the unit conversions
-                        colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
-                    }
-                    // look for data lines
-                    int rowNum = 0;
+                // now go through each header and create a report for each one
+                for (auto headerLine : headerLines) {
+                    std::vector<std::string> headerFields = splitCommaString(headerLine);
+                    std::string tableNameWithSigns = headerFields.at(0);
+                    std::string tableName = tableNameWithSigns.substr(
+                        3, tableNameWithSigns.size() - 4); // get rid of the '! <' from the beginning and the '>' from the end
+                    // first count the number of matching lines
+                    int countOfMatchingLines = 0;
                     for (auto bodyLine : bodyLines) {
                         if (bodyLine.size() > tableName.size()) {
                             if (bodyLine.substr(0, tableName.size() + 1) ==
-                                tableName + ",") { // this needs to match the test used in the original counting
-                                ++rowNum;
-                                if (rowNum > countOfMatchingLines) break; // should never happen since same test as original could
-                                std::vector<std::string> dataFields = splitCommaString(bodyLine);
-                                rowHead(rowNum) = fmt::to_string(rowNum);
-                                for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
-                                    if (ort->unitsStyle == iUnitsStyle::InchPound || ort->unitsStyle == iUnitsStyle::JtoKWH) {
-                                        if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
-                                            int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
-                                            Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
-                                            tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
-                                        } else if (iCol == numCols && columnHead(iCol) == "Value" && iCol > 1) { // if it is the last column and the
-                                                                                                                 // header is Value then treat the
-                                                                                                                 // previous column as source of units
-                                            int indexUnitConv = unitsFromHeading(state, tableBody(iCol - 1, rowNum));   // base units on previous column
-                                            int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
-                                            Real64 convertedVal = ConvertIP(state, indexUnitConv, StrToReal(dataFields[iCol]));
-                                            tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+                                tableName + ",") { // this needs to match the test used to populate the body of table below
+                                ++countOfMatchingLines;
+                            }
+                        }
+                    }
+                    int numRows = countOfMatchingLines;
+                    int numCols = headerFields.size() - 1;
+
+                    if (numRows >= 1) {
+                        rowHead.allocate(numRows);
+                        columnHead.allocate(numCols);
+                        columnWidth.allocate(numCols);
+                        columnWidth = 14; // array assignment - same for all columns
+                        tableBody.allocate(numCols, numRows);
+                        tableBody = ""; // make sure everything is blank
+                        std::string footnote = "";
+                        colUnitConv.allocate(numCols);
+                        // transfer the header row into column headings
+                        for (int iCol = 1; iCol <= numCols; ++iCol) {
+                            columnHead(iCol) = headerFields.at(iCol);
+                            // set the unit conversions
+                            // colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol));
+                            // Jan 2021: use overloaded version for dual units
+                            colUnitConv(iCol) = unitsFromHeading(state, columnHead(iCol), unitsStyle_cur);
+                        }
+                        // look for data lines
+                        int rowNum = 0;
+                        for (auto bodyLine : bodyLines) {
+                            if (bodyLine.size() > tableName.size()) {
+                                if (bodyLine.substr(0, tableName.size() + 1) ==
+                                    tableName + ",") { // this needs to match the test used in the original counting
+                                    ++rowNum;
+                                    if (rowNum > countOfMatchingLines) break; // should never happen since same test as original could
+                                    std::vector<std::string> dataFields = splitCommaString(bodyLine);
+                                    rowHead(rowNum) = fmt::to_string(rowNum);
+                                    for (int iCol = 1; iCol <= numCols && iCol < int(dataFields.size()); ++iCol) {
+                                        if (unitsStyle_cur == iUnitsStyle::InchPound || unitsStyle_cur == iUnitsStyle::JtoKWH) {
+                                            if (isNumber(dataFields[iCol]) && colUnitConv(iCol) > 0) { // if it is a number that has a conversion
+                                                int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
+                                                Real64 convertedVal = ConvertIP(state, colUnitConv(iCol), StrToReal(dataFields[iCol]));
+                                                tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+                                            } else if (iCol == numCols && columnHead(iCol) == "Value" &&
+                                                       iCol > 1) { // if it is the last column and the
+                                                                   // header is Value then treat the
+                                                                   // previous column as source of units
+                                                // int indexUnitConv =
+                                                //    unitsFromHeading(state, tableBody(iCol - 1, rowNum)); // base units on previous column
+                                                // Jan 2021: use overloaded version for dual units
+                                                int indexUnitConv = unitsFromHeading(state, tableBody(iCol - 1, rowNum), unitsStyle_cur);     // base units on previous column
+
+                                                int numDecimalDigits = digitsAferDecimal(dataFields[iCol]);
+                                                Real64 convertedVal = ConvertIP(state, indexUnitConv, StrToReal(dataFields[iCol]));
+                                                tableBody(iCol, rowNum) = RealToStr(convertedVal, numDecimalDigits);
+                                            } else {
+                                                tableBody(iCol, rowNum) = dataFields[iCol];
+                                            }
                                         } else {
                                             tableBody(iCol, rowNum) = dataFields[iCol];
                                         }
-                                    } else {
-                                        tableBody(iCol, rowNum) = dataFields[iCol];
                                     }
                                 }
                             }
                         }
-                    }
 
-                    WriteSubtitle(state, tableName);
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
-                            tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                        if (produceTabular) {
+                            WriteSubtitle(state, tableName);
+                            WriteTable(state, tableBody, rowHead, columnHead, columnWidth, false, footnote);
+                        }
+                        if (produceSQLite) {
+                            if (sqlite) {
+                                sqlite->createSQLiteTabularDataRecords(
+                                    tableBody, rowHead, columnHead, "Initialization Summary", "Entire Facility", tableName);
+                            }
+                        }
                     }
                 }
             }
@@ -11540,6 +12559,26 @@ namespace EnergyPlus::OutputReportTabular {
         if (ort->unitsStyle == iUnitsStyle::InchPound) {
             LookupSItoIP(state, heading, unitConv, curHeading);
         } else if (ort->unitsStyle == iUnitsStyle::JtoKWH) {
+            LookupJtokWH(state, heading, unitConv, curHeading);
+        } else {
+            curHeading = heading;
+        }
+        heading = curHeading;
+        return (unitConv);
+    }
+
+    // Jan 2021: Overloaded this function to accomondate dual units output needs
+    // changes the heading that contains and SI to IP as well as providing the unit conversion index
+    // Glazer Nov 2016
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading, iUnitsStyle unitsStyle_para)
+    {
+        // auto &ort(state.dataOutRptTab);
+
+        std::string curHeading = "";
+        int unitConv = 0;
+        if (unitsStyle_para == iUnitsStyle::InchPound) {
+            LookupSItoIP(state, heading, unitConv, curHeading);
+        } else if (unitsStyle_para == iUnitsStyle::JtoKWH) {
             LookupJtokWH(state, heading, unitConv, curHeading);
         } else {
             curHeading = heading;
@@ -12163,35 +13202,6 @@ namespace EnergyPlus::OutputReportTabular {
         Array2D<Real64> surfDelaySeqHeat;
         Array2D<Real64> surfDelaySeqCool;
 
-        peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
-        peopleDelaySeqHeat = 0.0;
-        peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        peopleDelaySeqCool = 0.0;
-        lightDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        lightDelaySeqHeat = 0.0;
-        lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        lightDelaySeqCool = 0.0;
-        equipDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        equipDelaySeqHeat = 0.0;
-        equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        equipDelaySeqCool = 0.0;
-        hvacLossDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        hvacLossDelaySeqHeat = 0.0;
-        hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        hvacLossDelaySeqCool = 0.0;
-        powerGenDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        powerGenDelaySeqHeat = 0.0;
-        powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        powerGenDelaySeqCool = 0.0;
-        feneSolarDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        feneSolarDelaySeqHeat = 0.0;
-        feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
-        feneSolarDelaySeqCool = 0.0;
-        surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
-        surfDelaySeqHeat = 0.0;
-        surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
-        surfDelaySeqCool = 0.0;
-
         Array1D<CompLoadTablesType> ZoneHeatCompLoadTables; // for zone level component load summary output tables
         Array1D<CompLoadTablesType> ZoneCoolCompLoadTables;
 
@@ -12205,256 +13215,137 @@ namespace EnergyPlus::OutputReportTabular {
         Array1D<CompLoadTablesType> FacilityZonesHeatCompLoadTables; // zone results used for facility report - never directly output
         Array1D<CompLoadTablesType> FacilityZonesCoolCompLoadTables;
 
-        CompLoadTablesType curCompLoadTable; // active component load table
+        // Jan 2021: The following variable is redudant in the original code, deleting the line
+        // CompLoadTablesType curCompLoadTable; // active component load table
 
-        // initialize arrays
-        if (ort->displayZoneComponentLoadSummary) {
-            ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : ZoneHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-            ZoneCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : ZoneCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-        }
-        if (ort->displayAirLoopComponentLoadSummary) {
-            AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
-            for (auto &e : AirLoopHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-                e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
-                e.zoneIndices = 0;
-            }
-            AirLoopCoolCompLoadTables.allocate(NumPrimaryAirSys);
-            for (auto &e : AirLoopCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-                e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
-                e.zoneIndices = 0;
-            }
-            AirLoopZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : AirLoopZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-            AirLoopZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : AirLoopZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-        }
-        if (ort->displayFacilityComponentLoadSummary) {
-            FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
-            FacilityHeatCompLoadTables.cells = 0.;
-            FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
-            FacilityHeatCompLoadTables.cellUsed = false;
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+            iUnitsStyle unitsStyle_cur = ort->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem, ort->unitsStyle, ort->unitsStyle_SQLite, unitsStyle_cur, produceTabular, produceSQLite)) break;
 
-            FacilityCoolCompLoadTables.cells.allocate(cPerArea, rGrdTot);
-            FacilityCoolCompLoadTables.cells = 0.;
-            FacilityCoolCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
-            FacilityCoolCompLoadTables.cellUsed = false;
+            // adjusted initilization location to after variable declaration for loops 2021-01-11
+            peopleDelaySeqHeat.dimension(state.dataGlobal->NumOfTimeStepInHour * 24, 0.0);
+            peopleDelaySeqHeat = 0.0;
+            peopleDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            peopleDelaySeqCool = 0.0;
+            lightDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            lightDelaySeqHeat = 0.0;
+            lightDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            lightDelaySeqCool = 0.0;
+            equipDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            equipDelaySeqHeat = 0.0;
+            equipDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            equipDelaySeqCool = 0.0;
+            hvacLossDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            hvacLossDelaySeqHeat = 0.0;
+            hvacLossDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            hvacLossDelaySeqCool = 0.0;
+            powerGenDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            powerGenDelaySeqHeat = 0.0;
+            powerGenDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            powerGenDelaySeqCool = 0.0;
+            feneSolarDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            feneSolarDelaySeqHeat = 0.0;
+            feneSolarDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
+            feneSolarDelaySeqCool = 0.0;
+            surfDelaySeqHeat.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            surfDelaySeqHeat = 0.0;
+            surfDelaySeqCool.allocate(state.dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+            surfDelaySeqCool = 0.0;
 
-            FacilityZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : FacilityZonesHeatCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-            FacilityZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
-            for (auto &e : FacilityZonesCoolCompLoadTables) {
-                e.cells.allocate(cPerArea, rGrdTot);
-                e.cells = 0.;
-                e.cellUsed.allocate(cPerArea, rGrdTot);
-                e.cellUsed = false;
-            }
-        }
-
-        // get the zone areas needed later
-        Array1D<ZompComponentAreasType> ZoneComponentAreas;
-        ZoneComponentAreas.allocate(state.dataGlobal->NumOfZones);
-        GetZoneComponentAreas(state, ZoneComponentAreas);
-
-        // ZoneComponentLoadSummary
-        if (ort->displayZoneComponentLoadSummary) {
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                if (allocated(CalcFinalZoneSizing)) {
-                    coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
-                    ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
-                    timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
-                    ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
-
-                    GetDelaySequences(state,
-                                      coolDesSelected,
-                                      true,
-                                      iZone,
-                                      peopleDelaySeqCool,
-                                      equipDelaySeqCool,
-                                      hvacLossDelaySeqCool,
-                                      powerGenDelaySeqCool,
-                                      lightDelaySeqCool,
-                                      feneSolarDelaySeqCool,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   ZoneCoolCompLoadTables(iZone).cells,
-                                                   ZoneCoolCompLoadTables(iZone).cellUsed,
-                                                   coolDesSelected,
-                                                   timeCoolMax,
-                                                   iZone,
-                                                   peopleDelaySeqCool,
-                                                   equipDelaySeqCool,
-                                                   hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool,
-                                                   lightDelaySeqCool,
-                                                   feneSolarDelaySeqCool,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqCool);
-                    CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
-                    // send latent load info to coil summary report
-                    coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
-
-                    heatDesSelected = CalcFinalZoneSizing(iZone).HeatDDNum;
-                    ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
-                    timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
-                    ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
-
-                    GetDelaySequences(state,
-                                      heatDesSelected,
-                                      false,
-                                      iZone,
-                                      peopleDelaySeqHeat,
-                                      equipDelaySeqHeat,
-                                      hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat,
-                                      lightDelaySeqHeat,
-                                      feneSolarDelaySeqHeat,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   ZoneHeatCompLoadTables(iZone).cells,
-                                                   ZoneHeatCompLoadTables(iZone).cellUsed,
-                                                   heatDesSelected,
-                                                   timeHeatMax,
-                                                   iZone,
-                                                   peopleDelaySeqHeat,
-                                                   equipDelaySeqHeat,
-                                                   hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat,
-                                                   lightDelaySeqHeat,
-                                                   feneSolarDelaySeqHeat,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqHeat);
-                    CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
-
-                    // send latent load info to coil summary report
-                    coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
-
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
-
-                    AddTotalRowsForLoadSummary(ZoneCoolCompLoadTables(iZone));
-                    AddTotalRowsForLoadSummary(ZoneHeatCompLoadTables(iZone));
-
-                    ComputePeakDifference(ZoneCoolCompLoadTables(iZone));
-                    ComputePeakDifference(ZoneHeatCompLoadTables(iZone));
-
-                    // We delay the potential application of SI to IP conversion and actual output until after both the AirLoopComponentLoadSummary
-                    // and FacilityComponentLoadSummary have been processed because below we try to retrieve the info directly when the timestamp
-                    // would match (cf #7356), and if we converted right now, we would apply the conversion twice
+            // initialize arrays
+            if (ort->displayZoneComponentLoadSummary) {
+                ZoneHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : ZoneHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+                ZoneCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : ZoneCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
                 }
             }
-        }
+            if (ort->displayAirLoopComponentLoadSummary) {
+                AirLoopHeatCompLoadTables.allocate(NumPrimaryAirSys);
+                for (auto &e : AirLoopHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                    e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
+                    e.zoneIndices = 0;
+                }
+                AirLoopCoolCompLoadTables.allocate(NumPrimaryAirSys);
+                for (auto &e : AirLoopCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                    e.zoneIndices.allocate(state.dataGlobal->NumOfZones); // only need to allocate this for the AirLoop
+                    e.zoneIndices = 0;
+                }
+                AirLoopZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : AirLoopZonesHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+                AirLoopZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : AirLoopZonesCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
+                }
+            }
+            if (ort->displayFacilityComponentLoadSummary) {
+                FacilityHeatCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+                FacilityHeatCompLoadTables.cells = 0.;
+                FacilityHeatCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+                FacilityHeatCompLoadTables.cellUsed = false;
 
-        // AirLoopComponentLoadSummary
-        if (ort->displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
-            Array1D_int zoneToAirLoopCool;
-            zoneToAirLoopCool.dimension(state.dataGlobal->NumOfZones);
-            Array1D_int zoneToAirLoopHeat;
-            zoneToAirLoopHeat.dimension(state.dataGlobal->NumOfZones);
-            // set the peak day and time for each zone used by the airloops - use all zones connected to the airloop for both heating and cooling
-            // (regardless of "heated" or "cooled" zone status)
-            for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
-                zoneToAirLoopCool = 0;
-                zoneToAirLoopHeat = 0;
-                if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
-                    coolDesSelected = SysSizPeakDDNum(iAirLoop).SensCoolPeakDD;
-                    if (coolDesSelected != 0) {
-                        timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtSensCoolPk(coolDesSelected);
-                    } else {
-                        timeCoolMax = 0;
-                    }
-                } else if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
-                    coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
-                    if (coolDesSelected != 0) {
-                        timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);
-                    } else {
-                        timeCoolMax = 0;
-                    }
-                } else {
-                    coolDesSelected = SysSizPeakDDNum(iAirLoop).TotCoolPeakDD;
-                    if (coolDesSelected != 0) {
-                        timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtTotCoolPk(coolDesSelected);
-                    } else {
-                        timeCoolMax = 0;
-                    }
-                }
-                heatDesSelected = SysSizPeakDDNum(iAirLoop).HeatPeakDD;
-                if (heatDesSelected != 0) {
-                    timeHeatMax = SysSizPeakDDNum(iAirLoop).TimeStepAtHeatPk(heatDesSelected);
-                } else {
-                    timeHeatMax = 0;
-                }
+                FacilityCoolCompLoadTables.cells.allocate(cPerArea, rGrdTot);
+                FacilityCoolCompLoadTables.cells = 0.;
+                FacilityCoolCompLoadTables.cellUsed.allocate(cPerArea, rGrdTot);
+                FacilityCoolCompLoadTables.cellUsed = false;
 
-                int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
-                for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
-                    zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
-                    zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
+                FacilityZonesHeatCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : FacilityZonesHeatCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
                 }
-                int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
-                for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
-                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
-                    zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
-                    AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
-                    zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
-                    AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
+                FacilityZonesCoolCompLoadTables.allocate(state.dataGlobal->NumOfZones);
+                for (auto &e : FacilityZonesCoolCompLoadTables) {
+                    e.cells.allocate(cPerArea, rGrdTot);
+                    e.cells = 0.;
+                    e.cellUsed.allocate(cPerArea, rGrdTot);
+                    e.cellUsed = false;
                 }
+            }
 
-                // now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise compute
-                // them for specific design day and time of max
+            // get the zone areas needed later
+            Array1D<ZompComponentAreasType> ZoneComponentAreas;
+            ZoneComponentAreas.allocate(state.dataGlobal->NumOfZones);
+            GetZoneComponentAreas(state, ZoneComponentAreas);
+
+            // ZoneComponentLoadSummary
+            if (ort->displayZoneComponentLoadSummary) {
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                    // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
-                    if (ort->displayZoneComponentLoadSummary &&
-                        (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
-                        (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
-                        AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
-                    } else {
-                        coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
-                        timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
+                    if (allocated(CalcFinalZoneSizing)) {
+                        coolDesSelected = CalcFinalZoneSizing(iZone).CoolDDNum;
+                        ZoneCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
+                        timeCoolMax = CalcFinalZoneSizing(iZone).TimeStepNumAtCoolMax;
+                        ZoneCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
 
                         GetDelaySequences(state,
                                           coolDesSelected,
@@ -12469,8 +13360,8 @@ namespace EnergyPlus::OutputReportTabular {
                                           ort->feneCondInstantSeq,
                                           surfDelaySeqCool);
                         ComputeTableBodyUsingMovingAvg(state,
-                                                       AirLoopZonesCoolCompLoadTables(iZone).cells,
-                                                       AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
+                                                       ZoneCoolCompLoadTables(iZone).cells,
+                                                       ZoneCoolCompLoadTables(iZone).cellUsed,
                                                        coolDesSelected,
                                                        timeCoolMax,
                                                        iZone,
@@ -12482,16 +13373,14 @@ namespace EnergyPlus::OutputReportTabular {
                                                        feneSolarDelaySeqCool,
                                                        ort->feneCondInstantSeq,
                                                        surfDelaySeqCool);
-                        CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
-                        AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
-                    }
-                    if (ort->displayZoneComponentLoadSummary &&
-                        (AirLoopZonesHeatCompLoadTables(iZone).desDayNum == ZoneHeatCompLoadTables(iZone).desDayNum) &&
-                        (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
-                        AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
-                    } else {
-                        heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
-                        timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
+                        CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        // send latent load info to coil summary report
+                        coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
+
+                        heatDesSelected = CalcFinalZoneSizing(iZone).HeatDDNum;
+                        ZoneHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
+                        timeHeatMax = CalcFinalZoneSizing(iZone).TimeStepNumAtHeatMax;
+                        ZoneHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
 
                         GetDelaySequences(state,
                                           heatDesSelected,
@@ -12506,8 +13395,8 @@ namespace EnergyPlus::OutputReportTabular {
                                           ort->feneCondInstantSeq,
                                           surfDelaySeqHeat);
                         ComputeTableBodyUsingMovingAvg(state,
-                                                       AirLoopZonesHeatCompLoadTables(iZone).cells,
-                                                       AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
+                                                       ZoneHeatCompLoadTables(iZone).cells,
+                                                       ZoneHeatCompLoadTables(iZone).cellUsed,
                                                        heatDesSelected,
                                                        timeHeatMax,
                                                        iZone,
@@ -12519,184 +13408,350 @@ namespace EnergyPlus::OutputReportTabular {
                                                        feneSolarDelaySeqHeat,
                                                        ort->feneCondInstantSeq,
                                                        surfDelaySeqHeat);
-                        CollectPeakZoneConditions(state, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
-                        AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
+                        CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+
+                        // send latent load info to coil summary report
+                        coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
+
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneCoolCompLoadTables(iZone));
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, ZoneHeatCompLoadTables(iZone));
+
+                        AddTotalRowsForLoadSummary(ZoneCoolCompLoadTables(iZone));
+                        AddTotalRowsForLoadSummary(ZoneHeatCompLoadTables(iZone));
+
+                        ComputePeakDifference(ZoneCoolCompLoadTables(iZone));
+                        ComputePeakDifference(ZoneHeatCompLoadTables(iZone));
+
+                        // We delay the potential application of SI to IP conversion and actual output until after both the
+                        // AirLoopComponentLoadSummary and FacilityComponentLoadSummary have been processed because below we try to retrieve the info
+                        // directly when the timestamp would match (cf #7356), and if we converted right now, we would apply the conversion twice
                     }
                 }
-                // combine the zones for each air loop
+            }
+
+            // AirLoopComponentLoadSummary
+            if (ort->displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
+                Array1D_int zoneToAirLoopCool;
+                zoneToAirLoopCool.dimension(state.dataGlobal->NumOfZones);
+                Array1D_int zoneToAirLoopHeat;
+                zoneToAirLoopHeat.dimension(state.dataGlobal->NumOfZones);
+                // set the peak day and time for each zone used by the airloops - use all zones connected to the airloop for both heating and cooling
+                // (regardless of "heated" or "cooled" zone status)
+                for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
+                    zoneToAirLoopCool = 0;
+                    zoneToAirLoopHeat = 0;
+                    if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
+                        coolDesSelected = SysSizPeakDDNum(iAirLoop).SensCoolPeakDD;
+                        if (coolDesSelected != 0) {
+                            timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtSensCoolPk(coolDesSelected);
+                        } else {
+                            timeCoolMax = 0;
+                        }
+                    } else if (DataSizing::FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
+                        coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
+                        if (coolDesSelected != 0) {
+                            timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);
+                        } else {
+                            timeCoolMax = 0;
+                        }
+                    } else {
+                        coolDesSelected = SysSizPeakDDNum(iAirLoop).TotCoolPeakDD;
+                        if (coolDesSelected != 0) {
+                            timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtTotCoolPk(coolDesSelected);
+                        } else {
+                            timeCoolMax = 0;
+                        }
+                    }
+                    heatDesSelected = SysSizPeakDDNum(iAirLoop).HeatPeakDD;
+                    if (heatDesSelected != 0) {
+                        timeHeatMax = SysSizPeakDDNum(iAirLoop).TimeStepAtHeatPk(heatDesSelected);
+                    } else {
+                        timeHeatMax = 0;
+                    }
+
+                    int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
+                    for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
+                        int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
+                        zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
+                        zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
+                    }
+                    int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
+                    for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
+                        int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
+                        zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
+                        AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
+                        zoneToAirLoopHeat(CtrlZoneNum) = iAirLoop;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
+                        AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
+                    }
+
+                    // now go through the zones and if design day and time of max match the previously calculated zone results use those otherwise
+                    // compute them for specific design day and time of max
+                    for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                        if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
+                        // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
+                        if (ort->displayZoneComponentLoadSummary &&
+                            (AirLoopZonesCoolCompLoadTables(iZone).desDayNum == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                            (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
+                            AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
+                        } else {
+                            coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
+                            timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
+
+                            GetDelaySequences(state,
+                                              coolDesSelected,
+                                              true,
+                                              iZone,
+                                              peopleDelaySeqCool,
+                                              equipDelaySeqCool,
+                                              hvacLossDelaySeqCool,
+                                              powerGenDelaySeqCool,
+                                              lightDelaySeqCool,
+                                              feneSolarDelaySeqCool,
+                                              ort->feneCondInstantSeq,
+                                              surfDelaySeqCool);
+                            ComputeTableBodyUsingMovingAvg(state,
+                                                           AirLoopZonesCoolCompLoadTables(iZone).cells,
+                                                           AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
+                                                           coolDesSelected,
+                                                           timeCoolMax,
+                                                           iZone,
+                                                           peopleDelaySeqCool,
+                                                           equipDelaySeqCool,
+                                                           hvacLossDelaySeqCool,
+                                                           powerGenDelaySeqCool,
+                                                           lightDelaySeqCool,
+                                                           feneSolarDelaySeqCool,
+                                                           ort->feneCondInstantSeq,
+                                                           surfDelaySeqCool);
+                            CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                            AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
+                        }
+                        if (ort->displayZoneComponentLoadSummary &&
+                            (AirLoopZonesHeatCompLoadTables(iZone).desDayNum == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                            (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
+                            AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
+                        } else {
+                            heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
+                            timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
+
+                            GetDelaySequences(state,
+                                              heatDesSelected,
+                                              false,
+                                              iZone,
+                                              peopleDelaySeqHeat,
+                                              equipDelaySeqHeat,
+                                              hvacLossDelaySeqHeat,
+                                              powerGenDelaySeqHeat,
+                                              lightDelaySeqHeat,
+                                              feneSolarDelaySeqHeat,
+                                              ort->feneCondInstantSeq,
+                                              surfDelaySeqHeat);
+                            ComputeTableBodyUsingMovingAvg(state,
+                                                           AirLoopZonesHeatCompLoadTables(iZone).cells,
+                                                           AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
+                                                           heatDesSelected,
+                                                           timeHeatMax,
+                                                           iZone,
+                                                           peopleDelaySeqHeat,
+                                                           equipDelaySeqHeat,
+                                                           hvacLossDelaySeqHeat,
+                                                           powerGenDelaySeqHeat,
+                                                           lightDelaySeqHeat,
+                                                           feneSolarDelaySeqHeat,
+                                                           ort->feneCondInstantSeq,
+                                                           surfDelaySeqHeat);
+                            CollectPeakZoneConditions(state, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                            AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
+                        }
+                    }
+                    // combine the zones for each air loop
+
+                    for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                        if (zoneToAirLoopCool(iZone) == iAirLoop) {
+                            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                            if (mult == 0.0) mult = 1.0;
+                            CombineLoadCompResults(AirLoopCoolCompLoadTables(iAirLoop), AirLoopZonesCoolCompLoadTables(iZone), mult);
+                        }
+                        if (zoneToAirLoopHeat(iZone) == iAirLoop) {
+                            mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                            if (mult == 0.0) mult = 1.0;
+                            CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
+                        }
+                    }
+
+                    ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
+                    ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
+
+                    AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
+                    AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
+
+                    ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
+                    ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
+
+                    CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
+                    CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
+
+                    LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop), unitsStyle_cur);
+                    LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop), unitsStyle_cur);
+
+                    OutputCompLoadSummary(
+                        state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop, unitsStyle_cur, produceTabular, produceSQLite);
+                }
+            }
+
+            // FacilityComponentLoadSummary
+            if (ort->displayFacilityComponentLoadSummary) {
+
+                coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
+                timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
+
+                heatDesSelected = CalcFinalFacilitySizing.HeatDDNum;
+                timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
 
                 for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                    if (zoneToAirLoopCool(iZone) == iAirLoop) {
-                        mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                        if (mult == 0.0) mult = 1.0;
-                        CombineLoadCompResults(AirLoopCoolCompLoadTables(iAirLoop), AirLoopZonesCoolCompLoadTables(iZone), mult);
+                    if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
+                    mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
+                    if (mult == 0.0) mult = 1.0;
+                    // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
+                    if (ort->displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
+                        (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
+                        FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
+                    } else {
+                        GetDelaySequences(state,
+                                          coolDesSelected,
+                                          true,
+                                          iZone,
+                                          peopleDelaySeqCool,
+                                          equipDelaySeqCool,
+                                          hvacLossDelaySeqCool,
+                                          powerGenDelaySeqCool,
+                                          lightDelaySeqCool,
+                                          feneSolarDelaySeqCool,
+                                          ort->feneCondInstantSeq,
+                                          surfDelaySeqCool);
+                        ComputeTableBodyUsingMovingAvg(state,
+                                                       FacilityZonesCoolCompLoadTables(iZone).cells,
+                                                       FacilityZonesCoolCompLoadTables(iZone).cellUsed,
+                                                       coolDesSelected,
+                                                       timeCoolMax,
+                                                       iZone,
+                                                       peopleDelaySeqCool,
+                                                       equipDelaySeqCool,
+                                                       hvacLossDelaySeqCool,
+                                                       powerGenDelaySeqCool,
+                                                       lightDelaySeqCool,
+                                                       feneSolarDelaySeqCool,
+                                                       ort->feneCondInstantSeq,
+                                                       surfDelaySeqCool);
+                        CollectPeakZoneConditions(state, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
                     }
-                    if (zoneToAirLoopHeat(iZone) == iAirLoop) {
-                        mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                        if (mult == 0.0) mult = 1.0;
-                        CombineLoadCompResults(AirLoopHeatCompLoadTables(iAirLoop), AirLoopZonesHeatCompLoadTables(iZone), mult);
+                    FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
+                    FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
+                    CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
+
+                    if (ort->displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
+                        (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
+                        FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
+                    } else {
+                        GetDelaySequences(state,
+                                          heatDesSelected,
+                                          false,
+                                          iZone,
+                                          peopleDelaySeqHeat,
+                                          equipDelaySeqHeat,
+                                          hvacLossDelaySeqHeat,
+                                          powerGenDelaySeqHeat,
+                                          lightDelaySeqHeat,
+                                          feneSolarDelaySeqHeat,
+                                          ort->feneCondInstantSeq,
+                                          surfDelaySeqHeat);
+                        ComputeTableBodyUsingMovingAvg(state,
+                                                       FacilityZonesHeatCompLoadTables(iZone).cells,
+                                                       FacilityZonesHeatCompLoadTables(iZone).cellUsed,
+                                                       heatDesSelected,
+                                                       timeHeatMax,
+                                                       iZone,
+                                                       peopleDelaySeqHeat,
+                                                       equipDelaySeqHeat,
+                                                       hvacLossDelaySeqHeat,
+                                                       powerGenDelaySeqHeat,
+                                                       lightDelaySeqHeat,
+                                                       feneSolarDelaySeqHeat,
+                                                       ort->feneCondInstantSeq,
+                                                       surfDelaySeqHeat);
+                        CollectPeakZoneConditions(state, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                        AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
+                    }
+                    FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
+                    FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
+                    CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
+                }
+
+                ComputeEngineeringChecks(FacilityCoolCompLoadTables);
+                ComputeEngineeringChecks(FacilityHeatCompLoadTables);
+
+                AddTotalRowsForLoadSummary(FacilityCoolCompLoadTables);
+                AddTotalRowsForLoadSummary(FacilityHeatCompLoadTables);
+
+                ComputePeakDifference(FacilityCoolCompLoadTables);
+                ComputePeakDifference(FacilityHeatCompLoadTables);
+
+                LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables, unitsStyle_cur);
+                LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables, unitsStyle_cur);
+
+                OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0, unitsStyle_cur, produceTabular, produceSQLite);
+            }
+
+            // ZoneComponentLoadSummary: Now we convert and Display
+            if (ort->displayZoneComponentLoadSummary) {
+                for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
+                    if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
+                    if (allocated(CalcFinalZoneSizing)) {
+                        LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone), unitsStyle_cur);
+                        LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone), unitsStyle_cur);
+
+                        OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone, unitsStyle_cur, produceTabular, produceSQLite);
                     }
                 }
-
-                ComputeEngineeringChecks(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputeEngineeringChecks(AirLoopHeatCompLoadTables(iAirLoop));
-
-                AddTotalRowsForLoadSummary(AirLoopCoolCompLoadTables(iAirLoop));
-                AddTotalRowsForLoadSummary(AirLoopHeatCompLoadTables(iAirLoop));
-
-                ComputePeakDifference(AirLoopCoolCompLoadTables(iAirLoop));
-                ComputePeakDifference(AirLoopHeatCompLoadTables(iAirLoop));
-
-                CreateListOfZonesForAirLoop(state, AirLoopCoolCompLoadTables(iAirLoop), zoneToAirLoopCool, iAirLoop);
-                CreateListOfZonesForAirLoop(state, AirLoopHeatCompLoadTables(iAirLoop), zoneToAirLoopHeat, iAirLoop);
-
-                LoadSummaryUnitConversion(state, AirLoopCoolCompLoadTables(iAirLoop));
-                LoadSummaryUnitConversion(state, AirLoopHeatCompLoadTables(iAirLoop));
-
-                OutputCompLoadSummary(state, iOutputType::airLoopOutput, AirLoopCoolCompLoadTables(iAirLoop), AirLoopHeatCompLoadTables(iAirLoop), iAirLoop);
-            }
-        }
-
-        // FacilityComponentLoadSummary
-        if (ort->displayFacilityComponentLoadSummary) {
-
-            coolDesSelected = CalcFinalFacilitySizing.CoolDDNum;
-            timeCoolMax = CalcFinalFacilitySizing.TimeStepNumAtCoolMax;
-
-            heatDesSelected = CalcFinalFacilitySizing.HeatDDNum;
-            timeHeatMax = CalcFinalFacilitySizing.TimeStepNumAtHeatMax;
-
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
-                if (mult == 0.0) mult = 1.0;
-                // The ZoneCoolCompLoadTables already hasn't gotten a potential IP conversion yet, so we won't convert it twice.
-                if (ort->displayZoneComponentLoadSummary && (coolDesSelected == ZoneCoolCompLoadTables(iZone).desDayNum) &&
-                    (timeCoolMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
-                    FacilityZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
-                } else {
-                    GetDelaySequences(state,
-                                      coolDesSelected,
-                                      true,
-                                      iZone,
-                                      peopleDelaySeqCool,
-                                      equipDelaySeqCool,
-                                      hvacLossDelaySeqCool,
-                                      powerGenDelaySeqCool,
-                                      lightDelaySeqCool,
-                                      feneSolarDelaySeqCool,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqCool);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   FacilityZonesCoolCompLoadTables(iZone).cells,
-                                                   FacilityZonesCoolCompLoadTables(iZone).cellUsed,
-                                                   coolDesSelected,
-                                                   timeCoolMax,
-                                                   iZone,
-                                                   peopleDelaySeqCool,
-                                                   equipDelaySeqCool,
-                                                   hvacLossDelaySeqCool,
-                                                   powerGenDelaySeqCool,
-                                                   lightDelaySeqCool,
-                                                   feneSolarDelaySeqCool,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqCool);
-                    CollectPeakZoneConditions(state, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
-                }
-                FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
-                FacilityZonesCoolCompLoadTables(iZone).desDayNum = coolDesSelected;
-                CombineLoadCompResults(FacilityCoolCompLoadTables, FacilityZonesCoolCompLoadTables(iZone), mult);
-
-                if (ort->displayZoneComponentLoadSummary && (heatDesSelected == ZoneHeatCompLoadTables(iZone).desDayNum) &&
-                    (timeHeatMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
-                    FacilityZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
-                } else {
-                    GetDelaySequences(state,
-                                      heatDesSelected,
-                                      false,
-                                      iZone,
-                                      peopleDelaySeqHeat,
-                                      equipDelaySeqHeat,
-                                      hvacLossDelaySeqHeat,
-                                      powerGenDelaySeqHeat,
-                                      lightDelaySeqHeat,
-                                      feneSolarDelaySeqHeat,
-                                      ort->feneCondInstantSeq,
-                                      surfDelaySeqHeat);
-                    ComputeTableBodyUsingMovingAvg(state,
-                                                   FacilityZonesHeatCompLoadTables(iZone).cells,
-                                                   FacilityZonesHeatCompLoadTables(iZone).cellUsed,
-                                                   heatDesSelected,
-                                                   timeHeatMax,
-                                                   iZone,
-                                                   peopleDelaySeqHeat,
-                                                   equipDelaySeqHeat,
-                                                   hvacLossDelaySeqHeat,
-                                                   powerGenDelaySeqHeat,
-                                                   lightDelaySeqHeat,
-                                                   feneSolarDelaySeqHeat,
-                                                   ort->feneCondInstantSeq,
-                                                   surfDelaySeqHeat);
-                    CollectPeakZoneConditions(state, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
-                    AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
-                }
-                FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
-                FacilityZonesHeatCompLoadTables(iZone).desDayNum = heatDesSelected;
-                CombineLoadCompResults(FacilityHeatCompLoadTables, FacilityZonesHeatCompLoadTables(iZone), mult);
             }
 
-            ComputeEngineeringChecks(FacilityCoolCompLoadTables);
-            ComputeEngineeringChecks(FacilityHeatCompLoadTables);
+            ZoneHeatCompLoadTables.deallocate();
+            ZoneCoolCompLoadTables.deallocate();
+            AirLoopHeatCompLoadTables.deallocate();
+            AirLoopCoolCompLoadTables.deallocate();
+            AirLoopZonesHeatCompLoadTables.deallocate();
+            AirLoopZonesCoolCompLoadTables.deallocate();
 
-            AddTotalRowsForLoadSummary(FacilityCoolCompLoadTables);
-            AddTotalRowsForLoadSummary(FacilityHeatCompLoadTables);
+            FacilityHeatCompLoadTables.cells.deallocate();
+            FacilityHeatCompLoadTables.cellUsed.deallocate();
+            FacilityCoolCompLoadTables.cells.deallocate();
+            FacilityCoolCompLoadTables.cellUsed.deallocate();
 
-            ComputePeakDifference(FacilityCoolCompLoadTables);
-            ComputePeakDifference(FacilityHeatCompLoadTables);
+            FacilityZonesHeatCompLoadTables.deallocate();
+            FacilityZonesCoolCompLoadTables.deallocate();
 
-            LoadSummaryUnitConversion(state, FacilityCoolCompLoadTables);
-            LoadSummaryUnitConversion(state, FacilityHeatCompLoadTables);
-
-            OutputCompLoadSummary(state, iOutputType::facilityOutput, FacilityCoolCompLoadTables, FacilityHeatCompLoadTables, 0);
+            peopleDelaySeqHeat.deallocate();
+            peopleDelaySeqCool.deallocate();
+            lightDelaySeqHeat.deallocate();
+            lightDelaySeqCool.deallocate();
+            equipDelaySeqHeat.deallocate();
+            equipDelaySeqCool.deallocate();
+            hvacLossDelaySeqHeat.deallocate();
+            hvacLossDelaySeqCool.deallocate();
+            powerGenDelaySeqHeat.deallocate();
+            powerGenDelaySeqCool.deallocate();
+            feneSolarDelaySeqHeat.deallocate();
+            feneSolarDelaySeqCool.deallocate();
+            surfDelaySeqHeat.deallocate();
+            surfDelaySeqCool.deallocate();
         }
-
-        // ZoneComponentLoadSummary: Now we convert and Display
-        if (ort->displayZoneComponentLoadSummary) {
-            for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                if (!state.dataZoneEquip->ZoneEquipConfig(iZone).IsControlled) continue;
-                if (allocated(CalcFinalZoneSizing)) {
-                    LoadSummaryUnitConversion(state, ZoneCoolCompLoadTables(iZone));
-                    LoadSummaryUnitConversion(state, ZoneHeatCompLoadTables(iZone));
-
-                    OutputCompLoadSummary(state, iOutputType::zoneOutput, ZoneCoolCompLoadTables(iZone), ZoneHeatCompLoadTables(iZone), iZone);
-                }
-            }
-        }
-
-        ZoneHeatCompLoadTables.deallocate();
-        ZoneCoolCompLoadTables.deallocate();
-        AirLoopHeatCompLoadTables.deallocate();
-        AirLoopCoolCompLoadTables.deallocate();
-        AirLoopZonesHeatCompLoadTables.deallocate();
-        AirLoopZonesCoolCompLoadTables.deallocate();
-        FacilityZonesHeatCompLoadTables.deallocate();
-        FacilityZonesCoolCompLoadTables.deallocate();
-
-        peopleDelaySeqHeat.deallocate();
-        peopleDelaySeqCool.deallocate();
-        lightDelaySeqHeat.deallocate();
-        lightDelaySeqCool.deallocate();
-        equipDelaySeqHeat.deallocate();
-        equipDelaySeqCool.deallocate();
-        hvacLossDelaySeqHeat.deallocate();
-        hvacLossDelaySeqCool.deallocate();
-        powerGenDelaySeqHeat.deallocate();
-        powerGenDelaySeqCool.deallocate();
-        feneSolarDelaySeqHeat.deallocate();
-        feneSolarDelaySeqCool.deallocate();
-        surfDelaySeqHeat.deallocate();
-        surfDelaySeqCool.deallocate();
     }
 
     // populate the delay sequence arrays for the component load summary table output
@@ -13483,6 +14538,66 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
+    // Jan 2021: Overloaded the function with addtional parameters for dual units; 
+    //           used overloading since the original function was checked in an existing test unit.
+    // apply unit conversions to the load components summary tables
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para)
+    {
+        // auto &ort(state.dataOutRptTab);
+
+        if (unitsStyle_para == iUnitsStyle::InchPound) {
+            Real64 powerConversion = getSpecificUnitMultiplier(state, "W", "Btu/h");
+            Real64 areaConversion = getSpecificUnitMultiplier(state, "m2", "ft2");
+            Real64 powerPerAreaConversion = getSpecificUnitMultiplier(state, "W/m2", "Btu/h-ft2");
+            Real64 airFlowConversion = getSpecificUnitMultiplier(state, "m3/s", "ft3/min");
+            Real64 airFlowPerAreaConversion = getSpecificUnitMultiplier(state, "m3/s-m2", "ft3/min-ft2");
+            Real64 powerPerFlowLiquidConversion = getSpecificUnitMultiplier(state, "W-s/m3", "W-min/gal");
+            for (int row = 1; row <= rGrdTot; ++row) {
+                for (int col = 1; col <= cTotal; ++col) {
+                    if (compLoadTotal.cellUsed(col, row)) {
+                        compLoadTotal.cells(col, row) *= powerConversion;
+                    }
+                }
+                if (compLoadTotal.cellUsed(cPerArea, row)) {
+                    compLoadTotal.cells(cPerArea, row) *= powerConversion;
+                }
+                if (compLoadTotal.cellUsed(cArea, row)) {
+                    compLoadTotal.cells(cArea, row) *= areaConversion;
+                }
+                if (compLoadTotal.cellUsed(cPerArea, row)) {
+                    compLoadTotal.cells(cPerArea, row) *= powerPerAreaConversion;
+                }
+            }
+            int tempConvIndx = getSpecificUnitIndex(state, "C", "F");
+            compLoadTotal.outsideDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideDryBulb);
+            compLoadTotal.outsideWetBulb = ConvertIP(state, tempConvIndx, compLoadTotal.outsideWetBulb);
+            compLoadTotal.zoneDryBulb = ConvertIP(state, tempConvIndx, compLoadTotal.zoneDryBulb);
+            compLoadTotal.peakDesSensLoad *= powerConversion;
+
+            compLoadTotal.supAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.supAirTemp);
+            compLoadTotal.mixAirTemp = ConvertIP(state, tempConvIndx, compLoadTotal.mixAirTemp);
+            compLoadTotal.mainFanAirFlow *= airFlowConversion;
+            compLoadTotal.outsideAirFlow *= airFlowConversion;
+            compLoadTotal.designPeakLoad *= powerConversion;
+            compLoadTotal.diffDesignPeak *= powerConversion;
+
+            compLoadTotal.estInstDelSensLoad *= powerConversion;
+            compLoadTotal.diffPeakEst *= powerConversion;
+
+            compLoadTotal.airflowPerFlrArea *= airFlowPerAreaConversion;
+            if (powerConversion != 0.) {
+                compLoadTotal.airflowPerTotCap = compLoadTotal.airflowPerTotCap * airFlowPerAreaConversion / powerConversion;
+                compLoadTotal.areaPerTotCap = compLoadTotal.areaPerTotCap * areaConversion / powerConversion;
+            }
+            if (areaConversion != 0.) {
+                compLoadTotal.totCapPerArea = compLoadTotal.totCapPerArea * powerConversion / areaConversion;
+            }
+            compLoadTotal.chlPumpPerFlow *= powerPerFlowLiquidConversion;
+            compLoadTotal.cndPumpPerFlow *= powerPerFlowLiquidConversion;
+        }
+    }
+
+
     // make a list of the zones for the airloop component loads report
     void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop)
     {
@@ -13495,12 +14610,14 @@ namespace EnergyPlus::OutputReportTabular {
         }
     }
 
+    // Jan 2021: Added additional parameters to accommondate dual-unit reporting
     // provide output from the load component summary tables
     void OutputCompLoadSummary(EnergyPlusData &state,
                                iOutputType const &kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
-                               int const &zoneOrAirLoopIndex)
+                               int const &zoneOrAirLoopIndex,
+        iUnitsStyle unitsStyle_para, bool produceTabular_para, bool produceSQLite_para)
     {
         CompLoadTablesType curCompLoad;
         bool writeOutput;
@@ -13530,7 +14647,9 @@ namespace EnergyPlus::OutputReportTabular {
             writeOutput = false;
         }
         if (writeOutput) {
-            WriteReportHeaders(state, reportName, zoneAirLoopFacilityName, OutputProcessor::StoreType::Averaged);
+            if (produceTabular_para) {
+                WriteReportHeaders(state, reportName, zoneAirLoopFacilityName, OutputProcessor::StoreType::Averaged);
+            }
             std::string peakLoadCompName;
             std::string peakCondName;
             std::string zonesIncludedName;
@@ -13593,7 +14712,7 @@ namespace EnergyPlus::OutputReportTabular {
                 rowHead(rGrdTot) = "Grand Total";
 
                 columnHead.allocate(cPerArea);
-                if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
                     columnHead(cSensInst) = "Sensible - Instant [W]";
                     columnHead(cSensDelay) = "Sensible - Delayed [W]";
                     columnHead(cSensRA) = "Sensible - Return Air [W]";
@@ -13602,7 +14721,6 @@ namespace EnergyPlus::OutputReportTabular {
                     columnHead(cPerc) = "%Grand Total";
                     columnHead(cArea) = "Related Area [m2]";
                     columnHead(cPerArea) = "Total per Area [W/m2]";
-
                 } else {
                     columnHead(cSensInst) = "Sensible - Instant [Btu/h]";
                     columnHead(cSensDelay) = "Sensible - Delayed [Btu/h]";
@@ -13615,14 +14733,20 @@ namespace EnergyPlus::OutputReportTabular {
                 }
                 columnWidth.dimension(cPerArea, 14); // array assignment - same for all columns
 
-                WriteSubtitle(state, peakLoadCompName);
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                if (produceTabular_para) {
+                    WriteSubtitle(state, peakLoadCompName);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                if (produceSQLite_para) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                    }
+                }
+                if (produceTabular_para) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
+                    }
                 }
 
                 //---- Peak Conditions
@@ -13636,7 +14760,7 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody = "";
 
                 columnHead(1) = "Value";
-                if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
                     rowHead(1) = "Time of Peak Load";
                     rowHead(2) = "Outside Dry Bulb Temperature [C]";
                     rowHead(3) = "Outside Wet Bulb Temperature [C]";
@@ -13697,14 +14821,20 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 15) = RealToStr(curCompLoad.estInstDelSensLoad, 2); // Estimated Instant + Delayed Sensible Load
                 tableBody(1, 16) = RealToStr(curCompLoad.diffPeakEst, 2);        // Difference
 
-                WriteSubtitle(state, peakCondName);
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                if (produceTabular_para) {
+                    WriteSubtitle(state, peakCondName);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                if (produceSQLite_para) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                    }
+                }
+                if (produceTabular_para) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
+                    }
                 }
 
                 //---- Engineering Checks
@@ -13718,7 +14848,7 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody = "";
 
                 columnHead(1) = "Value";
-                if (ort->unitsStyle != iUnitsStyle::InchPound) {
+                if (unitsStyle_para != iUnitsStyle::InchPound) {
                     rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
@@ -13745,14 +14875,21 @@ namespace EnergyPlus::OutputReportTabular {
                 tableBody(1, 5) = fmt::format("{:0.3E}", curCompLoad.totCapPerArea);      // total capacity per area
                 tableBody(1, 6) = fmt::format("{:.{}f}", curCompLoad.numPeople, 1);       // number of people
 
-                WriteSubtitle(state, engineeringCheckName);
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
+                if (produceTabular_para) {
+                    WriteSubtitle(state, engineeringCheckName);
+                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                 }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
+                if (produceSQLite_para) {
+                    if (sqlite) {
+                        sqlite->createSQLiteTabularDataRecords(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
+                    }
+                }
+                if (produceTabular_para) {
+                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
+                    }
                 }
 
                 // write the list of zone for the AirLoop level report
@@ -13779,15 +14916,21 @@ namespace EnergyPlus::OutputReportTabular {
                         }
                     }
 
-                    WriteSubtitle(state, zonesIncludedName);
-                    WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(
-                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                    if (produceTabular_para) {
+                        WriteSubtitle(state, zonesIncludedName);
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
                     }
-                    if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                        state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                            tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                    if (produceSQLite_para) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                        }
+                    }
+                    if (produceTabular_para) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
+                        }
                     }
                 }
             }
@@ -14988,14 +16131,19 @@ namespace EnergyPlus::OutputReportTabular {
         for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
                 if (Zone(iZone).isNominalOccupied) {
-                    ZonePreDefRep(iZone).MechVentVolTotal = 0.;
+                    ZonePreDefRep(iZone).MechVentVolTotalOcc = 0.;
+                    ZonePreDefRep(iZone).MechVentVolTotalOccStdDen = 0.;
                     ZonePreDefRep(iZone).MechVentVolMin = HUGE_(bigVal);
-                    ZonePreDefRep(iZone).InfilVolTotal = 0.;
+                    ZonePreDefRep(iZone).InfilVolTotalOcc = 0.;
+                    ZonePreDefRep(iZone).InfilVolTotalOccStdDen = 0.;
                     ZonePreDefRep(iZone).InfilVolMin = HUGE_(bigVal);
-                    ZonePreDefRep(iZone).AFNInfilVolTotal = 0.;
+                    ZonePreDefRep(iZone).AFNInfilVolTotalOcc = 0.;
+                    ZonePreDefRep(iZone).AFNInfilVolTotalOccStdDen = 0.;
                     ZonePreDefRep(iZone).AFNInfilVolMin = HUGE_(bigVal);
-                    ZonePreDefRep(iZone).SimpVentVolTotal = 0.;
+                    ZonePreDefRep(iZone).SimpVentVolTotalOcc = 0.;
+                    ZonePreDefRep(iZone).SimpVentVolTotalOccStdDen = 0.;
                     ZonePreDefRep(iZone).SimpVentVolMin = HUGE_(bigVal);
+                    ZonePreDefRep(iZone).AFNVentVolTotalOccStdDen = 0.;
                     ZonePreDefRep(iZone).TotTimeOcc = 0.;
                 }
             }
