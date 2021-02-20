@@ -230,3 +230,18 @@ See [8464](https://github.com/NREL/EnergyPlus/pull/8464)
 - Field 5, previous Field 11 -  Convergence Tolerance
 - Field 6, previous Field 12 -  Fraction Radiant
 - Field 7, previous Field 13 -  Fraction of Radiant Energy Incident on People
+
+# Object Change: ZoneAirMassFlowConservation
+
+Summary: name of the first input field have been renamed, the two existing key choices (*Yes* and *No*) have been renamed and three more new choice keys have been added.  
+
+Field 1 renamed from *Adjust Zone Mixing For Zone Air Mass Flow Balance* to *Adjust Zone Mixing and Return For Air Mass Flow Balance*.
+      - Choice key *Yes* has been replaced with *AdjustMixingOnly*.
+	  - Choice key *No* has been replaced with *None*.
+	  - New choice key *AdjustReturnOnly* has been added.
+      - New choice key *AdjustMixingThenReturn* has been added.
+      - New choice key *AdjustReturnThenMixing* has been added.
+      - Now there are five choice keys. 
+Fields 2-3 remain the same.
+
+See [pull request 8460] (https://github.com/NREL/EnergyPlus/pull/8460)

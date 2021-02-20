@@ -1270,32 +1270,43 @@ namespace HeatBalanceManager {
 
         if (NumObjects > 0) {
             inputProcessor->getObjectItem(state,
-                                          CurrentModuleObject,
-                                          1,
-                                          AlphaName,
-                                          NumAlpha,
-                                          BuildingNumbers,
-                                          NumNumber,
-                                          IOStat,
-                                          lNumericFieldBlanks,
-                                          lAlphaFieldBlanks,
-                                          cAlphaFieldNames,
-                                          cNumericFieldNames);
+                CurrentModuleObject,
+                1,
+                AlphaName,
+                NumAlpha,
+                BuildingNumbers,
+                NumNumber,
+                IOStat,
+                lNumericFieldBlanks,
+                lAlphaFieldBlanks,
+                cAlphaFieldNames,
+                cNumericFieldNames);
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
-                    if (SELECT_CASE_var == "YES") {
-                        ZoneAirMassFlow.BalanceMixing = true;
+                    if (SELECT_CASE_var == "ADJUSTMIXINGONLY") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingOnly;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        AlphaName(1) = "Yes";
-                    } else if (SELECT_CASE_var == "NO") {
-                        ZoneAirMassFlow.BalanceMixing = false;
-                        AlphaName(1) = "No";
+                        AlphaName(1) = "AdjustMixingOnly";
+                    } else if (SELECT_CASE_var == "ADJUSTRETURNONLY") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnOnly;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjustReturnOnly";
+                    } else if (SELECT_CASE_var == "ADJUSTMIXINGTHENRETURN") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustMixingThenReturn;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjustMixingThenReturn";
+                    } else if (SELECT_CASE_var == "ADJUSTRETURNTHENMIXING") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = AdjustReturnThenMixing;
+                        ZoneAirMassFlow.EnforceZoneMassBalance = true;
+                        AlphaName(1) = "AdjustReturnThenMixing";
+                    } else if (SELECT_CASE_var == "NONE") {
+                        ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        AlphaName(1) = "None";
                     } else {
-                        ZoneAirMassFlow.BalanceMixing = false;
-                        AlphaName(1) = "No";
-                        ShowWarningError(state,
-                                         CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = No");
+                        ZoneAirMassFlow.ZoneFlowAdjustment = NoAdjustReturnAndMixing;
+                        AlphaName(1) = "None";
+                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
                 }
             }
@@ -1306,14 +1317,12 @@ namespace HeatBalanceManager {
                         ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
-                            state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
                         ZoneAirMassFlow.InfiltrationTreatment = AdjustInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
-                            state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
+                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (SELECT_CASE_var == "NONE") {
                         ZoneAirMassFlow.InfiltrationTreatment = NoInfiltrationFlow;
                         AlphaName(2) = "None";
@@ -1321,9 +1330,8 @@ namespace HeatBalanceManager {
                         ZoneAirMassFlow.InfiltrationTreatment = AddInfiltrationFlow;
                         ZoneAirMassFlow.EnforceZoneMassBalance = true;
                         AlphaName(2) = "AddInfiltrationFlow";
-                        ShowWarningError(state,
-                                         CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) +
-                                             ". The default choice is assigned = AddInfiltrationFlow");
+                        ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(2) +
+                            ". The default choice is assigned = AddInfiltrationFlow");
                     }
                 }
             } else {
@@ -1346,9 +1354,8 @@ namespace HeatBalanceManager {
                         } else {
                             ZoneAirMassFlow.InfiltrationZoneType = MixingSourceZonesOnly;
                             AlphaName(3) = "MixingSourceZonesOnly";
-                            ShowWarningError(state,
-                                             CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) +
-                                                 ". The default choice is assigned = MixingSourceZonesOnly");
+                            ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(3) +
+                                ". The default choice is assigned = MixingSourceZonesOnly");
                         }
                     }
                 } else {
@@ -1361,7 +1368,7 @@ namespace HeatBalanceManager {
         }
 
         static constexpr auto Format_732(
-            "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
+            "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing | None}}, Adjust Zone Infiltration "
             "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
         static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
