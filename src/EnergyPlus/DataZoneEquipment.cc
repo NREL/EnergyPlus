@@ -1282,8 +1282,6 @@ namespace EnergyPlus::DataZoneEquipment {
         // FUNCTION INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
         //       DATE WRITTEN   October 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
         // This function returns the air volume flow rate based on DesignSpecification:OutdoorAir object.
@@ -1293,7 +1291,6 @@ namespace EnergyPlus::DataZoneEquipment {
         // Sizing does not use occupancy or min OA schedule and will call with flags set to FALSE
         // Ventilation Rate Procedure uses occupancy schedule based on user input.
 
-        // Using/Aliasing
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -1461,7 +1458,6 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
 
             } else if (SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc) {
-                Real64 ZoneEz = 1.0;
                 ZoneOAPeople = 0.0;
                 if (OARequirements(DSOAPtr).OAFlowMethod != ZOAM_ProportionalControlDesOcc) {
                     ZoneOAPeople = ZoneIntGain(ActualZoneNum).NOFOCC * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
@@ -1481,8 +1477,8 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
                 ZoneOAArea = Zone(ActualZoneNum).FloorArea * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
                              OARequirements(DSOAPtr).OAFlowPerArea;
-                ZoneOAMin = ZoneOAArea / ZoneEz;
-                ZoneOAMax = (ZoneOAArea + ZoneOAPeople) / ZoneEz;
+                ZoneOAMin = ZoneOAArea;
+                ZoneOAMax = (ZoneOAArea + ZoneOAPeople);
                 if (Zone(ActualZoneNum).ZoneContamControllerSchedIndex > 0.0) {
                     // Check the availability schedule value for ZoneControl:ContaminantController
                     ZoneContamControllerSched = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
@@ -1553,7 +1549,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                         }
                                     }
 
-                                    OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+                                    OAVolumeFlowRate = ZoneOAMax;
                                 } else {
 
                                     if (state.dataContaminantBalance->ZoneAirCO2(ActualZoneNum) <= ZoneMinCO2) {
@@ -1611,19 +1607,19 @@ namespace EnergyPlus::DataZoneEquipment {
                                         }
                                     }
                                 }
-                                OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+                                OAVolumeFlowRate = ZoneOAMax;
                             }
                         } else {
                             // ZoneOAPeople is less than or equal to zero
-                            OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+                            OAVolumeFlowRate = ZoneOAMax;
                         }
                     } else {
                         // ZoneControl:ContaminantController is scheduled off (not available)
-                        OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+                        OAVolumeFlowRate = ZoneOAMax;
                     }
                 } else {
                     // "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
-                    OAVolumeFlowRate = ZoneOAMax / ZoneEz;
+                    OAVolumeFlowRate = ZoneOAMax;
                 }
 
             } else {

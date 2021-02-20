@@ -1,3 +1,4 @@
+
 \section{Group -- Radiative \textbf{/} Convective Units}\label{group-radiative-convective-units}
 
 This section describes the radiative/convective zone equipment units.~ The following units are included in this section:
@@ -35,6 +36,10 @@ The objective of this model is to calculate the convective and radiant heat tran
 
 A unique user assigned name for an instance of a hot water baseboard heater unit. Any reference to this unit by another object will use this name.
 
+\paragraph{Field: Design Object}\label{HW_Baseboard_DesignObjectName}
+
+The name of the object that holds design data for this instance of hot water baseboard heater unit. Multiple input data values are taken from this object.
+
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-013}
 
 The name of the schedule (ref: Schedule) that denotes whether the hot water baseboard heater unit can run during a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
@@ -47,7 +52,7 @@ This field is the name of the hot water inlet node for the baseboard heater.
 
 This field is the name of the hot water outlet node for the baseboard heater.
 
-\paragraph{Field: Rated AverageWaterTemperature}\label{field-rated-averagewatertemperature}
+\paragraph{Field: Rated Average Water Temperature}\label{field-rated-averagewatertemperature}
 
 This field is the rated average water temperature for the baseboard heater which is published in the manufacturer's literature in degree Celsius. It typically ranges from 65.56°C to 115.36°C in the I = B = R rating document while the lowest allowable temperature is 32.22°C. The default value is 87.78°C. If the user does not enter this field, the default value is assumed.
 
@@ -55,43 +60,13 @@ This field is the rated average water temperature for the baseboard heater which
 
 This field is the rated standard water flow rate in kg/s which is published as part of the manufacturer's literature. It is used by the manufacturers when determining the rated capacity (see next field). The default value is 0.063kg/s. If it is blank or zero, the default values is assumed.
 
-\paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-000}
-
-Enter the method used to determine the heating design capacity or the method for scalable sizing. Input allowed is either \emph{HeatingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedHeatingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{HeatingDesignCapacity} means user specifies the magnitude of heating capacity or the program calculates the design heating capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the radiant baseboard unit. \emph{FractionOfAutosizedHeatingCapacity} means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is \emph{HeatingDesignCapacity}.
-
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-000}
 
 This field is the radiant-convective water baseboard rated capacity in watts at a rated water mass flow rate (see input field Rated Mass Flow Rate). Almost all publications from manufacturers indicate it as W/m (Btuh per linear foot). The user thus must multiply it by the active length of the unit. The active length is available in the literature. Manufacturers are required to publish the difference between active and total length of the unit (I = B = R rating for boilers baseboard radiation, 2009).If it is blank or zero, autosizing is assumed. Design day sizing run must be specified for autosizing.
 
-\paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-000}
-
-Enter the rated heating capacity per unit floor area of radiant-convective water baseboard unit in m3/s-m2. This field is required field when the Heating Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the heating capacity from floor area of the zone served by the radiant baseboard unit and the heating capacity per unit floor area value specified by the user. This field may be left blank.
-
-\paragraph{Field: Fraction of Autosized Heating Design Capacity}\label{field-fraction-of-autosized-heating-design-capacity-000}
-
-Enter the heating capacity as a fraction of the autosized heating capacity of radiant-convective water baseboard. This input field is required when the Heating Design Capacity Method is \emph{FractionOfAutosizedHeatingCapacity}. The program calculates the heating capacity from the design autosized heating capacity and user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
-
 \paragraph{Field: Maximum Water Flow Rate}\label{field-maximum-water-flow-rate-001}
 
 This field is the maximum water volumetric flow rate in m\(^{3}\)/sec.~ It can be autosized by EnergyPlus.
-
-\paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-000}
-
-This field is the control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For hot water baseboards, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
-
-\begin{equation}
-\frac{{\left| {({Q_{bb,out}} - {Q_{ZoneLoad}})} \right|}}{{{Q_{ZoneLoad}}}} \le Convergence{\kern 1pt} Tolerance
-\end{equation}
-
-The default is 0.001.
-
-\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-000}
-
-This field specifies what fraction of the power input to the baseboard heater is actually transferred to the space as radiant heat. The fraction should be between 0 and 1. This is the portion of the total power that is modeled as radiation. The portion that is radiant heat transfer from the baseboard heater is distributed to people and specific surfaces using the remaining fields. Note that the sum of the fractions in the remaining fields (people and surfaces) must equal 1.0 so that all the radiant power is distributed properly. For more information on the specification of this parameter, please see the Engineering Reference for EnergyPlus.
-
-\paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people}
-
-This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
 
 \paragraph{Field Set: Surface Name, Fraction of Radiant Energy to Surface}\label{field-set-surface-name-fraction-of-radiant-energy-to-surface}
 
@@ -118,32 +93,80 @@ An example IDF for the water baseboard is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:Baseboard:RadiantConvective:Water,
-      SPACE2-1 Baseboard,      !- Baseboard Name
-      ReheatCoilAvailSched,    !- Availability Schedule Name
-      SPACE2-1 Zone Coil Water In Node,  !- Inlet\_Node
-      SPACE2-1 Zone Coil Water Out Node,  !- Outlet\_Node
-      76.67,                   !- Average Water Temperature {C}
-      0.063,                   !- Standard Water Mass Flow Rate {Kg/s}
-      HeatingDesignCapacity,   !- Heating Design Capacity Method
-      3000.0,                  !- Heating Design Capacity{ W }
-      ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-      ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-      0.0013,                  !- Max Water Volumetric Flow Rate {m3/s}
-      0.001,                   !- Convergence Tolerance
-      0.3,                     !- Fraction radiant
-      0.3,                     !- Fraction of radiant energy incident on people
-      C2-1,                    !- Surface 1 Name
-      0.1,                     !- Fraction of radiant energy from heater distributed to surface 1
-      F2-1,                    !- Surface 2 Name
-      0.2,                     !- Fraction of radiant energy from heater distributed to surface 2
-      SB21,                    !- surface 3 Name
-      0.1,                     !- fraction of radiant energy from heater distributed to surface 3
-      SB23,                    !- surface 4 Name
-      0.1,                     !- fraction of radiant energy from heater distributed to surface 4
-      SB25,                    !- surface 5 Name
-      0.1,                     !- fraction of radiant energy from heater distributed to surface 5
-      WR-1,                    !- surface 6 Name
-      0.1;                     !- fraction of radiant energy from heater distributed to surface 6
+      SPACE4-1 Baseboard,           !- Name
+      SPACE4-1 Baseboard Design,    !- Design Object Name
+      ReheatCoilAvailSched,         !- Availability Schedule Name
+      SPACE4-1 Zone Coil Water In Node,     !- Inlet Node Name
+      SPACE4-1 Zone Coil Water Out Node,    !- Outlet Node Name
+      82.22,                        !- Rated Average Water Temperature
+      0.063,                        !- Rated Water Mass Flow Rate
+      autosize,                     !- Heating Design Capacity
+      autosize,                     !- Maximum Water Flow Rate
+      LEFT-1,                       !- Surface 1 Name
+      0.4,                          !- fraction of radiant energy from heater distributed to surface 1
+      C4-1,                         !- Surface 2 Name
+      0.2,                          !- fraction of radiant energy from heater distributed to surface 2
+      SB45,                         !- Surface 3 Name
+      0.1;                          !- fraction of radiant energy from heater distributed to surface 3
+      SB23,                         !- Surface 4 Name
+      0.1,                          !- fraction of radiant energy from heater distributed to surface 4
+      SB25,                         !- Surface 5 Name
+      0.1,                          !- fraction of radiant energy from heater distributed to surface 5
+      WR-1,                         !- Surface 6 Name
+      0.1;                          !- fraction of radiant energy from heater distributed to surface 6
+\end{lstlisting}
+
+\subsubsection{ZoneHVAC:Baseboard:RadiantConvective:Water:Design}\label{ZoneHVAC:Baseboard:RadiantConvective:Water:Design}
+
+This object contains the design fields for ZoneHVAC:Baseboard:RadiantConvective:Water. The information from one ZoneHVAC:Baseboard:RadiantConvective:Water:Design object can be shared with several ZoneHVAC:Baseboard:RadiantConvective:Water objects.
+
+\paragraph{Field: Design Object Name}\label{HW_BB_DesignObjectName}
+
+A unique user assigned name for an instance of a hot water baseboard heater unit design object. Any reference to this unit by another object will use this name.
+
+\paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-000}
+
+Enter the method used to determine the heating design capacity or the method for scalable sizing. Input allowed is either \emph{HeatingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedHeatingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{HeatingDesignCapacity} means user specifies the magnitude of heating capacity or the program calculates the design heating capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the radiant baseboard unit. \emph{FractionOfAutosizedHeatingCapacity} means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is \emph{HeatingDesignCapacity}.
+
+\paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-000}
+
+Enter the rated heating capacity per unit floor area of radiant-convective water baseboard unit in m3/s-m2. This field is required field when the Heating Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the heating capacity from floor area of the zone served by the radiant baseboard unit and the heating capacity per unit floor area value specified by the user. This field may be left blank.
+
+\paragraph{Field: Fraction of Autosized Heating Design Capacity}\label{field-fraction-of-autosized-heating-design-capacity-000}
+
+Enter the heating capacity as a fraction of the autosized heating capacity of radiant-convective water baseboard. This input field is required when the Heating Design Capacity Method is \emph{FractionOfAutosizedHeatingCapacity}. The program calculates the heating capacity from the design autosized heating capacity and user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
+
+\paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-000}
+
+This field is the control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For hot water baseboards, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+
+\begin{equation}
+\frac{{\left| {({Q_{bb,out}} - {Q_{ZoneLoad}})} \right|}}{{{Q_{ZoneLoad}}}} \le Convergence{\kern 1pt} Tolerance
+\end{equation}
+
+The default is 0.001.
+
+\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-000}
+
+This field specifies what fraction of the power input to the baseboard heater is actually transferred to the space as radiant heat. The fraction should be between 0 and 1. This is the portion of the total power that is modeled as radiation. The portion that is radiant heat transfer from the baseboard heater is distributed to people and specific surfaces using the remaining fields. Note that the sum of the fractions in the remaining fields (people and surfaces) must equal 1.0 so that all the radiant power is distributed properly. For more information on the specification of this parameter, please see the Engineering Reference for EnergyPlus.
+
+\paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people}
+
+This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
+
+An example IDF for the water baseboard design object is shown below.
+
+\begin{lstlisting}
+
+ZoneHVAC:Baseboard:RadiantConvective:Water:Design,
+      SPACE2-1 Baseboard Design,    !- Design Object Name
+      HeatingDesignCapacity,        !- Heating Design Capacity Method
+      ,                             !- Heating Design Capacity Per Floor Area
+      ,                             !- Fraction of Autosized Heating Design Capacity
+      0.001,                        !- Convergence Tolerance
+      0.3,                          !- Fraction Radiant
+      0.3;                          !- Fraction of Radiant Energy Incident on People
+
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-027}
@@ -225,9 +248,13 @@ The objective of this model is to calculate the convective and radiant heat tran
 
 A unique user assigned name for an instance of a steam baseboard heater unit. Any reference to this unit by another object will use this name.
 
+\paragraph{Field: Design Object Name}\label{SteamBB_DesignObjectName}
+
+The name of the object that holds design data for this instance of steam baseboard heater unit. Multiple input data values is taken from this object.
+
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-1-010}
 
-The name of the schedule (ref: Schedule) that denotes whether the steam baseboard heater unit can run during a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
+The name of the schedule (ref: Schedule) that denotes whether the steam baseboard heater unit can run duringhot water a given time period. A schedule value equal to 0 denotes that the unit must be off for that time period. A value greater than 0 denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
 
 \paragraph{Field: Inlet Node Name}\label{field-inlet-node-name-1-003}
 
@@ -237,21 +264,9 @@ This field is the name of the steam inlet node for the baseboard heater.
 
 This field is the name of the steam outlet node for the baseboard heater.
 
-\paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-1-000}
-
-Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either \emph{HeatingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedHeatingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{HeatingDesignCapacity} means user specifies the magnitude of maximum heating capacity or the program calculates the maximum design heating capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the radiant baseboard unit. \emph{FractionOfAutosizedHeatingCapacity} means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is \emph{HeatingDesignCapacity}.
-
 \paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-1-000}
 
 This field is for the a radiant/convective steam baseboard unit heating capacity in watts. This field can be autosized by EnergyPlus. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified.
-
-\paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-1-000}
-
-Enter the heating capacity per unit floor area in m3/s-m2 of radiant/convective steam baseboard. This field is required field when the Heating Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the heating capacity from floor area of the zone served by the steam baseboard unit and the heating capacity per unit floor area value specified by the user. This field may be left blank.
-
-\paragraph{Field: Fraction of Autosized Heating Design Capacity}\label{field-fraction-of-autosized-heating-design-capacity-1-000}
-
-Enter the heating capacity as a fraction of the autosized heating capacity of a radiant/convective steam baseboard unit. This input field is required when the Heating Design Capacity Method is \emph{FractionOfAutosizedHeatingCapacity}. The program calculates the heating capacity from the design autosized heat capacity and user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
 
 \paragraph{Field: Degree of SubCooling}\label{field-degree-of-subcooling-000}
 
@@ -260,24 +275,6 @@ This field is the temperature drop of the condensate in the coil of the baseboar
 \paragraph{Field: Maximum Steam Flow Rate}\label{field-maximum-steam-flow-rate-000}
 
 This field is the maximum steam volumetric flow rate in m\(^{3}\)/s through the steam baseboard heater.~ The steam volumetric flow rate is calculated at 100C and 101325 Pa. It can be autosized by EnergyPlus.
-
-\paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-1-000}
-
-This field is the control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For steam baseboards, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
-
-\begin{equation}
-\frac{{\left| {({Q_{bb,out}} - {Q_{ZoneLoad}})} \right|}}{{{Q_{ZoneLoad}}}} \le Convergence{\kern 1pt} Tolerance
-\end{equation}
-
-The default is 0.001.
-
-\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-1-000}
-
-This field specifies what fraction of the power input to the baseboard heater is actually transferred to the space as radiant heat. The fraction should be between 0 and 1. This is the portion of the total power that is modeled as radiation. The portion that is radiant heat transfer from the baseboard heater is distributed to people and specific surfaces using the remaining fields. Note that the sum of the fractions in the remaining fields (people and surfaces) must equal 1.0 so that all the radiant power is distributed properly.
-
-\paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people-1}
-
-This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
 
 \paragraph{Field Set: Surface Name, Fraction of Radiant Energy to Surface}\label{field-set-surface-name-fraction-of-radiant-energy-to-surface-1}
 
@@ -304,27 +301,75 @@ An example IDF for the steam baseboard is shown below.
 \begin{lstlisting}
 
 ZoneHVAC:Baseboard:RadiantConvective:Steam,
-  Zone1Baseboard,       !- Baseboard name
-  FanAndCoilAvailSched, !- On/off schedule
-  Steam Inlet Node,     !- Steam inlet node
-  Steam Outlet Node,    !- Steam outlet node
-  HeatingDesignCapacity,!- Heating Design Capacity Method
-  autosize,             !- Heating Design Capacity{ W }
-  ,                     !- Heating Design Capacity Per Floor Area{ W / m2 }
-  ,                     !- Fraction of Autosized Heating Design Capacity{ -}
-  5.0,                  !- Degree of sub cooling in the coil {C}
-  autosize,             !- Maximum steam volumetric flow rate {m3/s}
-  0.001,                !- Tolerance
-  0.3,                  !- Fraction radiant
-  0.3,                  !- Fraction of radiant energy that is incident directly on people
-  OuterWall,            !- Surface 1 Name
-  0.4,                  !- Fraction of radiant energy from heater distributed to surface 1
-  Ceiling,              !- Surface 2 Name
-  0.1,                  !- Fraction of radiant energy from heater distributed to surface 2
-  InnerWall,            !- Surface 3 Name
-  0.1,                  !- Fraction of radiant energy from heater distributed to surface 3
-  Floor,                !- Surface 4 Name
-  0.1;                  !- Fraction of radiant energy from heater distributed to surface 4
+  SPACE1-1 Baseboard,                   !- Name
+  SPACE1-1 Baseboard Design,            !- Design Object Name
+  REHEATCOILAVAILSCHED,                 !- Availability Schedule Name
+  SPACE1-1 Reheat Coil Steam Inlet,     !- Inlet Node Name
+  SPACE1-1 Reheat Coil Steam Outlet,    !- Outlet Node Name
+  Autosize,                             !- Heating Design Capacity
+  5,                                    !- Degree of SubCooling
+  autosize,                             !- Maximum Steam Flow Rate
+  FRONT-1,                              !- Surface 1 Name
+  0.4,                                  !- Fraction of radiant energy from heater distributed to surface 1
+  C1-1,                                 !- Surface 2 Name
+  0.2,                                  !- Fraction of radiant energy from heater distributed to surface 2
+  SB15,                                 !- Surface 3 Name
+  0.1;                                  !- Fraction of radiant energy from heater distributed to surface 3
+  Floor,                                !- Surface 4 Name
+  0.1;                                  !- Fraction of radiant energy from heater distributed to surface 4
+\end{lstlisting}
+
+\subsubsection{ZoneHVAC:Baseboard:RadiantConvective:Steam:Design}\label{ZoneHVAC:Baseboard:RadiantConvective:Steam:Design}
+
+
+This object contains the design fields for ZoneHVAC:Baseboard:RadiantConvective:Steam. The information from one ZoneHVAC:Baseboard:RadiantConvective:Steam:Design object can be shared with several ZoneHVAC:Baseboard:RadiantConvective:Steam objects.
+
+\paragraph{Field: Name}\label{steam-baseboard-design-name}
+
+A unique user assigned name for an instance of a steam baseboard heater unit design object. Any reference to this unit by another object will use this name.
+
+\paragraph{Field: Heating Design Capacity Method}\label{field-heating-design-capacity-method-1-000}
+
+Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either \emph{HeatingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedHeatingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{HeatingDesignCapacity} means user specifies the magnitude of maximum heating capacity or the program calculates the maximum design heating capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the radiant baseboard unit. \emph{FractionOfAutosizedHeatingCapacity} means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is \emph{HeatingDesignCapacity}.
+
+\paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-1-000}
+
+Enter the heating capacity per unit floor area in m3/s-m2 of radiant/convective steam baseboard. This field is required field when the Heating Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the heating capacity from floor area of the zone served by the steam baseboard unit and the heating capacity per unit floor area value specified by the user. This field may be left blank.
+
+\paragraph{Field: Fraction of Autosized Heating Design Capacity}\label{field-fraction-of-autosized-heating-design-capacity-1-000}
+
+Enter the heating capacity as a fraction of the autosized heating capacity of a radiant/convective steam baseboard unit. This input field is required when the Heating Design Capacity Method is \emph{FractionOfAutosizedHeatingCapacity}. The program calculates the heating capacity from the design autosized heat capacity and user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
+
+\paragraph{Field: Convergence Tolerance}\label{field-convergence-tolerance-1-000}
+
+This field is the control tolerance for the unit heating output. The unit is controlled by matching the unit output to the zone demand. For steam baseboards, the model must be numerically inverted to obtain a specified output. The convergence tolerance is the error tolerance used to terminate the numerical inversion procedure. Basically this is the fraction:
+
+\begin{equation}
+\frac{{\left| {({Q_{bb,out}} - {Q_{ZoneLoad}})} \right|}}{{{Q_{ZoneLoad}}}} \le Convergence{\kern 1pt} Tolerance
+\end{equation}
+
+The default is 0.001.
+
+\paragraph{Field: Fraction Radiant}\label{field-fraction-radiant-1-000}
+
+This field specifies what fraction of the power input to the baseboard heater is actually transferred to the space as radiant heat. The fraction should be between 0 and 1. This is the portion of the total power that is modeled as radiation. The portion that is radiant heat transfer from the baseboard heater is distributed to people and specific surfaces using the remaining fields. Note that the sum of the fractions in the remaining fields (people and surfaces) must equal 1.0 so that all the radiant power is distributed properly.
+
+\paragraph{Field: Fraction of Radiant Energy Incident on People}\label{field-fraction-of-radiant-energy-incident-on-people-1}
+
+This field specifies the fraction of radiant portion of heat transfer to the zone from the baseboard heater that is incident directly on people within the space. This has an impact on the predicted thermal comfort of the zone occupants. Note that although this energy is ``radiant'' it is actually modeled in the zone heat balance as convective energy (like an internal gain). The basic assumption here is that most radiant energy falling on people will most likely be rereleased to the zone air by convection. This is a simplification of reality, but it maintains the overall energy balance.
+
+An example IDF for the steam baseboard design object is shown below.
+
+\begin{lstlisting}
+
+ZoneHVAC:Baseboard:RadiantConvective:Steam:Design,
+  SPACE1-1 Baseboard Design,    !- Design Object Name
+  HeatingDesignCapacity,        !- Heating Design Capacity Method
+  ,                             !- Heating Design Capacity Per Floor Area
+  ,                             !- Fraction of Autosized Heating Design Capacity
+  0.001,                        !- Convergence Tolerance
+  0.3,                          !- Fraction Radiant
+  0.3;                          !- Fraction of Radiant Energy Incident on People
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-021}
@@ -1004,6 +1049,10 @@ This model covers a wide range of low temperature radiant systems: heating and/o
 
 This field is an unique user assigned name for an instance of a hydronic low temperature radiant system. Any reference to this unit by another object will use this name.
 
+\paragraph{Field: Design Object}\label{Varflow_DesignObjectName}
+
+The name of the object that holds design data for this instance of hydronic low temperature radiant system. Multiple input data values is taken from this object.
+
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-5-003}
 
 This field is the name of the schedule (ref: Schedule) that denotes whether the hydronic low temperature radiant system can run during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
@@ -1015,6 +1064,81 @@ This field is the name of the zone (Ref: Zone) in which the hydronic low tempera
 \paragraph{Field: Surface Name or Radiant Surface Group Name}\label{field-surface-name-or-radiant-surface-group-name}
 
 This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
+
+\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-000}
+
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
+
+\paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-5}
+
+This field is for the low temperature radiant variable flow unit design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
+
+\paragraph{Field: Maximum Hot Water Flow}\label{field-maximum-hot-water-flow}
+
+This field is the maximum flow rate of hot water through the radiant system in m\(^{3}\)/sec.~The controls for the radiant system will vary the flow rate of hot water through the surface using zero flow and the maximum flow rate specified in this field as the lower and upper bounds, respectively. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values.
+
+\paragraph{Field: Heating Water Inlet Node Name}\label{field-heating-water-inlet-node-name}
+
+This field contains the name of the hot water inlet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a heating coil.
+
+\paragraph{Field: Heating Water Outlet Node Name}\label{field-heating-water-outlet-node-name}
+
+This field contains the name of the hot water oulet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a heating coil.
+
+\paragraph{Field: Cooling Design Capacity \{W\}}\label{field-cooling-design-capacity-w-000}
+
+This field is for the low temperature radiant variable flow unit design cooling capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity} and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
+
+\paragraph{Field: Maximum Cold Water Flow}\label{field-maximum-cold-water-flow}
+
+This field is the maximum flow rate of cold water through the radiant system in m\(^{3}\)/sec.~The controls for the radiant system will vary the flow rate of cold water through the surface using zero flow and the maximum flow rate specified in this field as the lower and upper bounds, respectively. Note that this field is optional and not required for a heating only system. Note also that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values.
+
+\paragraph{Field: Cooling Water Inlet Node Name}\label{field-cooling-water-inlet-node-name-000}
+
+This field contains the name of the cold water inlet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a cooling coil. As with the maximum cold water flow rate, this field is optional and not required for a heating only system.
+
+\paragraph{Field: Cooling Water Outlet Node Name}\label{field-cooling-water-outlet-node-name-000}
+
+This field contains the name of the cold water oulet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a cooling coil. As with the maximum cold water flow rate, this field is optional and not required for a heating only system.
+
+\paragraph{Field: Number of Circuits}\label{field-number-of-circuits}
+
+This optional input allows the user to choose between modeling each surface in the radiant system as a single hydronic circuit or to allow the program to divide the surface into multiple parallel hydronic circuits based on the next input field \emph{Circuit Length}. To model as a single circuit choose \emph{OnePerSurface}. To model as multiple circuits choose \emph{CalculateFromCircuitLength}. It is recommended that \emph{CalculateFromCircuitLength} be chosen. The default is \emph{OnePerSurface} for backward compatibility with older versions of EnergyPlus.
+
+\paragraph{Field: Circuit Length}\label{field-circuit-length}
+
+The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to \emph{CalculateFromCircuitLength}. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
+
+An example IDF with a hydronic low temperature radiant system is shown below.
+
+\begin{lstlisting}
+
+ZoneHVAC:LowTemperatureRadiant:VariableFlow,
+      West Zone Radiant Floor,          !- Name
+      West Zone Radiant Floor Design,   !- Design_Object_Name
+      RadiantSysAvailSched,             !- Availability_Schedule_Name
+      West Zone,                        !- Zone_Name
+      Zn001:Flr001,                     !- Surface_Name_or_Radiant_Surface_Group_Name
+      Autosize,                         !- Hydronic_Tubing_Length
+      Autosize,                         !- Heating_Design_Capacity
+      Autosize,                         !- Maximum_Hot_Water_Flow
+      West Zone Radiant Water Inlet Node,   !- Heating_Water_Inlet_Node_Name
+      West Zone Radiant Water Outlet Node,  !- Heating_Water_Outlet_Node_Name
+      Autosize,                         !- Cooling_Design_Capacity
+      Autosize,                         !- Maximum_Cold_Water_Flow
+      Zone 1 Cooling Water Inlet Node,  !- Cooling_Water_Inlet_Node_Name
+      Zone 1 Cooling Water Outlet Node,     !- Cooling_Water_Outlet_Node_Name
+      ,                                 !- Number_of_Circuits
+      ;                                 !- Circuit_Length
+\end{lstlisting}
+
+\subsubsection{ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design}\label{zonehvaclowtemperatureradiantvariableflowdesign}
+
+This object contains the design fields for ZoneHVAC:LowTemperatureRadiant:VariableFlow. The information from one ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:VariableFlow objects.
+
+\paragraph{Field: Name}\label{hydrDesignObj}
+
+This field is an unique user assigned name for an instance of a hydronic low temperature radiant system design object. Any reference to this unit by another object will use this name.
 
 \paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-000}
 
@@ -1035,9 +1159,7 @@ This field is the inside diameter of the tubes through which the fluid is circul
 
 This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
 
-\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-000}
 
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
 
 \paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-000}
 
@@ -1053,15 +1175,28 @@ This field specifies along with setpoint (control) and water schedules how the u
 \item
   MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
 \item
-  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.
 \item
   OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
 \item
   OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
   SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
-\item
-  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item SurfaceInteriorTemperature - This option will allow the user to control
+      the radiant system using a surface temperature that is calculated inside
+      the radiant system.  This point will be defined by the
+      \hyperref[constructioninternalsource]{ConstructionProperty:InternalHeatSource}
+      description for the system.  In that input, the user has the option to
+      calculate a temperature at a particular point in the construction.  The
+      radiant system will then use this information for controlling the slab
+      not just producing temperatures for outputting at that point.  Users
+      should consult the input for Field: Temperature Calculation Requested
+      After Layer Number for more information.  Note that for the
+      SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being
+      used for control is the surface listed above in the field for Surface
+      Name.  If the user enters a group of surfaces for that input, the
+      \emph{first} surface in the radiant group is the surface for control
+      purposes.
 \end{itemize}
 
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
@@ -1074,10 +1209,6 @@ This field has two options (ZeroFlowPower and HalfFlowPower) and is used to dete
 
 Enter the method used to determine the heating design capacity for scalable sizing. Input allowed is either \emph{HeatingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedHeatingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{HeatingDesignCapacity} means user specifies the magnitude of maximum or nominal heating capacity or the program calculates the design heating capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design heating capacity from user specified heating capacity per floor area and floor area of the zone served by the low temperature radiant variable flow unit. \emph{FractionOfAutosizedHeatingCapacity} means the program calculates the design heating capacity from user specified fraction and the auto-sized design heating capacity. The default method is \emph{HeatingDesignCapacity}.
 
-\paragraph{Field: Heating Design Capacity \{W\}}\label{field-heating-design-capacity-w-5}
-
-This field is for the low temperature radiant variable flow unit design heating capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Heating Design Capacity Method is \emph{HeatingDesignCapacity}~ and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
-
 \paragraph{Field: Heating Design Capacity Per Floor Area \{W/m2\}}\label{field-heating-design-capacity-per-floor-area-wm2-5}
 
 Enter the heating capacity per unit floor area in m3/s-m2 of low temperature radiant variable flow unit. This field is required field when the Heating Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the heating capacity from floor area of the zone served by the low temperature radiant variable flow unit and the heating capacity per unit floor area value specified by the user. This field may be left blank.
@@ -1085,18 +1216,6 @@ Enter the heating capacity per unit floor area in m3/s-m2 of low temperature rad
 \paragraph{Field: Fraction of Autosized Heating Design Capacity}\label{field-fraction-of-autosized-heating-design-capacity-5}
 
 Enter the heating capacity as a fraction of the autosized heating capacity for low temperature radiant variable flow unit. This input field is required when the Heating Design Capacity Method is \emph{FractionOfAutosizedHeatingCapacity}. The program calculates the heating capacity from the design autosized heat capacity and user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
-
-\paragraph{Field: Maximum Hot Water Flow}\label{field-maximum-hot-water-flow}
-
-This field is the maximum flow rate of hot water through the radiant system in m\(^{3}\)/sec.~The controls for the radiant system will vary the flow rate of hot water through the surface using zero flow and the maximum flow rate specified in this field as the lower and upper bounds, respectively. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values.
-
-\paragraph{Field: Heating Water Inlet Node Name}\label{field-heating-water-inlet-node-name}
-
-This field contains the name of the hot water inlet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a heating coil.
-
-\paragraph{Field: Heating Water Outlet Node Name}\label{field-heating-water-outlet-node-name}
-
-This field contains the name of the hot water oulet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a heating coil.
 
 \paragraph{Field: Heating Control Throttling Range}\label{field-heating-control-throttling-range}
 
@@ -1112,10 +1231,6 @@ This field specifies the heating setpoint or control temperature for the radiant
 
 Enter the method used to determine the cooling design capacity for scalable sizing. Input allowed is either \emph{CoolingDesignCapacity}, \emph{CapacityPerFloorArea}, and \emph{FractionOfAutosizedCoolingCapacity}. If this input field is left blank or zero, then autosizing is assumed. \emph{CoolingDesignCapacity} means user specifies the design cooling capacity or the program calculates the design cooling capacity if autosize is specified. \emph{CapacityPerFloorArea} means the program calculates the design cooling capacity from user specified heating capacity per floor area and floor area of the zone served by the low temperature radiant variable flow unit. \emph{FractionOfAutosizedCoolingCapacity} means the program calculates the design cooling capacity from user specified fraction and the auto-sized design cooling capacity. The default method is \emph{CoolingDesignCapacity}.
 
-\paragraph{Field: Cooling Design Capacity \{W\}}\label{field-cooling-design-capacity-w-000}
-
-This field is for the low temperature radiant variable flow unit design cooling capacity in watts. This field can be autosized by EnergyPlus. This input field is autosizable. When the Cooling Design Capacity Method is \emph{CoolingDesignCapacity} and this input is blank, autosizing is assumed. Design day sizing run must be specified if autosized.
-
 \paragraph{Field: Cooling Design Capacity Per Floor Area \{W/m2\}}\label{field-cooling-design-capacity-per-floor-area-wm2-000}
 
 Enter the cooling capacity per unit floor area in m3/s-m2 of low temperature radiant variable flow unit. This field is required field when the Cooling Design Capacity Method is \emph{CapacityPerFloorArea}. The program calculates the cooling capacity from floor area of the zone served by the low temperature radiant variable flow unit and the cooling capacity per unit floor area value specified by the user. This field may be left blank.
@@ -1123,18 +1238,6 @@ Enter the cooling capacity per unit floor area in m3/s-m2 of low temperature rad
 \paragraph{Field: Fraction of Autosized Cooling Design Capacity}\label{field-fraction-of-autosized-cooling-design-capacity-000}
 
 Enter the cooling capacity as a fraction of the autosized cooling capacity for low temperature radiant variable flow unit. This input field is required when the Cooling Design Capacity Method is \emph{FractionOfAutosizedCoolingCapacity}. The program calculates the cooling capacity from the design autosized cooling capacity and user specified fraction. Design day sizing run must be specified. This field may be left blank. Default value is 1.0.
-
-\paragraph{Field: Maximum Cold Water Flow}\label{field-maximum-cold-water-flow}
-
-This field is the maximum flow rate of cold water through the radiant system in m\(^{3}\)/sec.~The controls for the radiant system will vary the flow rate of cold water through the surface using zero flow and the maximum flow rate specified in this field as the lower and upper bounds, respectively. Note that this field is optional and not required for a heating only system. Note also that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values.
-
-\paragraph{Field: Cooling Water Inlet Node Name}\label{field-cooling-water-inlet-node-name-000}
-
-This field contains the name of the cold water inlet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a cooling coil. As with the maximum cold water flow rate, this field is optional and not required for a heating only system.
-
-\paragraph{Field: Cooling Water Outlet Node Name}\label{field-cooling-water-outlet-node-name-000}
-
-This field contains the name of the cold water oulet node to the radiant system. Note that this node name must also show up in the branch description when defining the plant demand side network in a manner identical to defining a cooling coil. As with the maximum cold water flow rate, this field is optional and not required for a heating only system.
 
 \paragraph{Field: Cooling Control Throttling Range}\label{field-cooling-control-throttling-range}
 
@@ -1163,57 +1266,32 @@ When radiant systems do cooling, there is the possibility that condensation will
 
 This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed surface temperature to which the surface can drop before the radiant system shuts down (SimpleOff) or reduces its flow rate (VariableOff) to avoid condensation in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or reduce the flow rate when the surface temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or reduce the flow rate when the surface is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or reduce the flow rate when the surface temperature is the number of degrees Celsius below the dew-point temperature. While not recommended, this strategy allows the user to simulate a situation where small amounts of condensation are tolerable.  The default value for this parameter is 1°C.
 
-\paragraph{Field: Number of Circuits}\label{field-number-of-circuits}
-
-This optional input allows the user to choose between modeling each surface in the radiant system as a single hydronic circuit or to allow the program to divide the surface into multiple parallel hydronic circuits based on the next input field \emph{Circuit Length}. To model as a single circuit choose \emph{OnePerSurface}. To model as multiple circuits choose \emph{CalculateFromCircuitLength}. It is recommended that \emph{CalculateFromCircuitLength} be chosen. The default is \emph{OnePerSurface} for backward compatibility with older versions of EnergyPlus.
-
-\paragraph{Field: Circuit Length}\label{field-circuit-length}
-
-The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to \emph{CalculateFromCircuitLength}. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
 
 \paragraph{Field: Changeover Delay Time Period Schedule}\label{field-changeover-delay-time-period-schedule}
 
 This field defines a schedule which should be populated with values for the amount of time in hours that is required before this low temperature radiant system can switch between either heating or cooling and the opposite conditioning mode.  If this schedule value is set to 1 (hour) at a particular time and the system was previously in heating mode, then it will be locked out from switching into cooling mode until at least one hour of time has passed in the simulation with the system ``not operating''.  This helps avoid systems bouncing back and forth between the two conditioning modes in successive time steps.  This parameter can be set to any positive value, and a zero or negative value will be assumed to have no delay (equivalent to a delay of zero).  If the user leaves this field blank, EnergyPlus will assume that no changeover delay is requested (also equivalent to a delay of zero).
 
-An example IDF with a hydronic low temperature radiant system is shown below.
+An example IDF with a design object for a hydronic low temperature radiant system is shown below.
 
 \begin{lstlisting}
 
-  ZoneHVAC:LowTemperatureRadiant:VariableFlow,
-      SPACE1-1 Zone Radiant Floor,  !- Name
-      RADIANTSYSAVAILSCHED,    !- Availability Schedule Name
-      SPACE1-1,                !- Zone Name
-      C1-1,                    !- Surface Name or Radiant Surface Group Name
-      ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
-      0.013,                   !- Hydronic Tubing Inside Diameter {m}
-      0.016,                   !- Hydronic Tubing Outside Diameter {m}
-      autosize,                !- Hydronic Tubing Length {m}
-      0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
-      OperativeTemperature,    !- Temperature Control Type
-      HalfFlowPower,           !- Setpoint Control Type
-      HeatingDesignCapacity,   !- Heating Design Capacity Method
-      autosize,                !- Heating Design Capacity{ W }
-      ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-      ,                        !- Fraction of Autosized Heating Design Capacity{ -}
-      0.0004,                  !- Maximum Hot Water Flow {m3/s}
-      SPACE1-1 Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
-      SPACE1-1 Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
-      2.0,                     !- Heating Control Throttling Range {deltaC}
-      RADIANT HEATING SETPOINTS,  !- Heating Control Temperature Schedule Name
-      CoolingDesignCapacity,   !- Cooling Design Capacity Method
-      autosize,                !- Cooling Design Capacity{ W }
-      ,                        !- Cooling Design Capacity Per Floor Area{ W / m2 }
-      ,                        !- Fraction of Autosized Cooling Design Capacity{ -}
-      autosize,                !- Maximum Cold Water Flow {m3/s}
-      SPACE1-1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
-      SPACE1-1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
-      2.0,                     !- Cooling Control Throttling Range {deltaC}
-      RADIANT COOLING SETPOINTS,  !- Cooling Control Temperature Schedule Name
-      Off,                     !- Condensation Control Type
-      1.0,                     !- Condensation Control Dewpoint Offset
-      CalculateFromCircuitLength,   !- Number of Circuits
-      106.7,                   !- Circuit Length
-      ChangeoverSchedule;      !- Changeover Delay Time Period Schedule
+ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,
+      West Zone Radiant Floor Design,       !- Design Object Name
+      ConvectionOnly,                       !- Fluid to Radiant Surface Heat Transfer Model
+      0.013,                                !- Hydronic Tubing Inside Diameter
+      0.016,                                !- Hydronic Tubing Outside Diameter
+      0.35,                                 !- Hydronic Tubing Conductivity
+      MeanAirTemperature,                   !- Temperature Control Type
+      HalfFlowPower,                        !- Setpoint Control Type
+      HeatingDesignCapacity,                !- Heating Design Capacity Method
+      ,                                     !- Heating Design Capacity Per Floor Area Control Temperature Schedule Name
+      CoolingDesignCapacity,                !- Cooling Design Capacity Method
+      ,                                     !- Cooling Design Capacity Per Floor Area
+      ,                                     !- Fraction of Autosized Cooling Design Capacity
+      2.0,                                  !- Cooling Control Throttling Range
+      Radiant Cooling Setpoints,            !- Cooling Control Temperature Schedule Name
+      Off,                                  !- Condensation Control Type
+      ;                                     !- Condensation Control Dewpoint Offset
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-5-007}
@@ -1295,6 +1373,10 @@ One of the other differences between this model and the variable flow hydronic r
 
 This field is an unique user assigned name for an instance of a constant flow low temperature radiant system. Any reference to this unit by another object will use this name.
 
+\paragraph{Field: Design Object}\label{DesignObjectName}
+
+The name of the object that holds design data for this instance of constant flow low temperature radiant system. Multiple input data values is taken from this object.
+
 \paragraph{Field: Availability Schedule Name}\label{field-availability-schedule-name-6-003}
 
 This field is the name of the schedule (ref: Schedule) that denotes whether the constant flow low temperature radiant system can run during a given time period. A schedule value less than or equal to 0 (usually 0 is used) denotes that the unit must be off for that time period. A value greater than 0 (usually 1 is used) denotes that the unit is available to operate during that time period. If this field is left blank, the schedule has a value of 1 for all time periods.
@@ -1307,77 +1389,9 @@ This field is the name of the zone (Ref: Zone) in which the constant flow low te
 
 This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
-\paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-001}
-
-This field is provides the opportunity to control how the heat transfer between the fluid circulating through this radiant system and the radiant system itself.  There are two options for this parameter: ConvectionOnly or ISOStandard.  The default value is ConvectionOnly.  More information on each of these options is provided below.
-
-\begin{itemize}
-\item
-  ConvectionOnly - This is the default mode and the method that was implemented when the radiant model was first introduced into EnergyPlus.  In this modeling option, it is assumed that the impact of the tube material on heat exchange between the fluid and the radiant system and that only the convection between the fluid and the radiant system is the only critical heat transfer mechanism to take into account.  The reasoning behind this included the fact that there are other simplifications in the method for calculating heat transfer and that this simplification would not result in any significant difference in the simulated heat transfer performance of the system.  Convection between the fluid and the pipe wall of the system is related to physical parameters of the system (pipe/tube inner diameter and length) as well as the flow characteristics.
-\item
-ISOStandard - This method is based on the ISO Standard 11855, Part 2 (2012) document entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity'', Reference Number ISO 11855-2:2012(E).  This standard recommends equations (see Appendix B of this document) to include the effects of convective heat transfer between the fluid and the inside of the piping and conduction through the pipe wall.  This model requires both the inner and outer diameter of the pipe/tube, the length of the pipe/tube, and the thermal conductivity of the pipe/tube material.  Note that as part of the implementation of this model in EnergyPlus, flow within the piping/tubing is always assumed to be turbulent.
-\end{itemize}
-
-\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-001}
-
-This field is the inside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The inner diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.  The default for this parameter is 0.013 which is approximately equivalent to the inner diameter of a typical 1/2" PEX pipe size.
-
-\paragraph{Field: Hydronic Tubing Outside Diameter}\label{field-hydronic-tubing-outside-diameter-001}
-
-This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
-
 \paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-001}
 
 This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
-
-\paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-001}
-
-This field is the thermal conductivity of the pipe/tube that is used in this radiant system in Watts per meter-Kelvin (W/m-K).  It is used to calculate the resistance to heat transfer through the pipe/tube wall in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.35 which is the value given for PEX piping in ISO Standard 11855-2(2012).
-
-
-\paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
-
-This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of eight different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, the radiant surface interior temperture, or the running mean outdoor dry-bulb temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
-
-\begin{itemize}
-\item
-  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
-\item
-  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
-\item
-  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.  
-\item
-  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
-\item
-  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
-\item
-  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
-\item
-  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
-\item
-  RunningMeanOutdoorDryBulbTemperature - This option will allow the user to control the inlet water temperature to the system as a function of the running mean outdoor air temperature.  The next field (\hyperref[field-running-mean-outdoor-dry-bulb-temperature-weighting-factor]{Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}) will define how this temperature is actually calculated within EnergyPlus.
-\end{itemize}
-
-If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
-
-\paragraph{Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}\label{field-running-mean-outdoor-dry-bulb-temperature-weighting-factor}
-
-This field specifies the weighting factor that is used to calculate the running mean outdoor dry-bulb temperature.  The running mean outdoor dry-bulb temperature is determined using the following equation:
-
-\begin{equation}
-\Theta_{rm} = (1 - \alpha) \Theta_{ed-1} + \alpha \Theta_{rm-1}
-\label{eq:RunningMeanOutdoorDryBulbTemperatureEquation}
-\end{equation}
-
-where: 
-
-\(\Theta_{rm}\) is the current running mean outdoor dry-bulb temperature that is used to control the radiant system
-
-\(\Theta_{ed-1}\) is the average outdoor dry-bulb temperature from the previous day
-
-\(\Theta_{rm-1}\) is the running mean outdoor dry-bulb temperature from the previous day
-
-\(\alpha\) is the user defined weighting factor that is defined by this field.  It controls the weighting of the running mean outdoor dry-bulb temperature from the previous day and the average outdoor dry-bulb temperature from the previous day for the purposes of calculating the running mean outdoor dry-bulb temperature for the current day.  The value for this weighting factor must be between zero and 1.
 
 \paragraph{Field: Rated Flow Rate}\label{field-rated-flow-rate}
 
@@ -1394,14 +1408,6 @@ This numeric field contains the pump's rated head in Pascals.
 \paragraph{Field: Rated Power Consumption}\label{field-rated-power-consumption-000}
 
 This numeric field contains the pump's rated power consumption in Watts.
-
-\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-001}
-
-This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
-
-\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-000}
-
-This numeric field contains the pump motor's fraction of power loss to the fluid.
 
 \paragraph{Field: Heating Water Inlet Node Name}\label{field-heating-water-inlet-node-name-1}
 
@@ -1451,6 +1457,132 @@ This field specifies the high control temperature in degrees Celsius for the tem
 
 This field specifies the low control temperature in degrees Celsius for the temperature control of a constant flow cooling radiant system. For more information on its interpretation, see Cooling High Water Temperature Schedule above.
 
+\paragraph{Field: Condensation Control Dewpoint Offset}\label{field-condensation-control-dewpoint-offset-1}
+
+This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed surface temperature to which the surface can drop before the radiant system shuts down (SimpleOff) or tries to adjust the inlet water temperature (VariableOff) in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or adjust the inlet water temperature when the surface temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or increase the inlet water temperature when the surface is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or increase the inlet water temperature when the surface temperature is the number of degrees Celsius below the dew-point temperature. While not recommended, this strategy allows the user to simulate a situation where small amounts of condensation are tolerable. The default value for this parameter is 1°C.
+
+\paragraph{Field: Number of Circuits}\label{field-number-of-circuits-1}
+
+This optional input allows the user to choose between modeling each surface in the radiant system as a single hydronic circuit or to allow the program to divide the surface into multiple parallel hydronic circuits based on the next input field \emph{Circuit Length}. To model as a single circuit choose \emph{OnePerSurface}. To model as multiple circuits choose \emph{CalculateFromCircuitLength}. It is recommended that \emph{CalculateFromCircuitLength} be chosen. The default is \emph{OnePerSurface} for backward compatibility with older versions of EnergyPlus.
+
+\paragraph{Field: Circuit Length}\label{field-circuit-length-1}
+
+The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to \emph{CalculateFromCircuitLength}. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
+
+An example IDF with a constant flow low temperature radiant system is shown below.
+
+\begin{lstlisting}
+
+ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
+      West Zone Radiant Floor,              !- Name
+      West Zone Radiant Floor Design,       !- Design Object Name
+      RadiantSysAvailSched,                 !- Availability Schedule Name
+      West Zone,                            !- Zone Name
+      Zn001:Flr001,                         !- Surface Name or Radiant Surface Group Name
+      400.0,                                !- Hydronic Tubing Length
+      0.0004,                               !- Rated Flow Rate
+      ,                                     !- Pump Flow Rate Schedule Name
+      75000,                                !- Rated Pump Head
+      50,                                   !- Rated Power Consumption
+      West Zone Radiant Water Inlet Node,   !- Heating Water Inlet Node Name
+      West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
+      RadHeatHighWaterTemp,                 !- Heating High Water Temperature Schedule Name
+      RadHeatLowWaterTemp,                  !- Heating Low Water Temperature Schedule Name
+      RadHeatHighControlTemp,               !- Heating High Control Temperature Schedule Name
+      RadHeatLowControlTemp,                !- Heating Low Control Temperature Schedule Name
+      Zone 1 Cooling Water Inlet Node,      !- Cooling Water Inlet Node Name
+      Zone 1 Cooling Water Outlet Node,     !- Cooling Water Outlet Node Name
+      RadCoolHighWaterTemp,                 !- Cooling High Water Temperature Schedule Name
+      RadCoolLowWaterTemp,                  !- Cooling Low Water Temperature Schedule Name
+      RadCoolHighControlTemp,               !- Cooling High Control Temperature Schedule Name
+      RadCoolLowControlTemp,                !- Cooling Low Control Temperature Schedule Name
+      ,                                     !- Number_of_Circuits
+      ;                                     !- Circuit Length {m}
+\end{lstlisting}
+
+\subsubsection{ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design}\label{ConstFlowDesign}
+
+This object contains the design fields for ZoneHVAC:LowTemperatureRadiant:ConstantFlow. The information from one ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design object can be shared with several ZoneHVAC:LowTemperatureRadiant:ConstantFlow objects.
+
+\paragraph{Field: Name}\label{ConstFlowDesignName}
+
+This field is an unique user assigned name for an instance of a constant flow low temperature radiant system design object. Any reference to this unit by another object will use this name.
+
+\paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-001}
+
+This field is provides the opportunity to control how the heat transfer between the fluid circulating through this radiant system and the radiant system itself.  There are two options for this parameter: ConvectionOnly or ISOStandard.  The default value is ConvectionOnly.  More information on each of these options is provided below.
+
+\begin{itemize}
+\item
+  ConvectionOnly - This is the default mode and the method that was implemented when the radiant model was first introduced into EnergyPlus.  In this modeling option, it is assumed that the impact of the tube material on heat exchange between the fluid and the radiant system and that only the convection between the fluid and the radiant system is the only critical heat transfer mechanism to take into account.  The reasoning behind this included the fact that there are other simplifications in the method for calculating heat transfer and that this simplification would not result in any significant difference in the simulated heat transfer performance of the system.  Convection between the fluid and the pipe wall of the system is related to physical parameters of the system (pipe/tube inner diameter and length) as well as the flow characteristics.
+\item
+ISOStandard - This method is based on the ISO Standard 11855, Part 2 (2012) document entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity'', Reference Number ISO 11855-2:2012(E).  This standard recommends equations (see Appendix B of this document) to include the effects of convective heat transfer between the fluid and the inside of the piping and conduction through the pipe wall.  This model requires both the inner and outer diameter of the pipe/tube, the length of the pipe/tube, and the thermal conductivity of the pipe/tube material.  Note that as part of the implementation of this model in EnergyPlus, flow within the piping/tubing is always assumed to be turbulent.
+\end{itemize}
+
+\paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
+
+This field specifies along with setpoint (control) and water schedules how the user wishes to control the constant flow radiant system. The temperature denoted in the setpoint schedule can refer to one of eight different temperatures: the zone mean air temperature, the zone mean radiant temperature, the zone operative temperature, the outdoor dry-bulb temperature, the outdoor wet-bulb temperature, the radiant surface inside face temperature, the radiant surface interior temperture, or the running mean outdoor dry-bulb temperature. The choice of temperature is controlled by the current field--temperature control type. The user must select from the following options:
+
+\begin{itemize}
+\item
+  MeanAirTemperature - The mean air temperature of the zone being controlled by this radiant system.
+\item
+  MeanRadiantTemperature - The mean radiant temperature of the zone being controlled by this radiant system.
+\item
+  OperativeTemperature - The operative temperature of the zone being controlled by the radint system. Operative temperature for radiant system controls is the average of Mean Air Temperature and Mean Radiant Temperature.
+\item
+  OutdoorDryBulbTemperature - The outdoor dry-bulb temperature of the current outdoor environment.
+\item
+  OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
+\item
+  SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
+\item
+  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item
+  RunningMeanOutdoorDryBulbTemperature - This option will allow the user to control the inlet water temperature to the system as a function of the running mean outdoor air temperature.  The next field (\hyperref[field-running-mean-outdoor-dry-bulb-temperature-weighting-factor]{Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}) will define how this temperature is actually calculated within EnergyPlus.
+\end{itemize}
+
+If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.
+
+\paragraph{Field: Running Mean Outdoor Dry-Bulb Temperature Weighting Factor}\label{field-running-mean-outdoor-dry-bulb-temperature-weighting-factor}
+
+This field specifies the weighting factor that is used to calculate the running mean outdoor dry-bulb temperature.  The running mean outdoor dry-bulb temperature is determined using the following equation:
+
+\begin{equation}
+\Theta_{rm} = (1 - \alpha) \Theta_{ed-1} + \alpha \Theta_{rm-1}
+\label{eq:RunningMeanOutdoorDryBulbTemperatureEquation}
+\end{equation}
+
+where:
+
+\(\Theta_{rm}\) is the current running mean outdoor dry-bulb temperature that is used to control the radiant system
+
+\(\Theta_{ed-1}\) is the average outdoor dry-bulb temperature from the previous day
+
+\(\Theta_{rm-1}\) is the running mean outdoor dry-bulb temperature from the previous day
+
+\(\alpha\) is the user defined weighting factor that is defined by this field.  It controls the weighting of the running mean outdoor dry-bulb temperature from the previous day and the average outdoor dry-bulb temperature from the previous day for the purposes of calculating the running mean outdoor dry-bulb temperature for the current day.  The value for this weighting factor must be between zero and 1.
+
+\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-001}
+
+This field is the inside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The inner diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.  The default for this parameter is 0.013 which is approximately equivalent to the inner diameter of a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Outside Diameter}\label{field-hydronic-tubing-outside-diameter-001}
+
+This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-001}
+
+This field is the thermal conductivity of the pipe/tube that is used in this radiant system in Watts per meter-Kelvin (W/m-K).  It is used to calculate the resistance to heat transfer through the pipe/tube wall in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.35 which is the value given for PEX piping in ISO Standard 11855-2(2012).
+
+\paragraph{Field: Motor Efficiency}\label{field-motor-efficiency-001}
+
+This numeric field contains the pump motor's efficiency in decimal form (0 = 0\%, 1 = 100\%).
+
+\paragraph{Field: Fraction of Motor Inefficiencies to Fluid Stream}\label{field-fraction-of-motor-inefficiencies-to-fluid-stream-000}
+
+This numeric field contains the pump motor's fraction of power loss to the fluid.
+
 \paragraph{Field: Condensation Control Type}\label{field-condensation-control-type-1}
 
 When radiant systems do cooling, there is the possibility that condensation will occur on the surface that is being cooled. This is due to the fact that the surface temperature may drop below the dew-point temperature of the space. When this happens, condensation on the surface will occur. There are three options for handling this situation: Off, SimpleOff, and VariableOff. This parameter is optional and will default to SimpleOff.
@@ -1464,61 +1596,31 @@ When radiant systems do cooling, there is the possibility that condensation will
   VariableOff - the program will determine whether condensation is predicted for the flow rate determined by the unit control scheme.  If condensation is predicted, the unit makes one attempt to avoid condensation by increasing the water inlet temperature to the system to match the dew-point temperature modified by the condensation control dew-point offset (field: Condensation Control Dewpoint Offset). For example, if a surface in the space is predicted to be 15°C and the modified condensation dew-point temperature is 17°C, then the inlet water temperature to the unit is reset to 17°C and the system is simulated again with this new inlet water temperature.  If this increased inlet water temperature does not result in condensation, then the simulation continues using this operating condition for the system.  If the increased inlet water temperature still results in condensation, then the unit is turned off to avoid excessive iterations.
 \end{itemize}
 
-\paragraph{Field: Condensation Control Dewpoint Offset}\label{field-condensation-control-dewpoint-offset-1}
+\paragraph{Field: Condensation Control Dewpoint Offset}\label{field-condensation-control-dewpoint-offset-2}
 
-This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed surface temperature to which the surface can drop before the radiant system shuts down (SimpleOff) or tries to adjust the inlet water temperature (VariableOff) in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or adjust the inlet water temperature when the surface temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or increase the inlet water temperature when the surface is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or increase the inlet water temperature when the surface temperature is the number of degrees Celsius below the dew-point temperature. While not recommended, this strategy allows the user to simulate a situation where small amounts of condensation are tolerable. The default value for this parameter is 1°C.
-
-\paragraph{Field: Number of Circuits}\label{field-number-of-circuits-1}
-
-This optional input allows the user to choose between modeling each surface in the radiant system as a single hydronic circuit or to allow the program to divide the surface into multiple parallel hydronic circuits based on the next input field \emph{Circuit Length}. To model as a single circuit choose \emph{OnePerSurface}. To model as multiple circuits choose \emph{CalculateFromCircuitLength}. It is recommended that \emph{CalculateFromCircuitLength} be chosen. The default is \emph{OnePerSurface} for backward compatibility with older versions of EnergyPlus.
-
-\paragraph{Field: Circuit Length}\label{field-circuit-length-1}
-
-The length in meters of each parallel hydronic circuit in a surface. Used when the previous input field is set to \emph{CalculateFromCircuitLength}. The default is 106.7 meters (350 feet), which is the maximum circuit length allowed in Title 24.
+This optional parameter is only valid with the SimpleOff and VariableOff condensation handling algorithm (see previous input parameter). It establishes the difference between the calculated dew-point temperature of the space and the allowed surface temperature to which the surface can drop before the radiant system shuts down (SimpleOff) or reduces its flow rate (VariableOff) to avoid condensation in degrees Celsius. This parameter can be any positive, negative, or zero value. When this parameter is zero, the radiant system will shut down or reduce the flow rate when the surface temperature drops to the dew-point temperature or below. When this parameter is positive, the radiant system will shut down or reduce the flow rate when the surface is the number of degrees Celsius above the dew-point temperature. This allows some extra safety to avoid condensation. When this parameter is negative, the radiant system will shut down or reduce the flow rate when the surface temperature is the number of degrees Celsius below the dew-point temperature. While not recommended, this strategy allows the user to simulate a situation where small amounts of condensation are tolerable.  The default value for this parameter is 1°C.
 
 \paragraph{Field: Changeover Delay Time Period Schedule}\label{field-changeover-delay-time-period-schedule-1}
 
 This field defines a schedule which should be populated with values for the amount of time in hours that is required before this low temperature radiant system can switch between either heating or cooling and the opposite conditioning mode.  If this schedule value is set to 1 (hour) at a particular time and the system was previously in heating mode, then it will be locked out from switching into cooling mode until at least one hour of time has passed in the simulation with the system``not operating''.  This helps avoid systems bouncing back and forth between the two conditioning modes in successive time steps.  This parameter can be set to any positive value, and a zero or negative value will be assumed to have no delay (equivalent to a delay of zero).  If the user leaves this field blank, EnergyPlus will assume that no changeover delay is requested (also equivalent to a delay of zero).
 
-An example IDF with a constant flow low temperature radiant system is shown below.
+An example IDF with a design object for constant flow low temperature radiant system is shown below.
 
 \begin{lstlisting}
 
-ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
-      Resistive Zone Radiant Floor,  !- name of CONSTANT FLOW low temperature radiant system
-      RadiantSysAvailSched,   !- availability schedule
-      Resistive Zone,         !- Zone name
-      Zn001:Flr001,           !- Surface name or group
-      ConvectionOnly,         !- Fluid to Radiant Surface Heat Transfer Model
-      0.013,                  !- Hydronic Tubing Inside Diameter {m}
-      0.016,                  !- Hydronic Tubing Outside Diameter {m}
-      autosize,               !- Hydronic Tubing Length {m}
-      0.35,                   !- Hydronic Tubing Conductivity {W/m-K}
-      MeanAirTemperature,     !- temperature control type
-      0.8,                    !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
-      0.0004,                 !- maximum water volumetric flow rate {m3/s}
-      ,                       !-schedule for flow rate (optional, non-existent means constant)
-      30000,                  !-Rated Pump Head in Pa
-      50,                     !-Rated Power Consumption in W
-      0.87,                   !-Motor Efficiency
-      0.1,                    !-Fraction of Motor Inefficiencies to Fluid Stream
-      Resistive Zone Radiant Water Inlet Node,  !- heating water inlet node
-      Resistive Zone Radiant Water Outlet Node,  !- heating water outlet node
-      RadHeatHighWaterTemp,   !-high water temperature schedule
-      RadHeatLowWaterTemp,    !-low water temperature schedule
-      RadHeatHighControlTemp, !-high control temperature schedule
-      RadHeatLowControlTemp,  !-low control temperature schedule
-      Zone 1 Cooling Water Inlet Node,  !- cooling water inlet node
-      Zone 1 Cooling Water Outlet Node,  !- cooling water outlet node
-      RadCoolHighWaterTemp,   !-cooling high water temperature schedule
-      RadCoolLowWaterTemp,    !-cooling low water temperature schedule
-      RadCoolHighControlTemp, !- cooling high control temperature schedule
-      RadCoolLowControlTemp,  !- cooling low control temperature schedule
-      SimpleOff,              !- condensation control type
-      0.5,                    !- condensation control dewpoint offset
-      CalculateFromCircuitLength,   !- Number of Circuits
-      106.7,                   !- Circuit Length
-      ChangeoverSchedule;      !- Changeover Delay Time Period Schedule
+ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,
+      West Zone Radiant Floor Design,       !- Design_Object_Name
+      ConvectionOnly,                       !- Fluid_to_Radiant_Surface_Heat_Transfer_Model
+      MeanAirTemperature,                   !- Temperature_Control_Type
+      0.8,                                  !- Running_Mean_Outdoor_DryBulb_Temperature_Weighting_Factor
+      0.012,                                !- Hydronic_Tubing_Inside_Diameter
+      0.016,                                !- Hydronic_Tubing_Outside_Diameter
+      0.35,                                 !- Hydronic_Tubing_Conductivity
+      0.87,                                 !- Motor_Efficiency
+      0.1,                                  !- Fraction_of_Motor_Inefficiencies_to_Fluid_Stream
+      Off,                                  !- Condensation_Control_Type
+      1.0,                                  !- Condensation_Control_Dewpoint_Offset
+      ChangeoverSchedW;                     !- Changeover delay schedule
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-6-007}
@@ -1709,8 +1811,21 @@ This field specifies along with setpoint (control) and water schedules how the u
   OutdoorWetBulbTemperature - The outdoor wet-bulb temperature of the current outdoor environment.
 \item
   SurfaceFaceTemperature - This option allows the user to control the radiant system using the inside face surface temperature of the radiant system (the inside surface temperature).
-\item
-  SurfaceInteriorTemperature - This option will allow the user to control the radiant system using a surface temperature that is calculated inside the radiant system.  This point will be defined by the  \hyperref[constructioninternalsource]{Construction:InternalSource} description for the system.  In that input, the user has the option to calculate a temperature at a particular point in the construction.  The radiant system will then use this information for controlling the slab not just producing temperatures for outputting at that point.  Users should consult the input for Field: Temperature Calculation Requested After Layer Number for more information.  Note that for the SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being used for control is the surface listed above in the field for Surface Name.  If the user enters a group of surfaces for that input, the \emph{first} surface in the radiant group is the surface for control purposes.
+\item SurfaceInteriorTemperature - This option will allow the user to control
+      the radiant system using a surface temperature that is calculated inside
+      the radiant system.  This point will be defined by the
+      \hyperref[constructioninternalsource]{ConstructionProperty:InternalHeatSource}
+      description for the system.  In that input, the user has the option to
+      calculate a temperature at a particular point in the construction.  The
+      radiant system will then use this information for controlling the slab
+      not just producing temperatures for outputting at that point.  Users
+      should consult the input for Field: Temperature Calculation Requested
+      After Layer Number for more information.  Note that for the
+      SurfaceFaceTemperature and SurfaceInteriorTemperature the surface being
+      used for control is the surface listed above in the field for Surface
+      Name.  If the user enters a group of surfaces for that input, the
+      \emph{first} surface in the radiant group is the surface for control
+      purposes.
 \end{itemize}
 
 If the user does not select a control type, \textbf{MeanAirTemperature} control is assumed by EnergyPlus. See the throttling range and control temperature schedule fields below for more information on how the setpoint temperature is established for this particular radiant system.

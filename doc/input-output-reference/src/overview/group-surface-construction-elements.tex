@@ -4015,9 +4015,19 @@ Construction:FfactorGroundFloor,
       15.24,15.24,0.0;         !- X,Y,Z = = > Vertex 4
 \end{lstlisting}
 
-\subsection{Construction:InternalSource}\label{constructioninternalsource}
+\subsection{ConstructionProperty:InternalHeatSource}\label{constructioninternalsource}
 
-In some cases, such as radiant systems, a construction will actually have resistance wires or hydronic tubing embedded within the construction. Heat is then either added or removed from this building element to provide heating or cooling to the zone in question. In the case of building-integrated photovoltaics, the energy removed in the form of electricity will form a sink. It is possible to enter such constructions into EnergyPlus with the syntax described below. The definition is similar to the Construction definition with a few additions related to radiant or other systems that will lead to source/sink terms. The internal source capability is available with both the \textbf{ConductionTransferFunction} and \textbf{ConductionFiniteDifference} solution algorithms.~ The only difference is that the two dimensional pipe arrangements are not available to ConductionFiniteDifference. Those fields are ignored in that implementation.
+In some cases, such as radiant systems, a construction will actually have
+resistance wires or hydronic tubing embedded within the construction. Heat is
+then either added or removed from this building element to provide heating or
+cooling to the zone in question. In the case of building-integrated
+photovoltaics, the energy removed in the form of electricity will form a sink.
+It is possible to enter such constructions into EnergyPlus with the syntax
+described below. The internal source capability is available with both the
+\textbf{ConductionTransferFunction} and \textbf{ConductionFiniteDifference}
+solution algorithms. The only difference is that the two dimensional pipe
+arrangements are not available to ConductionFiniteDifference. Those fields are
+ignored in that implementation.
 
 \subsubsection{Inputs}\label{inputs-38}
 
@@ -4049,15 +4059,22 @@ This field defines the distance between adjacent hydronic tubes spaced in the di
 
 This field only has a meaning when the user opts to have a two-dimensional solution in \textbf{\hyperref[field-dimensions-for-the-ctf-calculation]{Dimensions for the CTF Calculation}} above.  It is used in conjunction with the information in \textbf{\hyperref[field-temperature-calculation-requested-after-layer-number]{Temperature Calculation Requested After Layer Number}} above to specify a location for where the simulation will calculate a temperature at the interior of a surface.  The \textbf{\hyperref[field-temperature-calculation-requested-after-layer-number]{Temperature Calculation Requested After Layer Number}} field sets where the position is in the main direction of heat transfer.  This field determines the position of this point in the direction \textbf{perpendicular} to the main direction of heat transfer.  Note that this parameter is a dimensionless value that is allowed to range from 0.0 to 1.0.  A value of 0.0 is used for a position that is in line with the tubing in the construction.  A value of 1.0 is used for a position that is at the mid-point between adjacent tubes.  The user is also given the flexibility to select a point in between those two extremes.
 
-It should also be noted that for values between 0.0 and 1.0 will not allow for exact positioning of the point at which this temperature is calculated.  Instead, it will be used to calculate which node in the state space representation will be used to calculate the temperature.  Currently, EnergyPlus uses seven nodes in the direction perpendicular to the main direction of heat transfer.  In this case, 0.0 represents the first node and 1.0 represents the seventh or last node in the perpendicular direction.  So, this field will be used to determine which node in the direction pendicular to the main direction of heat transfer to use and there are five other nodes (second, third, fourth, fifth, and sixth) that are possible locations.  For example, if the user enters a value of 0.167, the second node will be used.  Likewise, if the user enters a value of 0.1, because this will be closest to the second node, the second node will be used to calculate the internal temperature.  For more information on two-dimensional heat transfer within surfaces using Construction:InternalSource, please refer to the EnergyPlus Engineering Reference.
-
-\paragraph{Field: Outside Layer}\label{field-outside-layer-1}
-
-Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of this construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
-
-\paragraph{Field(s) 2-10: Layers}\label{fields-2-10-layers-1}
-
-The next fields are optional and the number of them showing up in a particular Construction definition depends solely on the number of material layers present in that particular construction. The data expected is identical to the outside layer field (see previous field description). The order of the remaining layers is important and should be listed in order of occurrence from the one just inside the outside layer until the inside layer is reached. As noted above, the inside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+It should also be noted that for values between 0.0 and 1.0 will not allow for
+exact positioning of the point at which this temperature is calculated.
+Instead, it will be used to calculate which node in the state space
+representation will be used to calculate the temperature.  Currently,
+EnergyPlus uses seven nodes in the direction perpendicular to the main
+direction of heat transfer.  In this case, 0.0 represents the first node and
+1.0 represents the seventh or last node in the perpendicular direction.  So,
+this field will be used to determine which node in the direction pendicular to
+the main direction of heat transfer to use and there are five other nodes
+(second, third, fourth, fifth, and sixth) that are possible locations.  For
+example, if the user enters a value of 0.167, the second node will be used.
+Likewise, if the user enters a value of 0.1, because this will be closest to
+the second node, the second node will be used to calculate the internal
+temperature.  For more information on two-dimensional heat transfer within
+surfaces using ConstructionProperty:InternalHeatSource, please refer to the
+EnergyPlus Engineering Reference.
 
 \subsubsection{Outputs}\label{outputs-36-1}
 

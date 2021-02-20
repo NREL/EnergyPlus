@@ -341,6 +341,10 @@ CHECKED_AND_OKED = {
             "heatingDesignlinepassed",
             "coolingDesignlinepassed",
             "desConditionlinepassed"
+        ],
+        "produceDualUnitsFlags": [
+            "produce_Sql",
+            "produce_Tab"
         ]
     },
     "PackagedTerminalHeatPump.cc": {
