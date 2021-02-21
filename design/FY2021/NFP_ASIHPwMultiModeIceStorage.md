@@ -5,9 +5,9 @@
 - February 14, 2021 - Initial Draft
 
 ## Justification for Feature Update
-To assess grid-responsive HVAC flexible measures, we need to simulate modulating coils which accept grid signals to restrict its capacity or shut off. This feature has been implemented in the relevant variable-speed cooling and heating coil objects. On the other hand, during a grid-responsive period, the coil with reduced capacity may operate differently from its normal mode, for example, reduce the air flow ratio relative to its delivered capacity, and thus, the moisture removal may be increased to improve the comfort level, when the zone sensible load can't be met by the reduced capacity. We need to incoporate multi-mode cooling and heating coils with capacity modulation. 
+To assess grid-responsive HVAC flexible measures, we need to simulate modulating coils which accept grid signals to restrict its capacity or shut off. This feature has been implemented in relevant variable-speed cooling and heating coil objects. On the other hand, during a grid-responsive period, a coil with reduced capacity may operate differently from its normal mode, for example, reduce the air flow ratio relative to its delivered capacity, and thus, the moisture removal may be increased to improve the comfort level, when the zone sensible load can't be met by the reduced capacity. We need to incoporate multi-mode cooling and heating coils with capacity modulation. 
 
-EnergyPlus has a single-speed DX cooling coil with ice storage capability. But, it doesn't contain any variable speed coils, i.e. more universal coil objects. it built all the features into one object, while didn't use other EnergyPlus existing features, e.g. ice storage tank, hydronic cooling coil. This development will implement a parent object with a modular structure to manage existing EnergyPlus features for ice storage and delivery. 
+EnergyPlus has a single-speed DX cooling coil with ice storage capability. But, it doesn't contain any variable speed coils, i.e. more universal coil objects. it built all the features into one object, while didn't use other EnergyPlus existing features, e.g. ice storage tank, hydronic cooling coil. This development will implement a parent object with a modular structure to manage existing EnergyPlus features for ice storage and supplemental hydronic cooling. 
 
 Air-source integrated heat pump has already been a collection of coil objects to simulate a multi-functional unit, capable of space cooling, space heating and water heating. We will expand the integrated heat pump object to hold dual-mode cooling and heating coils with ice storage. 
  
@@ -32,7 +32,7 @@ The logic and association of an IHP containing multiple variable-speed cooling c
 
 The IHP will comprise two variable-speed heating coils, i.e. Coil:Heating:DX:VariableSpeed, including a main heating coils and a grid-response heating coil. 
 
-During cooling mode, if a grid-response heating coil object exists and indicates a request of grid-response, i.e. a grid signal falls within a range preventing the normal heating, the IHP will call its grid-response heating coil, which host different sets of performance curves, capacities, heating efficiencies and air flow ratios than the main heating coil. If the grid-response heating coil doesn't exist or respond, the IHP object will call its main heating coil. 
+During heating mode, if a grid-response heating coil object exists and indicates a request of grid-response, i.e. a grid signal falls within a range preventing the normal heating, the IHP will call its grid-response heating coil, which host different sets of performance curves, capacities, heating efficiencies and air flow ratios than the main heating coil. If the grid-response heating coil doesn't exist or respond, the IHP object will call its main heating coil. 
 
 The IHP object will expand to include a variable-speed, air-source chiller, which will charge a ice storage tank defined in the IHP. The chiller can use the same compressor as the main cooling/heating coil, at different time; or a separate vapor compression unit that will operate on its own. The operating speed of the chiller is a user input. 
 
@@ -51,7 +51,7 @@ The curve can be absent, and then, the offset is always zero.
 
 The IHP includes a chilled water coil object. The chilled water coil will be turned on when the grid-response cooling coil or the main cooling coil indicates that an operation with reduced electric power is required; otherwise, the chilled water coil is off. 
 The chilled water coil obtains its energy from the ice/PCM storage tank. 
-It should be noted that a user will also need to define the storage tank and the chilled water coil in a plant loop at the delivery side. The IHP has already created the generation side, and so, there is no need to create the other half plant loop for the chiller charging part. 
+It should be noted that a user will also need to define the storage tank and the chilled water coil in a plant loop at the delivery side. The IHP has already included the generation side, and so, there is no need to create the other half plant loop for the chiller charging part. 
 
 All the water heating functions and controls will be the same, containing  dedicated water heating (DWH), combined space cooling and water heating with full condensing (SCWH), combined space cooling and water heating with desuperheating (SCDWH), and combined space heating and water heating with desuperheating (SHDWH).
 
