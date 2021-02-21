@@ -232,7 +232,6 @@ namespace InternalHeatGains {
         Array1D<Real64> IHGNumbers;
         int IOStat;
         int Loop;
-        bool MustInpSch;
         int NumAlpha;
         int NumNumber;
         int MaxAlpha;
@@ -407,8 +406,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->PeopleObjects(Item).Name = AlphaName(1);
 
@@ -692,9 +690,12 @@ namespace InternalHeatGains {
                     }
 
                     if (NumAlpha > 6) { // Optional parameters present--thermal comfort data follows...
-                        MustInpSch = false;
                         UsingThermalComfort = false;
-                        lastOption = NumAlpha;
+                        if (NumAlpha > 20) {
+                            lastOption = 20;
+                        } else {
+                            lastOption = NumAlpha;
+                        }
 
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
@@ -724,29 +725,36 @@ namespace InternalHeatGains {
 
                                 if (thermalComfortType == "FANGER") {
                                     state.dataHeatBal->People(Loop).Fanger = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     state.dataHeatBal->People(Loop).Pierce = true;
-                                    MustInpSch = true;
+                                    state.dataHeatBal->AnyThermalComfortPierceModel = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     state.dataHeatBal->People(Loop).KSU = true;
-                                    MustInpSch = true;
+                                    state.dataHeatBal->AnyThermalComfortKSUModel = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     state.dataHeatBal->People(Loop).AdaptiveASH55 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_ASH55 = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     state.dataHeatBal->People(Loop).AdaptiveCEN15251 = true;
                                     state.dataHeatBal->AdaptiveComfortRequested_CEN15251 = true;
-                                    MustInpSch = true;
+                                    UsingThermalComfort = true;
+
+                                } else if (thermalComfortType == "COOLINGEFFECTASH55") {
+                                    state.dataHeatBal->People(Loop).CoolingEffectASH55 = true;
+                                    state.dataHeatBal->AnyThermalComfortCoolingEffectModel = true;
+                                    UsingThermalComfort = true;
+
+                                } else if (thermalComfortType == "ANKLEDRAFTASH55") {
+                                    state.dataHeatBal->People(Loop).AnkleDraftASH55 = true;
+                                    state.dataHeatBal->AnyThermalComfortAnkleDraftModel = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
@@ -756,7 +764,7 @@ namespace InternalHeatGains {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(OptionNum) + " Option=" + AlphaName(OptionNum));
                                         ShowContinueError(state,
-                                            "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\"");
+                                            "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\", \"CoolingEffectASH55\", \"AnkleDraftASH55\"");
                                     }
                                 }
                             }
@@ -766,6 +774,8 @@ namespace InternalHeatGains {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
                             state.dataHeatBal->People(Loop).MRTCalcType = ZoneAveraged;
+
+                            bool ModelWithAdditionalInputs = state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU || state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55;
 
                             // MRT Calculation Type and Surface Name
                             {
@@ -777,16 +787,15 @@ namespace InternalHeatGains {
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     state.dataHeatBal->People(Loop).MRTCalcType = SurfaceWeighted;
                                     state.dataHeatBal->People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), Surface);
-                                    if (state.dataHeatBal->People(Loop).SurfacePtr == 0 && (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU)) {
+                                    if (state.dataHeatBal->People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
                                                             '=' + AlphaName(7) + " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
-                                    } else if (Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone != state.dataHeatBal->People(Loop).ZonePtr &&
-                                               (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU)) {
+                                    } else if (Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone != state.dataHeatBal->People(Loop).ZonePtr && ModelWithAdditionalInputs) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
-                                                        cAlphaFieldNames(7) + '=' + AlphaName(8) + " in different zone.");
+                                                        cAlphaFieldNames(7) + '=' + AlphaName(7) + " in different zone.");
                                         ShowContinueError(state, "Surface is in Zone=" + state.dataHeatBal->Zone(Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone).Name + " and " +
                                                           CurrentModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
@@ -797,12 +806,12 @@ namespace InternalHeatGains {
                                     state.dataHeatBal->People(Loop).AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
-                                    if (MustInpSch && Item1 == 1 && (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU))
+                                    if (Item1 == 1 && ModelWithAdditionalInputs)
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                          cAlphaFieldNames(7));
 
                                 } else { // An invalid keyword was entered--warn but ignore
-                                    if (MustInpSch && Item1 == 1 && (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU)) {
+                                    if (Item1 == 1 && ModelWithAdditionalInputs) {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(7) + '=' + AlphaName(7));
                                         ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
@@ -855,7 +864,7 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU)) {
+                            } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
                                                     " is required for this item.");
@@ -869,7 +878,7 @@ namespace InternalHeatGains {
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
                                         state.dataHeatBal->People(Loop).ClothingType = 1;
                                         state.dataHeatBal->People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (state.dataHeatBal->People(Loop).ClothingPtr == 0 && (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU)) {
+                                        if (state.dataHeatBal->People(Loop).ClothingPtr == 0 && ModelWithAdditionalInputs) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                 cAlphaFieldNames(12) + " entered=" + AlphaName(12));
@@ -983,10 +992,28 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU)) {
+                            } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
                                                     " is required for this item.");
+                                    ErrorsFound = true;
+                                }
+                            }
+
+                            int indexAnkleAirVelPtr = 21;
+                            if (!lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "" ) {
+                                state.dataHeatBal->People(Loop).AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
+                                if (state.dataHeatBal->People(Loop).AnkleAirVelocityPtr == 0) {
+                                    if (Item1 == 1) {
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                               cAlphaFieldNames(indexAnkleAirVelPtr) + " entered=" + AlphaName(indexAnkleAirVelPtr));
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            } else if (state.dataHeatBal->People(Loop).AnkleDraftASH55) {
+                                if (Item1 == 1) {
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(indexAnkleAirVelPtr) +
+                                                           " is required for this item.");
                                     ErrorsFound = true;
                                 }
                             }
@@ -1189,8 +1216,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->LightsObjects(Item).Name = AlphaName(1);
 
@@ -1651,8 +1677,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->ZoneElectricObjects(Item).Name = AlphaName(1);
 
@@ -2056,8 +2081,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->ZoneGasObjects(Item).Name = AlphaName(1);
 
@@ -2475,8 +2499,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->HotWaterEqObjects(Item).Name = AlphaName(1);
 
@@ -2879,8 +2902,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->SteamEqObjects(Item).Name = AlphaName(1);
 
@@ -3284,8 +3306,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             state.dataHeatBal->OtherEqObjects(Item).Name = AlphaName(1);
 
@@ -4827,11 +4848,11 @@ namespace InternalHeatGains {
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
                       "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
                       "Number of People,Nominal Maximum Number of People");
-                if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU) {
+                if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU || state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                     print(state.files.eio,
                           ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
-                          "Calculation,KSU Calculation\n");
+                          "Calculation,KSU Calculation,Cooling Effect Calculation,Ankle Draft Calculation\n");
                 } else {
                     print(state.files.eio, "\n");
                 }
@@ -4880,7 +4901,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.4R},", state.dataHeatBal->People(Loop).CO2RateFactor);
             print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMinNumberPeople);
 
-            if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU) {
+            if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU || state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
                 if (state.dataHeatBal->People(Loop).MRTCalcType == ZoneAveraged) {
@@ -4924,6 +4945,16 @@ namespace InternalHeatGains {
                     print(state.files.eio, "No,");
                 }
                 if (state.dataHeatBal->People(Loop).KSU) {
+                    print(state.files.eio, "Yes,");
+                } else {
+                    print(state.files.eio, "No,");
+                }
+                if (state.dataHeatBal->People(Loop).CoolingEffectASH55) {
+                    print(state.files.eio, "Yes,");
+                } else {
+                    print(state.files.eio, "No,");
+                }
+                if (state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                     print(state.files.eio, "Yes\n");
                 } else {
                     print(state.files.eio, "No\n");
@@ -5355,6 +5386,10 @@ namespace InternalHeatGains {
             e.CO2Rate = 0.0;
         }
 
+        for (auto &e : state.dataHeatBal->ZonePreDefRep) {
+            e.NumOcc = 0.0;
+        }
+
         //  QSA = 0.0
 
         // Process Internal Heat Gains, People done below
@@ -5402,6 +5437,7 @@ namespace InternalHeatGains {
 
                 // For predefined tabular reports related to outside air ventilation
                 state.dataHeatBal->ZonePreDefRep(NZ).isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
+                state.dataHeatBal->ZonePreDefRep(NZ).NumOcc += NumberOccupants;
                 state.dataHeatBal->ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * state.dataGlobal->TimeStepZone;
                 state.dataHeatBal->ZonePreDefRep(NZ).NumOccAccumTime += state.dataGlobal->TimeStepZone;
             } else {
