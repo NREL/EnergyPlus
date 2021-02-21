@@ -495,7 +495,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     SurfaceGeometry::AllocateModuleArrays(*state);
 
     //  Adding additional surfaces will change the index of the following based on where the surfaces are added in the array.
-    //	If adding new tests, break here and look at EnergyPlus::DataSurfaces::Surface to see the order.
+    //	If adding new tests, break here and look at EnergyPlus::state->dataSurface->Surface to see the order.
 
     //	enum surfaceShape:Triangle = 1
     //	"Surface 1 - Triangle"

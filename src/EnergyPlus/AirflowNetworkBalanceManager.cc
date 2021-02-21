@@ -101,6 +101,8 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 
 namespace EnergyPlus {
 
@@ -1797,6 +1799,12 @@ namespace AirflowNetworkBalanceManager {
         AirflowNetworkSimu.WPCCntr = Alphas(3);
         AirflowNetworkSimu.HeightOption = Alphas(4);
         AirflowNetworkSimu.BldgType = Alphas(5);
+
+        // Retrieve flag allowing the support of zone equipment
+        AirflowNetworkSimu.AllowSupportZoneEqp = false;
+        if (UtilityRoutines::SameString(Alphas(9), "Yes")) {
+            AirflowNetworkSimu.AllowSupportZoneEqp = true;
+        }
 
         // Find a flag for possible combination of vent and distribution system
         {
@@ -8492,8 +8500,15 @@ namespace AirflowNetworkBalanceManager {
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
             // save values for predefined report
+            Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
+                                        ReportingConstant; // compute volume using standard density air
+            // MJWToDo - Separate AFN Vent and InfilVolFlow
+            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += 0.0;
+            state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += StdDensInfilVolume;
             if (state.dataHeatBal->ZonePreDefRep(i).isOccupied) {
-                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotal += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * state.dataHeatBal->Zone(i).Multiplier * state.dataHeatBal->Zone(i).ListMultiplier;
+                state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * state.dataHeatBal->Zone(i).Multiplier * state.dataHeatBal->Zone(i).ListMultiplier;
                 if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
                     state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * state.dataHeatBal->Zone(i).Multiplier * state.dataHeatBal->Zone(i).ListMultiplier;
                 }
@@ -9455,6 +9470,8 @@ namespace AirflowNetworkBalanceManager {
         using SplitterComponent::GetSplitterNodeNumbers;
         using SplitterComponent::GetSplitterOutletNumber;
         using ZoneDehumidifier::GetZoneDehumidifierNodeNumber;
+        using WaterThermalTanks::GetHeatPumpWaterHeaterNodeNumber;
+        using HVACStandAloneERV::GetStandAloneERVNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("ValidateDistributionSystem: "); // include trailing blank space
@@ -9476,6 +9493,9 @@ namespace AirflowNetworkBalanceManager {
         bool errFlag(false);
         Array1D_int NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
+
+        bool HPWHFound(false);          // Flag for HPWH identification
+        bool StandaloneERVFound(false); // Flag for Standalone ERV (ZoneHVAC:EnergyRecoveryVentilator) identification
 
         // Validate supply and return connections
         NodeFound.dimension(NumOfNodes, false);
@@ -9562,6 +9582,20 @@ namespace AirflowNetworkBalanceManager {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
             if (GetZoneDehumidifierNodeNumber(state, i)) NodeFound(i) = true;
+
+            if (AirflowNetworkSimu.AllowSupportZoneEqp) {
+                // Skip HPWH nodes that don't have to be included in the AFN
+                if (GetHeatPumpWaterHeaterNodeNumber(state, i)) {
+                    NodeFound(i) = true;
+                    HPWHFound = true;
+                }
+
+                // Skip Standalone ERV nodes that don't have to be included in the AFN
+                if (GetStandAloneERVNodeNumber(state, i)) {
+                    NodeFound(i) = true;
+                    StandaloneERVFound = true;
+                }
+            }
 
             for (j = 1; j <= state.dataGlobal->NumOfZones; ++j) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(j).IsControlled) continue;
@@ -9672,6 +9706,12 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
             }
+        }
+        if (HPWHFound) {
+            ShowWarningError(state, "ValidateDistributionSystem: Heat pump water heater is simulated along with an AirflowNetwork but is not included in the AirflowNetwork.");
+        }
+        if (StandaloneERVFound) {
+            ShowWarningError(state, "ValidateDistributionSystem: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an AirflowNetwork but is not included in the AirflowNetwork.");
         }
         NodeFound.deallocate();
 

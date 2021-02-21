@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    state->dataHeatBal->AnyConstructInternalSourceInInput = true;
+    state->dataHeatBal->AnyInternalHeatSourceInInput = true;
 
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
 
@@ -1946,7 +1946,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
     state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
-    state->dataHeatBal->AnyConstructInternalSourceInInput = true;
+    state->dataHeatBal->AnyInternalHeatSourceInInput = true;
 
     state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(1).HeatTransSurf = true;

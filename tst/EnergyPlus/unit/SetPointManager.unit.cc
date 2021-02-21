@@ -306,7 +306,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
                                                       "Dimensionless;           !- Input Unit Type for z",
                                                       "Curve:QuadLinear,",
                                                       "OptCondEntCurveName,     !- Name",
-                                                      "12.2711,                 !- Coefficient1 Constant",
+                                                      "13.2711,                 !- Coefficient1 Constant",
                                                       "0.8,                     !- Coefficient2 w",
                                                       "6.6667,                  !- Coefficient3 x",
                                                       "0.266,                   !- Coefficient4 y",

@@ -19,8 +19,8 @@ which requires (see page 14) that glazing should have an interior shade coeffici
 winter.
 
 When trying to implement this using multiple WindowShadingControl objects, each using a scheduled shading 
-control, to reference a single window now produces an error (“Fenestration surface named "FOOBAR" appears on
-more than one WindowShadingControl list”). 
+control, to reference a single window now produces an error ("Fenestration surface named "FOOBAR" appears on
+more than one WindowShadingControl list"). 
 
 The second request is related to allowing multiple WindowMaterial:* objects to be used for a window. This would allow 
 EnergyPlus to model a window with, for example, both insect screens and interior shades. This requirement is prompted by
@@ -38,8 +38,8 @@ No changes were based on the feedback from the reviewers of the intial NFP.
 ## Overview ##
 
 Address the first request to allow multiple WindowShadingControl object to be used for a single window and not produce
-an error. Error message that is currently produced “Fenestration surface named "FOOBAR" appears on
-more than one WindowShadingControl list” will be removed to accommodate residential buildings where 
+an error. Error message that is currently produced "Fenestration surface named "FOOBAR" appears on
+more than one WindowShadingControl list" will be removed to accommodate residential buildings where 
 interior shading is defined by summer and winter shading factors. 
 
 Also, where multiple WindowShadingControls each deploy the same shade on the same window(s) in a zone, no error 

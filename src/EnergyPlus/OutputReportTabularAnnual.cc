@@ -624,16 +624,29 @@ namespace OutputReportTabularAnnual {
 
     void WriteAnnualTables(EnergyPlusData &state)
     {
-        // Jason Glazer, August 2015
-        // This function is not part of the class but acts as an interface between procedural code and the class by
-        // invoking the writeTable member function for each of the AnnualTable objects
-        std::vector<AnnualTable>::iterator annualTableIt;
-        for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
-            annualTableIt->writeTable(state, state.dataOutRptTab->unitsStyle);
+        for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+            OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
+            bool produceTabular = true;
+            bool produceSQLite = false;
+            if (produceDualUnitsFlags(iUnitSystem,
+                                      state.dataOutRptTab->unitsStyle,
+                                      state.dataOutRptTab->unitsStyle_SQLite,
+                                      unitsStyle_cur,
+                                      produceTabular,
+                                      produceSQLite))
+                break;
+
+            // Jason Glazer, August 2015
+            // This function is not part of the class but acts as an interface between procedural code and the class by
+            // invoking the writeTable member function for each of the AnnualTable objects
+            std::vector<AnnualTable>::iterator annualTableIt;
+            for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
+                annualTableIt->writeTable(state, unitsStyle_cur, produceTabular, produceSQLite);
+            }
         }
     }
 
-    void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle)
+    void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para)
     {
         Array1D_string columnHead;
         Array1D_int columnWidth;
@@ -662,7 +675,7 @@ namespace OutputReportTabularAnnual {
         Real64 energyUnitsConversionFactor = AnnualTable::setEnergyUnitStringAndFactor(unitsStyle, energyUnitsString);
 
         // Compute the columns related to the binning schemes
-        computeBinColumns(state);
+        computeBinColumns(state, unitsStyle);
 
         // Use title case names of variables if available for column headers
         columnHeadersToTitleCase(state);
@@ -921,11 +934,15 @@ namespace OutputReportTabularAnnual {
                        curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev) {
             }
         } // fldStIt
-        OutputReportTabular::WriteReportHeaders(state, m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
-        OutputReportTabular::WriteSubtitle(state, "Custom Annual Report");
-        OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
-        if (sqlite) {
-            sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
+        if (produceTabular_para) {
+            OutputReportTabular::WriteReportHeaders(state, m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
+            OutputReportTabular::WriteSubtitle(state, "Custom Annual Report");
+            OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
+        }
+        if (produceSQLite_para) {
+            if (sqlite) {
+                sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
+            }
         }
         // for the new binning aggregation types create a second table of the bin ranges
         if (createBinRangeTable) {
@@ -968,10 +985,16 @@ namespace OutputReportTabularAnnual {
                         tableBodyRange(iBin + 1, 2) =
                             OutputReportTabular::RealToStr(binBottom + float(iBin + 1) * intervalSize, fldStIt->m_showDigits);
                     }
-                    OutputReportTabular::WriteSubtitle(state, "Bin Sizes for: " + fldStIt->m_colHead);
-                    OutputReportTabular::WriteTable(state, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
-                    if (sqlite) {
-                        sqlite->createSQLiteTabularDataRecords(tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
+                    if (produceTabular_para) {
+                        OutputReportTabular::WriteSubtitle(state, "Bin Sizes for: " + fldStIt->m_colHead);
+                        OutputReportTabular::WriteTable(
+                            state, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
+                    }
+                    if (produceSQLite_para) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
+                        }
                     }
                 }
             }
@@ -1166,7 +1189,7 @@ namespace OutputReportTabularAnnual {
                      << "</a>    |   \n";
     }
 
-    void AnnualTable::computeBinColumns(EnergyPlusData &state)
+    void AnnualTable::computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const& unitsStyle_para)
     {
         std::vector<AnnualFieldSet>::iterator fldStIt;
         Real64 const veryLarge = 1.0E280;
@@ -1182,7 +1205,7 @@ namespace OutputReportTabularAnnual {
                 curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev) {
                 // the size the deferred vectors should be same for all rows
                 if (allRowsSameSizeDefferedVectors(fldStIt)) {
-                    convertUnitForDeferredResults(state, fldStIt, state.dataOutRptTab->unitsStyle);
+                    convertUnitForDeferredResults(state, fldStIt, unitsStyle_para);
                     std::vector<Real64> deferredTotalForColumn;
                     Real64 minVal = veryLarge;
                     Real64 maxVal = verySmall;

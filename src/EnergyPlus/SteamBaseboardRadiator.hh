@@ -68,6 +68,8 @@ namespace SteamBaseboardRadiator {
         // Members
         std::string EquipID;
         int EquipType;
+        std::string designObjectName;   // Design Object
+        int DesignObjectPtr;
         std::string Schedule;
         Array1D_string SurfaceName;
         Array1D_int SurfacePtr;
@@ -80,7 +82,6 @@ namespace SteamBaseboardRadiator {
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 DegOfSubcooling;      // Temperature differences due to subcooling of the condensate [C]
-        Real64 Offset;               // Control accuracy
         Real64 SteamMassFlowRate;    // Mass flow rate of steam passing through the heater [kg/s]
         Real64 SteamMassFlowRateMax; // Maximum mass flow rate of steam [kg/s]
         Real64 SteamVolFlowRateMax;  // Maximum volumetric flow rate of steam [m3/s]
@@ -111,20 +112,36 @@ namespace SteamBaseboardRadiator {
         int BBLoadReSimIndex;
         int BBMassFlowReSimIndex;
         int BBInletTempFlowReSimIndex;
-        int HeatingCapMethod; // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity,
-                              // CapacityPerFloorArea, FracOfAutosizedHeatingCapacity)
         Real64 ScaledHeatingCapacity; // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC
                                       // equipment, {-}, or {W/m2}
 
         // Default Constructor
         SteamBaseboardParams()
-            : EquipType(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0), TotSurfToDistrib(0), FluidIndex(0), ControlCompTypeNum(0),
-              CompErrIndex(0), DegOfSubcooling(0.0), Offset(0.0), SteamMassFlowRate(0.0), SteamMassFlowRateMax(0.0), SteamVolFlowRateMax(0.0),
+            : EquipType(0), DesignObjectPtr(0), ZonePtr(0), SchedPtr(0), SteamInletNode(0), SteamOutletNode(0), TotSurfToDistrib(0), FluidIndex(0), ControlCompTypeNum(0),
+              CompErrIndex(0), DegOfSubcooling(0.0), SteamMassFlowRate(0.0), SteamMassFlowRateMax(0.0), SteamVolFlowRateMax(0.0),
               SteamOutletTemp(0.0), SteamInletTemp(0.0), SteamInletEnthalpy(0.0), SteamOutletEnthalpy(0.0), SteamInletPress(0.0),
               SteamOutletPress(0.0), SteamInletQuality(0.0), SteamOutletQuality(0.0), FracRadiant(0.0), FracConvect(0.0), FracDistribPerson(0.0),
               TotPower(0.0), Power(0.0), ConvPower(0.0), RadPower(0.0), TotEnergy(0.0), Energy(0.0), ConvEnergy(0.0), RadEnergy(0.0), LoopNum(0),
               LoopSideNum(0), BranchNum(0), CompNum(0), BBLoadReSimIndex(0), BBMassFlowReSimIndex(0), BBInletTempFlowReSimIndex(0),
-              HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
+             ScaledHeatingCapacity(0.0)
+        {
+        }
+    };
+
+    struct SteamBaseboardDesignData : SteamBaseboardParams
+    {
+        // Members
+        std::string designName;
+        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea,
+        // FracOfAutosizedHeatingCapacity)
+        Real64 DesignScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
+        Real64 Offset;
+        Real64 FracRadiant;
+        Real64 FracDistribPerson;
+
+        // Default Constructor
+        SteamBaseboardDesignData()
+                : HeatingCapMethod(0), DesignScaledHeatingCapacity(0.0), Offset(0.0), FracRadiant(0.0), FracDistribPerson(0.0)
         {
         }
     };
@@ -136,6 +153,17 @@ namespace SteamBaseboardRadiator {
 
         // Default Constructor
         SteamBaseboardNumericFieldData()
+        {
+        }
+    };
+
+    struct SteamBaseboardDesignNumericFieldData
+    {
+        // Members
+        Array1D_string FieldNames;
+
+        // Default Constructor
+        SteamBaseboardDesignNumericFieldData()
         {
         }
     };
@@ -180,7 +208,9 @@ namespace SteamBaseboardRadiator {
 struct SteamBaseboardRadiatorData : BaseGlobalStruct {
 
     std::string const cCMO_BBRadiator_Steam = "ZoneHVAC:Baseboard:RadiantConvective:Steam";
+    std::string const cCMO_BBRadiator_Steam_Design = "ZoneHVAC:Baseboard:RadiantConvective:Steam:Design";
     int NumSteamBaseboards = 0;
+    int NumSteamBaseboardsDesign = 0;
     int SteamIndex = 0;
 
     Array1D<Real64> QBBSteamRadSource;    // Need to keep the last value in case we are still iterating
@@ -194,6 +224,7 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct {
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
+    Array1D_bool CheckDesignObjectName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
 
     bool GetInputFlag = true;       // one time get input flag
@@ -201,7 +232,9 @@ struct SteamBaseboardRadiatorData : BaseGlobalStruct {
     bool ZoneEquipmentListChecked = false;
 
     Array1D<SteamBaseboardRadiator::SteamBaseboardParams> SteamBaseboard;
+    Array1D<SteamBaseboardRadiator::SteamBaseboardDesignData> SteamBaseboardDesign;
     Array1D<SteamBaseboardRadiator::SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
+    Array1D<SteamBaseboardRadiator::SteamBaseboardDesignNumericFieldData> SteamBaseboardDesignNumericFields;
 
     void clear_state() override
     {

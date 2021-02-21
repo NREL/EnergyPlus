@@ -2734,7 +2734,11 @@ c\(_{p,c}\) is specific heat of chilled water at reference condition (5\(^{\circ
 TubeLength = \frac{{TotalSurfaceArea}}{{TubeSpacing}}
 \end{equation}
 
-Note that tube spacing is determined by the Tube Spacing field of the Construction:InternalSource input used to define the radiant surface(s) of this system.  If the user has entered a spacing that is less than 0.01m or more than 1.0m, the sizing calculation will assume that the spacing is equal to 0.15m.
+Note that tube spacing is determined by the Tube Spacing field of the
+ConstructionProperty:InternalHeatSource input used to define the radiant
+surface(s) of this system.  If the user has entered a spacing that is less
+than 0.01m or more than 1.0m, the sizing calculation will assume that the
+spacing is equal to 0.15m.
 
 \subsubsection{ZoneHVAC:LowTemperatureRadiant:ConstantFlow}\label{zonehvaclowtemperatureradiantconstantflow}
 
