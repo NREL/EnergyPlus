@@ -20223,8 +20223,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = false;
 
     // Create Fans
-    float supplyFlowRate = 0.005;
-    float exhaustFlowRate = 0.005;
+    Real64 supplyFlowRate = 0.005;
+    Real64  exhaustFlowRate = 0.005;
     Fan.allocate(2);
     Fan(1).InletNodeNum = 2;
     Fan(1).OutletNodeNum = 3;
@@ -20360,8 +20360,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
 
     // Create Fans
-    float supplyFlowRate = 0.005;
-    float exhaustFlowRate = 0.005;
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.005;
     Fan.allocate(2);
     Fan(1).InletNodeNum = 2;
     Fan(1).OutletNodeNum = 3;
@@ -20488,8 +20488,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
 
     // Create Fans
-    float supplyFlowRate = 0.005;
-    float exhaustFlowRate = 0.003;
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.003;
     Fan.allocate(2);
     Fan(1).InletNodeNum = 2;
     Fan(1).OutletNodeNum = 3;
