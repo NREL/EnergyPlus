@@ -214,12 +214,12 @@ losses_t::losses_t(const std::vector<double>& monthly_charge, const std::vector<
     initialize();
 }
 
-//losses_t::losses_t(const std::vector<double>& schedule_loss) {
-//    params = std::make_shared<losses_params>();
-//    params->loss_choice = losses_params::SCHEDULE;
-//    params->schedule_loss = schedule_loss;
-//    initialize();
-//}
+losses_t::losses_t(const std::vector<double>& schedule_loss) {
+    params = std::make_shared<losses_params>();
+    params->loss_choice = losses_params::SCHEDULE;
+    params->schedule_loss = schedule_loss;
+    initialize();
+}
 
 losses_t::losses_t(std::shared_ptr<losses_params> p) {
     params = std::move(p);
