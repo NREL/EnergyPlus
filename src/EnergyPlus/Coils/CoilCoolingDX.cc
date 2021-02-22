@@ -902,21 +902,21 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlus::EnergyPlusData &state) 
                   coil.performance.standardRatingSEER * ConvFromSIToIP,
                   coil.performance.standardRatingIEER * ConvFromSIToIP);
 
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, coil.name,
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, coil.name,
                                                      "Coil:Cooling:DX");
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilNetCapSI, coil.name,
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, coil.name,
                                                      coil.performance.standardRatingCoolingCapacity, 1);
             // W/W is the same as Btuh/Btuh so that's fine too
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, coil.name,
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, coil.name,
                                                      coil.performance.standardRatingEER, 2);
             // Btu/W-h will convert to itself
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, coil.name,
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, coil.name,
                                                      coil.performance.standardRatingEER * ConvFromSIToIP, 2);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERUserIP, coil.name,
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, coil.name,
                                                      coil.performance.standardRatingSEER * ConvFromSIToIP, 2);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, coil.name,
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, coil.name,
                                                      coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
-            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil,
+            OutputReportPredefined::addFootNoteSubTable(state, state.dataOutRptPredefined->pdstDXCoolCoil,
                                                         "ANSI/AHRI ratings account for supply air fan heat and electric power.");
         }
     }

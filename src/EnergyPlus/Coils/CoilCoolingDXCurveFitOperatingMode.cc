@@ -169,13 +169,13 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlu
 void CoilCoolingDXCurveFitOperatingMode::oneTimeInit(EnergyPlus::EnergyPlusData &state)
 {
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-        SetupEMSActuator(this->object_name,
+        SetupEMSActuator(state, this->object_name,
                          this->name,
                          "Autosized Rated Air Flow Rate",
                          "[m3/s]",
                          this->ratedAirVolFlowEMSOverrideON,
                          this->ratedAirVolFlowEMSOverrideValue);
-        SetupEMSActuator(this->object_name,
+        SetupEMSActuator(state, this->object_name,
                          this->name,
                          "Autosized Rated Total Cooling Capacity",
                          "[W]",
