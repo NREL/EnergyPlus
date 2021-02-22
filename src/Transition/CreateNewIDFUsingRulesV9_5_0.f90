@@ -386,6 +386,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with A, insert the rules here
 
               ! If your original object starts with C, insert the rules here
+              
              CASE('CONSTRUCTION:AIRBOUNDARY')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  nodiff=.false.
@@ -497,6 +498,23 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  ! Write the new curve object
                  CALL WriteOutIDFLines(DifLfn,ObjectName,14,OutArgs,NwFldNames,NwFldUnits)
                  Written = .true.
+                 
+             CASE('CONSTRUCTION:INTERNALSOURCE')
+                 ! Do not write the old object
+                 Written=.true.
+                 
+                CALL GetNewObjectDefInIDD('ConstructionProperty:InternalHeatSource',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1) = TRIM(InArgs(1)) // ' Heat Source'
+                OutArgs(2) = InArgs(1)
+                OutArgs(3:7) =  InArgs(2:6)
+                CALL WriteOutIDFLines(DifLfn,'ConstructionProperty:InternalHeatSource',NwNumArgs,OutArgs,NwFldNames,NwFldUnits)
+                
+                CALL GetNewObjectDefInIDD('Construction',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! Construction object has five fewer fields than the incoming Construction:InternalSource object
+                NwNumArgs = CurArgs - 5
+                OutArgs(1) = InArgs(1)
+                OutArgs(2:NwNumArgs) = InArgs(7:CurArgs)
+                CALL WriteOutIDFLines(DifLfn,'Construction',NwNumArgs,OutArgs,NwFldNames,NwFldUnits)
                  
               ! If your original object starts with D, insert the rules here
 
@@ -613,6 +631,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
+             CASE('ZONEAIRMASSFLOWCONSERVATION')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                 IF (OutArgs(1) == "YES" .OR. OutArgs(1) == "Yes" .OR. OutArgs(1) == "yes") THEN
+                     OutArgs(1) = "AdjustMixingOnly"
+                 END IF
+                 IF (OutArgs(1) == "NO" .OR. OutArgs(1) == "No" .OR. OutArgs(1) == "no") THEN
+                     OutArgs(1) = "None"
+                 END IF
+				 
               CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1)=InArgs(1)

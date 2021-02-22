@@ -122,7 +122,7 @@ namespace OutputReportTabularAnnual {
 
         void resetGathering();
 
-        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle);
+        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para);
 
         void addTableOfContents(std::ostream &);
 
@@ -149,7 +149,7 @@ namespace OutputReportTabularAnnual {
 
         Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns(EnergyPlusData &state);
+        void computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para);
 
         std::vector<std::string> setupAggString();
 

@@ -1621,6 +1621,7 @@ namespace EnergyPlus::SizingManager {
                                                                      VbzByZone(termUnitSizingIndex) /
                                                                          TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling,
                                                                      4); // Voz-clg
+                            
                         }
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zvpHtEz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
@@ -1715,11 +1716,12 @@ namespace EnergyPlus::SizingManager {
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  VpzMinClgByZone(termUnitSizingIndex),
                                                                  4); // Vpz-min
+                        Real64 VozClg = 0.0;
                         if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling > 0.0) {
+                            VozClg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
                             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVozclg,
                                                                      TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                     VbzByZone(termUnitSizingIndex) /
-                                                                         TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling,
+                                                                     VozClg,
                                                                      4); // Voz-clg
                         }
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdZpz,
@@ -1776,13 +1778,21 @@ namespace EnergyPlus::SizingManager {
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  VpzMinHtgByZone(termUnitSizingIndex),
                                                                  4); // Vpz-min
+                        Real64 VozHtg = 0.0;
                         if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating != 0.0) {
+                            VozHtg = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
                             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zhdVozhtg,
                                                                      TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                     VbzByZone(termUnitSizingIndex) /
-                                                                         TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating,
+                                                                     VozHtg,
                                                                      4); // Voz-htg
                         }
+                        // Outdoor Air Details Report - Design Zone Outdoor Airflow - Voz
+                        Real64 VozMax = std::max(VozHtg, VozClg);  // take larger of the heating and cooling Voz values
+                        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvDesZnOa,
+                            TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
+                            VozMax,
+                            4);
+                        state.dataOutRptPredefined->TotalVozMax += VozMax * DataHeatBalance::Zone(zoneNum).Multiplier * DataHeatBalance::Zone(zoneNum).ListMultiplier;
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zhdZpz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZpzHtgByZone,
@@ -1877,6 +1887,8 @@ namespace EnergyPlus::SizingManager {
                                                      4); // Voz-htg
             OutputReportPredefined::PreDefTableEntry(state,
                 state.dataOutRptPredefined->pdchS62shdEvz, FinalSysSizing(AirLoopNum).AirPriLoopName, EvzMinBySysHeat(AirLoopNum), 4); // Evz-min
+
+
         } // loop over air loops for table writing
     }
 
