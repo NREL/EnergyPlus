@@ -1446,7 +1446,7 @@ namespace UFADManager {
         int ZoneNodeNum;                 // node number of the HVAC zone node
         static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29,
+        static Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
