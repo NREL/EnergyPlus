@@ -442,7 +442,11 @@ battery_t::battery_t(double dt_hr, int chem, capacity_t *capacity_model, voltage
     voltage = std::unique_ptr<voltage_t>(voltage_model);
     lifetime = std::unique_ptr<lifetime_t>(lifetime_model);
     thermal = std::unique_ptr<thermal_t>(thermal_model);
-    losses = std::unique_ptr<losses_t>(losses_model);
+    if (losses_model == nullptr) {
+        losses = std::unique_ptr<losses_t>(new losses_t());
+    } else {
+        losses = std::unique_ptr<losses_t>(losses_model);
+    }
 
     state = std::make_shared<battery_state>(capacity->state, voltage->state, thermal->state, lifetime->state, losses->state);
     params = std::make_shared<battery_params>(capacity->params, voltage->params, thermal->params, lifetime->params, losses->params);

@@ -3199,7 +3199,6 @@ ElectricStorage::ElectricStorage( // main constructor
                     util::matrix_t<double> battLifetimeMatrix(6, 3, &tblVals);
                     battLifetime = new lifetime_calendar_cycle_t(battLifetimeMatrix, DataHVACGlobals::TimeStepSys);
                 }
-                std::vector<double> batt_losses{0};  // using double because SSC expects a double
 
                 // Create the SSC battery object
                 ssc_battery_ = std::unique_ptr<battery_t>(
@@ -3237,7 +3236,7 @@ ElectricStorage::ElectricStorage( // main constructor
                             liIon_heatTransferCoef_,
                             20.0  // Picking a temperature for now, will reset before each run.
                         ),
-                        new losses_t(batt_losses)
+                        nullptr
                     )
                 );
                 ssc_lastBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
