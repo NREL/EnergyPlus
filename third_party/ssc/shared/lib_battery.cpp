@@ -598,7 +598,8 @@ double battery_t::run(size_t lifetimeIndex, double &I) {
         runThermalModel(I, lifetimeIndex);
         runCapacityModel(I);
 
-        if (fabs(I - I_initial) / fabs(I_initial) > tolerance) {
+        double numerator = fabs(I - I_initial);
+        if ((numerator > 0.0) && (numerator / fabs(I_initial) > tolerance)) {
             *thermal->state = thermal_initial;
             *capacity->state = capacity_initial;
             I_initial = I;
