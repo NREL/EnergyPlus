@@ -133,7 +133,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
     {
         int brIdentity(0);
 
-        int branchTotalComp = DataPlant::PlantLoop(calledFromLocation.loopNum)
+        int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
                                   .LoopSide(calledFromLocation.loopSideNum)
                                   .Branch(calledFromLocation.branchNum)
                                   .TotalComponents;
@@ -143,7 +143,7 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
            // state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
 
         for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
-            int compInletNodeNum = DataPlant::PlantLoop(calledFromLocation.loopNum)
+            int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
                                        .LoopSide(calledFromLocation.loopSideNum)
                                        .Branch(calledFromLocation.branchNum)
                                        .Comp(iComp)
