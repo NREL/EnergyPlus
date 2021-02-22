@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,8 +56,8 @@
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -69,8 +69,6 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -455,7 +453,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -714,7 +712,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfNum = 1;
     DataSurfaces::Surface.allocate(SurfNum);
     DataSurfaces::Surface(SurfNum).Zone = 1;
-    DataRoomAirModel::AirModel.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(1);
     EnergyPlus::DataHeatBalance::TempEffBulkAir.allocate(1);
     EnergyPlus::DataHeatBalance::TempEffBulkAir(1) = 1.0;
     SurfTemp.allocate(1);
@@ -732,7 +730,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     DataSurfaces::Surface(SurfNum).HeatTransSurf = true;
     DataSurfaces::Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
     DataSurfaces::Surface(SurfNum).IntConvCoeff = 0.0;
-    DataRoomAirModel::AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel_UCSDDV;
+    state->dataRoomAirMod->AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
     DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
@@ -743,7 +741,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     DataSurfaces::Surface(SurfNum).HeatTransSurf = true;
     DataSurfaces::Surface(SurfNum).TAirRef = DataSurfaces::AdjacentAirTemp;
     DataSurfaces::Surface(SurfNum).IntConvCoeff = 0.0;
-    DataRoomAirModel::AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel_UCSDCV;
+    state->dataRoomAirMod->AirModel(DataSurfaces::Surface(SurfNum).Zone).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
     DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
@@ -999,7 +997,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1056,7 +1054,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1113,7 +1111,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1170,7 +1168,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1227,7 +1225,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1284,7 +1282,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData1(*state);
+    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1951,4 +1949,72 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     ASSERT_EQ(algorithm_identifier, HcExt_NaturalWaltonUnstableHorizontalOrTilt);
 
     DataHeatBalSurface::TempSurfInTmp.deallocate();
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
+{
+    Real64 Tsurf;
+    Real64 Tair;
+    Real64 AirStreamV;
+    Real64 Tilt;
+    Real64 Hin;
+
+    DataSurfaces::Surface.allocate(3);
+    DataHeatBalance::Zone.allocate(3);
+
+    // Horizontal Roof, heat flow down
+    DataSurfaces::Surface(1).Zone = 1;
+    DataHeatBalance::Zone(1).Volume = 1000;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
+    DataSurfaces::Surface(1).Tilt = 0;
+    DataSurfaces::Surface(1).Area = 100;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).WindSpeed = 1;
+
+    Tsurf = 18.0;
+    Tair = 15.0;
+    AirStreamV = 2.0;
+    Tilt = DataSurfaces::Surface(1).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(1, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 1.977, 0.001);
+
+    //Pitched Roof, heat flow up
+    DataSurfaces::Surface(2).Zone = 2;
+    DataHeatBalance::Zone(2).Volume = 1000;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Roof;
+    DataSurfaces::Surface(2).Tilt = 20;
+    DataSurfaces::Surface(2).Area = 100;
+    DataSurfaces::Surface(2).ExtBoundCond = 0;
+    DataSurfaces::Surface(2).WindSpeed = 1;
+    DataSurfaces::Surface(2).Height = 8;
+
+    Tsurf = 15.0;
+    Tair = 18.0;
+    AirStreamV = 2.0;
+    Tilt = DataSurfaces::Surface(2).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(2, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 2.666, 0.001);
+    
+    // Vertical Wall
+    DataSurfaces::Surface(3).Zone = 3;
+    DataHeatBalance::Zone(3).Volume = 1000;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Wall;
+    DataSurfaces::Surface(3).Tilt = 90;
+    DataSurfaces::Surface(3).Area = 100;
+    DataSurfaces::Surface(3).ExtBoundCond = 1;
+    DataSurfaces::Surface(3).Height = 3;
+
+    Tsurf = 15.0;
+    Tair = 18.0;
+    AirStreamV = 0.0055;
+    Tilt = DataSurfaces::Surface(3).Tilt;
+
+    Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(3, Tsurf, Tair, AirStreamV, Tilt);
+
+    EXPECT_NEAR(Hin, 1.756, 0.001);
+
 }

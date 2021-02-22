@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,13 +57,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -246,7 +245,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);
 
-        // FLOW:
+
 
         GetAirFlowFlag(state, ErrorsFound);
 
@@ -317,7 +316,7 @@ namespace HeatBalanceAirManager {
 
         // flow
 
-        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
+        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
             for (Loop = 1; Loop <= TotMixing; ++Loop) {
                 ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
                 ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
@@ -992,7 +991,7 @@ namespace HeatBalanceAirManager {
                         } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                             if (Infiltration(Loop).ZonePtr != 0) {
                                 if (rNumericArgs(4) >= 0.0) {
-                                    Infiltration(Loop).DesignLevel = rNumericArgs(4) * Zone(Infiltration(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
+                                    Infiltration(Loop).DesignLevel = rNumericArgs(4) * Zone(Infiltration(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
                                     if (Zone(Infiltration(Loop).ZonePtr).Volume <= 0.0) {
                                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + Infiltration(Loop).Name + "\", " +
                                                          cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
@@ -1271,7 +1270,7 @@ namespace HeatBalanceAirManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Zone Infiltration",
+                SetupEMSActuator(state, "Zone Infiltration",
                                  Infiltration(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
@@ -1470,7 +1469,7 @@ namespace HeatBalanceAirManager {
                         } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                             if (Ventilation(Loop).ZonePtr != 0) {
                                 if (rNumericArgs(4) >= 0.0) {
-                                    Ventilation(Loop).DesignLevel = rNumericArgs(4) * Zone(Ventilation(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
+                                    Ventilation(Loop).DesignLevel = rNumericArgs(4) * Zone(Ventilation(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
                                     if (Zone(Ventilation(Loop).ZonePtr).Volume <= 0.0) {
                                         ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + Ventilation(Loop).Name + "\", " +
                                                          cAlphaFieldNames(4) + " specifies " + cNumericFieldNames(4) +
@@ -1955,7 +1954,7 @@ namespace HeatBalanceAirManager {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("Zone Ventilation",
+                        SetupEMSActuator(state, "Zone Ventilation",
                                          Ventilation(Loop).Name,
                                          "Air Exchange Flow Rate",
                                          "[m3/s]",
@@ -2028,7 +2027,7 @@ namespace HeatBalanceAirManager {
             }
 
             Ventilation(VentiCount).OpenEff = rNumericArgs(2);
-            if (Ventilation(VentiCount).OpenEff != DataGlobalConstants::AutoCalculate() &&
+            if (Ventilation(VentiCount).OpenEff != DataGlobalConstants::AutoCalculate &&
                 (Ventilation(VentiCount).OpenEff < 0.0 || Ventilation(VentiCount).OpenEff > 1.0)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(2) +
                                 " must be between 0 and 1.");
@@ -2049,7 +2048,7 @@ namespace HeatBalanceAirManager {
             }
 
             Ventilation(VentiCount).DiscCoef = rNumericArgs(5);
-            if (Ventilation(VentiCount).DiscCoef != DataGlobalConstants::AutoCalculate() &&
+            if (Ventilation(VentiCount).DiscCoef != DataGlobalConstants::AutoCalculate &&
                 (Ventilation(VentiCount).DiscCoef < 0.0 || Ventilation(VentiCount).DiscCoef > 1.0)) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(5) +
                                 " must be between 0 and 1.");
@@ -2388,7 +2387,7 @@ namespace HeatBalanceAirManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("Zone Ventilation",
+                SetupEMSActuator(state, "Zone Ventilation",
                                  Ventilation(VentiCount).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
@@ -2500,7 +2499,7 @@ namespace HeatBalanceAirManager {
                 } else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                     if (Mixing(Loop).ZonePtr != 0) {
                         if (rNumericArgs(4) >= 0.0) {
-                            Mixing(Loop).DesignLevel = rNumericArgs(4) * Zone(Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
+                            Mixing(Loop).DesignLevel = rNumericArgs(4) * Zone(Mixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
                             if (Zone(Mixing(Loop).ZonePtr).Volume <= 0.0) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                                  " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Mixing will result.");
@@ -2756,7 +2755,7 @@ namespace HeatBalanceAirManager {
                 }
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("ZoneMixing",
+                SetupEMSActuator(state, "ZoneMixing",
                                  Mixing(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
@@ -2963,7 +2962,7 @@ namespace HeatBalanceAirManager {
                     else if (SELECT_CASE_var == "AIRCHANGES/HOUR") {
                         if (CrossMixing(Loop).ZonePtr != 0) {
                             if (rNumericArgs(4) >= 0.0) {
-                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour();
+                                CrossMixing(Loop).DesignLevel = rNumericArgs(4) * Zone(CrossMixing(Loop).ZonePtr).Volume / DataGlobalConstants::SecInHour;
                                 if (Zone(CrossMixing(Loop).ZonePtr).Volume <= 0.0) {
                                     ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(4) +
                                         " specifies " + cNumericFieldNames(4) + ", but Zone Volume = 0.  0 Cross Mixing will result.");
@@ -3292,7 +3291,7 @@ namespace HeatBalanceAirManager {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("ZoneCrossMixing",
+                SetupEMSActuator(state, "ZoneCrossMixing",
                                  CrossMixing(Loop).Name,
                                  "Air Exchange Flow Rate",
                                  "[m3/s]",
@@ -3558,7 +3557,7 @@ namespace HeatBalanceAirManager {
                     }
                 }
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("ZoneRefDoorMixing",
+                    SetupEMSActuator(state, "ZoneRefDoorMixing",
                                      RefDoorMixing(ZoneNumA).Name,
                                      "Air Exchange Flow Rate",
                                      "[m3/s]",
@@ -3630,7 +3629,7 @@ namespace HeatBalanceAirManager {
                     }
                 }
                 if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                    SetupEMSActuator("ZoneRefDoorMixing",
+                    SetupEMSActuator(state, "ZoneRefDoorMixing",
                                      RefDoorMixing(ZoneNumB).Name,
                                      "Air Exchange Flow Rate",
                                      "[m3/s]",
@@ -3680,7 +3679,7 @@ namespace HeatBalanceAirManager {
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Infiltration(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).ExteriorTotalSurfArea, Infiltration(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Infiltration(Loop).DesignLevel * DataGlobalConstants::SecInHour());
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Infiltration(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
             print(state.files.eio, "{:.3R},", Infiltration(Loop).ConstantTermCoef);
             print(state.files.eio, "{:.3R},", Infiltration(Loop).TemperatureTermCoef);
@@ -3721,7 +3720,7 @@ namespace HeatBalanceAirManager {
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Ventilation(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, Ventilation(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Ventilation(Loop).DesignLevel * DataGlobalConstants::SecInHour());
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Ventilation(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
             if (Ventilation(Loop).FanType == ExhaustVentilation) {
                 print(state.files.eio, "Exhaust,");
@@ -3788,7 +3787,7 @@ namespace HeatBalanceAirManager {
             print(state.files.eio, "{:.3R},", Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Mixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, Mixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Mixing(Loop).DesignLevel * DataGlobalConstants::SecInHour());
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, Mixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
             print(state.files.eio, "{},", Zone(Mixing(Loop).FromZone).Name);
             print(state.files.eio, "{:.2R}\n", Mixing(Loop).DeltaTemperature);
@@ -3822,7 +3821,7 @@ namespace HeatBalanceAirManager {
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, CrossMixing(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).TotOccupants, CrossMixing(Loop).DesignLevel);
-            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, CrossMixing(Loop).DesignLevel * DataGlobalConstants::SecInHour());
+            divide_and_print_if_greater_than_zero(Zone(ZoneNum).Volume, CrossMixing(Loop).DesignLevel * DataGlobalConstants::SecInHour);
 
             print(state.files.eio, "{},", Zone(CrossMixing(Loop).FromZone).Name);
             print(state.files.eio, "{:.2R}\n", CrossMixing(Loop).DeltaTemperature);
@@ -3861,7 +3860,7 @@ namespace HeatBalanceAirManager {
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
             // Check for infiltration in zone which are only a mixing source zone
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if ((ZoneAirMassFlow.BalanceMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
+                if ((ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
                     (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow)) {
                     if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
                         ShowSevereError(state, RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
@@ -3889,7 +3888,7 @@ namespace HeatBalanceAirManager {
                                     "System",
                                     "Average",
                                     Zone(ZoneNum).Name);
-                if (ZoneAirMassFlow.BalanceMixing &&
+                if ((ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) &&
                     ((MassConservation(ZoneNum).NumSourceZonesMixingObject + MassConservation(ZoneNum).NumReceivingZonesMixingObject) > 0)) {
                     SetupOutputVariable(state, "Zone Air Mass Balance Mixing Receiving Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -3953,22 +3952,6 @@ namespace HeatBalanceAirManager {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using DataHeatBalance::Zone;
-        using DataRoomAirModel::AirModel;
-        using DataRoomAirModel::ChAirModel;
-        using DataRoomAirModel::DirectCoupling;
-        using DataRoomAirModel::IndirectCoupling;
-        using DataRoomAirModel::MundtModelUsed;
-        using DataRoomAirModel::RoomAirModel_AirflowNetwork;
-        using DataRoomAirModel::RoomAirModel_Mixing;
-        using DataRoomAirModel::RoomAirModel_Mundt;
-        using DataRoomAirModel::RoomAirModel_UCSDCV;
-        using DataRoomAirModel::RoomAirModel_UCSDDV;
-        using DataRoomAirModel::RoomAirModel_UCSDUFE;
-        using DataRoomAirModel::RoomAirModel_UCSDUFI;
-        using DataRoomAirModel::RoomAirModel_UserDefined;
-        using DataRoomAirModel::UCSDModelUsed;
-        using DataRoomAirModel::UserDefinedUsed;
-
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas; // States which alpha value to read from a
@@ -3981,10 +3964,10 @@ namespace HeatBalanceAirManager {
         bool ErrorsFound;
         bool IsNotOK;
 
-        // FLOW:
+
 
         // Initialize default values for air model parameters
-        AirModel.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAirMod->AirModel.allocate(state.dataGlobal->NumOfZones);
 
         ErrorsFound = false;
 
@@ -4010,27 +3993,27 @@ namespace HeatBalanceAirManager {
                                           cNumericFieldNames);
             ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
             if (ZoneNum != 0) {
-                if (!AirModel(ZoneNum).AirModelName.empty()) {
+                if (!state.dataRoomAirMod->AirModel(ZoneNum).AirModelName.empty()) {
                     ShowSevereError(state, "Invalid " + cAlphaFieldNames(2) + " = " + cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Duplicate zone name, only one type of roomair model is allowed per zone");
                     ShowContinueError(state, "Zone " + cAlphaArgs(2) + " was already assigned a roomair model by " + cCurrentModuleObject + " = " +
-                                      AirModel(ZoneNum).AirModelName);
-                    ShowContinueError(state, "Air Model Type for zone already set to " + ChAirModel(AirModel(ZoneNum).AirModelType));
+                            state.dataRoomAirMod->AirModel(ZoneNum).AirModelName);
+                    ShowContinueError(state, format("Air Model Type for zone already set to {}", DataRoomAirModel::ChAirModel[static_cast<int>(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType)]));
                     ShowContinueError(state, "Trying to overwrite with model type = " + cAlphaArgs(3));
                     ErrorsFound = true;
                 }
-                AirModel(ZoneNum).AirModelName = cAlphaArgs(1);
-                AirModel(ZoneNum).ZoneName = cAlphaArgs(2);
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = cAlphaArgs(1);
+                state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = cAlphaArgs(2);
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(3));
                     if (SELECT_CASE_var == "MIXING") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_Mixing;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                     } else if (SELECT_CASE_var == "ONENODEDISPLACEMENTVENTILATION") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_Mundt;
-                        AirModel(ZoneNum).SimAirModel = true;
-                        MundtModelUsed = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mundt;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->MundtModelUsed = true;
                         IsNotOK = false;
                         ValidateComponent(
                             state, "RoomAirSettings:OneNodeDisplacementVentilation", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
@@ -4039,9 +4022,9 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "THREENODEDISPLACEMENTVENTILATION") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDDV;
-                        AirModel(ZoneNum).SimAirModel = true;
-                        UCSDModelUsed = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDDV;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->UCSDModelUsed = true;
                         IsNotOK = false;
                         ValidateComponent(
                             state, "RoomAirSettings:ThreeNodeDisplacementVentilation", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
@@ -4050,9 +4033,9 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "CROSSVENTILATION") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDCV;
-                        AirModel(ZoneNum).SimAirModel = true;
-                        UCSDModelUsed = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDCV;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->UCSDModelUsed = true;
                         IsNotOK = false;
                         ValidateComponent(state, "RoomAirSettings:CrossVentilation", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
@@ -4060,9 +4043,9 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONINTERIOR") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDUFI;
-                        AirModel(ZoneNum).SimAirModel = true;
-                        UCSDModelUsed = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDUFI;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->UCSDModelUsed = true;
                         ValidateComponent(state,
                             "RoomAirSettings:UnderFloorAirDistributionInterior", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
@@ -4070,9 +4053,9 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "UNDERFLOORAIRDISTRIBUTIONEXTERIOR") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UCSDUFE;
-                        AirModel(ZoneNum).SimAirModel = true;
-                        UCSDModelUsed = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UCSDUFE;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->UCSDModelUsed = true;
                         ValidateComponent(state,
                             "RoomAirSettings:UnderFloorAirDistributionExterior", "zone_name", cAlphaArgs(2), IsNotOK, "GetRoomAirModelParameters");
                         if (IsNotOK) {
@@ -4080,12 +4063,12 @@ namespace HeatBalanceAirManager {
                             ErrorsFound = true;
                         }
                     } else if (SELECT_CASE_var == "USERDEFINED") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_UserDefined;
-                        AirModel(ZoneNum).SimAirModel = true;
-                        UserDefinedUsed = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::UserDefined;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->UserDefinedUsed = true;
                     } else if (SELECT_CASE_var == "AIRFLOWNETWORK") {
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_AirflowNetwork;
-                        AirModel(ZoneNum).SimAirModel = true;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::AirflowNetwork;
+                        state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = true;
                         if (inputProcessor->getNumObjectsFound(state, "AirflowNetwork:SimulationControl") == 0) {
                             ShowSevereError(state, "In " + cCurrentModuleObject + " = " + cAlphaArgs(1) + ": " + cAlphaFieldNames(3) + " = AIRFLOWNETWORK.");
                             ShowContinueError(state, "This model requires AirflowNetwork:* objects to form a complete network, including "
@@ -4097,21 +4080,21 @@ namespace HeatBalanceAirManager {
                         ShowWarningError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                         ShowContinueError(state, "The mixing air model will be used for Zone =" + cAlphaArgs(2));
-                        AirModel(ZoneNum).AirModelType = RoomAirModel_Mixing;
+                        state.dataRoomAirMod->AirModel(ZoneNum).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
                     }
                 }
 
                 {
                     auto const SELECT_CASE_var(cAlphaArgs(4));
                     if (SELECT_CASE_var == "DIRECT") {
-                        AirModel(ZoneNum).TempCoupleScheme = DirectCoupling;
+                        state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
                     } else if (SELECT_CASE_var == "INDIRECT") {
-                        AirModel(ZoneNum).TempCoupleScheme = IndirectCoupling;
+                        state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Indirect;
                     } else {
                         ShowWarningError(state, "Invalid " + cAlphaFieldNames(4) + " = " + cAlphaArgs(4));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                         ShowContinueError(state, "The direct coupling scheme will be used for Zone =" + cAlphaArgs(2));
-                        AirModel(ZoneNum).TempCoupleScheme = DirectCoupling;
+                        state.dataRoomAirMod->AirModel(ZoneNum).TempCoupleScheme = DataRoomAirModel::CouplingScheme::Direct;
                     }
                 }
             } else { // Zone Not Found
@@ -4123,12 +4106,12 @@ namespace HeatBalanceAirManager {
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (NumOfAirModels == 0) {
-                AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + Zone(ZoneNum).Name;
-                AirModel(ZoneNum).ZoneName = Zone(ZoneNum).Name;
-            } else if (AirModel(ZoneNum).ZoneName == BlankString) {
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + Zone(ZoneNum).Name;
+                state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = Zone(ZoneNum).Name;
+            } else if (state.dataRoomAirMod->AirModel(ZoneNum).ZoneName == BlankString) {
                 // no 'select air model' object for this zone so the mixing model is used for this zone
-                AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + Zone(ZoneNum).Name;
-                AirModel(ZoneNum).ZoneName = Zone(ZoneNum).Name;
+                state.dataRoomAirMod->AirModel(ZoneNum).AirModelName = "MIXING AIR MODEL FOR " + Zone(ZoneNum).Name;
+                state.dataRoomAirMod->AirModel(ZoneNum).ZoneName = Zone(ZoneNum).Name;
             }
         }
 
@@ -4139,22 +4122,22 @@ namespace HeatBalanceAirManager {
             {
                 static constexpr auto RoomAirZoneFmt("RoomAir Model,{},{}\n");
 
-                auto const SELECT_CASE_var(AirModel(ZoneNum).AirModelType);
-                if (SELECT_CASE_var == RoomAirModel_Mixing) {
+                auto const SELECT_CASE_var(state.dataRoomAirMod->AirModel(ZoneNum).AirModelType);
+                if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mixing) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "Mixing/Well-Stirred");
-                } else if (SELECT_CASE_var == RoomAirModel_Mundt) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::Mundt) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "OneNodeDisplacementVentilation");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDDV) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "ThreeNodeDisplacementVentilation");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDCV) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "CrossVentilation");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFI) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "UnderFloorAirDistributionInterior");
-                } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "UnderFloorAirDistributionExterior");
-                } else if (SELECT_CASE_var == RoomAirModel_UserDefined) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::UserDefined) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "UserDefined");
-                } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) {
+                } else if (SELECT_CASE_var == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     print(state.files.eio, RoomAirZoneFmt, Zone(ZoneNum).Name, "AirflowNetwork");
                 }
             }
@@ -4368,9 +4351,9 @@ namespace HeatBalanceAirManager {
         // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
         // to allow an external hvac manager to play nice with E+
         EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
-        if (!EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             EnergyPlus::DataZoneEquipment::GetZoneEquipmentData(state);
-            EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
     }
 
@@ -4385,31 +4368,10 @@ namespace HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the AirHeatBalance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::MRT;
-        using DataZoneControls::AnyOpTempControl;
-        using DataZoneControls::TempControlledZone;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;             // Counter for the # of zones (nz)
@@ -4427,16 +4389,16 @@ namespace HeatBalanceAirManager {
 
             // if operative temperature control is being used, then radiative fraction/weighting
             //  might be defined by user to be something different than 0.5, even scheduled over simulation period
-            if (AnyOpTempControl) { // dig further...
+            if (state.dataZoneCtrls->AnyOpTempControl) { // dig further...
                 // find TempControlledZoneID from ZoneLoop index
                 TempControlledZoneID = Zone(ZoneLoop).TempControlledZoneIndex;
                 if (Zone(ZoneLoop).IsControlled) {
-                    if ((TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
+                    if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
                         // is operative temp radiative fraction scheduled or fixed?
-                        if (TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
-                            thisMRTFraction = GetCurrentScheduleValue(state, TempControlledZone(TempControlledZoneID).OpTempRadiativeFractionSched);
+                        if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
+                            thisMRTFraction = GetCurrentScheduleValue(state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempRadiativeFractionSched);
                         } else {
-                            thisMRTFraction = TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
+                            thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
                         ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * MRT(ZoneLoop);
                     }

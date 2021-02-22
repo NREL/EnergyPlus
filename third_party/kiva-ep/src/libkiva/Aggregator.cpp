@@ -58,7 +58,7 @@ void Aggregator::calc_weighted_results() {
     validate();
   }
   results.reset();
-  double Tz, Tr;
+  double Tz{}, Tr{};
   for (auto &instance : instances) {
     Ground *grnd = instance.first;
     Tz = surface_type == Surface::ST_WALL_INT ? grnd->bcs.wallConvectiveTemp

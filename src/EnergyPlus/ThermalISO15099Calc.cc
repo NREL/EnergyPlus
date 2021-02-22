@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,14 +57,11 @@
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGasses90.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
-#include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 #include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/ThermalISO15099Calc.hh>
 
-namespace EnergyPlus {
-
-namespace ThermalISO15099Calc {
+namespace EnergyPlus::ThermalISO15099Calc {
     //***********************************************************************
     // ThermalISO15099Calc: a TARCOG module
     //    module For Calculation of Thermal Performance Indices For Center
@@ -88,17 +85,6 @@ namespace ThermalISO15099Calc {
     // Module For Calculation of Thermal Performance Indices For Center
     //  of Glass According to ISO 15099
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
@@ -107,11 +93,6 @@ namespace ThermalISO15099Calc {
     using namespace TARCOGOutput;
     using namespace TARCOGGasses90;
     using namespace TarcogShading;
-
-    // Data
-    // private picard
-
-    // Functions
 
     void film(Real64 const tex, Real64 const tw, Real64 const ws, int const iwd, Real64 &hcout, int const ibc)
     {
@@ -174,7 +155,7 @@ namespace ThermalISO15099Calc {
         }
     }
 
-    void Calc_ISO15099(Files &files,
+    void Calc_ISO15099(EnergyPlusData &state, Files &files,
                        int const nlayer,
                        int const iwd,
                        Real64 &tout,
@@ -270,12 +251,6 @@ namespace ThermalISO15099Calc {
                        Real64 const edgeGlCorrFac)
     {
 
-        /// function attributes:
-
-        /// INPUTS:
-
-        /// General:
-
         // Argument array dimensioning
         EP_SIZE_CHECK(gap, MaxGap);
         EP_SIZE_CHECK(thick, maxlay);
@@ -324,40 +299,6 @@ namespace ThermalISO15099Calc {
         EP_SIZE_CHECK(Keff, maxlay);
         EP_SIZE_CHECK(ShadeGapKeffConv, MaxGap);
 
-        // Locals
-        //    0 - do not perform SHGC calculations
-        //    1 - perform SHGC calculations
-        //    0 - don't create debug output files
-        //    1 - append results to existing debug output file
-        //    2 - store results in new debug output file
-        //   3 - save in-between results (in all iterations) to existing debug file
-
-        /// Environment related:
-
-        /// Layers:
-
-        /// Venetians:
-
-        /// Laminates:
-
-        /// Gaps:
-
-        // 0 - does not have support pillar
-        // 1 - have support pillar
-
-        //// INPUTS/OUTPUTS:
-
-        /// OUTPUTS:
-        /// Overall:
-
-        /// Layers:
-
-        /// Gaps:
-
-        /// Shading related:
-
-        // Variables
-
         static Array1D<Real64> thetas(maxlay2);
         static Array1D<Real64> rir(maxlay2);
         static Array1D<Real64> hcgass(maxlay1);
@@ -391,8 +332,6 @@ namespace ThermalISO15099Calc {
 
         Real64 ShadeHcModifiedOut;
         Real64 ShadeHcModifiedIn;
-
-        // REAL(r64) :: xgrho(maxgas, 3)   !!!!!!!!!!!!!!!!!1
 
         // cbi...Variables for "unshaded" run:
 
@@ -949,19 +888,11 @@ namespace ThermalISO15099Calc {
                 // Simon: Removed unshaded debug output for now
                 UnshadedDebug = 0;
                 if (files.WriteDebugOutput && (UnshadedDebug == 1)) {
-                    files.FilePosition = "APPEND";
-                    // InArgumentsFile should already be open
-                    // open(unit=InArgumentsFile,  file=TRIM(DBGD)//DebugOutputFileName,  status='unknown', position=FilePosition,  &
-                    //     form='formatted', iostat=nperr)
-
-                    // if (nperr.ne.0)  open(unit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', position=FilePosition, &
-                    //    form='formatted', iostat=nperr)
                     print(files.DebugOutputFile, "\n");
                     print(files.DebugOutputFile, "UNSHADED RUN:\n");
                     print(files.DebugOutputFile, "\n");
-                    // close(InArgumentsFile)
 
-                    WriteInputArguments(files.DebugOutputFile,
+                    WriteInputArguments(state, files.DebugOutputFile,
                                         files.DBGD,
                                         tout,
                                         tind,
@@ -1370,7 +1301,7 @@ namespace ThermalISO15099Calc {
                  Real64 &ShadeHcModifiedOut,
                  Real64 &ShadeHcModifiedIn,
                  int const ThermalMod,
-                 int const Debug_mode,
+                 [[maybe_unused]] int const Debug_mode,
                  Real64 &AchievedErrorTolerance,
                  int &TotalIndex,
                  Real64 const edgeGlCorrFac)
@@ -1461,7 +1392,6 @@ namespace ThermalISO15099Calc {
         Array1D<Real64> told(2 * nlayer);
 
         // Simon: parameters used in case of JCFN iteration method
-        // REAL(r64) :: Dvector(maxlay4) ! store diagonal matrix used in JCFN iterations
         Array1D<Real64> FRes({1, 4 * nlayer});      // store function results from current iteration
         Array1D<Real64> FResOld({1, 4 * nlayer});   // store function results from previous iteration
         Array1D<Real64> FResDiff({1, 4 * nlayer});  // save difference in results between iterations
@@ -1484,8 +1414,6 @@ namespace ThermalISO15099Calc {
         Array1D<Real64> thetaSave({1, 2 * nlayer});
         int currentTry;
 
-        //		static Array1D_int LayerTypeSpec( maxlay ); //Unused
-
         int CSMFlag;
         int i;
         int j;
@@ -1497,7 +1425,7 @@ namespace ThermalISO15099Calc {
         Real64 qc_gap_in;
         Real64 hc_modified_in;
 
-        int CalcOutcome;
+        CalculationOutcome CalcOutcome;
 
         bool iterationsFinished; // To mark whether or not iterations are finished
         bool saveIterationResults;
@@ -1511,13 +1439,11 @@ namespace ThermalISO15099Calc {
 
         // Simon: This is set to zero until it is resolved what to do with modifier
         ShadeHcModifiedOut = 0.0;
-        // BuffIndex = 0
         CSMFlag = 0;
-        CalcOutcome = CALC_UNKNOWN;
+        CalcOutcome = CalculationOutcome::Unknown;
         curTempCorrection = 0;
         AchievedErrorTolerance = 0.0;
         curDifference = 0.0;
-        // TurnOnNewton = .TRUE.
         currentTry = 0;
         index = 0;
         TotalIndex = 0;
@@ -1530,25 +1456,15 @@ namespace ThermalISO15099Calc {
         a = 0.0;
         b = 0.0;
 
-        // Dvector = 0.0
         FRes = 0.0;
         FResOld = 0.0;
         FResDiff = 0.0;
         Radiation = 0.0;
         Relaxation = RelaxationStart;
-        // alpha = PicardRelaxation
 
         maxiter = NumOfIterations;
 
-        // call MarkVentilatedGaps(nlayer, isVentilated, LayerType, vvent)
-
-        if (Debug_mode == saveIntermediateResults) {
-            saveIterationResults = true;
-        } else {
-            saveIterationResults = false;
-        }
-
-        // call guess(tout, tind, nlayer, gap, thick, glsyswidth, theta, Ebb, Ebf, Tgap)
+        saveIterationResults = false;
 
         for (i = 1; i <= nlayer; ++i) {
             k = 2 * i;
@@ -1556,8 +1472,6 @@ namespace ThermalISO15099Calc {
             Radiation(k - 1) = Ebf(i);
             told(k - 1) = 0.0;
             told(k) = 0.0;
-            // told(k-1) = theta(k-1)
-            // told(k) = theta(k)
         }
 
         // bi...Set LayerTypeSpec array - need to treat venetians AND woven shades as glass:
@@ -1761,35 +1675,9 @@ namespace ThermalISO15099Calc {
 
             FResDiff = FRes - FResOld;
 
-            // if (TurnOnNewton) then
-            //  do i = 1, 4*nlayer
-            //    temp = x(i)
-            //    h = ConvergenceTolerance * ABS(x(i))
-            //    if (h == 0) then
-            //      h = ConvergenceTolerance
-            //    end if
-            //    x(i) = temp + h
-            //    h = x(i) - temp ! trick to reduce finite precision error
-            //    call CalculateFuncResults(nlayer, a, b, x, DRes, nperr, ErrorMessage)
-            //    do j = 1, 4*nlayer
-            //      Jacobian(j,i) = (DRes(j) - FRes(j)) / h
-            //    end do
-            //    x(i) = temp
-            //  end do
-            // end if
-
-            // if (TurnOnNewton) then
-            //  LeftHandSide = Jacobian
-            //  RightHandSide = -FRes
-            // else
             LeftHandSide = a;
             RightHandSide = b;
-            // end if
             EquationsSolver(LeftHandSide, RightHandSide, 4 * nlayer, nperr, ErrorMessage);
-
-            // if (TurnOnNewton) then
-            //  dx = RightHandSide
-            // end if
 
             // Simon: This is much better, but also much slower convergence criteria.  Think of how to make this flexible and allow
             // user to change this from outside (through argument passing)
@@ -1917,7 +1805,7 @@ namespace ThermalISO15099Calc {
 
             // Chek if results were found:
             if (curDifference < ConvergenceTolerance) {
-                CalcOutcome = CALC_OK;
+                CalcOutcome = CalculationOutcome::OK;
                 TotalIndex += index;
                 iterationsFinished = true;
             }
@@ -1942,7 +1830,7 @@ namespace ThermalISO15099Calc {
         }
 
         // Get results from closest iteration and store it
-        if (CalcOutcome == CALC_OK) {
+        if (CalcOutcome == CalculationOutcome::OK) {
             for (i = 1; i <= 2 * nlayer; ++i) {
                 Radiation(i) = RadiationSave(i);
                 theta(i) = thetaSave(i);
@@ -2045,7 +1933,7 @@ namespace ThermalISO15099Calc {
                     vfreevent);
         }
 
-        if (CalcOutcome == CALC_UNKNOWN) {
+        if (CalcOutcome == CalculationOutcome::Unknown) {
             ErrorMessage = "Tarcog failed to converge";
             nperr = 2; // error 2: failed to converge...
         }
@@ -2056,8 +1944,8 @@ namespace ThermalISO15099Calc {
             k = 2 * i - 1;
             Rf(i) = Radiation(k);
             Rb(i) = Radiation(k + 1);
-            Ebf(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(k));
-            Ebb(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(k + 1));
+            Ebf(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k));
+            Ebb(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(k + 1));
         }
         // end if
 
@@ -2072,7 +1960,7 @@ namespace ThermalISO15099Calc {
             qr_gap_in = Rf(nlayer) - Rb(nlayer - 1);
 
             if (IsShadingLayer(LayerType(1))) {
-                ShadeEmisRatioOut = qr_gap_out / (emis(3) * DataGlobalConstants::StefanBoltzmann() * (pow_4(theta(3)) - pow_4(trmout)));
+                ShadeEmisRatioOut = qr_gap_out / (emis(3) * DataGlobalConstants::StefanBoltzmann * (pow_4(theta(3)) - pow_4(trmout)));
                 // qc_gap_out = qprim(3) - qr_gap_out
                 // qcgapout2 = qcgas(1)
                 // Hc_modified_out = (qc_gap_out / (theta(3) - tout))
@@ -2080,26 +1968,13 @@ namespace ThermalISO15099Calc {
             }
 
             if (IsShadingLayer(LayerType(nlayer))) {
-                ShadeEmisRatioIn = qr_gap_in / (emis(2 * nlayer - 2) * DataGlobalConstants::StefanBoltzmann() * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
+                ShadeEmisRatioIn = qr_gap_in / (emis(2 * nlayer - 2) * DataGlobalConstants::StefanBoltzmann * (pow_4(trmin) - pow_4(theta(2 * nlayer - 2))));
                 qc_gap_in = q(2 * nlayer - 1) - qr_gap_in;
                 hc_modified_in = (qc_gap_in / (tind - theta(2 * nlayer - 2)));
                 ShadeHcModifiedIn = hc_modified_in;
             }
         } // IF dir = 0
 
-        // do i=1, nlayer-1
-        //  if (((LayerType(i).eq.VENETBLIND)  &
-        //      &  .and.(ThermalMod.ne.THERM_MOD_CSM))  &
-        //      &  .or.(LayerType(i).eq.WOVSHADE)) then
-        //    !hcgas(i+1)=hcv(2*i+1)
-        //  else
-        //    !hcgas(i+1)=hgas(i+1)
-        //  end if
-        // end do
-
-        // 110   format(' Theta(',I1,') = ',F12.6)
-        // 111   format(' T(',I1,')=',F15.9)
-        // 112  format(' ',A3,' =',F15.9)
     }
 
     void guess(Real64 const tout,
@@ -2169,8 +2044,8 @@ namespace ThermalISO15099Calc {
             j = 2 * i;
             theta(j - 1) = tout + x(j - 1) * delta;
             theta(j) = tout + x(j) * delta;
-            Ebf(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(j - 1));
-            Ebb(i) = DataGlobalConstants::StefanBoltzmann() * pow_4(theta(j));
+            Ebf(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(j - 1));
+            Ebb(i) = DataGlobalConstants::StefanBoltzmann * pow_4(theta(j));
         }
 
         for (i = 1; i <= nlayer + 1; ++i) {
@@ -2180,58 +2055,6 @@ namespace ThermalISO15099Calc {
                 Tgap(nlayer + 1) = tind;
             } else {
                 Tgap(i) = (theta(2 * i - 1) + theta(2 * i - 2)) / 2;
-            }
-        }
-    }
-
-    void TemperaturesFromEnergy(Array1D<Real64> &theta,
-                                Array1D<Real64> &Tgap,
-                                const Array1D<Real64> &Ebf,
-                                const Array1D<Real64> &Ebb,
-                                int const nlayer,
-                                int &nperr,
-                                std::string &ErrorMessage)
-    {
-        //***********************************************************************
-        // this subroutine computes the new temperature distribution
-        //***********************************************************************
-
-        // Using
-        // Argument array dimensioning
-        EP_SIZE_CHECK(theta, maxlay2);
-        EP_SIZE_CHECK(Tgap, maxlay1);
-        EP_SIZE_CHECK(Ebf, maxlay);
-        EP_SIZE_CHECK(Ebb, maxlay);
-
-        // Locals
-        // REAL(r64), intent(out) :: dtmax
-        // integer, intent(out) :: MaxIndex
-
-        Array1D<Real64> told(maxlay2);
-        int i;
-        int j;
-
-        // dtmax = 0.0d0
-        // MaxIndex = 0
-
-        // first check for energy values. They cannot be negative because power to 0.25
-        // will crash application
-        for (i = 1; i <= nlayer; ++i) {
-            if ((Ebf(i) < 0) && (Ebb(i) < 0)) {
-                nperr = 2; // this is flag for convergence error
-                ErrorMessage = "Tarcog failed to converge.";
-                return; // stop execution
-            }
-        }
-
-        for (i = 1; i <= nlayer; ++i) {
-            j = 2 * i;
-            told(j) = theta(j);
-            told(j - 1) = theta(j - 1);
-            theta(j - 1) = root_4(Ebf(i) / DataGlobalConstants::StefanBoltzmann());
-            theta(j) = root_4(Ebb(i) / DataGlobalConstants::StefanBoltzmann());
-            if (i != 1) {
-                Tgap(i) = (theta(j - 1) + theta(j - 2)) / 2;
             }
         }
     }
@@ -2306,8 +2129,6 @@ namespace ThermalISO15099Calc {
         // Locals
         int i;
 
-        // R_tot = 0.0d0
-
         // Simon: calculation of heat flow through gaps and layers as well as ventilation speed and heat flow
         // are kept just for reporting purposes.  U-factor calculation is performed by calculating heat flow transfer
         // at indoor layer
@@ -2337,15 +2158,6 @@ namespace ThermalISO15099Calc {
             //  rs(2*i) = thick(i)/scon(i)
             qlayer(2 * i) = scon(i) / thick(i) * (Theta(2 * i) - Theta(2 * i - 1));
         }
-
-        // R_tot = 0.0d0
-
-        // do i = 1, 2*nlayer+1
-        //  R_tot = R_tot + rs(i)
-        // end do
-
-        // U factor:
-        // ufactor = 1.0d0/R_tot
 
         flux = qlayer(2 * nlayer + 1);
         if (IsShadingLayer(LayerType(nlayer))) {
@@ -2457,35 +2269,9 @@ namespace ThermalISO15099Calc {
         int i;
         int k;
         int nface;
-        // character(len=3) :: a
-
-        //  common    /props/ gcon(maxgas,3),gvis(maxgas,3),gcp(maxgas,3),grho(maxgas,3),wght(maxgas)
 
         // evaluate convective/conductive components of gap grashof number, thermal conductivity and their derivatives:
         nface = 2 * nlayer;
-
-        // do i = 1, nlayer
-        //  j=2*i
-
-        //  if ((Ebb(i)-Ebf(i)).eq.0) then
-        //    theta(j) = theta(j) + tempCorrection
-        //    Ebb(i) = sigma * (theta(j) ** 4)
-        //  end if
-        //  hhat(j) = scon(i)/thick(i) * (theta(j)-theta(j-1))/(Ebb(i)-Ebf(i))
-
-        // dr.....caluclate for laminate procedure
-        //  if (nslice(i).gt.1) then
-        //    if ((LaminateB(i).ne.0).and.((Ebb(i)-Ebf(i)).ne.0)) then
-        //      hhat(j) = (theta(j)-theta(j-1))/(LaminateB(i) * (Ebb(i)-Ebf(i)))
-        //    end if
-        //  end if
-        // if (hhat(j).lt.0) then
-        //  nperr = 6
-        //  write(a, '(i3)') i
-        //  ErrorMessage = 'Heat transfer coefficient based on emissive power in glazing layer is less than zero. Layer #'//TRIM(a)
-        //  return
-        // end if
-        // end do
 
         filmg(tilt,
               theta,
@@ -2716,7 +2502,7 @@ namespace ThermalISO15099Calc {
                 }
             }
         } else {                             // main IF - else
-            tiltr = tilt * 2.0 * DataGlobalConstants::Pi() / 360.0; // convert tilt in degrees to radians
+            tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
             tmean = tair + 0.25 * (t - tair);
             delt = std::abs(tair - t);
 
@@ -2745,7 +2531,7 @@ namespace ThermalISO15099Calc {
 
             //   Calculate grashoff number:
             //   The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-            gr = DataGlobalConstants::GravityConstant() * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
+            gr = DataGlobalConstants::GravityConstant * pow_3(height) * delt * pow_2(dens) / (tmean * pow_2(visc));
 
             RaL = gr * pr;
             //   write(*,*)' RaCrit,RaL,gr,pr '
@@ -2885,7 +2671,7 @@ namespace ThermalISO15099Calc {
 
                 // Calculate grashoff number:
                 // The grashoff number is the Rayleigh Number (equation 5.29) in SPC142 divided by the Prandtl Number (prand):
-                ra = DataGlobalConstants::GravityConstant() * pow_3(gap(i)) * delt * cp * pow_2(dens) / (tmean * visc * con);
+                ra = DataGlobalConstants::GravityConstant * pow_3(gap(i)) * delt * cp * pow_2(dens) / (tmean * visc * con);
                 Rayleigh(i) = ra;
                 // write(*,*) 'height,gap(i),asp',height,gap(i),asp
                 // asp = 1
@@ -2945,17 +2731,11 @@ namespace ThermalISO15099Calc {
         for (i = 1; i <= nlayer - 1; ++i) {
             k = 2 * i + 1;
             if (SupportPillar(i) == YES_SupportPillar) {
-                // lkl        if (gap(i).gt.(VacuumMaxGapThickness + InputDataTolerance)) then
-                // lkl          nperr = 1007 !support pillar is not necessary for wide gaps (calculation will continue)
-                // lkl          write(a, '(f12.6)') VacuumMaxGapThickness
-                // lkl          write(b, '(i3)') i
-                // lkl          ErrorMessage = 'Gap width is more than '//TRIM(a)//' and it contains support pillar. Gap #'//TRIM(b)
-                // lkl        end if  !if (gap(i).gt.VacuumMaxGapThickness) then
 
                 // Average glass conductivity is taken as average from both glass surrounding gap
                 aveGlassConductivity = (scon(i) + scon(i + 1)) / 2;
 
-                cpa = 2.0 * aveGlassConductivity * PillarRadius(i) / (pow_2(PillarSpacing(i)) * (1.0 + 2.0 * gap(i) / (DataGlobalConstants::Pi() * PillarRadius(i))));
+                cpa = 2.0 * aveGlassConductivity * PillarRadius(i) / (pow_2(PillarSpacing(i)) * (1.0 + 2.0 * gap(i) / (DataGlobalConstants::Pi * PillarRadius(i))));
 
                 // It is important to add on prevoius values caluculated for gas
                 hcgas(i + 1) += cpa;
@@ -2996,7 +2776,7 @@ namespace ThermalISO15099Calc {
         Nu90 = 0.0;
         Nu60 = 0.0;
         G = 0.0;
-        tiltr = tilt * 2.0 * DataGlobalConstants::Pi() / 360.0;      // convert tilt in degrees to radians
+        tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0;      // convert tilt in degrees to radians
         if ((tilt >= 0.0) && (tilt < 60.0)) { // ISO/DIS 15099 - chapter 5.3.3.1
             subNu1 = 1.0 - 1708.0 / (ra * std::cos(tiltr));
             subNu1 = pos(subNu1);
@@ -3096,226 +2876,6 @@ namespace ThermalISO15099Calc {
         }
     }
 
-    //  subroutine picard(nlayer, alpha, Ebb, Ebf, Rf, Rb, Ebbold, Ebfold, Rfold, Rbold)
-
-    //    integer, intent(in) :: nlayer
-    //    REAL(r64), intent(in) :: alpha
-    //    REAL(r64), intent(in) :: Ebbold(maxlay), Ebfold(maxlay), Rbold(maxlay), Rfold(maxlay)
-    //    REAL(r64), intent(inout) :: Ebb(maxlay), Ebf(maxlay), Rb(maxlay), Rf(maxlay)
-
-    //    integer :: i
-
-    //    do i=1,nlayer
-    //      Ebb(i) = alpha * Ebb(i) + (1.0d0-alpha) * Ebbold(i)
-    //      Ebf(i) = alpha * Ebf(i) + (1.0d0-alpha) * Ebfold(i)
-    //      Rb(i) = alpha * Rb(i) + (1.0d0-alpha) * Rbold(i)
-    //      Rf(i) = alpha * Rf(i) + (1.0d0-alpha) * Rfold(i)
-    //    end do
-
-    //    return
-    //  end subroutine picard
-
-    void adjusthhat(int const SDLayerIndex,
-                    const Array1D_int &ibc,
-                    Real64 const tout,
-                    Real64 const tind,
-                    int const nlayer,
-                    const Array1D<Real64> &theta,
-                    Real64 const wso,
-                    Real64 const wsi,
-                    int const iwd,
-                    Real64 const height,
-                    Real64 const heightt,
-                    Real64 const tilt,
-                    const Array1D<Real64> &thick,
-                    const Array1D<Real64> &gap,
-                    Real64 const hout,
-                    Real64 const hrout,
-                    Real64 const hin,
-                    Real64 const hrin,
-                    Array2A_int const iprop,
-                    Array2A<Real64> const frct,
-                    const Array1D<Real64> &presure,
-                    const Array1D_int &nmix,
-                    const Array1D<Real64> &wght,
-                    Array2A<Real64> const gcon,
-                    Array2A<Real64> const gvis,
-                    Array2A<Real64> const gcp,
-                    int const index,
-                    Real64 const SDScalar,
-                    const Array1D<Real64> &Ebf,
-                    const Array1D<Real64> &Ebb,
-                    Array1D<Real64> &hgas,
-                    Array1D<Real64> &hhat,
-                    int &nperr,
-                    std::string &ErrorMessage)
-    {
-
-        //********************************************************************
-        //  Modifies hhat, hgas coefficients around SD layers
-        //********************************************************************
-
-        // Using
-        // Argument array dimensioning
-        EP_SIZE_CHECK(ibc, 2);
-        EP_SIZE_CHECK(theta, maxlay2);
-        EP_SIZE_CHECK(thick, maxlay);
-        EP_SIZE_CHECK(gap, MaxGap);
-        iprop.dim(maxgas, maxlay1);
-        frct.dim(maxgas, maxlay1);
-        EP_SIZE_CHECK(presure, maxlay1);
-        EP_SIZE_CHECK(nmix, maxlay1);
-        EP_SIZE_CHECK(wght, maxgas);
-        gcon.dim(3, maxgas);
-        gvis.dim(3, maxgas);
-        gcp.dim(3, maxgas);
-        EP_SIZE_CHECK(Ebf, maxlay);
-        EP_SIZE_CHECK(Ebb, maxlay);
-        EP_SIZE_CHECK(hgas, maxlay);
-        EP_SIZE_CHECK(hhat, maxlay3);
-
-        // Locals
-        Real64 hc_NOSD(0.0);
-        Real64 hc_0;
-        Real64 hc_1;
-        Real64 hc_alpha;
-        Real64 hhat_alpha;
-        Real64 hc_1_1;
-        Real64 hc_1_2;
-        Real64 hc_alpha1;
-        Real64 hc_alpha2;
-        Real64 hhat_alpha1;
-        Real64 hhat_alpha2;
-        Array1D<Real64> frctg(maxgas);
-        int i;
-        int j;
-        int k;
-        int l;
-        Array1D_int ipropg(maxgas);
-        Real64 tmean;
-        Real64 con;
-        Real64 visc;
-        Real64 dens;
-        Real64 cp;
-        Real64 pr;
-        Real64 delt;
-        Real64 gap_NOSD;
-        Real64 rayl;
-        Real64 asp;
-        Real64 gnu;
-
-        // bi...  Step 1: Calculate hc as if there was no SD here
-        if (SDLayerIndex == 1) {
-            // car    SD is the first layer (outdoor)
-            // calc hc_0 as hcout:
-            // convective outdoor film coeff:
-            if (ibc(1) <= 0) {
-                film(tout, theta(3), wso, iwd, hc_NOSD, ibc(1));
-            } else if (ibc(1) == 1) {
-                hc_NOSD = hout - hrout;
-            } else if ((ibc(1) == 2) && (index == 1)) {
-                hc_NOSD = hout;
-            } else {
-                assert(false);
-            }
-            if (hc_NOSD < 0) {
-                nperr = 9;
-                ErrorMessage = "Hcout is out of range.";
-                return;
-            }
-            hc_0 = hc_NOSD * (theta(3) - tout) / (theta(3) - theta(2));
-            hc_1 = hgas(2);
-            hc_alpha = SDScalar * (hc_1 - hc_0) + hc_0;
-            hhat_alpha = hc_alpha * (theta(3) - theta(2)) / (Ebf(2) - Ebb(1));
-
-            hgas(2) = hc_alpha;
-            hhat(3) = hhat_alpha;
-        } else if (SDLayerIndex == nlayer) {
-            // car    SD is the last layer (indoor)
-            // calc hc_0 as hcin:
-            // convective indoor film coeff:
-            if (ibc(2) <= 0) {
-                filmi(tind,
-                      theta(2 * nlayer - 2),
-                      nlayer,
-                      tilt,
-                      wsi,
-                      heightt,
-                      iprop,
-                      frct,
-                      presure,
-                      nmix,
-                      wght,
-                      gcon,
-                      gvis,
-                      gcp,
-                      hc_NOSD,
-                      ibc(2),
-                      nperr,
-                      ErrorMessage);
-            } else if (ibc(2) == 1) {
-                hc_NOSD = hin - hrin;
-            } else if (ibc(2) == 2 && index == 1) {
-                hc_NOSD = hin;
-            }
-            if (hc_NOSD < 0) {
-                nperr = 8;
-                ErrorMessage = "Hcin is out of range.";
-                return;
-            }
-            //    hgas(2*nlayer+1) = hcin
-            hc_0 = hc_NOSD * (tind - theta(2 * nlayer - 2)) / (theta(2 * nlayer - 1) - theta(2 * nlayer - 2));
-            hc_1 = hgas(nlayer + 1);
-            hc_alpha = SDScalar * (hc_1 - hc_0) + hc_0;
-            hhat_alpha = hc_alpha * (theta(2 * nlayer - 1) - theta(2 * nlayer - 2)) / (Ebf(nlayer) - Ebb(nlayer - 1));
-
-            hgas(nlayer + 1) = hc_alpha;
-            hhat(2 * nlayer - 1) = hhat_alpha;
-        } else {
-            // car     SD is in between glazing
-            //  calc hc_NOSD as hcgas:
-            j = 2 * SDLayerIndex - 2;
-            k = j + 3;
-            // determine the gas properties for this "gap":
-            tmean = (theta(j) + theta(k)) / 2.0;
-            delt = std::abs(theta(j) - theta(k));
-            i = SDLayerIndex;
-            for (l = 1; l <= nmix(i + 1); ++l) {
-                ipropg(l) = iprop(l, i + 1);
-                frctg(l) = frct(l, i + 1);
-            }
-            GASSES90(
-                tmean, ipropg, frctg, presure(i + 1), nmix(i + 1), wght, gcon, gvis, gcp, con, visc, dens, cp, pr, ISO15099, nperr, ErrorMessage);
-            gap_NOSD = gap(SDLayerIndex - 1) + gap(SDLayerIndex) + thick(SDLayerIndex);
-            // determine the Rayleigh number:
-            rayl = DataGlobalConstants::GravityConstant() * pow_3(gap_NOSD) * delt * cp * pow_2(dens) / (tmean * visc * con);
-            asp = height / gap_NOSD;
-            // determine the Nusselt number:
-            nusselt(tilt, rayl, asp, gnu, nperr, ErrorMessage);
-            // calculate effective conductance of the gap
-            hc_NOSD = con / gap_NOSD * gnu;
-            i = SDLayerIndex;
-            j = 2 * i;
-            // car     changed hc interpolation with temperatures by inverting ratios
-            // car  hc_0_1 = hc_NOSD*ABS((theta(2*i-1) - theta(2*i-2))/(theta(2*i+1) - theta(2*i-2)))
-            // car  hc_0_2 = hc_NOSD*ABS((theta(2*i+1) - theta(2*i))/(theta(2*i+1) - theta(2*i-2)))
-            hc_1_1 = hgas(i);
-            hc_1_2 = hgas(i + 1);
-
-            // car    changed how SDscalar interpolation is done.  Instead of hc_0_1 and hc_0_2, hc_NOSD is used
-            hc_alpha1 = SDScalar * (hc_1_1 - hc_NOSD) + hc_NOSD;
-            hc_alpha2 = SDScalar * (hc_1_2 - hc_NOSD) + hc_NOSD;
-
-            hhat_alpha1 = hc_alpha1 * (theta(j - 1) - theta(j - 2)) / (Ebf(i) - Ebb(i - 1));
-            hhat_alpha2 = hc_alpha2 * (theta(j + 1) - theta(j)) / (Ebf(i + 1) - Ebb(i));
-
-            hgas(i) = hc_alpha1;
-            hgas(i + 1) = hc_alpha2;
-            hhat(j - 1) = hhat_alpha1;
-            hhat(j + 1) = hhat_alpha2;
-        }
-    }
-
     void storeIterationResults(Files &files,
                                int const nlayer,
                                int const index,
@@ -3339,42 +2899,17 @@ namespace ThermalISO15099Calc {
                                int &)
     {
 
-        // Using/Aliasing
-        // Locals
-        // character(len=*), intent(inout) :: ErrorMessage
-
-        // localy used
         static std::string dynFormat;
         int i;
-
-        // Formats
-
-        // open(unit=InArgumentsFile,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
-        //          &  form='formatted', iostat=nperr)
-
-        // if (nperr.ne.0)  open(unit=InArgumentsFile,  file='TarcogIterations.dbg',  status='unknown', position='APPEND',  &
-        //          &  form='formatted', iostat=nperr)
-
-        // open(unit=IterationCSV,  file=TRIM(DBGD)//TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
-        //          &  form='formatted', iostat=nperr)
-
-        // if (nperr.ne.0)  open(unit=IterationCSV,  file=TRIM(IterationCSVName),  status='unknown', position='APPEND',  &
-        //          &  form='formatted', iostat=nperr)
-
-        // open(unit=IterationHHAT,  file=TRIM(DBGD)//TRIM(IterationHHATName),  status='unknown', position='APPEND',  &
-        //          &  form='formatted', iostat=nperr)
-
-        // if (nperr.ne.0)  open(unit=IterationHHAT,  file=TRIM(IterationHHATName),  status='unknown', position='APPEND',  &
-        //          &  form='formatted', iostat=nperr)
 
         // write(a,1000) index
         print(files.TarcogIterationsFile, "*************************************************************************************************\n");
         print(files.TarcogIterationsFile, "Iteration number: {:5}\n" , index);
 
-        print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n" , trmin - DataGlobalConstants::KelvinConv());
-        print(files.TarcogIterationsFile, "Troom = {:12.6F}\n" , troom - DataGlobalConstants::KelvinConv());
-        print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n" , trmout - DataGlobalConstants::KelvinConv());
-        print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n" , tamb - DataGlobalConstants::KelvinConv());
+        print(files.TarcogIterationsFile, "Trmin = {:8.4F}\n" , trmin - DataGlobalConstants::KelvinConv);
+        print(files.TarcogIterationsFile, "Troom = {:12.6F}\n" , troom - DataGlobalConstants::KelvinConv);
+        print(files.TarcogIterationsFile, "Trmout = {:8.4F}\n" , trmout - DataGlobalConstants::KelvinConv);
+        print(files.TarcogIterationsFile, "Tamb = {:12.6F}\n" , tamb - DataGlobalConstants::KelvinConv);
 
         print(files.TarcogIterationsFile, "Ebsky = {:8.4F}\n" , ebsky);
         print(files.TarcogIterationsFile, "Ebroom = {:8.4F}\n" , ebroom);
@@ -3449,9 +2984,9 @@ namespace ThermalISO15099Calc {
         print(files.TarcogIterationsFile, "\n");
 
         // write temperatures
-        print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv());
+        print(files.TarcogIterationsFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
         for (i = 2; i <= 2 * nlayer; ++i) {
-            print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv());
+            print(files.TarcogIterationsFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
         }
         print(files.TarcogIterationsFile, "\n");
 
@@ -3471,9 +3006,9 @@ namespace ThermalISO15099Calc {
             print(files.IterationCSVFile, dynFormat);
             print(files.IterationCSVFile, "\n");
         }
-        print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv());
+        print(files.IterationCSVFile, "{:16.8F}   \n", theta(1) - DataGlobalConstants::KelvinConv);
         for (i = 2; i <= 2 * nlayer; ++i) {
-            print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv());
+            print(files.IterationCSVFile, "   {:16.8F}   \n", theta(i) - DataGlobalConstants::KelvinConv);
         }
         print(files.IterationCSVFile, "\n");
 
@@ -3482,16 +3017,6 @@ namespace ThermalISO15099Calc {
 
     void CalculateFuncResults(int const nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes)
     {
-        // calculate balance equations by using temperature solution and estimates stores error in FRes
-        // REAL(r64), intent(in) :: theta(maxlay2)
-        // REAL(r64), intent(in) :: R(maxlay2)  ! Radiation on layer surfaces
-
-        // Locals
-        // integer, intent(out) :: nperr
-        // character(len=*), intent(out) :: ErrorMessage
-
-        // Local variables
-
         // Tuned Rewritten to traverse a in unit stride order
         int const nlayer4(4 * nlayer);
         for (int i = 1; i <= nlayer4; ++i) {
@@ -3504,7 +3029,5 @@ namespace ThermalISO15099Calc {
             }
         }
     }
-
-} // namespace ThermalISO15099Calc
 
 } // namespace EnergyPlus

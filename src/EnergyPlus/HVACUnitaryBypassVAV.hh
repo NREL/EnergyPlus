@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -67,8 +68,8 @@ namespace HVACUnitaryBypassVAV {
     // Data
     // MODULE PARAMETER DEFINITIONS
     // Compressor operation
-    extern int const On;  // Normal compressor operation
-    extern int const Off; // Signal DXCoil that compressor should not run
+    constexpr int On(1);  // Normal compressor operation
+    constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Dehumidification control modes (DehumidControlMode) for Multimode units only
     extern int const DehumidControl_None;
@@ -351,7 +352,7 @@ namespace HVACUnitaryBypassVAV {
     void GetZoneLoads(EnergyPlusData &state, int const CBVAVNum // Index to CBVAV unit being simulated
     );
 
-    Real64 CalcSetPointTempTarget(int const CBVAVNumber); // Index to changeover-bypass VAV system
+    Real64 CalcSetPointTempTarget(EnergyPlusData &state, int const CBVAVNumber); // Index to changeover-bypass VAV system
 
     Real64 DOE2DXCoilResidual(EnergyPlusData &state,
                               Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
@@ -394,6 +395,14 @@ namespace HVACUnitaryBypassVAV {
     );
 
 } // namespace HVACUnitaryBypassVAV
+
+struct HVACUnitaryBypassVAVData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -107,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Timestep,6;
 
@@ -419,13 +419,17 @@
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-  Construction:InternalSource,
-    Slab Floor with Radiant, !- Name
+  ConstructionProperty:InternalHeatSource,
+    Floor Source,            !- Name
+    Slab Floor with Radiant, !- Construction Name
     4,                       !- Source Present After Layer Number
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
-    0.0,                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+    0.0;                     !- Two-Dimensional Temperature Calculation Position {dimensionless}
+
+  Construction,
+    Slab Floor with Radiant, !- Name
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3

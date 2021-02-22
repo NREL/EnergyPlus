@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -413,11 +413,11 @@ namespace Vectors {
         }
 
         tlt = std::acos(NewellSurfaceNormalVector.z);
-        tlt /= DataGlobalConstants::DegToRadians();
+        tlt /= DataGlobalConstants::DegToRadians;
 
         az = rotang_0;
 
-        az /= DataGlobalConstants::DegToRadians();
+        az /= DataGlobalConstants::DegToRadians;
         az = mod(450.0 - az, 360.0);
         az += 90.0;
         if (az < 0.0) az += 360.0;

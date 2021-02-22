@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,10 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <map>
-
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -58,19 +55,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace EnergyPlus {
-namespace PluginManagement {
-    std::unique_ptr<PluginManager> pluginManager;
-
-    std::map<EMSManager::EMSCallFrom, std::vector<std::function<void(void *)>>> callbacks;
-    std::vector<PluginInstance> plugins;
-    std::vector<PluginTrendVariable> trends;
-    std::vector<std::string> globalVariableNames;
-    std::vector<Real64> globalVariableValues;
-
-    // some flags
-    bool fullyReady = false;
-    bool apiErrorFlag = false;
+namespace EnergyPlus::PluginManagement {
 
     PluginTrendVariable::PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable) :
     name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
@@ -84,36 +69,36 @@ namespace PluginManagement {
         }
     }
 
-    void registerNewCallback([[maybe_unused]] EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
+    void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
     {
-        callbacks[iCalledFrom].push_back(f);
+        state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
     }
 
-    void onBeginEnvironment() {
+    void onBeginEnvironment(EnergyPlusData &state) {
         // reset vars and trends -- sensors and actuators are reset by EMS
-        for (auto & v : globalVariableValues) {
+        for (auto & v : state.dataPluginManager->globalVariableValues) {
             v = 0;
         }
         // reinitialize trend variables so old data are purged
-        for (auto & tr : trends) {
+        for (auto & tr : state.dataPluginManager->trends) {
             tr.reset();
         }
     }
 
-    int PluginManager::numActiveCallbacks()
+    int PluginManager::numActiveCallbacks(EnergyPlusData &state)
     {
-        return (int)callbacks.size();
+        return (int)state.dataPluginManager->callbacks.size();
     }
 
     void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
     {
         if (state.dataGlobal->KickOffSimulation) return;
-        for (auto const &cb : callbacks[iCalledFrom]) {
+        for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
             cb((void *) &state);
             anyRan = true;
         }
 #if LINK_WITH_PYTHON == 1
-        for (auto &plugin : plugins) {
+        for (auto &plugin : state.dataPluginManager->plugins) {
             if (plugin.runDuringWarmup || !state.dataGlobal->WarmupFlag) {
                 bool const didOneRun = plugin.run(state, iCalledFrom);
                 if (didOneRun) anyRan = true;
@@ -197,14 +182,14 @@ namespace PluginManagement {
                     if (thisUnit != OutputProcessor::Unit::customEMS) {
                         SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
-                                            PluginManagement::globalVariableValues[variableHandle],
+                                            state.dataPluginManager->globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName);
                     } else {
                         SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
-                                            PluginManagement::globalVariableValues[variableHandle],
+                                            state.dataPluginManager->globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -377,7 +362,7 @@ namespace PluginManagement {
                     if (sEndUseSubcategory.empty()) { // no subcategory
                         SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
-                                            PluginManagement::globalVariableValues[variableHandle],
+                                            state.dataPluginManager->globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -389,7 +374,7 @@ namespace PluginManagement {
                     } else { // has subcategory
                         SetupOutputVariable(state, sOutputVariable,
                                             thisUnit,
-                                            PluginManagement::globalVariableValues[variableHandle],
+                                            state.dataPluginManager->globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -402,24 +387,6 @@ namespace PluginManagement {
                 }
             }
         }
-#endif
-    }
-
-    void clear_state()
-    {
-        callbacks.clear();
-#if LINK_WITH_PYTHON == 1
-        for (auto &plugin : plugins) {
-            plugin.shutdown(); // clear unmanaged memory first
-        }
-        trends.clear();
-        globalVariableNames.clear();
-        globalVariableValues.clear();
-        plugins.clear();
-        PluginManagement::fullyReady = false;
-        PluginManagement::apiErrorFlag = false;
-        PluginManager * p = PluginManagement::pluginManager.release();
-        delete p;
 #endif
     }
 
@@ -539,12 +506,12 @@ namespace PluginManagement {
                 if (sWarmup == "YES") {
                     warmup = true;
                 }
-                plugins.emplace_back(fileName, className, thisObjectName, warmup);
+                state.dataPluginManager->plugins.emplace_back(fileName, className, thisObjectName, warmup);
             }
         }
 
         // IMPORTANT - CALL setup() HERE ONCE ALL INSTANCES ARE CONSTRUCTED TO AVOID DESTRUCTOR/MEMORY ISSUES DURING VECTOR RESIZING
-        for (auto &plugin : plugins) {
+        for (auto &plugin : state.dataPluginManager->plugins) {
             plugin.setup(state);
         }
 
@@ -562,7 +529,7 @@ namespace PluginManagement {
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
                 auto const vars = fields.at("global_py_vars");
                 for (const auto &var : vars) {
-                    this->addGlobalVariable(var.at("variable_name"));
+                    this->addGlobalVariable(state, var.at("variable_name"));
                 }
             }
         }
@@ -596,7 +563,7 @@ namespace PluginManagement {
                 std::string variableName = fields.at("name_of_a_python_plugin_variable");
                 int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, variableName);
                 int numValues = fields.at("number_of_timesteps_to_be_logged");
-                trends.emplace_back(state, thisObjectName, numValues, variableIndex);
+                state.dataPluginManager->trends.emplace_back(state, thisObjectName, numValues, variableIndex);
                 this->maxTrendVariableIndex++;
             }
         }
@@ -1065,7 +1032,7 @@ namespace PluginManagement {
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
-        if (EnergyPlus::PluginManagement::apiErrorFlag) {
+        if (state.dataPluginManager->apiErrorFlag) {
             EnergyPlus::ShowFatalError(state, "API problems encountered while running plugin cause program termination.");
         }
         return true;
@@ -1099,15 +1066,15 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::addGlobalVariable(const std::string &name)
+    void PluginManager::addGlobalVariable(EnergyPlusData &state, const std::string &name)
     {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        PluginManagement::globalVariableNames.push_back(varNameUC);
-        PluginManagement::globalVariableValues.push_back(Real64());
+        state.dataPluginManager->globalVariableNames.push_back(varNameUC);
+        state.dataPluginManager->globalVariableValues.push_back(Real64());
         this->maxGlobalVariableIndex++;
     }
 #else
-    void PluginManager::addGlobalVariable([[maybe_unused]] const std::string &name)
+    void PluginManager::addGlobalVariable([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &name)
     {
     }
 #endif
@@ -1116,16 +1083,16 @@ namespace PluginManagement {
     int PluginManager::getGlobalVariableHandle(EnergyPlusData &state, const std::string &name, bool const suppress_warning)
     { // note zero is a valid handle
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        auto const it = std::find(PluginManagement::globalVariableNames.begin(), PluginManagement::globalVariableNames.end(), varNameUC);
-        if (it != PluginManagement::globalVariableNames.end()) {
-            return std::distance(PluginManagement::globalVariableNames.begin(), it);
+        auto const it = std::find(state.dataPluginManager->globalVariableNames.begin(), state.dataPluginManager->globalVariableNames.end(), varNameUC);
+        if (it != state.dataPluginManager->globalVariableNames.end()) {
+            return std::distance(state.dataPluginManager->globalVariableNames.begin(), it);
         } else {
             if (suppress_warning) {
                 return -1;
             } else {
                 EnergyPlus::ShowSevereError(state, "Tried to retrieve handle for a nonexistent plugin global variable");
                 EnergyPlus::ShowContinueError(state, "Name looked up: \"" + varNameUC + "\", available names: ");
-                for (auto const &gvName : PluginManagement::globalVariableNames) {
+                for (auto const &gvName : state.dataPluginManager->globalVariableNames) {
                     EnergyPlus::ShowContinueError(state, "    \"" + gvName + "\"");
                 }
                 EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
@@ -1143,11 +1110,11 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    int PluginManager::getTrendVariableHandle(const std::string &name)
+    int PluginManager::getTrendVariableHandle(EnergyPlusData &state, const std::string &name)
     {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        for (size_t i = 0; i < trends.size(); i++) {
-            auto &thisTrend = trends[i];
+        for (size_t i = 0; i < state.dataPluginManager->trends.size(); i++) {
+            auto &thisTrend = state.dataPluginManager->trends[i];
             if (thisTrend.name == varNameUC) {
                 return i;
             }
@@ -1155,96 +1122,96 @@ namespace PluginManagement {
         return -1;
     }
 #else
-    int PluginManager::getTrendVariableHandle([[maybe_unused]] const std::string &name)
+    int PluginManager::getTrendVariableHandle([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const std::string &name)
     {
         return -1;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex)
+    Real64 PluginManager::getTrendVariableValue(EnergyPlusData &state, int handle, int timeIndex)
     {
-        return trends[handle].values[timeIndex];
+        return state.dataPluginManager->trends[handle].values[timeIndex];
     }
 #else
-    Real64 PluginManager::getTrendVariableValue([[maybe_unused]] int handle, [[maybe_unused]] int timeIndex)
+    Real64 PluginManager::getTrendVariableValue([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int timeIndex)
     {
         return 0.0;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableAverage(int handle, int count)
+    Real64 PluginManager::getTrendVariableAverage(EnergyPlusData &state, int handle, int count)
     {
         Real64 sum = 0;
         for (int i = 0; i < count; i++) {
-            sum += trends[handle].values[i];
+            sum += state.dataPluginManager->trends[handle].values[i];
         }
         return sum / count;
     }
 #else
-    Real64 PluginManager::getTrendVariableAverage([[maybe_unused]] int handle, [[maybe_unused]] int count)
+    Real64 PluginManager::getTrendVariableAverage([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableMin(int handle, int count)
+    Real64 PluginManager::getTrendVariableMin(EnergyPlusData &state, int handle, int count)
     {
         Real64 minimumValue = 9999999999999;
         for (int i = 0; i < count; i++) {
-            if (trends[handle].values[i] < minimumValue) {
-                minimumValue = trends[handle].values[i];
+            if (state.dataPluginManager->trends[handle].values[i] < minimumValue) {
+                minimumValue = state.dataPluginManager->trends[handle].values[i];
             }
         }
         return minimumValue;
     }
 #else
-    Real64 PluginManager::getTrendVariableMin([[maybe_unused]] int handle, [[maybe_unused]] int count)
+    Real64 PluginManager::getTrendVariableMin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableMax(int handle, int count)
+    Real64 PluginManager::getTrendVariableMax(EnergyPlusData &state, int handle, int count)
     {
         Real64 maximumValue = -9999999999999;
         for (int i = 0; i < count; i++) {
-            if (trends[handle].values[i] > maximumValue) {
-                maximumValue = trends[handle].values[i];
+            if (state.dataPluginManager->trends[handle].values[i] > maximumValue) {
+                maximumValue = state.dataPluginManager->trends[handle].values[i];
             }
         }
         return maximumValue;
     }
 #else
-    Real64 PluginManager::getTrendVariableMax([[maybe_unused]] int handle, [[maybe_unused]] int count)
+    Real64 PluginManager::getTrendVariableMax([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableSum(int handle, int count)
+    Real64 PluginManager::getTrendVariableSum(EnergyPlusData &state, int handle, int count)
     {
         Real64 sum = 0.0;
         for (int i = 0; i < count; i++) {
-            sum += trends[handle].values[i];
+            sum += state.dataPluginManager->trends[handle].values[i];
         }
         return sum;
     }
 #else
-    Real64 PluginManager::getTrendVariableSum([[maybe_unused]] int handle, [[maybe_unused]] int count)
+    Real64 PluginManager::getTrendVariableSum([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    Real64 PluginManager::getTrendVariableDirection(int handle, int count)
+    Real64 PluginManager::getTrendVariableDirection(EnergyPlusData &state, int handle, int count)
     {
-        auto &trend = trends[handle];
+        auto &trend = state.dataPluginManager->trends[handle];
         Real64 timeSum = 0.0;
         Real64 valueSum = 0.0;
         Real64 crossSum = 0.0;
@@ -1260,19 +1227,19 @@ namespace PluginManagement {
         return numerator / denominator;
     }
 #else
-    Real64 PluginManager::getTrendVariableDirection([[maybe_unused]] int handle, [[maybe_unused]] int count)
+    Real64 PluginManager::getTrendVariableDirection([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle, [[maybe_unused]] int count)
     {
         return 0.0;
     }
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    size_t PluginManager::getTrendVariableHistorySize(int handle)
+    size_t PluginManager::getTrendVariableHistorySize(EnergyPlusData &state, int handle)
     {
-        return trends[handle].values.size();
+        return state.dataPluginManager->trends[handle].values.size();
     }
 #else
-    size_t PluginManager::getTrendVariableHistorySize([[maybe_unused]] int handle)
+    size_t PluginManager::getTrendVariableHistorySize([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int handle)
     {
         return 0;
     }
@@ -1281,7 +1248,7 @@ namespace PluginManagement {
     void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
-        for (auto &trend : trends) {
+        for (auto &trend : state.dataPluginManager->trends) {
             Real64 newVarValue = PluginManager::getGlobalVariableValue(state, trend.indexOfPluginVariable);
             trend.values.push_front(newVarValue);
             trend.values.pop_back();
@@ -1292,15 +1259,15 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getGlobalVariableValue(EnergyPlusData &state, int handle)
     {
-        if (PluginManagement::globalVariableValues.empty()) {
+        if (state.dataPluginManager->globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError(state,
                 "Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:Variables object to declare them.");
         }
         try {
-            return PluginManagement::globalVariableValues[handle];  // TODO: This won't be caught as an exception I think
+            return state.dataPluginManager->globalVariableValues[handle];  // TODO: This won't be caught as an exception I think
         } catch (...) {
             EnergyPlus::ShowSevereError(state, format("Tried to access plugin global variable value at index {}", handle));
-            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", PluginManagement::globalVariableValues.size() - 1));
+            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", state.dataPluginManager->globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
         }
         return 0.0;
@@ -1315,15 +1282,15 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::setGlobalVariableValue(EnergyPlusData &state, int handle, Real64 value)
     {
-        if (PluginManagement::globalVariableValues.empty()) {
+        if (state.dataPluginManager->globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError(state, "Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables "
                                        "object to declare them.");
         }
         try {
-            PluginManagement::globalVariableValues[handle] = value;  // TODO: This won't be caught as an exception I think
+            state.dataPluginManager->globalVariableValues[handle] = value;  // TODO: This won't be caught as an exception I think
         } catch (...) {
             EnergyPlus::ShowSevereError(state, format("Tried to set plugin global variable value at index {}", handle));
-            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", PluginManagement::globalVariableValues.size() - 1));
+            EnergyPlus::ShowContinueError(state, format("Available handles range from 0 to {}", state.dataPluginManager->globalVariableValues.size() - 1));
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
         }
     }
@@ -1334,10 +1301,10 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName)
+    int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::string const &programName)
     {
-        for (size_t handle = 0; handle < plugins.size(); handle++) {
-            auto const thisPlugin = plugins[handle];
+        for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
+            auto const thisPlugin = state.dataPluginManager->plugins[handle];
             if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
                 return handle;
             }
@@ -1345,7 +1312,7 @@ namespace PluginManagement {
         return -1;
     }
 #else
-    int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] std::string const &programName)
+    int PluginManager::getLocationOfUserDefinedPlugin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] std::string const &programName)
     {
         return -1;
     }
@@ -1354,7 +1321,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &state, int index)
     {
-        plugins[index].run(state, EMSManager::EMSCallFrom::UserDefinedComponentModel);
+        state.dataPluginManager->plugins[index].run(state, EMSManager::EMSCallFrom::UserDefinedComponentModel);
     }
 #else
     void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] int index)
@@ -1390,5 +1357,4 @@ namespace PluginManagement {
     }
 #endif
 
-} // namespace PluginManagement
 } // namespace EnergyPlus

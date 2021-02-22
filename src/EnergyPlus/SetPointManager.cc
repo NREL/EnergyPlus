@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataConvergParams.hh>
@@ -61,7 +62,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -69,11 +69,11 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -242,7 +242,6 @@ namespace EnergyPlus::SetPointManager {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataZoneControls::StageZoneLogic;
         using DataZoneEquipment::GetSystemNodeNumberForZone;
         using General::FindNumberInList;
 
@@ -3070,8 +3069,8 @@ namespace EnergyPlus::SetPointManager {
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else {
-                if (allocated(StageZoneLogic)) {
-                    if (!StageZoneLogic(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
+                if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
+                    if (!state.dataZoneCtrls->StageZoneLogic(state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                         ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ShowContinueError(state, "Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
@@ -3168,8 +3167,8 @@ namespace EnergyPlus::SetPointManager {
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
             } else {
-                if (allocated(StageZoneLogic)) {
-                    if (!StageZoneLogic(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
+                if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
+                    if (!state.dataZoneCtrls->StageZoneLogic(state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum)) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                         ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                         ShowContinueError(state, "Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
@@ -3565,10 +3564,6 @@ namespace EnergyPlus::SetPointManager {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
-        using DataZoneControls::HumidityControlZone;
-        using DataZoneControls::NumHumidityControlZones;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using namespace DataPlant;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
@@ -3611,7 +3606,7 @@ namespace EnergyPlus::SetPointManager {
 
         // One time initializations
 
-        if (ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) { // check that the zone equipment and air loop data has been read in
+        if (state.dataZoneEquip->ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) { // check that the zone equipment and air loop data has been read in
 
             if (state.dataSetPointManager->InitSetPointManagersOneTimeFlag) {
 
@@ -3623,7 +3618,7 @@ namespace EnergyPlus::SetPointManager {
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
                     }
@@ -3633,15 +3628,15 @@ namespace EnergyPlus::SetPointManager {
                         ErrorsFound = true;
                     } else {
                         bool found = false;
-                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
                                 found = true;
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
                                             NodeID(state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError(state, "is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ShowContinueError(state, "is not found in Zone = " + state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                     }
@@ -3655,7 +3650,7 @@ namespace EnergyPlus::SetPointManager {
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
                     }
@@ -3665,15 +3660,15 @@ namespace EnergyPlus::SetPointManager {
                         ErrorsFound = true;
                     } else {
                         bool found = false;
-                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
                                 found = true;
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
                                             NodeID(state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError(state, "is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ShowContinueError(state, "is not found in Zone = " + state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                     }
@@ -3685,9 +3680,9 @@ namespace EnergyPlus::SetPointManager {
                     for (SetZoneNum = 1; SetZoneNum <= state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
                         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+                                state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
                                 break;
                             }
                         }
@@ -3699,8 +3694,8 @@ namespace EnergyPlus::SetPointManager {
                         } else {
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                                if (HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)) continue;
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                                if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)) continue;
                                 HstatZoneFound = true;
                                 break;
                             }
@@ -3721,9 +3716,9 @@ namespace EnergyPlus::SetPointManager {
                     for (SetZoneNum = 1; SetZoneNum <= state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).NumZones; ++SetZoneNum) {
                         // set the actual and controlled zone numbers
                         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                            if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
+                            if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNodes(SetZoneNum)) {
                                 state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) = ControlledZoneNum;
-                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
+                                state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum) = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum;
                                 break;
                             }
                         }
@@ -3735,8 +3730,8 @@ namespace EnergyPlus::SetPointManager {
                         } else {
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
-                                if (HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)) continue;
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
+                                if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum != state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)) continue;
                                 HstatZoneFound = true;
                                 break;
                             }
@@ -3766,7 +3761,7 @@ namespace EnergyPlus::SetPointManager {
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     ConZoneNum = 0;
                     for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
-                        if (ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode == ZoneNode) {
                             ConZoneNum = ControlledZoneNum;
                         }
                     }
@@ -3776,16 +3771,16 @@ namespace EnergyPlus::SetPointManager {
                         ErrorsFound = true;
                     } else {
                         bool found = false;
-                        for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
-                            if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
+                        for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).NumInletNodes; ++zoneInNode) {
+                            if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum == state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNode(zoneInNode)) {
                                 found = true;
-                                AirLoopNum = ZoneEquipConfig(ConZoneNum).InletNodeAirLoopNum(zoneInNode);
+                                AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).InletNodeAirLoopNum(zoneInNode);
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
                                             NodeID(state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError(state, "is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
+                            ShowContinueError(state, "is not found in Zone = " + state.dataZoneEquip->ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                         if (AirLoopNum == 0) {
@@ -3806,7 +3801,6 @@ namespace EnergyPlus::SetPointManager {
                                         LookForFan = true;
                                     }
                                     if (LookForFan) {
-                                        // cpw22Aug2010 Add Fan:ComponentModel (new)
                                         if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
                                             UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                             UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
@@ -3822,7 +3816,6 @@ namespace EnergyPlus::SetPointManager {
                             for (BranchNum = 1; BranchNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumBranches; ++BranchNum) {
                                 for (CompNum = 1; CompNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                                     CompType = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf;
-                                    // cpw22Aug2010 Add Fan:ComponentModel (new)
                                     if (UtilityRoutines::SameString(CompType, "Fan:ConstantVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:VariableVolume") ||
                                         UtilityRoutines::SameString(CompType, "Fan:OnOff") ||
@@ -4037,11 +4030,11 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
-                                    if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
+                                    if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
                                         state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
@@ -4079,11 +4072,11 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
-                                    if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
+                                    if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
                                         state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
@@ -4120,11 +4113,11 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
-                                    if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
+                                    if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
                                         state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
@@ -4160,11 +4153,11 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             // make sure humidity controlled zone
                             HstatZoneFound = false;
-                            for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
+                            for (HStatZoneNum = 1; HStatZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
                                      ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
-                                    if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
+                                    if (state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).ActualZoneNum !=
                                         state.dataAirLoop->AirToZoneNodeInfo(state.dataSetPointManager->MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
@@ -4193,43 +4186,43 @@ namespace EnergyPlus::SetPointManager {
                     for (LoopNum = 1; LoopNum <= NumCondLoops + NumPlantLoops;
                          ++LoopNum) { // Begin demand side loops ... When condenser is added becomes NumLoops
                         for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
-                            if (PlantLoop(LoopNum).TempSetPointNodeNum == state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
-                                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
-                                    for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
+                            if (state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum == state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
+                                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
                                         // Check if cooling tower is single speed and generate and error
-                                        TypeOf_Num = PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        TypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                         if (TypeOf_Num == TypeOf_CoolingTower_SingleSpd) {
                                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->CondEntSetPtMgr(SetPtMgrNum).Name +
                                                             "\", invalid tower found");
                                             ShowContinueError(state, "Found SingleSpeed Cooling Tower, Cooling Tower=" +
-                                                              PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
+                                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
                                             ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager.");
                                             ErrorsFound = true;
                                         }
                                     }
                                 }
                                 // Scan all attached chillers in the condenser loop index found to find the chiller index
-                                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
-                                    for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
+                                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
+                                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
-                                        TypeOf_Num = PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        TypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                         if (TypeOf_Num == TypeOf_Chiller_Absorption || TypeOf_Num == TypeOf_Chiller_Indirect_Absorption ||
                                             TypeOf_Num == TypeOf_Chiller_CombTurbine || TypeOf_Num == TypeOf_Chiller_ConstCOP ||
                                             TypeOf_Num == TypeOf_Chiller_Electric || TypeOf_Num == TypeOf_Chiller_ElectricEIR ||
                                             TypeOf_Num == TypeOf_Chiller_DFAbsorption || TypeOf_Num == TypeOf_Chiller_ElectricReformEIR ||
                                             TypeOf_Num == TypeOf_Chiller_EngineDriven) {
                                             // Scan the supply side to find the chiller index and branch index on plantloop
-                                            TypeNum = PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                            TypeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                             for (LoopNum2 = 1; LoopNum2 <= NumCondLoops + NumPlantLoops; ++LoopNum2) {
                                                 for (BranchNumPlantSide = 1;
-                                                     BranchNumPlantSide <= PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
+                                                     BranchNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
                                                      ++BranchNumPlantSide) {
                                                     for (CompNumPlantSide = 1;
                                                          CompNumPlantSide <=
-                                                         PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNumPlantSide).TotalComponents;
+                                                         state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNumPlantSide).TotalComponents;
                                                          ++CompNumPlantSide) {
-                                                        if (PlantLoop(LoopNum2)
+                                                        if (state.dataPlnt->PlantLoop(LoopNum2)
                                                                 .LoopSide(SupplySide)
                                                                 .Branch(BranchNumPlantSide)
                                                                 .Comp(CompNumPlantSide)
@@ -4261,17 +4254,17 @@ namespace EnergyPlus::SetPointManager {
                     for (LoopNum = 1; LoopNum <= NumCondLoops + NumPlantLoops;
                          ++LoopNum) { // Begin demand side loops ... When condenser is added becomes NumLoops
                         for (CtrlNodeIndex = 1; CtrlNodeIndex <= state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++CtrlNodeIndex) {
-                            if (PlantLoop(LoopNum).TempSetPointNodeNum == state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
-                                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
-                                    for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
+                            if (state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum == state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).CtrlNodes(CtrlNodeIndex)) {
+                                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
                                         // Check if cooling tower is single speed and generate and error
-                                        TypeOf_Num = PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        TypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                         if (TypeOf_Num == TypeOf_CoolingTower_SingleSpd) {
                                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).Name +
                                                             "\", invalid cooling tower found");
                                             ShowContinueError(state, "Found Single Speed Cooling Tower, Cooling Tower=" +
-                                                              PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
+                                                              state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).Name);
                                             ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop");
                                             ErrorsFound = true;
                                         } else if (TypeOf_Num == TypeOf_CoolingTower_TwoSpd || TypeOf_Num == TypeOf_CoolingTower_VarSpd) {
@@ -4287,26 +4280,26 @@ namespace EnergyPlus::SetPointManager {
                                     }
                                 }
                                 // Scan all attached chillers in the condenser loop index found to find the chiller index
-                                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
-                                    for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
+                                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
+                                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).TotalComponents;
                                          ++CompNum) {
-                                        TypeOf_Num = PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                        TypeOf_Num = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                         if (TypeOf_Num == TypeOf_Chiller_Absorption || TypeOf_Num == TypeOf_Chiller_Indirect_Absorption ||
                                             TypeOf_Num == TypeOf_Chiller_CombTurbine || TypeOf_Num == TypeOf_Chiller_ConstCOP ||
                                             TypeOf_Num == TypeOf_Chiller_Electric || TypeOf_Num == TypeOf_Chiller_ElectricEIR ||
                                             TypeOf_Num == TypeOf_Chiller_DFAbsorption || TypeOf_Num == TypeOf_Chiller_ElectricReformEIR ||
                                             TypeOf_Num == TypeOf_Chiller_EngineDriven) {
                                             // Scan the supply side to find the chiller index and branch index on plantloop
-                                            TypeNum = PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
+                                            TypeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).TypeOf_Num;
                                             for (LoopNum2 = 1; LoopNum2 <= NumCondLoops + NumPlantLoops; ++LoopNum2) {
                                                 for (BranchNumPlantSide = 1;
-                                                     BranchNumPlantSide <= PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
+                                                     BranchNumPlantSide <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
                                                      ++BranchNumPlantSide) {
                                                     for (CompNumPlantSide = 1;
                                                          CompNumPlantSide <=
-                                                         PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNumPlantSide).TotalComponents;
+                                                         state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNumPlantSide).TotalComponents;
                                                          ++CompNumPlantSide) {
-                                                        TypeOf_Num = PlantLoop(LoopNum2)
+                                                        TypeOf_Num = state.dataPlnt->PlantLoop(LoopNum2)
                                                                          .LoopSide(SupplySide)
                                                                          .Branch(BranchNumPlantSide)
                                                                          .Comp(CompNumPlantSide)
@@ -4317,13 +4310,13 @@ namespace EnergyPlus::SetPointManager {
                                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).ChillerIndexPlantSide = CompNumPlantSide;
                                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).BranchIndexPlantSide = BranchNumPlantSide;
                                                             // Scan the pump on the chilled water loop
-                                                            for (BranchNum2 = 1; BranchNum2 <= PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
+                                                            for (BranchNum2 = 1; BranchNum2 <= state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).TotalBranches;
                                                                  ++BranchNum2) {
                                                                 for (CompNum2 = 1;
                                                                      CompNum2 <=
-                                                                     PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNum2).TotalComponents;
+                                                                     state.dataPlnt->PlantLoop(LoopNum2).LoopSide(SupplySide).Branch(BranchNum2).TotalComponents;
                                                                      ++CompNum2) {
-                                                                    TypeOf_Num = PlantLoop(LoopNum2)
+                                                                    TypeOf_Num = state.dataPlnt->PlantLoop(LoopNum2)
                                                                                      .LoopSide(SupplySide)
                                                                                      .Branch(BranchNum2)
                                                                                      .Comp(CompNum2)
@@ -4344,7 +4337,7 @@ namespace EnergyPlus::SetPointManager {
                                                                 "\", too many chillers found");
                                                 ShowContinueError(state, "only one chiller can be used with this setpoint manager on each loop");
                                                 ShowContinueError(state, "Found more than one chiller, chiller =" +
-                                                                  PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Name);
+                                                                  state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).Name);
                                                 ErrorsFound = true;
                                             }
                                             state.dataSetPointManager->IdealCondEntSetPtMgr(SetPtMgrNum).TypeNum = TypeNum;
@@ -4589,7 +4582,7 @@ namespace EnergyPlus::SetPointManager {
                 }
             }
 
-            if (ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) {
+            if (state.dataZoneEquip->ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     NodeNum = state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
                     if (state.dataSetPointManager->RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType::MassFlow) {
@@ -4876,25 +4869,25 @@ namespace EnergyPlus::SetPointManager {
         // The Single Zone Heating Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZHtSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Cooling Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZClSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Minimum Humidity Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMinHumSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Single Zone Maximum Humidity Setpoint Managers
 
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZMaxHumSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Warmest Setpoint Managers
@@ -4982,12 +4975,12 @@ namespace EnergyPlus::SetPointManager {
 
         // the single zone cooling on/off staged control setpoint managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageCoolingSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // the single zone heating on/off staged control setpoint managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumSZOneStageHeatingSetPtMgrs; ++SetPtMgrNum) {
-            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).calculate();
+            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // return water reset
@@ -5047,13 +5040,13 @@ namespace EnergyPlus::SetPointManager {
         Real64 CurSchValOnPeak;
         Real64 CurSchValCharge;
         Real64 const OnVal(0.5);
-        int const CoolOpComp(1); // a component that cools only (chillers)
-        int const DualOpComp(2); // a component that heats or cools (ice storage tank)
 
         CurSchValOnPeak = GetCurrentScheduleValue(state, this->SchedPtr);
         CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
 
-        if (this->CompOpType == CoolOpComp) { // this is some sort of chiller
+        // CtrlType bug
+//        if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of chiller
+        if (this->CompOpType == DataPlant::iCtrlType::HeatingOp) { // this is some sort of chiller
             if (CurSchValOnPeak >= OnVal) {
                 this->SetPt = this->NonChargeCHWTemp;
             } else if (CurSchValCharge < OnVal) {
@@ -5061,7 +5054,9 @@ namespace EnergyPlus::SetPointManager {
             } else {
                 this->SetPt = this->ChargeCHWTemp;
             }
-        } else if (this->CompOpType == DualOpComp) { // this is some sort of ice storage system
+            // CtrlType Bug
+//        } else if (this->CompOpType == DataPlant::iCtrlType::DualOp) { // this is some sort of ice storage system
+        } else if (this->CompOpType == DataPlant::iCtrlType::CoolingOp) { // this is some sort of ice storage system
             this->SetPt = this->NonChargeCHWTemp;
         }
     }
@@ -5227,10 +5222,10 @@ namespace EnergyPlus::SetPointManager {
         AirLoopNum = this->AirLoopNum;
         OAFrac = state.dataAirLoop->AirLoopFlow(AirLoopNum).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
-        ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
-        ZoneLoadToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
-        ZoneLoadToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
-        DeadBand = DeadBandOrSetback(ZoneNum);
+        ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+        ZoneLoadToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
+        ZoneLoadToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
+        DeadBand = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
         ZoneTemp = Node(ZoneNode).Temp;
         LoopInNode = this->LoopInNode;
         if (OAMixOAInNode > 0) {
@@ -5304,7 +5299,7 @@ namespace EnergyPlus::SetPointManager {
         this->SetPt = TSetPt;
     }
 
-    void DefineSZHeatingSetPointManager::calculate()
+    void DefineSZHeatingSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5320,7 +5315,6 @@ namespace EnergyPlus::SetPointManager {
 
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         Real64 ZoneLoadtoHeatSP; // required zone load to zone heating setpoint [W]
         Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
@@ -5334,7 +5328,7 @@ namespace EnergyPlus::SetPointManager {
         ZoneNum = this->ControlZoneNum;
         ZoneNode = this->ZoneNodeNum;
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
-        ZoneLoadtoHeatSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
+        ZoneLoadtoHeatSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
         ZoneTemp = Node(ZoneNode).Temp;
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MinSetTemp;
@@ -5346,7 +5340,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    void DefineSZCoolingSetPointManager::calculate()
+    void DefineSZCoolingSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5362,7 +5356,6 @@ namespace EnergyPlus::SetPointManager {
 
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         Real64 ZoneLoadtoCoolSP; // required zone load to zone Cooling setpoint [W]
         Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
@@ -5376,7 +5369,7 @@ namespace EnergyPlus::SetPointManager {
         ZoneNum = this->ControlZoneNum;
         ZoneNode = this->ZoneNodeNum;
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
-        ZoneLoadtoCoolSP = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
+        ZoneLoadtoCoolSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
         ZoneTemp = Node(ZoneNode).Temp;
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MaxSetTemp;
@@ -5388,7 +5381,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    void DefineSZOneStageCoolinggSetPointManager::calculate()
+    void DefineSZOneStageCoolinggSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5403,35 +5396,14 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Evaluate stage in zone energy demand structure and choose setpoint accordingly
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (ZoneSysEnergyDemand(this->ControlZoneNum).StageNum >= 0) {
+        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum >= 0) {
             this->SetPt = this->CoolingOffTemp;
         } else { // negative so a cooling stage is set
             this->SetPt = this->CoolingOnTemp;
         }
     }
 
-    void DefineSZOneStageHeatingSetPointManager::calculate()
+    void DefineSZOneStageHeatingSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5446,34 +5418,14 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Evaluate stage in zone energy demand structure and choose setpoint accordingly
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-        if (ZoneSysEnergyDemand(this->ControlZoneNum).StageNum <= 0) {
+        if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum <= 0) {
             this->SetPt = this->HeatingOffTemp;
         } else { // positive so a heating stage is set
             this->SetPt = this->HeatingOnTemp;
         }
     }
 
-    void DefineSZMinHumSetPointManager::calculate()
+    void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5492,25 +5444,9 @@ namespace EnergyPlus::SetPointManager {
         // is used to calculate the minimum supply air humidity ratio
         // needed to meet minimum zone relative humidity requirement
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using Psychrometrics::PsyWFnTdbRhPb;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNode;
         Real64 ZoneMassFlow;
@@ -5527,7 +5463,7 @@ namespace EnergyPlus::SetPointManager {
 
         if (ZoneMassFlow > SmallMassFlow) {
 
-            MoistureLoad = ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToHumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToHumidifyingSP;
 
             SupplyAirHumRat = max(0.0, Node(ZoneNode).HumRat + MoistureLoad / ZoneMassFlow);
 
@@ -5537,7 +5473,7 @@ namespace EnergyPlus::SetPointManager {
         }
     }
 
-    void DefineSZMaxHumSetPointManager::calculate()
+    void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5555,25 +5491,9 @@ namespace EnergyPlus::SetPointManager {
         // is used to calculate the maximum supply air humidity ratio
         // needed to meet maximum zone relative humidity requirement
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
         using Psychrometrics::PsyWFnTdbRhPb;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNode;        // Control zone air node number
         Real64 ZoneMassFlow; // Zone air mass flow rate (kg/s)
@@ -5589,7 +5509,7 @@ namespace EnergyPlus::SetPointManager {
 
         if (ZoneMassFlow > SmallMassFlow) {
 
-            MoistureLoad = ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToDehumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ZoneNum(1)).OutputRequiredToDehumidifyingSP;
 
             SystemMassFlow = Node(this->CtrlNodes(1)).MassFlowRate;
 
@@ -5624,7 +5544,6 @@ namespace EnergyPlus::SetPointManager {
         // Using/Aliasing
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5666,7 +5585,7 @@ namespace EnergyPlus::SetPointManager {
                     SetPointErrorFlag = true;
                 } else {
                     // need call to check if this is the target of an EnergyManagementSystem:Actuator object
-                    CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, SetPointErrorFlag);
+                    CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                     if (SetPointErrorFlag) {
                         ShowSevereError(state, "CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager " + this->Name);
                         ShowContinueError(state, "Node Referenced =" + NodeID(RefNode));
@@ -5724,10 +5643,6 @@ namespace EnergyPlus::SetPointManager {
 
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iHumidityRatioMaxSetPoint;
-        using EMSManager::iHumidityRatioMinSetPoint;
-        using EMSManager::iHumidityRatioSetPoint;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5798,13 +5713,13 @@ namespace EnergyPlus::SetPointManager {
                     {
                         auto const SELECT_CASE_var(this->CtrlTypeMode);
                         if (SELECT_CASE_var == iCtrlVarType::Temp) { // 'Temperature'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iTemperatureSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iTemperatureSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType::MaxHumRat) { // 'HUMRATMAX'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType::MinHumRat) { // 'HUMRATMIN'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, LocalSetPointCheckFailed);
                         } else if (SELECT_CASE_var == iCtrlVarType::HumRat) { // 'HumidityRatio'
-                            CheckIfNodeSetPointManagedByEMS(state, RefNode, iHumidityRatioSetPoint, LocalSetPointCheckFailed);
+                            CheckIfNodeSetPointManagedByEMS(state, RefNode, EMSManager::SPControlType::iHumidityRatioSetPoint, LocalSetPointCheckFailed);
                         }
                     }
                     if (LocalSetPointCheckFailed) {
@@ -5848,24 +5763,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible heat balance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;         // required zone load [W]
@@ -5889,10 +5789,10 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-            ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-            ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             ZoneSetPointTemp = this->MaxSetTemp;
             if (ZoneLoad < 0.0) {
@@ -5929,24 +5829,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible heat balance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;         // required zone load [W]
@@ -5972,10 +5857,10 @@ namespace EnergyPlus::SetPointManager {
             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++ZonesHeatedIndex) {
                 CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedIndex);
                 ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZonesHeatedIndex);
-                ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-                ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+                ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+                ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-                ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
                 ZoneTemp = Node(ZoneNode).Temp;
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
@@ -5992,10 +5877,10 @@ namespace EnergyPlus::SetPointManager {
             for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
                 CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
                 ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
-                ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-                ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+                ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+                ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-                ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+                ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
                 ZoneTemp = Node(ZoneNode).Temp;
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
@@ -6033,24 +5918,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible heat balance
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;         // required zone load [W]
@@ -6088,10 +5958,10 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
-            ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
-            ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             ZoneSetPointTemp = MaxSetPointTemp;
             ZoneFracFlow = MinFracFlow;
@@ -6233,24 +6103,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible (heating load) heat balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
@@ -6293,9 +6148,9 @@ namespace EnergyPlus::SetPointManager {
 
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
@@ -6332,24 +6187,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone sensible (cooling load) heat balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
@@ -6383,9 +6223,9 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
+            ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
             CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
@@ -6424,24 +6264,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone latent load balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
@@ -6471,9 +6296,9 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             SumMdotTot += ZoneMassFlowRate;
             SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
@@ -6507,24 +6332,9 @@ namespace EnergyPlus::SetPointManager {
         // METHODOLOGY EMPLOYED:
         // Zone latent load balance around the zones served by a central air system
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
@@ -6555,9 +6365,9 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             SumMdotTot += ZoneMassFlowRate;
             SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
@@ -6592,25 +6402,12 @@ namespace EnergyPlus::SetPointManager {
         // over all the zones that a central air system can humidify and calculates the setpoint based
         // on a zone with the highest humidity ratio setpoint requirement:
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -6631,9 +6428,9 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             ZoneSetPointHum = this->MinSetHum;
             // For humidification the moisture load is positive
@@ -6671,25 +6468,12 @@ namespace EnergyPlus::SetPointManager {
         // over all the zones that a central air system can dehumidify and calculates the setpoint
         // based on a zone with the lowest humidity ratio setpoint requirement:
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
-        using DataZoneEnergyDemands::ZoneSysMoistureDemand;
-        using DataZoneEquipment::ZoneEquipConfig;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
@@ -6710,9 +6494,9 @@ namespace EnergyPlus::SetPointManager {
         for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
-            ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
+            ZoneNode = state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
-            MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
+            MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
             ZoneHum = Node(ZoneNode).HumRat;
             ZoneSetPointHum = this->MaxSetHum;
 
@@ -6995,25 +6779,25 @@ namespace EnergyPlus::SetPointManager {
         BranchIndexDemandSide = this->BranchIndexDemandSide;
 
         // If chiller is on
-        CurLoad = std::abs(PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MyLoad);
+        CurLoad = std::abs(state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MyLoad);
         if (CurLoad > 0) {
             if (TypeNum == TypeOf_Chiller_Absorption || TypeNum == TypeOf_Chiller_CombTurbine || TypeNum == TypeOf_Chiller_Electric ||
                 TypeNum == TypeOf_Chiller_ElectricReformEIR || TypeNum == TypeOf_Chiller_EngineDriven) {
                 TempDesCondIn =
-                    PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesCondIn;
+                    state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesCondIn;
                 state.dataSetPointManager->DCESPMCondInletTemp =
-                    Node(PlantLoop(LoopIndexDemandSide).LoopSide(DemandSide).Branch(BranchIndexDemandSide).Comp(ChillerIndexDemandSide).NodeNumIn)
+                    Node(state.dataPlnt->PlantLoop(LoopIndexDemandSide).LoopSide(DemandSide).Branch(BranchIndexDemandSide).Comp(ChillerIndexDemandSide).NodeNumIn)
                         .Temp;
                 state.dataSetPointManager->DCESPMEvapOutletTemp =
-                    Node(PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).NodeNumOut).Temp;
+                    Node(state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).NodeNumOut).Temp;
                 TempEvapOutDesign =
-                    PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesEvapOut;
+                    state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesEvapOut;
                 state.dataSetPointManager->DCESPMDesignClgCapacity_Watts =
-                    PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MaxLoad;
-                state.dataSetPointManager->DCESPMCurrentLoad_Watts = PlantLoop(LoopIndexPlantSide).CoolingDemand;
+                    state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MaxLoad;
+                state.dataSetPointManager->DCESPMCurrentLoad_Watts = state.dataPlnt->PlantLoop(LoopIndexPlantSide).CoolingDemand;
             } else if (TypeNum == TypeOf_Chiller_Indirect_Absorption || TypeNum == TypeOf_Chiller_DFAbsorption) {
                 TempDesCondIn =
-                    PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesCondIn;
+                    state.dataPlnt->PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesCondIn;
                 TempEvapOutDesign = 6.666;
             } else {
                 TempDesCondIn = 25.0;
@@ -7152,7 +6936,7 @@ namespace EnergyPlus::SetPointManager {
 
             // If chiller is on
             CurLoad = std::abs(
-                PlantLoop(this->LoopIndexPlantSide).LoopSide(SupplySide).Branch(this->BranchIndexPlantSide).Comp(this->ChillerIndexPlantSide).MyLoad);
+                state.dataPlnt->PlantLoop(this->LoopIndexPlantSide).LoopSide(SupplySide).Branch(this->BranchIndexPlantSide).Comp(this->ChillerIndexPlantSide).MyLoad);
 
             if (CurLoad > 0) {
 
@@ -7160,7 +6944,7 @@ namespace EnergyPlus::SetPointManager {
                 if (this->TypeNum == TypeOf_Chiller_Absorption || this->TypeNum == TypeOf_Chiller_CombTurbine ||
                     this->TypeNum == TypeOf_Chiller_Electric || this->TypeNum == TypeOf_Chiller_ElectricReformEIR ||
                     this->TypeNum == TypeOf_Chiller_EngineDriven) {
-                    EvapOutletTemp = Node(PlantLoop(this->LoopIndexPlantSide)
+                    EvapOutletTemp = Node(state.dataPlnt->PlantLoop(this->LoopIndexPlantSide)
                                               .LoopSide(SupplySide)
                                               .Branch(this->BranchIndexPlantSide)
                                               .Comp(this->ChillerIndexPlantSide)
@@ -7309,13 +7093,13 @@ namespace EnergyPlus::SetPointManager {
         // if plant isn't initialized, assume index=1 (water)
         int fluidIndex = 1;
         if (this->plantLoopIndex == 0) {
-            for (int plantIndex = 1; plantIndex <= DataPlant::TotNumLoops; plantIndex++) {
-                if (this->supplyNodeIndex == DataPlant::PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
+            for (int plantIndex = 1; plantIndex <= state.dataPlnt->TotNumLoops; plantIndex++) {
+                if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
                     this->plantLoopIndex = plantIndex;
-                    this->plantSetpointNodeIndex = DataPlant::PlantLoop(plantIndex).TempSetPointNodeNum;
-                    fluidIndex = DataPlant::PlantLoop(plantIndex).FluidIndex;
+                    this->plantSetpointNodeIndex = state.dataPlnt->PlantLoop(plantIndex).TempSetPointNodeNum;
+                    fluidIndex = state.dataPlnt->PlantLoop(plantIndex).FluidIndex;
                     // now that we've found the plant populated, let's verify that the nodes match
-                    if (!PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(this->supplyNodeIndex, this->returnNodeIndex)) {
+                    if (!PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(state, this->supplyNodeIndex, this->returnNodeIndex)) {
                         ShowSevereError(state, "Node problem for SetpointManager:ReturnTemperature:ChilledWater.");
                         ShowContinueError(state, "Return and Supply nodes were not found on the same plant loop.  Verify node names.");
                         ShowFatalError(state, "Simulation aborts due to setpoint node problem");
@@ -7414,13 +7198,13 @@ namespace EnergyPlus::SetPointManager {
         // if plant isn't initialized, assume index=1 (water)
         int fluidIndex = 1;
         if (this->plantLoopIndex == 0) {
-            for (int plantIndex = 1; plantIndex <= DataPlant::TotNumLoops; plantIndex++) {
-                if (this->supplyNodeIndex == DataPlant::PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
+            for (int plantIndex = 1; plantIndex <= state.dataPlnt->TotNumLoops; plantIndex++) {
+                if (this->supplyNodeIndex == state.dataPlnt->PlantLoop(plantIndex).LoopSide(2).NodeNumOut) {
                     this->plantLoopIndex = plantIndex;
-                    this->plantSetpointNodeIndex = DataPlant::PlantLoop(plantIndex).TempSetPointNodeNum;
-                    fluidIndex = DataPlant::PlantLoop(plantIndex).FluidIndex;
+                    this->plantSetpointNodeIndex = state.dataPlnt->PlantLoop(plantIndex).TempSetPointNodeNum;
+                    fluidIndex = state.dataPlnt->PlantLoop(plantIndex).FluidIndex;
                     // now that we've found the plant populated, let's verify that the nodes match
-                    if (!PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(this->supplyNodeIndex, this->returnNodeIndex)) {
+                    if (!PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(state, this->supplyNodeIndex, this->returnNodeIndex)) {
                         ShowSevereError(state, "Node problem for SetpointManager:ReturnTemperature:HotWater.");
                         ShowContinueError(state, "Return and Supply nodes were not found on the same plant loop.  Verify node names.");
                         ShowFatalError(state, "Simulation aborts due to setpoint node problem");
@@ -7519,9 +7303,9 @@ namespace EnergyPlus::SetPointManager {
         int CondPumpBranchNum(this->CondPumpBranchNum); // Condenser water pump branch number
         int CondPumpNum(this->CondPumpNum);             // Condenser pump number
 
-        TypeOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
-        NameOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        TypeOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).TypeOf;
+        NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChillerBranchNum).Comp(ChillerNum).Name;
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7539,9 +7323,9 @@ namespace EnergyPlus::SetPointManager {
         this->ChllrVarType = VarTypes(1);
         this->ChllrVarIndex = VarIndexes(1);
 
-        TypeOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
-        NameOfComp = PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        TypeOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).TypeOf;
+        NameOfComp = state.dataPlnt->PlantLoop(ChillerLoopNum).LoopSide(SupplySide).Branch(ChilledPumpBranchNum).Comp(ChilledPumpNum).Name;
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7561,9 +7345,9 @@ namespace EnergyPlus::SetPointManager {
         this->ChlPumpVarIndex = VarIndexes(1);
 
         for (int i = 1; i <= this->numTowers; i++) {
-            TypeOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).TypeOf;
-            NameOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).Name;
-            NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+            TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).TypeOf;
+            NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(this->CondTowerBranchNum(i)).Comp(this->TowerNum(i)).Name;
+            NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
             VarIndexes.allocate(NumVariables);
             VarTypes.allocate(NumVariables);
             IndexTypes.allocate(NumVariables);
@@ -7584,9 +7368,9 @@ namespace EnergyPlus::SetPointManager {
             this->ClTowerVarIndex.push_back(VarIndexes(1));
         }
 
-        TypeOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
-        NameOfComp = PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
-        NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+        TypeOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).TypeOf;
+        NameOfComp = state.dataPlnt->PlantLoop(TowerLoopNum).LoopSide(SupplySide).Branch(CondPumpBranchNum).Comp(CondPumpNum).Name;
+        NumVariables = GetNumMeteredVariables(state, TypeOfComp, NameOfComp);
         VarIndexes.allocate(NumVariables);
         VarTypes.allocate(NumVariables);
         IndexTypes.allocate(NumVariables);
@@ -7655,7 +7439,6 @@ namespace EnergyPlus::SetPointManager {
         // Using/Aliasing
         using DataHVACGlobals::SetPointErrorFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iTemperatureSetPoint;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -8312,7 +8095,7 @@ namespace EnergyPlus::SetPointManager {
         int SetPtMgrNum; // loop counter for each set point manager
         int NumNode;     // loop counter for each node and specific control type
 
-        // FLOW:
+
 
         // First time called, get the input for all the setpoint managers
         if (state.dataSetPointManager->GetInputFlag) {
@@ -8559,7 +8342,12 @@ namespace EnergyPlus::SetPointManager {
     }
 
     void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
-        int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum)
+                                      int const SchedPtr,
+                                      int const SchedPtrCharge,
+                                      Real64 NonChargeCHWTemp,
+                                      Real64 ChargeCHWTemp,
+                                      DataPlant::iCtrlType const &CompOpType,
+                                      int const ControlNodeNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand

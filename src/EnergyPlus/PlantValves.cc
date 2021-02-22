@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,21 +53,19 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/PlantValves.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/PlantValves.hh>
-
 
 namespace EnergyPlus {
 
@@ -113,7 +111,7 @@ namespace PlantValves {
     {
         this->initialize(state);
         this->calculate(state);
-        PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
+        PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
         if (this->LoopNum > 0) {
             PlantUtilities::SetComponentFlowRate(state,
@@ -282,7 +280,7 @@ namespace PlantValves {
                 IsBranchActive = false;
 
                 // . A) find indexes of PlantLoop, Half loop, and Branch by searching CompData
-                for (auto & thisPlantLoop : DataPlant::PlantLoop) {
+                for (auto & thisPlantLoop : state.dataPlnt->PlantLoop) {
                     for (auto & thisLoopSide : thisPlantLoop.LoopSide) {
                         int branchCtr = 0;
                         for (auto & thisBranch : thisLoopSide.Branch) {
@@ -449,7 +447,7 @@ namespace PlantValves {
 
         if (state.dataGlobal->KickOffSimulation) return;
 
-        if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 0) {
+        if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Unlocked) {
             Tin = this->InletTemp;
             Tset = this->SetPointTemp;
             Ts2 = this->Stream2SourceTemp;
@@ -463,7 +461,7 @@ namespace PlantValves {
                     this->FlowDivFract = 1.0;
                 }
             }
-        } else if (DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == 1) { // don't recalc diversion, just reuse current flows
+        } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
                 this->FlowDivFract = Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {

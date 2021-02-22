@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,6 +48,7 @@
 // Standard C++ library
 #include <errno.h>
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -257,11 +258,31 @@ namespace FileSystem {
 
     void moveFile(std::string const &filePath, std::string const &destination)
     {
+        if (!fileExists(filePath)) {
+            return;
+        }
 #ifdef _WIN32
         //Note: on Windows, rename function doesn't always replace the existing file so MoveFileExA is used
         MoveFileExA(filePath.c_str(), destination.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING);
 #else
-        rename(filePath.c_str(), destination.c_str());
+        // Start by removing the destination file. rename fails silently, so you don't want to silently use a potentially outdated file...
+        removeFile(destination);
+        int result = rename(filePath.c_str(), destination.c_str());
+        if ((result != 0) || !fileExists(destination)) {
+            // rename won't work for cross-device (eg: copying from one disk to another)
+
+            // Do a copy of the content
+            {
+                std::ifstream src(filePath, std::ios::binary);
+                std::ofstream dst(destination, std::ios::binary);
+                dst << src.rdbuf();
+            }
+
+            //  Then remove original
+            if (fileExists(destination)) {
+                removeFile(filePath);
+            }
+        }
 #endif
     }
 

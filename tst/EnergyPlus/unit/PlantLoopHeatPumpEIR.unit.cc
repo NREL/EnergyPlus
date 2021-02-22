@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,15 +57,13 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
@@ -429,22 +427,22 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
@@ -481,7 +479,7 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // now call for initialization again, for begin environment
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // validate that plant sizing went ok
@@ -558,26 +556,26 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
     Real64 const plantSizingLoadVolFlow = 0.01;
     Real64 const plantSizingLoadDeltaT = 1.0;
@@ -588,10 +586,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
     DataSizing::PlantSizData(2).DeltaT = 1.0;
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
-    auto &loop2demandComponent2 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+    auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
@@ -620,13 +618,13 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // assign the plant sizing data
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(2).PlantSizNum = 2;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
 
     // The load side should be what is imposed by the plant sizing data for the design flow rate.
     // The source side should be calculated based on the COP, which was set at 1.0 for convenience.
@@ -745,28 +743,28 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).PlantSizNum = 2;
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
 
     DataSizing::PlantSizData.allocate(2);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.020;
@@ -774,10 +772,10 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
     DataSizing::PlantSizData(2).DeltaT = 1.0;
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
-    auto &loop2demandComponent2 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+    auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
@@ -804,9 +802,9 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // The values really should just come out all as the hard-sized values, this just makes sure that function didn't
     // botch something up.
@@ -882,31 +880,31 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
-    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
-    auto &loop2demandComponent2 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+    auto &loop2demandComponent2 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(2);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
@@ -934,9 +932,9 @@ TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // let's just fake that the companion coil already got autosized properly
     thisHeatingPLHP->loadSideDesignVolFlowRate = 0.1;
@@ -993,29 +991,29 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
@@ -1035,9 +1033,9 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // with no plant sizing available and no companion coil to size from, it should throw a fatal
     EXPECT_THROW(thisHeatingPLHP->sizeLoadSide(*state), std::runtime_error);
@@ -1082,29 +1080,29 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop2demandComponent1 = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop2demandComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
@@ -1124,9 +1122,9 @@ TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     // initialize so the components can find themselves on the plant
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // this should report out to the sizing output, but just the user defined stuff
     thisHeatingPLHP->sizeLoadSide(*state);
@@ -1164,15 +1162,15 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    auto &PLHPPlantLoadSideLoop = DataPlant::PlantLoop(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
@@ -1197,7 +1195,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
 
     // set up the plant setpoint conditions and test for single setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     DataLoopNode::Node(5).TempSetPoint = 2.718;
@@ -1206,7 +1204,7 @@ TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
     EXPECT_NEAR(2.718, thisCoolingPLHP->getLoadSideOutletSetPointTemp(*state), 0.001);
 
     // test for dual setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     DataLoopNode::Node(5).TempSetPointHi = 5.436;
@@ -1243,22 +1241,22 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
@@ -1281,7 +1279,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // call with run flag off, loose limits on node min/max
@@ -1299,7 +1297,7 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMinAvail = 0.0;
     thisCoolingPLHP->running = false;
@@ -1308,8 +1306,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
@@ -1318,8 +1316,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.2, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
@@ -1328,8 +1326,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on both sides
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
@@ -1338,8 +1336,8 @@ TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
-    DataPlant::PlantLoop(2).LoopSide(1).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRate = 0.13;
     thisCoolingPLHP->running = true;
@@ -1375,32 +1373,32 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // set up a couple simple plant loops with one branch per loop-side and one component per branch
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantSupplySideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &PLHPPlantDemandSideComp = DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
-    auto &extraPLHPPlantSupplySideComp = DataPlant::PlantLoop(2).LoopSide(2).Branch(1).Comp(1);
-    auto &extraPLHPPlantDemandSideComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantSupplySideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &PLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1);
+    auto &extraPLHPPlantSupplySideComp = state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp(1);
+    auto &extraPLHPPlantDemandSideComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantSupplySideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantDemandSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     extraPLHPPlantSupplySideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
@@ -1420,7 +1418,7 @@ TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
 
     // set a couple global flags
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // test the case where the heat pump is connected to both the supply and demand sides of the same loop
     PLHPPlantSupplySideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
@@ -1493,24 +1491,24 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
@@ -1534,7 +1532,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
@@ -1556,10 +1554,10 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
     EXPECT_NEAR(thisCoolingPLHP->sourceSideInletTemp, thisCoolingPLHP->sourceSideOutletTemp, 0.001);
 
     // call from source side location, firsthvac, no load, not running, connected loop should be triggered to resimulate
-    DataPlant::PlantLoop(1).LoopSide(2).SimLoopSideNeeded = false;
-    DataPlant::PlantLoop(2).LoopSide(1).SimLoopSideNeeded = false;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).SimLoopSideNeeded = false;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).SimLoopSideNeeded = false;
     thisCoolingPLHP->simulate(*state, mySourceLocation, firstHVAC, curLoad, runFlag);
-    EXPECT_TRUE(DataPlant::PlantLoop(2).LoopSide(1).SimLoopSideNeeded);
+    EXPECT_TRUE(state->dataPlnt->PlantLoop(2).LoopSide(1).SimLoopSideNeeded);
 
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit can meet load)
     {
@@ -1627,24 +1625,24 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
@@ -1667,7 +1665,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
@@ -1856,15 +1854,15 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
 
@@ -1886,7 +1884,7 @@ TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
@@ -1973,15 +1971,15 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
 
@@ -2003,7 +2001,7 @@ TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     // call it from the load side, but this time there is a negative (cooling) load - shouldn't try to run
@@ -2189,14 +2187,14 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
@@ -2217,7 +2215,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLocation);
 
     // call with run flag off, loose limits on node min/max
@@ -2234,7 +2232,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag off, load side flow locked
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.24;
     thisCoolingPLHP->running = false;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2242,7 +2240,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on load side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2250,7 +2248,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at zero on source side
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.2;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2258,7 +2256,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 
     // call with run flag ON, flow locked at zero on both sides
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.0;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2266,7 +2264,7 @@ TEST_F(EnergyPlusFixture, Initialization2_AirSource)
     EXPECT_NEAR(0.0, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 
     // call with run flag ON, flow locked at nonzero both
-    DataPlant::PlantLoop(1).LoopSide(2).FlowLock = true;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).FlowLock = DataPlant::iFlowLock::Locked;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.inlet).MassFlowRate = 0.14;
     thisCoolingPLHP->running = true;
     thisCoolingPLHP->setOperatingFlowRatesASHP(*state);
@@ -2331,17 +2329,17 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
 
     Real64 const plantSizingLoadVolFlow = 0.01;
     Real64 const plantSizingLoadDeltaT = 1.0;
@@ -2356,8 +2354,8 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
     DataSizing::PlantSizData(2).DeltaT = 1.0;
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
@@ -2379,12 +2377,12 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // assign the plant sizing data
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
 
     Real64 expectedLoadCp = 4197.93;
     Real64 expectedLoadRho = 999.898;
@@ -2495,17 +2493,17 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
 
     // We'll set up two plant loops: a load and a source loop
-    DataPlant::TotNumLoops = 1;
-    DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 2;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(2);
 
     Real64 const plantSizingLoadVolFlow = 0.01;
     Real64 const plantSizingLoadDeltaT = 1.0;
@@ -2516,8 +2514,8 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
     DataSizing::PlantSizData(2).DeltaT = 1.0;
 
-    auto &loop1supplyComponent1 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
-    auto &loop1supplyComponent2 = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
 
     loop1supplyComponent1.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     loop1supplyComponent2.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
@@ -2539,12 +2537,12 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
     thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
 
-    DataPlant::PlantFinalSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToReport = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
     // assign the plant sizing data
-    DataPlant::PlantLoop(1).PlantSizNum = 1;
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
 
     Real64 expectedLoadCp = 4197.93;
     Real64 expectedLoadRho = 999.898;
@@ -2647,24 +2645,24 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideLoop = DataPlant::PlantLoop(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideLoop = state->dataPlnt->PlantLoop(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
 
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // call the factory with a valid name to trigger reading inputs
@@ -2689,14 +2687,14 @@ TEST_F(EnergyPlusFixture, Test_DoPhysics)
     PLHPPlantLoadSideLoop.TempSetPointNodeNum = 5;
 
     // set up the plant setpoint conditions and test for single setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPoint = 3.141;
     DataLoopNode::Node(5).TempSetPoint = 2.718;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CoolingRBOpSchemeType;
 
     // test for dual setpoint operation
-    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::DualSetPointDeadBand;
+    PLHPPlantLoadSideLoop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     DataLoopNode::Node(thisCoolingPLHP->loadSideNodes.outlet).TempSetPointHi = 6.282;
     DataLoopNode::Node(5).TempSetPointHi = 5.436;
@@ -2744,24 +2742,24 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
 
     // the init call expects a "from" calling point
@@ -2784,14 +2782,14 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     int NumFound;
 
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
     std::string NameOfComp = thisCoolingPLHP->name;
-    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
     Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
     Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
@@ -2844,24 +2842,24 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
     // set up the plant loops
     // first the load side
-    DataPlant::TotNumLoops = 2;
-    DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantLoop(1).LoopSide.allocate(2);
-    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
-    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
     PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
     // then the source side
-    DataPlant::PlantLoop(2).LoopSide.allocate(2);
-    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
-    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    state->dataPlnt->PlantLoop(2).LoopSide.allocate(2);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
     PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
 
     // the init call expects a "from" calling point
@@ -2884,14 +2882,14 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
     // call for all initialization
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(*state, myLoadLocation);
 
     int NumFound;
 
     std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
     std::string NameOfComp = thisHeatingPLHP->name;
-    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    int NumVariables = GetNumMeteredVariables(*state, TypeOfComp, NameOfComp);
     Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
     Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
     Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)

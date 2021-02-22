@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -63,21 +64,19 @@ struct EnergyPlusData;
 
 namespace OutsideEnergySources {
 
-    extern int NumDistrictUnits;
-
     struct OutsideEnergySourceSpecs : public PlantComponent
     {
 
         // Members
-        std::string Name;          // user identifier
+        std::string Name;                // user identifier
         Real64 NomCap = 0.0;             // design nominal capacity of district service
-        bool NomCapWasAutoSized = false;   // ture if Nominal Capacity was autosize on input
-        int CapFractionSchedNum = 0;   // capacity modifier schedule number
-        int InletNodeNum = 0;          // Node number on the inlet side of the plant
-        int OutletNodeNum = 0;         // Node number on the inlet side of the plant
+        bool NomCapWasAutoSized = false; // ture if Nominal Capacity was autosize on input
+        int CapFractionSchedNum = 0;     // capacity modifier schedule number
+        int InletNodeNum = 0;            // Node number on the inlet side of the plant
+        int OutletNodeNum = 0;           // Node number on the inlet side of the plant
         Real64 EnergyTransfer = 0.0;     // cooling energy provided in time step
         Real64 EnergyRate = 0.0;         // cooling power
-        int EnergyType = 0;            // flag for district heating OR cooling
+        int EnergyType = 0;              // flag for district heating OR cooling
         // loop topology variables
         int LoopNum = 0;
         int LoopSideNum = 0;
@@ -97,36 +96,46 @@ namespace OutsideEnergySources {
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate([[maybe_unused]] EnergyPlusData &state,
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
                       bool RunFlag) override;
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(EnergyPlusData &state,
-                                 const PlantLocation &calledFromLocation,
-                                 Real64 &MaxLoad,
-                                 Real64 &MinLoad,
-                                 Real64 &OptLoad) override;
+        void getDesignCapacities(
+            EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void initialize(EnergyPlusData &state, Real64 curLoad);
 
         void calculate(EnergyPlusData &state, bool runFlag, Real64 curLoad);
 
         void size(EnergyPlusData &state);
-
     };
-
-    // Object Data
-    extern Array1D<OutsideEnergySourceSpecs> EnergySource;
-
-    // Functions
-    void clear_state();
 
     void GetOutsideEnergySourcesInput(EnergyPlusData &state);
 
     void InitSimVars(int EnergySourceNum, Real64 MyLoad);
 
 } // namespace OutsideEnergySources
+
+struct OutsideEnergySourcesData : BaseGlobalStruct
+{
+
+    int NumDistrictUnits = 0;
+    bool SimOutsideEnergyGetInputFlag = true;
+    Array1D<OutsideEnergySources::OutsideEnergySourceSpecs> EnergySource;
+    std::unordered_map<std::string, std::string> EnergySourceUniqueNames;
+
+    void clear_state() override
+    {
+        this->NumDistrictUnits = 0;
+        this->SimOutsideEnergyGetInputFlag = true;
+        this->EnergySource.deallocate();
+        this->EnergySourceUniqueNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

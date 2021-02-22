@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -65,7 +64,6 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -104,7 +102,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestVentEffLimit)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
     CtrlZoneNum = 1;
     TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_DOUBLE_EQ(0.7, SysCoolingEv);
     EXPECT_NEAR(0.5516, TermUnitFinalZoneSizing(CtrlZoneNum).ZpzClgByZone, 0.0001);
     EXPECT_NEAR(0.1132, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.0001);
@@ -113,7 +111,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestVentEffLimit)
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
     CtrlZoneNum = 2;
     TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
-    LimitZoneVentEff(Xs, VozClg, CtrlZoneNum, SysCoolingEv);
+    LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_NEAR(0.7622, SysCoolingEv, .0001);
 
     TermUnitFinalZoneSizing.deallocate();
@@ -245,7 +243,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -290,7 +288,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.084324, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -425,7 +423,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -470,7 +468,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -604,7 +602,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -650,7 +648,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.092756, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -785,7 +783,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     // GetOARequirements(*state); // get the OA requirements object
     // GetZoneAirDistribution(*state); // get zone air distribution objects
     // GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -799,7 +797,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
@@ -935,7 +933,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     GetOARequirements(*state);      // get the OA requirements object
     GetZoneAirDistribution(*state); // get zone air distribution objects
     GetZoneSizingInput(*state);
-    GetZoneEquipmentData1(*state);
+    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state);
@@ -980,7 +978,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     EXPECT_DOUBLE_EQ(state->dataSingleDuct->sd_airterminal(CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.08);
 
     Node.deallocate();
-    ZoneEquipConfig.deallocate();
+    state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Zone.deallocate();
     FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();

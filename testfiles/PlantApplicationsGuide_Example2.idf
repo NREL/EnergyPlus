@@ -82,7 +82,7 @@
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 !**********************************VERSION IDENTIFIER****************************************
 
-  Version,9.4;
+  Version,9.5;
 
 !********************************************************************************************
 !***********************COMMON PLANT LOOP SCHEDULES AND SCHEDULETYPELIMITS*******************

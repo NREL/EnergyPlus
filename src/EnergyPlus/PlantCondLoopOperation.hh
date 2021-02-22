@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,35 +52,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
 namespace PlantCondLoopOperation {
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const HeatingOp; // Constant for Heating Operation
-    extern int const CoolingOp; // Constant for Cooling Operation
-    extern int const DualOp;    // Constant for Cooling or Heating Operation
-
-    extern bool const TurnItemOn;  // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-    extern bool const TurnItemOff; // Convenient for calling TurnPlantItemOnOff instead of hardwired true/false
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE  !SUBROUTINE SPECIFICATIONS FOR MODULE
-    // Driver Routines
-    // Get Input Routines
-    // Initialization Routines
-    // Load Distribution/Calculation Routines
-
-    // ON/OFF Utility Routines
-
-    // PLANT EMS Utility Routines
-
-    // Functions
-    void clear_state();
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
                                      int const LoopNum,     // PlantLoop data structure loop counter
@@ -161,8 +138,9 @@ namespace PlantCondLoopOperation {
                              Real64 const LoopDemand,
                              Real64 &RemLoopDemand);
 
-    void AdjustChangeInLoadForLastStageUpperRangeLimit(int const LoopNum,         // component topology
-                                                       int const CurOpSchemePtr,  // currect active operation scheme
+    void AdjustChangeInLoadForLastStageUpperRangeLimit(EnergyPlusData &state,
+                                                       int const LoopNum,         // component topology
+                                                       int const CurOpSchemePtr,  // current active operation scheme
                                                        int const CurEquipListPtr, // current equipment list
                                                        Real64 &ChangeInLoad       // positive magnitude of load change
     );
@@ -209,11 +187,11 @@ namespace PlantCondLoopOperation {
     // Begin Plant Loop ON/OFF Utility Subroutines
     //******************************************************************************
 
-    void TurnOnPlantLoopPipes(int const LoopNum, int const LoopSideNum);
+    void TurnOnPlantLoopPipes(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
-    void TurnOffLoopEquipment(int const LoopNum);
+    void TurnOffLoopEquipment(EnergyPlusData &state, int const LoopNum);
 
-    void TurnOffLoopSideEquipment(int const LoopNum, int const LoopSideNum);
+    void TurnOffLoopSideEquipment(EnergyPlusData &state, int const LoopNum, int const LoopSideNum);
 
     // End Plant Loop ON/OFF Utility Subroutines
     //******************************************************************************
@@ -221,21 +199,33 @@ namespace PlantCondLoopOperation {
     // Begin Plant EMS Control Routines
     //******************************************************************************
 
-    void SetupPlantEMSActuators();
+    void SetupPlantEMSActuators(EnergyPlusData &state);
 
     void ActivateEMSControls(EnergyPlusData &state, int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, bool &LoopShutDownFlag);
 
-    void AdjustChangeInLoadByEMSControls(int const LoopNum,
+    void AdjustChangeInLoadByEMSControls(EnergyPlusData &state,
+                                         int const LoopNum,
                                          int const LoopSideNum,
                                          int const BranchNum,
                                          int const CompNum,
                                          Real64 &ChangeInLoad // positive magnitude of load change
     );
 
-    //*END PLANT EMS CONTROL ROUTINES!
-    //******************************************************************************
-
 } // namespace PlantCondLoopOperation
+
+struct PlantCondLoopOperationData : BaseGlobalStruct {
+
+    bool GetPlantOpInput = true;
+    bool InitLoadDistributionOneTimeFlag = true;
+    bool LoadEquipListOneTimeFlag = true;
+
+    void clear_state() override
+    {
+        this->GetPlantOpInput = true;
+        this->InitLoadDistributionOneTimeFlag = true;
+        this->LoadEquipListOneTimeFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,12 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -141,7 +141,7 @@ namespace Boilers {
         BoilerSpecs()
             : FuelType(DataGlobalConstants::ResourceType::None), TypeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), Available(false),
               ON(false), NomCap(0.0),
-              NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
+              NomCapWasAutoSized(false), NomEffic(0.0), TempDesBoilerOut(0.0), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), VolFlowRate(0.0), VolFlowRateWasAutoSized(false), DesMassFlowRate(0.0), MassFlowRate(0.0), SizFac(0.0),
               BoilerInletNodeNum(0), BoilerOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), OperPartLoadRat(0.0),
               CurveTempMode(TempMode::NOTSET), EfficiencyCurvePtr(0), TempUpLimitBoilerOut(0.0), ParasiticElecLoad(0.0), EffCurveOutputError(0),
@@ -162,6 +162,10 @@ namespace Boilers {
 
         void SetupOutputVars(EnergyPlusData &state);
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void InitBoiler(EnergyPlusData &state); // number of the current boiler being simulated
 
         void SizeBoiler(EnergyPlusData &state);
@@ -172,7 +176,8 @@ namespace Boilers {
                              DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl // Flow control mode for the equipment
         );
 
-        void UpdateBoilerRecords(Real64 MyLoad, // boiler operating load
+        void UpdateBoilerRecords(EnergyPlusData &state,
+                                 Real64 MyLoad, // boiler operating load
                                  bool RunFlag   // boiler on when TRUE
         );
 

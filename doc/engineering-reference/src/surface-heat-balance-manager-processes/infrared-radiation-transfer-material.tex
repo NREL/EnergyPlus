@@ -77,8 +77,6 @@ The Infrared Transparent (IRT) surface is similar to a resistance-only surface. 
 
 The Infrared Transparent surface should not participate in a convective/conductive exchange between the zones it separates. In order to minimize this effect, the SurfaceProperty:ConvectionCoefficients object must be used. Outside and Inside values for the surface's convection coefficients should be on the order of .1.~ Further examples are given in the Input Output Reference document.
 
-Infrared transparent surfaces may also be specified using Construction:AirBoundary with the \textit{IRTSurface} option for radiant exchange. This method automatically generates an internal material layer with IRT properties and sets the inside convection coefficient to the Minimum Surface Convection Heat Transfer Coefficient Value specified in the HeatBalanceAlgorithm object which defaults to 0.1 [W/m2-K].
-
 \subsection{Behavior Checks}\label{behavior-checks}
 
 The behavior of multi zones separated with infrared transparent surfaces can be checked with a simple comparison. Begin with a single zone model as shown below. This model has a south-facing window, and four walls exposed to wind and sun, and a roof exposed to wind and sun.

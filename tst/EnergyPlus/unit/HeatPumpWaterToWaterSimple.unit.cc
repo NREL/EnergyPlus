@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,6 +50,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -64,7 +65,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -408,16 +408,44 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                           "    0.0003,                  !- Rated Source Side Flow Rate {m3/s}",
                           "    5490,                    !- Rated Heating Capacity {W}",
                           "    1640,                    !- Rated Heating Power Consumption {W}",
-                          "    -3.01043,                !- Heating Capacity Coefficient 1",
-                          "    -.51452,                 !- Heating Capacity Coefficient 2",
-                          "    4.515927,                !- Heating Capacity Coefficient 3",
-                          "    0.017971,                !- Heating Capacity Coefficient 4",
-                          "    0.155798,                !- Heating Capacity Coefficient 5",
-                          "    -2.65423,                !- Heating Compressor Power Coefficient 1",
-                          "    8.570358,                !- Heating Compressor Power Coefficient 2",
-                          "    1.21629,                 !- Heating Compressor Power Coefficient 3",
-                          "    -.21629,                 !- Heating Compressor Power Coefficient 4",
-                          "    0.033862;                !- Heating Compressor Power Coefficient 5",
+                          "    HtgCapCurve,             !- Heating Capacity Curve Name",
+                          "    HtgPowCurve;             !- Heating Compressor Power Curve Name",
+                              
+                          "Curve:QuadLinear,",
+                          "    HtgCapCurve,             ! Curve Name",
+                          "    -3.01043,                ! CoefficientC1",
+                          "    -.51452,                 ! CoefficientC2",
+                          "    4.515927,                ! CoefficientC3",
+                          "    0.017971,                ! CoefficientC4",
+                          "    0.155798,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
+
+                          "Curve:QuadLinear,",
+                          "    HtgPowCurve,             ! Curve Name",
+                          "    -2.65423,                ! CoefficientC1",
+                          "    8.570358,                ! CoefficientC2",
+                          "    1.21629,                 ! CoefficientC3",
+                          "    -.21629,                 ! CoefficientC4",
+                          "    0.033862,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
 
                           "PlantLoop,",
                           "    GHEV Loop,               !- Name",
@@ -1150,18 +1178,46 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
                           "    autosize,                  !- Rated Source Side Flow Rate {m3/s}",
                           "    autosize,                    !- Rated Heating Capacity {W}",
                           "    autosize,                    !- Rated Heating Power Consumption {W}",
-                          "    -3.01043,                !- Heating Capacity Coefficient 1",
-                          "    -.51452,                 !- Heating Capacity Coefficient 2",
-                          "    4.515927,                !- Heating Capacity Coefficient 3",
-                          "    0.017971,                !- Heating Capacity Coefficient 4",
-                          "    0.155798,                !- Heating Capacity Coefficient 5",
-                          "    -2.65423,                !- Heating Compressor Power Coefficient 1",
-                          "    8.570358,                !- Heating Compressor Power Coefficient 2",
-                          "    1.21629,                 !- Heating Compressor Power Coefficient 3",
-                          "    -.21629,                 !- Heating Compressor Power Coefficient 4",
-                          "    0.033862,                !- Heating Compressor Power Coefficient 5",
+                          "    HtgCapCurve,                !- Heating Capacity Curve Name",
+                          "    HtgPowCurve,                !- Heating Compressor Power Curve Name",
                           "    3.3475,                  !- Reference Coefficient of Performance",
                           "    1.0;                     !- Sizing Factor",
+                                                            
+                          "Curve:QuadLinear,",
+                          "    HtgCapCurve,             ! Curve Name",
+                          "    -3.01043,                ! CoefficientC1",
+                          "    -.51452,                 ! CoefficientC2",
+                          "    4.515927,                ! CoefficientC3",
+                          "    0.017971,                ! CoefficientC4",
+                          "    0.155798,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
+
+                          "Curve:QuadLinear,",
+                          "    HtgPowCurve,             ! Curve Name",
+                          "    -2.65423,                ! CoefficientC1",
+                          "    8.570358,                ! CoefficientC2",
+                          "    1.21629,                 ! CoefficientC3",
+                          "    -.21629,                 ! CoefficientC4",
+                          "    0.033862,                ! CoefficientC5",
+                          "    0.,                      ! Minimum Value of w",
+                          "    100.,                    ! Maximum Value of w",
+                          "    0.,                      ! Minimum Value of x",
+                          "    100.,                    ! Maximum Value of x",
+                          "    0.,                      ! Minimum Value of y",
+                          "    100.,                    ! Maximum Value of y",
+                          "    0,                       ! Minimum Value of z",
+                          "    100,                     ! Maximum Value of z",
+                          "    0.,                      ! Minimum Curve Output",
+                          "    38.;                     ! Maximum Curve Output",
 
                           "PlantLoop,",
                           "    GHEV Loop,               !- Name",
@@ -1482,27 +1538,27 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
 
     // should be sized now
 
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedLoadVolFlowHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedSourceVolFlowHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedCapHeatWasAutoSized);
-    EXPECT_TRUE(HeatPumpWaterToWaterSimple::GSHP(1).ratedPowerHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedLoadVolFlowHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedSourceVolFlowHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedCapHeatWasAutoSized);
+    EXPECT_TRUE(state->dataHPWaterToWaterSimple->GSHP(1).ratedPowerHeatWasAutoSized);
 
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedLoadVolFlowHeat, 0.00025, 0.0000001);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedCapHeat, 7200.71, 0.1);
-    EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedPowerHeat, 2151.07, 0.1);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedLoadVolFlowHeat, 0.00025, 0.0000001);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedCapHeat, 7200.71, 0.1);
+    EXPECT_NEAR(state->dataHPWaterToWaterSimple->GSHP(1).RatedPowerHeat, 2151.07, 0.1);
 
     // Check that we are outputing the correct values
     EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechType,
+                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("3.35",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomEff,
+                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
 
     EXPECT_EQ("7200.71",
-              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
-                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+              OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchMechNomCap,
+                                                               state->dataHPWaterToWaterSimple->GSHP(1).Name));
 }
 } // namespace EnergyPlus

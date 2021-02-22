@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,13 +51,12 @@
 #include <gtest/gtest.h>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -728,7 +727,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(1);
     WaterThermalTanks::HeatPumpWaterHeaterData &HPWH = state->dataWaterThermalTanks->HPWaterHeater(Tank.HeatPumpNum);
-    DXCoils::DXCoilData &Coil = DXCoils::DXCoil(HPWH.DXCoilNum);
+    DXCoils::DXCoilData &Coil = state->dataDXCoils->DXCoil(HPWH.DXCoilNum);
     Tank.Node(1).SavedTemp = 51.190278176501131;
     Tank.Node(2).SavedTemp = 51.190445301209223;
     Tank.Node(3).SavedTemp = 51.190593898651336;
@@ -768,7 +767,7 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
     DataHVACGlobals::HPWHInletDBTemp = 21.666666666666668;
     DataHVACGlobals::HPWHInletWBTemp = 14.963459972723468;
     HPWH.SetPointTemp = 51.666666666666664;
-    OutputReportPredefined::pdstHeatCoil = -1;
+    state->dataOutRptPredefined->pdstHeatCoil = -1;
     state->dataWaterThermalTanks->mdotAir = 0.0993699992873531;
 
     int GlycolIndex = 0;
@@ -1042,7 +1041,7 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     DataHeatBalFanSys::MAT(1) = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
-    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, DXCoils::DXCoil(1).RatedAirVolFlowRate(1));
+    EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
 }
 
 TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
@@ -1411,7 +1410,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     DataHVACGlobals::HPWHInletDBTemp = 30.0;
     state->dataEnvrn->WaterMainsTemp = 40.0;
     DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-    DXCoils::HPWHHeatingCapacity = 4000.0;
+    state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
     DataLoopNode::Node(3).Temp = 30.0;
     DataLoopNode::Node(3).HumRat = 0.01;
@@ -2009,7 +2008,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankCalc)
     for (int i = 0; i < Tank.Nodes - 1; ++i) {
         EXPECT_GE(NodeTemps[i], NodeTemps[i + 1]);
     }
-    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour();
+    const Real64 SecInTimeStep = TimeStepSys * DataGlobalConstants::SecInHour;
     int DummyIndex = 1;
     Real64 TankNodeEnergy = 0;
     for (int i = 0; i < Tank.Nodes; ++i) {
@@ -2167,7 +2166,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
         EnergySum += node.Mass * Cp * (node.Temp - 60.0);
     }
     Real64 Esource = Tank.SourceEffectiveness * Tank.SourceMassFlowRate * Cp *
-                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour();
+                     (Tank.SourceInletTemp - Tank.Node(Tank.SourceOutletStratNode).TempAvg) * TimeStepSys * DataGlobalConstants::SecInHour;
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
@@ -2177,7 +2176,6 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2410,7 +2408,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     Desuperheater.SetPointTemp = 55;
     Desuperheater.Mode = 1;
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 0;
-    DXCoil(DXNum).PartLoadRatio = 1.0;
+    state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     Tank.Mode = 0;
     Tank.SetPointTemp = 50;
@@ -2457,7 +2455,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DataPlant::PlantLoop;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2571,24 +2568,68 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
         "    10297.3451215615,        !- Gross Rated Sensible Cooling Capacity {W}",
         "    5.3555091458258,         !- Gross Rated Cooling COP",
-        "    -3.9160645386,           !- Total Cooling Capacity Coefficient 1",
-        "    7.042944024,             !- Total Cooling Capacity Coefficient 2",
-        "    -2.270589372,            !- Total Cooling Capacity Coefficient 3",
-        "    0,                       !- Total Cooling Capacity Coefficient 4",
-        "    0,                       !- Total Cooling Capacity Coefficient 5",
-        "    26.7839398084,           !- Sensible Cooling Capacity Coefficient 1",
-        "    0,                       !- Sensible Cooling Capacity Coefficient 2",
-        "    -23.832385974,           !- Sensible Cooling Capacity Coefficient 3",
-        "    -1.115743914,            !- Sensible Cooling Capacity Coefficient 4",
-        "    0,                       !- Sensible Cooling Capacity Coefficient 5",
-        "    0,                       !- Sensible Cooling Capacity Coefficient 6",
-        "    -6.2337364523,           !- Cooling Power Consumption Coefficient 1",
-        "    1.610096238,             !- Cooling Power Consumption Coefficient 2",
-        "    5.317076448,             !- Cooling Power Consumption Coefficient 3",
-        "    0,                       !- Cooling Power Consumption Coefficient 4",
-        "    0,                       !- Cooling Power Consumption Coefficient 5",
+        "    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
+        "    SensCoolCapCurve,        !- Sensible Cooling Name",
+        "    CoolPowCurve,           !- Cooling Power Consumption Curve Name",
         "    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
         "    1.5;                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+
+        "Curve:QuintLinear,",
+        "  SensCoolCapCurve,     ! Curve Name",
+        "  26.7839398084,        ! CoefficientC1",
+        "  0,                    ! CoefficientC2",
+        "  -23.832385974,        ! CoefficientC3",
+        "  -1.115743914,         ! CoefficientC4",
+        "  0,                    ! CoefficientC5",
+        "  0,                    ! CoefficientC6",
+        "  0.,                   ! Minimum Value of v",
+        "  100.,                 ! Maximum Value of v",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+        
+        "Curve:QuadLinear,",
+        "  TotCoolCapCurve,      ! Curve Name",
+        "  -3.9160645386,        ! CoefficientC1",
+        "  7.042944024,          ! CoefficientC2",
+        "  -2.270589372,         ! CoefficientC3",
+        "  0,                    ! CoefficientC4",
+        "  0,                    ! CoefficientC5",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+        
+        "Curve:QuadLinear,",
+        "  CoolPowCurve,         ! Curve Name",
+        "  -6.2337364523,        ! CoefficientC1",
+        "  1.610096238,          ! CoefficientC2",
+        "  5.317076448,          ! CoefficientC3",
+        "  0,                    ! CoefficientC4",
+        "  0,                    ! CoefficientC5",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2612,7 +2653,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
-    DataPlant::TotNumLoops = 1;
+    state->dataPlnt->TotNumLoops = 1;
     int TankNum(1);
     int HPNum(1);
     int CyclingScheme(1);
@@ -2636,11 +2677,11 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
-    PlantLoop.allocate(LoopNum);
-    PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
-    PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
-    PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
-    auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
+    state->dataPlnt->PlantLoop.allocate(LoopNum);
+    state->dataPlnt->PlantLoop(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
+    state->dataPlnt->PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
+    auto &SupplySideloop(state->dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide));
     SupplySideloop.TotalBranches = 1;
     SupplySideloop.Branch.allocate(BranchNum);
     auto &CoilBranch(SupplySideloop.Branch(BranchNum));
@@ -2721,7 +2762,6 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3022,25 +3062,25 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(*state, 32.0, 0.02, 101325.0);
 
-    DXCoil(1).MSRatedAirMassFlowRate(1) = DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
-    DXCoil(1).MSRatedAirMassFlowRate(2) = DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
-    DXCoil(1).InletAirMassFlowRate = DXCoil(1).MSRatedAirMassFlowRate(2);
-    DataHVACGlobals::MSHPMassFlowRateLow = DXCoil(1).MSRatedAirMassFlowRate(1);
-    DataHVACGlobals::MSHPMassFlowRateHigh = DXCoil(1).MSRatedAirMassFlowRate(2);
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
+    state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
+    state->dataDXCoils->DXCoil(1).InletAirMassFlowRate = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
+    DataHVACGlobals::MSHPMassFlowRateLow = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1);
+    DataHVACGlobals::MSHPMassFlowRateHigh = state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2);
 
-    DXCoil(1).InletAirTemp = 27.0;
-    DXCoil(1).InletAirHumRat = 0.005;
-    DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
-    DXCoil(1).SchedPtr = 1;
-    ScheduleManager::Schedule(DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
-    DXCoil(1).MSRatedCBF(1) = 0.1262;
-    DXCoil(1).MSRatedCBF(2) = 0.0408;
+    state->dataDXCoils->DXCoil(1).InletAirTemp = 27.0;
+    state->dataDXCoils->DXCoil(1).InletAirHumRat = 0.005;
+    state->dataDXCoils->DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
+    state->dataDXCoils->DXCoil(1).SchedPtr = 1;
+    ScheduleManager::Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
+    state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
     // Calculate multispeed DX cooling coils
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, DXCoil(DXNum).TotalCoolingEnergyRate + DXCoil(DXNum).ElecCoolingPower);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, state->dataDXCoils->DXCoil(DXNum).TotalCoolingEnergyRate + state->dataDXCoils->DXCoil(DXNum).ElecCoolingPower);
 
     // Now move to the water thermal tank calculation
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
@@ -3068,7 +3108,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Desuperheater.FirstTimeThroughFlag = true;
     Tank.CalcDesuperheaterWaterHeater(*state, true);
 
-    EXPECT_EQ(Desuperheater.DXSysPLR, DXCoil(DXNum).PartLoadRatio);
+    EXPECT_EQ(Desuperheater.DXSysPLR, state->dataDXCoils->DXCoil(DXNum).PartLoadRatio);
     // if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
     EXPECT_GE(Desuperheater.DXSysPLR, Desuperheater.DesuperheaterPLR);
     // used desuperheater reclaim heat is successfully stored in HeatReclaimDXCoil data struct
@@ -3409,7 +3449,6 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
-    using DXCoils::DXCoil;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -3698,7 +3737,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     }
 
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
-    DXCoil(DXNum).PartLoadRatio = 1.0;
+    state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     // first tank heat reclaim
     // Call desuperheater calculation function
@@ -4419,7 +4458,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
         state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-        DXCoils::HPWHHeatingCapacity = 4000.0;
+        state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;
@@ -4443,7 +4482,7 @@ TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
         DataHVACGlobals::HPWHInletDBTemp = 30.0;
         state->dataEnvrn->WaterMainsTemp = 40.0;
         DataHVACGlobals::DXCoilTotalCapacity = 3500.0;
-        DXCoils::HPWHHeatingCapacity = 4000.0;
+        state->dataDXCoils->HPWHHeatingCapacity = 4000.0;
 
         DataLoopNode::Node(3).Temp = 30.0;
         DataLoopNode::Node(3).HumRat = 0.01;

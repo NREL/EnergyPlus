@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -96,8 +95,6 @@ namespace BaseboardElectric {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the Electric Baseboard units.
-
-        using DataZoneEnergyDemands::ZoneSysEnergyDemand;
 
         int BaseboardNum; // index of unit in baseboard array
         Real64 QZnReq;    // zone load not yet satisfied
@@ -139,15 +136,15 @@ namespace BaseboardElectric {
 
         InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
-        QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
+        QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
         // Simulate baseboard
         SimElectricConvective(state, BaseboardNum, QZnReq);
 
         PowerMet = baseboard->Baseboard(BaseboardNum).Power;
 
-        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
-        baseboard->Baseboard(BaseboardNum).ElecUseLoad = baseboard->Baseboard(BaseboardNum).ElecUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        baseboard->Baseboard(BaseboardNum).Energy = baseboard->Baseboard(BaseboardNum).Power * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+        baseboard->Baseboard(BaseboardNum).ElecUseLoad = baseboard->Baseboard(BaseboardNum).ElecUseRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     void GetBaseboardInput(EnergyPlusData &state)
@@ -173,7 +170,6 @@ namespace BaseboardElectric {
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
         using DataZoneEquipment::BBElectricConvective_Num;
-        using DataZoneEquipment::ZoneEquipList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetBaseboardInput: "); // include trailing blank space
@@ -241,7 +237,7 @@ namespace BaseboardElectric {
                 thisBaseboard.EquipType = UtilityRoutines::MakeUPPERCase(cCurrentModuleObject); // the type of baseboard-rename change
                 thisBaseboard.Schedule = cAlphaArgs(2);
                 if (lAlphaFieldBlanks(2)) {
-                    thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    thisBaseboard.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     thisBaseboard.SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                     if (thisBaseboard.SchedPtr == 0) {
@@ -321,9 +317,9 @@ namespace BaseboardElectric {
                 }
 
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
-                    for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
-                        if (ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
-                            ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
+                    for (ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= state.dataZoneEquip->ZoneEquipList(CtrlZone).NumOfEquipTypes; ++ZoneEquipTypeNum) {
+                        if (state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipType_Num(ZoneEquipTypeNum) == BBElectricConvective_Num &&
+                            state.dataZoneEquip->ZoneEquipList(CtrlZone).EquipName(ZoneEquipTypeNum) == thisBaseboard.EquipName) {
                             thisBaseboard.ZonePtr = CtrlZone;
                         }
                     }
@@ -387,8 +383,6 @@ namespace BaseboardElectric {
 
         using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using DataZoneEquipment::ZoneEquipConfig;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
@@ -407,7 +401,7 @@ namespace BaseboardElectric {
         }
 
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!baseboard->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!baseboard->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             baseboard->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= baseboard->NumBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(state, baseboard->Baseboard(Loop).EquipType, baseboard->Baseboard(Loop).EquipName)) continue;
@@ -429,7 +423,7 @@ namespace BaseboardElectric {
         baseboard->Baseboard(BaseboardNum).ElecUseRate = 0.0;
 
         // Do the every time step initializations
-        ZoneNode = ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
         baseboard->Baseboard(BaseboardNum).AirInletTemp = Node(ZoneNode).Temp;
         baseboard->Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }

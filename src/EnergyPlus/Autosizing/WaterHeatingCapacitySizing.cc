@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,27 +73,27 @@ Real64 WaterHeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalVa
             if ((this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU) && (this->curTermUnitSizingNum > 0)) {
                 DesMassFlow = this->termUnitSizing(this->curTermUnitSizingNum).MaxHWVolFlow;
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp(),
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                    this->callingRoutine);
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp(),
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 NominalCapacityDes = DesMassFlow * this->dataWaterCoilSizHeatDeltaT * Cp * rho;
             } else if (this->zoneEqFanCoil || this->zoneEqUnitHeater) {
                 DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).MaxHWVolFlow;
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                                   DataGlobalConstants::HWInitConvTemp(),
-                                                                   DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                                   DataGlobalConstants::HWInitConvTemp,
+                                                                   state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                    this->callingRoutine);
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidName,
-                                                               DataGlobalConstants::HWInitConvTemp(),
-                                                               DataPlant::PlantLoop(this->dataWaterLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
+                                                               DataGlobalConstants::HWInitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                this->callingRoutine);
                 NominalCapacityDes = DesMassFlow * this->dataWaterCoilSizHeatDeltaT * Cp * rho;
                 // if coil is part of a zonal unit, calc coil load to get hot water flow rate

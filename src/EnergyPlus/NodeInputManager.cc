@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,9 +67,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace NodeInputManager {
+namespace EnergyPlus::NodeInputManager {
 
     // MODULE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -84,64 +82,7 @@ namespace NodeInputManager {
     using namespace DataLoopNode;
     using namespace BranchNodeConnections;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-    static std::string const fluidNameSteam("STEAM");
-
-    // DERIVED TYPE DEFINITIONS
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int NumOfNodeLists(0);       // Total number of Node Lists in IDF
-    int NumOfUniqueNodeNames(0); // Number of Unique Node Names (current)
-    // The following is a module level flag because there are several possible "entries" into
-    // this module that may need to get the Node Inputs.
-    bool GetNodeInputFlag(true);     // Flag to Get Node Input(s)
-    Array1D_string TmpNodeID;        // Used to "reallocate" name arrays
-    Array1D_int NodeRef;             // Number of times a Node is "referenced"
-    std::string CurCheckContextName; // Used in Uniqueness checks
-    Array1D_string UniqueNodeNames;  // used in uniqueness checks
-    int NumCheckNodes(0);            // Num of Unique nodes in check
-    int MaxCheckNodes(0);            // Current "max" unique nodes in check
-    bool NodeVarsSetup(false);       // Setup indicator of node vars for reporting (also that all nodes have been entered)
-    Array1D_bool NodeWetBulbRepReq;
-
-    // Object Data
-    Array1D<NodeListDef> NodeLists; // Node Lists
-    namespace {
-        bool CalcMoreNodeInfoMyOneTimeFlag(true); // one time flag
-        Array1D_int GetOnlySingleNodeNodeNums;
-        bool GetOnlySingleNodeFirstTime(true);
-    } // namespace
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    // Clears the global data in NodeInputManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        CalcMoreNodeInfoMyOneTimeFlag = true;
-        NumOfNodeLists = 0;
-        NumOfUniqueNodeNames = 0;
-        GetNodeInputFlag = true;
-        TmpNodeID.deallocate();
-        NodeRef.deallocate();
-        CurCheckContextName = std::string();
-        UniqueNodeNames.deallocate();
-        NumCheckNodes = 0;
-        MaxCheckNodes = 0;
-        NodeVarsSetup = false;
-        NodeLists.deallocate();
-        GetOnlySingleNodeNodeNums.deallocate();
-        GetOnlySingleNodeFirstTime = true;
-        NodeWetBulbRepReq.deallocate();
-    }
+    constexpr const char *fluidNameSteam("STEAM");
 
     void GetNodeNums(EnergyPlusData &state,
                      std::string const &Name,                  // Name for which to obtain information
@@ -172,39 +113,18 @@ namespace NodeInputManager {
         // it is a single node and will need to be entered in the Node
         // data structure.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNodeNums: ");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisOne; // Indicator for this Name
-        //  CHARACTER(len=20) :: CaseNodeFluidType
         std::string ConnectionType;
         int Loop;
         int FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
 
-        if (GetNodeInputFlag) {
+        if (state.dataNodeInputMgr->GetNodeInputFlag) {
             GetNodeListsInput(state, ErrorsFound);
-            GetNodeInputFlag = false;
+            state.dataNodeInputMgr->GetNodeInputFlag = false;
         }
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
@@ -216,10 +136,10 @@ namespace NodeInputManager {
         }
 
         if (not_blank(Name)) {
-            ThisOne = UtilityRoutines::FindItemInList(Name, NodeLists);
+            ThisOne = UtilityRoutines::FindItemInList(Name, state.dataNodeInputMgr->NodeLists);
             if (ThisOne != 0) {
-                NumNodes = NodeLists(ThisOne).NumOfNodesInList;
-                NodeNumbers({1, NumNodes}) = NodeLists(ThisOne).NodeNumbers({1, NumNodes});
+                NumNodes = state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList;
+                NodeNumbers({1, NumNodes}) = state.dataNodeInputMgr->NodeLists(ThisOne).NodeNumbers({1, NumNodes});
                 for (Loop = 1; Loop <= NumNodes; ++Loop) {
                     if (NodeFluidType != NodeType_Unknown && Node(NodeNumbers(Loop)).FluidType != NodeType_Unknown) {
                         if (Node(NodeNumbers(Loop)).FluidType != NodeFluidType) {
@@ -234,7 +154,7 @@ namespace NodeInputManager {
                     if (Node(NodeNumbers(Loop)).FluidType == NodeType_Unknown) {
                         Node(NodeNumbers(Loop)).FluidType = NodeFluidType;
                     }
-                    ++NodeRef(NodeNumbers(Loop));
+                    ++state.dataNodeInputMgr->NodeRef(NodeNumbers(Loop));
                 }
             } else {
                 ThisOne = AssignNodeNumber(state, Name, NodeFluidType, ErrorsFound);
@@ -285,34 +205,10 @@ namespace NodeInputManager {
         // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
         // complete, whichever condition is reached first.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataErrorTracking::AbortProcessing; // used here to determine if this routine called during fatal error processing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        if (!NodeVarsSetup) {
-            if (!AbortProcessing) {
-                MoreNodeInfo.allocate(NumOfUniqueNodeNames);
-                for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
+        if (!state.dataNodeInputMgr->NodeVarsSetup) {
+            if (!state.dataErrTracking->AbortProcessing) {
+                MoreNodeInfo.allocate(state.dataNodeInputMgr->NumOfUniqueNodeNames);
+                for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
                     // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
                     SetupOutputVariable(state,
                         "System Node Temperature", OutputProcessor::Unit::C, Node(NumNode).Temp, "System", "Average", NodeID(NumNode));
@@ -488,7 +384,7 @@ namespace NodeInputManager {
                     }
                 }
             }
-            NodeVarsSetup = true;
+            state.dataNodeInputMgr->NodeVarsSetup = true;
 
             print(state.files.bnd, "{}\n", "! This file shows details about the branches, nodes, and other");
             print(state.files.bnd, "{}\n", "! elements of the flow connections.");
@@ -501,16 +397,16 @@ namespace NodeInputManager {
             // Show the node names on the Branch-Node Details file
             static constexpr auto Format_700("! #Nodes,<Number of Unique Nodes>");
             print(state.files.bnd, "{}\n", Format_700);
-            print(state.files.bnd, " #Nodes,{}\n", NumOfUniqueNodeNames);
-            if (NumOfUniqueNodeNames > 0) {
+            print(state.files.bnd, " #Nodes,{}\n", state.dataNodeInputMgr->NumOfUniqueNodeNames);
+            if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
                 static constexpr auto Format_702(
                     "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
                 print(state.files.bnd, "{}\n", Format_702);
             }
             int Count0 = 0;
-            for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
-               print(state.files.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,NodeRef(NumNode));
-                if (NodeRef(NumNode) == 0) ++Count0;
+            for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
+               print(state.files.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,state.dataNodeInputMgr->NodeRef(NumNode));
+                if (state.dataNodeInputMgr->NodeRef(NumNode) == 0) ++Count0;
             }
             // Show suspicious node names on the Branch-Node Details file
             if (Count0 > 0) {
@@ -520,9 +416,9 @@ namespace NodeInputManager {
                 static constexpr auto Format_703(
                     "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
                 print(state.files.bnd, "{}\n", Format_703);
-                for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
-                    if (NodeRef(NumNode) > 0) continue;
-                    print(state.files.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  NodeRef(NumNode));
+                for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
+                    if (state.dataNodeInputMgr->NodeRef(NumNode) > 0) continue;
+                    print(state.files.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  state.dataNodeInputMgr->NodeRef(NumNode));
                 }
             }
         }
@@ -541,27 +437,9 @@ namespace NodeInputManager {
         // This subroutine gets the Node Lists from the IDF and fills the
         // Node List Data Structure.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNodeListsInput: ");
         static std::string const CurrentModuleObject("NodeList");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;       // Loop Variable
@@ -579,25 +457,25 @@ namespace NodeInputManager {
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
         cAlphas.allocate(NumAlphas);
         rNumbers.allocate(NumNumbers);
-        NumOfNodeLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        NodeLists.allocate(NumOfNodeLists);
-        for (int i = 1; i <= NumOfNodeLists; ++i) {
-            NodeLists(i).Name.clear();
-            NodeLists(i).NumOfNodesInList = 0;
+        state.dataNodeInputMgr->NumOfNodeLists = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataNodeInputMgr->NodeLists.allocate(state.dataNodeInputMgr->NumOfNodeLists);
+        for (int i = 1; i <= state.dataNodeInputMgr->NumOfNodeLists; ++i) {
+            state.dataNodeInputMgr->NodeLists(i).Name.clear();
+            state.dataNodeInputMgr->NodeLists(i).NumOfNodesInList = 0;
         }
 
         NCount = 0;
-        for (Loop = 1; Loop <= NumOfNodeLists; ++Loop) {
+        for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
             inputProcessor->getObjectItem(state, CurrentModuleObject, Loop, cAlphas, NumAlphas, rNumbers, NumNumbers, IOStatus);
             if (UtilityRoutines::IsNameEmpty(state, cAlphas(1), CurrentModuleObject, localErrorsFound)) continue;
 
             ++NCount;
-            NodeLists(NCount).Name = cAlphas(1);
-            NodeLists(NCount).NodeNames.allocate(NumAlphas - 1);
-            NodeLists(NCount).NodeNames = "";
-            NodeLists(NCount).NodeNumbers.allocate(NumAlphas - 1);
-            NodeLists(NCount).NodeNumbers = 0;
-            NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
+            state.dataNodeInputMgr->NodeLists(NCount).Name = cAlphas(1);
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNames.allocate(NumAlphas - 1);
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNames = "";
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers.allocate(NumAlphas - 1);
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers = 0;
+            state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
             if (NumAlphas <= 1) {
                 if (NumAlphas == 1) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
@@ -609,19 +487,19 @@ namespace NodeInputManager {
             }
             //  Put all in, then determine unique
             for (Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1) {
-                NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
+                state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
                 if (cAlphas(Loop1 + 1).empty()) {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", blank node name in list.");
-                    --NodeLists(NCount).NumOfNodesInList;
-                    if (NodeLists(NCount).NumOfNodesInList <= 0) {
+                    --state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList;
+                    if (state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList <= 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" does not have any nodes.");
                         localErrorsFound = true;
                         break;
                     }
                     continue;
                 }
-                NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(state, NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
-                if (UtilityRoutines::SameString(NodeLists(NCount).NodeNames(Loop1), NodeLists(NCount).Name)) {
+                state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), NodeType_Unknown, localErrorsFound);
+                if (UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), state.dataNodeInputMgr->NodeLists(NCount).Name)) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\", invalid node name in list.");
                     ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
                     localErrorsFound = true;
@@ -629,9 +507,9 @@ namespace NodeInputManager {
             }
             // Error on any duplicates
             flagError = true;
-            for (Loop1 = 1; Loop1 <= NodeLists(NCount).NumOfNodesInList; ++Loop1) {
-                for (Loop2 = Loop1 + 1; Loop2 <= NodeLists(NCount).NumOfNodesInList; ++Loop2) {
-                    if (NodeLists(NCount).NodeNumbers(Loop1) != NodeLists(NCount).NodeNumbers(Loop2)) continue;
+            for (Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop1) {
+                for (Loop2 = Loop1 + 1; Loop2 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop2) {
+                    if (state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) != state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2)) continue;
                     if (flagError) { // only list nodelist name once
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + cAlphas(1) + "\" has duplicate nodes:");
                         flagError = false;
@@ -639,22 +517,22 @@ namespace NodeInputManager {
                     ShowContinueError(state,
                                       format("...list item={}, \"{}\", duplicate list item={}, \"{}\".",
                                              Loop1,
-                                             NodeID(NodeLists(NCount).NodeNumbers(Loop1)),
+                                             NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1)),
                                              Loop2,
-                                             NodeID(NodeLists(NCount).NodeNumbers(Loop2))));
+                                             NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))));
                     localErrorsFound = true;
                 }
             }
         }
 
-        for (Loop = 1; Loop <= NumOfNodeLists; ++Loop) {
-            for (Loop2 = 1; Loop2 <= NodeLists(Loop).NumOfNodesInList; ++Loop2) {
-                for (Loop1 = 1; Loop1 <= NumOfNodeLists; ++Loop1) {
+        for (Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
+            for (Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumOfNodesInList; ++Loop2) {
+                for (Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop1) {
                     if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
-                    if (!UtilityRoutines::SameString(NodeLists(Loop).NodeNames(Loop2), NodeLists(Loop1).Name)) continue;
-                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + NodeLists(Loop1).Name + "\", invalid node name in list.");
-                    ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop2, NodeLists(Loop).NodeNames(Loop2)));
-                    ShowContinueError(state, "... NodeList=\"" + NodeLists(Loop1).Name + "\", is duplicated.");
+                    if (!UtilityRoutines::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2), state.dataNodeInputMgr->NodeLists(Loop1).Name)) continue;
+                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name + "\", invalid node name in list.");
+                    ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop2, state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2)));
+                    ShowContinueError(state, "... NodeList=\"" + state.dataNodeInputMgr->NodeLists(Loop1).Name + "\", is duplicated.");
                     ShowContinueError(state, "... Items in NodeLists must not be the name of another NodeList.");
                     localErrorsFound = true;
                 }
@@ -688,27 +566,8 @@ namespace NodeInputManager {
         // Look to see if a name has already been entered.  Use the index of
         // the array as the node number, if there.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int AssignNodeNumber;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
@@ -718,11 +577,11 @@ namespace NodeInputManager {
         }
 
         int NumNode = 0;
-        if (NumOfUniqueNodeNames > 0) {
-            NumNode = UtilityRoutines::FindItemInList(Name, NodeID({1, NumOfUniqueNodeNames}), NumOfUniqueNodeNames);
+        if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
+            NumNode = UtilityRoutines::FindItemInList(Name, NodeID({1, state.dataNodeInputMgr->NumOfUniqueNodeNames}), state.dataNodeInputMgr->NumOfUniqueNodeNames);
             if (NumNode > 0) {
                 AssignNodeNumber = NumNode;
-                ++NodeRef(NumNode);
+                ++state.dataNodeInputMgr->NodeRef(NumNode);
                 if (NodeFluidType != NodeType_Unknown) {
                     if (Node(NumNode).FluidType != NodeFluidType && Node(NumNode).FluidType != NodeType_Unknown) {
                         ShowSevereError(state, "Existing Fluid type for node, incorrect for request. Node=" + NodeID(NumNode));
@@ -735,20 +594,20 @@ namespace NodeInputManager {
                     Node(NumNode).FluidType = NodeFluidType;
                 }
             } else {
-                ++NumOfUniqueNodeNames;
-                NumOfNodes = NumOfUniqueNodeNames;
+                ++state.dataNodeInputMgr->NumOfUniqueNodeNames;
+                NumOfNodes = state.dataNodeInputMgr->NumOfUniqueNodeNames;
 
                 Node.redimension(NumOfNodes);
                 NodeID.redimension({0, NumOfNodes});
-                NodeRef.redimension(NumOfNodes);
+                state.dataNodeInputMgr->NodeRef.redimension(NumOfNodes);
                 MarkedNode.redimension(NumOfNodes);
                 NodeSetpointCheck.redimension(NumOfNodes);
                 // Set new item in Node
                 Node(NumOfNodes).FluidType = NodeFluidType;
-                NodeRef(NumOfNodes) = 0;
-                NodeID(NumOfUniqueNodeNames) = Name;
+                state.dataNodeInputMgr->NodeRef(NumOfNodes) = 0;
+                NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
 
-                AssignNodeNumber = NumOfUniqueNodeNames;
+                AssignNodeNumber = state.dataNodeInputMgr->NumOfUniqueNodeNames;
             }
         } else {
             Node.allocate(1);
@@ -756,15 +615,15 @@ namespace NodeInputManager {
             // Allocate takes care of defining
             NumOfNodes = 1;
             NodeID.allocate({0, 1});
-            NodeRef.allocate(1);
+            state.dataNodeInputMgr->NodeRef.allocate(1);
             MarkedNode.allocate(1);
             NodeSetpointCheck.allocate(1);
 
-            NumOfUniqueNodeNames = 1;
+            state.dataNodeInputMgr->NumOfUniqueNodeNames = 1;
             NodeID(0) = "Undefined";
-            NodeID(NumOfUniqueNodeNames) = Name;
+            NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
             AssignNodeNumber = 1;
-            NodeRef(1) = 0;
+            state.dataNodeInputMgr->NodeRef(1) = 0;
         }
 
         return AssignNodeNumber;
@@ -793,29 +652,11 @@ namespace NodeInputManager {
         // This function gets a single node (or error message results) using the
         // node id from the input file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int GetSingleNodeResult;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // FUNCTION PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetOnlySingleNode: ");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int NumNodes;
@@ -827,10 +668,10 @@ namespace NodeInputManager {
         int NumAlphas;
         int NumNums;
 
-        if (GetOnlySingleNodeFirstTime) {
+        if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
             inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
-            GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
-            GetOnlySingleNodeFirstTime = false;
+            state.dataNodeInputMgr->GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
+            state.dataNodeInputMgr->GetOnlySingleNodeFirstTime = false;
         }
 
         FluidType = NodeFluidType;
@@ -838,7 +679,7 @@ namespace NodeInputManager {
         GetNodeNums(state,
                     NodeName,
                     NumNodes,
-                    GetOnlySingleNodeNodeNums,
+                    state.dataNodeInputMgr->GetOnlySingleNodeNodeNums,
                     errFlag,
                     FluidType,
                     NodeObjectType,
@@ -856,7 +697,7 @@ namespace NodeInputManager {
             ShowContinueError(state, "...a Nodelist may not be valid in this context.");
             errFlag = true;
         } else if (NumNodes == 0) {
-            GetOnlySingleNodeNodeNums(1) = 0;
+            state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1) = 0;
         }
         if (NumNodes > 0) {
             if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
@@ -868,7 +709,7 @@ namespace NodeInputManager {
             //                                  ConnectionType,NodeFluidStream,ObjectIsParent,errFlag)
         }
 
-        GetSingleNodeResult = GetOnlySingleNodeNodeNums(1);
+        GetSingleNodeResult = state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1);
 
         return GetSingleNodeResult;
     }
@@ -886,52 +727,31 @@ namespace NodeInputManager {
         // This subroutine begins a process of checking for unique node names
         // in a sequence of nodes.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag(false);
 
         // Begin set up of Uniqueness context
 
-        if (GetNodeInputFlag) {
+        if (state.dataNodeInputMgr->GetNodeInputFlag) {
             GetNodeListsInput(state, errFlag);
-            GetNodeInputFlag = false;
+            state.dataNodeInputMgr->GetNodeInputFlag = false;
         }
 
-        if (!CurCheckContextName.empty()) {
-            ShowFatalError(state, "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName +
+        if (!state.dataNodeInputMgr->CurCheckContextName.empty()) {
+            ShowFatalError(state, "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + state.dataNodeInputMgr->CurCheckContextName +
                            "\" was already in progress.");
         }
-        if (ContextName == BlankString) {
+        if (ContextName == std::string()) {
             ShowFatalError(state, "Init Uniqueness called with Blank Context Name");
         }
-        if (allocated(UniqueNodeNames)) {
-            UniqueNodeNames.deallocate();
+        if (allocated(state.dataNodeInputMgr->UniqueNodeNames)) {
+            state.dataNodeInputMgr->UniqueNodeNames.deallocate();
         }
 
-        NumCheckNodes = 0;
-        MaxCheckNodes = 100;
-        UniqueNodeNames.allocate(MaxCheckNodes);
-        CurCheckContextName = ContextName;
+        state.dataNodeInputMgr->NumCheckNodes = 0;
+        state.dataNodeInputMgr->MaxCheckNodes = 100;
+        state.dataNodeInputMgr->UniqueNodeNames.allocate(state.dataNodeInputMgr->MaxCheckNodes);
+        state.dataNodeInputMgr->CurCheckContextName = ContextName;
     }
 
     void CheckUniqueNodes(EnergyPlusData &state, std::string const &NodeTypes,
@@ -962,24 +782,6 @@ namespace NodeInputManager {
         // METHODOLOGY EMPLOYED:
         // checks the current list of items for this (again)
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Found;
 
@@ -991,20 +793,20 @@ namespace NodeInputManager {
                     ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument.");
                 }
                 if (!CheckName().empty()) {
-                    Found = UtilityRoutines::FindItemInList(CheckName, UniqueNodeNames, NumCheckNodes);
+                    Found = UtilityRoutines::FindItemInList(CheckName, state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
                     if (Found != 0) {
-                        ShowSevereError(state, CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
+                        ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
                         ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + CheckName + "\".");
                         ShowContinueError(state, "...Nodes must be unique across instances of this object.");
                         //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(CheckName))
                         //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
                         ErrorsFound = true;
                     } else {
-                        ++NumCheckNodes;
-                        if (NumCheckNodes > MaxCheckNodes) {
-                            UniqueNodeNames.redimension(MaxCheckNodes += 100);
+                        ++state.dataNodeInputMgr->NumCheckNodes;
+                        if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
+                            state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
                         }
-                        UniqueNodeNames(NumCheckNodes) = CheckName;
+                        state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = CheckName;
                     }
                 }
 
@@ -1013,20 +815,18 @@ namespace NodeInputManager {
                     ShowFatalError(state, "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument.");
                 }
                 if (CheckNumber != 0) {
-                    Found = UtilityRoutines::FindItemInList(NodeID(CheckNumber), UniqueNodeNames, NumCheckNodes);
+                    Found = UtilityRoutines::FindItemInList(NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
                     if (Found != 0) {
-                        ShowSevereError(state, CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
+                        ShowSevereError(state, state.dataNodeInputMgr->CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found.");
                         ShowContinueError(state, "...for Node Type(s)=" + NodeTypes + ", duplicate node name=\"" + NodeID(CheckNumber) + "\".");
                         ShowContinueError(state, "...Nodes must be unique across instances of this object.");
-                        //          CALL ShowSevereError(state, 'Node Types='//TRIM(NodeTypes)//', Non Unique Name found='//TRIM(NodeID(CheckNumber)))
-                        //          CALL ShowContinueError(state, 'Context='//TRIM(CurCheckContextName))
                         ErrorsFound = true;
                     } else {
-                        ++NumCheckNodes;
-                        if (NumCheckNodes > MaxCheckNodes) {
-                            UniqueNodeNames.redimension(MaxCheckNodes += 100);
+                        ++state.dataNodeInputMgr->NumCheckNodes;
+                        if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
+                            state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
                         }
-                        UniqueNodeNames(NumCheckNodes) = NodeID(CheckNumber);
+                        state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = NodeID(CheckNumber);
                     }
                 }
 
@@ -1049,39 +849,15 @@ namespace NodeInputManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine marks the end of a unique node check.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
-        if (CurCheckContextName != ContextName) {
-            ShowFatalError(state, "End Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was in progress.");
+        if (state.dataNodeInputMgr->CurCheckContextName != ContextName) {
+            ShowFatalError(state, "End Uniqueness called for \"" + ContextName + ", but checks for \"" + state.dataNodeInputMgr->CurCheckContextName + "\" was in progress.");
         }
-        if (ContextName == BlankString) {
+        if (ContextName == std::string()) {
             ShowFatalError(state, "End Uniqueness called with Blank Context Name");
         }
-        CurCheckContextName = BlankString;
-        if (allocated(UniqueNodeNames)) {
-            UniqueNodeNames.deallocate();
+        state.dataNodeInputMgr->CurCheckContextName = std::string();
+        if (allocated(state.dataNodeInputMgr->UniqueNodeNames)) {
+            state.dataNodeInputMgr->UniqueNodeNames.deallocate();
         }
     }
 
@@ -1108,9 +884,7 @@ namespace NodeInputManager {
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
         using FluidProperties::NumOfGlycols;
-        using OutputProcessor::NumOfReqVariables;
         using OutputProcessor::ReqReportVariables;
-        using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -1151,10 +925,10 @@ namespace NodeInputManager {
         Real64 Cp;
         Real64 rhoStd;
 
-        if (CalcMoreNodeInfoMyOneTimeFlag) {
+        if (state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag) {
             RhoAirStdInit = state.dataEnvrn->StdRhoAir;
-            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp());
-            NodeWetBulbRepReq.allocate(NumOfNodes);
+            RhoWaterStdInit = RhoH2O(DataGlobalConstants::InitConvTemp);
+            state.dataNodeInputMgr->NodeWetBulbRepReq.allocate(NumOfNodes);
             NodeWetBulbSchedPtr.allocate(NumOfNodes);
             NodeRelHumidityRepReq.allocate(NumOfNodes);
             NodeRelHumiditySchedPtr.allocate(NumOfNodes);
@@ -1164,7 +938,7 @@ namespace NodeInputManager {
             NodeSpecificHeatSchedPtr.allocate(NumOfNodes);
             nodeReportingStrings.reserve(NumOfNodes);
             nodeFluidNames.reserve(NumOfNodes);
-            NodeWetBulbRepReq = false;
+            state.dataNodeInputMgr->NodeWetBulbRepReq = false;
             NodeWetBulbSchedPtr = 0;
             NodeRelHumidityRepReq = false;
             NodeRelHumiditySchedPtr = 0;
@@ -1176,41 +950,41 @@ namespace NodeInputManager {
             for (iNode = 1; iNode <= NumOfNodes; ++iNode) {
                 nodeReportingStrings.push_back(std::string(NodeReportingCalc + NodeID(iNode)));
                 nodeFluidNames.push_back(GetGlycolNameByIndex(Node(iNode).FluidIndex));
-                for (iReq = 1; iReq <= NumOfReqVariables; ++iReq) {
-                    if (UtilityRoutines::SameString(ReqRepVars(iReq).Key, NodeID(iNode)) || ReqRepVars(iReq).Key.empty()) {
-                        if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
-                            NodeWetBulbRepReq(iNode) = true;
-                            NodeWetBulbSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
+                for (iReq = 1; iReq <= state.dataOutputProcessor->NumOfReqVariables; ++iReq) {
+                    if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).Key, NodeID(iNode)) || state.dataOutputProcessor->ReqRepVars(iReq).Key.empty()) {
+                        if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Wetbulb Temperature")) {
+                            state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
+                            NodeWetBulbSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Relative Humidity")) {
                             NodeRelHumidityRepReq(iNode) = true;
-                            NodeRelHumiditySchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
+                            NodeRelHumiditySchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Dewpoint Temperature")) {
                             NodeDewPointRepReq(iNode) = true;
-                            NodeDewPointSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
-                        } else if (UtilityRoutines::SameString(ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
+                            NodeDewPointSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
+                        } else if (UtilityRoutines::SameString(state.dataOutputProcessor->ReqRepVars(iReq).VarName, "System Node Specific Heat")) {
                             NodeSpecificHeatRepReq(iNode) = true;
-                            NodeSpecificHeatSchedPtr(iNode) = ReqRepVars(iReq).SchedPtr;
+                            NodeSpecificHeatSchedPtr(iNode) = state.dataOutputProcessor->ReqRepVars(iReq).SchedPtr;
                         }
                     }
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Wetbulb Temperature")) {
-                    NodeWetBulbRepReq(iNode) = true;
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Wetbulb Temperature")) {
+                    state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
                     NodeWetBulbSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Relative Humidity")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Relative Humidity")) {
                     NodeRelHumidityRepReq(iNode) = true;
                     NodeRelHumiditySchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Dewpoint Temperature")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Dewpoint Temperature")) {
                     NodeDewPointRepReq(iNode) = true;
                     NodeDewPointSchedPtr(iNode) = 0;
                 }
-                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(iNode, "System Node Specific Heat")) {
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Specific Heat")) {
                     NodeSpecificHeatRepReq(iNode) = true;
                     NodeSpecificHeatSchedPtr(iNode) = 0;
                 }
             }
-            CalcMoreNodeInfoMyOneTimeFlag = false;
+            state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag = false;
         }
 
         for (iNode = 1; iNode <= NumOfNodes; ++iNode) {
@@ -1218,9 +992,9 @@ namespace NodeInputManager {
             ReportRelHumidity = false;
             ReportDewPoint = false;
             ReportSpecificHeat = false;
-            if (NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
+            if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
                 ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
-            } else if (NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
+            } else if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
                 ReportWetBulb = true;
             } else if (Node(iNode).SPMNodeWetBulbRepReq) {
                 ReportWetBulb = true;
@@ -1282,7 +1056,7 @@ namespace NodeInputManager {
                 } else {
                     Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rhoStd = GetDensityGlycol(
-                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp(), Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
+                        state, nodeFluidNames[iNode - 1], DataGlobalConstants::InitConvTemp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                     rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], Node(iNode).Temp, Node(iNode).FluidIndex, nodeReportingStrings[iNode - 1]);
                 }
 
@@ -1351,30 +1125,6 @@ namespace NodeInputManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine marks a node -- this node needs to exist in more than one object.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         MarkedNode(NodeNumber).IsMarked = true;
         MarkedNode(NodeNumber).ObjectType = ObjectType;
         MarkedNode(NodeNumber).ObjectName = ObjectName;
@@ -1393,33 +1143,12 @@ namespace NodeInputManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine checks "marked" nodes.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
 
         for (NodeNum = 1; NodeNum <= NumOfNodes; ++NodeNum) {
             if (MarkedNode(NodeNum).IsMarked) {
-                if (NodeRef(NodeNum) == 0) {
+                if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
                     ShowSevereError(state, "Node=\"" + NodeID(NodeNum) + "\" did not find reference by another object.");
                     ShowContinueError(state, "Object=\"" + MarkedNode(NodeNum).ObjectType + "\", Name=\"" + MarkedNode(NodeNum).ObjectName + "\", Field=[" +
                                       MarkedNode(NodeNum).FieldName + ']');
@@ -1428,7 +1157,5 @@ namespace NodeInputManager {
             }
         }
     }
-
-} // namespace NodeInputManager
 
 } // namespace EnergyPlus

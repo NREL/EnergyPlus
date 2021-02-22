@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,16 +52,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -753,37 +750,49 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    AIR 6MM,                 !- Layer 2",
         "    CLEAR 6MM;               !- Layer 3",
 
-        "  Construction:InternalSource,",
-        "    Ceiling with Radiant,    !- Name",
+        "  ConstructionProperty:InternalHeatSource,",
+        "    Radiant Ceiling Source,  !- Name",
+        "    Ceiling with Radiant,    !- ConstructionName",
         "    2,                       !- Source Present After Layer Number",
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
-        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+        "    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+
+        "  Construction,",
+        "    Ceiling with Radiant,    !- Name",
         "    CLN-INS,                 !- Outside Layer",
         "    GYP1,                    !- Layer 2",
         "    GYP2,                    !- Layer 3",
         "    MAT-CLNG-1;              !- Layer 4",
 
-        "  Construction:InternalSource,",
-        "    reverseCeiling with Radiant,  !- Name",
+        "  ConstructionProperty:InternalHeatSource,",
+        "    reverse ceiling source,  !- Name",
+        "    reverseCeiling with Radiant,  !- Construction Name",
         "    2,                       !- Source Present After Layer Number",
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
-        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+        "    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+
+        "  Construction,",
+        "    reverseCeiling with Radiant,  !- Name",
         "    MAT-CLNG-1,              !- Outside Layer",
         "    GYP2,                    !- Layer 2",
         "    GYP1,                    !- Layer 3",
         "    CLN-INS;                 !- Layer 4",
 
-        "  Construction:InternalSource,",
-        "    Floor with Radiant,      !- Name",
+        "  ConstructionProperty:InternalHeatSource,",
+        "    Floor Radiant Source,    !- Name",
+        "    Floor with Radiant,      !- Construction Name",
         "    2,                       !- Source Present After Layer Number",
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
-        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+        "    0.0;                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
+
+        "  Construction,",
+        "    Floor with Radiant,      !- Name",
         "    INS - EXPANDED EXT POLYSTYRENE R12,  !- Outside Layer",
         "    CONC,                    !- Layer 2",
         "    CONC,                    !- Layer 3",

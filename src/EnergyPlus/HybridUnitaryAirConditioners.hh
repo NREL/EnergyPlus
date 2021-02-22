@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,14 +66,11 @@ namespace HybridUnitaryAirConditioners {
 
     using HybridEvapCoolingModel::CSetting;
     using HybridEvapCoolingModel::Model;
-    extern Array1D<Model> ZoneHybridUnitaryAirConditioner;
-
-    void clear_state();
 
     // MODULE PARAMETER DEFINITIONS
     void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
                                              std::string const &CompName,    // name of the packaged terminal heat pump
-                                             int const ZoneNum,              // number of zone being served
+                                             int ZoneNum,              // number of zone being served
                                              Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                              Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                              int &CompIndex                  // index to zone hvac unit
@@ -82,25 +79,46 @@ namespace HybridUnitaryAirConditioners {
     void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors);
 
     void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                              int const UnitNum, // unit number
-                                              int const ZoneNum  // number of zone being served
+                                              int UnitNum, // unit number
+                                              int ZoneNum  // number of zone being served
     );
 
     void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
-                                              int const UnitNum,              // unit number
-                                              int const ZoneNum,              // number of zone being served
+                                              int UnitNum,              // unit number
+                                              int ZoneNum,              // number of zone being served
                                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                               Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
-    void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
+    void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int UnitNum);
 
-    int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const UnitNum);
+    int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int UnitNum);
 
-    int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const UnitNum);
+    int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int UnitNum);
 
-    int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const UnitNum);
+    int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
+
+struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
+
+    int NumZoneHybridEvap = 0;
+    bool GetInputZoneHybridEvap = true;
+    bool ZoneEquipmentListChecked = false;
+    bool HybridCoolOneTimeFlag = true;
+    Array1D_bool CheckZoneHybridEvapName;
+    Array1D<HybridUnitaryAirConditioners::Model> ZoneHybridUnitaryAirConditioner;
+
+    void clear_state() override
+    {
+        this->NumZoneHybridEvap = 0;
+        this->GetInputZoneHybridEvap = true;
+        this->ZoneEquipmentListChecked = false;
+        this->HybridCoolOneTimeFlag = true;
+        this->CheckZoneHybridEvapName.deallocate();
+        this->ZoneHybridUnitaryAirConditioner.deallocate();
+    }
+};
+
 } // namespace EnergyPlus
 #endif

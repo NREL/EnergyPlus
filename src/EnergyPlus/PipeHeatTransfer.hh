@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,49 +76,25 @@ namespace PipeHeatTransfer {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    extern int const None;
-    extern int const ZoneEnv;
-    extern int const ScheduleEnv;
-    extern int const OutsideAirEnv;
-    extern int const GroundEnv;
+    enum class iEnvrnPtr
+    {
+        None,
+        ZoneEnv,
+        ScheduleEnv,
+        OutsideAirEnv,
+        GroundEnv,
+    };
 
-    extern int const PreviousTimeIndex;
-    extern int const CurrentTimeIndex;
-    extern int const TentativeTimeIndex;
+    constexpr int PreviousTimeIndex(1);
+    constexpr int CurrentTimeIndex(2);
+    constexpr int TentativeTimeIndex(3);
 
-    extern Real64 const InnerDeltaTime; // one minute time step in seconds
-
-    // DERIVED TYPE DEFINITIONS
-
-    // the model data structures
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int nsvNumOfPipeHT;          // Number of Pipe Heat Transfer objects
-    extern int nsvInletNodeNum;         // module variable for inlet node number
-    extern int nsvOutletNodeNum;        // module variable for outlet node number
-    extern int nsvPipeHTNum;            // object index
-    extern Real64 nsvMassFlowRate;      // pipe mass flow rate
-    extern Real64 nsvVolumeFlowRate;    // pipe volumetric flow rate
-    extern Real64 nsvDeltaTime;         // time change from last update
-    extern Real64 nsvInletTemp;         // pipe inlet temperature
-    extern Real64 nsvOutletTemp;        // pipe outlet temperature
-    extern Real64 nsvEnvironmentTemp;   // environmental temperature (surrounding pipe)
-    extern Real64 nsvEnvHeatLossRate;   // heat loss rate from pipe to the environment
-    extern Real64 nsvFluidHeatLossRate; // overall heat loss from fluid to pipe
-    extern int nsvNumInnerTimeSteps;    // the number of "inner" time steps for our model
-
-    extern bool GetPipeInputFlag; // First time, input is "gotten"
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
+    constexpr Real64 InnerDeltaTime(60.0); // one minute time step in seconds
 
     struct PipeHTData : public PlantComponent
     {
 
-        virtual ~PipeHTData()
-        {
-        }
+        virtual ~PipeHTData() = default;
 
         // Members
         // Input data
@@ -127,7 +103,6 @@ namespace PipeHeatTransfer {
         std::string Environment;     // keyword:  'Schedule', 'OutdoorAir', 'Zone'
         std::string EnvrSchedule;    // temperature schedule for environmental temp
         std::string EnvrVelSchedule; // temperature schedule for environmental temp
-        std::string EnvrZone;        // zone providing environmental temp
         std::string EnvrAirNode;     // outside air node providing environmental temp
         Real64 Length;               // total pipe length [m]
         Real64 PipeID;               // pipe inside diameter [m]
@@ -138,7 +113,7 @@ namespace PipeHeatTransfer {
         int TypeOf;                  // Type of pipe
         // derived data
         int ConstructionNum; // construction ref number
-        int EnvironmentPtr;
+        iEnvrnPtr EnvironmentPtr;
         int EnvrSchedPtr;              // pointer to schedule used to set environmental temp
         int EnvrVelSchedPtr;           // pointer to schedule used to set environmental temp
         int EnvrZonePtr;               // pointer to zone number used to set environmental temp
@@ -147,7 +122,6 @@ namespace PipeHeatTransfer {
         Real64 FluidSpecHeat;          // fluid Cp [J/kg.K]
         Real64 FluidDensity;           // density [kg/m3]
         Real64 MaxFlowRate;            // max flow rate (from loop/node data)
-        Real64 FluidSectionVol;        // volume of each pipe section (node) [m^3]
         Real64 InsideArea;             // pipe section inside surface area [m^2]
         Real64 OutsideArea;            // pipe section outside surface area [m^2]
         Real64 SectionArea;            // cross sectional area [m^2]
@@ -188,8 +162,6 @@ namespace PipeHeatTransfer {
         Real64 SoilRoughness;         // ground surface roughness
         Real64 SoilThermAbs;          // ground surface thermal absorptivity
         Real64 SoilSolarAbs;          // ground surface solar absorptivity
-        Real64 CoefS1;                // soil surface finite difference coefficient
-        Real64 CoefS2;                // soil surface finite difference coefficient
         Real64 CoefA1;                // soil finite difference coefficient
         Real64 CoefA2;                // soil finite difference coefficient
         Real64 FourierDS;             // soil Fourier number based on grid spacing
@@ -225,14 +197,14 @@ namespace PipeHeatTransfer {
 
         // Default Constructor
         PipeHTData()
-            : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), TypeOf(0), ConstructionNum(0), EnvironmentPtr(0), EnvrSchedPtr(0),
+            : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), TypeOf(0), ConstructionNum(0), EnvironmentPtr(iEnvrnPtr::None), EnvrSchedPtr(0),
               EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0), FluidSpecHeat(0.0), FluidDensity(0.0), MaxFlowRate(0.0),
-              FluidSectionVol(0.0), InsideArea(0.0), OutsideArea(0.0), SectionArea(0.0), PipeHeatCapacity(0.0), PipeOD(0.0), PipeCp(0.0),
+              InsideArea(0.0), OutsideArea(0.0), SectionArea(0.0), PipeHeatCapacity(0.0), PipeOD(0.0), PipeCp(0.0),
               PipeDensity(0.0), PipeConductivity(0.0), InsulationOD(0.0), InsulationCp(0.0), InsulationDensity(0.0), InsulationConductivity(0.0),
               InsulationThickness(0.0), InsulationResistance(0.0), CurrentSimTime(0.0), PreviousSimTime(0.0), NumDepthNodes(0), PipeNodeDepth(0),
               PipeNodeWidth(0), PipeDepth(0.0), DomainDepth(0.0), dSregular(0.0), OutdoorConvCoef(0.0), SoilMaterialNum(0), MonthOfMinSurfTemp(0),
               MinSurfTemp(0.0), SoilDensity(0.0), SoilDepth(0.0), SoilCp(0.0), SoilConductivity(0.0), SoilRoughness(0.0), SoilThermAbs(0.0),
-              SoilSolarAbs(0.0), CoefS1(0.0), CoefS2(0.0), CoefA1(0.0), CoefA2(0.0), FourierDS(0.0), SoilDiffusivity(0.0), SoilDiffusivityPerDay(0.0),
+              SoilSolarAbs(0.0), CoefA1(0.0), CoefA2(0.0), FourierDS(0.0), SoilDiffusivity(0.0), SoilDiffusivityPerDay(0.0),
               BeginSimInit(true), BeginSimEnvrn(true), FirstHVACupdateFlag(true), BeginEnvrnupdateFlag(true), SolarExposed(true), SumTK(0.0),
               ZoneHeatGainRate(0.0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), CheckEquipName(true), OneTimeInit(true),
               FluidInletTemp(0.0), FluidOutletTemp(0.0), MassFlowRate(0.0), FluidHeatLossRate(0.0), FluidHeatLossEnergy(0.0), PipeInletTemp(0.0),
@@ -241,17 +213,18 @@ namespace PipeHeatTransfer {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
 
-        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
-        );
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void InitPipesHeatTransfer(EnergyPlusData &state, bool FirstHVACIteration);
 
         Real64 TBND(EnergyPlusData &state,
-                    Real64 const z       // Current Depth
+                    Real64 z       // Current Depth
         );
 
         void CalcBuriedPipeSoil(EnergyPlusData &state);
@@ -261,34 +234,69 @@ namespace PipeHeatTransfer {
         Real64 OutsidePipeHeatTransCoef(EnergyPlusData &state);
 
         Real64 CalcPipeHeatTransCoef(EnergyPlusData &state,
-                                     Real64 const Temperature,  // Temperature of water entering the surface, in C
-                                     Real64 const MassFlowRate, // Mass flow rate, in kg/s
-                                     Real64 const Diameter      // Pipe diameter, m
+                                     Real64 Temperature,  // Temperature of water entering the surface, in C
+                                     Real64 MassFlowRate, // Mass flow rate, in kg/s
+                                     Real64 Diameter      // Pipe diameter, m
         );
 
-        void ReportPipesHeatTransfer(); // Index for the surface under consideration
+        void ReportPipesHeatTransfer(EnergyPlusData &state); // Index for the surface under consideration
 
-        void UpdatePipesHeatTransfer();
+        void UpdatePipesHeatTransfer(EnergyPlusData &state);
 
         void ValidatePipeConstruction(EnergyPlusData &state,
                                       std::string const &PipeType,         // module object of pipe (error messages)
                                       std::string const &ConstructionName, // construction name of pipe (error messages)
                                       std::string const &FieldName,        // fieldname of pipe (error messages)
-                                      int const ConstructionNum,           // pointer into construction data
+                                      int ConstructionNum,           // pointer into construction data
                                       bool &ErrorsFound                    // set to true if errors found here
         );
 
         static void CalcZonePipesHeatGain(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<PipeHTData> PipeHT;
-
-    void clear_state();
-
     void GetPipesHeatTransfer(EnergyPlusData &state);
 
 } // namespace PipeHeatTransfer
+
+struct PipeHeatTransferData : BaseGlobalStruct {
+
+    int nsvNumOfPipeHT = 0;             // Number of Pipe Heat Transfer objects
+    int nsvInletNodeNum = 0;            // module variable for inlet node number
+    int nsvOutletNodeNum = 0;           // module variable for outlet node number
+    Real64 nsvMassFlowRate = 0.0;       // pipe mass flow rate
+    Real64 nsvVolumeFlowRate = 0.0;     // pipe volumetric flow rate
+    Real64 nsvDeltaTime = 0.0;          // time change from last update
+    Real64 nsvInletTemp = 0.0;          // pipe inlet temperature
+    Real64 nsvOutletTemp = 0.0;         // pipe outlet temperature
+    Real64 nsvEnvironmentTemp = 0.0;    // environmental temperature (surrounding pipe)
+    Real64 nsvEnvHeatLossRate = 0.0;    // heat loss rate from pipe to the environment
+    Real64 nsvFluidHeatLossRate = 0.0;  // overall heat loss from fluid to pipe
+    int nsvNumInnerTimeSteps = 0;       // the number of "inner" time steps for our model
+    bool GetPipeInputFlag = true;       // First time, input is "gotten"
+    bool MyEnvrnFlag = true;
+    Array1D<PipeHeatTransfer::PipeHTData> PipeHT;
+    std::unordered_map<std::string, std::string> PipeHTUniqueNames;
+
+    void clear_state() override
+    {
+        this->nsvNumOfPipeHT = 0;
+        this->nsvInletNodeNum = 0;
+        this->nsvOutletNodeNum = 0;
+        this->nsvMassFlowRate = 0.0;
+        this->nsvVolumeFlowRate = 0.0;
+        this->nsvDeltaTime = 0.0;
+        this->nsvInletTemp = 0.0;
+        this->nsvOutletTemp = 0.0;
+        this->nsvEnvironmentTemp = 0.0;
+        this->nsvEnvHeatLossRate = 0.0;
+        this->nsvFluidHeatLossRate = 0.0;
+        this->nsvNumInnerTimeSteps = 0;
+        this->GetPipeInputFlag = true;
+        this->MyEnvrnFlag = true;
+        this->PipeHT.deallocate();
+        this->PipeHTUniqueNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

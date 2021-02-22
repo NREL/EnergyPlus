@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -85,9 +85,6 @@ namespace GeneratorFuelSupply {
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // <description>
-
     // METHODOLOGY EMPLOYED:
     // data defined in DataGenerators.cc
     // this module only provides input and subroutines for other component simulations
@@ -96,33 +93,8 @@ namespace GeneratorFuelSupply {
     // REFERENCES:
     // Annex 42 documentation
 
-    // OTHER NOTES:
-    // na
-
     // Using/Aliasing
     using namespace DataGenerators;
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // <name Public routines, optionally name Private routines within this module>
-
-    // Functions
-    static bool MyOneTimeFlag(true);
-
-    void clear_state() {
-        MyOneTimeFlag = true;
-    }
 
     void GetGeneratorFuelSupplyInput(EnergyPlusData &state)
     {
@@ -156,94 +128,94 @@ namespace GeneratorFuelSupply {
         std::string ObjMSGName;
         int ConstitNum;
 
-        if (MyOneTimeFlag) {
+        if (state.dataGeneratorFuelSupply->MyOneTimeFlag) {
             cCurrentModuleObject = "Generator:FuelSupply";
-            NumGeneratorFuelSups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+            state.dataGenerator->NumGeneratorFuelSups = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-            if (NumGeneratorFuelSups <= 0) {
+            if (state.dataGenerator->NumGeneratorFuelSups <= 0) {
                 ShowSevereError(state, "No " + cCurrentModuleObject + " equipment specified in input file");
                 ErrorsFound = true;
             }
 
-            FuelSupply.allocate(NumGeneratorFuelSups);
+            state.dataGenerator->FuelSupply.allocate(state.dataGenerator->NumGeneratorFuelSups);
 
-            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
+            for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
                 inputProcessor->getObjectItem(
                     state, cCurrentModuleObject, FuelSupNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, _, cAlphaFieldNames, cNumericFieldNames);
                 UtilityRoutines::IsNameEmpty(state, AlphArray(1), cCurrentModuleObject, ErrorsFound);
 
-                FuelSupply(FuelSupNum).Name = AlphArray(1);
+                state.dataGenerator->FuelSupply(FuelSupNum).Name = AlphArray(1);
                 ObjMSGName = cCurrentModuleObject + " Named " + AlphArray(1);
                 if (UtilityRoutines::SameString("TemperatureFromAirNode", AlphArray(2))) {
-                    FuelSupply(FuelSupNum).FuelTempMode = FuelInTempFromNode;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempFromNode;
                 } else if (UtilityRoutines::SameString("Scheduled", AlphArray(2))) {
-                    FuelSupply(FuelSupNum).FuelTempMode = FuelInTempSchedule;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode = DataGenerators::FuelTemperatureMode::FuelInTempSchedule;
                 } else {
                     ShowSevereError(state, "Invalid, " + cAlphaFieldNames(2) + " = " + AlphArray(2));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
-                FuelSupply(FuelSupNum).NodeName = AlphArray(3);
-                FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
+                state.dataGenerator->FuelSupply(FuelSupNum).NodeName = AlphArray(3);
+                state.dataGenerator->FuelSupply(FuelSupNum).NodeNum = GetOnlySingleNode(state,
                     AlphArray(3), ErrorsFound, cCurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
-                FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
-                if ((FuelSupply(FuelSupNum).SchedNum == 0) && (FuelSupply(FuelSupNum).FuelTempMode == FuelInTempSchedule)) {
+                state.dataGenerator->FuelSupply(FuelSupNum).SchedNum = GetScheduleIndex(state, AlphArray(4));
+                if ((state.dataGenerator->FuelSupply(FuelSupNum).SchedNum == 0) && (state.dataGenerator->FuelSupply(FuelSupNum).FuelTempMode == DataGenerators::FuelTemperatureMode::FuelInTempSchedule)) {
                     ShowSevereError(state, "Invalid, " + cAlphaFieldNames(4) + " = " + AlphArray(4));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Schedule named was not found");
                     ErrorsFound = true;
                 }
 
-                FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
-                if (FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
+                state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
+                if (state.dataGenerator->FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
                     ShowSevereError(state, "Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ShowContinueError(state, "Curve named was not found ");
                     ErrorsFound = true;
                 }
 
-                for (auto &e : FuelSupply)
+                for (auto &e : state.dataGenerator->FuelSupply)
                     e.CompPowerLossFactor = NumArray(1);
 
                 if (UtilityRoutines::SameString(AlphArray(6), "GaseousConstituents")) {
-                    FuelSupply(FuelSupNum).FuelTypeMode = fuelModeGaseousConstituents;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGaseousConstituents;
                 } else if (UtilityRoutines::SameString(AlphArray(6), "LiquidGeneric")) {
-                    FuelSupply(FuelSupNum).FuelTypeMode = fuelModeGenericLiquid;
+                    state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode = DataGenerators::FuelMode::fuelModeGenericLiquid;
                 } else {
                     ShowSevereError(state, "Invalid, " + cAlphaFieldNames(6) + " = " + AlphArray(6));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + AlphArray(1));
                     ErrorsFound = true;
                 }
 
-                FuelSupply(FuelSupNum).LHVliquid = NumArray(2) * 1000.0; // generic liquid LHV  (kJ/kG input converted to J/kG )
-                FuelSupply(FuelSupNum).HHV = NumArray(3) * 1000.0;       // generic liquid HHV (kJ/kG input converted to J/kG )
-                FuelSupply(FuelSupNum).MW = NumArray(4);
-                FuelSupply(FuelSupNum).eCO2 = NumArray(5);
+                state.dataGenerator->FuelSupply(FuelSupNum).LHVliquid = NumArray(2) * 1000.0; // generic liquid LHV  (kJ/kG input converted to J/kG )
+                state.dataGenerator->FuelSupply(FuelSupNum).HHV = NumArray(3) * 1000.0;       // generic liquid HHV (kJ/kG input converted to J/kG )
+                state.dataGenerator->FuelSupply(FuelSupNum).MW = NumArray(4);
+                state.dataGenerator->FuelSupply(FuelSupNum).eCO2 = NumArray(5);
 
-                if (FuelSupply(FuelSupNum).FuelTypeMode == fuelModeGaseousConstituents) {
-                    NumFuelConstit = NumArray(6);
-                    FuelSupply(FuelSupNum).NumConstituents = NumFuelConstit;
+                if (state.dataGenerator->FuelSupply(FuelSupNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGaseousConstituents) {
+                    state.dataGenerator->NumFuelConstit = NumArray(6);
+                    state.dataGenerator->FuelSupply(FuelSupNum).NumConstituents = state.dataGenerator->NumFuelConstit;
 
-                    if (NumFuelConstit > 12) {
+                    if (state.dataGenerator->NumFuelConstit > 12) {
                         ShowSevereError(state, cCurrentModuleObject + " model not set up for more than 12 fuel constituents");
                         ErrorsFound = true;
                     }
-                    if (NumFuelConstit < 1) {
+                    if (state.dataGenerator->NumFuelConstit < 1) {
                         ShowSevereError(state, cCurrentModuleObject + " model needs at least one fuel constituent");
                         ErrorsFound = true;
                     }
 
-                    for (ConstitNum = 1; ConstitNum <= NumFuelConstit; ++ConstitNum) {
-                        FuelSupply(FuelSupNum).ConstitName(ConstitNum) = AlphArray(ConstitNum + 6);
-                        FuelSupply(FuelSupNum).ConstitMolalFract(ConstitNum) = NumArray(ConstitNum + 6);
+                    for (ConstitNum = 1; ConstitNum <= state.dataGenerator->NumFuelConstit; ++ConstitNum) {
+                        state.dataGenerator->FuelSupply(FuelSupNum).ConstitName(ConstitNum) = AlphArray(ConstitNum + 6);
+                        state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract(ConstitNum) = NumArray(ConstitNum + 6);
                     }
 
                     // check for molar fractions summing to 1.0.
-                    if (std::abs(sum(FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
+                    if (std::abs(sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract) - 1.0) > 0.0001) {
                         ShowSevereError(state, cCurrentModuleObject + " molar fractions do not sum to 1.0");
-                        ShowContinueError(state, format("Sum was={:.5R}", sum(FuelSupply(FuelSupNum).ConstitMolalFract)));
+                        ShowContinueError(state, format("Sum was={:.5R}", sum(state.dataGenerator->FuelSupply(FuelSupNum).ConstitMolalFract)));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + AlphArray(1));
                         ErrorsFound = true;
                     }
@@ -252,7 +224,7 @@ namespace GeneratorFuelSupply {
 
             // now make calls to Setup
 
-            for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
+            for (FuelSupNum = 1; FuelSupNum <= state.dataGenerator->NumGeneratorFuelSups; ++FuelSupNum) {
                 SetupFuelConstituentData(state, FuelSupNum, ErrorsFound);
             }
 
@@ -260,7 +232,7 @@ namespace GeneratorFuelSupply {
                 ShowFatalError(state, "Problem found processing input for " + cCurrentModuleObject);
             }
 
-            MyOneTimeFlag = false;
+            state.dataGeneratorFuelSupply->MyOneTimeFlag = false;
         } // MyOneTimeFlag
     }
 
@@ -304,315 +276,315 @@ namespace GeneratorFuelSupply {
 
         NumHardCodedConstituents = 14;
 
-        if (!allocated(GasPhaseThermoChemistryData)) {
-            GasPhaseThermoChemistryData.allocate(NumHardCodedConstituents);
+        if (!allocated(state.dataGenerator->GasPhaseThermoChemistryData)) {
+            state.dataGenerator->GasPhaseThermoChemistryData.allocate(NumHardCodedConstituents);
         }
         // Carbon Dioxide (CO2) Temp K 298-1200 (Chase 1998)
-        GasPhaseThermoChemistryData(1).ConstituentName = "CarbonDioxide";
-        GasPhaseThermoChemistryData(1).ConstituentFormula = "CO2";
-        GasPhaseThermoChemistryData(1).StdRefMolarEnthOfForm = -393.5224; // KJ/mol
-        GasPhaseThermoChemistryData(1).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(1).ShomateA = 24.99735;
-        GasPhaseThermoChemistryData(1).ShomateB = 55.18696;
-        GasPhaseThermoChemistryData(1).ShomateC = -33.69137;
-        GasPhaseThermoChemistryData(1).ShomateD = 7.948387;
-        GasPhaseThermoChemistryData(1).ShomateE = -0.136638;
-        GasPhaseThermoChemistryData(1).ShomateF = -403.6075;
-        GasPhaseThermoChemistryData(1).ShomateG = 228.2431;
-        GasPhaseThermoChemistryData(1).ShomateH = -393.5224;
-        GasPhaseThermoChemistryData(1).NumCarbons = 1.0;
-        GasPhaseThermoChemistryData(1).NumHydrogens = 0.0;
-        GasPhaseThermoChemistryData(1).NumOxygens = 2.0;
-        GasPhaseThermoChemistryData(1).MolecularWeight = 44.01;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ConstituentName = "CarbonDioxide";
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ConstituentFormula = "CO2";
+        state.dataGenerator->GasPhaseThermoChemistryData(1).StdRefMolarEnthOfForm = -393.5224; // KJ/mol
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateA = 24.99735;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateB = 55.18696;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateC = -33.69137;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateD = 7.948387;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateE = -0.136638;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateF = -403.6075;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateG = 228.2431;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).ShomateH = -393.5224;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).NumCarbons = 1.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).NumHydrogens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).NumOxygens = 2.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(1).MolecularWeight = 44.01;
 
         // Nitrogen (N2) Temp (K) 298-6000
-        GasPhaseThermoChemistryData(2).ConstituentName = "Nitrogen";
-        GasPhaseThermoChemistryData(2).ConstituentFormula = "N2";
-        GasPhaseThermoChemistryData(2).StdRefMolarEnthOfForm = 0.0;
-        GasPhaseThermoChemistryData(2).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(2).ShomateA = 26.092;
-        GasPhaseThermoChemistryData(2).ShomateB = 8.218801;
-        GasPhaseThermoChemistryData(2).ShomateC = -1.976141;
-        GasPhaseThermoChemistryData(2).ShomateD = 0.159274;
-        GasPhaseThermoChemistryData(2).ShomateE = 0.044434;
-        GasPhaseThermoChemistryData(2).ShomateF = -7.98923;
-        GasPhaseThermoChemistryData(2).ShomateG = 221.02;
-        GasPhaseThermoChemistryData(2).ShomateH = 0.000;
-        GasPhaseThermoChemistryData(2).NumCarbons = 0.0;
-        GasPhaseThermoChemistryData(2).NumHydrogens = 0.0;
-        GasPhaseThermoChemistryData(2).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(2).MolecularWeight = 28.01;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ConstituentName = "Nitrogen";
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ConstituentFormula = "N2";
+        state.dataGenerator->GasPhaseThermoChemistryData(2).StdRefMolarEnthOfForm = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateA = 26.092;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateB = 8.218801;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateC = -1.976141;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateD = 0.159274;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateE = 0.044434;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateF = -7.98923;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateG = 221.02;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).ShomateH = 0.000;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).NumCarbons = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).NumHydrogens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(2).MolecularWeight = 28.01;
 
         // Oxygen (O2) Temp (K) 298-6000
-        GasPhaseThermoChemistryData(3).ConstituentName = "Oxygen";
-        GasPhaseThermoChemistryData(3).ConstituentFormula = "O2";
-        GasPhaseThermoChemistryData(3).StdRefMolarEnthOfForm = 0.0;
-        GasPhaseThermoChemistryData(3).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(3).ShomateA = 29.659;
-        GasPhaseThermoChemistryData(3).ShomateB = 6.137261;
-        GasPhaseThermoChemistryData(3).ShomateC = -1.186521;
-        GasPhaseThermoChemistryData(3).ShomateD = 0.095780;
-        GasPhaseThermoChemistryData(3).ShomateE = -0.219663;
-        GasPhaseThermoChemistryData(3).ShomateF = -9.861391;
-        GasPhaseThermoChemistryData(3).ShomateG = 237.948;
-        GasPhaseThermoChemistryData(3).ShomateH = 0.0;
-        GasPhaseThermoChemistryData(3).NumCarbons = 0.0;
-        GasPhaseThermoChemistryData(3).NumHydrogens = 0.0;
-        GasPhaseThermoChemistryData(3).NumOxygens = 2.0;
-        GasPhaseThermoChemistryData(3).MolecularWeight = 32.00;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ConstituentName = "Oxygen";
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ConstituentFormula = "O2";
+        state.dataGenerator->GasPhaseThermoChemistryData(3).StdRefMolarEnthOfForm = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateA = 29.659;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateB = 6.137261;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateC = -1.186521;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateD = 0.095780;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateE = -0.219663;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateF = -9.861391;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateG = 237.948;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).ShomateH = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).NumCarbons = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).NumHydrogens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).NumOxygens = 2.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(3).MolecularWeight = 32.00;
 
         // Water (H2O) Temp K 300-1700
         // need lower temperature range for Shomate coef for Water Vapor..
-        GasPhaseThermoChemistryData(4).ConstituentName = "Water";
-        GasPhaseThermoChemistryData(4).ConstituentFormula = "H2O";
-        GasPhaseThermoChemistryData(4).StdRefMolarEnthOfForm = -241.8264; // KJ/mol
-        GasPhaseThermoChemistryData(4).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(4).ShomateA = 29.0373;
-        GasPhaseThermoChemistryData(4).ShomateB = 10.2573;
-        GasPhaseThermoChemistryData(4).ShomateC = 2.81048;
-        GasPhaseThermoChemistryData(4).ShomateD = -0.95914;
-        GasPhaseThermoChemistryData(4).ShomateE = 0.11725;
-        GasPhaseThermoChemistryData(4).ShomateF = -250.569;
-        GasPhaseThermoChemistryData(4).ShomateG = 223.3967;
-        GasPhaseThermoChemistryData(4).ShomateH = -241.8264;
-        GasPhaseThermoChemistryData(4).NumCarbons = 0.0;
-        GasPhaseThermoChemistryData(4).NumHydrogens = 2.0;
-        GasPhaseThermoChemistryData(4).NumOxygens = 1.0;
-        GasPhaseThermoChemistryData(4).MolecularWeight = 18.02;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ConstituentName = "Water";
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ConstituentFormula = "H2O";
+        state.dataGenerator->GasPhaseThermoChemistryData(4).StdRefMolarEnthOfForm = -241.8264; // KJ/mol
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateA = 29.0373;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateB = 10.2573;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateC = 2.81048;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateD = -0.95914;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateE = 0.11725;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateF = -250.569;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateG = 223.3967;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).ShomateH = -241.8264;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).NumCarbons = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).NumHydrogens = 2.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).NumOxygens = 1.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(4).MolecularWeight = 18.02;
 
         // Argon (Ar)  Temp K 298-600
 
-        GasPhaseThermoChemistryData(5).ConstituentName = "Argon";
-        GasPhaseThermoChemistryData(5).ConstituentFormula = "Ar";
-        GasPhaseThermoChemistryData(5).StdRefMolarEnthOfForm = 0.0;
-        GasPhaseThermoChemistryData(5).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(5).ShomateA = 20.786;
-        GasPhaseThermoChemistryData(5).ShomateB = 2.825911e-07;
-        GasPhaseThermoChemistryData(5).ShomateC = -1.464191e-07;
-        GasPhaseThermoChemistryData(5).ShomateD = 1.092131e-08;
-        GasPhaseThermoChemistryData(5).ShomateE = -3.661371e-08;
-        GasPhaseThermoChemistryData(5).ShomateF = -6.19735;
-        GasPhaseThermoChemistryData(5).ShomateG = 179.999;
-        GasPhaseThermoChemistryData(5).ShomateH = 0.0;
-        GasPhaseThermoChemistryData(5).NumCarbons = 0.0;
-        GasPhaseThermoChemistryData(5).NumHydrogens = 0.0;
-        GasPhaseThermoChemistryData(5).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(5).MolecularWeight = 39.95;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ConstituentName = "Argon";
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ConstituentFormula = "Ar";
+        state.dataGenerator->GasPhaseThermoChemistryData(5).StdRefMolarEnthOfForm = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateA = 20.786;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateB = 2.825911e-07;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateC = -1.464191e-07;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateD = 1.092131e-08;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateE = -3.661371e-08;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateF = -6.19735;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateG = 179.999;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).ShomateH = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).NumCarbons = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).NumHydrogens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(5).MolecularWeight = 39.95;
 
         // Hydrogen (H2) Temp K 298-1000
-        GasPhaseThermoChemistryData(6).ConstituentName = "Hydrogen";
-        GasPhaseThermoChemistryData(6).ConstituentFormula = "H2";
-        GasPhaseThermoChemistryData(6).StdRefMolarEnthOfForm = 0.0;
-        GasPhaseThermoChemistryData(6).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(6).ShomateA = 33.066178;
-        GasPhaseThermoChemistryData(6).ShomateB = -11.363417;
-        GasPhaseThermoChemistryData(6).ShomateC = 11.432816;
-        GasPhaseThermoChemistryData(6).ShomateD = -2.772874;
-        GasPhaseThermoChemistryData(6).ShomateE = -0.158558;
-        GasPhaseThermoChemistryData(6).ShomateF = -9.980797;
-        GasPhaseThermoChemistryData(6).ShomateG = 172.707974;
-        GasPhaseThermoChemistryData(6).ShomateH = 0.0;
-        GasPhaseThermoChemistryData(6).NumCarbons = 0.0;
-        GasPhaseThermoChemistryData(6).NumHydrogens = 2.0;
-        GasPhaseThermoChemistryData(6).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(6).MolecularWeight = 2.02;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ConstituentName = "Hydrogen";
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ConstituentFormula = "H2";
+        state.dataGenerator->GasPhaseThermoChemistryData(6).StdRefMolarEnthOfForm = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateA = 33.066178;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateB = -11.363417;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateC = 11.432816;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateD = -2.772874;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateE = -0.158558;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateF = -9.980797;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateG = 172.707974;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).ShomateH = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).NumCarbons = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).NumHydrogens = 2.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(6).MolecularWeight = 2.02;
 
         // Methane (CH4) Temp K 298-1300
-        GasPhaseThermoChemistryData(7).ConstituentName = "Methane";
-        GasPhaseThermoChemistryData(7).ConstituentFormula = "CH4";
-        GasPhaseThermoChemistryData(7).StdRefMolarEnthOfForm = -74.8731; // KJ/mol (Chase 1998)
-        GasPhaseThermoChemistryData(7).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(7).ShomateA = -0.703029;
-        GasPhaseThermoChemistryData(7).ShomateB = 108.4773;
-        GasPhaseThermoChemistryData(7).ShomateC = -42.52157;
-        GasPhaseThermoChemistryData(7).ShomateD = 5.862788;
-        GasPhaseThermoChemistryData(7).ShomateE = 0.678565;
-        GasPhaseThermoChemistryData(7).ShomateF = -76.84376;
-        GasPhaseThermoChemistryData(7).ShomateG = 158.7163;
-        GasPhaseThermoChemistryData(7).ShomateH = -74.87310;
-        GasPhaseThermoChemistryData(7).NumCarbons = 1.0;
-        GasPhaseThermoChemistryData(7).NumHydrogens = 4.0;
-        GasPhaseThermoChemistryData(7).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(7).MolecularWeight = 16.04;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ConstituentName = "Methane";
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ConstituentFormula = "CH4";
+        state.dataGenerator->GasPhaseThermoChemistryData(7).StdRefMolarEnthOfForm = -74.8731; // KJ/mol (Chase 1998)
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateA = -0.703029;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateB = 108.4773;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateC = -42.52157;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateD = 5.862788;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateE = 0.678565;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateF = -76.84376;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateG = 158.7163;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).ShomateH = -74.87310;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).NumCarbons = 1.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).NumHydrogens = 4.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(7).MolecularWeight = 16.04;
 
         // Ethane (C2H6)
-        GasPhaseThermoChemistryData(8).ConstituentName = "Ethane";
-        GasPhaseThermoChemistryData(8).ConstituentFormula = "C2H6";
-        GasPhaseThermoChemistryData(8).StdRefMolarEnthOfForm = -83.8605; // -83.8 !KJ/mol (Pittam and Pilcher 1972)
-        GasPhaseThermoChemistryData(8).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(8).ShomateA = -3.03849;
-        GasPhaseThermoChemistryData(8).ShomateB = 199.202;
-        GasPhaseThermoChemistryData(8).ShomateC = -84.9812;
-        GasPhaseThermoChemistryData(8).ShomateD = 11.0348;
-        GasPhaseThermoChemistryData(8).ShomateE = 0.30348;
-        GasPhaseThermoChemistryData(8).ShomateF = -90.0633;
-        GasPhaseThermoChemistryData(8).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(8).ShomateH = -83.8605;
-        GasPhaseThermoChemistryData(8).NumCarbons = 2.0;
-        GasPhaseThermoChemistryData(8).NumHydrogens = 6.0;
-        GasPhaseThermoChemistryData(8).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(8).MolecularWeight = 30.07;
-        GasPhaseThermoChemistryData(8).NASA_A1 = 0.14625388e+01;
-        GasPhaseThermoChemistryData(8).NASA_A2 = 0.15494667e-01;
-        GasPhaseThermoChemistryData(8).NASA_A3 = 0.05780507e-04;
-        GasPhaseThermoChemistryData(8).NASA_A4 = -0.12578319e-07;
-        GasPhaseThermoChemistryData(8).NASA_A5 = 0.04586267e-10;
-        GasPhaseThermoChemistryData(8).NASA_A6 = -0.11239176e+05;
-        GasPhaseThermoChemistryData(8).NASA_A7 = 0.14432295e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ConstituentName = "Ethane";
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ConstituentFormula = "C2H6";
+        state.dataGenerator->GasPhaseThermoChemistryData(8).StdRefMolarEnthOfForm = -83.8605; // -83.8 !KJ/mol (Pittam and Pilcher 1972)
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateA = -3.03849;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateB = 199.202;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateC = -84.9812;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateD = 11.0348;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateE = 0.30348;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateF = -90.0633;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).ShomateH = -83.8605;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NumCarbons = 2.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NumHydrogens = 6.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).MolecularWeight = 30.07;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A1 = 0.14625388e+01;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A2 = 0.15494667e-01;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A3 = 0.05780507e-04;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A4 = -0.12578319e-07;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A5 = 0.04586267e-10;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A6 = -0.11239176e+05;
+        state.dataGenerator->GasPhaseThermoChemistryData(8).NASA_A7 = 0.14432295e+02;
 
         // Propane (C3H8)
-        GasPhaseThermoChemistryData(9).ConstituentName = "Propane";
-        GasPhaseThermoChemistryData(9).ConstituentFormula = "C3H8";
-        GasPhaseThermoChemistryData(9).StdRefMolarEnthOfForm = -103.855; //  -104.7 !kJ/mol  (Pittam and Pilcher 1972)
-        GasPhaseThermoChemistryData(9).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(9).ShomateA = -23.1747;
-        GasPhaseThermoChemistryData(9).ShomateB = 363.742;
-        GasPhaseThermoChemistryData(9).ShomateC = -222.981;
-        GasPhaseThermoChemistryData(9).ShomateD = 56.253;
-        GasPhaseThermoChemistryData(9).ShomateE = 0.61164;
-        GasPhaseThermoChemistryData(9).ShomateF = -109.206;
-        GasPhaseThermoChemistryData(9).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(9).ShomateH = -103.855;
-        GasPhaseThermoChemistryData(9).NumCarbons = 3.0;
-        GasPhaseThermoChemistryData(9).NumHydrogens = 8.0;
-        GasPhaseThermoChemistryData(9).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(9).MolecularWeight = 44.10;
-        GasPhaseThermoChemistryData(9).NASA_A1 = 0.08969208e+01;
-        GasPhaseThermoChemistryData(9).NASA_A2 = 0.02668986e+00;
-        GasPhaseThermoChemistryData(9).NASA_A3 = 0.05431425e-04;
-        GasPhaseThermoChemistryData(9).NASA_A4 = -0.02126000e-06;
-        GasPhaseThermoChemistryData(9).NASA_A5 = 0.09243330e-10;
-        GasPhaseThermoChemistryData(9).NASA_A6 = -0.13954918e+05;
-        GasPhaseThermoChemistryData(9).NASA_A7 = 0.01935533e+03;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ConstituentName = "Propane";
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ConstituentFormula = "C3H8";
+        state.dataGenerator->GasPhaseThermoChemistryData(9).StdRefMolarEnthOfForm = -103.855; //  -104.7 !kJ/mol  (Pittam and Pilcher 1972)
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateA = -23.1747;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateB = 363.742;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateC = -222.981;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateD = 56.253;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateE = 0.61164;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateF = -109.206;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).ShomateH = -103.855;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NumCarbons = 3.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NumHydrogens = 8.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).MolecularWeight = 44.10;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A1 = 0.08969208e+01;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A2 = 0.02668986e+00;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A3 = 0.05431425e-04;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A4 = -0.02126000e-06;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A5 = 0.09243330e-10;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A6 = -0.13954918e+05;
+        state.dataGenerator->GasPhaseThermoChemistryData(9).NASA_A7 = 0.01935533e+03;
 
         // Butane (C4H10)
-        GasPhaseThermoChemistryData(10).ConstituentName = "Butane";
-        GasPhaseThermoChemistryData(10).ConstituentFormula = "C4H10";
-        GasPhaseThermoChemistryData(10).StdRefMolarEnthOfForm = -133.218; // -125.6 !kJ/mol  (Pittam and Pilcher 1972)
-        GasPhaseThermoChemistryData(10).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(10).ShomateA = -5.24343;
-        GasPhaseThermoChemistryData(10).ShomateB = 426.442;
-        GasPhaseThermoChemistryData(10).ShomateC = -257.955;
-        GasPhaseThermoChemistryData(10).ShomateD = 66.535;
-        GasPhaseThermoChemistryData(10).ShomateE = -0.26994;
-        GasPhaseThermoChemistryData(10).ShomateF = -149.365;
-        GasPhaseThermoChemistryData(10).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(10).ShomateH = -133.218;
-        GasPhaseThermoChemistryData(10).NumCarbons = 4.0;
-        GasPhaseThermoChemistryData(10).NumHydrogens = 10.0;
-        GasPhaseThermoChemistryData(10).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(10).MolecularWeight = 58.12;
-        GasPhaseThermoChemistryData(10).NASA_A1 = -0.02256618e+02;
-        GasPhaseThermoChemistryData(10).NASA_A2 = 0.05881732e+00;
-        GasPhaseThermoChemistryData(10).NASA_A3 = -0.04525782e-03;
-        GasPhaseThermoChemistryData(10).NASA_A4 = 0.02037115e-06;
-        GasPhaseThermoChemistryData(10).NASA_A5 = -0.04079458e-10;
-        GasPhaseThermoChemistryData(10).NASA_A6 = -0.01760233e+06;
-        GasPhaseThermoChemistryData(10).NASA_A7 = 0.03329595e+03;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ConstituentName = "Butane";
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ConstituentFormula = "C4H10";
+        state.dataGenerator->GasPhaseThermoChemistryData(10).StdRefMolarEnthOfForm = -133.218; // -125.6 !kJ/mol  (Pittam and Pilcher 1972)
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateA = -5.24343;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateB = 426.442;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateC = -257.955;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateD = 66.535;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateE = -0.26994;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateF = -149.365;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).ShomateH = -133.218;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NumCarbons = 4.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NumHydrogens = 10.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).MolecularWeight = 58.12;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A1 = -0.02256618e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A2 = 0.05881732e+00;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A3 = -0.04525782e-03;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A4 = 0.02037115e-06;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A5 = -0.04079458e-10;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A6 = -0.01760233e+06;
+        state.dataGenerator->GasPhaseThermoChemistryData(10).NASA_A7 = 0.03329595e+03;
 
         // Pentane (C5H12)
-        GasPhaseThermoChemistryData(11).ConstituentName = "Pentane";
-        GasPhaseThermoChemistryData(11).ConstituentFormula = "C5H12";
-        GasPhaseThermoChemistryData(11).StdRefMolarEnthOfForm = -146.348; // -146.8 !kJ/mol (Good 1970)
-        GasPhaseThermoChemistryData(11).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(11).ShomateA = -34.9431;
-        GasPhaseThermoChemistryData(11).ShomateB = 576.777;
-        GasPhaseThermoChemistryData(11).ShomateC = -338.353;
-        GasPhaseThermoChemistryData(11).ShomateD = 76.8232;
-        GasPhaseThermoChemistryData(11).ShomateE = 1.00948;
-        GasPhaseThermoChemistryData(11).ShomateF = -155.348;
-        GasPhaseThermoChemistryData(11).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(11).ShomateH = -146.348;
-        GasPhaseThermoChemistryData(11).NumCarbons = 5.0;
-        GasPhaseThermoChemistryData(11).NumHydrogens = 12.0;
-        GasPhaseThermoChemistryData(11).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(11).MolecularWeight = 72.15;
-        GasPhaseThermoChemistryData(11).NASA_A1 = 0.01877907e+02;
-        GasPhaseThermoChemistryData(11).NASA_A2 = 0.04121645e+00;
-        GasPhaseThermoChemistryData(11).NASA_A3 = 0.12532337e-04;
-        GasPhaseThermoChemistryData(11).NASA_A4 = -0.03701536e-06;
-        GasPhaseThermoChemistryData(11).NASA_A5 = 0.15255685e-10;
-        GasPhaseThermoChemistryData(11).NASA_A6 = -0.02003815e+06;
-        GasPhaseThermoChemistryData(11).NASA_A7 = 0.01877256e+03;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ConstituentName = "Pentane";
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ConstituentFormula = "C5H12";
+        state.dataGenerator->GasPhaseThermoChemistryData(11).StdRefMolarEnthOfForm = -146.348; // -146.8 !kJ/mol (Good 1970)
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateA = -34.9431;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateB = 576.777;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateC = -338.353;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateD = 76.8232;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateE = 1.00948;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateF = -155.348;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).ShomateH = -146.348;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NumCarbons = 5.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NumHydrogens = 12.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).MolecularWeight = 72.15;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A1 = 0.01877907e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A2 = 0.04121645e+00;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A3 = 0.12532337e-04;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A4 = -0.03701536e-06;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A5 = 0.15255685e-10;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A6 = -0.02003815e+06;
+        state.dataGenerator->GasPhaseThermoChemistryData(11).NASA_A7 = 0.01877256e+03;
 
         // Hexane  (C6H14)
-        GasPhaseThermoChemistryData(12).ConstituentName = "Hexane";
-        GasPhaseThermoChemistryData(12).ConstituentFormula = "C6H14";
-        GasPhaseThermoChemistryData(12).StdRefMolarEnthOfForm = -166.966; // -167.2 !kJ/mol (Prosen and Rossini 1945)
-        GasPhaseThermoChemistryData(12).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(12).ShomateA = -46.7786;
-        GasPhaseThermoChemistryData(12).ShomateB = 711.187;
-        GasPhaseThermoChemistryData(12).ShomateC = -438.39;
-        GasPhaseThermoChemistryData(12).ShomateD = 103.784;
-        GasPhaseThermoChemistryData(12).ShomateE = 1.23887;
-        GasPhaseThermoChemistryData(12).ShomateF = -176.813;
-        GasPhaseThermoChemistryData(12).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(12).ShomateH = -166.966;
-        GasPhaseThermoChemistryData(12).NumCarbons = 6.0;
-        GasPhaseThermoChemistryData(12).NumHydrogens = 14.0;
-        GasPhaseThermoChemistryData(12).NumOxygens = 0.0;
-        GasPhaseThermoChemistryData(12).MolecularWeight = 86.18;
-        GasPhaseThermoChemistryData(12).NASA_A1 = 0.01836174e+02;
-        GasPhaseThermoChemistryData(12).NASA_A2 = 0.05098461e+00;
-        GasPhaseThermoChemistryData(12).NASA_A3 = 0.12595857e-04;
-        GasPhaseThermoChemistryData(12).NASA_A4 = -0.04428362e-06;
-        GasPhaseThermoChemistryData(12).NASA_A5 = 0.01872237e-09;
-        GasPhaseThermoChemistryData(12).NASA_A6 = -0.02292749e+06;
-        GasPhaseThermoChemistryData(12).NASA_A7 = 0.02088145e+03;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ConstituentName = "Hexane";
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ConstituentFormula = "C6H14";
+        state.dataGenerator->GasPhaseThermoChemistryData(12).StdRefMolarEnthOfForm = -166.966; // -167.2 !kJ/mol (Prosen and Rossini 1945)
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateA = -46.7786;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateB = 711.187;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateC = -438.39;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateD = 103.784;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateE = 1.23887;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateF = -176.813;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).ShomateH = -166.966;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NumCarbons = 6.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NumHydrogens = 14.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NumOxygens = 0.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).MolecularWeight = 86.18;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A1 = 0.01836174e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A2 = 0.05098461e+00;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A3 = 0.12595857e-04;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A4 = -0.04428362e-06;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A5 = 0.01872237e-09;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A6 = -0.02292749e+06;
+        state.dataGenerator->GasPhaseThermoChemistryData(12).NASA_A7 = 0.02088145e+03;
 
         // Methanol (CH3OH)
         // No Shomate coefficients???
-        GasPhaseThermoChemistryData(13).ConstituentName = "Methanol";
-        GasPhaseThermoChemistryData(13).ConstituentFormula = "CH3OH";
-        GasPhaseThermoChemistryData(13).StdRefMolarEnthOfForm = -201.102; // -201.0 !kJ/mol (Hine and Arata 1976)
-        GasPhaseThermoChemistryData(13).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(13).ShomateA = 14.1952;
-        GasPhaseThermoChemistryData(13).ShomateB = 97.7218;
-        GasPhaseThermoChemistryData(13).ShomateC = -9.73279;
-        GasPhaseThermoChemistryData(13).ShomateD = -12.8461;
-        GasPhaseThermoChemistryData(13).ShomateE = 0.15819;
-        GasPhaseThermoChemistryData(13).ShomateF = -209.037;
-        GasPhaseThermoChemistryData(13).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(13).ShomateH = -201.102;
-        GasPhaseThermoChemistryData(13).NumCarbons = 1.0;
-        GasPhaseThermoChemistryData(13).NumHydrogens = 4.0;
-        GasPhaseThermoChemistryData(13).NumOxygens = 1.0;
-        GasPhaseThermoChemistryData(13).MolecularWeight = 32.04;
-        GasPhaseThermoChemistryData(13).NASA_A1 = 0.02660115e+02;
-        GasPhaseThermoChemistryData(13).NASA_A2 = 0.07341508e-01;
-        GasPhaseThermoChemistryData(13).NASA_A3 = 0.07170050e-04;
-        GasPhaseThermoChemistryData(13).NASA_A4 = -0.08793194e-07;
-        GasPhaseThermoChemistryData(13).NASA_A5 = 0.02390570e-10;
-        GasPhaseThermoChemistryData(13).NASA_A6 = -0.02535348e+06;
-        GasPhaseThermoChemistryData(13).NASA_A7 = 0.11232631e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ConstituentName = "Methanol";
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ConstituentFormula = "CH3OH";
+        state.dataGenerator->GasPhaseThermoChemistryData(13).StdRefMolarEnthOfForm = -201.102; // -201.0 !kJ/mol (Hine and Arata 1976)
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateA = 14.1952;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateB = 97.7218;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateC = -9.73279;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateD = -12.8461;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateE = 0.15819;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateF = -209.037;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).ShomateH = -201.102;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NumCarbons = 1.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NumHydrogens = 4.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NumOxygens = 1.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).MolecularWeight = 32.04;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A1 = 0.02660115e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A2 = 0.07341508e-01;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A3 = 0.07170050e-04;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A4 = -0.08793194e-07;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A5 = 0.02390570e-10;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A6 = -0.02535348e+06;
+        state.dataGenerator->GasPhaseThermoChemistryData(13).NASA_A7 = 0.11232631e+02;
 
         // Ethanol (C2H5OH)
         // No Shomate coefficients???
-        GasPhaseThermoChemistryData(14).ConstituentName = "Ethanol";
-        GasPhaseThermoChemistryData(14).ConstituentFormula = "C2H5OH";
-        GasPhaseThermoChemistryData(14).StdRefMolarEnthOfForm = -234.441; //  -235.3 !kJ/mol (Green 1960)
-        GasPhaseThermoChemistryData(14).ThermoMode = NISTShomate;
-        GasPhaseThermoChemistryData(14).ShomateA = -8.87256;
-        GasPhaseThermoChemistryData(14).ShomateB = 282.389;
-        GasPhaseThermoChemistryData(14).ShomateC = -178.85;
-        GasPhaseThermoChemistryData(14).ShomateD = 46.3528;
-        GasPhaseThermoChemistryData(14).ShomateE = 0.48364;
-        GasPhaseThermoChemistryData(14).ShomateF = -241.239;
-        GasPhaseThermoChemistryData(14).ShomateG = -999.0;
-        GasPhaseThermoChemistryData(14).ShomateH = -234.441;
-        GasPhaseThermoChemistryData(14).NumCarbons = 2.0;
-        GasPhaseThermoChemistryData(14).NumHydrogens = 6.0;
-        GasPhaseThermoChemistryData(14).NumOxygens = 1.0;
-        GasPhaseThermoChemistryData(14).MolecularWeight = 46.07;
-        GasPhaseThermoChemistryData(14).NASA_A1 = 0.18461027e+01;
-        GasPhaseThermoChemistryData(14).NASA_A2 = 0.20475008e-01;
-        GasPhaseThermoChemistryData(14).NASA_A3 = 0.39904089e-05;
-        GasPhaseThermoChemistryData(14).NASA_A4 = -0.16585986e-07;
-        GasPhaseThermoChemistryData(14).NASA_A5 = 0.73090440e-11;
-        GasPhaseThermoChemistryData(14).NASA_A6 = -0.29663086e+05;
-        GasPhaseThermoChemistryData(14).NASA_A7 = 0.17289993e+02;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ConstituentName = "Ethanol";
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ConstituentFormula = "C2H5OH";
+        state.dataGenerator->GasPhaseThermoChemistryData(14).StdRefMolarEnthOfForm = -234.441; //  -235.3 !kJ/mol (Green 1960)
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ThermoMode = DataGenerators::ThermodynamicMode::NISTShomate;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateA = -8.87256;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateB = 282.389;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateC = -178.85;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateD = 46.3528;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateE = 0.48364;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateF = -241.239;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateG = -999.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).ShomateH = -234.441;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NumCarbons = 2.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NumHydrogens = 6.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NumOxygens = 1.0;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).MolecularWeight = 46.07;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A1 = 0.18461027e+01;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A2 = 0.20475008e-01;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A3 = 0.39904089e-05;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A4 = -0.16585986e-07;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A5 = 0.73090440e-11;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A6 = -0.29663086e+05;
+        state.dataGenerator->GasPhaseThermoChemistryData(14).NASA_A7 = 0.17289993e+02;
 
-        if (FuelSupply(FuelSupplyNum).FuelTypeMode == fuelModeGaseousConstituents) {
+        if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGaseousConstituents) {
             // now calculate LHV of fuel for entire simulation
 
             // sum over each constituent
@@ -622,11 +594,11 @@ namespace GeneratorFuelSupply {
             CO2dataID = 1;   // hard-coded above
             WaterDataID = 4; // hard-coded above
             // Loop over fuel constituents and do one-time setup
-            for (i = 1; i <= FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
+            for (i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
 
-                thisName = FuelSupply(FuelSupplyNum).ConstitName(i);
-                thisGasID = UtilityRoutines::FindItem(thisName, GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
-                FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
+                thisName = state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitName(i);
+                thisGasID = UtilityRoutines::FindItem(thisName, state.dataGenerator->GasPhaseThermoChemistryData, &GasPropertyDataStruct::ConstituentName);
+                state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i) = thisGasID;
 
                 if (thisGasID == 0) {
                     ShowSevereError(state, "Fuel constituent not found in thermochemistry data: " + thisName);
@@ -634,67 +606,67 @@ namespace GeneratorFuelSupply {
                 }
 
                 // for this fuel mixture, figure stoichiometric oxygen requirement
-                O2Stoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
-                           (GasPhaseThermoChemistryData(thisGasID).NumCarbons + GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 4.0 -
-                            GasPhaseThermoChemistryData(thisGasID).NumOxygens / 2.0);
+                O2Stoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) *
+                           (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons + state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 4.0 -
+                            state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumOxygens / 2.0);
                 // for this fuel mixture, figure stoichiometric Carbon Dioxide in Product Gases
 
-                CO2ProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumCarbons;
+                CO2ProdStoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons;
 
-                H2OProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
+                H2OProdStoic += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
             }
 
-            FuelSupply(FuelSupplyNum).StoicOxygenRate = O2Stoic;
-            FuelSupply(FuelSupplyNum).CO2ProductGasCoef = CO2ProdStoic;
-            FuelSupply(FuelSupplyNum).H2OProductGasCoef = H2OProdStoic;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).StoicOxygenRate = O2Stoic;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).CO2ProductGasCoef = CO2ProdStoic;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).H2OProductGasCoef = H2OProdStoic;
 
             // Calculate LHV for an NdotFuel of 1.0
             LHVfuel = 0.0;
-            for (i = 1; i <= FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
-                thisGasID = FuelSupply(FuelSupplyNum).GasLibID(i);
-                if (GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
+            for (i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
+                thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
+                if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
                     LHVi = 0.0;
                 } else {
                     LHVi =
-                        GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
-                        GasPhaseThermoChemistryData(thisGasID).NumCarbons * GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
-                        (GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) * GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm;
+                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
+                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons * state.dataGenerator->GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
+                        (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) * state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm;
                 }
-                LHVfuel += LHVi * FuelSupply(FuelSupplyNum).ConstitMolalFract(i);
+                LHVfuel += LHVi * state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i);
             }
-            FuelSupply(FuelSupplyNum).LHV = LHVfuel;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).LHV = LHVfuel;
 
             // Calculate HHV for an NdotFuel of 1.0
             HHVfuel = 0.0;
-            for (i = 1; i <= FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
-                thisGasID = FuelSupply(FuelSupplyNum).GasLibID(i);
-                if (GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
+            for (i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
+                thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
+                if (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens == 0.0) {
                     HHVi = 0.0;
                 } else {
                     HHVi =
-                        GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
-                        GasPhaseThermoChemistryData(thisGasID).NumCarbons * GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
-                        (GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) * GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm +
-                        (GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) *
-                            (GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm + 285.8304);
+                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).StdRefMolarEnthOfForm -
+                        state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumCarbons * state.dataGenerator->GasPhaseThermoChemistryData(CO2dataID).StdRefMolarEnthOfForm -
+                        (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) * state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm +
+                        (state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0) *
+                            (state.dataGenerator->GasPhaseThermoChemistryData(WaterDataID).StdRefMolarEnthOfForm + 285.8304);
                 }
-                HHVfuel += HHVi * FuelSupply(FuelSupplyNum).ConstitMolalFract(i);
+                HHVfuel += HHVi * state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i);
             }
 
             // Calculate Molecular Weight for this fuel
             MWfuel = 0.0;
-            for (i = 1; i <= FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
-                thisGasID = FuelSupply(FuelSupplyNum).GasLibID(i);
-                MWfuel += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).MolecularWeight;
+            for (i = 1; i <= state.dataGenerator->FuelSupply(FuelSupplyNum).NumConstituents; ++i) {
+                thisGasID = state.dataGenerator->FuelSupply(FuelSupplyNum).GasLibID(i);
+                MWfuel += state.dataGenerator->FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * state.dataGenerator->GasPhaseThermoChemistryData(thisGasID).MolecularWeight;
             }
-            FuelSupply(FuelSupplyNum).MW = MWfuel;
-            FuelSupply(FuelSupplyNum).KmolPerSecToKgPerSec = MWfuel;      // TODO check this, guessing on conversion...
-            FuelSupply(FuelSupplyNum).HHV = 1000000.0 * HHVfuel / MWfuel; // (1000/k) (1000/k) (kJ/mol)/(g/mol) = J/kg
-            FuelSupply(FuelSupplyNum).LHVJperkg = FuelSupply(FuelSupplyNum).LHV * 1000000.0 / FuelSupply(FuelSupplyNum).MW;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).MW = MWfuel;
+            state.dataGenerator->FuelSupply(FuelSupplyNum).KmolPerSecToKgPerSec = MWfuel;      // TODO check this, guessing on conversion...
+            state.dataGenerator->FuelSupply(FuelSupplyNum).HHV = 1000000.0 * HHVfuel / MWfuel; // (1000/k) (1000/k) (kJ/mol)/(g/mol) = J/kg
+            state.dataGenerator->FuelSupply(FuelSupplyNum).LHVJperkg = state.dataGenerator->FuelSupply(FuelSupplyNum).LHV * 1000000.0 / state.dataGenerator->FuelSupply(FuelSupplyNum).MW;
 
-        } else if (FuelSupply(FuelSupplyNum).FuelTypeMode == fuelModeGenericLiquid) {
-            FuelSupply(FuelSupplyNum).LHV =
-                FuelSupply(FuelSupplyNum).LHVliquid * FuelSupply(FuelSupplyNum).MW / 1000000.0; // J/kg * g/mol (k/1000) (k/10000)
+        } else if (state.dataGenerator->FuelSupply(FuelSupplyNum).FuelTypeMode == DataGenerators::FuelMode::fuelModeGenericLiquid) {
+            state.dataGenerator->FuelSupply(FuelSupplyNum).LHV =
+                    state.dataGenerator->FuelSupply(FuelSupplyNum).LHVliquid * state.dataGenerator->FuelSupply(FuelSupplyNum).MW / 1000000.0; // J/kg * g/mol (k/1000) (k/10000)
 
         } else {
         }
@@ -705,11 +677,11 @@ namespace GeneratorFuelSupply {
         static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
         print(state.files.eio,
               Format_501,
-              FuelSupply(FuelSupplyNum).Name,
-              FuelSupply(FuelSupplyNum).LHV * 1000000.0,
-              FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0,
-              FuelSupply(FuelSupplyNum).HHV / 1000.0,
-              FuelSupply(FuelSupplyNum).MW);
+              state.dataGenerator->FuelSupply(FuelSupplyNum).Name,
+              state.dataGenerator->FuelSupply(FuelSupplyNum).LHV * 1000000.0,
+              state.dataGenerator->FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0,
+              state.dataGenerator->FuelSupply(FuelSupplyNum).HHV / 1000.0,
+              state.dataGenerator->FuelSupply(FuelSupplyNum).MW);
     }
 
 } // namespace GeneratorFuelSupply

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,7 +68,6 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -120,9 +119,7 @@
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 
-namespace EnergyPlus {
-
-    namespace PlantManager {
+namespace EnergyPlus::PlantManager {
 
         // MODULE INFORMATION:
         //       AUTHOR         Sankaranarayanan K P, Rich Liesen
@@ -146,26 +143,7 @@ namespace EnergyPlus {
         using namespace DataLoopNode;
         using namespace FluidProperties;
 
-        // MODULE PARAMETER DEFINITIONS
-        int const Plant(1);
-        int const Condenser(2);
-        int const TempSetPt(1001);
-        bool InitLoopEquip(true);
-        bool GetCompSizFac(true);
-
         static std::string const fluidNameSteam("STEAM");
-
-        Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
-        Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
-        Array1D_int DemandSideInletNode;  // Inlet node on the demand side
-
-        void clear_state() {
-            InitLoopEquip = true;
-            GetCompSizFac = true;
-            SupplySideInletNode.deallocate();
-            SupplySideOutletNode.deallocate();
-            DemandSideInletNode.deallocate();
-        }
 
         void ManagePlantLoops(EnergyPlusData &state,
                               bool const FirstHVACIteration,
@@ -204,16 +182,16 @@ namespace EnergyPlus {
             int HalfLoopNum;
             int CurntMinPlantSubIterations;
 
-            if (std::any_of(PlantLoop.begin(), PlantLoop.end(), [](DataPlant::PlantLoopData const &e) {
-                return (e.CommonPipeType == DataPlant::CommonPipe_Single) ||
-                       (e.CommonPipeType == DataPlant::CommonPipe_TwoWay);
+            if (std::any_of(state.dataPlnt->PlantLoop.begin(), state.dataPlnt->PlantLoop.end(), [](DataPlant::PlantLoopData const &e) {
+                return (e.CommonPipeType == DataPlant::iCommonPipeType::Single) ||
+                       (e.CommonPipeType == DataPlant::iCommonPipeType::TwoWay);
             })) {
                 CurntMinPlantSubIterations = max(7, state.dataConvergeParams->MinPlantSubIterations);
             } else {
                 CurntMinPlantSubIterations = state.dataConvergeParams->MinPlantSubIterations;
             }
 
-            if (TotNumLoops <= 0) { // quick return if no plant in model
+            if (state.dataPlnt->TotNumLoops <= 0) { // quick return if no plant in model
                 SimPlantLoops = false;
                 return;
             }
@@ -223,13 +201,13 @@ namespace EnergyPlus {
 
             while ((SimPlantLoops) && (IterPlant <= state.dataConvergeParams->MaxPlantSubIterations)) {
                 // go through half loops in predetermined calling order
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSide = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSide = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     OtherSide = 3 - LoopSide; // will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
 
-                    auto &this_loop(PlantLoop(LoopNum));
+                    auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
                     auto &this_loop_side(this_loop.LoopSide(LoopSide));
                     auto &other_loop_side(this_loop.LoopSide(OtherSide));
 
@@ -252,16 +230,16 @@ namespace EnergyPlus {
                         // Update the report variable
                         this_loop.LastLoopSideSimulated = LoopSide;
 
-                        ++PlantManageHalfLoopCalls;
+                        ++state.dataPlnt->PlantManageHalfLoopCalls;
                     }
 
                 } // half loop based calling order...
 
                 // decide new status for SimPlantLoops flag
                 SimPlantLoops = false;
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = 1; LoopSideNum <= 2; ++LoopSideNum) {
-                        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).SimLoopSideNeeded) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).SimLoopSideNeeded) {
                             SimPlantLoops = true;
                             goto LoopLevel_exit;
                         }
@@ -271,14 +249,14 @@ namespace EnergyPlus {
 
                 ++IterPlant; // Increment the iteration counter
                 if (IterPlant < CurntMinPlantSubIterations) SimPlantLoops = true;
-                ++PlantManageSubIterations; // these are summed across all half loops for reporting
+                ++state.dataPlnt->PlantManageSubIterations; // these are summed across all half loops for reporting
             }                               // while
 
             // add check for non-plant system sim flag updates
             //  could set SimAirLoops, SimElecCircuits, SimZoneEquipment flags for now
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 for (LoopSide = DemandSide; LoopSide <= SupplySide; ++LoopSide) {
-                    auto &this_loop_side(PlantLoop(LoopNum).LoopSide(LoopSide));
+                    auto &this_loop_side(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSide));
                     if (this_loop_side.SimAirLoopsNeeded) SimAirLoops = true;
                     if (this_loop_side.SimZoneEquipNeeded) SimZoneEquipment = true;
                     //  IF (this_loop_side.SimNonZoneEquipNeeded) SimNonZoneEquipment = .TRUE.
@@ -287,7 +265,7 @@ namespace EnergyPlus {
             }
 
             // Also log the convergence history of all loopsides once complete
-            LogPlantConvergencePoints(FirstHVACIteration);
+            LogPlantConvergencePoints(state, FirstHVACIteration);
         }
 
         void GetPlantLoopData(EnergyPlusData &state) {
@@ -323,7 +301,6 @@ namespace EnergyPlus {
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum;      // DO loop counter for loops
-            int PressSimLoop; // DO loop counter for pressure simulation type
             int NumAlphas;    // Number of elements in the alpha array
             int NumNums;      // Number of elements in the numeric array
             int IOStat;       // IO Status when calling get input subroutine
@@ -332,43 +309,43 @@ namespace EnergyPlus {
             int CondLoopNum;
             Array1D_string Alpha(18); // dimension to num of alpha fields in input
             Array1D<Real64> Num(30);  // dimension to num of numeric data fields in input
-            static bool ErrorsFound(false);
+            bool ErrorsFound(false);
             std::string LoadingScheme;
             bool ErrFound;
             std::string CurrentModuleObject; // for ease in renaming.
             bool MatchedPressureString;
             int PressSimAlphaIndex;
 
-            // FLOW:
+
             CurrentModuleObject = "PlantLoop";
             NumPlantLoops = inputProcessor->getNumObjectsFound(state,
                     CurrentModuleObject); // Get the number of primary plant loops
             CurrentModuleObject = "CondenserLoop";
             NumCondLoops = inputProcessor->getNumObjectsFound(state, CurrentModuleObject); // Get the number of Condenser loops
-            TotNumLoops = NumPlantLoops + NumCondLoops;
+            state.dataPlnt->TotNumLoops = NumPlantLoops + NumCondLoops;
 
-            if (TotNumLoops > 0) {
-                PlantLoop.allocate(TotNumLoops);
-                state.dataConvergeParams->PlantConvergence.allocate(TotNumLoops);
-                if (!allocated(PlantAvailMgr)) {
-                    PlantAvailMgr.allocate(TotNumLoops);
+            if (state.dataPlnt->TotNumLoops > 0) {
+                state.dataPlnt->PlantLoop.allocate(state.dataPlnt->TotNumLoops);
+                state.dataConvergeParams->PlantConvergence.allocate(state.dataPlnt->TotNumLoops);
+                if (!allocated(state.dataPlnt->PlantAvailMgr)) {
+                    state.dataPlnt->PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
                 }
             } else {
                 return;
             }
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 Alpha = "";
                 Num = 0.0;
 
                 // set up some references
-                auto &this_loop(PlantLoop(LoopNum));
+                auto &this_loop(state.dataPlnt->PlantLoop(LoopNum));
                 this_loop.LoopSide.allocate(2);
                 auto &this_demand_side(this_loop.LoopSide(1));
                 auto &this_supply_side(this_loop.LoopSide(2));
                 if (LoopNum <= NumPlantLoops) {
                     PlantLoopNum = LoopNum;
-                    this_loop.TypeOfLoop = Plant;
+                    this_loop.TypeOfLoop = LoopType::Plant;
                     CurrentModuleObject = "PlantLoop";
                     inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
@@ -384,7 +361,7 @@ namespace EnergyPlus {
                                                   cNumericFieldNames);
                 } else {
                     CondLoopNum = LoopNum - NumPlantLoops;
-                    this_loop.TypeOfLoop = Condenser;
+                    this_loop.TypeOfLoop = LoopType::Condenser;
                     CurrentModuleObject = "CondenserLoop";
                     inputProcessor->getObjectItem(state,
                                                   CurrentModuleObject,
@@ -451,8 +428,8 @@ namespace EnergyPlus {
                 // correct loop temperature step.  Loop data is read in supply side, but the volume is not used in
                 // a calculation there.
                 this_loop.Volume = Num(5);
-                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate();
-                if (this_loop.Volume == DataGlobalConstants::AutoCalculate()) {
+                if (lNumericFieldBlanks(5)) this_loop.Volume = DataGlobalConstants::AutoCalculate;
+                if (this_loop.Volume == DataGlobalConstants::AutoCalculate) {
                     this_loop.VolumeWasAutoSized = true;
                 }
                 // circulation time used to autocalculate loop volume
@@ -496,27 +473,27 @@ namespace EnergyPlus {
                 // Load the load distribution scheme.
                 LoadingScheme = Alpha(14);
                 if (UtilityRoutines::SameString(LoadingScheme, "Optimal")) {
-                    this_loop.LoadDistribution = OptimalLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Optimal;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialLoad")) {
-                    this_loop.LoadDistribution = SequentialLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "UniformLoad")) {
-                    this_loop.LoadDistribution = UniformLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Uniform;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "UniformPLR")) {
-                    this_loop.LoadDistribution = UniformPLRLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::UniformPLR;
                 } else if (UtilityRoutines::SameString(LoadingScheme, "SequentialUniformPLR")) {
-                    this_loop.LoadDistribution = SequentialUniformPLRLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::SequentialUniformPLR;
                 } else {
                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                     ShowContinueError(state, "..." + cAlphaFieldNames(14) + "=\"" + Alpha(14) + "\".");
                     ShowContinueError(state, "Will default to SequentialLoad."); // TODO rename point
-                    this_loop.LoadDistribution = SequentialLoading;
+                    this_loop.LoadDistribution = DataPlant::iLoadingScheme::Sequential;
                 }
 
-                // When dual setpoint is allowed in condenser loop modify this code. Sankar 06/29/2009
-                if (this_loop.TypeOfLoop == Plant) {
+                // When dual setpoint is allowed in condenser loop modify this code.
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     // Get the Loop Demand Calculation Scheme
                     if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {
-                        this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                        this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
                         if (this_loop.FluidType == NodeType_Steam) {
                             ShowWarningError(state,
@@ -525,41 +502,41 @@ namespace EnergyPlus {
                                               cAlphaFieldNames(2) + "= Steam");
                             ShowContinueError(state, "Will reset " + cAlphaFieldNames(16) +
                                               " = SingleSetPoint and simulation will continue.");
-                            this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                            this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                         } else {
-                            this_loop.LoopDemandCalcScheme = DualSetPointDeadBand;
+                            this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand;
                         }
                     } else if (UtilityRoutines::SameString(Alpha(16), "")) {
-                        this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                        this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     } else {
                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                         ShowContinueError(state, "..." + cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\".");
                         ShowContinueError(state, "Will default to SingleSetPoint."); // TODO rename point
-                        this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                        this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     }
-                } else if (this_loop.TypeOfLoop == Condenser) {
-                    this_loop.LoopDemandCalcScheme = SingleSetPoint;
+                } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
+                    this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                 }
 
                 // When Commonpipe is allowed in condenser loop modify this code. Sankar 06/29/2009
-                if (this_loop.TypeOfLoop == Plant) {
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     if (UtilityRoutines::SameString(Alpha(17), "CommonPipe")) {
-                        this_loop.CommonPipeType = CommonPipe_Single;
+                        this_loop.CommonPipeType = DataPlant::iCommonPipeType::Single;
                     } else if (UtilityRoutines::SameString(Alpha(17), "TwoWayCommonPipe")) {
-                        this_loop.CommonPipeType = CommonPipe_TwoWay;
+                        this_loop.CommonPipeType = DataPlant::iCommonPipeType::TwoWay;
                     } else if (UtilityRoutines::SameString(Alpha(17), "None") || lAlphaFieldBlanks(17)) {
-                        this_loop.CommonPipeType = CommonPipe_No;
+                        this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                         ShowContinueError(state, "Invalid " + cAlphaFieldNames(17) + "=\"" + Alpha(17) + "\".");
                         ShowContinueError(state, "Refer to I/O reference document for more details.");
                         ErrorsFound = true;
                     }
-                } else if (this_loop.TypeOfLoop == Condenser) {
-                    this_loop.CommonPipeType = CommonPipe_No;
+                } else if (this_loop.TypeOfLoop == LoopType::Condenser) {
+                    this_loop.CommonPipeType = DataPlant::iCommonPipeType::No;
                 }
 
-                if (this_loop.CommonPipeType == CommonPipe_TwoWay) {
+                if (this_loop.CommonPipeType == DataPlant::iCommonPipeType::TwoWay) {
                     if (this_demand_side.InletNodeSetPt && this_supply_side.InletNodeSetPt) {
                         ShowSevereError(state,
                                 RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
@@ -584,7 +561,7 @@ namespace EnergyPlus {
                 // Pressure Simulation Type Input
                 // First set the alpha index in the object as it is different for plant/condenser
                 // When CommonPipe, etc., is allowed in condenser loop, modify this code.  Edwin/Sankar 08/12/2009
-                if (this_loop.TypeOfLoop == Plant) {
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
                     PressSimAlphaIndex = 18;
                 } else {
                     PressSimAlphaIndex = 15;
@@ -594,20 +571,26 @@ namespace EnergyPlus {
                     MatchedPressureString = false;
 
                     // Check all types
-                    for (PressSimLoop = 1; PressSimLoop <= 4; ++PressSimLoop) {
-                        if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), PressureSimType(PressSimLoop))) {
-                            this_loop.PressureSimType = PressSimLoop;
-                            MatchedPressureString = true;
-                            break;
-                        }
+                    if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)))) {
+                        this_loop.PressureSimType = DataPlant::iPressSimType::NoPressure;
+                        MatchedPressureString = true;
+                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)))) {
+                        this_loop.PressureSimType = DataPlant::iPressSimType::PumpPowerCorrection;
+                        MatchedPressureString = true;
+                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::FlowSimulation)))) {
+                        this_loop.PressureSimType = DataPlant::iPressSimType::FlowSimulation;
+                        MatchedPressureString = true;
+                    } else if (UtilityRoutines::SameString(Alpha(PressSimAlphaIndex), format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)))) {
+                        this_loop.PressureSimType = DataPlant::iPressSimType::FlowCorrection;
+                        MatchedPressureString = true;
                     }
 
                     // If we found a match, check to make sure it is one of the valid
                     // ones for this phase of pressure implementation
                     if (MatchedPressureString) {
-                        if ((this_loop.PressureSimType == Press_NoPressure) ||
-                            (this_loop.PressureSimType == Press_PumpPowerCorrection) ||
-                            (this_loop.PressureSimType == Press_FlowCorrection)) {
+                        if ((this_loop.PressureSimType == DataPlant::iPressSimType::NoPressure) ||
+                            (this_loop.PressureSimType == DataPlant::iPressSimType::PumpPowerCorrection) ||
+                            (this_loop.PressureSimType == DataPlant::iPressSimType::FlowCorrection)) {
                             // We are OK here, move on
                         } else {
                             // We have an erroneous input, alert user
@@ -616,9 +599,9 @@ namespace EnergyPlus {
                             ShowContinueError(state, "Invalid " + cAlphaFieldNames(PressSimAlphaIndex) + "=\"" +
                                               Alpha(PressSimAlphaIndex) + "\".");
                             ShowContinueError(state, "Currently only options are: ");
-                            ShowContinueError(state, "  - " + PressureSimType(Press_NoPressure));
-                            ShowContinueError(state, "  - " + PressureSimType(Press_PumpPowerCorrection));
-                            ShowContinueError(state, "  - " + PressureSimType(Press_FlowCorrection));
+                            ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::NoPressure)));
+                            ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::PumpPowerCorrection)));
+                            ShowContinueError(state, "  - " + format("{}", cPressureSimType(DataPlant::iPressSimType::FlowCorrection)));
                             ErrorsFound = true;
                         }
                     }
@@ -626,7 +609,7 @@ namespace EnergyPlus {
                     // if we made it this far and didn't get a match, check for blank
                     if (!MatchedPressureString) {
                         if (Alpha(PressSimAlphaIndex).empty()) {
-                            this_loop.PressureSimType = Press_NoPressure;
+                            this_loop.PressureSimType = DataPlant::iPressSimType::NoPressure;
                             break;
                         }
                     }
@@ -644,8 +627,8 @@ namespace EnergyPlus {
 
                 ErrFound = false;
 
-                if (this_loop.TypeOfLoop == Plant) {
-                    GetPlantAvailabilityManager(state, Alpha(15), LoopNum, TotNumLoops, ErrFound);
+                if (this_loop.TypeOfLoop == LoopType::Plant) {
+                    GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
                 }
 
                 if (ErrFound) {
@@ -722,15 +705,15 @@ namespace EnergyPlus {
             // set up loop status (set by system availability managers) report variables
             // Condenser loop does not have availability manager yet. Once implemented, move the setup output variable to
             // outside the IF statement.
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
                 SetupOutputVariable(state,
                                     "Plant System Cycle On Off Status",
                                     OutputProcessor::Unit::None,
-                                    PlantAvailMgr(LoopNum).AvailStatus,
+                                    state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus,
                                     "Plant",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
             }
         }
 
@@ -774,7 +757,7 @@ namespace EnergyPlus {
 
             bool SplitInBranch;
             bool MixerOutBranch;
-            static bool ErrorsFound(false);
+            bool ErrorsFound(false);
             bool ASeriesBranchHasPump;
             bool AParallelBranchHasPump;
 
@@ -799,8 +782,8 @@ namespace EnergyPlus {
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
             HalfLoopNum = 0;
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                auto &plantLoop = PlantLoop(LoopNum);
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
                 plantLoop.LoopHasConnectionComp = false;
 
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
@@ -810,13 +793,13 @@ namespace EnergyPlus {
                     NumOfPipesInLoop = 0; // Initialization
                     ++HalfLoopNum;
                     loopSide.BypassExists = false;
-                    if (plantLoop.TypeOfLoop == Plant && LoopSideNum == DemandSide) {
+                    if (plantLoop.TypeOfLoop == LoopType::Plant && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Plant Demand";
-                    } else if (plantLoop.TypeOfLoop == Plant && LoopSideNum == SupplySide) {
+                    } else if (plantLoop.TypeOfLoop == LoopType::Plant && LoopSideNum == SupplySide) {
                         LoopIdentifier = "Plant Supply";
-                    } else if (plantLoop.TypeOfLoop == Condenser && LoopSideNum == DemandSide) {
+                    } else if (plantLoop.TypeOfLoop == LoopType::Condenser && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Condenser Demand";
-                    } else if (plantLoop.TypeOfLoop == Condenser && LoopSideNum == SupplySide) {
+                    } else if (plantLoop.TypeOfLoop == LoopType::Condenser && LoopSideNum == SupplySide) {
                         LoopIdentifier = "Condenser Supply";
                     }
 
@@ -858,10 +841,10 @@ namespace EnergyPlus {
 
                         branch.Comp.allocate(branch.TotalComponents);
 
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                             // set up some references
                             auto &this_comp_type(CompTypes(CompNum));
-                            auto &this_comp(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
+                            auto &this_comp(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
                             this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             this_comp.TypeOf = this_comp_type;
@@ -915,7 +898,7 @@ namespace EnergyPlus {
                                     ShowContinueError(state, "Component Type =" + this_comp_type);
                                 }
                                 this_comp.CurOpSchemeType = PumpOpSchemeType;
-                                if (BranchNum == 1 || BranchNum == PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
+                                if (BranchNum == 1 || BranchNum == state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
                                     ASeriesBranchHasPump = true;
                                 } else {
                                     AParallelBranchHasPump = true;
@@ -925,9 +908,9 @@ namespace EnergyPlus {
                                 p.BranchNum = BranchNum;
                                 p.CompNum = CompNum;
                                 p.PumpOutletNode = OutletNodeNumbers(CompNum);
-                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchPumpsExist = AParallelBranchHasPump;
-                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps.push_back(p);
-                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumps++;
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchPumpsExist = AParallelBranchHasPump;
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps.push_back(p);
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumps++;
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_WtrHeaterMixed;
                                 if (LoopSideNum == DemandSide) {
@@ -1430,7 +1413,7 @@ namespace EnergyPlus {
 
                     if (ASeriesBranchHasPump && AParallelBranchHasPump) {
                         ShowSevereError(state, "Current version does not support Loop pumps and branch pumps together");
-                        ShowContinueError(state, "Occurs in loop " + PlantLoop(LoopNum).Name);
+                        ShowContinueError(state, "Occurs in loop " + state.dataPlnt->PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
                     }
 
@@ -1635,12 +1618,12 @@ namespace EnergyPlus {
                 // a nice little spot to report out bad pump/common-pipe configurations
                 bool const ThisSideHasPumps = (plantLoop.LoopSide(1).TotalPumps > 0);
                 bool const OtherSideHasPumps = (plantLoop.LoopSide(2).TotalPumps > 0);
-                if ((plantLoop.CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
+                if ((plantLoop.CommonPipeType != DataPlant::iCommonPipeType::No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
                     ShowSevereError(state, "Input Error: Common Pipe configurations must have pumps on both sides of loop");
                     ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError(state, "Make sure both demand and supply sides have a pump");
                     ErrorsFound = true;
-                } else if ((plantLoop.CommonPipeType == CommonPipe_No) && ThisSideHasPumps && OtherSideHasPumps) {
+                } else if ((plantLoop.CommonPipeType == DataPlant::iCommonPipeType::No) && ThisSideHasPumps && OtherSideHasPumps) {
                     ShowSevereError(state, "Input Error: Pumps on both loop sides must utilize a common pipe");
                     ShowContinueError(state, "Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError(state, "Add common pipe or remove one loop side pump");
@@ -1667,17 +1650,17 @@ namespace EnergyPlus {
                 ShowFatalError(state, "GetPlantInput: Errors in getting PlantLoop Input");
             }
 
-            if (NumPlantLoops > 0) VentRepPlantSupplySide.allocate(NumPlantLoops);
-            if (NumPlantLoops > 0) VentRepPlantDemandSide.allocate(NumPlantLoops);
+            if (NumPlantLoops > 0) state.dataPlnt->VentRepPlantSupplySide.allocate(NumPlantLoops);
+            if (NumPlantLoops > 0) state.dataPlnt->VentRepPlantDemandSide.allocate(NumPlantLoops);
 
             for (LoopNum = 1; LoopNum <= NumPlantLoops; ++LoopNum) {
 
                 // set up references for this loop
-                auto &this_plant_loop(PlantLoop(LoopNum));
+                auto &this_plant_loop(state.dataPlnt->PlantLoop(LoopNum));
                 auto &this_plant_supply(this_plant_loop.LoopSide(SupplySide));
-                auto &this_vent_plant_supply(VentRepPlantSupplySide(LoopNum));
+                auto &this_vent_plant_supply(state.dataPlnt->VentRepPlantSupplySide(LoopNum));
                 auto &this_plant_demand(this_plant_loop.LoopSide(DemandSide));
-                auto &this_vent_plant_demand(VentRepPlantDemandSide(LoopNum));
+                auto &this_vent_plant_demand(state.dataPlnt->VentRepPlantDemandSide(LoopNum));
 
                 this_vent_plant_supply.Name = this_plant_loop.Name;
                 this_vent_plant_supply.NodeNumIn = this_plant_supply.NodeNumIn;
@@ -1691,8 +1674,8 @@ namespace EnergyPlus {
 
                 for (BranchNum = 1; BranchNum <= this_vent_plant_supply.TotalBranches; ++BranchNum) {
 
-                    auto &this_plant_supply_branch(PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum));
-                    auto &this_vent_plant_supply_branch(VentRepPlantSupplySide(LoopNum).Branch(BranchNum));
+                    auto &this_plant_supply_branch(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum));
+                    auto &this_vent_plant_supply_branch(state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum));
 
                     this_vent_plant_supply_branch.Name = this_plant_supply_branch.Name;
                     this_vent_plant_supply_branch.NodeNumIn = this_plant_supply_branch.NodeNumIn;
@@ -1704,12 +1687,12 @@ namespace EnergyPlus {
                     }
 
                     for (CompNum = 1;
-                         CompNum <= VentRepPlantSupplySide(LoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+                         CompNum <= state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
 
                         auto &this_plant_supply_comp(
-                                PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum));
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum));
                         auto &this_vent_plant_supply_comp(
-                                VentRepPlantSupplySide(LoopNum).Branch(BranchNum).Comp(CompNum));
+                                state.dataPlnt->VentRepPlantSupplySide(LoopNum).Branch(BranchNum).Comp(CompNum));
 
                         this_vent_plant_supply_comp.Name = this_plant_supply_comp.Name;
                         this_vent_plant_supply_comp.TypeOf = this_plant_supply_comp.TypeOf;
@@ -1734,8 +1717,8 @@ namespace EnergyPlus {
 
                 for (BranchNum = 1; BranchNum <= this_vent_plant_demand.TotalBranches; ++BranchNum) {
 
-                    auto &this_plant_demand_branch(PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum));
-                    auto &this_vent_plant_demand_branch(VentRepPlantDemandSide(LoopNum).Branch(BranchNum));
+                    auto &this_plant_demand_branch(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum));
+                    auto &this_vent_plant_demand_branch(state.dataPlnt->VentRepPlantDemandSide(LoopNum).Branch(BranchNum));
 
                     this_vent_plant_demand_branch.Name = this_plant_demand_branch.Name;
                     this_vent_plant_demand_branch.NodeNumIn = this_plant_demand_branch.NodeNumIn;
@@ -1749,9 +1732,9 @@ namespace EnergyPlus {
                     for (CompNum = 1; CompNum <= this_vent_plant_demand_branch.TotalComponents; ++CompNum) {
 
                         auto &this_plant_demand_comp(
-                                PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum));
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum));
                         auto &this_vent_plant_demand_comp(
-                                VentRepPlantDemandSide(LoopNum).Branch(BranchNum).Comp(CompNum));
+                                state.dataPlnt->VentRepPlantDemandSide(LoopNum).Branch(BranchNum).Comp(CompNum));
 
                         this_vent_plant_demand_comp.Name = this_plant_demand_comp.Name;
                         this_vent_plant_demand_comp.TypeOf = this_plant_demand_comp.TypeOf;
@@ -1766,19 +1749,19 @@ namespace EnergyPlus {
 
             } // loop over plant supply loops (ventilation report data)
 
-            if (NumCondLoops > 0) VentRepCondSupplySide.allocate(NumCondLoops);
-            if (NumCondLoops > 0) VentRepCondDemandSide.allocate(NumCondLoops);
+            if (NumCondLoops > 0) state.dataPlnt->VentRepCondSupplySide.allocate(NumCondLoops);
+            if (NumCondLoops > 0) state.dataPlnt->VentRepCondDemandSide.allocate(NumCondLoops);
 
             for (LoopNum = 1; LoopNum <= NumCondLoops; ++LoopNum) {
 
                 LoopNumInArray = LoopNum + NumPlantLoops;
 
                 // set up references for this loop
-                auto &this_cond_loop(PlantLoop(LoopNumInArray));
+                auto &this_cond_loop(state.dataPlnt->PlantLoop(LoopNumInArray));
                 auto &this_cond_supply(this_cond_loop.LoopSide(SupplySide));
-                auto &this_vent_cond_supply(VentRepCondSupplySide(LoopNum));
+                auto &this_vent_cond_supply(state.dataPlnt->VentRepCondSupplySide(LoopNum));
                 auto &this_cond_demand(this_cond_loop.LoopSide(DemandSide));
-                auto &this_vent_cond_demand(VentRepCondDemandSide(LoopNum));
+                auto &this_vent_cond_demand(state.dataPlnt->VentRepCondDemandSide(LoopNum));
 
                 this_vent_cond_supply.Name = this_cond_loop.Name;
                 this_vent_cond_supply.NodeNumIn = this_cond_supply.NodeNumIn;
@@ -1877,7 +1860,6 @@ namespace EnergyPlus {
             // Using/Aliasing
             using DataPlant::DemandOpSchemeType;
             using DataPlant::DemandSide;
-            using DataPlant::PlantLoop;
             using DataPlant::SupplySide;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1889,9 +1871,9 @@ namespace EnergyPlus {
             std::string CurrentModuleObject; // for ease in renaming.
             int FluidIndex;
 
-            // FLOW:
+
             MaxBranches = 0;
-            for (auto &loop : PlantLoop) {
+            for (auto &loop : state.dataPlnt->PlantLoop) {
                 MaxBranches = max(MaxBranches, loop.LoopSide(DemandSide).TotalBranches);
                 MaxBranches = max(MaxBranches, loop.LoopSide(SupplySide).TotalBranches);
                 loop.MaxBranch = MaxBranches;
@@ -1906,8 +1888,8 @@ namespace EnergyPlus {
                 loop.OutletNodeFlowrate = 0.0;
             }
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                auto &loop = PlantLoop(LoopNum);
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                auto &loop = state.dataPlnt->PlantLoop(LoopNum);
                 if (LoopNum <= NumPlantLoops) {
                     CurrentModuleObject = "Plant Loop";
                 } else {
@@ -1919,127 +1901,127 @@ namespace EnergyPlus {
                                     loop.CoolingDemand,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
                 SetupOutputVariable(state, "Plant Supply Side Heating Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.HeatingDemand,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
                 SetupOutputVariable(state, "Plant Supply Side Inlet Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
                                     loop.InletNodeFlowrate,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
 
                 SetupOutputVariable(state, "Plant Supply Side Inlet Temperature",
                                     OutputProcessor::Unit::C,
                                     loop.InletNodeTemperature,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
                 SetupOutputVariable(state, "Plant Supply Side Outlet Temperature",
                                     OutputProcessor::Unit::C,
                                     loop.OutletNodeTemperature,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
 
                 SetupOutputVariable(state, "Plant Supply Side Not Distributed Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.DemandNotDispatched,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
                 SetupOutputVariable(state, "Plant Supply Side Unmet Demand Rate",
                                     OutputProcessor::Unit::W,
                                     loop.UnmetDemand,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
                 SetupOutputVariable(state, "Debug Plant Loop Bypass Fraction",
                                     OutputProcessor::Unit::None,
                                     loop.BypassFrac,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
                 SetupOutputVariable(state, "Debug Plant Last Simulated Loop Side",
                                     OutputProcessor::Unit::None,
                                     loop.LastLoopSideSimulated,
                                     "System",
                                     "Average",
-                                    PlantLoop(LoopNum).Name);
+                                    state.dataPlnt->PlantLoop(LoopNum).Name);
             }
 
             // setup more variables inside plant data structure
             // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
             if (state.dataGlobal->DisplayAdvancedReportVariables) {
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,
-                                        PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp,
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TankTemp,
                                         "System",
                                         "Average",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Temperature",
                                         OutputProcessor::Unit::C,
-                                        PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp,
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_TankTemp,
                                         "System",
                                         "Average",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Heat Transport Rate",
                                         OutputProcessor::Unit::W,
-                                        PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_MdotCpDeltaT,
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_MdotCpDeltaT,
                                         "System",
                                         "Average",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Heat Transport Rate",
                                         OutputProcessor::Unit::W,
-                                        PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_MdotCpDeltaT,
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_MdotCpDeltaT,
                                         "System",
                                         "Average",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Heat Storage Rate",
                                         OutputProcessor::Unit::W,
-                                        PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_McpDTdt,
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_McpDTdt,
                                         "System",
                                         "Average",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Heat Storage Rate",
                                         OutputProcessor::Unit::W,
-                                        PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_McpDTdt,
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).LoopSideInlet_McpDTdt,
                                         "System",
                                         "Average",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Demand Side Lumped Capacitance Excessive Storage Time",
                                         OutputProcessor::Unit::hr,
-                                        PlantLoop(LoopNum).LoopSide(
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(
                                                 DemandSide).LoopSideInlet_CapExcessStorageTimeReport,
                                         "System",
                                         "Sum",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     SetupOutputVariable(state, "Plant Supply Side Lumped Capacitance Excessive Storage Time",
                                         OutputProcessor::Unit::hr,
-                                        PlantLoop(LoopNum).LoopSide(
+                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(
                                                 SupplySide).LoopSideInlet_CapExcessStorageTimeReport,
                                         "System",
                                         "Sum",
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                         for (BranchNum = 1;
-                             BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                             BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).CurOpSchemeType != DemandOpSchemeType) {
                                     SetupOutputVariable(state, "Plant Component Distributed Demand Rate",
                                                         OutputProcessor::Unit::W,
-                                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                                                 CompNum).MyLoad,
                                                         "System",
                                                         "Average",
-                                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                                                 CompNum).Name);
                                 }
                             }
@@ -2049,18 +2031,18 @@ namespace EnergyPlus {
             }
 
             // now traverse plant loops and set fluid type index in all nodes on the loop
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                FluidIndex = PlantLoop(LoopNum).FluidIndex;
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                FluidIndex = state.dataPlnt->PlantLoop(LoopNum).FluidIndex;
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
-                    Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).FluidIndex = FluidIndex;
-                    Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).FluidIndex = FluidIndex;
+                    Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).FluidIndex = FluidIndex;
+                    Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).FluidIndex = FluidIndex;
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                            Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                     CompNum).NodeNumIn).FluidIndex = FluidIndex;
-                            Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                            Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                     CompNum).NodeNumOut).FluidIndex = FluidIndex;
                         }
                     }
@@ -2089,12 +2071,8 @@ namespace EnergyPlus {
             using namespace DataSizing;
             using DataHVACGlobals::NumCondLoops;
             using DataHVACGlobals::NumPlantLoops;
-            using DataPlant::PlantFirstSizesOkayToReport;
             using EMSManager::CheckIfNodeSetPointManagedByEMS;
-            using EMSManager::iTemperatureMaxSetPoint;
-            using EMSManager::iTemperatureMinSetPoint;
-            using EMSManager::iTemperatureSetPoint;
-            ;
+
             using PlantUtilities::SetAllFlowLocks;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2104,7 +2082,7 @@ namespace EnergyPlus {
             int CompNum;   // plant side component counter
             int SensedNode;
 
-            static bool ErrorsFound(false);
+            bool ErrorsFound(false);
             bool FinishSizingFlag;
 
             static bool SupplyEnvrnFlag(true);
@@ -2116,7 +2094,7 @@ namespace EnergyPlus {
             int passNum;
 
             if (!allocated(PlantLoopSetPointInitFlag)) {
-                PlantLoopSetPointInitFlag.allocate(TotNumLoops);
+                PlantLoopSetPointInitFlag.allocate(state.dataPlnt->TotNumLoops);
             }
 
             // Initialize the setpoints  for Load range based schemes only as determined by the init flag
@@ -2143,25 +2121,25 @@ namespace EnergyPlus {
             if (MySetPointCheckFlag && DoSetPointTest) {
 
                 // check for missing setpoints
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
 
-                    SensedNode = PlantLoop(LoopNum).TempSetPointNodeNum;
+                    SensedNode = state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum;
                     if (SensedNode > 0) {
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state,
                                         "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
-                                        " in PlantLoop=" + PlantLoop(LoopNum).Name);
+                                        " in PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                                 ShowContinueError(state,
                                         "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
                                 SetPointErrorFlag = true;
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, iTemperatureSetPoint, SetPointErrorFlag);
+                                CheckIfNodeSetPointManagedByEMS(state, SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, SetPointErrorFlag);
                                 if (SetPointErrorFlag) {
                                     ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + NodeID(SensedNode) +
-                                            " in PlantLoop=" + PlantLoop(LoopNum).Name);
+                                            " in PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                                     ShowContinueError(state,
                                             "Add Temperature Setpoint Manager with Control Variable = \"Temperature\" for this PlantLoop.");
                                     ShowContinueError(state,
@@ -2179,29 +2157,29 @@ namespace EnergyPlus {
             //*****************************************************************
             // First Pass PUMP AND SIZING INIT
             //*****************************************************************
-            if (!PlantFirstSizeCompleted) {
+            if (!state.dataPlnt->PlantFirstSizeCompleted) {
 
-                SetAllFlowLocks(FlowUnlocked);
+                SetAllFlowLocks(state, DataPlant::iFlowLock::Unlocked);
                 FinishSizingFlag = false;
-                PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
-                PlantFirstSizesOkayToReport = false;
-                PlantFinalSizesOkayToReport = false;
-                GetCompSizFac = true;
+                state.dataPlnt->PlantFirstSizesOkayToFinalize = false; // set global flag for when it ready to store final sizes
+                state.dataPlnt->PlantFirstSizesOkayToReport = false;
+                state.dataPlnt->PlantFinalSizesOkayToReport = false;
+                state.dataPlantMgr->GetCompSizFac = true;
                 for (passNum = 1;
                      passNum <= 4; ++passNum) { // begin while loop to iterate over the next calls sequentially
-                    InitLoopEquip = true;
+                    state.dataPlantMgr->InitLoopEquip = true;
 
                     // Step 2, call component models it  using PlantCallingOrderInfo for sizing
-                    for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
-                        LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                        LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+                        LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                        LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                         CurLoopNum = LoopNum;
 
                         for (BranchNum = 1;
-                             BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                             BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                             } //-CompNum
                         }     //-BranchNum
                     }
@@ -2213,52 +2191,52 @@ namespace EnergyPlus {
 
                     // Step 4: Simulate plant loop components so their design flows are included
 
-                    for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                    for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                        LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                        LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                        LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                        LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                         CurLoopNum = LoopNum;
                         if (LoopSideNum == SupplySide) {
                             SizePlantLoop(state, LoopNum, FinishSizingFlag);
                         }
                     }
-                    GetCompSizFac = false;
+                    state.dataPlantMgr->GetCompSizFac = false;
                 } // iterative passes thru sizing related routines.  end while?
 
                 // Step 5 now one more time for the final
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     if (state.dataGlobal->DoHVACSizingSimulation) {
-                        PlantFirstSizesOkayToFinalize = true;
+                        state.dataPlnt->PlantFirstSizesOkayToFinalize = true;
                         FinishSizingFlag = true;
-                        PlantFirstSizesOkayToReport = true;
-                        PlantFinalSizesOkayToReport = false;
+                        state.dataPlnt->PlantFirstSizesOkayToReport = true;
+                        state.dataPlnt->PlantFinalSizesOkayToReport = false;
                     } else {
-                        PlantFirstSizesOkayToFinalize = true;
+                        state.dataPlnt->PlantFirstSizesOkayToFinalize = true;
                         FinishSizingFlag = true;
-                        PlantFirstSizesOkayToReport = false;
-                        PlantFinalSizesOkayToReport = true;
+                        state.dataPlnt->PlantFirstSizesOkayToReport = false;
+                        state.dataPlnt->PlantFinalSizesOkayToReport = true;
                     }
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
                     if (LoopSideNum == SupplySide) {
                         SizePlantLoop(state, LoopNum, FinishSizingFlag);
                     }
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     //				if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
                     //).VolFlowSizingDone = true;
                 }
 
-                PlantFirstSizeCompleted = true;
-                PlantFirstSizesOkayToReport = false;
+                state.dataPlnt->PlantFirstSizeCompleted = true;
+                state.dataPlnt->PlantFirstSizesOkayToReport = false;
             }
             //*****************************************************************
             // END First Pass SIZING INIT
@@ -2266,82 +2244,82 @@ namespace EnergyPlus {
             //*****************************************************************
             // BEGIN Resizing Pass for HVAC Sizing Simultion Adjustments
             //*****************************************************************
-            if (state.dataGlobal->RedoSizesHVACSimulation && !PlantReSizingCompleted) {
+            if (state.dataGlobal->RedoSizesHVACSimulation && !state.dataPlnt->PlantReSizingCompleted) {
 
                 // cycle through plant equipment calling with InitLoopEquip true
-                InitLoopEquip = true;
-                GetCompSizFac = false;
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                state.dataPlantMgr->InitLoopEquip = true;
+                state.dataPlantMgr->GetCompSizFac = false;
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                 }
 
                 // reset loop level
-                PlantFinalSizesOkayToReport = true;
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                state.dataPlnt->PlantFinalSizesOkayToReport = true;
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     ResizePlantLoopLevelSizes(state, LoopNum);
                 }
 
-                InitLoopEquip = true;
+                state.dataPlantMgr->InitLoopEquip = true;
 
                 // now call everything again to reporting turned on
-                for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
-                    LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                    LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+                    LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                    LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
                 }
 
-                PlantReSizingCompleted = true;
-                PlantFinalSizesOkayToReport = false;
+                state.dataPlnt->PlantReSizingCompleted = true;
+                state.dataPlnt->PlantFinalSizesOkayToReport = false;
             }
             //*****************************************************************
-            // END Resizing Pass for HVAC Sizing Simultion Adjustments
+            // END Resizing Pass for HVAC Sizing Simulation Adjustments
             //*****************************************************************
             //*****************************************************************
             // BEGIN ONE TIME ENVIRONMENT INITS
             //*****************************************************************
             if (SupplyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                         // check if setpoints being placed on node properly
-                        if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
-                            if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                            if (Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi == SensedNodeFlagValue) {
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                             "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
                                     ShowContinueError(state,
-                                            "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
+                                            "Node Referenced =" + NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
                                     ShowContinueError(state,
                                             "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                     SetPointErrorFlag = true;
                                 } else {
-                                    CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                                    iTemperatureMaxSetPoint, SetPointErrorFlag);
+                                    CheckIfNodeSetPointManagedByEMS(state, state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
+                                                                    EMSManager::SPControlType::iTemperatureMaxSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
                                                 "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
                                         ShowContinueError(state,
-                                                "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
+                                                "Node Referenced =" + NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
                                         ShowContinueError(state,
                                                 "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                         ShowContinueError(state, "Or add EMS Actuator for Temperature Maximum Setpoint");
@@ -2349,23 +2327,23 @@ namespace EnergyPlus {
                                     } // SetPointErrorFlag
                                 }     // Not EMS
                             }         // Node TSPhi = Sensed
-                            if (Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
+                            if (Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo == SensedNodeFlagValue) {
                                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                     ShowSevereError(state,
                                             "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
                                     ShowContinueError(state,
-                                            "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
+                                            "Node Referenced =" + NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
                                     ShowContinueError(state,
                                             "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                     SetPointErrorFlag = true;
                                 } else {
-                                    CheckIfNodeSetPointManagedByEMS(state, PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                                    iTemperatureMinSetPoint, SetPointErrorFlag);
+                                    CheckIfNodeSetPointManagedByEMS(state, state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
+                                                                    EMSManager::SPControlType::iTemperatureMinSetPoint, SetPointErrorFlag);
                                     if (SetPointErrorFlag) {
                                         ShowSevereError(state,
                                                 "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");
                                         ShowContinueError(state,
-                                                "Node Referenced =" + NodeID(PlantLoop(LoopNum).TempSetPointNodeNum));
+                                                "Node Referenced =" + NodeID(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum));
                                         ShowContinueError(state,
                                                 "Use a SetpointManager:Scheduled:DualSetpoint to establish appropriate setpoints");
                                         ShowContinueError(state, "Or add EMS Actuator for Temperature Minimum Setpoint");
@@ -2380,16 +2358,16 @@ namespace EnergyPlus {
                 // Any per-environment load distribution init should be OK here
                 // Just clear away any trailing MyLoad for now...
                 // This could likely be moved into InitLoadDistribution also...
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                         for (BranchNum = 1;
-                             BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                             BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad = 0.0;
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad = 0.0;
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).FreeCoolCntrlShutDown = false;
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).Available = false;
                             }
                         }
@@ -2463,34 +2441,34 @@ namespace EnergyPlus {
 
             if (MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-                for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                     for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
 
                         {
-                            auto const SELECT_CASE_var(PlantLoop(LoopNum).LoopDemandCalcScheme);
+                            auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme);
 
-                            if (SELECT_CASE_var == SingleSetPoint) {
-                                LoopSetPointTemp = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
+                            if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
+                                LoopSetPointTemp = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
 
-                            } else if (SELECT_CASE_var == DualSetPointDeadBand) {
+                            } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
                                 // Get the range of setpoints
-                                LoopSetPointTemperatureHi = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
-                                LoopSetPointTemperatureLo = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
+                                LoopSetPointTemperatureHi = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
+                                LoopSetPointTemperatureLo = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
                                 LoopSetPointTemp = (LoopSetPointTemperatureLo + LoopSetPointTemperatureHi) / 2.0;
                             }
                         }
 
-                        if ((PlantLoop(LoopNum).CommonPipeType == CommonPipe_TwoWay) && (LoopSideNum == DemandSide) &&
-                            (PlantLoop(LoopNum).LoopSide(
+                        if ((state.dataPlnt->PlantLoop(LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) && (LoopSideNum == DemandSide) &&
+                            (state.dataPlnt->PlantLoop(LoopNum).LoopSide(
                                     DemandSide).InletNodeSetPt)) { // get a second setpoint for secondaryLoop
                             // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
                             // we want to initialize the demand side of the loop using that setpoint
-                            LoopSetPointTemp = Node(PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPoint;
+                            LoopSetPointTemp = Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPoint;
                         }
 
                         // Check the Loop Setpoint and make sure it is bounded by the Loop Max and Min
-                        LoopMaxTemp = PlantLoop(LoopNum).MaxTemp;
-                        LoopMinTemp = PlantLoop(LoopNum).MinTemp;
+                        LoopMaxTemp = state.dataPlnt->PlantLoop(LoopNum).MaxTemp;
+                        LoopMinTemp = state.dataPlnt->PlantLoop(LoopNum).MinTemp;
 
                         // trap for -999 and set to average of limits if so
                         if (LoopSetPointTemp == SensedNodeFlagValue) {
@@ -2501,43 +2479,43 @@ namespace EnergyPlus {
                         LoopSetPointTemp = max(LoopMinTemp, LoopSetPointTemp);
 
                         // Initialize the capacitance model at the tank interface, and other loop side values
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).TempInterfaceTankOutlet = LoopSetPointTemp;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).LastTempInterfaceTankOutlet = LoopSetPointTemp;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).LoopSideInlet_TankTemp = LoopSetPointTemp;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumpHeat = 0.0;
-                        if (allocated(PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps))
-                            for (auto &e : PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps)
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TempInterfaceTankOutlet = LoopSetPointTemp;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).LastTempInterfaceTankOutlet = LoopSetPointTemp;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).LoopSideInlet_TankTemp = LoopSetPointTemp;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumpHeat = 0.0;
+                        if (allocated(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps))
+                            for (auto &e : state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps)
                                 e.PumpHeatToFluid = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowRequest = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).TimeElapsed = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = 0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.TemperatureHistory = 0.0;
-                        PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.MassFlowRateHistory = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowRequest = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TimeElapsed = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock = DataPlant::iFlowLock::Unlocked;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.TemperatureHistory = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).InletNode.MassFlowRateHistory = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.TemperatureHistory = 0.0;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.MassFlowRateHistory = 0.0;
 
-                        if (PlantLoop(LoopNum).FluidType != NodeType_Steam) {
-                            Cp = GetSpecificHeatGlycol(state, PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
-                                                       PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
+                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType != NodeType_Steam) {
+                            Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
+                                                       state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
                             StartEnthalpy = Cp * LoopSetPointTemp;
                         }
                         // Use Min/Max flow rates to initialize loop
-                        if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                            rho = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
-                                                   PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
+                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Water) {
+                            rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
+                                                   state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
 
-                            LoopMaxMassFlowRate = PlantLoop(LoopNum).MaxVolFlowRate * rho;
-                            LoopMinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * rho;
+                            LoopMaxMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * rho;
+                            LoopMinMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate * rho;
                         }
                         // use saturated liquid of steam at the loop setpoint temp as the starting enthalpy for a water loop
-                        if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Steam) {
                             SteamTemp = 100.0;
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, SteamTemp, 1.0,
-                                                               PlantLoop(LoopNum).FluidIndex, RoutineName);
-                            LoopMaxMassFlowRate = PlantLoop(LoopNum).MaxVolFlowRate * SteamDensity;
+                                                               state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+                            LoopMaxMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * SteamDensity;
                             StartEnthalpy = GetSatEnthalpyRefrig(state, fluidNameSteam, LoopSetPointTemp, 0.0,
-                                                                 PlantLoop(LoopNum).FluidIndex, RoutineName);
-                            LoopMinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * SteamDensity;
+                                                                 state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+                            LoopMinMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate * SteamDensity;
                         }
 
                         LoopMaxMassFlowRate = max(0.0, LoopMaxMassFlowRate);
@@ -2545,14 +2523,14 @@ namespace EnergyPlus {
 
                         // Initial all loop nodes by initializing all component inlet and outlet nodes
                         for (BranchNum = 1;
-                             BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                            for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                             BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                            for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                ComponentInlet = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                ComponentInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).NodeNumIn;
-                                ComponentOutlet = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                ComponentOutlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).NodeNumOut;
-                                BranchInlet = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
+                                BranchInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn;
 
                                 Node(ComponentInlet).Temp = LoopSetPointTemp;
                                 Node(ComponentInlet).TempMin = LoopMinTemp;
@@ -2560,12 +2538,12 @@ namespace EnergyPlus {
                                 Node(ComponentInlet).TempLastTimestep = LoopSetPointTemp;
 
                                 Node(ComponentInlet).MassFlowRate = 0.0;
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad = 0.0;
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).MyLoad = 0.0;
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).Available = false;
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                         CompNum).FreeCoolCntrlShutDown = false;
-                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).RequestedMassFlow = 0.0;
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).RequestedMassFlow = 0.0;
 
                                 if (Node(ComponentInlet).MassFlowRateMin > 0.0) {
                                     Node(ComponentInlet).MassFlowRateMinAvail = Node(ComponentInlet).MassFlowRateMin;
@@ -2606,7 +2584,7 @@ namespace EnergyPlus {
                         }     // BRANCH LOOP
                     }         // LOOPSIDE
                 }             // PLANT LOOP
-                for (auto &loop : PlantLoop) {
+                for (auto &loop : state.dataPlnt->PlantLoop) {
                     loop.CoolingDemand = 0.0;
                     loop.HeatingDemand = 0.0;
                     loop.DemandNotDispatched = 0.0;
@@ -2627,53 +2605,49 @@ namespace EnergyPlus {
             if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlag = true;
 
             // FirstHVACiteration inits
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                // UPDATE LOOP FLOW SETPOINT
-                //    Node(LoopIn)%MassFlowRateSetPoint =  LoopMaxMassFlowRate !DSU? this is suspect, may not be set?
-                // UPDATE LOOP TEMPERATURE SETPOINTS
-
-                LoopSetPointTemp = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+                LoopSetPointTemp = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPoint;
 
                 // Check the Loop Setpoint and make sure it is bounded by the Loop Max and Min
-                LoopMaxTemp = PlantLoop(LoopNum).MaxTemp;
-                LoopMinTemp = PlantLoop(LoopNum).MinTemp;
+                LoopMaxTemp = state.dataPlnt->PlantLoop(LoopNum).MaxTemp;
+                LoopMinTemp = state.dataPlnt->PlantLoop(LoopNum).MinTemp;
                 // Check it against the loop temperature limits
                 LoopSetPointTemp = min(LoopMaxTemp, LoopSetPointTemp);
                 LoopSetPointTemp = max(LoopMinTemp, LoopSetPointTemp);
 
                 // Update supply side loop setpoint in plant data structure
-                PlantLoop(LoopNum).LoopSide(SupplySide).TempSetPoint = LoopSetPointTemp;
-                PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TempSetPoint = LoopSetPointTemp;
+                state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
 
                 // Update supply side hi-lo setpoints for dual SP control
-                if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
-                    LoopSetPointTempHi = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
-                    LoopSetPointTempLo = Node(PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                    LoopSetPointTempHi = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointHi;
+                    LoopSetPointTempLo = Node(state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum).TempSetPointLo;
                     LoopSetPointTempHi = min(LoopMaxTemp, LoopSetPointTempHi);
                     LoopSetPointTempHi = max(LoopMinTemp, LoopSetPointTempHi);
                     LoopSetPointTempLo = min(LoopMaxTemp, LoopSetPointTempLo);
                     LoopSetPointTempLo = max(LoopMinTemp, LoopSetPointTempLo);
-                    PlantLoop(LoopNum).LoopSide(SupplySide).TempSetPointHi = LoopSetPointTempHi;
-                    PlantLoop(LoopNum).LoopSide(SupplySide).TempSetPointLo = LoopSetPointTempLo;
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TempSetPointHi = LoopSetPointTempHi;
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TempSetPointLo = LoopSetPointTempLo;
                 }
 
                 // update demand side loop setpoint in plant data structure
-                if (PlantLoop(LoopNum).CommonPipeType == CommonPipe_TwoWay) { // get a second setpoint for secondaryLoop
+                if (state.dataPlnt->PlantLoop(LoopNum).CommonPipeType == DataPlant::iCommonPipeType::TwoWay) { // get a second setpoint for secondaryLoop
                     // if the plant loop is two common pipe configured for temperature control on secondary side inlet, then
                     // we want to initialize the demand side of the loop using that setpoint
-                    if (PlantLoop(LoopNum).LoopSide(DemandSide).InletNodeSetPt) {
+                    if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).InletNodeSetPt) {
                         SecondaryLoopSetPointTemp = Node(
-                                PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPoint;
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPoint;
                         SecondaryLoopSetPointTemp = min(LoopMaxTemp, SecondaryLoopSetPointTemp);
                         SecondaryLoopSetPointTemp = max(LoopMinTemp, SecondaryLoopSetPointTemp);
-                        PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = SecondaryLoopSetPointTemp;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = SecondaryLoopSetPointTemp;
                         // Since Dual setpoint not explicitly available for demand side, we can't do the
                         // bounding check on hi/lo setpoint.  IF we did we would over-write
                         // the SensedNodeFlagValue of -999 for no dual setpoint case.
-                        PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointHi = Node(
-                                PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPointHi;
-                        PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointLo = Node(
-                                PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPointLo;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointHi = Node(
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPointHi;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointLo = Node(
+                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).NodeNumIn).TempSetPointLo;
                     }
 
                     // initialize common pipe flows to zero.
@@ -2684,21 +2658,21 @@ namespace EnergyPlus {
                         PlantCommonPipe(LoopNum).SecCPLegFlow = 0.0;
                     }
                 } else { // no secondary loop, so use supply side loop SP on demand side too.
-                    PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
-                    if (PlantLoop(LoopNum).LoopDemandCalcScheme == DualSetPointDeadBand) {
-                        PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointHi = LoopSetPointTempHi;
-                        PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointLo = LoopSetPointTempLo;
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPoint = LoopSetPointTemp;
+                    if (state.dataPlnt->PlantLoop(LoopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointHi = LoopSetPointTempHi;
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TempSetPointLo = LoopSetPointTempLo;
                     }
                 }
 
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            ComponentInlet = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                            ComponentInlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                     CompNum).NodeNumIn;
-                            ComponentOutlet = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                            ComponentOutlet = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
                                     CompNum).NodeNumOut;
 
                             // reinit to node hardware limits
@@ -2713,9 +2687,9 @@ namespace EnergyPlus {
                     }
                 }
 
-                for (OpNum = 1; OpNum <= PlantLoop(LoopNum).NumOpSchemes; ++OpNum) {
+                for (OpNum = 1; OpNum <= state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes; ++OpNum) {
                     // If the operating scheme is scheduled "OFF", go to next scheme
-                    PlantLoop(LoopNum).OpScheme(OpNum).Available = GetCurrentScheduleValue(state, PlantLoop(LoopNum).OpScheme(OpNum).SchedPtr) > 0.0;
+                    state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpNum).Available = GetCurrentScheduleValue(state, state.dataPlnt->PlantLoop(LoopNum).OpScheme(OpNum).SchedPtr) > 0.0;
                 }
             }
         }
@@ -2782,9 +2756,6 @@ namespace EnergyPlus {
             //       then another branch in the s/m needs to be active
             //  other checks could/should be added!
 
-            // Using/Aliasing
-            using DataErrorTracking::AskForPlantCheckOnAbort;
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum;           // DO loop counter for loops
             bool ActiveCntrlfound; // used to search for active control branches in parallel with bypass branches
@@ -2797,32 +2768,32 @@ namespace EnergyPlus {
             int CompNum;   // do loop for multiple components on a branch
             bool ShouldBeACTIVE;
 
-            if (!(AskForPlantCheckOnAbort)) {
+            if (!(state.dataErrTracking->AskForPlantCheckOnAbort)) {
                 return;
             }
 
-            if (TotNumLoops <= 0) return;
-            if (!(allocated(PlantLoop))) return;
+            if (state.dataPlnt->TotNumLoops <= 0) return;
+            if (!(allocated(state.dataPlnt->PlantLoop))) return;
 
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 numLoopSides = 2;
                 for (SideNum = 1; SideNum <= numLoopSides; ++SideNum) {
-                    if (!(PlantLoop(LoopNum).LoopSide(SideNum).Splitter.Exists)) continue;
+                    if (!(state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.Exists)) continue;
 
                     for (ParalBranchNum = 1;
-                         ParalBranchNum <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
+                         ParalBranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
                          ++ParalBranchNum) {
-                        BranchNum = PlantLoop(LoopNum).LoopSide(SideNum).Splitter.BranchNumOut(ParalBranchNum);
-                        if (PlantLoop(LoopNum).LoopSide(SideNum).Branch(
+                        BranchNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.BranchNumOut(ParalBranchNum);
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(
                                 BranchNum).IsBypass) { // we know there is a bypass
                             // check that there is at least one 'Active' control type in parallel with bypass branch
                             ActiveCntrlfound = false;
                             for (ParalBranchNum2 = 1;
-                                 ParalBranchNum2 <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
+                                 ParalBranchNum2 <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
                                  ++ParalBranchNum2) {
-                                BranchNum2 = PlantLoop(LoopNum).LoopSide(SideNum).Splitter.BranchNumOut(
+                                BranchNum2 = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Splitter.BranchNumOut(
                                         ParalBranchNum2);
-                                if (PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum2).ControlType ==
+                                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum2).ControlType ==
                                     DataBranchAirLoopPlant::ControlTypeEnum::Active) {
                                     ActiveCntrlfound = true;
                                 }
@@ -2830,12 +2801,12 @@ namespace EnergyPlus {
                             if (!(ActiveCntrlfound)) {
                                 ShowWarningError(state,
                                         "Check control types on branches between splitter and mixer in PlantLoop=" +
-                                        PlantLoop(LoopNum).Name);
+                                        state.dataPlnt->PlantLoop(LoopNum).Name);
                                 ShowContinueError(state, "Found a BYPASS branch with no ACTIVE branch in parallel with it");
                                 ShowContinueError(state,
                                         "In certain (but not all) situations, this can cause problems; please verify your inputs");
                                 ShowContinueError(state, "Bypass branch named: " +
-                                                  PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                                  state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
                             }
                         } // bypass present
 
@@ -2850,12 +2821,12 @@ namespace EnergyPlus {
                             // COIL:STEAM:AIRHEATING
                             // SOLAR COLLECTOR:FLAT PLATE
                             // PLANT LOAD PROFILE
-                            for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SideNum).Branch(
+                            for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
                                 ShouldBeACTIVE = false;
                                 {
                                     auto const SELECT_CASE_var(
-                                            PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Comp(
+                                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Comp(
                                                     CompNum).TypeOf_Num);
 
                                     if (SELECT_CASE_var == TypeOf_WtrHeaterMixed) {
@@ -2884,12 +2855,12 @@ namespace EnergyPlus {
                                 if (ShouldBeACTIVE) {
                                     {
                                         auto const SELECT_CASE_var(
-                                                PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).ControlType);
+                                                state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).ControlType);
 
                                         if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Unknown) {
                                             ShowWarningError(state,
                                                     "Found potential problem with Control Type for Branch named: " +
-                                                    PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
                                             ShowContinueError(state,
                                                     "This branch should (probably) be ACTIVE but has control type unknown");
                                         } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Active) {
@@ -2897,7 +2868,7 @@ namespace EnergyPlus {
                                         } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Passive) {
                                             ShowWarningError(state,
                                                     "Found potential problem with Control Type for Branch named: " +
-                                                    PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
                                             ShowContinueError(state,
                                                     "This branch should (probably) be ACTIVE but has control type PASSIVE");
                                         } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
@@ -2905,7 +2876,7 @@ namespace EnergyPlus {
                                         } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
                                             ShowWarningError(state,
                                                     "Found potential problem with Control Type for Branch named: " +
-                                                    PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
+                                                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).Branch(BranchNum).Name);
                                             ShowContinueError(state,
                                                     "This branch should (probably) be ACTIVE but has control type Bypass");
                                         }
@@ -2917,10 +2888,10 @@ namespace EnergyPlus {
                     } // splitter outlet nodes
 
                     // check to see if bypass exists in demand side. If not warn error of possible flow problems
-                    if (!PlantLoop(LoopNum).LoopSide(SideNum).BypassExists) {
+                    if (!state.dataPlnt->PlantLoop(LoopNum).LoopSide(SideNum).BypassExists) {
                         if (SideNum == DemandSide) {
                             ShowWarningError(state, "There is no BYPASS component in the demand-side of PlantLoop =" +
-                                             PlantLoop(LoopNum).Name);
+                                             state.dataPlnt->PlantLoop(LoopNum).Name);
                             ShowContinueError(state,
                                     "You may be able to fix the fatal error above by adding a demand-side BYPASS PIPE.");
                         }
@@ -2929,7 +2900,7 @@ namespace EnergyPlus {
             }     // plant loops
         }
 
-        void InitOneTimePlantSizingInfo(int const LoopNum) // loop being initialized for sizing
+        void InitOneTimePlantSizingInfo(EnergyPlusData &state, int const LoopNum) // loop being initialized for sizing
         {
 
             // SUBROUTINE INFORMATION:
@@ -2967,12 +2938,12 @@ namespace EnergyPlus {
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int PlantSizNum(0); // index of Plant Sizing data for this loop
 
-            if (PlantLoop(LoopNum).PlantSizNum == 0) {
+            if (state.dataPlnt->PlantLoop(LoopNum).PlantSizNum == 0) {
                 if (NumPltSizInput > 0) {
-                    PlantSizNum = UtilityRoutines::FindItemInList(PlantLoop(LoopNum).Name, PlantSizData,
+                    PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, PlantSizData,
                                                                   &PlantSizingData::PlantLoopName);
                     if (PlantSizNum > 0) {
-                        PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
+                        state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
                     }
                 }
             }
@@ -3021,41 +2992,41 @@ namespace EnergyPlus {
             Real64 FluidDensity(0.0); // local value from glycol routine
             bool Finalize(OkayToFinish);
 
-            if (PlantLoop(LoopNum).PlantSizNum > 0) {
-                PlantSizNum = PlantLoop(LoopNum).PlantSizNum;
+            if (state.dataPlnt->PlantLoop(LoopNum).PlantSizNum > 0) {
+                PlantSizNum = state.dataPlnt->PlantLoop(LoopNum).PlantSizNum;
                 // PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
             } else {
                 if (NumPltSizInput > 0) {
-                    PlantSizNum = UtilityRoutines::FindItemInList(PlantLoop(LoopNum).Name, PlantSizData,
+                    PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, PlantSizData,
                                                                   &PlantSizingData::PlantLoopName);
                 }
             }
-            PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
+            state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
             // calculate a loop sizing factor and a branch sizing factor. Note that components without a sizing factor
             // are assigned sizing factors of zero in this calculation
             if (PlantSizNum > 0) {
-                if (GetCompSizFac) {
+                if (state.dataPlantMgr->GetCompSizFac) {
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
                         BranchSizFac = 0.0;
-                        PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = 1.0;
-                        if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn)
+                        state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = 1.0;
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn)
                             continue;
-                        if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut ==
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumOut)
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut ==
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumOut)
                             continue;
-                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SupplySide).Branch(
+                        for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(state, true, localInitLoopEquip, GetCompSizFac);
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(state, true, localInitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                             BranchSizFac = max(BranchSizFac,
-                                               PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(
+                                               state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(
                                                        CompNum).SizFac);
                         }
                         LoopSizFac += BranchSizFac;
                         MaxSizFac = max(MaxSizFac, BranchSizFac);
                         if (BranchSizFac > 0.0) {
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = BranchSizFac;
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = BranchSizFac;
                             ++NumBrSizFac;
                         }
                     }
@@ -3072,14 +3043,14 @@ namespace EnergyPlus {
                     PlantSizData(PlantSizNum).PlantSizFac = PlantSizFac;
                     // might deprecate this next bit in favor of simpler storage in PlantSizData structure
                     for (BranchNum = 1;
-                         BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
-                        if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn) {
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = PlantSizFac;
+                         BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn) {
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = PlantSizFac;
                         }
-                        if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut ==
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumOut) {
-                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = PlantSizFac;
+                        if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumOut ==
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumOut) {
+                            state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac = PlantSizFac;
                         }
                     }
 
@@ -3096,10 +3067,10 @@ namespace EnergyPlus {
 
                 // sum up contributions from CompDesWaterFlow, demand side size request (non-coincident)
                 PlantSizData(PlantSizNum).DesVolFlowRate = 0.0; // init for summation
-                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
-                    for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
+                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
+                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
                             BranchNum).TotalComponents; ++CompNum) {
-                        SupNodeNum = PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
+                        SupNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                         for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
                             if (SupNodeNum == CompDesWaterFlow(WaterCompNum).SupNode) {
                                 PlantSizData(PlantSizNum).DesVolFlowRate += CompDesWaterFlow(
@@ -3109,109 +3080,109 @@ namespace EnergyPlus {
                     }
                 }
 
-                if (!PlantLoop(LoopNum).MaxVolFlowRateWasAutoSized && (PlantLoop(LoopNum).MaxVolFlowRate > 0.0)) {
+                if (!state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRateWasAutoSized && (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate > 0.0)) {
                     // if the user puts in a large throwaway value for hard max plant loop size, they may not want this affecting anything else.
                     //  but if they put in a smaller value, then it should cap the design size, so use hard value if it is smaller than non-coincident
                     //  result
                     PlantSizData(PlantSizNum).DesVolFlowRate = std::min(PlantSizData(PlantSizNum).DesVolFlowRate,
-                                                                        PlantLoop(LoopNum).MaxVolFlowRate);
+                                                                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
                 }
             }
 
-            if (PlantLoop(LoopNum).MaxVolFlowRateWasAutoSized) {
+            if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRateWasAutoSized) {
 
                 if ((PlantSizNum > 0)) {
 
                     if (PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                        PlantLoop(LoopNum).MaxVolFlowRate =
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate =
                                 PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizData(PlantSizNum).PlantSizFac;
                     } else {
-                        PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
-                        if (PlantFinalSizesOkayToReport) {
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             ShowWarningError(
                                 state,
                                 format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
                                        PlantSizData(PlantSizNum).DesVolFlowRate));
-                            ShowContinueError(state, "..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
+                            ShowContinueError(state, "..occurs for PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         }
                     }
                     if (Finalize) {
-                        if (PlantFinalSizesOkayToReport) {
-                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                            if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                 BaseSizer::reportSizerOutput(state,
-                                        "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                        PlantLoop(LoopNum).MaxVolFlowRate);
-                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                                        "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
+                                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                            } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                                 BaseSizer::reportSizerOutput(state,
-                                        "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                        PlantLoop(LoopNum).MaxVolFlowRate);
+                                        "CondenserLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
+                                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
                             }
                         }
-                        if (PlantFirstSizesOkayToReport) {
-                            if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+                            if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                                 BaseSizer::reportSizerOutput(state,
-                                        "PlantLoop", PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
-                                        PlantLoop(LoopNum).MaxVolFlowRate);
-                            } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                                        "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Initial Maximum Loop Flow Rate [m3/s]",
+                                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                            } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                                 BaseSizer::reportSizerOutput(state,
-                                        "CondenserLoop", PlantLoop(LoopNum).Name,
-                                        "Initial Maximum Loop Flow Rate [m3/s]", PlantLoop(LoopNum).MaxVolFlowRate);
+                                        "CondenserLoop", state.dataPlnt->PlantLoop(LoopNum).Name,
+                                        "Initial Maximum Loop Flow Rate [m3/s]", state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
                             }
                         }
                     }
 
                 } else {
-                    if (PlantFirstSizesOkayToFinalize) {
+                    if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                         ShowFatalError(state, "Autosizing of plant loop requires a loop Sizing:Plant object");
-                        ShowContinueError(state, "Occurs in PlantLoop object=" + PlantLoop(LoopNum).Name);
+                        ShowContinueError(state, "Occurs in PlantLoop object=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
                     }
                 }
             }
 
             // Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
-            if (PlantLoop(LoopNum).VolumeWasAutoSized) {
+            if (state.dataPlnt->PlantLoop(LoopNum).VolumeWasAutoSized) {
                 // There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
                 // Note this calculation also appears in PlantManager::ResizePlantLoopLevelSizes and SizingAnalysisObjects::ResolveDesignFlowRate
-                PlantLoop(LoopNum).Volume =
-                        PlantLoop(LoopNum).MaxVolFlowRate * PlantLoop(LoopNum).CirculationTime * 60.0;
-                if (PlantFinalSizesOkayToReport) {
-                    if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                state.dataPlnt->PlantLoop(LoopNum).Volume =
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * state.dataPlnt->PlantLoop(LoopNum).CirculationTime * 60.0;
+                if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                    if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         // condenser loop vs plant loop breakout needed.
-                        BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
-                                           PlantLoop(LoopNum).Volume);
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                        BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
-                                           PlantLoop(LoopNum).Volume);
+                        BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
+                                           state.dataPlnt->PlantLoop(LoopNum).Volume);
+                    } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
+                        BaseSizer::reportSizerOutput(state, "CondenserLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
+                                           state.dataPlnt->PlantLoop(LoopNum).Volume);
                     }
                 }
-                if (PlantFirstSizesOkayToReport) {
-                    if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+                    if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                         // condenser loop vs plant loop breakout needed.
-                        BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Initial Plant Loop Volume [m3]",
-                                           PlantLoop(LoopNum).Volume);
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                        BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name,
-                                           "Initial Condenser Loop Volume [m3]", PlantLoop(LoopNum).Volume);
+                        BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Initial Plant Loop Volume [m3]",
+                                           state.dataPlnt->PlantLoop(LoopNum).Volume);
+                    } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
+                        BaseSizer::reportSizerOutput(state, "CondenserLoop", state.dataPlnt->PlantLoop(LoopNum).Name,
+                                           "Initial Condenser Loop Volume [m3]", state.dataPlnt->PlantLoop(LoopNum).Volume);
                     }
                 }
             }
 
             // should now have plant volume, calculate plant volume's mass for fluid type
-            if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
-                                                PlantLoop(LoopNum).FluidIndex, RoutineName);
-            } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
-                FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
+            if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Water) {
+                FluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp,
+                                                state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+            } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Steam) {
+                FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                                    RoutineName);
             } else {
                 assert(false);
             }
 
-            PlantLoop(LoopNum).Mass = PlantLoop(LoopNum).Volume * FluidDensity;
+            state.dataPlnt->PlantLoop(LoopNum).Mass = state.dataPlnt->PlantLoop(LoopNum).Volume * FluidDensity;
 
-            PlantLoop(LoopNum).MaxMassFlowRate = PlantLoop(LoopNum).MaxVolFlowRate * FluidDensity;
-            PlantLoop(LoopNum).MinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * FluidDensity;
+            state.dataPlnt->PlantLoop(LoopNum).MaxMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * FluidDensity;
+            state.dataPlnt->PlantLoop(LoopNum).MinMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate * FluidDensity;
 
             if (ErrorsFound) {
                 ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -3235,9 +3206,7 @@ namespace EnergyPlus {
 
             // Using/Aliasing
             using namespace DataSizing;
-            using DataPlant::PlantLoop;
             using FluidProperties::GetDensityGlycol;
-            ;
 
             // SUBROUTINE PARAMETER DEFINITIONS:
             static std::string const RoutineName("ResizePlantLoop");
@@ -3254,13 +3223,13 @@ namespace EnergyPlus {
 
             Real64 PlantSizeFac = 0.0;
 
-            PlantSizNum = PlantLoop(LoopNum).PlantSizNum;
+            PlantSizNum = state.dataPlnt->PlantLoop(LoopNum).PlantSizNum;
 
             // fill PlantSizFac from data structure
-            for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
-                if (PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
-                    PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn) {
-                    PlantSizeFac = PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac;
+            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).NodeNumIn ==
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).NodeNumIn) {
+                    PlantSizeFac = state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).PumpSizFac;
                     break;
                 }
             }
@@ -3269,10 +3238,10 @@ namespace EnergyPlus {
                 // so refresh sum of registered flows (they may have changed)
 
                 PlantSizData(PlantSizNum).DesVolFlowRate = 0.0; // init for summation
-                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
-                    for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
+                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
+                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
                             BranchNum).TotalComponents; ++CompNum) {
-                        SupNodeNum = PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
+                        SupNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
                         for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
                             if (SupNodeNum == CompDesWaterFlow(WaterCompNum).SupNode) {
                                 PlantSizData(PlantSizNum).DesVolFlowRate += CompDesWaterFlow(
@@ -3283,73 +3252,73 @@ namespace EnergyPlus {
                 }
             }
 
-            if (PlantLoop(LoopNum).MaxVolFlowRateWasAutoSized) {
+            if (state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRateWasAutoSized) {
 
                 if ((PlantSizNum > 0)) {
 
                     if (PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                        PlantLoop(LoopNum).MaxVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizeFac;
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizeFac;
                     } else {
-                        PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
-                        if (PlantFinalSizesOkayToReport) {
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
+                        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             ShowWarningError(
                                 state,
                                 format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
                                        PlantSizData(PlantSizNum).DesVolFlowRate));
-                            ShowContinueError(state, "..occurs for PlantLoop=" + PlantLoop(LoopNum).Name);
+                            ShowContinueError(state, "..occurs for PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         }
                     }
-                    if (PlantFinalSizesOkayToReport) {
-                        if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
-                            BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                               PlantLoop(LoopNum).MaxVolFlowRate);
-                        } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
+                    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+                            BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
+                                               state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
+                        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
                             BaseSizer::reportSizerOutput(state,
-                                    "CondenserLoop", PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
-                                    PlantLoop(LoopNum).MaxVolFlowRate);
+                                    "CondenserLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Maximum Loop Flow Rate [m3/s]",
+                                    state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
                         }
                     }
                 }
             }
 
             // Small loop mass no longer introduces instability. Checks and warnings removed by SJR 20 July 2007.
-            if (PlantLoop(LoopNum).VolumeWasAutoSized) {
+            if (state.dataPlnt->PlantLoop(LoopNum).VolumeWasAutoSized) {
                 // There is no stability requirement (mass can be zero), autosizing is based on loop circulation time.
                 // Note this calculation also appears in PlantManager::SizePlantLoop and SizingAnalysisObjects::ResolveDesignFlowRate
-                PlantLoop(LoopNum).Volume =
-                        PlantLoop(LoopNum).MaxVolFlowRate * PlantLoop(LoopNum).CirculationTime * 60.0;
-                if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Plant) {
+                state.dataPlnt->PlantLoop(LoopNum).Volume =
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * state.dataPlnt->PlantLoop(LoopNum).CirculationTime * 60.0;
+                if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
                     // condenser loop vs plant loop breakout needed.
-                    BaseSizer::reportSizerOutput(state, "PlantLoop", PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
-                                       PlantLoop(LoopNum).Volume);
-                } else if (PlantLoop(LoopNum).TypeOfLoop == LoopType_Condenser) {
-                    BaseSizer::reportSizerOutput(state, "CondenserLoop", PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
-                                       PlantLoop(LoopNum).Volume);
+                    BaseSizer::reportSizerOutput(state, "PlantLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Plant Loop Volume [m3]",
+                                       state.dataPlnt->PlantLoop(LoopNum).Volume);
+                } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
+                    BaseSizer::reportSizerOutput(state, "CondenserLoop", state.dataPlnt->PlantLoop(LoopNum).Name, "Condenser Loop Volume [m3]",
+                                       state.dataPlnt->PlantLoop(LoopNum).Volume);
                 }
             }
 
             // should now have plant volume, calculate plant volume's mass for fluid type
-            if (PlantLoop(LoopNum).FluidType == NodeType_Water) {
-                FluidDensity = GetDensityGlycol(state, PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp(),
-                                                PlantLoop(LoopNum).FluidIndex, RoutineName);
-            } else if (PlantLoop(LoopNum).FluidType == NodeType_Steam) {
-                FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, PlantLoop(LoopNum).FluidIndex,
+            if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Water) {
+                FluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp,
+                                                state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
+            } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Steam) {
+                FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                                    RoutineName);
             } else {
                 assert(false);
             }
 
-            PlantLoop(LoopNum).Mass = PlantLoop(LoopNum).Volume * FluidDensity;
+            state.dataPlnt->PlantLoop(LoopNum).Mass = state.dataPlnt->PlantLoop(LoopNum).Volume * FluidDensity;
 
-            PlantLoop(LoopNum).MaxMassFlowRate = PlantLoop(LoopNum).MaxVolFlowRate * FluidDensity;
-            PlantLoop(LoopNum).MinMassFlowRate = PlantLoop(LoopNum).MinVolFlowRate * FluidDensity;
+            state.dataPlnt->PlantLoop(LoopNum).MaxMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate * FluidDensity;
+            state.dataPlnt->PlantLoop(LoopNum).MinMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate * FluidDensity;
 
             if (ErrorsFound) {
                 ShowFatalError(state, "Preceding sizing errors cause program termination");
             }
         }
 
-        void SetupInitialPlantCallingOrder() {
+        void SetupInitialPlantCallingOrder(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Brent Griffith
@@ -3369,61 +3338,43 @@ namespace EnergyPlus {
             // 3.  third call all condenser demand sides
             // 4.  fourth call all condenser supply sides
 
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
-
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int OrderIndex; // local
             int I;          // local loop
 
-            TotNumHalfLoops = 2 * TotNumLoops;
+            state.dataPlnt->TotNumHalfLoops = 2 * state.dataPlnt->TotNumLoops;
 
-            if (TotNumHalfLoops <= 0) return;
+            if (state.dataPlnt->TotNumHalfLoops <= 0) return;
 
             // first allocate to total number of plant half loops
 
-            if (!allocated(PlantCallingOrderInfo)) PlantCallingOrderInfo.allocate(TotNumHalfLoops);
+            if (!allocated(state.dataPlnt->PlantCallingOrderInfo)) state.dataPlnt->PlantCallingOrderInfo.allocate(state.dataPlnt->TotNumHalfLoops);
 
             // set plant loop demand sides
             for (I = 1; I <= NumPlantLoops; ++I) {
-                PlantCallingOrderInfo(I).LoopIndex = I;
-                PlantCallingOrderInfo(I).LoopSide = DemandSide;
+                state.dataPlnt->PlantCallingOrderInfo(I).LoopIndex = I;
+                state.dataPlnt->PlantCallingOrderInfo(I).LoopSide = DemandSide;
             }
 
             // set plant loop supply sides
             for (I = 1; I <= NumPlantLoops; ++I) {
                 OrderIndex = I + NumPlantLoops;
-                PlantCallingOrderInfo(OrderIndex).LoopIndex = I;
-                PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopIndex = I;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
             }
 
             // set condenser Loop demand sides
             for (I = 1; I <= NumCondLoops; ++I) {
                 OrderIndex = 2 * NumPlantLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopSide = DemandSide;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopSide = DemandSide;
             }
 
             // set condenser Loop supply sides
             for (I = 1; I <= NumCondLoops; ++I) {
                 OrderIndex = 2 * NumPlantLoops + NumCondLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
-                PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopIndex = NumPlantLoops + I;
+                state.dataPlnt->PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
             }
 
         }
@@ -3443,24 +3394,8 @@ namespace EnergyPlus {
             // simple rule-based allocation of which order to call the half loops
             // Examine for interconnected components and rearrange to impose the following rules
 
-            // REFERENCES:
-            // na
-
             // Using/Aliasing
             using PlantUtilities::ShiftPlantLoopSideCallingOrder;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int HalfLoopNum;
@@ -3475,23 +3410,23 @@ namespace EnergyPlus {
             bool thisLoopPutsDemandOnAnother;
             int ConnctNum;
 
-            for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
+            for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
 
-                LoopNum = PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
-                LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
+                LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
+                LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
 
-                if (allocated(PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected)) {
+                if (allocated(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected)) {
                     for (ConnctNum = 1;
-                         ConnctNum <= isize(PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected); ++ConnctNum) {
-                        OtherLoopNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
-                        OtherLoopSideNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopSideNum;
-                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum, OtherLoopSideNum);
+                         ConnctNum <= isize(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected); ++ConnctNum) {
+                        OtherLoopNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopNum;
+                        OtherLoopSideNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(ConnctNum).LoopSideNum;
+                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum, OtherLoopSideNum);
 
-                        thisLoopPutsDemandOnAnother = PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(
+                        thisLoopPutsDemandOnAnother = state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Connected(
                                 ConnctNum).LoopDemandsOnRemote;
                         if (thisLoopPutsDemandOnAnother) {             // make sure this loop side is called before the other loop side
                             if (OtherLoopCallingIndex < HalfLoopNum) { // rearrange
-                                newCallingIndex = min(HalfLoopNum + 1, TotNumHalfLoops);
+                                newCallingIndex = min(HalfLoopNum + 1, state.dataPlnt->TotNumHalfLoops);
                                 ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                             }
 
@@ -3501,19 +3436,19 @@ namespace EnergyPlus {
 
                                 if (OtherLoopSideNum ==
                                     SupplySide) { // if this is a supplyside, don't push it before its own demand side
-                                    OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum,
+                                    OtherLoopDemandSideCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
                                                                                                  DemandSide);
                                     if (OtherLoopDemandSideCallingIndex <
                                         HalfLoopNum) {                             // good to go
                                         newCallingIndex = min(OtherLoopDemandSideCallingIndex + 1,
-                                                              TotNumHalfLoops); // put it right after its demand side
+                                                              state.dataPlnt->TotNumHalfLoops); // put it right after its demand side
                                         ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
                                     } else { // move both sides of other loop before this, keeping demand side in front
                                         NewOtherDemandSideCallingIndex = max(HalfLoopNum, 1);
                                         ShiftPlantLoopSideCallingOrder(state,  OtherLoopDemandSideCallingIndex,
                                                                        NewOtherDemandSideCallingIndex);
                                         // get fresh pointer after it has changed in previous call
-                                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(OtherLoopNum,
+                                        OtherLoopCallingIndex = FindLoopSideInCallingOrder(state, OtherLoopNum,
                                                                                            OtherLoopSideNum);
                                         newCallingIndex = NewOtherDemandSideCallingIndex + 1;
                                         ShiftPlantLoopSideCallingOrder(state,  OtherLoopCallingIndex, newCallingIndex);
@@ -3528,7 +3463,7 @@ namespace EnergyPlus {
             }
         }
 
-        int FindLoopSideInCallingOrder(int const LoopNum, int const LoopSide) {
+        int FindLoopSideInCallingOrder(EnergyPlusData &state, int const LoopNum, int const LoopSide) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         B. Griffith
@@ -3568,9 +3503,9 @@ namespace EnergyPlus {
 
             CallingIndex = 0;
 
-            for (HalfLoopNum = 1; HalfLoopNum <= TotNumHalfLoops; ++HalfLoopNum) {
-                if ((LoopNum == PlantCallingOrderInfo(HalfLoopNum).LoopIndex) &&
-                    (LoopSide == PlantCallingOrderInfo(HalfLoopNum).LoopSide)) {
+            for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
+                if ((LoopNum == state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex) &&
+                    (LoopSide == state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide)) {
 
                     CallingIndex = HalfLoopNum;
                 }
@@ -3611,27 +3546,27 @@ namespace EnergyPlus {
             int NumCount;
 
             // first set component level control type (obsoletes one input in field set for Branch )
-            if (allocated(PlantLoop)) {
-                NumCount = size(PlantLoop);
+            if (allocated(state.dataPlnt->PlantLoop)) {
+                NumCount = size(state.dataPlnt->PlantLoop);
             } else {
                 NumCount = 0;
             }
             for (LoopCtr = 1; LoopCtr <= NumCount; ++LoopCtr) {
                 for (LoopSideCtr = DemandSide; LoopSideCtr <= SupplySide; ++LoopSideCtr) {
-                    for (BranchCtr = 1; BranchCtr <= PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
+                    for (BranchCtr = 1; BranchCtr <= state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
                         BranchIsInSplitterMixer = false;
                         // test if this branch is inside a splitter/mixer
-                        if (PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Splitter.Exists) {
-                            if ((BranchCtr > 1) && (BranchCtr < PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches)) {
+                        if (state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Splitter.Exists) {
+                            if ((BranchCtr > 1) && (BranchCtr < state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches)) {
                                 BranchIsInSplitterMixer = true;
                             }
                         }
 
-                        NumComponentsOnBranch = PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).TotalComponents;
+                        NumComponentsOnBranch = state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).TotalComponents;
 
-                        for (CompCtr = 1; CompCtr <= isize(PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp); ++CompCtr) {
+                        for (CompCtr = 1; CompCtr <= isize(state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp); ++CompCtr) {
 
-                            auto &this_component(PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp(CompCtr));
+                            auto &this_component(state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp(CompCtr));
 
                             {
                                 auto const SELECT_CASE_var(this_component.TypeOf_Num);
@@ -4211,39 +4146,39 @@ namespace EnergyPlus {
 
             // now set up branch control types based on components.
 
-            if (allocated(PlantLoop)) {
-                NumCount = size(PlantLoop);
+            if (allocated(state.dataPlnt->PlantLoop)) {
+                NumCount = size(state.dataPlnt->PlantLoop);
             } else {
                 NumCount = 0;
             }
             for (LoopCtr = 1; LoopCtr <= NumCount; ++LoopCtr) { // SIZE(PlantLoop)
                 for (LoopSideCtr = DemandSide; LoopSideCtr <= SupplySide; ++LoopSideCtr) {
                     for (BranchCtr = 1;
-                         BranchCtr <= PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
+                         BranchCtr <= state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
                         ActiveCount = 0;
                         BypassCount = 0;
-                        for (CompCtr = 1; CompCtr <= isize(PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                        for (CompCtr = 1; CompCtr <= isize(state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                 BranchCtr).Comp); ++CompCtr) {
-                            ComponentFlowCtrl = PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp(
+                            ComponentFlowCtrl = state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp(
                                     CompCtr).FlowCtrl;
 
                             {
                                 auto const SELECT_CASE_var(ComponentFlowCtrl);
 
                                 if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Unknown) {
-                                    PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                    state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                             BranchCtr).ControlType = DataBranchAirLoopPlant::ControlTypeEnum::Passive;
                                 } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Active) {
                                     ++ActiveCount;
                                     if (ActiveCount > 1) {
                                         //  assume multiple active components in series means branch is SeriesActive
-                                        PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                        state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                 BranchCtr).ControlType = DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive;
                                         // assume all components on branch are to be SeriesActive as well
-                                        for (auto &e : PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp)
+                                        for (auto &e : state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp)
                                             e.FlowCtrl = DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive;
                                     } else {
-                                        PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                        state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                 BranchCtr).ControlType = DataBranchAirLoopPlant::ControlTypeEnum::Active;
                                     }
 
@@ -4251,11 +4186,11 @@ namespace EnergyPlus {
                                         ShowSevereError(state,
                                                 "An active component is on the same branch as a pipe situated between splitter/mixer");
                                         ShowContinueError(state, "Occurs in Branch=" +
-                                                          PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                                          state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                                   BranchCtr).Name);
-                                        ShowContinueError(state, "Occurs in Plant Loop=" + PlantLoop(LoopCtr).Name);
+                                        ShowContinueError(state, "Occurs in Plant Loop=" + state.dataPlnt->PlantLoop(LoopCtr).Name);
                                         ShowContinueError(state, "SetupBranchControlTypes: and the simulation continues");
-                                        // DSU3 note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
+                                        //  note not sure why this is so bad.  heat transfer pipe might be a good reason to allow this?
                                         //   this used to fatal in older PlantFlowResolver.
                                     }
 
@@ -4263,18 +4198,18 @@ namespace EnergyPlus {
                                 } else if (SELECT_CASE_var == DataBranchAirLoopPlant::ControlTypeEnum::Bypass) {
 
                                     ++BypassCount;
-                                    PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                    state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                             BranchCtr).ControlType = DataBranchAirLoopPlant::ControlTypeEnum::Bypass;
-                                    PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).IsBypass = true;
-                                    PlantLoop(LoopCtr).LoopSide(LoopSideCtr).BypassExists = true;
+                                    state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).IsBypass = true;
+                                    state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).BypassExists = true;
 
                                     if (CompCtr > 1) {
                                         ShowSevereError(state,
                                                 "A pipe used as a bypass should not be in series with another component");
                                         ShowContinueError(state, "Occurs in Branch = " +
-                                                          PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                                          state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                                   BranchCtr).Name);
-                                        ShowContinueError(state, "Occurs in PlantLoop = " + PlantLoop(LoopCtr).Name);
+                                        ShowContinueError(state, "Occurs in PlantLoop = " + state.dataPlnt->PlantLoop(LoopCtr).Name);
                                         ShowFatalError(state,
                                                 "SetupBranchControlTypes: preceding condition causes termination.");
                                     }
@@ -4286,7 +4221,7 @@ namespace EnergyPlus {
                                         if (BypassCount > 0) {
 
                                         } else {
-                                            PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
+                                            state.dataPlnt->PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
                                                     BranchCtr).ControlType = DataBranchAirLoopPlant::ControlTypeEnum::Passive;
                                         }
                                     }
@@ -4330,27 +4265,25 @@ namespace EnergyPlus {
                 state.dataGlobal->AnyPlantInModel = true;
             } else {
                 state.dataGlobal->AnyPlantInModel = false;
-                PlantLoop.allocate(0);
+                state.dataPlnt->PlantLoop.allocate(0);
             }
         }
 
         void CheckOngoingPlantWarnings(EnergyPlusData &state) {
             int LoopNum;
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+            for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // Warning if the excess storage time is more than half of the total time
-                if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
-                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError(state, "Plant Loop: " + PlantLoop(LoopNum).Name +
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+                    ShowWarningError(state, "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
                                      " Demand Side is storing excess heat the majority of the time.");
                 }
-                if (PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
-                    PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
-                    ShowWarningError(state, "Plant Loop: " + PlantLoop(LoopNum).Name +
+                if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_CapExcessStorageTime >
+                    state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).LoopSideInlet_TotalTime / 2) {
+                    ShowWarningError(state, "Plant Loop: " + state.dataPlnt->PlantLoop(LoopNum).Name +
                                      " Supply Side is storing excess heat the majority of the time.");
                 }
             }
         }
 
-    } // namespace PlantManager
-
-} // namespace EnergyPlus
+    } // namespace EnergyPlus

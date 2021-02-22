@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,6 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -136,8 +135,6 @@ namespace HeatRecovery {
     // Economizer lockout operation
     int const EconoLockOut_No(0);
     int const EconoLockOut_Yes(1);
-
-    static std::string const BlankString;
 
     namespace {
         bool MyOneTimeAllocate(true);
@@ -418,7 +415,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_FLATPLATE;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -501,7 +498,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_AIRTOAIR_GENERIC;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -634,7 +631,7 @@ namespace HeatRecovery {
             ExchCond(ExchNum).Name = cAlphaArgs(1);
             ExchCond(ExchNum).ExchTypeNum = HX_DESICCANT_BALANCED;
             if (lAlphaFieldBlanks(2)) {
-                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                ExchCond(ExchNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 ExchCond(ExchNum).SchedPtr = GetScheduleIndex(state, cAlphaArgs(2));
                 if (ExchCond(ExchNum).SchedPtr == 0) {
@@ -1279,29 +1276,8 @@ namespace HeatRecovery {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DXCoils::DXCoilFullLoadOutAirHumRat;
-        using DXCoils::DXCoilFullLoadOutAirTemp;
-
         //  USE DataZoneEquipment,  ONLY: ZoneEquipInputsFilled,CheckZoneEquipmentList
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using EMSManager::iHumidityRatioMaxSetPoint;
-        using EMSManager::iTemperatureSetPoint;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ExIndex;   // do loop index
@@ -1476,7 +1452,7 @@ namespace HeatRecovery {
                                 ShowFatalError(state, " Previous condition causes program termination.");
                             } else {
                                 // need call to EMS to check node
-                                CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExIndex).SupOutletNode, iTemperatureSetPoint, FatalError);
+                                CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExIndex).SupOutletNode, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
                                 if (FatalError) {
                                     ShowSevereError(state, "Missing temperature setpoint for " + cHXTypes(ExchCond(ExIndex).ExchTypeNum) + " \"" +
                                                     ExchCond(ExIndex).Name + "\" :");
@@ -1562,7 +1538,7 @@ namespace HeatRecovery {
                                                       "desiccant Heat Exchanger if control is desired.");
                                 } else {
                                     // need call to EMS to check node
-                                    CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExchNum).SecOutletNode, iHumidityRatioMaxSetPoint, LocalWarningError);
+                                    CheckIfNodeSetPointManagedByEMS(state, ExchCond(ExchNum).SecOutletNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, LocalWarningError);
                                     DataLoopNode::NodeSetpointCheck(ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
                                     if (LocalWarningError) {
                                         ShowWarningError(state, "Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) +
@@ -1585,14 +1561,14 @@ namespace HeatRecovery {
 
                     if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        if (DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 || DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
+                        if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 || state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
                             //       DX Coil is OFF, read actual inlet conditions
                             FullLoadOutAirTemp = ExchCond(ExchNum).SecInTemp;
                             FullLoadOutAirHumRat = ExchCond(ExchNum).SecInHumRat;
                         } else {
                             //       DX Coil is ON, read full load DX coil outlet conditions (conditions HX sees when ON)
-                            FullLoadOutAirTemp = DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
-                            FullLoadOutAirHumRat = DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
+                            FullLoadOutAirTemp = state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex);
+                            FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex);
                         }
                     } else if (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                         // how to support VS dx coil here?
@@ -2580,7 +2556,6 @@ namespace HeatRecovery {
 
         // Using/Aliasing
         using DataLoopNode::SensedNodeFlagValue;
-        using DXCoils::DXCoilPartLoadRatio;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2827,7 +2802,7 @@ namespace HeatRecovery {
 
                     } else if (CompanionCoilIndex > 0) {
                         // VS coil issue here?
-                        HXPartLoadRatio = DXCoilPartLoadRatio(CompanionCoilIndex);
+                        HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
                     }
 
                     if (FanOpMode == CycFanCycCoil || RegenInletIsOANode) {
@@ -3291,7 +3266,7 @@ namespace HeatRecovery {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ReportingConstant;
 
-        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour();
+        ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
         ExchCond(ExNum).ElecUseEnergy = ExchCond(ExNum).ElecUseRate * ReportingConstant;
         ExchCond(ExNum).SensHeatingEnergy = ExchCond(ExNum).SensHeatingRate * ReportingConstant;
         ExchCond(ExNum).LatHeatingEnergy = ExchCond(ExNum).LatHeatingRate * ReportingConstant;

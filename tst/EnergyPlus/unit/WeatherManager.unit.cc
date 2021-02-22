@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ConfiguredFunctions.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
@@ -66,6 +66,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
+// Fixtures
 #include "Fixtures/EnergyPlusFixture.hh"
 #include "Fixtures/SQLiteFixture.hh"
 
@@ -689,8 +690,8 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     EnergyPlus::sqlite->sqliteBegin();
     EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
-    OutputReportTabular::WriteTabularFiles = true;
-    OutputReportTabular::displayEioSummary = true;
+    state->dataOutRptTab->WriteTabularFiles = true;
+    state->dataOutRptTab->displayEioSummary = true;
 
     std::string const idf_objects = delimited_string({
 
@@ -1078,19 +1079,19 @@ TEST_F(EnergyPlusFixture, Add_and_InterpolateWeatherInputOutputTest)
     WeatherManager::GetNextEnvironment(*state, Available, ErrorsFound);
 
     // Test get output variables for Total Sky Cover and Opaque Sky Cover
-    EXPECT_EQ("Site Outdoor Air Drybulb Temperature", OutputProcessor::RVariableTypes(1).VarNameOnly);
-    EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", OutputProcessor::RVariableTypes(1).VarName);
-    EXPECT_EQ("Site Wind Speed", OutputProcessor::RVariableTypes(2).VarNameOnly);
-    EXPECT_EQ("Environment:Site Wind Speed", OutputProcessor::RVariableTypes(2).VarName);
-    EXPECT_EQ("Site Total Sky Cover", OutputProcessor::RVariableTypes(3).VarNameOnly);
-    EXPECT_EQ("Environment:Site Total Sky Cover", OutputProcessor::RVariableTypes(3).VarName);
-    EXPECT_EQ("Site Opaque Sky Cover", OutputProcessor::RVariableTypes(4).VarNameOnly);
-    EXPECT_EQ("Environment:Site Opaque Sky Cover", OutputProcessor::RVariableTypes(4).VarName);
+    EXPECT_EQ("Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->RVariableTypes(1).VarNameOnly);
+    EXPECT_EQ("Environment:Site Outdoor Air Drybulb Temperature", state->dataOutputProcessor->RVariableTypes(1).VarName);
+    EXPECT_EQ("Site Wind Speed", state->dataOutputProcessor->RVariableTypes(2).VarNameOnly);
+    EXPECT_EQ("Environment:Site Wind Speed", state->dataOutputProcessor->RVariableTypes(2).VarName);
+    EXPECT_EQ("Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(3).VarNameOnly);
+    EXPECT_EQ("Environment:Site Total Sky Cover", state->dataOutputProcessor->RVariableTypes(3).VarName);
+    EXPECT_EQ("Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(4).VarNameOnly);
+    EXPECT_EQ("Environment:Site Opaque Sky Cover", state->dataOutputProcessor->RVariableTypes(4).VarName);
 
-    EXPECT_EQ(7, OutputProcessor::RVariableTypes(1).ReportID);
-    EXPECT_EQ(8, OutputProcessor::RVariableTypes(2).ReportID);
-    EXPECT_EQ(9, OutputProcessor::RVariableTypes(3).ReportID);
-    EXPECT_EQ(10, OutputProcessor::RVariableTypes(4).ReportID);
+    EXPECT_EQ(7, state->dataOutputProcessor->RVariableTypes(1).ReportID);
+    EXPECT_EQ(8, state->dataOutputProcessor->RVariableTypes(2).ReportID);
+    EXPECT_EQ(9, state->dataOutputProcessor->RVariableTypes(3).ReportID);
+    EXPECT_EQ(10, state->dataOutputProcessor->RVariableTypes(4).ReportID);
 
     state->dataWeatherManager->Envrn = 1;
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,327 +78,109 @@ namespace OutputReportTabular {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    extern int const MaxHeaderLength;
-    extern int const MaxNoteLength;
+    enum class iAggType {
+        Unassigned,
+        SumOrAvg,
+        Maximum,
+        Minimum,
+        ValueWhenMaxMin,
+        HoursZero,
+        HoursNonZero,
+        HoursPositive,
+        HoursNonPositive,
+        HoursNegative,
+        HoursNonNegative,
+        SumOrAverageHoursShown,
+        MaximumDuringHoursShown,
+        MinimumDuringHoursShown,
+    };
 
-    extern int const aggTypeSumOrAvg;
-    extern int const aggTypeMaximum;
-    extern int const aggTypeMinimum;
-    extern int const aggTypeValueWhenMaxMin;
-    extern int const aggTypeHoursZero;
-    extern int const aggTypeHoursNonZero;
-    extern int const aggTypeHoursPositive;
-    extern int const aggTypeHoursNonPositive;
-    extern int const aggTypeHoursNegative;
-    extern int const aggTypeHoursNonNegative;
-    extern int const aggTypeSumOrAverageHoursShown;
-    extern int const aggTypeMaximumDuringHoursShown;
-    extern int const aggTypeMinimumDuringHoursShown;
+    enum class iTableStyle {
+        Unassigned,
+        Comma,
+        Tab,
+        Fixed,
+        HTML,
+        XML,
+    };
 
-    extern int const tableStyleComma;
-    extern int const tableStyleTab;
-    extern int const tableStyleFixed;
-    extern int const tableStyleHTML;
-    extern int const tableStyleXML;
-
-    extern int const unitsStyleNone; // no change to any units
-    extern int const unitsStyleJtoKWH;
-    extern int const unitsStyleJtoMJ;
-    extern int const unitsStyleJtoGJ;
-    extern int const unitsStyleInchPound;
-    extern int const unitsStyleNotFound;
+    enum class iUnitsStyle {
+        None,
+        JtoKWH,
+        JtoMJ,
+        JtoGJ,
+        InchPound,
+        NotFound,
+    };
 
     extern int const stepTypeZone;
     extern int const stepTypeHVAC;
 
-    extern int const cSensInst;
-    extern int const cSensDelay;
-    extern int const cSensRA;
-    extern int const cLatent;
-    extern int const cTotal;
-    extern int const cPerc;
-    extern int const cArea;
-    extern int const cPerArea;
+    // These correspond to the columns in the load component table
+    constexpr int cSensInst(1);
+    constexpr int cSensDelay(2);
+    constexpr int cSensRA(3);
+    constexpr int cLatent(4);
+    constexpr int cTotal(5);
+    constexpr int cPerc(6);
+    constexpr int cArea(7);
+    constexpr int cPerArea(8);
 
-    extern int const rPeople;
-    extern int const rLights;
-    extern int const rEquip;
-    extern int const rRefrig;
-    extern int const rWaterUse;
-    extern int const rHvacLoss;
-    extern int const rPowerGen;
-    extern int const rDOAS;
-    extern int const rInfil;
-    extern int const rZoneVent;
-    extern int const rIntZonMix;
-    extern int const rRoof;
-    extern int const rIntZonCeil;
-    extern int const rOtherRoof;
-    extern int const rExtWall;
-    extern int const rIntZonWall;
-    extern int const rGrdWall;
-    extern int const rOtherWall;
-    extern int const rExtFlr;
-    extern int const rIntZonFlr;
-    extern int const rGrdFlr;
-    extern int const rOtherFlr;
-    extern int const rFeneCond;
-    extern int const rFeneSolr;
-    extern int const rOpqDoor;
-    extern int const rGrdTot;
+    // internal gains
+    constexpr int rPeople(1);
+    constexpr int rLights(2);
+    constexpr int rEquip(3);
+    constexpr int rRefrig(4);
+    constexpr int rWaterUse(5);
+    constexpr int rHvacLoss(6);
+    constexpr int rPowerGen(7);
+    // misc
+    constexpr int rDOAS(8);
+    constexpr int rInfil(9);
+    constexpr int rZoneVent(10);
+    constexpr int rIntZonMix(11);
+    // opaque surfaces
+    constexpr int rRoof(12);
+    constexpr int rIntZonCeil(13);
+    constexpr int rOtherRoof(14);
+    constexpr int rExtWall(15);
+    constexpr int rIntZonWall(16);
+    constexpr int rGrdWall(17);
+    constexpr int rOtherWall(18);
+    constexpr int rExtFlr(19);
+    constexpr int rIntZonFlr(20);
+    constexpr int rGrdFlr(21);
+    constexpr int rOtherFlr(22);
+    // subsurfaces
+    constexpr int rFeneCond(23);
+    constexpr int rFeneSolr(24);
+    constexpr int rOpqDoor(25);
+    // total
+    constexpr int rGrdTot(26);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
-    extern int const numResourceTypes;
-    extern int const numSourceTypes;
+    constexpr int numResourceTypes(14);
+    constexpr int numSourceTypes(12);
+
+    constexpr const char *validChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:.");
+
+    enum class iOutputType {
+        zoneOutput,
+        airLoopOutput,
+        facilityOutput,
+    };
 
     // MODULE VARIABLE DECLARATIONS:
 
     // The Binned table type is different and only references one variable and its structure is very
     // different from the others so it is has its own type.
 
-    // arrays for time binned results
-
-    extern int OutputTableBinnedCount;
-    extern int BinResultsTableCount;
-    extern int BinResultsIntervalCount;
-
-    extern int const numNamedMonthly;
+    constexpr int numNamedMonthly(63);
     // These reports are detailed/named in routine InitializePredefinedMonthlyTitles
 
-    extern int MonthlyInputCount;
-    extern int sizeMonthlyInput;
-    extern int MonthlyFieldSetInputCount;
-    extern int sizeMonthlyFieldSetInput;
-    extern int MonthlyTablesCount;
-    extern int MonthlyColumnsCount;
-    extern Array1D_bool IsMonthGathered; // shown as true for any month used
-
-    extern int TOCEntriesCount;
-    extern int TOCEntriesSize;
-
-    extern int UnitConvSize;
-
-    extern bool WriteTabularFiles;
-
     // Allow up to five output files to be created
-    extern int const maxNumStyles;
-
-    // From Report:Table:Style
-    extern int unitsStyle; // see list of parameters
-    extern int numStyles;
-    extern std::ofstream csv_stream;                   // CSV table stream
-    extern std::ofstream tab_stream;                   // Tab table stream
-    extern std::ofstream fix_stream;                   // Fixed table stream
-    extern std::ofstream htm_stream;                   // HTML table stream
-    extern std::ofstream xml_stream;                   // XML table stream
-    extern Array1D<std::ofstream *> TabularOutputFile; // Table stream array
-    extern Array1D_string del;                         // the delimiter to use
-    extern Array1D_int TableStyle;                     // see list of parameters
-
-    extern Real64 timeInYear;
-
-    // Flags for predefined tabular reports
-    extern bool displayTabularBEPS;
-    extern bool displayLEEDSummary;
-    extern bool displayTabularCompCosts; // added BTG 5/6/04 for component cost summary
-    extern bool displayTabularVeriSum;   // added JG 2006-06-28 for input verification and summary report
-    extern bool displayComponentSizing;
-    extern bool displaySurfaceShadowing;
-    extern bool displayDemandEndUse;
-    extern bool displayAdaptiveComfort;
-    extern bool displaySourceEnergyEndUseSummary;
-    extern bool displayZoneComponentLoadSummary;
-    extern bool displayAirLoopComponentLoadSummary;
-    extern bool displayFacilityComponentLoadSummary;
-    extern bool displayLifeCycleCostReport;
-    extern bool displayTariffReport;
-    extern bool displayEconomicResultSummary;
-    extern bool displayHeatEmissionsSummary;
-    extern bool displayEioSummary;
-    extern bool displayThermalResilienceSummary;
-    extern bool displayCO2ResilienceSummary;
-    extern bool displayVisualResilienceSummary;
-    extern bool displayThermalResilienceSummaryExplicitly;
-    extern bool displayCO2ResilienceSummaryExplicitly;
-    extern bool displayVisualResilienceSummaryExplicitly;
-    // BEPS Report Related Variables
-    // From Report:Table:Predefined - BEPS
-    // arrays that hold the meter numbers that are initialized at get input
-    extern Array1D_int meterNumTotalsBEPS;
-    extern Array1D_int meterNumTotalsSource;
-    extern Array1D_bool fuelfactorsused;
-    extern Array1D_bool ffUsed;
-    extern Array1D<Real64> SourceFactors;
-    extern Array1D_bool ffSchedUsed;
-    extern Array1D_int ffSchedIndex;
-    extern Array2D_int meterNumEndUseBEPS;
-    extern Array3D_int meterNumEndUseSubBEPS;
-    // arrays that hold the names of the resource and end uses
-    extern Array1D_string resourceTypeNames;
-    extern Array1D_string sourceTypeNames;
-    extern Array1D_string endUseNames;
-    // arrays that hold the actual values for the year
-    extern Array1D<Real64> gatherTotalsBEPS;
-    extern Array1D<Real64> gatherTotalsBySourceBEPS;
-    extern Array1D<Real64> gatherTotalsSource;
-    extern Array1D<Real64> gatherTotalsBySource;
-    extern Array2D<Real64> gatherEndUseBEPS;
-    extern Array2D<Real64> gatherEndUseBySourceBEPS;
-    extern Array3D<Real64> gatherEndUseSubBEPS;
-    // arrays the hold the demand values
-    extern Array1D<Real64> gatherDemandTotal;
-    extern Array2D<Real64> gatherDemandEndUse;
-    extern Array2D<Real64> gatherDemandIndEndUse;
-    extern Array3D<Real64> gatherDemandEndUseSub;
-    extern Array3D<Real64> gatherDemandIndEndUseSub;
-    extern Array1D_int gatherDemandTimeStamp;
-    // to keep track of hours for the BEPS report gathering
-    extern Real64 gatherElapsedTimeBEPS;
-    // for normalization of results
-    extern Real64 buildingGrossFloorArea;
-    extern Real64 buildingConditionedFloorArea;
-    // keep track if schedules are used in fuel factors
-    extern bool fuelFactorSchedulesUsed;
-    // for electic load components on BEPS report
-    extern int meterNumPowerFuelFireGen;
-    extern Real64 gatherPowerFuelFireGen;
-    extern int meterNumPowerPV;
-    extern Real64 gatherPowerPV;
-    extern int meterNumPowerWind;
-    extern Real64 gatherPowerWind;
-    extern Real64 OverallNetEnergyFromStorage;
-    extern int meterNumPowerHTGeothermal;
-    extern Real64 gatherPowerHTGeothermal;
-    extern int meterNumElecProduced;
-    extern Real64 gatherElecProduced;
-    extern int meterNumElecPurchased;
-    extern Real64 gatherElecPurchased;
-    extern int meterNumElecSurplusSold;
-    extern Real64 gatherElecSurplusSold;
-    extern int meterNumElecStorage;
-    extern Real64 gatherElecStorage;
-    extern int meterNumPowerConversion;
-    extern Real64 gatherPowerConversion;
-    // for on site thermal source components on BEPS report
-    extern int meterNumWaterHeatRecovery;
-    extern Real64 gatherWaterHeatRecovery;
-    extern int meterNumAirHeatRecoveryCool;
-    extern Real64 gatherAirHeatRecoveryCool;
-    extern int meterNumAirHeatRecoveryHeat;
-    extern Real64 gatherAirHeatRecoveryHeat;
-    extern int meterNumHeatHTGeothermal;
-    extern Real64 gatherHeatHTGeothermal;
-    extern int meterNumHeatSolarWater;
-    extern Real64 gatherHeatSolarWater;
-    extern int meterNumHeatSolarAir;
-    extern Real64 gatherHeatSolarAir;
-    // for on site water components on BEPS report
-    extern int meterNumRainWater;
-    extern Real64 gatherRainWater;
-    extern int meterNumCondensate;
-    extern Real64 gatherCondensate;
-    extern int meterNumGroundwater;
-    extern Real64 gatherWellwater;
-    extern int meterNumMains;
-    extern Real64 gatherMains;
-    extern int meterNumWaterEndUseTotal;
-    extern Real64 gatherWaterEndUseTotal;
-    // for source energy conversion factors on BEPS report
-    extern Real64 sourceFactorElectric;
-    extern Real64 sourceFactorNaturalGas;
-    extern Real64 efficiencyDistrictCooling;
-    extern Real64 efficiencyDistrictHeating;
-    extern Real64 sourceFactorSteam;
-    extern Real64 sourceFactorGasoline;
-    extern Real64 sourceFactorDiesel;
-    extern Real64 sourceFactorCoal;
-    extern Real64 sourceFactorFuelOil1;
-    extern Real64 sourceFactorFuelOil2;
-    extern Real64 sourceFactorPropane;
-    extern Real64 sourceFactorOtherFuel1;
-    extern Real64 sourceFactorOtherFuel2;
-
-    extern Array1D_int td;
-    //(1)   Current year
-    //(2)   Current month
-    //(3)   Current day
-    //(4)   Time difference with respect to UTC in minutes (0-59)
-    //(5)   Hour of the day (0-23)
-    //(6)   Minutes (0-59)
-    //(7)   Seconds (0-59)
-    //(8)   Milliseconds (0-999)
-
-    // Design day name storage
-    extern Array1D_string DesignDayName;
-    extern int DesignDayCount;
-
-    // arrays related to pulse and load component reporting
-    extern Array2D_int radiantPulseTimestep;
-    extern Array2D<Real64> radiantPulseReceived;
-    extern Array3D<Real64> loadConvectedNormal;
-    extern Array3D<Real64> loadConvectedWithPulse;
-    extern Array3D<Real64> netSurfRadSeq;
-    extern Array2D<Real64> decayCurveCool;
-    extern Array2D<Real64> decayCurveHeat;
-    extern Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
-    extern Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
-
-    extern Array3D<Real64> peopleInstantSeq;
-    extern Array3D<Real64> peopleLatentSeq;
-    extern Array3D<Real64> peopleRadSeq;
-    extern Array3D<Real64> peopleDelaySeq;
-
-    extern Array3D<Real64> lightInstantSeq;
-    extern Array3D<Real64> lightRetAirSeq;
-    extern Array3D<Real64> lightLWRadSeq; // long wave thermal radiation
-    extern Array3D<Real64> lightSWRadSeq; // short wave visible radiation
-    extern Array3D<Real64> lightDelaySeq;
-
-    extern Array3D<Real64> equipInstantSeq;
-    extern Array3D<Real64> equipLatentSeq;
-    extern Array3D<Real64> equipRadSeq;
-    extern Array3D<Real64> equipDelaySeq;
-
-    extern Array3D<Real64> refrigInstantSeq;
-    extern Array3D<Real64> refrigRetAirSeq;
-    extern Array3D<Real64> refrigLatentSeq;
-
-    extern Array3D<Real64> waterUseInstantSeq;
-    extern Array3D<Real64> waterUseLatentSeq;
-
-    extern Array3D<Real64> hvacLossInstantSeq;
-    extern Array3D<Real64> hvacLossRadSeq;
-    extern Array3D<Real64> hvacLossDelaySeq;
-
-    extern Array3D<Real64> powerGenInstantSeq;
-    extern Array3D<Real64> powerGenRadSeq;
-    extern Array3D<Real64> powerGenDelaySeq;
-
-    extern Array3D<Real64> infilInstantSeq;
-    extern Array3D<Real64> infilLatentSeq;
-
-    extern Array3D<Real64> zoneVentInstantSeq;
-    extern Array3D<Real64> zoneVentLatentSeq;
-
-    extern Array3D<Real64> interZoneMixInstantSeq;
-    extern Array3D<Real64> interZoneMixLatentSeq;
-
-    extern Array3D<Real64> feneCondInstantSeq;
-    // REAL(r64), DIMENSION(:,:,:),ALLOCATABLE,PUBLIC  :: feneSolarInstantSeq
-    extern Array3D<Real64> feneSolarRadSeq;
-    extern Array3D<Real64> feneSolarDelaySeq;
-
-    extern Array3D<Real64> surfDelaySeq;
-
-    extern int maxUniqueKeyCount;
-
-    // for the XML report must keep track fo the active sub-table name and report set by other routines
-    extern std::string activeSubTableName;
-    extern std::string activeReportNameNoSpace;
-    extern std::string activeReportName;
-    extern std::string activeForName;
-    extern std::string prevReportName;
+    constexpr int maxNumStyles(5);
 
     // LineTypes for reading the stat file
     enum class StatLineType {
@@ -530,7 +312,7 @@ namespace OutputReportTabular {
         // Members
         std::string variMeter;                // the name of the variable or meter
         std::string colHead;                  // the column header to use instead of the variable name (only for predefined)
-        int aggregate;                        // the type of aggregation for the variable (see aggType parameters)
+        iAggType aggregate;                        // the type of aggregation for the variable (see aggType parameters)
         OutputProcessor::Unit varUnits;       // Units enumeration
         std::string variMeterUpper;           // the name of the variable or meter uppercased
         int typeOfVar;                        // 0=not found, 1=integer, 2=real, 3=meter
@@ -542,8 +324,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyFieldSetInputType()
-            : aggregate(0), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0), varAvgSum(OutputProcessor::StoreType::Averaged),
-              varStepType(OutputProcessor::TimeStepType::TimeStepZone)
+            : aggregate(iAggType::Unassigned), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0),
+              varAvgSum(OutputProcessor::StoreType::Averaged), varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
     };
@@ -571,7 +353,7 @@ namespace OutputReportTabular {
         OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units string, may be blank
-        int aggType;                       // index to the type of aggregation (see list of parameters)
+        iAggType aggType;                       // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;             // monthly results
         Array1D<Real64> duration;          // the time during which results are summed for use in averages
         Array1D_int timeStamp;             // encoded timestamp of max or min
@@ -580,8 +362,8 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(0),
-              reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
+            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone),
+              units(OutputProcessor::Unit::None), aggType(iAggType::Unassigned), reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
     };
@@ -687,21 +469,6 @@ namespace OutputReportTabular {
         }
     };
 
-    // Object Data
-    extern Array1D<OutputTableBinnedType> OutputTableBinned;
-    extern Array2D<BinResultsType> BinResults;      // table number, number of intervals
-    extern Array1D<BinResultsType> BinResultsBelow; // time below the lowest defined bin
-    extern Array1D<BinResultsType> BinResultsAbove; // time above the highest defined bin
-    extern Array1D<BinObjVarIDType> BinObjVarID;
-    extern Array1D<BinStatisticsType> BinStatistics;
-    extern Array1D<NamedMonthlyType> namedMonthly; // for predefined monthly report titles
-    extern Array1D<MonthlyFieldSetInputType> MonthlyFieldSetInput;
-    extern Array1D<MonthlyInputType> MonthlyInput;
-    extern Array1D<MonthlyTablesType> MonthlyTables;
-    extern Array1D<MonthlyColumnsType> MonthlyColumns;
-    extern Array1D<TOCEntriesType> TOCEntries;
-    extern Array1D<UnitConvType> UnitConv;
-
     // Functions
     void clear_state(EnergyPlusData &state);
 
@@ -719,9 +486,9 @@ namespace OutputReportTabular {
 
     void GetInputTabularMonthly(EnergyPlusData &state);
 
-    int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
+    int AddMonthlyReport(EnergyPlusData &state, std::string const &inReportName, int const inNumDigitsShown);
 
-    void AddMonthlyFieldSetInput(int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, int const inAggregate);
+    void AddMonthlyFieldSetInput(EnergyPlusData &state, int const inMonthReport, std::string const &inVariMeter, std::string const &inColHead, iAggType const inAggregate);
 
     void InitializeTabularMonthly(EnergyPlusData &state);
 
@@ -733,7 +500,7 @@ namespace OutputReportTabular {
 
     void GetInputTabularStyle(EnergyPlusData &state);
 
-    int SetUnitsStyleFromString(std::string const &unitStringIn);
+    iUnitsStyle SetUnitsStyleFromString(std::string const &unitStringIn);
 
     void GetInputOutputTableSummaryReports(EnergyPlusData &state);
 
@@ -743,7 +510,7 @@ namespace OutputReportTabular {
 
     void InitializePredefinedMonthlyTitles(EnergyPlusData &state);
 
-    void CreatePredefinedMonthlyReports();
+    void CreatePredefinedMonthlyReports(EnergyPlusData &state);
 
     void GetInputFuelAndPollutionFactors(EnergyPlusData &state);
 
@@ -757,7 +524,7 @@ namespace OutputReportTabular {
 
     void OpenOutputTabularFile(EnergyPlusData &state);
 
-    void CloseOutputTabularFile();
+    void CloseOutputTabularFile(EnergyPlusData &state);
 
     void WriteTableOfContents(EnergyPlusData &state);
 
@@ -773,7 +540,7 @@ namespace OutputReportTabular {
 
     void GatherMonthlyResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     void GatherSourceEnergyEndUseResultsForTimestep(EnergyPlusData &state, OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -853,13 +620,15 @@ namespace OutputReportTabular {
 
     int unitsFromHeading(EnergyPlusData &state, std::string &heading);
 
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading, iUnitsStyle unitsStyle_para);
+
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
     void AddTOCLoadComponentTableSummaries(EnergyPlusData &state);
 
     void AllocateLoadComponentArrays(EnergyPlusData &state);
 
-    void DeallocateLoadComponentArrays();
+    void DeallocateLoadComponentArrays(EnergyPlusData &state);
 
     void ComputeLoadComponentDecayCurve(EnergyPlusData &state);
 
@@ -916,19 +685,24 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal);
 
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para);
+
     void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
-                               int const &kind, // zone=1, airloop=2, facility=3
+                               iOutputType const &kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
-                               int const &zoneOrAirLoopIndex);
+                               int const &zoneOrAirLoopIndex,
+                               iUnitsStyle unitsStyle_para,
+                               bool produceTabular_para,
+                               bool produceSQLite_para);
 
-    void WriteReportHeaders(std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
+    void WriteReportHeaders(EnergyPlusData &state, std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
 
-    void WriteSubtitle(std::string const &subtitle);
+    void WriteSubtitle(EnergyPlusData &state, std::string const &subtitle);
 
-    void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
+    void WriteTextLine(EnergyPlusData &state, std::string const &lineOfText, Optional_bool_const isBold = _);
 
     void WriteTable(EnergyPlusData &state,
                     Array2S_string const body, // row,column
@@ -937,6 +711,13 @@ namespace OutputReportTabular {
                     Array1D_int &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
+
+    bool produceDualUnitsFlags(const int &iUnit_Sys,
+                               const iUnitsStyle &unitsStyle_Tab,
+                               const iUnitsStyle &unitsStyle_Sql,
+                               iUnitsStyle &unitsStyle_Cur,
+                               bool &produce_Tab,
+                               bool &produce_Sql);
 
     std::string MakeAnchorName(std::string const &reportString, std::string const &objectString);
 
@@ -967,21 +748,21 @@ namespace OutputReportTabular {
 
     void ResetTabularReports(EnergyPlusData &state);
 
-    void ResetMonthlyGathering();
+    void ResetMonthlyGathering(EnergyPlusData &state);
 
-    void ResetBinGathering();
+    void ResetBinGathering(EnergyPlusData &state);
 
-    void ResetBEPSGathering();
+    void ResetBEPSGathering(EnergyPlusData &state);
 
-    void ResetSourceEnergyEndUseGathering();
+    void ResetSourceEnergyEndUseGathering(EnergyPlusData &state);
 
-    void ResetPeakDemandGathering();
+    void ResetPeakDemandGathering(EnergyPlusData &state);
 
     void ResetHeatGainGathering(EnergyPlusData &state);
 
     void ResetRemainingPredefinedEntries(EnergyPlusData &state);
 
-    void ResetAdaptiveComfort();
+    void ResetAdaptiveComfort(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -1023,29 +804,478 @@ namespace OutputReportTabular {
 
     int digitsAferDecimal(std::string s);
 
-    void AddTOCEntry(std::string const &nameSection, std::string const &nameReport);
+    void AddTOCEntry(EnergyPlusData &state, std::string const &nameSection, std::string const &nameReport);
 
-    void SetupUnitConversions();
+    void SetupUnitConversions(EnergyPlusData &state);
 
     std::string GetUnitSubString(std::string const &inString); // Input String
 
     void LookupSItoIP(EnergyPlusData &state, std::string const &stringInWithSI, int &unitConvIndex, std::string &stringOutWithIP);
 
-    void LookupJtokWH(std::string const &stringInWithJ, int &unitConvIndex, std::string &stringOutWithKWH);
+    void LookupJtokWH(EnergyPlusData &state, std::string const &stringInWithJ, int &unitConvIndex, std::string &stringOutWithKWH);
 
-    Real64 ConvertIP(int const unitConvIndex, Real64 const SIvalue);
+    Real64 ConvertIP(EnergyPlusData &state, int const unitConvIndex, Real64 const SIvalue);
 
-    Real64 ConvertIPdelta(int const unitConvIndex, Real64 const SIvalue);
+    Real64 ConvertIPdelta(EnergyPlusData &state, int const unitConvIndex, Real64 const SIvalue);
 
-    void GetUnitConversion(int const unitConvIndex, Real64 &multiplier, Real64 &offset, std::string &IPunit);
+    void GetUnitConversion(EnergyPlusData &state, int const unitConvIndex, Real64 &multiplier, Real64 &offset, std::string &IPunit);
 
     Real64 getSpecificUnitMultiplier(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
     Real64 getSpecificUnitDivider(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
-    Real64 getSpecificUnitIndex(std::string const &SIunit, std::string const &IPunit);
+    Real64 getSpecificUnitIndex(EnergyPlusData &state, std::string const &SIunit, std::string const &IPunit);
 
 } // namespace OutputReportTabular
+
+struct OutputReportTabularData : BaseGlobalStruct {
+
+    OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
+    OutputReportTabular::iUnitsStyle unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
+    int OutputTableBinnedCount = 0;
+    int BinResultsTableCount = 0;
+    int BinResultsIntervalCount = 0;
+    int MonthlyInputCount = 0;
+    int sizeMonthlyInput = 0;
+    int MonthlyFieldSetInputCount = 0;
+    int sizeMonthlyFieldSetInput = 0;
+    int MonthlyTablesCount = 0;
+    int MonthlyColumnsCount = 0;
+    Array1D_bool IsMonthGathered = Array1D_bool(12, false); // shown as true for any month used
+    int TOCEntriesCount = 0;
+    int TOCEntriesSize = 0;
+    int UnitConvSize = 0;
+    bool WriteTabularFiles = false;
+    bool GetInput = true;
+
+    // From Report:Table:Style
+    int numStyles = 0;
+    std::ofstream csv_stream;               // CSV table stream
+    std::ofstream tab_stream;               // Tab table stream
+    std::ofstream fix_stream;               // Fixed table stream
+    std::ofstream htm_stream;               // HTML table stream
+    std::ofstream xml_stream;               // XML table stream
+    Array1D<std::ofstream *> TabularOutputFile = Array1D<std::ofstream *>(OutputReportTabular::maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
+    Array1D_string del = Array1D_string(OutputReportTabular::maxNumStyles);        // the delimiter to use
+    Array1D<OutputReportTabular::iTableStyle> TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned); // see list of parameters
+
+    Real64 timeInYear = 0.0;
+
+    // Flags for predefined tabular reports
+    bool displayTabularBEPS = false;
+    bool displayLEEDSummary = false;
+    bool displayTabularCompCosts = false;
+    bool displayTabularVeriSum = false;
+    bool displayComponentSizing = false;
+    bool displaySurfaceShadowing = false;
+    bool displayDemandEndUse = false;
+    bool displayAdaptiveComfort = false;
+    bool displaySourceEnergyEndUseSummary = false;
+    bool displayZoneComponentLoadSummary = false;
+    bool displayAirLoopComponentLoadSummary = false;
+    bool displayFacilityComponentLoadSummary = false;
+    bool displayLifeCycleCostReport = false;
+    bool displayTariffReport = false;
+    bool displayEconomicResultSummary = false;
+    bool displayHeatEmissionsSummary = false;
+    bool displayEioSummary = false;
+    bool displayThermalResilienceSummary = false;
+    bool displayCO2ResilienceSummary = false;
+    bool displayVisualResilienceSummary = false;
+    bool displayThermalResilienceSummaryExplicitly = false;
+    bool displayCO2ResilienceSummaryExplicitly = false;
+    bool displayVisualResilienceSummaryExplicitly = false;
+    // BEPS Report Related Variables
+    // From Report:Table:Predefined - BEPS
+    // arrays that hold the meter numbers that are initialized at get input
+    Array1D_int meterNumTotalsBEPS= Array1D_int(OutputReportTabular::numResourceTypes, 0);
+    Array1D_int meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
+    Array1D_bool fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
+    Array1D_bool ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+    Array1D<Real64> SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array1D_bool ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+    Array1D_int ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+    Array2D_int meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0);
+    Array3D_int meterNumEndUseSubBEPS;
+    // arrays that hold the names of the resource and end uses
+    Array1D_string resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
+    Array1D_string sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
+    Array1D_string endUseNames = Array1D_string(DataGlobalConstants::iEndUse.size());
+    // arrays that hold the actual values for the year
+    Array1D<Real64> gatherTotalsBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array1D<Real64> gatherTotalsBySourceBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array1D<Real64> gatherTotalsSource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+    Array1D<Real64> gatherTotalsBySource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+    Array2D<Real64> gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array2D<Real64> gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array3D<Real64> gatherEndUseSubBEPS;
+    Array1D_bool needOtherRowLEED45 = Array1D_bool(DataGlobalConstants::iEndUse.size());
+
+    // arrays the hold the demand values
+    Array1D<Real64> gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+    Array2D<Real64> gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array2D<Real64> gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+    Array3D<Real64> gatherDemandEndUseSub;
+    Array3D<Real64> gatherDemandIndEndUseSub;
+    Array1D_int gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+
+    // to keep track of hours for the BEPS report gathering
+    Real64 gatherElapsedTimeBEPS = 0.0;
+    // for normalization of results
+    Real64 buildingGrossFloorArea = 0.0;
+    Real64 buildingConditionedFloorArea = 0.0;
+    // keep track if schedules are used in fuel factors
+    bool fuelFactorSchedulesUsed = false;
+    // for electric load components on BEPS report
+    int meterNumPowerFuelFireGen = 0;
+    Real64 gatherPowerFuelFireGen = 0.0;
+    int meterNumPowerPV = 0;
+    Real64 gatherPowerPV = 0.0;
+    int meterNumPowerWind = 0;
+    Real64 gatherPowerWind = 0.0;
+    Real64 OverallNetEnergyFromStorage = 0.0;
+    int meterNumPowerHTGeothermal = 0;
+    Real64 gatherPowerHTGeothermal = 0.0;
+    int meterNumElecProduced = 0;
+    Real64 gatherElecProduced = 0.0;
+    int meterNumElecPurchased = 0;
+    Real64 gatherElecPurchased = 0.0;
+    int meterNumElecSurplusSold = 0;
+    Real64 gatherElecSurplusSold = 0.0;
+    int meterNumElecStorage = 0;
+    Real64 gatherElecStorage = 0.0;
+    int meterNumPowerConversion = 0;
+    Real64 gatherPowerConversion = 0.0;
+    // for on site thermal source components on BEPS report
+    int meterNumWaterHeatRecovery = 0;
+    Real64 gatherWaterHeatRecovery = 0.0;
+    int meterNumAirHeatRecoveryCool = 0;
+    Real64 gatherAirHeatRecoveryCool = 0.0;
+    int meterNumAirHeatRecoveryHeat = 0;
+    Real64 gatherAirHeatRecoveryHeat = 0.0;
+    int meterNumHeatHTGeothermal = 0;
+    Real64 gatherHeatHTGeothermal = 0.0;
+    int meterNumHeatSolarWater = 0;
+    Real64 gatherHeatSolarWater = 0.0;
+    int meterNumHeatSolarAir = 0;
+    Real64 gatherHeatSolarAir = 0.0;
+    // for on site water components on BEPS report
+    int meterNumRainWater = 0;
+    Real64 gatherRainWater = 0.0;
+    int meterNumCondensate = 0;
+    Real64 gatherCondensate = 0.0;
+    int meterNumGroundwater = 0;
+    Real64 gatherWellwater = 0.0;
+    int meterNumMains = 0;
+    Real64 gatherMains = 0.0;
+    int meterNumWaterEndUseTotal = 0;
+    Real64 gatherWaterEndUseTotal = 0.0;
+    // for source energy conversion factors on BEPS report
+    Real64 sourceFactorElectric = 0.0;
+    Real64 sourceFactorNaturalGas = 0.0;
+    Real64 efficiencyDistrictCooling = 0.0;
+    Real64 efficiencyDistrictHeating = 0.0;
+    Real64 sourceFactorSteam = 0.0;
+    Real64 sourceFactorGasoline = 0.0;
+    Real64 sourceFactorDiesel = 0.0;
+    Real64 sourceFactorCoal = 0.0;
+    Real64 sourceFactorFuelOil1 = 0.0;
+    Real64 sourceFactorFuelOil2 = 0.0;
+    Real64 sourceFactorPropane = 0.0;
+    Real64 sourceFactorOtherFuel1 = 0.0;
+    Real64 sourceFactorOtherFuel2 = 0.0;
+
+    Array1D_int td = Array1D_int(8);
+    //(1)   Current year
+    //(2)   Current month
+    //(3)   Current day
+    //(4)   Time difference with respect to UTC in minutes (0-59)
+    //(5)   Hour of the day (0-23)
+    //(6)   Minutes (0-59)
+    //(7)   Seconds (0-59)
+    //(8)   Milliseconds (0-999)
+
+    // Design day name storage
+    Array1D_string DesignDayName;
+    int DesignDayCount = 0;
+
+    // arrays related to pulse and load component reporting
+    Array2D_int radiantPulseTimestep;
+    Array2D<Real64> radiantPulseReceived;
+    Array3D<Real64> loadConvectedNormal;
+    Array3D<Real64> loadConvectedWithPulse;
+    Array3D<Real64> netSurfRadSeq;
+    Array2D<Real64> decayCurveCool;
+    Array2D<Real64> decayCurveHeat;
+    Array3D<Real64> ITABSFseq; // used for determining the radiant fraction on each surface
+    Array3D<Real64> TMULTseq;  // used for determining the radiant fraction on each surface
+
+    Array3D<Real64> peopleInstantSeq;
+    Array3D<Real64> peopleLatentSeq;
+    Array3D<Real64> peopleRadSeq;
+
+    Array3D<Real64> lightInstantSeq;
+    Array3D<Real64> lightRetAirSeq;
+    Array3D<Real64> lightLWRadSeq; // long wave thermal radiation
+    Array3D<Real64> lightSWRadSeq; // short wave visible radiation
+
+    Array3D<Real64> equipInstantSeq;
+    Array3D<Real64> equipLatentSeq;
+    Array3D<Real64> equipRadSeq;
+
+    Array3D<Real64> refrigInstantSeq;
+    Array3D<Real64> refrigRetAirSeq;
+    Array3D<Real64> refrigLatentSeq;
+
+    Array3D<Real64> waterUseInstantSeq;
+    Array3D<Real64> waterUseLatentSeq;
+
+    Array3D<Real64> hvacLossInstantSeq;
+    Array3D<Real64> hvacLossRadSeq;
+
+    Array3D<Real64> powerGenInstantSeq;
+    Array3D<Real64> powerGenRadSeq;
+    Array3D<Real64> infilInstantSeq;
+    Array3D<Real64> infilLatentSeq;
+
+    Array3D<Real64> zoneVentInstantSeq;
+    Array3D<Real64> zoneVentLatentSeq;
+
+    Array3D<Real64> interZoneMixInstantSeq;
+    Array3D<Real64> interZoneMixLatentSeq;
+
+    Array3D<Real64> feneCondInstantSeq;
+    Array3D<Real64> feneSolarRadSeq;
+
+    int maxUniqueKeyCount = 0;
+
+    // for the XML report must keep track fo the active sub-table name and report set by other routines
+    std::string activeSubTableName;
+    std::string activeReportNameNoSpace;
+    std::string activeReportName;
+    std::string activeForName;
+    std::string prevReportName;
+
+    // Object Data
+    Array1D<OutputReportTabular::OutputTableBinnedType> OutputTableBinned;
+    Array2D<OutputReportTabular::BinResultsType> BinResults;      // table number, number of intervals
+    Array1D<OutputReportTabular::BinResultsType> BinResultsBelow; // time below the lowest defined bin
+    Array1D<OutputReportTabular::BinResultsType> BinResultsAbove; // time above the highest defined bin
+    Array1D<OutputReportTabular::BinObjVarIDType> BinObjVarID;
+    Array1D<OutputReportTabular::BinStatisticsType> BinStatistics;
+    Array1D<OutputReportTabular::NamedMonthlyType> namedMonthly; // for predefined monthly report titles
+    Array1D<OutputReportTabular::MonthlyFieldSetInputType> MonthlyFieldSetInput;
+    Array1D<OutputReportTabular::MonthlyInputType> MonthlyInput;
+    Array1D<OutputReportTabular::MonthlyTablesType> MonthlyTables;
+    Array1D<OutputReportTabular::MonthlyColumnsType> MonthlyColumns;
+    Array1D<OutputReportTabular::TOCEntriesType> TOCEntries;
+    Array1D<OutputReportTabular::UnitConvType> UnitConv;
+
+    bool GatherMonthlyResultsForTimestepRunOnce = true;
+    bool UpdateTabularReportsGetInput = true;
+    bool GatherHeatGainReportfirstTime = true;
+    bool AllocateLoadComponentArraysDoAllocate = true;
+    bool initAdjFenDone = false;
+    int numPeopleAdaptive = 0;
+
+    void clear_state() override
+    {
+        this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
+        this->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
+        this->OutputTableBinnedCount = 0;
+        this->BinResultsTableCount = 0;
+        this->BinResultsIntervalCount = 0;
+        this->MonthlyInputCount = 0;
+        this->sizeMonthlyInput = 0;
+        this->MonthlyFieldSetInputCount = 0;
+        this->sizeMonthlyFieldSetInput = 0;
+        this->MonthlyTablesCount = 0;
+        this->MonthlyColumnsCount = 0;
+        this->IsMonthGathered = Array1D_bool(12, false);
+        this->TOCEntriesCount = 0;
+        this->TOCEntriesSize = 0;
+        this->UnitConvSize = 0;
+        this->WriteTabularFiles = false;
+        this->GetInput = true;
+        this->numStyles = 0;
+        this->TabularOutputFile = Array1D<std::ofstream *>(
+            OutputReportTabular::maxNumStyles, {&this->csv_stream, &this->tab_stream, &this->fix_stream, &this->htm_stream, &this->xml_stream});
+        this->del = Array1D_string(OutputReportTabular::maxNumStyles);
+        this->TableStyle = Array1D<OutputReportTabular::iTableStyle>(OutputReportTabular::maxNumStyles, OutputReportTabular::iTableStyle::Unassigned);
+        this->timeInYear = 0.0;
+        this->displayTabularBEPS = false;
+        this->displayLEEDSummary = false;
+        this->displayTabularCompCosts = false;
+        this->displayTabularVeriSum = false;
+        this->displayComponentSizing = false;
+        this->displaySurfaceShadowing = false;
+        this->displayDemandEndUse = false;
+        this->displayAdaptiveComfort = false;
+        this->displaySourceEnergyEndUseSummary = false;
+        this->displayZoneComponentLoadSummary = false;
+        this->displayAirLoopComponentLoadSummary = false;
+        this->displayFacilityComponentLoadSummary = false;
+        this->displayLifeCycleCostReport = false;
+        this->displayTariffReport = false;
+        this->displayEconomicResultSummary = false;
+        this->displayHeatEmissionsSummary = false;
+        this->displayEioSummary = false;
+        this->displayThermalResilienceSummary = false;
+        this->displayCO2ResilienceSummary = false;
+        this->displayVisualResilienceSummary = false;
+        this->displayThermalResilienceSummaryExplicitly = false;
+        this->displayCO2ResilienceSummaryExplicitly = false;
+        this->displayVisualResilienceSummaryExplicitly = false;
+        this->meterNumTotalsBEPS= Array1D_int(OutputReportTabular::numResourceTypes, 0);
+        this->meterNumTotalsSource = Array1D_int(OutputReportTabular::numSourceTypes, 0);
+        this->fuelfactorsused = Array1D_bool(OutputReportTabular::numSourceTypes, false);
+        this->ffUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+        this->SourceFactors = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->ffSchedUsed = Array1D_bool(OutputReportTabular::numResourceTypes, false);
+        this->ffSchedIndex = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+        this->meterNumEndUseBEPS = Array2D_int(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0);
+        this->meterNumEndUseSubBEPS.deallocate();
+        this->resourceTypeNames = Array1D_string(OutputReportTabular::numResourceTypes);
+        this->sourceTypeNames = Array1D_string(OutputReportTabular::numSourceTypes);
+        this->endUseNames = Array1D_string(DataGlobalConstants::iEndUse.size());
+        this->gatherTotalsBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->gatherTotalsBySourceBEPS = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->gatherTotalsSource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+        this->gatherTotalsBySource = Array1D<Real64>(OutputReportTabular::numSourceTypes, 0.0);
+        this->gatherEndUseBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherEndUseBySourceBEPS = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherEndUseSubBEPS.deallocate();
+        this->needOtherRowLEED45 = Array1D_bool(DataGlobalConstants::iEndUse.size());
+        this->gatherDemandTotal = Array1D<Real64>(OutputReportTabular::numResourceTypes, 0.0);
+        this->gatherDemandEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherDemandIndEndUse = Array2D<Real64>(OutputReportTabular::numResourceTypes, DataGlobalConstants::iEndUse.size(), 0.0);
+        this->gatherDemandEndUseSub.deallocate();
+        this->gatherDemandIndEndUseSub.deallocate();
+        this->gatherDemandTimeStamp = Array1D_int(OutputReportTabular::numResourceTypes, 0);
+        this->gatherElapsedTimeBEPS = 0.0;
+        this->buildingGrossFloorArea = 0.0;
+        this->buildingConditionedFloorArea = 0.0;
+        this->fuelFactorSchedulesUsed = false;
+        this->meterNumPowerFuelFireGen = 0;
+        this->gatherPowerFuelFireGen = 0.0;
+        this->meterNumPowerPV = 0;
+        this->gatherPowerPV = 0.0;
+        this->meterNumPowerWind = 0;
+        this->gatherPowerWind = 0.0;
+        this->OverallNetEnergyFromStorage = 0.0;
+        this->meterNumPowerHTGeothermal = 0;
+        this->gatherPowerHTGeothermal = 0.0;
+        this->meterNumElecProduced = 0;
+        this->gatherElecProduced = 0.0;
+        this->meterNumElecPurchased = 0;
+        this->gatherElecPurchased = 0.0;
+        this->meterNumElecSurplusSold = 0;
+        this->gatherElecSurplusSold = 0.0;
+        this->meterNumElecStorage = 0;
+        this->gatherElecStorage = 0.0;
+        this->meterNumPowerConversion = 0;
+        this->gatherPowerConversion = 0.0;
+        this->meterNumWaterHeatRecovery = 0;
+        this->gatherWaterHeatRecovery = 0.0;
+        this->meterNumAirHeatRecoveryCool = 0;
+        this->gatherAirHeatRecoveryCool = 0.0;
+        this->meterNumAirHeatRecoveryHeat = 0;
+        this->gatherAirHeatRecoveryHeat = 0.0;
+        this->meterNumHeatHTGeothermal = 0;
+        this->gatherHeatHTGeothermal = 0.0;
+        this->meterNumHeatSolarWater = 0;
+        this->gatherHeatSolarWater = 0.0;
+        this->meterNumHeatSolarAir = 0;
+        this->gatherHeatSolarAir = 0.0;
+        this->meterNumRainWater = 0;
+        this->gatherRainWater = 0.0;
+        this->meterNumCondensate = 0;
+        this->gatherCondensate = 0.0;
+        this->meterNumGroundwater = 0;
+        this->gatherWellwater = 0.0;
+        this->meterNumMains = 0;
+        this->gatherMains = 0.0;
+        this->meterNumWaterEndUseTotal = 0;
+        this->gatherWaterEndUseTotal = 0.0;
+        this->sourceFactorElectric = 0.0;
+        this->sourceFactorNaturalGas = 0.0;
+        this->efficiencyDistrictCooling = 0.0;
+        this->efficiencyDistrictHeating = 0.0;
+        this->sourceFactorSteam = 0.0;
+        this->sourceFactorGasoline = 0.0;
+        this->sourceFactorDiesel = 0.0;
+        this->sourceFactorCoal = 0.0;
+        this->sourceFactorFuelOil1 = 0.0;
+        this->sourceFactorFuelOil2 = 0.0;
+        this->sourceFactorPropane = 0.0;
+        this->sourceFactorOtherFuel1 = 0.0;
+        this->sourceFactorOtherFuel2 = 0.0;
+        this->td = Array1D_int(8);
+        this->DesignDayName.deallocate();
+        this->DesignDayCount = 0;
+        this->radiantPulseTimestep.deallocate();
+        this->radiantPulseReceived.deallocate();
+        this->loadConvectedNormal.deallocate();
+        this->loadConvectedWithPulse.deallocate();
+        this->netSurfRadSeq.deallocate();
+        this->decayCurveCool.deallocate();
+        this->decayCurveHeat.deallocate();
+        this->ITABSFseq.deallocate();
+        this->TMULTseq .deallocate();
+        this->peopleInstantSeq.deallocate();
+        this->peopleLatentSeq.deallocate();
+        this->peopleRadSeq.deallocate();
+        this->lightInstantSeq.deallocate();
+        this->lightRetAirSeq.deallocate();
+        this->lightLWRadSeq.deallocate();
+        this->lightSWRadSeq.deallocate();
+        this->equipInstantSeq.deallocate();
+        this->equipLatentSeq.deallocate();
+        this->equipRadSeq.deallocate();
+        this->refrigInstantSeq.deallocate();
+        this->refrigRetAirSeq.deallocate();
+        this->refrigLatentSeq.deallocate();
+        this->waterUseInstantSeq.deallocate();
+        this->waterUseLatentSeq.deallocate();
+        this->hvacLossInstantSeq.deallocate();
+        this->hvacLossRadSeq.deallocate();
+        this->powerGenInstantSeq.deallocate();
+        this->powerGenRadSeq.deallocate();
+        this->infilInstantSeq.deallocate();
+        this->infilLatentSeq.deallocate();
+        this->zoneVentInstantSeq.deallocate();
+        this->zoneVentLatentSeq.deallocate();
+        this->interZoneMixInstantSeq.deallocate();
+        this->interZoneMixLatentSeq.deallocate();
+        this->feneCondInstantSeq.deallocate();
+        this->feneSolarRadSeq.deallocate();
+        this->maxUniqueKeyCount = 0;
+        this->activeSubTableName.clear();
+        this->activeReportNameNoSpace.clear();
+        this->activeReportName.clear();
+        this->activeForName.clear();
+        this->prevReportName.clear();
+        this->OutputTableBinned.deallocate();
+        this->BinResults.deallocate();
+        this->BinResultsBelow.deallocate();
+        this->BinResultsAbove.deallocate();
+        this->BinObjVarID.deallocate();
+        this->BinStatistics.deallocate();
+        this->namedMonthly.deallocate();
+        this->MonthlyFieldSetInput.deallocate();
+        this->MonthlyInput.deallocate();
+        this->MonthlyTables.deallocate();
+        this->MonthlyColumns.deallocate();
+        this->TOCEntries.deallocate();
+        this->UnitConv.deallocate();
+        this->GatherMonthlyResultsForTimestepRunOnce = true;
+        this->UpdateTabularReportsGetInput = true;
+        this->GatherHeatGainReportfirstTime = true;
+        this->AllocateLoadComponentArraysDoAllocate = true;
+        this->initAdjFenDone = false;
+        this->numPeopleAdaptive = 0;
+    }
+};
 
 } // namespace EnergyPlus
 

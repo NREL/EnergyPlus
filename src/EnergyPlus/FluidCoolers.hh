@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -60,17 +61,11 @@ namespace EnergyPlus {
 
 namespace FluidCoolers {
 
-    // MODULE PARAMETER DEFINITIONS:
-    extern std::string const cFluidCooler_SingleSpeed;
-    extern std::string const cFluidCooler_TwoSpeed;
-
     enum class PerfInputMethod
     {
         NOMINAL_CAPACITY,
         U_FACTOR
     };
-
-    extern int NumSimpleFluidCoolers; // Number of similar fluid coolers
 
     struct FluidCoolerspecs : PlantComponent
     {
@@ -126,7 +121,7 @@ namespace FluidCoolers {
         int LoopSideNum;
         int BranchNum;
         int CompNum;
-        bool oneTimeInit;
+        bool oneTimeInitFlag;
         bool beginEnvrnInit;
 
         // Report vars
@@ -161,11 +156,15 @@ namespace FluidCoolers {
               OutdoorAirInletNodeNum(0), HighMassFlowErrorCount(0), HighMassFlowErrorIndex(0), OutletWaterTempErrorCount(0),
               OutletWaterTempErrorIndex(0), SmallWaterMassFlowErrorCount(0), SmallWaterMassFlowErrorIndex(0), WMFRLessThanMinAvailErrCount(0),
               WMFRLessThanMinAvailErrIndex(0), WMFRGreaterThanMaxAvailErrCount(0), WMFRGreaterThanMaxAvailErrIndex(0), LoopNum(0), LoopSideNum(0),
-              BranchNum(0), CompNum(0), oneTimeInit(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0),
+              BranchNum(0), CompNum(0), oneTimeInitFlag(true), beginEnvrnInit(true), InletWaterTemp(0.0), OutletWaterTemp(0.0), WaterMassFlowRate(0.0),
               Qactual(0.0), FanPower(0.0), FanEnergy(0.0), WaterTemp(0.0), AirTemp(0.0), AirHumRat(0.0), AirPress(0.0), AirWetBulb(0.0),
               indexInArray(0)
         {
         }
+
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
 
         void initialize(EnergyPlusData &state);
 
@@ -203,10 +202,8 @@ namespace FluidCoolers {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation) override;
 
-        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int typeOf, std::string const &objectName);
     };
-
-    extern Array1D<FluidCoolerspecs> SimpleFluidCooler; // dimension to number of machines
 
     void GetFluidCoolerInput(EnergyPlusData &state);
 
@@ -217,9 +214,23 @@ namespace FluidCoolers {
                                        Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     );
 
-    void clear_state();
-
 } // namespace FluidCoolers
+
+struct FluidCoolersData : BaseGlobalStruct {
+
+    bool GetFluidCoolerInputFlag = true;
+    int NumSimpleFluidCoolers = 0;
+    Array1D<FluidCoolers::FluidCoolerspecs> SimpleFluidCooler;
+    std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
+
+    void clear_state() override
+    {
+        this->GetFluidCoolerInputFlag = true;
+        this->NumSimpleFluidCoolers = 0;
+        this->SimpleFluidCooler.deallocate();
+        this->UniqueSimpleFluidCoolerNames.clear();
+    }
+};
 
 } // namespace EnergyPlus
 

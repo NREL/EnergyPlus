@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,12 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
@@ -179,7 +179,7 @@ namespace ChillerAbsorption {
         // Default Constructor
         BLASTAbsorberSpecs()
             : Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomPumpPower(0.0), NomPumpPowerWasAutoSized(false),
-              FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0),
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
@@ -200,6 +200,10 @@ namespace ChillerAbsorption {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;
@@ -214,7 +218,7 @@ namespace ChillerAbsorption {
 
         void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void updateRecords(Real64 MyLoad, bool RunFlag);
+        void updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetBLASTAbsorberInput(EnergyPlusData &state);

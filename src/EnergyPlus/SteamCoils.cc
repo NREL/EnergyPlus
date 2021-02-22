@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,14 +99,12 @@ namespace SteamCoils {
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using namespace FluidProperties;
-    using DataPlant::PlantLoop;
     using DataPlant::TypeOf_CoilSteamAirHeating;
     using PlantUtilities::MyPlantSizingIndex;
     using PlantUtilities::ScanPlantLoopsForObject;
     using namespace ScheduleManager;
 
     static std::string const fluidNameSteam("STEAM");
-    static std::string const BlankString;
 
     void SimulateSteamCoilComponents(EnergyPlusData &state,
                                      std::string const &CompName,
@@ -284,7 +282,7 @@ namespace SteamCoils {
             state.dataSteamCoils->SteamCoil(CoilNum).Name = AlphArray(1);
             state.dataSteamCoils->SteamCoil(CoilNum).Schedule = AlphArray(2);
             if (lAlphaBlanks(2)) {
-                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
             } else {
                 state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr = GetScheduleIndex(state, AlphArray(2));
                 if (state.dataSteamCoils->SteamCoil(CoilNum).SchedPtr == 0) {
@@ -475,7 +473,7 @@ namespace SteamCoils {
             state.dataSteamCoils->MyOneTimeFlag = false;
         }
 
-        if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
+        if (MyPlantScanFlag(CoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             ScanPlantLoopsForObject(state,
                                     state.dataSteamCoils->SteamCoil(CoilNum).Name,
@@ -785,7 +783,7 @@ namespace SteamCoils {
                     if (DesCoilLoad >= SmallLoad) {
                         // TempSteamIn=SteamCoil(CoilNum)%InletSteamTemp
                         // TempSteamIn=PlantSizData(PltSizSteamNum)%ExitTemp
-                        TempSteamIn = 100.0; // DSU? Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
+                        TempSteamIn = 100.0; // Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
                         // RefrigIndex is set during GetInput for this module
                         EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
                         EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataSteamCoils->SteamCoil(CoilNum).FluidIndex, RoutineName);
@@ -804,9 +802,6 @@ namespace SteamCoils {
                     } else {
                         state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate = 0.0;
                         ShowWarningError(state, "The design coil load is zero for COIL:Heating:Steam " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
-                        // CALL ShowContinueError(state, 'The autosize value for max Steam flow rate is zero')
-                        // CALL ShowContinueError(state, 'To change this, input a value for UA, change the heating design day, or lower')
-                        // CALL ShowContinueError(state, '  the system heating design supply air temperature')
                     }
                     BaseSizer::reportSizerOutput(state,
                         "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
@@ -893,8 +888,6 @@ namespace SteamCoils {
                     if (state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate == 0.0) {
                         ShowWarningError(state, "The design coil load is zero for COIL:Heating:Steam " + state.dataSteamCoils->SteamCoil(CoilNum).Name);
                         ShowContinueError(state, "The autosize value for max Steam flow rate is zero");
-                        // CALL ShowContinueError(state, 'To change this, input a value for UA, change the heating design day, or lower')
-                        // CALL ShowContinueError(state, '  the system heating design supply air temperature')
                     }
                     BaseSizer::reportSizerOutput(state,
                         "Coil:Heating:Steam", state.dataSteamCoils->SteamCoil(CoilNum).Name, "Maximum Steam Flow Rate [m3/s]", state.dataSteamCoils->SteamCoil(CoilNum).MaxSteamVolFlowRate);
@@ -1417,7 +1410,7 @@ namespace SteamCoils {
         Node(AirOutletNode).HumRat = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirHumRat;
         Node(AirOutletNode).Enthalpy = state.dataSteamCoils->SteamCoil(CoilNum).OutletAirEnthalpy;
 
-        SafeCopyPlantNode(SteamInletNode, SteamOutletNode);
+        SafeCopyPlantNode(state, SteamInletNode, SteamOutletNode);
 
         // Set the outlet Steam nodes for the Coil
         //   Node(SteamOutletNode)%MassFlowRate = SteamCoil(CoilNum)%OutletSteamMassFlowRate
@@ -1474,7 +1467,7 @@ namespace SteamCoils {
         // This subroutine updates the report variable for the coils.
 
         // Report the SteamCoil energy from this component
-        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour();
+        state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilEnergy = state.dataSteamCoils->SteamCoil(CoilNum).TotSteamHeatingCoilRate * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
     // End of Reporting subroutines for the SteamCoil Module

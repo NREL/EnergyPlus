@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,15 +51,12 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/ConfiguredFunctions.hh>
+#include "Fixtures/InputProcessorFixture.hh"
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 
-#include "Fixtures/InputProcessorFixture.hh"
-
-#include <fstream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -2063,11 +2060,11 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     inputProcessor->getObjectItem(*state,
         CurrentModuleObject, NumSQLite, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR"}), Alphas));
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type"}), cAlphaFields));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR",""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type","Unit Conversion for Tabular Data"}), cAlphaFields));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({}), cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<bool>({false}), lAlphaBlanks));
+    EXPECT_TRUE(compare_containers(std::vector<bool>({false,true}), lAlphaBlanks));
     EXPECT_TRUE(compare_containers(std::vector<Real64>({}), Numbers));
     EXPECT_EQ(1, NumAlphas);
     EXPECT_EQ(0, NumNumbers);
@@ -3979,6 +3976,34 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
 
+}
+
+TEST_F(InputProcessorFixture, Duplicate_Name_Context)
+{
+    // Test for #8392 - Duplicate name error needs more context
+
+    std::string const idf(delimited_string({
+        "Exterior:Lights,",
+        "  ExtLights,               !- Name",
+        "  AlwaysOn,                !- Schedule Name",
+        "  5250,                    !- Design Level {W}",
+        "  AstronomicalClock,       !- Control Option",
+        "  Grounds Lights;          !- End-Use Subcategory",
+
+        "Exterior:Lights,",
+        "  ExtLights,               !- Name",
+        "  AlwaysOn,                !- Schedule Name",
+        "  525,                     !- Design Level {W}",
+        "  AstronomicalClock,       !- Control Option",
+        "  Grounds Lights;          !- End-Use Subcategory",
+    }));
+
+
+    EXPECT_FALSE(process_idf(idf, false)); // No assertions
+    const std::string error_string = delimited_string({
+        "   ** Severe  ** Duplicate name found for object of type \"Exterior:Lights\" named \"ExtLights\". Overwriting existing object."
+    });
+    compare_err_stream(error_string, true);
 }
 
 TEST_F(InputProcessorFixture, clean_epjson)

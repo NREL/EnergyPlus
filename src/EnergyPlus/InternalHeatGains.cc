@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -165,7 +164,7 @@ namespace InternalHeatGains {
         // PURPOSE OF THIS SUBROUTINE:
         // This is the main driver subroutine for the internal heat gains.
 
-        // FLOW:
+
         if (GetInternalHeatGainsInputFlag) {
             GetInternalHeatGainsInput(state);
             GetInternalHeatGainsInputFlag = false;
@@ -233,7 +232,6 @@ namespace InternalHeatGains {
         Array1D<Real64> IHGNumbers;
         int IOStat;
         int Loop;
-        bool MustInpSch;
         int NumAlpha;
         int NumNumber;
         int MaxAlpha;
@@ -281,7 +279,7 @@ namespace InternalHeatGains {
             }
         };
 
-        // FLOW:
+
         ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         ZnRpt.allocate(state.dataGlobal->NumOfZones);
         ZoneIntEEuse.allocate(state.dataGlobal->NumOfZones);
@@ -408,8 +406,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             PeopleObjects(Item).Name = AlphaName(1);
 
@@ -615,7 +612,7 @@ namespace InternalHeatGains {
                     if (NumNumber >= 5 && !lNumericFieldBlanks(5)) {
                         People(Loop).UserSpecSensFrac = IHGNumbers(5);
                     } else {
-                        People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate();
+                        People(Loop).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
                     }
 
                     if (NumNumber == 6 && !lNumericFieldBlanks(6)) {
@@ -693,9 +690,12 @@ namespace InternalHeatGains {
                     }
 
                     if (NumAlpha > 6) { // Optional parameters present--thermal comfort data follows...
-                        MustInpSch = false;
                         UsingThermalComfort = false;
-                        lastOption = NumAlpha;
+                        if (NumAlpha > 20) {
+                            lastOption = 20;
+                        } else {
+                            lastOption = NumAlpha;
+                        }
 
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
@@ -725,29 +725,36 @@ namespace InternalHeatGains {
 
                                 if (thermalComfortType == "FANGER") {
                                     People(Loop).Fanger = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "PIERCE") {
                                     People(Loop).Pierce = true;
-                                    MustInpSch = true;
+                                    AnyThermalComfortPierceModel = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "KSU") {
                                     People(Loop).KSU = true;
-                                    MustInpSch = true;
+                                    AnyThermalComfortKSUModel = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVEASH55") {
                                     People(Loop).AdaptiveASH55 = true;
                                     AdaptiveComfortRequested_ASH55 = true;
-                                    MustInpSch = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "ADAPTIVECEN15251") {
                                     People(Loop).AdaptiveCEN15251 = true;
                                     AdaptiveComfortRequested_CEN15251 = true;
-                                    MustInpSch = true;
+                                    UsingThermalComfort = true;
+
+                                } else if (thermalComfortType == "COOLINGEFFECTASH55") {
+                                    People(Loop).CoolingEffectASH55 = true;
+                                    AnyThermalComfortCoolingEffectModel = true;
+                                    UsingThermalComfort = true;
+
+                                } else if (thermalComfortType == "ANKLEDRAFTASH55") {
+                                    People(Loop).AnkleDraftASH55 = true;
+                                    AnyThermalComfortAnkleDraftModel = true;
                                     UsingThermalComfort = true;
 
                                 } else if (thermalComfortType == "") { // Blank input field--just ignore this
@@ -757,7 +764,7 @@ namespace InternalHeatGains {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(OptionNum) + " Option=" + AlphaName(OptionNum));
                                         ShowContinueError(state,
-                                            "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\"");
+                                            "Valid Values are \"Fanger\", \"Pierce\", \"KSU\", \"AdaptiveASH55\", \"AdaptiveCEN15251\", \"CoolingEffectASH55\", \"AnkleDraftASH55\"");
                                     }
                                 }
                             }
@@ -767,6 +774,8 @@ namespace InternalHeatGains {
 
                             // Set the default value of MRTCalcType as 'ZoneAveraged'
                             People(Loop).MRTCalcType = ZoneAveraged;
+
+                            bool ModelWithAdditionalInputs = People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55;
 
                             // MRT Calculation Type and Surface Name
                             {
@@ -778,16 +787,15 @@ namespace InternalHeatGains {
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     People(Loop).MRTCalcType = SurfaceWeighted;
                                     People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), Surface);
-                                    if (People(Loop).SurfacePtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                    if (People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
                                                             '=' + AlphaName(7) + " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
-                                    } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr &&
-                                               (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                    } else if (Surface(People(Loop).SurfacePtr).Zone != People(Loop).ZonePtr && ModelWithAdditionalInputs) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
-                                                        cAlphaFieldNames(7) + '=' + AlphaName(8) + " in different zone.");
+                                                        cAlphaFieldNames(7) + '=' + AlphaName(7) + " in different zone.");
                                         ShowContinueError(state, "Surface is in Zone=" + Zone(Surface(People(Loop).SurfacePtr).Zone).Name + " and " +
                                                           CurrentModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
@@ -798,12 +806,12 @@ namespace InternalHeatGains {
                                     People(Loop).AngleFactorListName = AlphaName(8);
 
                                 } else if (mrtType == "") { // Blank input field--just ignore this
-                                    if (MustInpSch && Item1 == 1 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU))
+                                    if (Item1 == 1 && ModelWithAdditionalInputs)
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " +
                                                          cAlphaFieldNames(7));
 
                                 } else { // An invalid keyword was entered--warn but ignore
-                                    if (MustInpSch && Item1 == 1 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                    if (Item1 == 1 && ModelWithAdditionalInputs) {
                                         ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                          cAlphaFieldNames(7) + '=' + AlphaName(7));
                                         ShowContinueError(state, "...Valid values are \"ZoneAveraged\", \"SurfaceWeighted\", \"AngleFactor\".");
@@ -856,7 +864,7 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                            } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
                                                     " is required for this item.");
@@ -870,7 +878,7 @@ namespace InternalHeatGains {
                                     if (clothingType == "CLOTHINGINSULATIONSCHEDULE") {
                                         People(Loop).ClothingType = 1;
                                         People(Loop).ClothingPtr = GetScheduleIndex(state, AlphaName(12));
-                                        if (People(Loop).ClothingPtr == 0 && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                                        if (People(Loop).ClothingPtr == 0 && ModelWithAdditionalInputs) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
                                                                 cAlphaFieldNames(12) + " entered=" + AlphaName(12));
@@ -984,10 +992,28 @@ namespace InternalHeatGains {
                                         }
                                     }
                                 }
-                            } else if (MustInpSch && (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU)) {
+                            } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
                                                     " is required for this item.");
+                                    ErrorsFound = true;
+                                }
+                            }
+
+                            int indexAnkleAirVelPtr = 21;
+                            if (!lAlphaFieldBlanks(indexAnkleAirVelPtr) || AlphaName(indexAnkleAirVelPtr) != "" ) {
+                                People(Loop).AnkleAirVelocityPtr = GetScheduleIndex(state, AlphaName(indexAnkleAirVelPtr));
+                                if (People(Loop).AnkleAirVelocityPtr == 0) {
+                                    if (Item1 == 1) {
+                                        ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
+                                                               cAlphaFieldNames(indexAnkleAirVelPtr) + " entered=" + AlphaName(indexAnkleAirVelPtr));
+                                        ErrorsFound = true;
+                                    }
+                                }
+                            } else if (People(Loop).AnkleDraftASH55) {
+                                if (Item1 == 1) {
+                                    ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(indexAnkleAirVelPtr) +
+                                                           " is required for this item.");
                                     ErrorsFound = true;
                                 }
                             }
@@ -1102,7 +1128,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator(
+                        SetupEMSActuator(state,
                             "People", People(Loop).Name, "Number of People", "[each]", People(Loop).EMSPeopleOn, People(Loop).EMSNumberOfPeople);
                         SetupEMSInternalVariable(state, "People Count Design Level", People(Loop).Name, "[each]", People(Loop).NumberOfPeople);
                     }
@@ -1164,8 +1190,8 @@ namespace InternalHeatGains {
             if (Zone(Loop).isNominalControlled) { // conditioned zones only
                 if (Zone(Loop).TotOccupants > 0.0) {
                     Zone(Loop).isNominalOccupied = true;
-                    PreDefTableEntry(pdchOaoNomNumOcc1, Zone(Loop).Name, Zone(Loop).TotOccupants);
-                    PreDefTableEntry(pdchOaoNomNumOcc2, Zone(Loop).Name, Zone(Loop).TotOccupants);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoNomNumOcc1, Zone(Loop).Name, Zone(Loop).TotOccupants);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoNomNumOcc2, Zone(Loop).Name, Zone(Loop).TotOccupants);
                 }
             }
         }
@@ -1190,8 +1216,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             LightsObjects(Item).Name = AlphaName(1);
 
@@ -1578,15 +1603,15 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator(
+                        SetupEMSActuator(state,
                             "Lights", Lights(Loop).Name, "Electricity Rate", "[W]", Lights(Loop).EMSLightsOn, Lights(Loop).EMSLightingPower);
                         SetupEMSInternalVariable(state, "Lighting Power Design Level", Lights(Loop).Name, "[W]", Lights(Loop).DesignLevel);
                     } // EMS
                     // setup internal gains
                     int returnNodeNum = 0;
                     if ((Lights(Loop).ZoneReturnNum > 0) &&
-                        (Lights(Loop).ZoneReturnNum <= DataZoneEquipment::ZoneEquipConfig(Lights(Loop).ZonePtr).NumReturnNodes)) {
-                        returnNodeNum = DataZoneEquipment::ZoneEquipConfig(Lights(Loop).ZonePtr).ReturnNode(Lights(Loop).ZoneReturnNum);
+                        (Lights(Loop).ZoneReturnNum <= state.dataZoneEquip->ZoneEquipConfig(Lights(Loop).ZonePtr).NumReturnNodes)) {
+                        returnNodeNum = state.dataZoneEquip->ZoneEquipConfig(Lights(Loop).ZonePtr).ReturnNode(Lights(Loop).ZoneReturnNum);
                     }
                     if (!ErrorsFound)
                         SetupZoneInternalGain(state, Lights(Loop).ZonePtr,
@@ -1609,28 +1634,28 @@ namespace InternalHeatGains {
                     mult = Zone(zonePt).Multiplier * Zone(zonePt).ListMultiplier;
                     sumArea += Zone(zonePt).FloorArea * mult;
                     sumPower += Lights(Loop).DesignLevel * mult;
-                    PreDefTableEntry(pdchInLtZone, liteName, Zone(zonePt).Name);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtZone, liteName, Zone(zonePt).Name);
                     if (Zone(zonePt).FloorArea > 0.0) {
-                        PreDefTableEntry(pdchInLtDens, liteName, Lights(Loop).DesignLevel / Zone(zonePt).FloorArea, 4);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, liteName, Lights(Loop).DesignLevel / Zone(zonePt).FloorArea, 4);
                     } else {
-                        PreDefTableEntry(pdchInLtDens, liteName, DataPrecisionGlobals::constant_zero, 4);
+                        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, liteName, DataPrecisionGlobals::constant_zero, 4);
                     }
-                    PreDefTableEntry(pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
-                    PreDefTableEntry(pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
-                    PreDefTableEntry(pdchInLtEndUse, liteName, Lights(Loop).EndUseSubcategory);
-                    PreDefTableEntry(pdchInLtSchd, liteName, GetScheduleName(state, Lights(Loop).SchedPtr));
-                    PreDefTableEntry(pdchInLtRetAir, liteName, Lights(Loop).FractionReturnAir, 4);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, liteName, Zone(zonePt).FloorArea * mult);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, liteName, Lights(Loop).DesignLevel * mult);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtEndUse, liteName, Lights(Loop).EndUseSubcategory);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtSchd, liteName, GetScheduleName(state, Lights(Loop).SchedPtr));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtRetAir, liteName, Lights(Loop).FractionReturnAir, 4);
                 } // Item1 - zones
             }     // Item = Number of Lights Objects
         }         // TotLights > 0 check
         // add total line to lighting summary table
         if (sumArea > 0.0) {
-            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", sumPower / sumArea, 4); //** line 792
         } else {
-            PreDefTableEntry(pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
+            PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtDens, "Interior Lighting Total", DataPrecisionGlobals::constant_zero, 4);
         }
-        PreDefTableEntry(pdchInLtArea, "Interior Lighting Total", sumArea);
-        PreDefTableEntry(pdchInLtPower, "Interior Lighting Total", sumPower);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtArea, "Interior Lighting Total", sumArea);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtPower, "Interior Lighting Total", sumPower);
 
         RepVarSet = true;
         CurrentModuleObject = "ElectricEquipment";
@@ -1652,8 +1677,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             ZoneElectricObjects(Item).Name = AlphaName(1);
 
@@ -2013,7 +2037,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("ElectricEquipment",
+                        SetupEMSActuator(state, "ElectricEquipment",
                                          ZoneElectric(Loop).Name,
                                          "Electricity Rate",
                                          "[W]",
@@ -2057,8 +2081,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             ZoneGasObjects(Item).Name = AlphaName(1);
 
@@ -2431,7 +2454,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("GasEquipment",
+                        SetupEMSActuator(state, "GasEquipment",
                                          ZoneGas(Loop).Name,
                                          "NaturalGas Rate",
                                          "[W]",
@@ -2476,8 +2499,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             HotWaterEqObjects(Item).Name = AlphaName(1);
 
@@ -2837,7 +2859,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("HotWaterEquipment",
+                        SetupEMSActuator(state, "HotWaterEquipment",
                                          ZoneHWEq(Loop).Name,
                                          "District Heating Power Level",
                                          "[W]",
@@ -2880,8 +2902,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             SteamEqObjects(Item).Name = AlphaName(1);
 
@@ -3241,7 +3262,7 @@ namespace InternalHeatGains {
                     }
 
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("SteamEquipment",
+                        SetupEMSActuator(state, "SteamEquipment",
                                          ZoneSteamEq(Loop).Name,
                                          "District Heating Power Level",
                                          "[W]",
@@ -3285,8 +3306,7 @@ namespace InternalHeatGains {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
-            errFlag = ErrorsFound;
+            errFlag = UtilityRoutines::IsNameEmpty(state, AlphaName(1), CurrentModuleObject, ErrorsFound);
 
             OtherEqObjects(Item).Name = AlphaName(1);
 
@@ -3673,7 +3693,7 @@ namespace InternalHeatGains {
                                             Zone(ZoneOtherEq(Loop).ZonePtr).Name);
                     }
                     if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        SetupEMSActuator("OtherEquipment",
+                        SetupEMSActuator(state, "OtherEquipment",
                                          ZoneOtherEq(Loop).Name,
                                          "Power Level",
                                          "[W]",
@@ -3788,7 +3808,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(5)) {
-                    ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneITEq(Loop).OperSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneITEq(Loop).OperSchedPtr = GetScheduleIndex(state, AlphaName(5));
                 }
@@ -3818,7 +3838,7 @@ namespace InternalHeatGains {
                 }
 
                 if (lAlphaFieldBlanks(6)) {
-                    ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn();
+                    ZoneITEq(Loop).CPULoadSchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
                 } else {
                     ZoneITEq(Loop).CPULoadSchedPtr = GetScheduleIndex(state, AlphaName(6));
                 }
@@ -3970,8 +3990,8 @@ namespace InternalHeatGains {
 
                 // check supply air node for matches with zone equipment supply air node
                 int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, Zone(ZoneITEq(Loop).ZonePtr).Name);
-                auto itStart = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.begin();
-                auto itEnd = DataZoneEquipment::ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
+                auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
                 auto key = ZoneITEq(Loop).SupplyAirNodeNum;
                 bool supplyNodeFound = false;
                 if (std::find(itStart, itEnd, key) != itEnd) {
@@ -4632,7 +4652,7 @@ namespace InternalHeatGains {
             }
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator("ZoneBaseboard:OutdoorTemperatureControlled",
+                SetupEMSActuator(state, "ZoneBaseboard:OutdoorTemperatureControlled",
                                  ZoneBBHeat(Loop).Name,
                                  "Power Level",
                                  "[W]",
@@ -4828,11 +4848,11 @@ namespace InternalHeatGains {
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
                       "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
                       "Number of People,Nominal Maximum Number of People");
-                if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
+                if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55) {
                     print(state.files.eio,
                           ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
-                          "Calculation,KSU Calculation\n");
+                          "Calculation,KSU Calculation,Cooling Effect Calculation,Ankle Draft Calculation\n");
                 } else {
                     print(state.files.eio, "\n");
                 }
@@ -4866,7 +4886,7 @@ namespace InternalHeatGains {
 
             print(state.files.eio, "{:.3R},", People(Loop).FractionRadiant);
             print(state.files.eio, "{:.3R},", People(Loop).FractionConvected);
-            if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
+            if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
                 print(state.files.eio, "AutoCalculate,");
             } else {
                 print(state.files.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
@@ -4881,7 +4901,7 @@ namespace InternalHeatGains {
             print(state.files.eio, "{:.4R},", People(Loop).CO2RateFactor);
             print(state.files.eio, "{:.0R},", People(Loop).NomMinNumberPeople);
 
-            if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
+            if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU || People(Loop).CoolingEffectASH55 || People(Loop).AnkleDraftASH55) {
                 print(state.files.eio, "{:.0R},", People(Loop).NomMaxNumberPeople);
 
                 if (People(Loop).MRTCalcType == ZoneAveraged) {
@@ -4925,6 +4945,16 @@ namespace InternalHeatGains {
                     print(state.files.eio, "No,");
                 }
                 if (People(Loop).KSU) {
+                    print(state.files.eio, "Yes,");
+                } else {
+                    print(state.files.eio, "No,");
+                }
+                if (People(Loop).CoolingEffectASH55) {
+                    print(state.files.eio, "Yes,");
+                } else {
+                    print(state.files.eio, "No,");
+                }
+                if (People(Loop).AnkleDraftASH55) {
                     print(state.files.eio, "Yes\n");
                 } else {
                     print(state.files.eio, "No\n");
@@ -5260,17 +5290,11 @@ namespace InternalHeatGains {
         using DataHeatBalFanSys::SumConvHTRadSys;
         using DataHeatBalFanSys::ZoneLatentGain;
         using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
-        using DataRoomAirModel::IsZoneDV;
-        using DataRoomAirModel::IsZoneUI;
-        using DataRoomAirModel::TCMF;
         using DataSizing::CurOverallSimDay;
-        using DataZoneEquipment::ZoneEquipConfig;
         using DaylightingDevices::FigureTDDZoneGains;
         using FuelCellElectricGenerator::FigureFuelCellZoneGains;
         using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
         using OutputReportTabular::AllocateLoadComponentArrays;
-        using OutputReportTabular::radiantPulseReceived;
-        using OutputReportTabular::radiantPulseTimestep;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using RefrigeratedCase::FigureRefrigerationZoneGains;
         using WaterThermalTanks::CalcWaterThermalTankZoneGains;
@@ -5362,6 +5386,10 @@ namespace InternalHeatGains {
             e.CO2Rate = 0.0;
         }
 
+        for (auto &e : DataHeatBalance::ZonePreDefRep) {
+            e.NumOcc = 0.0;
+        }
+
         //  QSA = 0.0
 
         // Process Internal Heat Gains, People done below
@@ -5388,8 +5416,8 @@ namespace InternalHeatGains {
                 ActivityLevel_WperPerson = GetCurrentScheduleValue(state, People(Loop).ActivityLevelPtr);
                 TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
                 // if the user did not specify a sensible fraction, calculate the sensible heat gain
-                if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate()) {
-                    if (!(IsZoneDV(NZ) || IsZoneUI(NZ))) {
+                if (People(Loop).UserSpecSensFrac == DataGlobalConstants::AutoCalculate) {
+                    if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
                                                MAT(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
@@ -5397,8 +5425,8 @@ namespace InternalHeatGains {
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
-                                               TCMF(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
-                                                           TCMF(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
+                                    state.dataRoomAirMod->TCMF(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
+                                            state.dataRoomAirMod->TCMF(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
                     }
                 } else { // if the user did specify a sensible fraction, use it
                     SensiblePeopleGain = TotalPeopleGain * People(Loop).UserSpecSensFrac;
@@ -5409,10 +5437,11 @@ namespace InternalHeatGains {
 
                 // For predefined tabular reports related to outside air ventilation
                 ZonePreDefRep(NZ).isOccupied = true; // set flag to occupied to be used in tabular reporting for ventilation
+                ZonePreDefRep(NZ).NumOcc += NumberOccupants;
                 ZonePreDefRep(NZ).NumOccAccum += NumberOccupants * state.dataGlobal->TimeStepZone;
                 ZonePreDefRep(NZ).NumOccAccumTime += state.dataGlobal->TimeStepZone;
             } else {
-                ZonePreDefRep(NZ).isOccupied = false; // set flag to occupied to be used in tabular reporting for ventilation
+                DataHeatBalance::ZonePreDefRep(NZ).isOccupied = false; // set flag to occupied to be used in tabular reporting for ventilation
             }
 
             People(Loop).NumOcc = NumberOccupants;
@@ -5455,7 +5484,7 @@ namespace InternalHeatGains {
                 // Calculate FractionReturnAir based on conditions in the zone's return air plenum, if there is one.
                 if (Zone(NZ).IsControlled) {
                     int retNum = Lights(Loop).ZoneReturnNum;
-                    int ReturnZonePlenumCondNum = ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
+                    int ReturnZonePlenumCondNum = state.dataZoneEquip->ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
                     if (ReturnZonePlenumCondNum > 0) {
                         ReturnPlenumTemp = state.dataZonePlenum->ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
                         FractionReturnAir =
@@ -5692,8 +5721,8 @@ namespace InternalHeatGains {
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
                     SurfQRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
-                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                    radiantPulseReceived(CurOverallSimDay, SurfNum) =
+                    state.dataOutRptTab->radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+                    state.dataOutRptTab->radiantPulseReceived(CurOverallSimDay, SurfNum) =
                             (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
                 }
             }
@@ -5712,7 +5741,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using DataHeatBalance::Zone;
-        using DataZoneEquipment::ZoneEquipConfig;
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).HasAdjustedReturnTempByITE && Zone(ZoneNum).HasLtsRetAirGain) {
@@ -5740,7 +5768,6 @@ namespace InternalHeatGains {
 
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataZoneEquipment::ZoneEquipConfig;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
@@ -5748,9 +5775,6 @@ namespace InternalHeatGains {
         using DataHVACGlobals::SmallAirVolFlow;
         using DataHVACGlobals::SmallTempDiff;
         using DataLoopNode::Node;
-        using DataRoomAirModel::IsZoneDV;
-        using DataRoomAirModel::IsZoneUI;
-        using DataRoomAirModel::TCMF;
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C
         // From ASHRAE 2011 Thermal Guidelines environmental classes for Air-Cooled ITE
@@ -5908,7 +5932,7 @@ namespace InternalHeatGains {
                     WAirIn = ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
-                    int ZoneAirInletNode = DataZoneEquipment::ZoneEquipConfig(NZ).InletNode(1);
+                    int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                     TSupply = Node(ZoneAirInletNode).Temp;
                     TAirIn = MAT(NZ);
                     WAirIn = ZoneAirHumRat(NZ);
@@ -6150,9 +6174,6 @@ namespace InternalHeatGains {
         // REFERENCES:
         // OutputDataStructure.doc (EnergyPlus documentation)
 
-        // Using/Aliasing
-        using OutputReportTabular::WriteTabularFiles;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ZoneLoop; // Counter for the # of zones (nz)
@@ -6166,7 +6187,7 @@ namespace InternalHeatGains {
                                              IntGainTypeOf_SteamEquipment,
                                              IntGainTypeOf_OtherEquipment});
 
-        // FLOW:
+
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
             People(Loop).RadGainEnergy = People(Loop).RadGainRate * state.dataGlobal->TimeStepZoneSec;
             People(Loop).ConGainEnergy = People(Loop).ConGainRate * state.dataGlobal->TimeStepZoneSec;
@@ -6183,7 +6204,8 @@ namespace InternalHeatGains {
             Lights(Loop).RetAirGainEnergy = Lights(Loop).RetAirGainRate * state.dataGlobal->TimeStepZoneSec;
             Lights(Loop).TotGainEnergy = Lights(Loop).TotGainRate * state.dataGlobal->TimeStepZoneSec;
             if (!state.dataGlobal->WarmupFlag) {
-                if (state.dataGlobal->DoOutputReporting && WriteTabularFiles && (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
+                if (state.dataGlobal->DoOutputReporting && state.dataOutRptTab->WriteTabularFiles &&
+                    (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumulate the total electricity used for each Light object
                     Lights(Loop).SumConsumption += Lights(Loop).Consumption;
                     // for tabular report, accumulate the time when each Light has consumption (using a very small threshold instead of zero)
@@ -7049,24 +7071,6 @@ namespace InternalHeatGains {
         // Using/Aliasing
         using namespace DataHeatBalance;
         using DataSizing::CurOverallSimDay;
-        using OutputReportTabular::equipInstantSeq;
-        using OutputReportTabular::equipLatentSeq;
-        using OutputReportTabular::equipRadSeq;
-        using OutputReportTabular::hvacLossInstantSeq;
-        using OutputReportTabular::hvacLossRadSeq;
-        using OutputReportTabular::lightInstantSeq;
-        using OutputReportTabular::lightLWRadSeq;
-        using OutputReportTabular::lightRetAirSeq;
-        using OutputReportTabular::peopleInstantSeq;
-        using OutputReportTabular::peopleLatentSeq;
-        using OutputReportTabular::peopleRadSeq;
-        using OutputReportTabular::powerGenInstantSeq;
-        using OutputReportTabular::powerGenRadSeq;
-        using OutputReportTabular::refrigInstantSeq;
-        using OutputReportTabular::refrigLatentSeq;
-        using OutputReportTabular::refrigRetAirSeq;
-        using OutputReportTabular::waterUseInstantSeq;
-        using OutputReportTabular::waterUseLatentSeq;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
@@ -7128,30 +7132,30 @@ namespace InternalHeatGains {
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesPeople, peopleInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(iZone, IntGainTypesPeople, peopleLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(iZone, IntGainTypesPeople, peopleRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesPeople, state.dataOutRptTab->peopleInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(iZone, IntGainTypesPeople, state.dataOutRptTab->peopleLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(iZone, IntGainTypesPeople, state.dataOutRptTab->peopleRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesLight, lightInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumReturnAirConvectionGainsByTypes(iZone, IntGainTypesLight, lightRetAirSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(iZone, IntGainTypesLight, lightLWRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesLight, state.dataOutRptTab->lightInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumReturnAirConvectionGainsByTypes(iZone, IntGainTypesLight, state.dataOutRptTab->lightRetAirSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(iZone, IntGainTypesLight, state.dataOutRptTab->lightLWRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesEquip, equipInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(iZone, IntGainTypesEquip, equipLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(iZone, IntGainTypesEquip, equipRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesEquip, state.dataOutRptTab->equipInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(iZone, IntGainTypesEquip, state.dataOutRptTab->equipLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(iZone, IntGainTypesEquip, state.dataOutRptTab->equipRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesRefrig, refrigInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumReturnAirConvectionGainsByTypes(iZone, IntGainTypesRefrig, refrigRetAirSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(iZone, IntGainTypesRefrig, refrigLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumReturnAirConvectionGainsByTypes(iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigRetAirSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesWaterUse, waterUseInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(iZone, IntGainTypesWaterUse, waterUseLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesWaterUse, state.dataOutRptTab->waterUseInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(iZone, IntGainTypesWaterUse, state.dataOutRptTab->waterUseLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesHvacLoss, hvacLossInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(iZone, IntGainTypesHvacLoss, hvacLossRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(iZone, IntGainTypesPowerGen, powerGenInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(iZone, IntGainTypesPowerGen, powerGenRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
             }
         }
     }

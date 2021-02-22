@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputReportData.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -121,7 +122,7 @@ namespace OutputReportTabularAnnual {
 
         void resetGathering();
 
-        void writeTable(EnergyPlusData &state, int unitsStyle);
+        void writeTable(EnergyPlusData &state, OutputReportTabular::iUnitsStyle unitsStyle, bool produceTabular_para, bool produceSQLite_para);
 
         void addTableOfContents(std::ostream &);
 
@@ -132,7 +133,7 @@ namespace OutputReportTabularAnnual {
         void clearTable();
 
         // this could be private but was made public for unit testing only
-        void columnHeadersToTitleCase();
+        void columnHeadersToTitleCase(EnergyPlusData &state);
 
     private:
         // Members
@@ -148,11 +149,11 @@ namespace OutputReportTabularAnnual {
 
         Real64 getSecondsInTimeStep(EnergyPlusData &state, OutputProcessor::TimeStepType kindOfTimeStep);
 
-        void computeBinColumns(EnergyPlusData &state);
+        void computeBinColumns(EnergyPlusData &state, OutputReportTabular::iUnitsStyle const &unitsStyle_para);
 
         std::vector<std::string> setupAggString();
 
-        Real64 setEnergyUnitStringAndFactor(int const unitsStyle, std::string &unitString);
+        Real64 setEnergyUnitStringAndFactor(OutputReportTabular::iUnitsStyle const unitsStyle, std::string &unitString);
 
         int columnCountForAggregation(AnnualFieldSet::AggregationKind curAgg);
 
@@ -162,7 +163,9 @@ namespace OutputReportTabularAnnual {
 
         bool allRowsSameSizeDefferedVectors(std::vector<AnnualFieldSet>::iterator fldStIt);
 
-        void convertUnitForDeferredResults(EnergyPlusData &state, std::vector<AnnualFieldSet>::iterator fldStIt, int const unitsStyle);
+        void convertUnitForDeferredResults(EnergyPlusData &state,
+                                           std::vector<AnnualFieldSet>::iterator fldStIt,
+                                           OutputReportTabular::iUnitsStyle const unitsStyle);
 
         std::vector<Real64> calculateBins(int const numberOfBins,
                                           std::vector<Real64> const valuesToBin,
@@ -177,6 +180,14 @@ namespace OutputReportTabularAnnual {
     extern std::vector<AnnualTable> annualTables;
 
 } // namespace OutputReportTabularAnnual
+
+struct OutputReportTabularAnnualData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

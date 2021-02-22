@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -200,7 +200,7 @@ namespace ChillerElectricEIR {
 
         // Default Constructor
         ElectricEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::NOTSET),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), RefCap(0.0), RefCapWasAutoSized(false), RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRate(0.0), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0),
               CondVolFlowRateWasAutoSized(false), CondMassFlowRate(0.0), CondMassFlowRateMax(0.0), CondenserFanPowerRatio(0.0),
@@ -239,6 +239,10 @@ namespace ChillerElectricEIR {
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void size(EnergyPlusData &state);
@@ -252,7 +256,7 @@ namespace ChillerElectricEIR {
                               Real64 &QHeatRec      // Amount of heat recovered [W]
         );
 
-        void update(Real64 MyLoad, bool RunFlag);
+        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
     void GetElectricEIRChillerInput(EnergyPlusData &state);

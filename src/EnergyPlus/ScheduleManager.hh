@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -217,8 +218,8 @@ namespace ScheduleManager {
 
     int GetDayScheduleIndex(EnergyPlusData &state, std::string &ScheduleName);
 
-    void
-    GetScheduleValuesForDay(EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
+    void GetScheduleValuesForDay(
+        EnergyPlusData &state, int const ScheduleIndex, Array2S<Real64> DayValues, Optional_int_const JDay = _, Optional_int_const CurDayofWeek = _);
 
     void GetSingleDayScheduleValues(EnergyPlusData &state,
                                     int const DayScheduleIndex, // Index of the DaySchedule for values
@@ -230,7 +231,8 @@ namespace ScheduleManager {
                                       Real64 &Value // The new value for the schedule
     );
 
-    void ProcessIntervalFields(EnergyPlusData &state, Array1S_string const Untils,
+    void ProcessIntervalFields(EnergyPlusData &state,
+                               Array1S_string const Untils,
                                Array1S<Real64> const Numbers,
                                int const NumUntils,
                                int const NumNumbers,
@@ -242,7 +244,8 @@ namespace ScheduleManager {
                                ScheduleInterpolation interpolationKind // enumeration on how to interpolate values in schedule
     );
 
-    void DecodeHHMMField(EnergyPlusData &state, std::string const &FieldValue,          // Input field value
+    void DecodeHHMMField(EnergyPlusData &state,
+                         std::string const &FieldValue,          // Input field value
                          int &RetHH,                             // Returned "hour"
                          int &RetMM,                             // Returned "minute"
                          bool &ErrorsFound,                      // True if errors found in this field
@@ -253,30 +256,35 @@ namespace ScheduleManager {
 
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
 
-    void ProcessForDayTypes(EnergyPlusData &state, std::string const &ForDayField, // Field containing the "FOR:..."
+    void ProcessForDayTypes(EnergyPlusData &state,
+                            std::string const &ForDayField, // Field containing the "FOR:..."
                             Array1D_bool &TheseDays,        // Array to contain returned "true" days
                             Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     );
 
-    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum          // Minimum desired value
     );
 
-    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
                                   Real64 const Maximum          // Maximum desired value
     );
 
-    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum          // Minimum desired value
     );
 
-    bool CheckScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,      // Which Schedule being tested
+    bool CheckScheduleValueMinMax(EnergyPlusData &state,
+                                  int const ScheduleIndex,      // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
@@ -301,7 +309,8 @@ namespace ScheduleManager {
                                      Optional_string_const MaxString = _ // Maximum indicator ('<', ',=')
     );
 
-    bool CheckDayScheduleValueMinMax(EnergyPlusData &state, int const ScheduleIndex,            // Which Day Schedule being tested
+    bool CheckDayScheduleValueMinMax(EnergyPlusData &state,
+                                     int const ScheduleIndex,            // Which Day Schedule being tested
                                      Real32 const Minimum,               // Minimum desired value
                                      std::string const &MinString,       // Minimum indicator ('>', '>=')
                                      Optional<Real32 const> Maximum = _, // Maximum desired value
@@ -332,7 +341,8 @@ namespace ScheduleManager {
                                        bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    Real64 ScheduleHoursGT1perc(EnergyPlusData &state, int const ScheduleIndex,  // Which Schedule being tested
+    Real64 ScheduleHoursGT1perc(EnergyPlusData &state,
+                                int const ScheduleIndex,  // Which Schedule being tested
                                 int const StartDayOfWeek, // Day of week for start of year
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     );
@@ -340,6 +350,14 @@ namespace ScheduleManager {
     int GetNumberOfSchedules();
 
 } // namespace ScheduleManager
+
+struct ScheduleManagerData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

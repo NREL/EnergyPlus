@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,9 +58,7 @@
 #include <EnergyPlus/TARCOGGasses90.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGGasses90 {
+namespace EnergyPlus::TARCOGGasses90 {
 
     // MODULE INFORMATION:
     //       AUTHOR         D. Charlie Curcija
@@ -78,24 +76,8 @@ namespace TARCOGGasses90 {
     // PURPOSE OF THIS MODULE:
     // A module containing functions for gas properties calculation
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // ISO15099, EN673
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGGassesParams;
-
-    // Data
-    // private doe2gas90
-
-    // Functions
 
     void GASSES90(Real64 const tmean,
                   const Array1D_int &iprop,
@@ -116,10 +98,6 @@ namespace TARCOGGasses90 {
                   std::string &ErrorMessage)
     {
 
-        // Variables
-
-        // Locals
-
         static Real64 const two_sqrt_2(2.0 * std::sqrt(2.0));
         static Array1D<Real64> fvis(maxgas);
         static Array1D<Real64> fcon(maxgas);
@@ -138,9 +116,6 @@ namespace TARCOGGasses90 {
         Real64 psiterm;
         Real64 phikup;
 
-        // REAL(r64) gaslaw
-        // DATA gaslaw /8314.51d0/   ! Molar gas constant in Joules/(kmol*K)
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ENpressure(1.0e5); // Gap gas pressure (Pa)
         Real64 const gaslaw(8314.51);   // Molar gas constant (J/kMol-K)
@@ -155,7 +130,7 @@ namespace TARCOGGasses90 {
         fvis(1) = xgvis(1, iprop(1)) + xgvis(2, iprop(1)) * tmean + xgvis(3, iprop(1)) * tmean_2;
         fcp(1) = xgcp(1, iprop(1)) + xgcp(2, iprop(1)) * tmean + xgcp(3, iprop(1)) * tmean_2;
         // Density using ideal gas law: rho=(presure*mol. weight)/(gas const*Tmean)
-        fdens(1) = pres * xwght(iprop(1)) / (DataGlobalConstants::UniversalGasConst() * tmean);
+        fdens(1) = pres * xwght(iprop(1)) / (DataGlobalConstants::UniversalGasConst * tmean);
         // Mollecular weights in kg/kmol
         if ((standard == EN673) || (standard == EN673Design)) {
             // fdens( 1 ) = xgrho( iprop( 1 ), 1 ) + xgrho( iprop( 1 ), 2 ) * tmean + xgrho( iprop( 1 ), 3 ) * pow_2( tmean ); //Autodesk:Uninit xgrho
@@ -174,7 +149,7 @@ namespace TARCOGGasses90 {
             if (stdISO15099) {
                 molmix = frct(1) * xwght(iprop(1));                               // initialize equation 56
                 cpmixm = molmix * fcp(1);                                         // initialize equation 58
-                kprime(1) = 3.75 * DataGlobalConstants::UniversalGasConst() / xwght(iprop(1)) * fvis(1); // equation 67
+                kprime(1) = 3.75 * DataGlobalConstants::UniversalGasConst / xwght(iprop(1)) * fvis(1); // equation 67
                 kdblprm(1) = fcon(1) - kprime(1);                                 // equation 67
                 // initialize sumations for eqns 60-66:
                 mukpdwn(1) = 1.0;
@@ -199,7 +174,7 @@ namespace TARCOGGasses90 {
                 if (stdISO15099) {
                     molmix += frct(i) * xwght(iprop(i));                              // equation 56
                     cpmixm += frct(i) * fcp(i) * xwght(iprop(i));                     // equation 58-59
-                    kprime(i) = 3.75 * DataGlobalConstants::UniversalGasConst() / xwght(iprop(i)) * fvis(i); // equation 67
+                    kprime(i) = 3.75 * DataGlobalConstants::UniversalGasConst / xwght(iprop(i)) * fvis(i); // equation 67
                     kdblprm(i) = fcon(i) - kprime(i);                                 // equation 68
                     mukpdwn(i) = 1.0;                                                 // initialize denominator of equation 60
                     kpdown(i) = 1.0;                                                  // initialize denominator of equation 63
@@ -247,7 +222,7 @@ namespace TARCOGGasses90 {
                 }
 
                 // calculate the density of the mixture assuming an ideal gas:
-                Real64 const rhomix = pres * molmix / (DataGlobalConstants::UniversalGasConst() * tmean); // equation 57
+                Real64 const rhomix = pres * molmix / (DataGlobalConstants::UniversalGasConst * tmean); // equation 57
                 Real64 const kmix = kpmix + kdpmix;                                // equation 68-a
 
                 // final mixture properties:
@@ -283,11 +258,7 @@ namespace TARCOGGasses90 {
     GassesLow(Real64 const tmean, Real64 const mwght, Real64 const pressure, Real64 const gama, Real64 &cond, int &nperr, std::string &ErrorMessage)
     {
 
-        // Locals
-        static Real64 alpha(0.0);
-        static Real64 B(0.0);
-
-        alpha = alpha1 * alpha2 / (alpha2 + alpha1 * (1 - alpha2));
+        Real64 const alpha = alpha1 * alpha2 / (alpha2 + alpha1 * (1 - alpha2));
 
         if ((gama) == 1) {
             nperr = 40; // supplied gamma coefficient is incorrect
@@ -295,61 +266,9 @@ namespace TARCOGGasses90 {
             return;
         }
 
-        B = alpha * (gama + 1) / (gama - 1) * std::sqrt(DataGlobalConstants::UniversalGasConst() / (8 * DataGlobalConstants::Pi() * mwght * tmean));
+        Real64 const B = alpha * (gama + 1) / (gama - 1) * std::sqrt(DataGlobalConstants::UniversalGasConst / (8 * DataGlobalConstants::Pi * mwght * tmean));
 
         cond = B * pressure;
     }
-
-    //  subroutine doe2gas90 (standard, iprop, frct, pres, nmix, con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr)
-    //    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
-    //    !  calculate gas properties using old doe2 format                              !
-    //    !------------------------------------------------------------------------------!
-    //    !  iprop(i)  vector of gas identifiers (for max of w5cog.fi::maxgas gasses)
-    //    !  frct(i)   vector of fraction of gasses in a mixture (for max of w5cog.fi::maxgas gasses)
-    //    !  pres(i)   pressure (default: pres = 1e5)[N/m^2]
-    //    !  nmix(i)   number of gasses in a mixture
-    //    !  con0(o)   thermal conductivity @ mean temperature of 0 C[W/m-K]
-    //    !  dcon(o)   derivative of thermal conductivity wrt temperature x 10^5 [W/m-K^2 x 10^5]
-    //    !  visc0(o)  dynamic viscosity @ mean temperature of 0 C x 10^5 [kg/m-s x 10^5]
-    //    !  dvisc(o)  derivative of dynamic viscosity wrt temperature x 10^8 [kg/m-s-K x 10^8]
-    //    !  dens0(o)  density @ mean temperature of 0 C [kg/m^3]
-    //    !  ddens(o)  derivative of density wrt temperature [kg/m^3-K]
-    //    !  pr0(o)    Prandl number @ mean temperature of 0 C [ - ]
-    //    !  dpr(o)    derivative of Prandl number wrt temperature [ 1/K ]
-    //    !  nperr(o)  error flag (if component fraction in a mixture is 0%)
-    //    !
-    //    !**import:
-    //    !  w5cog.fi::maxgas
-    //    !
-    //    !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
-
-    //    ! Variables
-
-    //    integer, intent(in) :: nmix, iprop(maxgas)
-    //    REAL(r64), intent(in) :: pres, frct(maxgas)
-
-    //    REAL(r64), intent(out) :: con0, dcon, visc0, dvisc, dens0, ddens, pr0, dpr
-
-    //    REAL(r64) :: con, visc, dens, cp, pr
-    //    integer :: standard, nperr
-    //    character(len=2000) :: ErrMsg
-
-    //    call GASSES90(273.15d0, iprop, frct, pres,nmix, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, standard, nperr, ErrMsg)
-
-    //    con0=con
-    //    visc0=visc*10**5
-    //    dens0=dens
-    //    pr0=pr
-
-    //    call GASSES90(283.15d0,iprop, frct, pres, nmix, wght, gcon, gvis, gcp, con, visc, dens, cp, pr, standard, nperr, ErrMsg)
-
-    //    dcon=(con-con0)/10*10**5
-    //    dvisc=(visc*10**5-visc0)/10*10**3
-    //    ddens=(dens-dens0)/10
-    //    dpr=(pr-pr0)/10
-
-    //  end subroutine doe2gas90
-
-} // namespace TARCOGGasses90
 
 } // namespace EnergyPlus

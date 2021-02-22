@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,20 +54,20 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SolarCollectors.hh>
@@ -223,7 +223,7 @@ namespace SolarCollectors {
                 }
 
                 if (DataIPShortCuts::rNumericArgs(2) > 0.0) {
-                    state.dataSolarCollectors->Parameters(ParametersNum).TestMassFlowRate = DataIPShortCuts::rNumericArgs(2) * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp());
+                    state.dataSolarCollectors->Parameters(ParametersNum).TestMassFlowRate = DataIPShortCuts::rNumericArgs(2) * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
                 } else {
                     ShowSevereError(state, CurrentModuleParamObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  flow rate must be greater than zero for " + DataIPShortCuts::cNumericFieldNames(2));
@@ -287,7 +287,7 @@ namespace SolarCollectors {
                 // Collector name
                 GlobalNames::VerifyUniqueInterObjectName(state, state.dataSolarCollectors->UniqueCollectorNames, DataIPShortCuts::cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
                 state.dataSolarCollectors->Collector(CollectorNum).Name = DataIPShortCuts::cAlphaArgs(1);
-                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant !DSU
+                state.dataSolarCollectors->Collector(CollectorNum).TypeNum = DataPlant::TypeOf_SolarCollectorFlatPlate; // parameter assigned in DataPlant
 
                 // Get parameters object
                 int ParametersNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), state.dataSolarCollectors->Parameters);
@@ -782,7 +782,7 @@ namespace SolarCollectors {
         }
 
         if (this->SetLoopIndexFlag) {
-            if (allocated(DataPlant::PlantLoop)) {
+            if (allocated(state.dataPlnt->PlantLoop)) {
                 bool errFlag = false;
                 PlantUtilities::ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
@@ -802,9 +802,9 @@ namespace SolarCollectors {
             // Clear node initial conditions
             if (this->VolFlowRateMax > 0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                               DataPlant::PlantLoop(this->WLoopNum).FluidName,
-                                                               DataGlobalConstants::InitConvTemp(),
-                                                               DataPlant::PlantLoop(this->WLoopNum).FluidIndex,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidName,
+                                                               DataGlobalConstants::InitConvTemp,
+                                                               state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex,
                                                                RoutineName);
 
                 this->MassFlowRateMax = this->VolFlowRateMax * rho;
@@ -845,14 +845,14 @@ namespace SolarCollectors {
 
             this->Tilt = DataSurfaces::Surface(SurfNum).Tilt;
             this->TiltR2V = std::abs(90.0 - Tilt);
-            this->CosTilt = std::cos(Tilt * DataGlobalConstants::DegToRadians());
-            this->SinTilt = std::sin(1.8 * Tilt * DataGlobalConstants::DegToRadians());
+            this->CosTilt = std::cos(Tilt * DataGlobalConstants::DegToRadians);
+            this->SinTilt = std::sin(1.8 * Tilt * DataGlobalConstants::DegToRadians);
 
             // Diffuse reflectance of the cover for solar radiation diffusely reflected back from the absober
             // plate to the cover.  The diffuse solar radiation reflected back from the absober plate to the
             // cover is represented by the 60 degree equivalent incident angle.  This diffuse reflectance is
             // used to calculate the transmittance - absorptance product (Duffie and Beckman, 1991)
-            Real64 Theta = 60.0 * DataGlobalConstants::DegToRadians();
+            Real64 Theta = 60.0 * DataGlobalConstants::DegToRadians;
             Real64 TransSys = 0.0;
             Real64 RefSys = 0.0;
             Real64 AbsCover1 = 0.0;
@@ -869,7 +869,7 @@ namespace SolarCollectors {
 
             // transmittance-absorptance product for sky diffuse radiation.  Uses equivalent incident angle
             // of sky radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians();
+            Theta = (59.68 - 0.1388 * Tilt + 0.001497 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians;
             this->CalcTransRefAbsOfCover(state, Theta, TransSys, RefSys, AbsCover1, AbsCover2);
             this->TauAlphaSkyDiffuse = TransSys * state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate /
                                        (1.0 - (1.0 - state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
@@ -878,7 +878,7 @@ namespace SolarCollectors {
 
             // transmittance-absorptance product for ground diffuse radiation.  Uses equivalent incident angle
             // of ground radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians();
+            Theta = (90.0 - 0.5788 * Tilt + 0.002693 * pow_2(Tilt)) * DataGlobalConstants::DegToRadians;
             this->CalcTransRefAbsOfCover(state, Theta, TransSys, RefSys, AbsCover1, AbsCover2);
             this->TauAlphaGndDiffuse = TransSys * state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate /
                                        (1.0 - (1.0 - state.dataSolarCollectors->Parameters(ParamNum).AbsorOfAbsPlate) * this->RefDiffInnerCover);
@@ -967,10 +967,10 @@ namespace SolarCollectors {
             Real64 tilt = DataSurfaces::Surface(SurfNum).Tilt;
 
             // Equivalent incident angle of sky radiation (radians)
-            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
+            Real64 ThetaSky = (59.68 - 0.1388 * tilt + 0.001497 * pow_2(tilt)) * DataGlobalConstants::DegToRadians;
 
             // Equivalent incident angle of ground radiation (radians)
-            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobalConstants::DegToRadians();
+            Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobalConstants::DegToRadians;
 
             incidentAngleModifier = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaBeam) +
                                      DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * state.dataSolarCollectors->Parameters(ParamNum).IAM(state, ThetaSky) +
@@ -988,7 +988,7 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // Gross area of collector (m2)
         Real64 area = DataSurfaces::Surface(SurfNum).Area;
@@ -1184,7 +1184,7 @@ namespace SolarCollectors {
         Real64 IAM;
 
         // cut off IAM for angles greater than 60 degrees. (CR 7534)
-        Real64 CutoffAngle = 60.0 * DataGlobalConstants::DegToRadians();
+        Real64 CutoffAngle = 60.0 * DataGlobalConstants::DegToRadians;
         if (std::abs(IncidentAngle) > CutoffAngle) { // cut off, model curves not robust beyond cutoff
             // curves from FSEC/SRCC testing are only certified to 60 degrees, larger angles can cause numerical problems in curves
             IAM = 0.0;
@@ -1237,7 +1237,7 @@ namespace SolarCollectors {
 
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
-        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 SecInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
         Real64 TempWater = this->SavedTempOfWater;
         Real64 TempAbsPlate = this->SavedTempOfAbsPlate;
         Real64 TempOutdoorAir = DataSurfaces::Surface(SurfNum).OutDryBulbTemp;
@@ -1260,11 +1260,11 @@ namespace SolarCollectors {
 
         // Specific heat of collector fluid (J/kg-K)
         Real64 Cpw = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // density of collector fluid (kg/m3)
         Real64 Rhow = FluidProperties::GetDensityGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, inletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, inletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
 
         // calculate heat transfer coefficients and covers temperature:
         this->CalcHeatTransCoeffAndCoverTemp(state);
@@ -1655,8 +1655,8 @@ namespace SolarCollectors {
             auto const SELECT_CASE_var(NumCovers);
             if (SELECT_CASE_var == 1) {
                 // calc linearized radiation coefficient
-                tempnom = DataGlobalConstants::StefanBoltzmann() * ((TempAbsPlate + DataGlobalConstants::KelvinConv()) + (TempOuterCover + DataGlobalConstants::KelvinConv())) *
-                          (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv()) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()));
+                tempnom = DataGlobalConstants::StefanBoltzmann * ((TempAbsPlate + DataGlobalConstants::KelvinConv) + (TempOuterCover + DataGlobalConstants::KelvinConv)) *
+                          (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv));
                 tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
                 hRadCoefA2C = tempnom / tempdenom;
                 hRadCoefC2C = 0.0;
@@ -1668,9 +1668,9 @@ namespace SolarCollectors {
                 for (int CoverNum = 1; CoverNum <= NumCovers; ++CoverNum) {
                     if (CoverNum == 1) {
                         // calc linearized radiation coefficient
-                        tempnom = DataGlobalConstants::StefanBoltzmann() *
-                                  ((TempAbsPlate + DataGlobalConstants::KelvinConv()) + (TempInnerCover + DataGlobalConstants::KelvinConv())) *
-                                  (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv()) + pow_2(TempInnerCover + DataGlobalConstants::KelvinConv()));
+                        tempnom = DataGlobalConstants::StefanBoltzmann *
+                                  ((TempAbsPlate + DataGlobalConstants::KelvinConv) + (TempInnerCover + DataGlobalConstants::KelvinConv)) *
+                                  (pow_2(TempAbsPlate + DataGlobalConstants::KelvinConv) + pow_2(TempInnerCover + DataGlobalConstants::KelvinConv));
                         tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
                         hRadCoefA2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
@@ -1678,9 +1678,9 @@ namespace SolarCollectors {
                             TempAbsPlate, TempOuterCover, AirGapDepth, this->CosTilt, this->SinTilt);
                     } else {
                         // calculate the linearized radiation coeff.
-                        tempnom = DataGlobalConstants::StefanBoltzmann() *
-                                  ((TempInnerCover + DataGlobalConstants::KelvinConv()) + (TempOuterCover + DataGlobalConstants::KelvinConv())) *
-                                  (pow_2(TempInnerCover + DataGlobalConstants::KelvinConv()) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()));
+                        tempnom = DataGlobalConstants::StefanBoltzmann *
+                                  ((TempInnerCover + DataGlobalConstants::KelvinConv) + (TempOuterCover + DataGlobalConstants::KelvinConv)) *
+                                  (pow_2(TempInnerCover + DataGlobalConstants::KelvinConv) + pow_2(TempOuterCover + DataGlobalConstants::KelvinConv));
                         tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
                         hRadCoefC2C = tempnom / tempdenom;
                         // Calc convection heat transfer coefficient:
@@ -1695,9 +1695,9 @@ namespace SolarCollectors {
         hConvCoefC2O = 2.8 + 3.0 * DataSurfaces::Surface(SurfNum).WindSpeed;
 
         // Calc linearized radiation coefficient between outer cover and the surrounding:
-        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
-                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + state.dataEnvrn->SkyTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(state.dataEnvrn->SkyTempKelvin));
+        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorSky * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann *
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv) + state.dataEnvrn->SkyTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv) + pow_2(state.dataEnvrn->SkyTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->SkyTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1709,9 +1709,9 @@ namespace SolarCollectors {
             hRadCoefC2Sky = tempnom / tempdenom;
         }
 
-        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann() *
-                  ((TempOuterCover + DataGlobalConstants::KelvinConv()) + state.dataEnvrn->GroundTempKelvin) *
-                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv()) + pow_2(state.dataEnvrn->GroundTempKelvin));
+        tempnom = DataSurfaces::Surface(SurfNum).ViewFactorGround * EmissOfOuterCover * DataGlobalConstants::StefanBoltzmann *
+                  ((TempOuterCover + DataGlobalConstants::KelvinConv) + state.dataEnvrn->GroundTempKelvin) *
+                  (pow_2(TempOuterCover + DataGlobalConstants::KelvinConv) + pow_2(state.dataEnvrn->GroundTempKelvin));
         tempdenom = (TempOuterCover - TempOutdoorAir) / (TempOuterCover - state.dataEnvrn->GroundTemp);
         if (tempdenom < 0.0) {
             // use approximate linearized radiation coefficient
@@ -1848,7 +1848,7 @@ namespace SolarCollectors {
             DensOfAir = Density(Index - 1) + InterpFrac * (Density(Index) - Density(Index - 1));
         }
 
-        VolExpAir = 1.0 / (Tref + DataGlobalConstants::KelvinConv());
+        VolExpAir = 1.0 / (Tref + DataGlobalConstants::KelvinConv);
 
         // Rayleigh number
         Real64 RaNum = gravity * pow_2(DensOfAir) * VolExpAir * PrOfAir * DeltaT * pow_3(AirGap) / pow_2(VisDOfAir);
@@ -1918,7 +1918,7 @@ namespace SolarCollectors {
 
         // Grashof number
         Real64 GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * pow_3(Lc) / pow_2(VisOfWater);
-        Real64 CosTilt = std::cos(TiltR2V * DataGlobalConstants::DegToRadians());
+        Real64 CosTilt = std::cos(TiltR2V * DataGlobalConstants::DegToRadians);
 
         Real64 RaNum; // Raleigh number
         Real64 NuL;   // Nusselt number
@@ -1967,11 +1967,11 @@ namespace SolarCollectors {
 
         static std::string const RoutineName("UpdateSolarCollector");
 
-        PlantUtilities::SafeCopyPlantNode(this->InletNode, this->OutletNode);
+        PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
         DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
-            state, DataPlant::PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, DataPlant::PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
         DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
     }
 
@@ -1985,7 +1985,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
-        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour();
+        Real64 TimeStepInSecond = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         this->Energy = this->Power * TimeStepInSecond;
         this->HeatEnergy = this->HeatRate * TimeStepInSecond;

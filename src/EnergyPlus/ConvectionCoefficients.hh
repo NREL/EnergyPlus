@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -477,7 +477,7 @@ namespace ConvectionCoefficients {
                                     Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
     );
 
-    Real64 CalcZoneSupplyAirTemp(int ZoneNum);
+    Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int ZoneNum);
 
     Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int ZoneNum);
 
@@ -862,6 +862,14 @@ namespace ConvectionCoefficients {
                          Real64 WindDirect, // Wind direction measured clockwise from geographic North
                          Real64 RoofArea,
                          Real64 RoofPerimeter);
+
+    void CalcASTMC1340ConvCoeff(EnergyPlusData &state,
+                                int const SurfNum,                  // surface number for which coefficients are being calculated
+                                Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
+                                Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
+    );
+
+    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt);
 
 } // namespace ConvectionCoefficients
 

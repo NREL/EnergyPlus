@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,15 +48,20 @@
 #ifndef DataZoneEquipment_hh_INCLUDED
 #define DataZoneEquipment_hh_INCLUDED
 
+// C++ Headers
+#include <unordered_set>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SystemReports.hh>
 
 namespace EnergyPlus {
 
@@ -71,80 +76,56 @@ namespace DataZoneEquipment {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const PathInlet;
-    extern int const CompInlet;
-    extern int const Intermediate;
-    extern int const Outlet;
+    constexpr int PathInlet(1);
+    constexpr int CompInlet(2);
+    constexpr int Intermediate(3);
+    constexpr int Outlet(4);
 
-    extern int const ZoneSplitter_Type;
-    extern int const ZoneSupplyPlenum_Type;
-    extern int const ZoneMixer_Type;
-    extern int const ZoneReturnPlenum_Type;
+    constexpr int ZoneSplitter_Type(1);
+    constexpr int ZoneSupplyPlenum_Type(2);
+    constexpr int ZoneMixer_Type(3);
+    constexpr int ZoneReturnPlenum_Type(4);
 
     // Start zone equip objects
     // list units that are valid for zone system availability managers first
-    extern int const FanCoil4Pipe_Num;
-    extern int const PkgTermHPAirToAir_Num;
-    extern int const PkgTermACAirToAir_Num;
-    extern int const PkgTermHPWaterToAir_Num;
-    extern int const WindowAC_Num;
-    extern int const UnitHeater_Num;
-    extern int const UnitVentilator_Num;
-    extern int const ERVStandAlone_Num;
-    extern int const VentilatedSlab_Num;
-    extern int const OutdoorAirUnit_Num;
-    extern int const VRFTerminalUnit_Num;
-    extern int const PurchasedAir_Num;
-    extern int const ZoneEvaporativeCoolerUnit_Num;
-    extern int const ZoneHybridEvaporativeCooler_Num; // #14, last zone equipment type to use zone availability manager. The above list must not
-                                                      // change or NumValidSysAvailZoneComponents(14) must also change.
-    extern int const AirDistUnit_Num;
-    extern int const BBWaterConvective_Num;
-    extern int const BBElectricConvective_Num;
-    extern int const HiTempRadiant_Num;
-    extern int const LoTempRadiant_Num;
-    extern int const ZoneExhaustFan_Num;
-    extern int const HeatXchngr_Num;
-    extern int const HPWaterHeater_Num;
-    extern int const BBWater_Num;
-    extern int const ZoneDXDehumidifier_Num;
-    extern int const BBSteam_Num;
-    extern int const BBElectric_Num;
-    extern int const RefrigerationAirChillerSet_Num;
-    extern int const UserDefinedZoneHVACForcedAir_Num;
-    extern int const CoolingPanel_Num;
-    extern int const ZoneUnitarySys_Num; // UnitarySystem configured as zone equipment
-    extern int const TotalNumZoneEquipType;
-    // **NOTE**... if you add another zone equipment object, then increment
-    // TotalNumZoneEquipType above to match the total number of zone equipment types
-    // End zone equip objects
+    constexpr int FanCoil4Pipe_Num(1);
+    constexpr int PkgTermHPAirToAir_Num(2);
+    constexpr int PkgTermACAirToAir_Num(3);
+    constexpr int PkgTermHPWaterToAir_Num(4);
+    constexpr int WindowAC_Num(5);
+    constexpr int UnitHeater_Num(6);
+    constexpr int UnitVentilator_Num(7);
+    constexpr int ERVStandAlone_Num(8);
+    constexpr int VentilatedSlab_Num(9);
+    constexpr int OutdoorAirUnit_Num(10);
+    constexpr int VRFTerminalUnit_Num(11);
+    constexpr int PurchasedAir_Num(12);
+    constexpr int ZoneEvaporativeCoolerUnit_Num(13);
+    constexpr int ZoneHybridEvaporativeCooler_Num(14); // #14, last zone equipment type to use zone availability manager. The above list must not
+                                                   // change or NumValidSysAvailZoneComponents(14) must also change.
+    constexpr int AirDistUnit_Num(15);
+    constexpr int BBWaterConvective_Num(16);
+    constexpr int BBElectricConvective_Num(17);
+    constexpr int HiTempRadiant_Num(18);
+    constexpr int LoTempRadiant_Num(19);
+    constexpr int ZoneExhaustFan_Num(20);
+    constexpr int HeatXchngr_Num(21);
+    constexpr int HPWaterHeater_Num(22);
+    constexpr int BBWater_Num(23);
+    constexpr int ZoneDXDehumidifier_Num(24);
+    constexpr int BBSteam_Num(25);
+    constexpr int BBElectric_Num(26);
+    constexpr int RefrigerationAirChillerSet_Num(27);
+    constexpr int UserDefinedZoneHVACForcedAir_Num(28);
+    constexpr int CoolingPanel_Num(29);
+    constexpr int ZoneUnitarySys_Num(30);
 
     // Per Person Ventilation Rate Mode
-    extern int const PerPersonDCVByCurrentLevel;
-    extern int const PerPersonByDesignLevel;
+    constexpr int PerPersonDCVByCurrentLevel(1);
+    constexpr int PerPersonByDesignLevel(2);
 
-    extern int const NumValidSysAvailZoneComponents;
+    constexpr int NumValidSysAvailZoneComponents(14);
     extern Array1D_string const cValidSysAvailManagerCompTypes;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumSupplyAirPaths;
-    extern int NumReturnAirPaths;
-    extern bool ZoneEquipInputsFilled;
-    extern bool ZoneEquipSimulatedOnce;
-    extern int NumOfZoneEquipLists; // The Number of Zone Equipment List objects
-    extern Array1D_int ZoneEquipAvail;
-
-    // moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
-    extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    extern Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
-    extern Array1D<Real64> VentMCP;            // product of mass rate and Cp for each Venitlation object
-    extern Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
-    extern Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
-    // Utility routines for module
-
-    // Types
 
     enum class LoadDist
     {
@@ -161,7 +142,7 @@ namespace DataZoneEquipment {
         OutputProcessor::Unit ReportVarUnits;
         DataGlobalConstants::ResourceType ResourceType;
         std::string EndUse;
-        int EndUse_CompMode;
+        SystemReports::iEndUseType EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
         OutputProcessor::TimeStepType ReportVarIndexType;
@@ -170,7 +151,8 @@ namespace DataZoneEquipment {
 
         // Default Constructor
         EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None), EndUse_CompMode(0), ReportVarIndex(0),
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(DataGlobalConstants::ResourceType::None),
+              EndUse_CompMode(SystemReports::iEndUseType::NoHeatNoCool), ReportVarIndex(0),
               ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
         {
         }
@@ -193,24 +175,13 @@ namespace DataZoneEquipment {
         Real64 Capacity;
         Real64 Efficiency;
         Real64 TotPlantSupplyElec;
-        Real64 PlantSupplyElecEff;
-        Real64 PeakPlantSupplyElecEff;
         Real64 TotPlantSupplyGas;
-        Real64 PlantSupplyGasEff;
-        Real64 PeakPlantSupplyGasEff;
         Real64 TotPlantSupplyPurch;
-        Real64 PlantSupplyPurchEff;
-        Real64 PeakPlantSupplyPurchEff;
-        Real64 TotPlantSupplyOther;
-        Real64 PlantSupplyOtherEff;
-        Real64 PeakPlantSupplyOtherEff;
 
         // Default Constructor
         SubSubEquipmentData()
-            : EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0), OpMode(0),
-              Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0),
-              PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0),
-              TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0)
+            : EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0.0), OpMode(0),
+              Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0)
         {
         }
     };
@@ -235,24 +206,14 @@ namespace DataZoneEquipment {
         Real64 Capacity;
         Real64 Efficiency;
         Real64 TotPlantSupplyElec;
-        Real64 PlantSupplyElecEff;
-        Real64 PeakPlantSupplyElecEff;
         Real64 TotPlantSupplyGas;
-        Real64 PlantSupplyGasEff;
-        Real64 PeakPlantSupplyGasEff;
         Real64 TotPlantSupplyPurch;
-        Real64 PlantSupplyPurchEff;
-        Real64 PeakPlantSupplyPurchEff;
-        Real64 TotPlantSupplyOther;
-        Real64 PlantSupplyOtherEff;
-        Real64 PeakPlantSupplyOtherEff;
 
         // Default Constructor
         SubEquipmentData()
             : Parent(false), NumSubSubEquip(0), EquipIndex(0), ON(true), InletNodeNum(0), OutletNodeNum(0), NumMeteredVars(0), EnergyTransComp(0),
-              ZoneEqToPlantPtr(0), OpMode(0), Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0),
-              PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0), PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0),
-              PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0), PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0)
+              ZoneEqToPlantPtr(0.0), OpMode(0), Capacity(0.0), Efficiency(0.0), TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0),
+              TotPlantSupplyPurch(0.0)
         {
         }
     };
@@ -268,13 +229,12 @@ namespace DataZoneEquipment {
         int AirDistUnitIndex;    // equipment number in EquipList
         int TermUnitSizingIndex; // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
         int SupplyAirPathIndex;
-        Real64 NetBranchCoilDemand;
         Array1D<SubSubEquipmentData> Coil;
 
         // Default Constructor
         AirIn()
             : InNode(0), OutNode(0), SupplyAirPathExists(false), MainBranchIndex(0), SupplyBranchIndex(0), AirDistUnitIndex(0),
-              TermUnitSizingIndex(0), SupplyAirPathIndex(0), NetBranchCoilDemand(0.0)
+              TermUnitSizingIndex(0), SupplyAirPathIndex(0)
         {
         }
     };
@@ -329,15 +289,16 @@ namespace DataZoneEquipment {
         // true when zone has in-ceiling HVAC
         bool ZoneHasAirFlowWindowReturn; // true if zone has an airflow window (WindowProperty:AirflowControl) with destination=ReturnAir
         bool ZoneHasAirLoopWithOASys;    // true if zone is served by one or more airloops with an outdoor air system
+        int ZoneAirDistributionIndex; // index to DesignSpecification:ZoneAirDistribution object
+        int ZoneDesignSpecOAIndex;    // index to DesignSpecification:OutdoorAir object
 
         // Default Constructor
         EquipConfiguration()
             : ZoneName("Uncontrolled Zone"), ActualZoneNum(0), EquipListIndex(0), ZoneNode(0), NumInletNodes(0), NumExhaustNodes(0),
-              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false),
-
-              ZonalSystemOnly(false), IsControlled(false), ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0),
-              TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0), TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
-              ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false)
+              NumReturnNodes(0), NumReturnFlowBasisNodes(0), ReturnFlowSchedPtrNum(0), FlowError(false), ZonalSystemOnly(false), IsControlled(false),
+              ZoneExh(0.0), ZoneExhBalanced(0.0), PlenumMassFlow(0.0), ExcessZoneExh(0.0), TotAvailAirLoopOA(0.0), TotInletAirMassFlowRate(0.0),
+              TotExhaustAirMassFlowRate(0.0), InFloorActiveElement(false), InWallActiveElement(false), InCeilingActiveElement(false),
+              ZoneHasAirFlowWindowReturn(false), ZoneHasAirLoopWithOASys(false), ZoneAirDistributionIndex(0), ZoneDesignSpecOAIndex(0)
         {
         }
     };
@@ -360,25 +321,14 @@ namespace DataZoneEquipment {
         int EnergyTransComp;                    // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
         int ZoneEqToPlantPtr;                   // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         Real64 TotPlantSupplyElec;
-        Real64 PlantSupplyElecEff;
-        Real64 PeakPlantSupplyElecEff;
         Real64 TotPlantSupplyGas;
-        Real64 PlantSupplyGasEff;
-        Real64 PeakPlantSupplyGasEff;
         Real64 TotPlantSupplyPurch;
-        Real64 PlantSupplyPurchEff;
-        Real64 PeakPlantSupplyPurchEff;
-        Real64 TotPlantSupplyOther;
-        Real64 PlantSupplyOtherEff;
-        Real64 PeakPlantSupplyOtherEff;
         int OpMode;
 
         // Default Constructor
         EquipmentData()
-            : Parent(false), NumSubEquip(0), ON(true), NumInlets(0), NumOutlets(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0),
-              TotPlantSupplyElec(0.0), PlantSupplyElecEff(0.0), PeakPlantSupplyElecEff(0.0), TotPlantSupplyGas(0.0), PlantSupplyGasEff(0.0),
-              PeakPlantSupplyGasEff(0.0), TotPlantSupplyPurch(0.0), PlantSupplyPurchEff(0.0), PeakPlantSupplyPurchEff(0.0), TotPlantSupplyOther(0.0),
-              PlantSupplyOtherEff(0.0), PeakPlantSupplyOtherEff(0.0), OpMode(0)
+            : Parent(false), NumSubEquip(0), ON(true), NumInlets(0), NumOutlets(0), NumMeteredVars(0), EnergyTransComp(0), ZoneEqToPlantPtr(0.0),
+              TotPlantSupplyElec(0.0), TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0), OpMode(0)
         {
         }
     };
@@ -410,7 +360,7 @@ namespace DataZoneEquipment {
         }
 
         void getPrioritiesForInletNode(EnergyPlusData &state,
-                                       int const inletNodeNum, // Zone inlet node number to match
+                                       int inletNodeNum, // Zone inlet node number to match
                                        int &coolingPriority,   // Cooling priority num for matching equipment
                                        int &heatingPriority    // Heating priority num for matching equipment
         );
@@ -475,22 +425,7 @@ namespace DataZoneEquipment {
         }
     };
 
-    // Object Data
-    extern Array1D<EquipConfiguration> ZoneEquipConfig;
-    extern Array1D<EquipList> ZoneEquipList;
-    extern Array1D<ControlList> HeatingControlList;
-    extern Array1D<ControlList> CoolingControlList;
-    extern Array1D<SupplyAir> SupplyAirPath;
-    extern Array1D<ReturnAir> ReturnAirPath;
-
-    // Functions
-    // Clears the global data in DataZoneEquipment.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void GetZoneEquipmentData(EnergyPlusData &state);
-
-    void GetZoneEquipmentData1(EnergyPlusData &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime(EnergyPlusData &state);
 
@@ -501,7 +436,7 @@ namespace DataZoneEquipment {
 
     int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 
     int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
@@ -517,15 +452,61 @@ namespace DataZoneEquipment {
 
     Real64
     CalcDesignSpecificationOutdoorAir(EnergyPlusData &state,
-                                      int const DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
-                                      int const ActualZoneNum,    // Zone index
-                                      bool const UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
-                                      bool const UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
+                                      int DSOAPtr,          // Pointer to DesignSpecification:OutdoorAir object
+                                      int ActualZoneNum,    // Zone index
+                                      bool UseOccSchFlag,   // Zone occupancy schedule will be used instead of using total zone occupancy
+                                      bool UseMinOASchFlag, // Use min OA schedule in DesignSpecification:OutdoorAir object
                                       Optional_bool_const PerPersonNotSet = _, // when calculation should not include occupants (e.g., dual duct)
                                       Optional_bool_const MaxOAVolFlowFlag = _ // TRUE when calculation uses occupancy schedule  (e.g., dual duct)
     );
 
 } // namespace DataZoneEquipment
+
+struct DataZoneEquipmentData : BaseGlobalStruct {
+
+    bool GetZoneEquipmentDataErrorsFound = false;
+    int GetZoneEquipmentDataFound = 0;
+    int NumSupplyAirPaths = 0;
+    int NumReturnAirPaths = 0;
+    bool ZoneEquipInputsFilled = false;
+    bool ZoneEquipSimulatedOnce = false;
+    int NumOfZoneEquipLists = 0;
+    Array1D_int ZoneEquipAvail;
+    Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+    Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
+    Array1D<Real64> VentMCP;            // Product of mass rate and Cp for each Ventilation object
+    Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
+    Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
+    Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
+    std::unordered_set<std::string> UniqueZoneEquipListNames;
+    Array1D<DataZoneEquipment::EquipList> ZoneEquipList;
+    Array1D<DataZoneEquipment::SupplyAir> SupplyAirPath;
+    Array1D<DataZoneEquipment::ReturnAir> ReturnAirPath;
+    bool CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
+
+    void clear_state() override
+    {
+        this->GetZoneEquipmentDataErrorsFound = false;
+        this->GetZoneEquipmentDataFound = 0;
+        this->NumSupplyAirPaths = 0;
+        this->NumReturnAirPaths = 0;
+        this->ZoneEquipInputsFilled = false;
+        this->ZoneEquipSimulatedOnce = false;
+        this->NumOfZoneEquipLists = 0;
+        this->ZoneEquipAvail.deallocate();
+        this->CrossMixingReportFlag.deallocate();
+        this->MixingReportFlag.deallocate();
+        this->VentMCP.deallocate();
+        this->ZMAT.deallocate();
+        this->ZHumRat.deallocate();
+        this->ZoneEquipConfig.deallocate();
+        this->UniqueZoneEquipListNames.clear();
+        this->ZoneEquipList.deallocate();
+        this->SupplyAirPath.deallocate();
+        this->ReturnAirPath.deallocate();
+        this->CalcDesignSpecificationOutdoorAirOneTimeFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

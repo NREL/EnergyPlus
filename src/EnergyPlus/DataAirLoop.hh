@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -241,8 +241,8 @@ namespace DataAirLoop {
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;    // component inelt node number
-        Array1D_int OutletNodeNum;   // component outelt node number
+        Array1D_int InletNodeNum;    // component inlet node number
+        Array1D_int OutletNodeNum;   // component outlet node number
         bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
         bool DXCoolingCoilFlag;      // True with DX cooling coil

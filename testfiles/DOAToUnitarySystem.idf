@@ -16,7 +16,7 @@
 !
 ! Highlights:              DOAS ducted to inlet and supply side of AirLoopHVAC:UnitarySystem as Zone equipment using AirTerminal:SingleDuct:Mixer
 !                          Each AirTerminal:SingleDuct:Mixers specifies outdoor air flow rate for each zone with OutDoor Air Method = either
-!                          ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedonOccupancySchedule in
+!                          ProportionalControlBasedOnDesignOccupancy or ProportionalControlBasedOnOccupancySchedule in
 !                          DesignSpecification:OutdoorAir.
 !
 ! Simulation Location/Run: Miami Intl Ap FL USA WMO=722020, 2 design days, 2 run periods.
@@ -109,7 +109,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1959,14 +1959,14 @@
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
-    ProportionalControlBasedonOccupancySchedule,  !- Outdoor Air Method
+    ProportionalControlBasedOnOccupancySchedule,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
-    ProportionalControlBasedonOccupancySchedule,  !- Outdoor Air Method
+    ProportionalControlBasedOnOccupancySchedule,  !- Outdoor Air Method
     0.00250,                 !- Outdoor Air Flow per Person {m3/s-person}
     0.00030,                 !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}

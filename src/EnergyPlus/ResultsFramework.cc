@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,8 +78,6 @@ namespace ResultsFramework {
     using namespace OutputProcessor;
     using OutputProcessor::RealVariableType;
     using OutputProcessor::RealVariables;
-
-    std::unique_ptr<ResultsFramework> resultsFramework(new ResultsFramework);
 
     // trim string
     std::string trim(std::string str)
@@ -1540,38 +1538,6 @@ namespace ResultsFramework {
         outputVariables.emplace_back(fmt::format("{0} [{1}]({2})", meter, units, reportingFrequency(reportingInterval)));
     }
 
-    void clear_state()
-    {
-        resultsFramework->DYMeters.setRDataFrameEnabled(false);
-        resultsFramework->DYMeters.setRVariablesScanned(false);
-        resultsFramework->DYMeters.setIVariablesScanned(false);
-        resultsFramework->DYMeters.setIDataFrameEnabled(false);
-
-        resultsFramework->TSMeters.setRVariablesScanned(false);
-        resultsFramework->TSMeters.setRDataFrameEnabled(false);
-        resultsFramework->TSMeters.setIDataFrameEnabled(false);
-        resultsFramework->TSMeters.setIVariablesScanned(false);
-
-        resultsFramework->HRMeters.setRVariablesScanned(false);
-        resultsFramework->HRMeters.setRDataFrameEnabled(false);
-        resultsFramework->HRMeters.setIDataFrameEnabled(false);
-        resultsFramework->HRMeters.setIVariablesScanned(false);
-
-        resultsFramework->MNMeters.setRVariablesScanned(false);
-        resultsFramework->MNMeters.setRDataFrameEnabled(false);
-        resultsFramework->MNMeters.setIDataFrameEnabled(false);
-        resultsFramework->MNMeters.setIVariablesScanned(false);
-
-        resultsFramework->SMMeters.setRVariablesScanned(false);
-        resultsFramework->SMMeters.setRDataFrameEnabled(false);
-        resultsFramework->SMMeters.setIDataFrameEnabled(false);
-        resultsFramework->SMMeters.setIVariablesScanned(false);
-
-        resultsFramework->YRMeters.setRVariablesScanned(false);
-        resultsFramework->YRMeters.setRDataFrameEnabled(false);
-        resultsFramework->YRMeters.setIDataFrameEnabled(false);
-        resultsFramework->YRMeters.setIVariablesScanned(false);
-    }
 } // namespace ResultsFramework
 
 } // namespace EnergyPlus

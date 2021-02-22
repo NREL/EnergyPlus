@@ -101,7 +101,7 @@
   output:Sqlite,
     simple;                  !- Option Type
 
-  Version,9.4;
+  Version,9.5;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -895,8 +895,8 @@ Real64 SystemAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, bo
                 DDNameFanPeak = "Scaled size, not from any peak";
                 dateTimeFanPeak = "Scaled size, not from any peak";
             }
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanDesDay, this->compName, DDNameFanPeak);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchFanPkTime, this->compName, dateTimeFanPeak);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDesDay, this->compName, DDNameFanPeak);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPkTime, this->compName, dateTimeFanPeak);
         }
     }
     return this->autoSizedValue;

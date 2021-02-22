@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,18 +51,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-
-#include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace ObjexxFCL;
 using namespace EnergyPlus;
@@ -112,8 +110,8 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataConstruction->Construct.allocate(ConstrNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint.allocate(MatNum);
     state->dataConstruction->Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    dataMaterial.Material.allocate(MatNum);
-    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
+    state->dataMaterial->Material.allocate(MatNum);
+    state->dataMaterial->Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
@@ -165,7 +163,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface.deallocate();
     state->dataConstruction->Construct(ConstrNum).LayerPoint.deallocate();
     state->dataConstruction->Construct.deallocate();
-    dataMaterial.Material.deallocate();
+    state->dataMaterial->Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,16 +49,18 @@
 
 // Google Test Headers
 #include <gtest/gtest.h>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ScheduleManager;
@@ -595,6 +597,88 @@ TEST_F(EnergyPlusFixture, ScheduleDayInterval_PartialHourLinearInterp)
     EXPECT_NEAR(100.001, LookUpScheduleValue(*state, ASchedIndex, 8, 4), 0.000001);
 }
 
+TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalHittingIntervals)
+{
+    // J.Thomas - Feb 2021
+
+    std::string const idf_objects = delimited_string({
+//    This schedule should cause issues if interpolation issue is not fixed. Got the initial schedule from the unmethours issue.
+     "ScheduleTypeLimits, ",
+     "  Fractional,                     !-Name ",
+     "  0.1,                            !-Lower Limit Value",
+     "  0.9,                            !-Upper Limit Value",
+     "  Continuous;                     !-Numeric Type",
+
+     "Schedule:Day:Interval,",
+     "  2LLO Weekday,                   !- Name",
+     "  Fractional,                     !- Schedule Type Limits Name",
+     "  Linear,                         !- Interpolate to Timestep",
+     "  06:00,                          !- Time 1 {hh:mm}",
+     "  0.1,                            !- Value Until Time 1",
+     "  07:15,                          !- Time 2 {hh:mm}",
+     "  0.9,                            !- Value Until Time 2",
+     "  16:15,                          !- Time 3 {hh:mm}",
+     "  0.1,                            !- Value Until Time 3",
+     "  18:15,                          !- Time 4 {hh:mm}",
+     "  0.1,                            !- Value Until Time 4",
+     "  24:00,                          !- Time 5 {hh:mm}",
+     "  0.9;                            !-Value Until Time 5 ",
+
+     "Schedule:Week:Daily,",
+     "  Week Rule - Jan1-Dec31,         !- Name",
+     "  2LLO Weekday,                   !- Sunday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Monday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Tuesday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Wednesday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Thursday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Friday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Saturday Schedule:Day Name",
+     "  2LLO Weekday,                   !- Holiday Schedule:Day Name",
+     "  2LLO Weekday,                   !- SummerDesignDay Schedule:Day Name",
+     "  2LLO Weekday,                   !- WinterDesignDay Schedule:Day Name",
+     "  2LLO Weekday,                   !- CustomDay1 Schedule:Day Name",
+     "  2LLO Weekday;                   !- CustomDay2 Schedule:Day Name",
+
+     "Schedule:Year,",
+     "  2LLOYEAR,                       !- Name ",
+     "  Fractional,                     !-Schedule Type Limits Name",
+     "  Week Rule - Jan1-Dec31,         !- Schedule:Week Name 1",
+     "  1,                              !- Start Month 1 ",
+     "  1,                              !- Start Day 1",
+     "  12,                             !- End Month 1",
+     "  31;                             !- End Day 1",
+    //    End of problem schedule
+                                                     });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfTimeStepInHour = 4;
+    state->dataGlobal->MinutesPerTimeStep = 15;
+    state->dataGlobal->TimeStepZone = 0.25;
+
+    state->dataEnvrn->Month = 1;
+    state->dataEnvrn->DayOfMonth = 1;
+    state->dataGlobal->HourOfDay = 1;
+    state->dataGlobal->TimeStep = 1;
+    state->dataEnvrn->DSTIndicator = 0;
+    state->dataEnvrn->DayOfWeek = 2;
+    state->dataEnvrn->HolidayIndex = 0;
+    state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
+
+    int ASchedIndex = GetScheduleIndex(*state, "2LLOYEAR"); // interpolate Linear
+    // Timesteps will go 1,2,3,4; Not 0,1,2,3, Hours to go as (actual hour+1) therefore 7:15 is 8,1
+    // Check for values specified in schedule (Lower and upper limits)
+    EXPECT_NEAR(0.1, LookUpScheduleValue(*state, ASchedIndex, 6, 4), 0.000001); // at 6:00
+    EXPECT_NEAR(0.1, LookUpScheduleValue(*state, ASchedIndex, 17, 1), 0.000001); // at 16:15
+    EXPECT_NEAR(0.1, LookUpScheduleValue(*state, ASchedIndex, 19, 1), 0.000001); // at 18:15
+    EXPECT_NEAR(0.9, LookUpScheduleValue(*state, ASchedIndex, 24, 4), 0.000001); // at 24:00
+
+//    Interpolation check
+    EXPECT_NEAR(0.4199999, LookUpScheduleValue(*state, ASchedIndex, 7, 2), 0.000001); // Value at 06:30
+    EXPECT_NEAR(0.1000000, LookUpScheduleValue(*state, ASchedIndex, 18, 3), 0.000001); // Value at 06:30
+    EXPECT_NEAR(0.8304347, LookUpScheduleValue(*state, ASchedIndex, 24, 2), 0.000001); // Value at 06:30
+}
+
 TEST_F(EnergyPlusFixture, ScheduleDayInterval_LinearInterpIntervalNotTimestep)
 {
     // J.Glazer - September 2017
@@ -780,7 +864,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -829,7 +913,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     state->dataGlobal->NumOfTimeStepInHour = 4;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
@@ -926,7 +1010,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     state->dataGlobal->NumOfTimeStepInHour = state->dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     state->dataEnvrn->Month = 12;
     state->dataEnvrn->DayOfMonth = 31;
@@ -1135,7 +1219,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     state->dataGlobal->NumOfTimeStepInHour = state->dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
     state->dataGlobal->TimeStepZone = 0.25;
-    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour();
+    state->dataGlobal->TimeStepZoneSec = state->dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
 
     state->dataEnvrn->Month = 12;
     state->dataEnvrn->DayOfMonth = 31;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,35 +52,31 @@
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include "TARCOGOutput.hh"
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/TARCOGOutput.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::TARCOGArgs {
 
-namespace TARCOGArgs {
-
-    // Functions
-
-    int ArgCheck(EnergyPlus::TARCOGOutput::Files &files,
-                 int const nlayer,
-                 int const iwd,
-                 Real64 const tout,
-                 Real64 const tind,
-                 Real64 const trmin,
-                 Real64 const wso,
-                 Real64 const wsi,
-                 Real64 const dir,
-                 Real64 const outir,
-                 int const isky,
-                 Real64 const tsky,
-                 Real64 const esky,
-                 Real64 const fclr,
-                 Real64 const VacuumPressure,
-                 Real64 const VacuumMaxGapThickness,
-                 int const CalcDeflection,
-                 Real64 const Pa,
-                 Real64 const Pini,
-                 Real64 const Tini,
+    int ArgCheck(EnergyPlusData &state, EnergyPlus::TARCOGOutput::Files &files,
+                 int nlayer,
+                 int iwd,
+                 Real64 tout,
+                 Real64 tind,
+                 Real64 trmin,
+                 Real64 wso,
+                 Real64 wsi,
+                 Real64 dir,
+                 Real64 outir,
+                 int isky,
+                 Real64 tsky,
+                 Real64 esky,
+                 Real64 fclr,
+                 Real64 VacuumPressure,
+                 Real64 VacuumMaxGapThickness,
+                 int CalcDeflection,
+                 Real64 Pa,
+                 Real64 Pini,
+                 Real64 Tini,
                  const Array1D<Real64> &gap,
                  const Array1D<Real64> &GapDef,
                  const Array1D<Real64> &thick,
@@ -89,18 +85,18 @@ namespace TARCOGArgs {
                  const Array1D<Real64> &PoissonsRat,
                  const Array1D<Real64> &tir,
                  const Array1D<Real64> &emis,
-                 Real64 const totsol,
-                 Real64 const tilt,
+                 Real64 totsol,
+                 Real64 tilt,
                  const Array1D<Real64> &asol,
-                 Real64 const height,
-                 Real64 const heightt,
-                 Real64 const width,
+                 Real64 height,
+                 Real64 heightt,
+                 Real64 width,
                  const Array1D<Real64> &presure,
-                 Array2A_int const iprop,
-                 Array2A<Real64> const frct,
-                 Array2A<Real64> const xgcon,
-                 Array2A<Real64> const xgvis,
-                 Array2A<Real64> const xgcp,
+                 Array2A_int iprop,
+                 Array2A<Real64> frct,
+                 Array2A<Real64> xgcon,
+                 Array2A<Real64> xgvis,
+                 Array2A<Real64> xgcp,
                  const Array1D<Real64> &xwght,
                  const Array1D<Real64> &gama,
                  const Array1D_int &nmix,
@@ -128,27 +124,27 @@ namespace TARCOGArgs {
                  const Array1D<Real64> &LaminateA,
                  const Array1D<Real64> &LaminateB,
                  const Array1D<Real64> &sumsol,
-                 int const standard,
-                 int const ThermalMod,
-                 Real64 const SDScalar,
+                 int standard,
+                 int ThermalMod,
+                 Real64 SDScalar,
                  std::string &ErrorMessage);
 
-    void PrepVariablesISO15099(int const nlayer,
-                               Real64 const tout,
-                               Real64 const tind,
+    void PrepVariablesISO15099(int nlayer,
+                               Real64 tout,
+                               Real64 tind,
                                Real64 &trmin,
-                               int const isky,
-                               Real64 const outir,
+                               int isky,
+                               Real64 outir,
                                // IR radiance of window's exterior/interior surround (W/m2)
-                               Real64 const tsky,
+                               Real64 tsky,
                                Real64 &esky,
-                               Real64 const fclr,
+                               Real64 fclr,
                                Array1D<Real64> &gap,
                                Array1D<Real64> &thick,
                                Array1D<Real64> &scon,
                                const Array1D<Real64> &tir,
                                const Array1D<Real64> &emis,
-                               Real64 const tilt,
+                               Real64 tilt,
                                Real64 &hin,
                                Real64 &hout,
                                const Array1D_int &ibc,
@@ -157,8 +153,8 @@ namespace TARCOGArgs {
                                const Array1D<Real64> &SlatAngle,
                                const Array1D<Real64> &SlatCond,
                                const Array1D_int &LayerType,
-                               int const ThermalMod,
-                               Real64 const SDScalar,
+                               int ThermalMod,
+                               Real64 SDScalar,
                                Real64 &ShadeEmisRatioOut,
                                Real64 &ShadeEmisRatioIn,
                                Real64 &ShadeHcRatioOut,
@@ -184,9 +180,7 @@ namespace TARCOGArgs {
                                int &nperr,
                                std::string &ErrorMessage);
 
-    bool GoAhead(int const nperr);
-
-} // namespace TARCOGArgs
+    bool GoAhead(int nperr);
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -202,7 +202,7 @@ namespace ChillerIndirectAbsorption {
               GeneratorDeltaTempWasAutoSized(true), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), GeneratorInputCurvePtr(0), PumpPowerCurvePtr(0), CapFCondenserTempPtr(0),
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
-              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
+              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), MinCondInletTempCtr(0), MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0),
@@ -224,13 +224,15 @@ namespace ChillerIndirectAbsorption {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars(EnergyPlusData &state);
 
         void sizeChiller(EnergyPlusData &state);
 
-        void updateRecords(Real64 MyLoad, bool RunFlag);
+        void updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void calculate(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };

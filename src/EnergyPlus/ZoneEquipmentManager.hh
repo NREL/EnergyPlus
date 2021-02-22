@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -122,9 +122,20 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
 
+    void CalcZoneInfiltrationFlows(EnergyPlusData &state,
+                                   int const ZoneNum,                // current zone index
+                                   Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
+    );
+
+    void ZoneReturnFlowsMaximum(EnergyPlusData &state,
+        int const ZoneNum,
+        Real64 &MaximumZoneReturnMassFlow // maximum zone total return air mass flow rate
+    );
+
     void CalcAirFlowSimple(EnergyPlusData &state,
                            int const SysTimestepLoop = 0,              // System time step index
-                           bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
+                           bool const AdjustZoneMixingFlowFlag = false, // flags to adjust zone mxing mass flow rate
+                           bool const AdjustZoneInfiltrationFlowFlag = false // flags to djust zone infiltration air flow rate
     );
 
     void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum); // Zone Air Balance Outdoor index

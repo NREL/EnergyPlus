@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -480,10 +481,45 @@ namespace ResultsFramework {
         inline bool hasOutputData() { return hasTSData() || hasMeterData(); };
     };
 
-    extern std::unique_ptr<ResultsFramework> resultsFramework;
-
-    void clear_state();
 } // namespace ResultsFramework
+
+struct ResultsFrameworkData : BaseGlobalStruct {
+
+    std::unique_ptr<ResultsFramework::ResultsFramework> resultsFramework = std::make_unique<ResultsFramework::ResultsFramework>();
+
+    void clear_state() override
+    {
+        this->resultsFramework->DYMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->DYMeters.setRVariablesScanned(false);
+        this->resultsFramework->DYMeters.setIVariablesScanned(false);
+        this->resultsFramework->DYMeters.setIDataFrameEnabled(false);
+
+        this->resultsFramework->TSMeters.setRVariablesScanned(false);
+        this->resultsFramework->TSMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->TSMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->TSMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->HRMeters.setRVariablesScanned(false);
+        this->resultsFramework->HRMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->HRMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->HRMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->MNMeters.setRVariablesScanned(false);
+        this->resultsFramework->MNMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->MNMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->MNMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->SMMeters.setRVariablesScanned(false);
+        this->resultsFramework->SMMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->SMMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->SMMeters.setIVariablesScanned(false);
+
+        this->resultsFramework->YRMeters.setRVariablesScanned(false);
+        this->resultsFramework->YRMeters.setRDataFrameEnabled(false);
+        this->resultsFramework->YRMeters.setIDataFrameEnabled(false);
+        this->resultsFramework->YRMeters.setIVariablesScanned(false);
+    }
+};
 
 } // namespace EnergyPlus
 

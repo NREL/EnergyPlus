@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -62,122 +63,13 @@ struct EnergyPlusData;
 
 namespace SystemReports {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    extern int const NoHeatNoCool;
-    extern int const CoolingOnly;
-    extern int const HeatingOnly;
-    extern int const HeatAndCool;
-    extern int const MaxSetBackCount;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Ventilation Report Variables
-    extern Array1D<Real64> MaxCoolingLoadMetByVent;
-    extern Array1D<Real64> MaxCoolingLoadAddedByVent;
-    extern Array1D<Real64> MaxOvercoolingByVent;
-    extern Array1D<Real64> MaxHeatingLoadMetByVent;
-    extern Array1D<Real64> MaxHeatingLoadAddedByVent;
-    extern Array1D<Real64> MaxOverheatingByVent;
-    extern Array1D<Real64> MaxNoLoadHeatingByVent;
-    extern Array1D<Real64> MaxNoLoadCoolingByVent;
-
-    extern Array1D<Real64> RemMaxCoolingLoadMetByVent;
-    extern Array1D<Real64> RemMaxCoolingLoadAddedByVent;
-    extern Array1D<Real64> RemMaxOvercoolingByVent;
-    extern Array1D<Real64> RemMaxHeatingLoadMetByVent;
-    extern Array1D<Real64> RemMaxHeatingLoadAddedByVent;
-    extern Array1D<Real64> RemMaxOverheatingByVent;
-    extern Array1D<Real64> RemMaxNoLoadHeatingByVent;
-    extern Array1D<Real64> RemMaxNoLoadCoolingByVent;
-
-    extern Array1D<Real64> LastMaxCoolingLoadMetByVent;
-    extern Array1D<Real64> LastMaxCoolingLoadAddedByVent;
-    extern Array1D<Real64> LastMaxOvercoolingByVent;
-    extern Array1D<Real64> LastMaxHeatingLoadMetByVent;
-    extern Array1D<Real64> LastMaxHeatingLoadAddedByVent;
-    extern Array1D<Real64> LastMaxOverheatingByVent;
-    extern Array1D<Real64> LastMaxNoLoadHeatingByVent;
-    extern Array1D<Real64> LastMaxNoLoadCoolingByVent;
-
-    extern Array1D<Real64> SysTotZoneLoadHTNG;
-    extern Array1D<Real64> SysTotZoneLoadCLNG;
-    extern Array1D<Real64> SysOALoadHTNG;
-    extern Array1D<Real64> SysOALoadCLNG;
-    extern Array1D<Real64> SysTotHTNG;
-    extern Array1D<Real64> SysTotCLNG;
-
-    extern Array1D<Real64> SysTotH2OHOT;
-    extern Array1D<Real64> SysTotH2OCOLD;
-    extern Array1D<Real64> SysTotElec;
-    extern Array1D<Real64> SysTotNaturalGas;
-    extern Array1D<Real64> SysTotPropane;
-    extern Array1D<Real64> SysTotSteam;
-
-    extern Array1D<Real64> SysHumidHTNG;
-    extern Array1D<Real64> SysHumidElec;
-    extern Array1D<Real64> SysHumidNaturalGas;
-    extern Array1D<Real64> SysHumidPropane;
-    extern Array1D<Real64> SysEvapCLNG;
-    extern Array1D<Real64> SysEvapElec;
-    extern Array1D<Real64> SysHeatExHTNG;
-    extern Array1D<Real64> SysHeatExCLNG;
-    extern Array1D<Real64> DesDehumidCLNG;
-    extern Array1D<Real64> DesDehumidElec;
-    extern Array1D<Real64> SysSolarCollectHeating;
-    extern Array1D<Real64> SysSolarCollectCooling;
-    extern Array1D<Real64> SysUserDefinedTerminalHeating;
-    extern Array1D<Real64> SysUserDefinedTerminalCooling;
-
-    extern Array1D<Real64> SysFANCompHTNG;
-    extern Array1D<Real64> SysFANCompElec;
-    extern Array1D<Real64> SysCCCompCLNG;
-    extern Array1D<Real64> SysCCCompH2OCOLD;
-    extern Array1D<Real64> SysCCCompElec;
-    extern Array1D<Real64> SysHCCompH2OHOT;
-    extern Array1D<Real64> SysHCCompElec;
-    extern Array1D<Real64> SysHCCompElecRes;
-    extern Array1D<Real64> SysHCCompHTNG;
-    extern Array1D<Real64> SysHCCompNaturalGas;
-    extern Array1D<Real64> SysHCCompPropane;
-    extern Array1D<Real64> SysHCCompSteam;
-    extern Array1D<Real64> SysDomesticH2O;
-
-    extern Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
-    extern Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
-    extern Array1D<Real64> ZoneOAVolFlowStdRho;  // zone mech vent volume flow rate at standard density {m3/s}
-    extern Array1D<Real64> ZoneOAVolStdRho;      // zone mech vent total volume OA at standard density {m3/s}
-    extern Array1D<Real64> ZoneOAVolFlowCrntRho; // zone mech vent volume flow rate at current density {m3/s}
-    extern Array1D<Real64> ZoneOAVolCrntRho;     // zone mech vent total volume OA at current density {m3/s}
-    extern Array1D<Real64> ZoneMechACH;          // zone mech vent air changes per hour {ACH}
-
-    extern bool AirLoopLoadsReportEnabled;
-    extern bool VentLoadsReportEnabled;
-    extern bool VentEnergyReportEnabled;
-    extern bool VentReportStructureCreated;
-    extern int TotalLoopConnects; // Total number of loop connections
-    extern int MaxLoopArraySize;
-    extern int MaxCompArraySize;
-    extern int DBFlag;
-
-    extern Array1D_int SetBackCounter;
-    extern Array1D_int HeatCoolFlag;
-    extern Array1D_int FirstHeatCoolFlag;
-    extern Array1D_int FirstHeatCoolHour;
-    extern Array1D_int LastHeatCoolFlag;
-    extern Array1D_int LastHeatCoolHour;
-    extern Array1D_bool AirLoopCalcDone;
-    extern Array1D_bool NoLoadFlag;
-    extern Array1D_bool UnmetLoadFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
-
-    // Reporting Initialization
-
-    // Reporting routines for module
-
-    // Types
+    enum class iEndUseType
+    {
+        NoHeatNoCool,
+        CoolingOnly,
+        HeatingOnly,
+        HeatAndCool,
+    };
 
     struct Energy
     {
@@ -205,9 +97,7 @@ namespace SystemReports {
         Energy ReducedByHC; // LoadAddedByVent
 
         // Default Constructor
-        CoilType()
-        {
-        }
+        CoilType() = default;
     };
 
     struct SummarizeLoads
@@ -220,14 +110,48 @@ namespace SystemReports {
         CoilType PotentialCost;    // LoadAddedByVentHeatLost
 
         // Default Constructor
-        SummarizeLoads()
+        SummarizeLoads() = default;
+    };
+
+    struct CompTypeError
+    {
+        // Members
+        std::string CompType;
+        int CompErrIndex;
+
+        // Default Constructor
+        CompTypeError() : CompErrIndex(0)
         {
         }
     };
 
-    // Object Data
-    extern Array1D<SummarizeLoads> Vent;
+    struct SysPreDefRepType
+    {
+        Real64 SysMechVentTotal;           // air loop mechanical vent total volume OA at standard density {m3}
+        Real64 SysNatVentTotal;            // air loop natural vent total volume OA at standard density {m3}
+        Real64 SysTargetVentTotalVoz;      // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3}
+        Real64 SysTimeBelowVozDynTotal;    // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+        Real64 SysTimeAtVozDynTotal;       // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+        Real64 SysTimeAboveVozDynTotal;    // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+        Real64 SysMechVentTotalOcc;        // air loop mechanical vent total volume OA at standard density {m3}
+        Real64 SysNatVentTotalOcc;         // air loop natural vent total volume OA at standard density {m3}
+        Real64 SysTargetVentTotalVozOcc;   // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3} during occupied
+        Real64 SysTimeBelowVozDynTotalOcc; // time [hrs] that mechanical+natural ventilation is < VozTarget - 1% during occupied
+        Real64 SysTimeAtVozDynTotalOcc;    // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero during occ
+        Real64 SysTimeAboveVozDynTotalOcc; // time [hrs] that mechanical+natural ventilation is > VozTarget + 1% during occupied
+        Real64 SysTimeVentUnoccTotal;      // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+        Real64 SysTimeOccupiedTotal;       // time [hrs] that any zone is occupied
 
+        // Default Constructor
+        SysPreDefRepType()
+            : SysMechVentTotal(0.0), SysNatVentTotal(0.0), SysTargetVentTotalVoz(0.0), SysTimeBelowVozDynTotal(0.0), SysTimeAtVozDynTotal(0.0),
+              SysTimeAboveVozDynTotal(0.0), SysMechVentTotalOcc(0.0), SysNatVentTotalOcc(0.0), SysTargetVentTotalVozOcc(0.0),
+              SysTimeBelowVozDynTotalOcc(0.0), SysTimeAtVozDynTotalOcc(0.0), SysTimeAboveVozDynTotalOcc(0.0), SysTimeVentUnoccTotal(0.0),
+              SysTimeOccupiedTotal(0.0)
+        {
+        }
+    };
+        
     // Functions
 
     void InitEnergyReports(EnergyPlusData &state);
@@ -324,7 +248,8 @@ namespace SystemReports {
                        int const BranchNum   // counter for zone air distribution inlets
     );
 
-    void FindDemandSideMatch(std::string const &CompType, // Inlet node of the component to find the match of
+    void FindDemandSideMatch(EnergyPlusData &state,
+                             std::string const &CompType, // Inlet node of the component to find the match of
                              std::string const &CompName, // Outlet node of the component to find the match of
                              bool &MatchFound,            // Set to .TRUE. when a match is found
                              int &MatchLoopType,          // Loop number of the match
@@ -339,6 +264,250 @@ namespace SystemReports {
     // *****************************************************************************
 
 } // namespace SystemReports
+
+struct SystemReportsData : BaseGlobalStruct {
+
+    Array1D<Real64> MaxCoolingLoadMetByVent;
+    Array1D<Real64> MaxCoolingLoadAddedByVent;
+    Array1D<Real64> MaxOvercoolingByVent;
+    Array1D<Real64> MaxHeatingLoadMetByVent;
+    Array1D<Real64> MaxHeatingLoadAddedByVent;
+    Array1D<Real64> MaxOverheatingByVent;
+    Array1D<Real64> MaxNoLoadHeatingByVent;
+    Array1D<Real64> MaxNoLoadCoolingByVent;
+
+    Array1D<Real64> SysTotZoneLoadHTNG;
+    Array1D<Real64> SysTotZoneLoadCLNG;
+    Array1D<Real64> SysOALoadHTNG;
+    Array1D<Real64> SysOALoadCLNG;
+    Array1D<Real64> SysTotHTNG;
+    Array1D<Real64> SysTotCLNG;
+
+    Array1D<Real64> SysTotH2OHOT;
+    Array1D<Real64> SysTotH2OCOLD;
+    Array1D<Real64> SysTotElec;
+    Array1D<Real64> SysTotNaturalGas;
+    Array1D<Real64> SysTotPropane;
+    Array1D<Real64> SysTotSteam;
+
+    Array1D<Real64> SysHumidHTNG;
+    Array1D<Real64> SysHumidElec;
+    Array1D<Real64> SysHumidNaturalGas;
+    Array1D<Real64> SysHumidPropane;
+    Array1D<Real64> SysEvapCLNG;
+    Array1D<Real64> SysEvapElec;
+    Array1D<Real64> SysHeatExHTNG;
+    Array1D<Real64> SysHeatExCLNG;
+    Array1D<Real64> DesDehumidCLNG;
+    Array1D<Real64> DesDehumidElec;
+    Array1D<Real64> SysSolarCollectHeating;
+    Array1D<Real64> SysSolarCollectCooling;
+    Array1D<Real64> SysUserDefinedTerminalHeating;
+    Array1D<Real64> SysUserDefinedTerminalCooling;
+
+    Array1D<Real64> SysFANCompHTNG;
+    Array1D<Real64> SysFANCompElec;
+    Array1D<Real64> SysCCCompCLNG;
+    Array1D<Real64> SysCCCompH2OCOLD;
+    Array1D<Real64> SysCCCompElec;
+    Array1D<Real64> SysHCCompH2OHOT;
+    Array1D<Real64> SysHCCompElec;
+    Array1D<Real64> SysHCCompElecRes;
+    Array1D<Real64> SysHCCompHTNG;
+    Array1D<Real64> SysHCCompNaturalGas;
+    Array1D<Real64> SysHCCompPropane;
+    Array1D<Real64> SysHCCompSteam;
+    Array1D<Real64> SysDomesticH2O;
+
+    Array1D<Real64> ZoneOAMassFlow;               // zone mech vent mass flow rate {kg/s}
+    Array1D<Real64> ZoneOAMass;                   // zone mech vent total mass for time {kg}
+    Array1D<Real64> ZoneOAVolFlowStdRho;          // zone mech vent volume flow rate at standard density {m3/s}
+    Array1D<Real64> ZoneOAVolStdRho;              // zone mech vent total volume OA at standard density {m3}
+    Array1D<Real64> ZoneOAVolFlowCrntRho;         // zone mech vent volume flow rate at current density {m3/s}
+    Array1D<Real64> ZoneOAVolCrntRho;             // zone mech vent total volume OA at current density {m3}
+    Array1D<Real64> ZoneMechACH;                  // zone mech vent air changes per hour {ACH}
+    Array1D<Real64> ZoneTargetVentilationFlowVoz; // zone target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+    Array1D<Real64> ZoneTimeBelowVozDyn;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+    Array1D<Real64> ZoneTimeAtVozDyn;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Array1D<Real64> ZoneTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+    Array1D<Real64> ZoneTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+    Real64 AnyZoneTimeBelowVozDyn = 0.0;          // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1%
+    Real64 AllZonesTimeAtVozDyn = 0.0;            // time [hrs] that all zones mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Real64 AnyZoneTimeAboveVozDyn = 0.0;          // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1%
+    Real64 AnyZoneTimeVentUnocc = 0.0;            // time [hrs] that any zone mechanical+natural ventilation is > zero during unoccupied
+    Real64 AnyZoneTimeBelowVozDynOcc = 0.0;       // time [hrs] that any zone mechanical+natural ventilation is < VozTarget - 1% during occupied
+    Real64 AllZonesTimeAtVozDynOcc = 0.0;         // time [hrs] that all zones mech+nat vent is = VozTarget within 1% and > zero during occupied
+    Real64 AnyZoneTimeAboveVozDynOcc = 0.0;       // time [hrs] that any zone mechanical+natural ventilation is > VozTarget + 1% during occupied
+
+    Array1D<Real64> SysMechVentFlow;             // air loop mechanical vent total volume OA at standard density {m3/s}
+    Array1D<Real64> SysNatVentFlow;              // air loop natural vent total volume OA at standard density {m3/s}
+    Array1D<Real64> SysTargetVentilationFlowVoz; // air loop target ventilation ventilation flow based on 62.1 Voz-dyn {m3/s}
+    Array1D<Real64> SysTimeBelowVozDyn;          // time [hrs] that mechanical+natural ventilation is < VozTarget - 1%
+    Array1D<Real64> SysTimeAtVozDyn;             // time [hrs] that mechanical+natural ventilation is = VozTarget within 1% and > zero
+    Array1D<Real64> SysTimeAboveVozDyn;          // time [hrs] that mechanical+natural ventilation is > VozTarget + 1%
+    Array1D<Real64> SysTimeVentUnocc;            // time [hrs] that mechanical+natural ventilation is > zero during unoccupied
+    Array1D<bool> SysAnyZoneOccupied;            // true if any zone on system is occupied
+
+    bool AirLoopLoadsReportEnabled = true;
+    bool VentLoadsReportEnabled = true;
+    bool VentEnergyReportEnabled = false;
+    bool VentReportStructureCreated = false;
+    int TotalLoopConnects = 0;              // Total number of loop connections
+    int MaxLoopArraySize = 100;
+    int MaxCompArraySize = 500;
+
+    Array1D_int SetBackCounter;
+    Array1D_int HeatCoolFlag;
+    Array1D_int FirstHeatCoolFlag;
+    Array1D_int FirstHeatCoolHour;
+    Array1D_int LastHeatCoolFlag;
+    Array1D_int LastHeatCoolHour;
+    Array1D_bool NoLoadFlag;
+    Array1D_bool UnmetLoadFlag;
+
+    Array1D<SystemReports::SummarizeLoads> Vent;
+    Array1D<SystemReports::SysPreDefRepType> SysPreDefRep;
+
+    bool OneTimeFlag_FindFirstLastPtr = true;
+    bool OneTimeFlag_InitEnergyReports = true;
+    bool OneTimeFlag_UpdateZoneCompPtrArray = true;
+    int ArrayLimit_UpdateZoneCompPtrArray = 100;
+    int ArrayCounter_UpdateZoneCompPtrArray = 1;
+    bool OneTimeFlag_UpdateZoneSubCompPtrArray = true;
+    int ArrayLimit_UpdateZoneSubCompPtrArray = 100;
+    int ArrayCounter_UpdateZoneSubCompPtrArray = 1;
+    bool OneTimeFlag_UpdateZoneSubSubCompPtrArray = true;
+    int ArrayLimit_UpdateZoneSubSubCompPtrArray = 100;
+    int ArrayCounter_UpdateZoneSubSubCompPtrArray = 1;
+    bool OneTimeFlag_UpdateAirSysCompPtrArray = true;
+    int ArrayLimit_UpdateAirSysCompPtrArray = 100;
+    int ArrayCounter_UpdateAirSysCompPtrArray = 1;
+    bool OneTimeFlag_UpdateAirSysSubCompPtrArray = true;
+    int ArrayLimit_UpdateAirSysSubCompPtrArray = 100;
+    int ArrayCounter_UpdateAirSysSubCompPtrArray = 1;
+    bool OneTimeFlag_UpdateAirSysSubSubCompPtrArray = true;
+    int ArrayLimit_UpdateAirSysSubSubCompPtrArray = 100;
+    int ArrayCounter_UpdateAirSysSubSubCompPtrArray = 1;
+    int NumCompTypes = 0;
+    Array1D<SystemReports::CompTypeError> CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
+
+    void clear_state() override
+    {
+        this->MaxCoolingLoadMetByVent.deallocate();
+        this->MaxCoolingLoadAddedByVent.deallocate();
+        this->MaxOvercoolingByVent.deallocate();
+        this->MaxHeatingLoadMetByVent.deallocate();
+        this->MaxHeatingLoadAddedByVent.deallocate();
+        this->MaxOverheatingByVent.deallocate();
+        this->MaxNoLoadHeatingByVent.deallocate();
+        this->MaxNoLoadCoolingByVent.deallocate();
+        this->SysTotZoneLoadHTNG.deallocate();
+        this->SysTotZoneLoadCLNG.deallocate();
+        this->SysOALoadHTNG.deallocate();
+        this->SysOALoadCLNG.deallocate();
+        this->SysTotHTNG.deallocate();
+        this->SysTotCLNG.deallocate();
+        this->SysTotH2OHOT.deallocate();
+        this->SysTotH2OCOLD.deallocate();
+        this->SysTotElec.deallocate();
+        this->SysTotNaturalGas.deallocate();
+        this->SysTotPropane.deallocate();
+        this->SysTotSteam.deallocate();
+        this->SysHumidHTNG.deallocate();
+        this->SysHumidElec.deallocate();
+        this->SysHumidNaturalGas.deallocate();
+        this->SysHumidPropane.deallocate();
+        this->SysEvapCLNG.deallocate();
+        this->SysEvapElec.deallocate();
+        this->SysHeatExHTNG.deallocate();
+        this->SysHeatExCLNG.deallocate();
+        this->DesDehumidCLNG.deallocate();
+        this->DesDehumidElec.deallocate();
+        this->SysSolarCollectHeating.deallocate();
+        this->SysSolarCollectCooling.deallocate();
+        this->SysUserDefinedTerminalHeating.deallocate();
+        this->SysUserDefinedTerminalCooling.deallocate();
+        this->SysFANCompHTNG.deallocate();
+        this->SysFANCompElec.deallocate();
+        this->SysCCCompCLNG.deallocate();
+        this->SysCCCompH2OCOLD.deallocate();
+        this->SysCCCompElec.deallocate();
+        this->SysHCCompH2OHOT.deallocate();
+        this->SysHCCompElec.deallocate();
+        this->SysHCCompElecRes.deallocate();
+        this->SysHCCompHTNG.deallocate();
+        this->SysHCCompNaturalGas.deallocate();
+        this->SysHCCompPropane.deallocate();
+        this->SysHCCompSteam.deallocate();
+        this->SysDomesticH2O.deallocate();
+        this->ZoneOAMassFlow.deallocate();
+        this->ZoneOAMass.deallocate();
+        this->ZoneOAVolFlowStdRho.deallocate();
+        this->ZoneOAVolStdRho.deallocate();
+        this->ZoneOAVolFlowCrntRho.deallocate();
+        this->ZoneOAVolCrntRho.deallocate();
+        this->ZoneMechACH.deallocate();
+        this->ZoneTargetVentilationFlowVoz.deallocate();
+        this->ZoneTimeBelowVozDyn.deallocate();
+        this->ZoneTimeAtVozDyn.deallocate();
+        this->ZoneTimeAboveVozDyn.deallocate();
+        this->ZoneTimeVentUnocc.deallocate();
+        this->AnyZoneTimeBelowVozDyn = 0.0;
+        this->AllZonesTimeAtVozDyn = 0.0;
+        this->AnyZoneTimeAboveVozDyn = 0.0;
+        this->AnyZoneTimeVentUnocc = 0.0;
+        this->AnyZoneTimeBelowVozDynOcc = 0.0;
+        this->AllZonesTimeAtVozDynOcc = 0.0;
+        this->AnyZoneTimeAboveVozDynOcc = 0.0;
+        this->SysMechVentFlow = 0.0;
+        this->SysNatVentFlow = 0.0;
+        this->SysTargetVentilationFlowVoz.deallocate();
+        this->SysTimeBelowVozDyn.deallocate();
+        this->SysTimeAtVozDyn.deallocate();
+        this->SysTimeAboveVozDyn.deallocate();
+        this->SysTimeVentUnocc.deallocate();
+        this->SysAnyZoneOccupied.deallocate();
+        this->AirLoopLoadsReportEnabled = true;
+        this->VentLoadsReportEnabled = true;
+        this->VentEnergyReportEnabled = false;
+        this->VentReportStructureCreated = false;
+        this->TotalLoopConnects = 0;
+        this->MaxLoopArraySize = 100;
+        this->MaxCompArraySize = 500;
+        this->SetBackCounter.deallocate();
+        this->HeatCoolFlag.deallocate();
+        this->FirstHeatCoolFlag.deallocate();
+        this->FirstHeatCoolHour.deallocate();
+        this->LastHeatCoolFlag.deallocate();
+        this->LastHeatCoolHour.deallocate();
+        this->NoLoadFlag.deallocate();
+        this->UnmetLoadFlag.deallocate();
+        this->Vent.deallocate();
+        this->SysPreDefRep.deallocate();
+        this->OneTimeFlag_FindFirstLastPtr = true;
+        this->OneTimeFlag_InitEnergyReports = true;
+        this->OneTimeFlag_UpdateZoneCompPtrArray = true;
+        this->ArrayLimit_UpdateZoneCompPtrArray = 100;
+        this->ArrayCounter_UpdateZoneCompPtrArray = 1;
+        this->OneTimeFlag_UpdateZoneSubCompPtrArray = true;
+        this->ArrayLimit_UpdateZoneSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateZoneSubCompPtrArray = 1;
+        this->OneTimeFlag_UpdateZoneSubSubCompPtrArray = true;
+        this->ArrayLimit_UpdateZoneSubSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateZoneSubSubCompPtrArray = 1;
+        this->OneTimeFlag_UpdateAirSysCompPtrArray = true;
+        this->ArrayLimit_UpdateAirSysCompPtrArray = 100;
+        this->ArrayCounter_UpdateAirSysCompPtrArray = 1;
+        this->OneTimeFlag_UpdateAirSysSubCompPtrArray = true;
+        this->ArrayLimit_UpdateAirSysSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateAirSysSubCompPtrArray = 1;
+        this->OneTimeFlag_UpdateAirSysSubSubCompPtrArray = true;
+        this->ArrayLimit_UpdateAirSysSubSubCompPtrArray = 100;
+        this->ArrayCounter_UpdateAirSysSubSubCompPtrArray = 1;
+        this->NumCompTypes = 0;
+        this->CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
+    }
+};
 
 } // namespace EnergyPlus
 

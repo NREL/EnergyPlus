@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1233,7 +1233,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
         extension_key = key.value().get<std::string>();
     }
 
-    for (auto const obj : *objects) {
+    for (auto const &obj : *objects) {
         if (obj.find(extension_key) != obj.end()) {
             auto const size = obj[extension_key].size();
             if (size > max_size) max_size = size;
@@ -1609,7 +1609,7 @@ void InputProcessor::preProcessorCheck(EnergyPlusData &state, bool &PreP_Fatal) 
                                   " audit trail or error file for possible reasons.");
             }
             while (CountM <= NumAlphas) {
-                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength()) {
+                if (len(DataIPShortCuts::cAlphaArgs(CountM)) == DataGlobalConstants::MaxNameLength) {
                     ShowContinueError(state, DataIPShortCuts::cAlphaArgs(CountM) + DataIPShortCuts::cAlphaArgs(CountM + 1));
                     CountM += 2;
                 } else {
@@ -1743,7 +1743,7 @@ void InputProcessor::preScanReportingVariables(EnergyPlusData &state)
         }
     }
 
-    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+    for (auto const & requestedVar : state.dataOutputProcessor->apiVarRequests) {
         addRecordToOutputVariableStructure(state, requestedVar.varKey, requestedVar.varName);
     }
 

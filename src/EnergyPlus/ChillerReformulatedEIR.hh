@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -221,8 +221,8 @@ namespace ChillerReformulatedEIR {
 
         // Default Constructor
         ReformulatedEIRChillerSpecs()
-            : TypeNum(0), CondenserType(DataPlant::CondenserType::NOTSET), PartLoadCurveType(PLR::Unassigned), RefCap(0.0), RefCapWasAutoSized(false),
-              RefCOP(0.0), FlowMode(DataPlant::FlowMode::NOTSET),
+            : TypeNum(0), CondenserType(DataPlant::CondenserType::Unassigned), PartLoadCurveType(PLR::Unassigned), RefCap(0.0), RefCapWasAutoSized(false),
+              RefCOP(0.0), FlowMode(DataPlant::FlowMode::Unassigned),
               ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0), EvapVolFlowRateWasAutoSized(false),
               EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), CondMassFlowRateMax(0.0),
               CompPowerToCondenserFrac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
@@ -261,6 +261,8 @@ namespace ChillerReformulatedEIR {
 
         void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
+        void oneTimeInit(EnergyPlusData &state) override;
+
         void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars(EnergyPlusData &state);
@@ -273,7 +275,7 @@ namespace ChillerReformulatedEIR {
 
         void calcHeatRecovery(EnergyPlusData &state, Real64 &QCond, Real64 CondMassFlow, Real64 condInletTemp, Real64 &QHeatRec);
 
-        void update(Real64 MyLoad, bool RunFlag);
+        void update(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
 
         void checkMinMaxCurveBoundaries(EnergyPlusData &state, bool FirstIteration);
 
