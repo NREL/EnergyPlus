@@ -4321,6 +4321,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // if zone mass balance true, set to expected return flow
         if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance) {
+            // applied zone return flow schedule multiplier
+            if (DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingOnly)
+                ExpTotalReturnMassFlow = returnSchedFrac * ExpTotalReturnMassFlow;
             // set air flow rate for each return node
             Real64 zoneTotReturnFlow = 0.0;
             Real64 returnNodeMassFlow = 0.0;
