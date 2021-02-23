@@ -130,41 +130,64 @@ namespace EnergyPlus::ChillerGasAbsorption {
 
     void GasAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
+        int brIdentity(0);
 
-        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
-        int BranchInletNodeNum =
-            state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+        int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
+                                  .LoopSide(calledFromLocation.loopSideNum)
+                                  .Branch(calledFromLocation.branchNum)
+                                  .TotalComponents;
 
-        // Match inlet node name of calling branch to determine if this call is for heating or cooling
-        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
-            // Calculate Node Values
-            // Calculate Equipment and Update Variables
-            this->InCoolingMode = RunFlag != 0;
-            this->initialize(state);
-            this->calculateChiller(state, CurLoad);
-            this->updateCoolRecords(CurLoad, RunFlag);
-        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
-            // Calculate Node Values
-            // Calculate Equipment and Update Variables
-            this->InHeatingMode = RunFlag != 0;
-            this->initialize(state);
-            this->calculateHeater(state, CurLoad, RunFlag);
-            this->updateHeatRecords(CurLoad, RunFlag);
-        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
-            if (this->CDLoopNum > 0) {
-                PlantUtilities::UpdateChillerComponentCondenserSide(state,
-                                                                    this->CDLoopNum,
-                                                                    this->CDLoopSideNum,
-                                                                    DataPlant::TypeOf_Chiller_DFAbsorption,
-                                                                    this->CondReturnNodeNum,
-                                                                    this->CondSupplyNodeNum,
-                                                                    this->TowerLoad,
-                                                                    this->CondReturnTemp,
-                                                                    this->CondSupplyTemp,
-                                                                    this->CondWaterFlowRate,
-                                                                    FirstHVACIteration);
+        // // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        // int BranchInletNodeNum =
+        //    DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+
+        for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
+            int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
+                                       .LoopSide(calledFromLocation.loopSideNum)
+                                       .Branch(calledFromLocation.branchNum)
+                                       .Comp(iComp)
+                                       .NodeNumIn;
+            // Match inlet node name of calling branch to determine if this call is for heating or cooling
+            if (compInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+                // Calculate Node Values
+                // Calculate Equipment and Update Variables
+                this->InCoolingMode = RunFlag != 0;
+                this->initialize(state);
+                this->calculateChiller(state, CurLoad);
+                this->updateCoolRecords(CurLoad, RunFlag);
+                brIdentity = 1;
+                break;
+            } else if (compInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
+                // Calculate Node Values
+                // Calculate Equipment and Update Variables
+                this->InHeatingMode = RunFlag != 0;
+                this->initialize(state);
+                this->calculateHeater(state, CurLoad, RunFlag);
+                this->updateHeatRecords(CurLoad, RunFlag);
+                brIdentity = 2;
+                break;
+            } else if (compInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+                if (this->CDLoopNum > 0) {
+                    PlantUtilities::UpdateChillerComponentCondenserSide(state,
+                                                                        this->CDLoopNum,
+                                                                        this->CDLoopSideNum,
+                                                                        DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                                        this->CondReturnNodeNum,
+                                                                        this->CondSupplyNodeNum,
+                                                                        this->TowerLoad,
+                                                                        this->CondReturnTemp,
+                                                                        this->CondSupplyTemp,
+                                                                        this->CondWaterFlowRate,
+                                                                        FirstHVACIteration);
+                }
+                brIdentity = 3;
+                break;
+            } else {
+                brIdentity = 0;
             }
-        } else { // Error, nodes do not match
+        }
+
+        if (brIdentity == 0) { // Error, nodes do not match
             ShowSevereError(state, "Invalid call to Gas Absorber Chiller " + this->Name);
             ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
             ShowFatalError(state, "Preceding conditions cause termination.");
@@ -173,24 +196,49 @@ namespace EnergyPlus::ChillerGasAbsorption {
 
     void GasAbsorberSpecs::getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad)
     {
-        // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
-        int BranchInletNodeNum =
-            state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+        bool matchfound(false);
 
-        if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
-            MinLoad = this->NomCoolingCap * this->MinPartLoadRat;
-            MaxLoad = this->NomCoolingCap * this->MaxPartLoadRat;
-            OptLoad = this->NomCoolingCap * this->OptPartLoadRat;
-        } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
-            Real64 Sim_HeatCap = this->NomCoolingCap * this->NomHeatCoolRatio;
-            MinLoad = Sim_HeatCap * this->MinPartLoadRat;
-            MaxLoad = Sim_HeatCap * this->MaxPartLoadRat;
-            OptLoad = Sim_HeatCap * this->OptPartLoadRat;
-        } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
-            MinLoad = 0.0;
-            MaxLoad = 0.0;
-            OptLoad = 0.0;
-        } else { // Error, nodes do not match
+        int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
+                                  .LoopSide(calledFromLocation.loopSideNum)
+                                  .Branch(calledFromLocation.branchNum)
+                                  .TotalComponents;
+
+        // // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
+        // int BranchInletNodeNum =
+           // state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
+
+        for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
+            int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
+                                       .LoopSide(calledFromLocation.loopSideNum)
+                                       .Branch(calledFromLocation.branchNum)
+                                       .Comp(iComp)
+                                       .NodeNumIn;
+
+            if (compInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
+                MinLoad = this->NomCoolingCap * this->MinPartLoadRat;
+                MaxLoad = this->NomCoolingCap * this->MaxPartLoadRat;
+                OptLoad = this->NomCoolingCap * this->OptPartLoadRat;
+                matchfound = true;
+                break;
+            } else if (compInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
+                Real64 Sim_HeatCap = this->NomCoolingCap * this->NomHeatCoolRatio;
+                MinLoad = Sim_HeatCap * this->MinPartLoadRat;
+                MaxLoad = Sim_HeatCap * this->MaxPartLoadRat;
+                OptLoad = Sim_HeatCap * this->OptPartLoadRat;
+                matchfound = true;
+                break;
+            } else if (compInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
+                MinLoad = 0.0;
+                MaxLoad = 0.0;
+                OptLoad = 0.0;
+                matchfound = true;
+                break;
+            } else {
+                matchfound = false;
+            }
+        }
+
+        if (!matchfound) { // Error, nodes do not match
             ShowSevereError(state, "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name);
             ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
             ShowFatalError(state, "Preceding conditions cause termination.");
@@ -1562,7 +1610,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                 } else {
                     ShowSevereError(state, "CalcGasAbsorberChillerModel: Condenser flow = 0, for Gas Absorber Chiller=" + this->Name);
                     ShowContinueErrorTimeStamp(state, "");
-                    ShowFatalError(state, "Program Terminates due to previous error condition.");
+                    // ShowFatalError(state, "Program Terminates due to previous error condition.");
                 }
             } else {
                 lCondSupplyTemp = lCondReturnTemp; // if air cooled condenser just set supply and return to same temperature
