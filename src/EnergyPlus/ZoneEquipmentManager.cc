@@ -3995,8 +3995,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
                         ZoneMixingAirMassFlowRate = MixingMassFlowZone(ZoneNum);
                     } else {
-                        //Real64 returnSchedFrac = ScheduleManager::GetCurrentScheduleValue(state, state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnFlowSchedPtrNum);
-                        //if (Iteration == 1) ZoneReturnAirMassFlowRate = returnSchedFrac * ZoneReturnAirMassFlowRate;
                         ZoneMixingAirMassFlowRate = max(0.0, ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate -
                                 TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
                     }
@@ -4038,7 +4036,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
                         Real64 AdjustedTotalReturnMassFlow = 0;
                         MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
-                        ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
                         if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingThenReturn) {
 
                             // Calculate return air flow rate using mass conservation equation
@@ -4283,10 +4280,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         returnNodeMassFlow = inletMassFlow;
                         thisZoneEquip.FixedReturnFlow(returnNum) = true;
                     }
-                    //// if zone mass balance true, set totReturnFlow to expected return flow
-                    //if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
-                    //    returnNodeMassFlow = ExpTotalReturnMassFlow;
-                    //}
                 } else {
                     returnNodeMassFlow = 0.0;
                 }
@@ -4317,10 +4310,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                 returnNodeMassFlow = max(0.0, (ExpTotalReturnMassFlow * returnSchedFrac * airLoopReturnFrac));
                             }
                         }
-                        //// if zone mass balance true, set totReturnFlow to expected return flow
-                        //if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance ) {
-                        //    returnNodeMassFlow = ExpTotalReturnMassFlow;
-                        //}
                     }
                 }
                 totReturnFlow += returnNodeMassFlow;
