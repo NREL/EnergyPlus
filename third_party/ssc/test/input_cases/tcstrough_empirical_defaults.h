@@ -1,16 +1,16 @@
-#ifndef _TCSTROUGH_EMPIRICAL_COMMON_DATA_H
-#define _TCSTROUGH_EMPIRICAL_COMMON_DATA_H
+#ifndef _TCSTROUGH_EMPIRICAL_DEFAULTS_H
+#define _TCSTROUGH_EMPIRICAL_DEFAULTS_H
 
 #include <stdio.h>
-
 #include "../input_cases/code_generator_utilities.h"
 
-
 /**
-*  Default data for tcstrough_empirical run that can be further modified
+*  Default data for tcstrough_empirical technology model
 */
-void tcstrough_empirical_default(ssc_data_t &data)
+ssc_data_t tcstrough_empirical_defaults()
 {
+    ssc_data_t data = ssc_data_create();
+
 	char solar_resource_path[512];
 	int n1 = sprintf(solar_resource_path, "%s/test/input_cases/trough_empirical_data/tucson_az_32.116521_-110.933042_psmv3_60_tmy.csv", std::getenv("SSCDIR"));
 
@@ -153,6 +153,8 @@ void tcstrough_empirical_default(ssc_data_t &data)
     ssc_data_set_number(data, "HhtfParF2", 0.79400000000000004);
     ssc_data_set_number(data, "PbFixPar", 0.61049997806549072);
     ssc_data_set_number(data, "adjust:constant", 4);
+
+    return data;
 }
 
 #endif
