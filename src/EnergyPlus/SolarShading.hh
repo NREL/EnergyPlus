@@ -273,6 +273,8 @@ namespace SolarShading {
 
     void WindowShadingManager(EnergyPlusData &state);
 
+    DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue);
+
     int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface);
 
     void WindowGapAirflowControl(EnergyPlusData &state);

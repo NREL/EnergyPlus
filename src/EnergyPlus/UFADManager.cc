@@ -212,7 +212,7 @@ namespace UFADManager {
             if (SurfNum == 0) continue;
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
                 Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     ++NumShadesDown;
                 }
             }
@@ -971,7 +971,7 @@ namespace UFADManager {
         Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
         Real64 ZoneMult;                 // total zone multiplier
         int ZoneNodeNum;                 // node number of the HVAC zone node
-        Array1D_int IntGainTypesOccupied(29,
+        Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -991,6 +991,7 @@ namespace UFADManager {
                                                  IntGainTypeOf_ElectricLoadCenterInverterSimple,
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_PipeIndoor,
@@ -1445,7 +1446,7 @@ namespace UFADManager {
         int ZoneNodeNum;                 // node number of the HVAC zone node
         static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29,
+        static Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -1466,6 +1467,7 @@ namespace UFADManager {
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
                                                  IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_PipeIndoor,
                                                  IntGainTypeOf_RefrigerationCase,
