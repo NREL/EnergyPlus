@@ -73,7 +73,8 @@ namespace {
 		ssc_data_set_number(data, "batt_minimum_SOC", 15);
 		ssc_data_set_number(data, "batt_maximum_SOC", 95);
 		ssc_data_set_number(data, "batt_minimum_modetime", 10);
-		ssc_number_t p_batt_lifetime_matrix[18] = { 20, 0, 100, 20, 5000, 80, 20, 10000, 60, 80, 0, 100, 80, 1000, 80, 80, 2000, 60 };
+        ssc_data_set_number(data, "batt_life_model", 0);
+        ssc_number_t p_batt_lifetime_matrix[18] = { 20, 0, 100, 20, 5000, 80, 20, 10000, 60, 80, 0, 100, 80, 1000, 80, 80, 2000, 60 };
 		ssc_data_set_matrix(data, "batt_lifetime_matrix", p_batt_lifetime_matrix, 6, 3);
 		ssc_data_set_number(data, "batt_calendar_choice", 1);
 		ssc_number_t p_batt_calendar_lifetime_matrix[6] = { 0, 100, 3650, 80, 7300, 50 };
@@ -123,8 +124,6 @@ namespace {
 		ssc_number_t p_ur_ec_tou_mat[24] = { 1, 1, 200, 1, 0.21174600720405579, 0.028000000864267349, 1, 2, 400, 1, 0.057693801820278168, 0.028000000864267349, 1, 3, 600, 1, 0.052770901471376419, 0.028000000864267349, 1, 4, 10000, 1, 0.049003798514604568, 0.028000000864267349 };
 		ssc_data_set_matrix(data, "ur_ec_tou_mat", p_ur_ec_tou_mat, 4, 6);
         ssc_data_set_number(data, "batt_cycle_cost_choice", 0);
-        ssc_number_t p_batt_cycle_cost[1] = { 0.1 };
-        ssc_data_set_array(data, "batt_cycle_cost", p_batt_cycle_cost, 1);
 	}
 }
 #endif
