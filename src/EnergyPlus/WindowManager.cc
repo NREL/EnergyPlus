@@ -1511,7 +1511,6 @@ namespace WindowManager {
         int NumHorDividers;   // Number of horizontal divider elements
         int NumVertDividers;  // Number of vertical divider elements
         int BaseSurfNum;      // Base surface number
-        int ShadingType;      // Window shading type
         int MatNum;           // Material number
         int DifOverrideCount; // Count the number of SolarDiffusing material overrides
 
@@ -1544,8 +1543,8 @@ namespace WindowManager {
 
             if (Surface(SurfNum).HasShadeControl) {
                 for (int winShadCtrl : Surface(SurfNum).windowShadingControlList) {
-                    ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
-                    if (ShadingType == WSC_ST_ExteriorScreen) {
+                    WinShadingType ShadingType = WindowShadingControl(winShadCtrl).ShadingType;
+                    if (ShadingType == WinShadingType::ExtScreen) {
                         //     Count number of exterior window screens, initialize in InitGlassOpticalCalculations after returning
                         //     from this subroutine. The blind structure is initialized first and then the screen structure is initialized.
                         ++state.dataHeatBal->NumSurfaceScreens;
@@ -1615,7 +1614,7 @@ namespace WindowManager {
                     if (!Surface(SurfNum).HasShadeControl) {
                         SurfWinSolarDiffusing(SurfNum) = true;
                     } else { // There is a shading control
-                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType == WinShadingType::SwitchableGlazing) {
                             SurfWinSolarDiffusing(SurfNum) = true;
                         } else {
                             SurfWinSolarDiffusing(SurfNum) = false;
@@ -2063,7 +2062,7 @@ namespace WindowManager {
         int IGap;        // Gap layer number (1,2,...)
         int IMix;        // Gas number in a mixture of gases
         int ICoeff;      // Gas property index (1,2,3)
-        int ShadeFlag;   // Flag indicating whether shade or blind is on, and shade/blind position
+        WinShadingType ShadeFlag;   // Flag indicating whether shade or blind is on, and shade/blind position
         int k;           // Layer counter
         // REAL(r64) :: tsky                         ! Sky temperature [K]
         int ShadeLayPtr; // Material number corresponding to a shade layer
@@ -2320,8 +2319,7 @@ namespace WindowManager {
             //   blind/shade and glass 3.
 
             IConst = ConstrNum;
-            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
-                ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
+            if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 IConst = surface.activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) > 0) IConst = surface.activeStormWinShadedConstruction;
             }
@@ -2345,13 +2343,13 @@ namespace WindowManager {
                 }
 
                 if (state.dataMaterial->Material(LayPtr).Group == Shade || state.dataMaterial->Material(LayPtr).Group == WindowBlind || state.dataMaterial->Material(LayPtr).Group == Screen) {
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(state.dataConstruction->Construct(IConst).TotLayers);
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(1);
-                    if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(state.dataConstruction->Construct(IConst).TotLayers);
+                    if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(1);
+                    if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                         ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(3);
                         if (TotGlassLay == 3) ShadeLayPtr = state.dataConstruction->Construct(IConst).LayerPoint(5);
                     }
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
+                    if (ANY_SHADE_SCREEN(ShadeFlag)) {
                         // Shade or screen on
                         if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // check to make sure the user hasn't messed up the shade control values
                             if (state.dataMaterial->Material(ShadeLayPtr).Group == WindowBlind) {
@@ -2363,7 +2361,7 @@ namespace WindowManager {
                         }
                         state.dataWindowManager->thick(TotGlassLay + 1) = state.dataMaterial->Material(ShadeLayPtr).Thickness;
                         state.dataWindowManager->scon(TotGlassLay + 1) = state.dataMaterial->Material(ShadeLayPtr).Conductivity / state.dataMaterial->Material(ShadeLayPtr).Thickness;
-                        if (ShadeFlag == ExtScreenOn) {
+                        if (ShadeFlag == WinShadingType::ExtScreen) {
                             state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermalFront;
                             state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
                             state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = state.dataHeatBal->SurfaceScreens(state.dataMaterial->Material(ShadeLayPtr).ScreenDataPtr).DifDifTrans;
@@ -2411,12 +2409,11 @@ namespace WindowManager {
 
             } // End of loop over glass, gap and blind/shade layers in a window construction
 
-            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
-                ShadeFlag == ExtScreenOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag) || ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                 // Interior or exterior blind, shade or screen is on.
                 // Fill gap between blind/shade and adjacent glass with air properties.
                 ++IGap;
-                if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == ExtScreenOn) { // Interior or exterior shade
+                if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) { // Interior or exterior shade
                     state.dataWindowManager->gap(IGap) = state.dataMaterial->Material(ShadeLayPtr).WinShadeToGlassDist;
                 } else { // Interior or exterior blind
                     state.dataWindowManager->gap(IGap) = state.dataHeatBal->Blind(SurfWinBlindNumber(SurfNum)).BlindToGlassDist;
@@ -2563,7 +2560,7 @@ namespace WindowManager {
             dth3 = state.dataWindowManager->thetas(6) - state.dataWindowManager->thetas(5);
             dth4 = state.dataWindowManager->thetas(8) - state.dataWindowManager->thetas(7);
 
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 SurfInsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer + 2) - state.dataWindowManager->TKelvin;
                 EffShBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
                 EffGlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
@@ -2571,7 +2568,7 @@ namespace WindowManager {
             } else {
                 SurfInsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
             }
-            if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+            if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                 SurfOutsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer + 1) - state.dataWindowManager->TKelvin; // this index looks suspicious (CR 8202)
                 // SurfOutsideEmiss = emis(1)  ! this index should be coordinated with previous line
                 SurfOutsideEmiss = state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer + 1); // fix for CR 8202
@@ -2886,7 +2883,7 @@ namespace WindowManager {
         //  2=exterior shade/blind
         Real64 TauShIR; // Long-wave transmittance of isolated shade/blind
         Real64 sconsh;  // shade/blind conductance (W/m2-K)
-        int ShadeFlag;  // Shading flag
+        WinShadingType ShadeFlag;  // Shading flag
         // Real64 ShadeAbsFac1; // Fractions for apportioning absorbed radiation to shade/blind faces
         // Real64 ShadeAbsFac2;
         static Array1D<Real64> AbsRadShadeFace(2); // Solar radiation, short-wave radiation from lights, and long-wave //Tuned Made static
@@ -2938,22 +2935,21 @@ namespace WindowManager {
         AbsRadShadeFace = 0.0;
         TGapNew = 0.0;
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
-            ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
+        if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
             state.dataWindowManager->nglfacep = state.dataWindowManager->nglface + 2;
             AbsRadShadeFace(1) = DataSurfaces::AbsFrontSide(SurfNum);
             AbsRadShadeFace(2) = DataSurfaces::AbsBackSide(SurfNum);
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) AbsRadShadeFace(2) += SurfWinIntLWAbsByShade(SurfNum);
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) AbsRadShadeFace(2) += SurfWinIntLWAbsByShade(SurfNum);
             sconsh = state.dataWindowManager->scon(state.dataWindowManager->ngllayer + 1);
             TauShIR = state.dataWindowManager->tir(state.dataWindowManager->nglface + 1);
             EpsShIR1 = state.dataWindowManager->emis(state.dataWindowManager->nglface + 1);
             EpsShIR2 = state.dataWindowManager->emis(state.dataWindowManager->nglface + 2);
             RhoShIR1 = max(0.0, 1.0 - TauShIR - EpsShIR1);
             RhoShIR2 = max(0.0, 1.0 - TauShIR - EpsShIR2);
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 RhoGlIR2 = 1.0 - state.dataWindowManager->emis(2 * state.dataWindowManager->ngllayer);
                 ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-            } else if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+            } else if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                 RhoGlIR1 = 1.0 - state.dataWindowManager->emis(1);
                 ShGlReflFacIR = 1.0 - RhoGlIR1 * RhoShIR2;
             }
@@ -2985,7 +2981,7 @@ namespace WindowManager {
                 (Surface(SurfNum).IntConvCoeff == -2)) {
                 // coef model is "detailed" and not prescribed by user
                 // need to find inside face index, varies with shade/blind etc.
-                if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                     InsideFaceIndex = state.dataWindowManager->nglfacep;
                 } else {
                     InsideFaceIndex = state.dataWindowManager->nglface;
@@ -3001,8 +2997,7 @@ namespace WindowManager {
             // coefficient from glass and shade/blind to gap between glass and shade/blind,
             // effective gap air temperature, velocity of air in gap and gap outlet temperature.
 
-            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
-                ShadeFlag == ExtScreenOn) {
+            if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 ExtOrIntShadeNaturalFlow(state, SurfNum, iter, VGap, TGapNew, TGapOutlet, hcv, ConvHeatFlowNatural);
                 if (iter >= 1) {
                     hcv = 0.5 * (hcvPrev + hcv);
@@ -3018,7 +3013,7 @@ namespace WindowManager {
             // get glass-to-air forced convection heat transfer coefficient, average gap air temperature, and
             // convective heat flow from gap.
 
-            if (ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfWinAirflowThisTS(SurfNum) > 0.0) {
+            if (!ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag) && SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 BetweenGlassForcedFlow(state, SurfNum, iter, VAirflowGap, TAirflowGapNew, TAirflowGapOutlet, hcvAirflowGap, ConvHeatFlowForced);
             }
 
@@ -3027,7 +3022,7 @@ namespace WindowManager {
             // Also get average gas temperature in the two gaps, and, for airflow window, the sum of the
             // convective heat flows from the gaps.
 
-            if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+            if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                 if (SurfWinAirflowThisTS(SurfNum) == 0.0) { // Natural convection in gaps
                     BetweenGlassShadeNaturalFlow(state, SurfNum, iter, VGap, TGapNewBG, hcvBG);
                 } else { // Forced convection in gaps
@@ -3051,7 +3046,7 @@ namespace WindowManager {
                     Aface(1, 2) = -state.dataWindowManager->scon(1);
                     Aface(2, 2) = hr(2) + state.dataWindowManager->scon(1) + state.dataWindowManager->hcin;
 
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                         Bface(2) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(2) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(2);
                         Bface(3) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
                         Bface(4) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin + AbsRadShadeFace(2);
@@ -3065,7 +3060,7 @@ namespace WindowManager {
                         Aface(4, 4) = hr(4) + sconsh + state.dataWindowManager->hcin;
                     }
 
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+                    if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(3) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(4) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3107,7 +3102,7 @@ namespace WindowManager {
                     Aface(3, 4) = -state.dataWindowManager->scon(2);
                     Aface(4, 4) = hr(4) + state.dataWindowManager->scon(2) + state.dataWindowManager->hcin;
 
-                    if (ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    if (!ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag) && SurfWinAirflowThisTS(SurfNum) > 0.0) {
                         Bface(2) = state.dataWindowManager->AbsRadGlassFace(2) + hcvAirflowGap * TAirflowGapNew;
                         Bface(3) = state.dataWindowManager->AbsRadGlassFace(3) + hcvAirflowGap * TAirflowGapNew;
                         Aface(2, 2) = state.dataWindowManager->scon(1) + hcvAirflowGap - state.dataWindowManager->A23P * hr(2);
@@ -3116,7 +3111,7 @@ namespace WindowManager {
                         Aface(3, 3) = hcvAirflowGap + state.dataWindowManager->scon(2) + state.dataWindowManager->A32P * hr(3);
                     }
 
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                         Bface(4) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(4) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(4);
                         Bface(5) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
                         Bface(6) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin + AbsRadShadeFace(2);
@@ -3130,7 +3125,7 @@ namespace WindowManager {
                         Aface(6, 6) = hr(6) + sconsh + state.dataWindowManager->hcin;
                     }
 
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+                    if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(5) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(6) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3144,7 +3139,7 @@ namespace WindowManager {
                         Aface(6, 6) = hr(6) * (1 - RhoGlIR1 * (EpsShIR2 + RhoShIR2)) / ShGlReflFacIR + sconsh + hcv;
                     }
 
-                    if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+                    if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                         for (i = 1; i <= 6; ++i) {
                             RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir(i) - state.dataWindowManager->emis(i));
                         }
@@ -3225,7 +3220,7 @@ namespace WindowManager {
                     Aface(5, 6) = -state.dataWindowManager->scon(3);
                     Aface(6, 6) = hr(6) + state.dataWindowManager->scon(3) + state.dataWindowManager->hcin;
 
-                    if (ShadeFlag != BGShadeOn && ShadeFlag != BGBlindOn && SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    if (!ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag) && SurfWinAirflowThisTS(SurfNum) > 0.0) {
                         Bface(4) = state.dataWindowManager->AbsRadGlassFace(4) + hcvAirflowGap * TAirflowGapNew;
                         Bface(5) = state.dataWindowManager->AbsRadGlassFace(5) + hcvAirflowGap * TAirflowGapNew;
                         Aface(4, 4) = state.dataWindowManager->scon(2) + hcvAirflowGap - state.dataWindowManager->A45P * hr(4);
@@ -3234,7 +3229,7 @@ namespace WindowManager {
                         Aface(5, 5) = hcvAirflowGap + state.dataWindowManager->scon(3) + state.dataWindowManager->A54P * hr(5);
                     }
 
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                         Bface(6) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(6) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(6);
                         Bface(7) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
                         Bface(8) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin + AbsRadShadeFace(2);
@@ -3246,9 +3241,7 @@ namespace WindowManager {
                         Aface(8, 7) = -sconsh;
                         Aface(7, 8) = -sconsh;
                         Aface(8, 8) = hr(8) + sconsh + state.dataWindowManager->hcin;
-                    }
-
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+                    } else if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(7) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(8) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3260,9 +3253,7 @@ namespace WindowManager {
                         Aface(1, 8) = -hr(1) * EpsShIR2 / ShGlReflFacIR;
                         Aface(7, 8) = -sconsh;
                         Aface(8, 8) = hr(8) * (1 - RhoGlIR1 * (EpsShIR2 + RhoShIR2)) / ShGlReflFacIR + sconsh + hcv;
-                    }
-
-                    if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+                    } else if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                         for (i = 1; i <= 8; ++i) {
                             RhoIR(i) = max(0.0, 1.0 - state.dataWindowManager->tir(i) - state.dataWindowManager->emis(i));
                         }
@@ -3360,7 +3351,7 @@ namespace WindowManager {
                     Aface(7, 8) = -state.dataWindowManager->scon(4);
                     Aface(8, 8) = hr(8) + state.dataWindowManager->scon(4) + state.dataWindowManager->hcin;
 
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                         Bface(8) = state.dataWindowManager->Rmir * state.dataWindowManager->emis(8) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(8);
                         Bface(9) = state.dataWindowManager->Rmir * TauShIR * RhoGlIR2 * EpsShIR1 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(1);
                         Bface(10) = state.dataWindowManager->Rmir * EpsShIR2 + state.dataWindowManager->hcin * state.dataWindowManager->tin + AbsRadShadeFace(2);
@@ -3374,7 +3365,7 @@ namespace WindowManager {
                         Aface(10, 10) = hr(10) + sconsh + state.dataWindowManager->hcin;
                     }
 
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+                    if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
                         Bface(1) = state.dataWindowManager->Outir * state.dataWindowManager->emis(1) * TauShIR / ShGlReflFacIR + hcv * TGapNew + state.dataWindowManager->AbsRadGlassFace(1);
                         Bface(9) = state.dataWindowManager->Outir * EpsShIR1 + state.dataWindowManager->hcout * state.dataWindowManager->tout + AbsRadShadeFace(1);
                         Bface(10) = state.dataWindowManager->Outir * TauShIR * RhoGlIR1 * EpsShIR2 / ShGlReflFacIR + hcv * TGapNew + AbsRadShadeFace(2);
@@ -3426,7 +3417,7 @@ namespace WindowManager {
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
             // contribution of frame and divider.
             IncidentSolar = Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 // Interior shade or blind
                 SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
                 // Window heat gain from glazing and shade/blind to zone. Consists of transmitted solar, convection
@@ -3507,14 +3498,14 @@ namespace WindowManager {
             }
 
             TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
-            if (ShadeFlag <= 0) {
+            if (NOT_SHADED(ShadeFlag)) {
                 TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff;
-            } else if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
+            } else if (ANY_SHADE_SCREEN(ShadeFlag)) {
                 TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
-            } else if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
+            } else if (ANY_BLIND(ShadeFlag)) {
                 TransDiff =
                     InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataConstruction->Construct(ConstrNumSh).BlTransDiff);
-            } else if (ShadeFlag == SwitchableGlazing) {
+            } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                 TransDiff = InterpSw(SurfWinSwitchingFactor(SurfNum), state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
             }
             SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
@@ -3522,8 +3513,7 @@ namespace WindowManager {
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
             SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
-            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
-                ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
+            if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -3542,7 +3532,7 @@ namespace WindowManager {
             }
 
             // Save hcv for use in divider calc with interior or exterior shade (see CalcWinFrameAndDividerTemps)
-            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn)
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag) || ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag))
                 SurfWinConvCoeffWithShade(SurfNum) = hcv;
         } else {
             // No convergence after MaxIterations even with relaxed error tolerance
@@ -3637,7 +3627,7 @@ namespace WindowManager {
         Real64 gr;     // glass-shade/blind gap Grashof number
         Real64 pr;     // glass-shade/blind gap Prandtl number
         Real64 nu;     // glass-shade/blind gap Nusselt number
-        int ShadeFlag; // Shading flag
+        WinShadingType ShadeFlag; // Shading flag
         int BlNum;     // Blind number
 
         // Air properties
@@ -3650,7 +3640,7 @@ namespace WindowManager {
         nglassfaces = 2 * state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
         TotGaps = state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers;
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) { // Interior shade or blind
+        if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) { // Interior shade or blind
             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(nglassfaces);
             TGapInlet = state.dataWindowManager->tin;
             TGlassFace = state.dataWindowManager->thetas(nglassfaces);
@@ -3688,7 +3678,7 @@ namespace WindowManager {
 
         GapHeight = Surface(SurfNum).Height;
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == ExtScreenOn) {
+        if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtScreen) {
             // Shade or Screen on
             GapDepth = state.dataMaterial->Material(MatNumSh).WinShadeToGlassDist;
             AGap = GapDepth * Surface(SurfNum).Width;
@@ -3752,7 +3742,7 @@ namespace WindowManager {
         TGapNew = TAve - (GapHeightChar / GapHeight) * (TGapOutlet - TGapInlet);
 
         // Convective heat flow from gap to room air for interior shade or blind
-        if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+        if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
             RhoAir = state.dataWindowManager->AirProps(1) + state.dataWindowManager->AirProps(2) * (TGapNew - state.dataWindowManager->TKelvin);
             QConvGap = RhoAir * AGap * VGap * 1008.0 * (TGapOutlet - TGapInlet);
             // Exclude convection to gap due to divider, if present; divider convection handled
@@ -3837,7 +3827,7 @@ namespace WindowManager {
         Real64 gr;                        // Gap gas Grashof number
         Real64 pr;                        // Gap gas Prandtl number
         Real64 nu;                        // Gap gas Nusselt number
-        int ShadeFlag;                    // Shading flag
+        WinShadingType ShadeFlag;                    // Shading flag
         int BlNum;                        // Blind number
         int IGap;                         // Gap counter; 1 = gap on outer side of shade/blind, 2 = gap on inner side.
         int IGapInc;                      // Gap increment (0 or 1)
@@ -3891,7 +3881,7 @@ namespace WindowManager {
         GapDepth = state.dataWindowManager->gap(1 + IGapInc);
         AGap = GapDepth * Surface(SurfNum).Width;
 
-        if (ShadeFlag == BGShadeOn) {
+        if (ShadeFlag == WinShadingType::BGShade) {
             // Shade on
             ATopGap = state.dataMaterial->Material(MatNumSh).WinShadeTopOpeningMult * AGap;
             ABotGap = state.dataMaterial->Material(MatNumSh).WinShadeBottomOpeningMult * AGap;
@@ -4127,7 +4117,7 @@ namespace WindowManager {
         Real64 gr;                        // Gap air Grashof number
         Real64 pr;                        // Gap air Prandtl number
         Real64 nu;                        // Gap air Nusselt number
-        int ShadeFlag;                    // Shading flag
+        WinShadingType ShadeFlag;                    // Shading flag
         int IGap;                         // Gap counter; 1 = gap on outer side of shade/blind, 2 = gap on inner side.
         int IGapInc;                      // Gap increment; =0, double glass, =1, triple glass
         // REAL(r64)            :: AirProps(8)         ! Air properties
@@ -4617,7 +4607,7 @@ namespace WindowManager {
         Real64 const resgap(0.21); // Typical gap resistance (m2-K/W)
 
         int i;                             // Face counter
-        int ShadeFlag;                     // Shading flag
+        WinShadingType ShadeFlag;                     // Shading flag
         static Array1D<Real64> rguess(11); // Combined radiative/convective resistance (m2-K/W) of //Tuned Made static
         // inside or outside air film, or gap
         Real64 restot; // Total window resistance including outside
@@ -4674,9 +4664,9 @@ namespace WindowManager {
         // Initialize face temperatures of shade or blind, if present
 
         ShadeFlag = SurfWinShadingFlag(SurfNum);
-        if (SurfWinExtIntShadePrevTS(SurfNum) == IntShadeOn || SurfWinExtIntShadePrevTS(SurfNum) == IntBlindOn ||
-            SurfWinExtIntShadePrevTS(SurfNum) == ExtShadeOn || SurfWinExtIntShadePrevTS(SurfNum) == ExtBlindOn ||
-            SurfWinExtIntShadePrevTS(SurfNum) == BGShadeOn || SurfWinExtIntShadePrevTS(SurfNum) == BGBlindOn) {
+        if (ANY_INTERIOR_SHADE_BLIND(SurfWinExtIntShadePrevTS(SurfNum)) ||
+            SurfWinExtIntShadePrevTS(SurfNum) == WinShadingType::ExtShade || SurfWinExtIntShadePrevTS(SurfNum) == WinShadingType::ExtBlind ||
+                ANY_BETWEENGLASS_SHADE_BLIND(SurfWinExtIntShadePrevTS(SurfNum))) {
             // Shade or blind is on during the previous TS; use previous-TS values of shade/blind face temps.
             // Note that if shade or blind is NOT on in the current TS the following two
             // temperature values, although calculated here, are not used. The shade/blind face numbers
@@ -4696,15 +4686,13 @@ namespace WindowManager {
             // equal to tout. For between-glass shade/blind it is assumed to be equal to the
             // average temperature of the adjacent glass faces.
 
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 state.dataWindowManager->thetas(state.dataWindowManager->nglface + 1) = state.dataWindowManager->tin + (AbsRadShade(1) + AbsRadShade(2)) / (2 * (state.dataWindowManager->hcin + hrad));
                 state.dataWindowManager->thetas(state.dataWindowManager->nglface + 2) = state.dataWindowManager->thetas(state.dataWindowManager->nglface + 1);
-            }
-            if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn) {
+            } else if (ShadeFlag == WinShadingType::ExtShade || ShadeFlag == WinShadingType::ExtBlind) {
                 state.dataWindowManager->thetas(state.dataWindowManager->nglface + 1) = state.dataWindowManager->tout + (AbsRadShade(1) + AbsRadShade(2)) / (2 * (state.dataWindowManager->hcout + hrad));
                 state.dataWindowManager->thetas(state.dataWindowManager->nglface + 2) = state.dataWindowManager->thetas(state.dataWindowManager->nglface + 1);
-            }
-            if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+            } else if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
                 // Between-glass shade/blind allowed only for double and triple glazing.
                 // The factor 16.0 below is based on a combined convective/radiative heat transfer
                 // coefficient on either side of the shade/blind of 8.0 W/m2-K -- about 1.4 Btu/h-ft2-F.
@@ -5737,7 +5725,7 @@ namespace WindowManager {
         Real64 TOutRad;    // Outside radiative temperature (K)
         Real64 TOutRadFr;  // Effective outside radiative temperature for frame (K)
         Real64 TOutRadDiv; // Effective outside radiative temperature for divider (K)
-        int ShadeFlag;     // Window shading flag
+        WinShadingType ShadeFlag;     // Window shading flag
         Real64 FrameCon;   // Frame conductance (W/m2-K)
 
         Real64 Afac; // Intermediate calculation variables
@@ -5861,7 +5849,7 @@ namespace WindowManager {
 
             if (FrameDivider(FrDivNum).DividerProjectionOut > 0.0) {
                 HOutRad *= (1.0 + 2.0 * SurfWinProjCorrDivOut(SurfNum));
-                if (SurfWinShadingFlag(SurfNum) == ExtShadeOn) HOutConvDiv = SurfWinConvCoeffWithShade(SurfNum);
+                if (SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) HOutConvDiv = SurfWinConvCoeffWithShade(SurfNum);
                 HOutConvDiv *= (1.0 + 2.0 * SurfWinProjCorrDivOut(SurfNum));
                 // Add long-wave from outside window surface absorbed by divider outside projection
                 SurfWinDividerQRadOutAbs(SurfNum) += SurfWinProjCorrDivOut(SurfNum) * FrameDivider(FrDivNum).DividerEmis *
@@ -5872,7 +5860,7 @@ namespace WindowManager {
 
             if (FrameDivider(FrDivNum).DividerProjectionIn > 0.0) {
                 HInRad *= (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn) HInConvDiv = SurfWinConvCoeffWithShade(SurfNum);
+                if (SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade) HInConvDiv = SurfWinConvCoeffWithShade(SurfNum);
                 HInConvDiv *= (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
                 // Add long-wave from inside window surface absorbed by divider inside projection
                 SurfWinDividerQRadInAbs(SurfNum) += SurfWinProjCorrDivIn(SurfNum) * FrameDivider(FrDivNum).DividerEmis * EmisGlassIn *
@@ -5904,7 +5892,7 @@ namespace WindowManager {
             // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
             // interaction between divider and shade is ignored due to the difficulty of calculating this interaction
             // at the same time that the interaction between glass and shade is calculated.
-            if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+            if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum)))
                 SurfWinDividerHeatGain(SurfNum) = DividerHeatGain;
             DivTempOut = SurfWinDividerTempSurfOut(SurfNum) + state.dataWindowManager->TKelvin;
         } // End of check if window has dividers
@@ -6015,7 +6003,7 @@ namespace WindowManager {
         Array1D<Real64> hgap(5);        // Conductive gap conductance [W/m2-K]
         Array1D<Real64> hGapTot(5);     // Combined radiative and conductive gap conductance [W/m2-K]
         Real64 Rbare;                   // Nominal center-of-glass resistance without air films [m2-K/W]
-        int ShadeFlag;                  // Shading flag
+        WinShadingType ShadeFlag;                  // Shading flag
         Real64 ShadeRes;                // Thermal resistance of shade
         int MatOutside;                 // Material number of outside layer of construction
         int MatInside;                  // Material number of inside layer of construction
@@ -6116,42 +6104,42 @@ namespace WindowManager {
         state.dataWindowManager->Outir = state.dataWindowManager->sigma * pow_4(state.dataWindowManager->tout);
 
         // Determine whether construction has an exterior or interior shade or blind
-        ShadeFlag = NoShade;
+        ShadeFlag = WinShadingType::NoShade;
         ShadeRes = 0.0;
         MatOutside = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
         MatInside = state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLay);
         if (state.dataMaterial->Material(MatOutside).Group == 2) { // Exterior shade present
             MatShade = MatOutside;
-            ShadeFlag = ExtShadeOn;
+            ShadeFlag = WinShadingType::ExtShade;
             // Set glazing outside convection coefficient to Window 4 still-air value
             state.dataWindowManager->hcout = 12.25;
         } else if (state.dataMaterial->Material(MatOutside).Group == 7) { // Exterior screen present
             MatShade = MatOutside;
             ScNum = state.dataMaterial->Material(MatShade).ScreenDataPtr;
             // Orphaned constructs with exterior screen are ignored
-            if (ScNum > 0) ShadeFlag = ExtScreenOn;
+            if (ScNum > 0) ShadeFlag = WinShadingType::ExtScreen;
             state.dataWindowManager->hcout = 12.25;
         } else if (state.dataMaterial->Material(MatOutside).Group == 5) { // Exterior blind present
             MatShade = MatOutside;
-            ShadeFlag = ExtBlindOn;
+            ShadeFlag = WinShadingType::ExtBlind;
             BlNum = state.dataMaterial->Material(MatShade).BlindDataPtr;
             state.dataWindowManager->hcout = 12.25;
         } else if (state.dataMaterial->Material(MatInside).Group == 2) { // Interior shade present
             MatShade = MatInside;
-            ShadeFlag = IntShadeOn;
+            ShadeFlag = WinShadingType::IntShade;
         } else if (state.dataMaterial->Material(MatInside).Group == 5) { // Interior blind present
             MatShade = MatInside;
             BlNum = state.dataMaterial->Material(MatShade).BlindDataPtr;
-            ShadeFlag = IntBlindOn;
+            ShadeFlag = WinShadingType::IntBlind;
         } else if (TotGlassLay == 2) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == 2) ShadeFlag = BGShadeOn;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == 5) ShadeFlag = BGBlindOn;
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == 2) ShadeFlag = WinShadingType::BGShade;
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == 5) ShadeFlag = WinShadingType::BGBlind;
         } else if (TotGlassLay == 3) {
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == 2) ShadeFlag = BGShadeOn;
-            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == 5) ShadeFlag = BGBlindOn;
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == 2) ShadeFlag = WinShadingType::BGShade;
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == 5) ShadeFlag = WinShadingType::BGBlind;
         }
 
-        if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+        if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
             errFlag = 2;
             return;
         }
@@ -6159,10 +6147,10 @@ namespace WindowManager {
         TSolNorm = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef);
         TVisNorm = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).TransVisBeamCoef);
         AbsBeamShadeNorm = 0.0;
-        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn) { // Exterior or interior shade on
+        if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) { // Exterior or interior shade on
             AbsBeamShadeNorm = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).AbsBeamShadeCoef);
             // Exterior blind or screen or interior blind on
-        } else if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+        } else if (ShadeFlag == WinShadingType::IntBlind || ShadeFlag == WinShadingType::ExtBlind || ShadeFlag == WinShadingType::ExtScreen) {
             // Find unshaded construction that goes with this construction w/blind or screen
             ConstrNumBare = 0;
             for (ConstrNum1 = 1; ConstrNum1 <= state.dataHeatBal->TotConstructs; ++ConstrNum1) {
@@ -6174,7 +6162,7 @@ namespace WindowManager {
                     ConstrNumBare = ConstrNum1;
                     for (Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum1).TotLayers; ++Lay) {
                         LayPtr = state.dataConstruction->Construct(ConstrNum1).LayerPoint(Lay);
-                        if (ShadeFlag == IntBlindOn) { // The shaded construction has an interior blind
+                        if (ShadeFlag == WinShadingType::IntBlind) { // The shaded construction has an interior blind
                             LayPtrSh = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
                         } else { // The shaded construction has an exterior blind or screen
                             LayPtrSh = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay + 1);
@@ -6192,7 +6180,7 @@ namespace WindowManager {
 
             TBmBm = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).TransSolBeamCoef);
             TBmBmVis = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).TransVisBeamCoef);
-            if (ShadeFlag == ExtScreenOn) {
+            if (ShadeFlag == WinShadingType::ExtScreen) {
                 //   Don't need to call subroutine, use normal incident properties (SUBROUTINE CalcNominalWindowCond)
                 //   Last call to CalcScreenTransmittance(ISurf) was done at direct normal angle (0,0) in CalcWindowScreenProperties
                 TScBmBm = state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans;
@@ -6224,7 +6212,7 @@ namespace WindowManager {
                 TBlBmDifVis = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans);
                 TDif = state.dataConstruction->Construct(ConstrNumBare).TransDiff;
                 TDifVis = state.dataConstruction->Construct(ConstrNumBare).TransDiffVis;
-                if (ShadeFlag == IntBlindOn) {
+                if (ShadeFlag == WinShadingType::IntBlind) {
                     RGlDiffBack = state.dataConstruction->Construct(ConstrNumBare).ReflectSolDiffBack;
                     RGlDiffBackVis = state.dataConstruction->Construct(ConstrNumBare).ReflectVisDiffBack;
                     RhoBlFront = InterpProfSlatAng(0.0, SlatAng, VarSlats, state.dataHeatBal->Blind(BlNum).SolFrontBeamDiffRefl);
@@ -6241,7 +6229,7 @@ namespace WindowManager {
                     TVisNorm = TBmBmVis *
                                (TBlBmBm + TBlBmDifVis + TBlDifDifVis * RhoBlFrontVis * RGlDiffBackVis / (1.0 - RhoBlDiffFrontVis * RGlDiffBackVis));
                 } // (IntBlind)
-                if (ShadeFlag == ExtBlindOn) {
+                if (ShadeFlag == WinShadingType::ExtBlind) {
                     TBlBmBm = BlindBeamBeamTrans(0.0, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                     RGlFront = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).ReflSolBeamFrontCoef);
                     RGlFrontVis = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).ReflSolBeamFrontCoef);
@@ -6292,16 +6280,16 @@ namespace WindowManager {
                 state.dataWindowManager->tir(2 * IGlass - 1) = state.dataMaterial->Material(LayPtr).TransThermal;
                 state.dataWindowManager->tir(2 * IGlass) = state.dataMaterial->Material(LayPtr).TransThermal;
                 AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, IGlass));
-                if (ShadeFlag == IntBlindOn) { // Interior blind on
+                if (ShadeFlag == WinShadingType::IntBlind) { // Interior blind on
                     AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
                     AGlDiffBack = state.dataConstruction->Construct(ConstrNumBare).AbsDiffBack(IGlass);
                     AbsBeamNorm(IGlass) += TBmBm * AGlDiffBack * RhoBlFront / (1.0 - RhoBlFront * RGlDiffBack);
-                } else if (ShadeFlag == ExtBlindOn) { // Exterior blind on
+                } else if (ShadeFlag == WinShadingType::ExtBlind) { // Exterior blind on
                     AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
                     AbsBeamNorm(IGlass) = TBlBmBm * AbsBeamNorm(IGlass) + (TBlBmBm * RGlFront * RhoBlBack + TBlBmDif) *
                                                                               state.dataConstruction->Construct(ConstrNumBare).AbsDiff(IGlass) /
                                                                               (1.0 - RGlDiffFront * RhoBlDiffBack);
-                } else if (ShadeFlag == ExtScreenOn) { // Exterior screen on
+                } else if (ShadeFlag == WinShadingType::ExtScreen) { // Exterior screen on
                     AbsBeamNorm(IGlass) = POLYF(1.0, state.dataConstruction->Construct(ConstrNumBare).AbsBeamCoef({1, 6}, IGlass));
                     AbsBeamNorm(IGlass) = TScBmBm * AbsBeamNorm(IGlass) + (TScBmBm * RGlFront * RScBack + TScBmDif) *
                                                                               state.dataConstruction->Construct(ConstrNumBare).AbsDiff(IGlass) /
@@ -6362,7 +6350,7 @@ namespace WindowManager {
         hInRad = state.dataWindowManager->emis(state.dataWindowManager->nglface) * state.dataWindowManager->sigma * 0.5 * pow_3(state.dataWindowManager->tin + state.dataWindowManager->thetas(state.dataWindowManager->nglface));
         rIn = 1.0 / (hInRad + state.dataWindowManager->hcin);
 
-        if (!(ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn)) AbsBeamShadeNorm = 0.0;
+        if (!ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) AbsBeamShadeNorm = 0.0;
 
         {
             auto const SELECT_CASE_var(state.dataWindowManager->ngllayer);
@@ -7417,7 +7405,6 @@ namespace WindowManager {
         Real64 SumReflect;     // Integration variable for reflectance
         Real64 SumReflectVis;  // Integration variable for visible reflectance
         Real64 SumArea;        // Integration variable for area of quarter hemisphere
-        int ShadingType;       // Type of shading device
         bool FoundMaterial;    // Flag to avoid printing screen transmittance data multiple times when Material:WindowScreen
         // is used on multiple surfaces
         bool PrintTransMap; // Flag used to print transmittance map
@@ -7469,8 +7456,8 @@ namespace WindowManager {
             if (Surface(SurfNum).HasShadeControl) {
                 ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 MatNum = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1);
-                ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
-                if (ShadingType == WSC_ST_ExteriorScreen) {
+                WinShadingType ShadingType = WindowShadingControl(Surface(SurfNum).activeWindowShadingControl).ShadingType;
+                if (ShadingType == WinShadingType::ExtScreen) {
 
                     if (state.dataMaterial->Material(MatNum).ScreenMapResolution > 0) PrintTransMap = true;
                     ++ScreenNum;

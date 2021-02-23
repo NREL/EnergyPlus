@@ -1007,8 +1007,8 @@ namespace EnergyPlus::SwimmingPool {
             Real64 Area = DataSurfaces::Surface(SurfNum).Area; // Effective surface area
 
             if (DataSurfaces::Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
-                if (DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::IntShadeOn ||
-                    DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::IntBlindOn) {
+                if (DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntShade ||
+                    DataSurfaces::SurfWinShadingFlag(SurfNum) == DataSurfaces::WinShadingType::IntBlind) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
                     Area += DataSurfaces::SurfWinDividerArea(SurfNum);
                 }
@@ -1020,8 +1020,8 @@ namespace EnergyPlus::SwimmingPool {
                 }
 
                 if (DataSurfaces::SurfWinDividerArea(SurfNum) > 0.0 &&
-                    DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::IntShadeOn &&
-                    DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::IntBlindOn) {
+                    DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntShade &&
+                    DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntBlind) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * DataSurfaces::SurfWinDividerArea(SurfNum) *
                                   (1.0 + 2.0 * DataSurfaces::SurfWinProjCorrDivIn(SurfNum)) *
