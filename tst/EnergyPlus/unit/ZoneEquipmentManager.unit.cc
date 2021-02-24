@@ -3062,7 +3062,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingOnly);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingOnly);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
@@ -3306,7 +3306,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustReturnOnly);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustReturnOnly);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
@@ -3568,7 +3568,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustReturnThenMixing);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustReturnThenMixing);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
@@ -3833,7 +3833,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingThenReturn);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustmentType::AdjustMixingThenReturn);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
     EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);

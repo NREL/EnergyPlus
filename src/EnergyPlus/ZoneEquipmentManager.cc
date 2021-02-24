@@ -2685,8 +2685,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // and controllers
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::NoAdjustReturnAndMixing) AdjustZoneMixingFlowFlag = false;
-            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::NoInfiltrationFlow) AdjustZoneInfiltrationFlowFlag = false;
+            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) AdjustZoneMixingFlowFlag = false;
+            if (ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::NoInfiltrationFlow) AdjustZoneInfiltrationFlowFlag = false;
             CalcAirFlowSimple(state, 0, AdjustZoneMixingFlowFlag, AdjustZoneInfiltrationFlowFlag);
         }
 
@@ -3991,8 +3991,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         }
                     }
                     // Set zone mixing incoming mass flow rate
-                    if ((Iteration == 0) || ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnOnly || 
-                        ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
+                    if ((Iteration == 0) || ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnOnly || 
+                        ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnThenMixing) {
                         ZoneMixingAirMassFlowRate = MixingMassFlowZone(ZoneNum);
                     } else {
                         ZoneMixingAirMassFlowRate = max(0.0, ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate -
@@ -4031,12 +4031,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     MassConservation(ZoneNum).InMassFlowRate = TotInletAirMassFlowRate;
                     MassConservation(ZoneNum).ExhMassFlowRate = TotExhaustAirMassFlowRate;
 
-                    if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingOnly ||
-                        ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingThenReturn) {
+                    if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingOnly ||
+                        ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingThenReturn) {
                         ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
                         Real64 AdjustedTotalReturnMassFlow = 0;
                         MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
-                        if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingThenReturn) {
+                        if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingThenReturn) {
 
                             // Calculate return air flow rate using mass conservation equation
                             AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
@@ -4052,8 +4052,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         // Set zone infiltration air flow rate
                         CalcZoneInfiltrationFlows(state, ZoneNum, ZoneReturnAirMassFlowRate);
 
-                    } else if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnOnly ||
-                               ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
+                    } else if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnOnly ||
+                               ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnThenMixing) {
 
                         Real64 zoneReturnFlowMax = 0.0;
                         Real64 AdjustedTotalReturnMassFlow = 0;
@@ -4068,7 +4068,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
                         ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
 
-                        if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustReturnThenMixing) {
+                        if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnThenMixing) {
                             ZoneMixingAirMassFlowRate = max(0.0,
                                                             ZoneReturnAirMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate +
                                                                 MassConservation(ZoneNum).MixingSourceMassFlowRate);
@@ -4322,7 +4322,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // if zone mass balance true, set to expected return flow
         if (DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance) {
             // applied zone return flow schedule multiplier
-            if (DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustMixingOnly)
+            if (DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingOnly)
                 ExpTotalReturnMassFlow = returnSchedFrac * ExpTotalReturnMassFlow;
             // set air flow rate for each return node
             Real64 zoneTotReturnFlow = 0.0;

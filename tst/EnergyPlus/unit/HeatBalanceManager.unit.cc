@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(ZoneAirMassFlow.ZoneFlowAdjustment, AdjustMixingOnly);
+    EXPECT_EQ(ZoneAirMassFlow.ZoneFlowAdjustment, AdjustmentType::AdjustMixingOnly);
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationTreatment, AddInfiltrationFlow);
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationZoneType, MixingSourceZonesOnly);
 }
@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(ZoneAirMassFlow.ZoneFlowAdjustment, NoAdjustReturnAndMixing);
+    EXPECT_EQ(ZoneAirMassFlow.ZoneFlowAdjustment, AdjustmentType::NoAdjustReturnAndMixing);
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationTreatment, AdjustInfiltrationFlow);
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationZoneType, AllZones);
 
@@ -604,7 +604,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(ZoneAirMassFlow.ZoneFlowAdjustment, NoAdjustReturnAndMixing);
+    EXPECT_EQ(ZoneAirMassFlow.ZoneFlowAdjustment, AdjustmentType::NoAdjustReturnAndMixing);
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationTreatment, NoInfiltrationFlow);
     EXPECT_EQ(ZoneAirMassFlow.InfiltrationZoneType, 0);
 }
