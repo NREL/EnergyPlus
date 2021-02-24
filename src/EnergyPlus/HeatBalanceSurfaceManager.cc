@@ -5515,7 +5515,7 @@ namespace HeatBalanceSurfaceManager {
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
             for (int SurfNum = Zone(zoneNum).HTSurfaceFirst; SurfNum <= Zone(zoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class != SurfaceClass::Window) continue;
+                if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
                 if (present(ZoneToResimulate)) {
                     if ((zoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone
