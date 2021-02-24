@@ -816,7 +816,7 @@ namespace util
 	bool translate_schedule(int tod[8760], const matrix_t<double> &wkday, const matrix_t<double> &wkend, int min_val, int max_val);
 
 	std::vector<double> frequency_table(double* values, size_t n_vals, double bin_width);
-};
+}
 
 
 #endif
