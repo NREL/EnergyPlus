@@ -110,9 +110,7 @@ namespace WindowManager {
 
         // Interior and exterior shading layers have gas between them and IGU but that gas
         // was not part of construction so it needs to be increased by one
-        if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == ExtShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn ||
-            state.dataSurface->SurfWinShadingFlag(SurfNum) == ExtBlindOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == ExtScreenOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == BGShadeOn ||
-            state.dataSurface->SurfWinShadingFlag(SurfNum) == BGBlindOn) {
+        if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
             ++totSolidLayers;
         }
 
@@ -141,7 +139,7 @@ namespace WindowManager {
                 ++i;
             }
             SurfInsideTemp = aTemp - DataGlobalConstants::KelvinConv;
-            if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                 auto EffShBlEmiss = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
                 auto EffGlEmiss = InterpSlatAng(state.dataSurface->SurfWinSlatAngThisTS(SurfNum), state.dataSurface->SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
@@ -150,7 +148,7 @@ namespace WindowManager {
         }
 
         state.dataHeatBal->HConvIn(SurfNum) = aSystem->getHc(Environment::Indoor);
-        if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn || aFactory.isInteriorShade()) {
+        if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))|| aFactory.isInteriorShade()) {
             // It is not clear why EnergyPlus keeps this interior calculations separately for interior shade. This does create different
             // solution from heat transfer from tarcog itself. Need to confirm with LBNL team about this approach. Note that heat flow
             // through shade (consider case when openings are zero) is different from heat flow obtained by these equations. Will keep
@@ -248,23 +246,22 @@ namespace WindowManager {
         m_ConstructionNumber = m_Surface.Construction;
         m_ShadePosition = ShadePosition::NoShade;
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
-            ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
+        if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
             m_ConstructionNumber = m_Surface.activeShadedConstruction;
             if (state.dataSurface->SurfWinStormWinFlag(t_SurfNum) > 0) m_ConstructionNumber = m_Surface.activeStormWinShadedConstruction;
         }
 
         m_TotLay = getNumOfLayers(state);
 
-        if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+        if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
             m_ShadePosition = ShadePosition::Interior;
         }
 
-        if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) {
+        if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
             m_ShadePosition = ShadePosition::Exterior;
         }
 
-        if (ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn) {
+        if (ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag)) {
             m_ShadePosition = ShadePosition::Between;
         }
     }
@@ -303,9 +300,7 @@ namespace WindowManager {
     {
         auto ConstrNum = m_Surface.Construction;
 
-        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == IntBlindOn ||
-            state.dataSurface->SurfWinShadingFlag(m_SurfNum) == ExtBlindOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == BGShadeOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == BGBlindOn ||
-            state.dataSurface->SurfWinShadingFlag(m_SurfNum) == ExtScreenOn) {
+        if (ANY_SHADE_SCREEN(state.dataSurface->SurfWinShadingFlag(m_SurfNum)) || ANY_BLIND(state.dataSurface->SurfWinShadingFlag(m_SurfNum))) {
             ConstrNum = m_Surface.activeShadedConstruction;
             if (state.dataSurface->SurfWinStormWinFlag(m_SurfNum) > 0) ConstrNum = m_Surface.activeStormWinShadedConstruction;
         }
@@ -499,10 +494,10 @@ namespace WindowManager {
         auto aGas = getAir();
         auto thickness = 0.0;
 
-        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == IntBlindOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == ExtBlindOn) {
+        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntBlind || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtBlind) {
             thickness = state.dataHeatBal->Blind(state.dataSurface->SurfWinBlindNumber(m_SurfNum)).BlindToGlassDist;
         }
-        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == ExtShadeOn || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == ExtScreenOn) {
+        if (state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::IntShade || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtShade || state.dataSurface->SurfWinShadingFlag(m_SurfNum) == WinShadingType::ExtScreen) {
             auto material = getLayerMaterial(state, t_Index);
             thickness = material->WinShadeToGlassDist;
         }

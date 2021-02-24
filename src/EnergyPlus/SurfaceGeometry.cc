@@ -159,13 +159,13 @@ namespace SurfaceGeometry {
         state.dataSurface->SurfWinProfileAngHor.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinProfileAngVert.dimension(NumSurfaces, 0);
 
-        state.dataSurface->SurfWinShadingFlag.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinShadingFlag.dimension(NumSurfaces, WinShadingType::ShadeOff);
         state.dataSurface->SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0.0);
         state.dataSurface->SurfWinStormWinFlag.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinStormWinFlagPrevDay.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinFracTimeShadingDeviceOn.dimension(NumSurfaces, 0);
-        state.dataSurface->SurfWinExtIntShadePrevTS.dimension(NumSurfaces, 0);
+        state.dataSurface->SurfWinExtIntShadePrevTS.dimension(NumSurfaces, WinShadingType::ShadeOff);
         state.dataSurface->SurfWinHasShadeOrBlindLayer.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinSurfDayLightInit.dimension(NumSurfaces, 0);
         state.dataSurface->SurfWinDaylFacPoint.dimension(NumSurfaces, 0);
@@ -1006,7 +1006,6 @@ namespace SurfaceGeometry {
         // unused  INTEGER :: SchID
         int BlNumNew;
         int WinShadingControlPtr(0);
-        int ShadingType;
         int ErrCount;
         Real64 diffp;
         bool izConstDiff;    // differences in construction for IZ surfaces
@@ -2037,10 +2036,10 @@ namespace SurfaceGeometry {
                 ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
                 if (ConstrNumSh <= 0) continue;
 
-                ShadingType = state.dataSurface->WindowShadingControl(WinShadingControlPtr).ShadingType;
+                WinShadingType ShadingType = state.dataSurface->WindowShadingControl(WinShadingControlPtr).ShadingType;
 
                 // only for blinds
-                if (ShadingType == WSC_ST_ExteriorBlind || ShadingType == WSC_ST_InteriorBlind || ShadingType == WSC_ST_BetweenGlassBlind) {
+                if (ANY_BLIND(ShadingType)) {
 
                     // TH 1/7/2010. CR 7930
                     // The old code did not consider between-glass blind. Also there should not be two blinds - both interior and exterior
@@ -4772,11 +4771,7 @@ namespace SurfaceGeometry {
                 if (ConstrNumSh > 0) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction = ConstrNumSh;
                 } else {
-                    if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                        state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind ||
-                        state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
-                        state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
-                        state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
+                    if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType) || ANY_EXTERIOR_SHADE_BLIND_SCREEN(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                         ShDevNum = state.dataSurface->WindowShadingControl(WSCPtr).ShadingDevice;
                         if (ShDevNum > 0) {
                             CreateShadedWindowConstruction(state, SurfNum, WSCPtr, ShDevNum, shadeControlIndex);
@@ -4791,8 +4786,7 @@ namespace SurfaceGeometry {
             ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
             if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
 
-                if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                    state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                     TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                     TotShLayers = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
                     if (TotShLayers - 1 != TotLayers) {
@@ -4815,9 +4809,7 @@ namespace SurfaceGeometry {
                     }
                 }
 
-                if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
-                    state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
-                    state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
+                if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                     TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                     TotShLayers = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
                     if (TotShLayers - 1 != TotLayers) {
@@ -4840,8 +4832,7 @@ namespace SurfaceGeometry {
                     }
                 }
 
-                if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                    state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                if (ANY_BETWEENGLASS_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                     // Divider not allowed with between-glass shade or blind
                     if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider > 0) {
                         if (state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
@@ -4884,7 +4875,7 @@ namespace SurfaceGeometry {
                         MatGap1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 2);
                         MatGap2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
                         MatSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
-                        if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                        if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::BGBlind) {
                             MatGapCalc = std::abs(state.dataMaterial->Material(MatGap).Thickness - (state.dataMaterial->Material(MatGap1).Thickness + state.dataMaterial->Material(MatGap2).Thickness));
                             if (MatGapCalc > 0.001) {
                                 ShowSevereError(state, cRoutineName + ": The gap width(s) for the unshaded window construction " + state.dataConstruction->Construct(ConstrNum).Name);
@@ -4972,8 +4963,7 @@ namespace SurfaceGeometry {
                     // Divider not allowed with between-glass shade or blind
                     for (int WSCPtr : state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList) {
                         if (!ErrorsFound && WSCPtr > 0 && ConstrNumSh > 0) {
-                            if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                                state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                            if (ANY_BETWEENGLASS_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider > 0) {
                                     if (state.dataSurface->FrameDivider(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
                                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + "\", invalid " +
@@ -8139,25 +8129,19 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int const NumValidShadingTypes(8);
+
+        int const NumValidShadingTypes(9);
         static Array1D_string const cValidShadingTypes(NumValidShadingTypes,
-                                                       {"INTERIORSHADE",
-                                                        "EXTERIORSHADE",
-                                                        "EXTERIORSCREEN",
-                                                        "INTERIORBLIND",
-                                                        "EXTERIORBLIND",
-                                                        "BETWEENGLASSSHADE",
-                                                        "BETWEENGLASSBLIND",
-                                                        "SWITCHABLEGLAZING"});
-        static Array1D_int const ValidShadingTypes(NumValidShadingTypes,
-                                                   {WSC_ST_InteriorShade,
-                                                    WSC_ST_ExteriorShade,
-                                                    WSC_ST_ExteriorScreen,
-                                                    WSC_ST_InteriorBlind,
-                                                    WSC_ST_ExteriorBlind,
-                                                    WSC_ST_BetweenGlassShade,
-                                                    WSC_ST_BetweenGlassBlind,
-                                                    WSC_ST_SwitchableGlazing});
+                                                       {"SHADEOFF", // 1
+                                                        "INTERIORSHADE", // 2
+                                                        "SWITCHABLEGLAZING", // 3
+                                                        "EXTERIORSHADE", // 4
+                                                        "EXTERIORSCREEN", // 5
+                                                        "INTERIORBLIND", // 6
+                                                        "EXTERIORBLIND", // 7
+                                                        "BETWEENGLASSSHADE", // 8
+                                                        "BETWEENGLASSBLIND" // 9
+                                                        });
 
         int const NumValidWindowShadingControlTypes(21);
         static Array1D_string const cValidWindowShadingControlTypes(NumValidWindowShadingControlTypes,
@@ -8183,43 +8167,7 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
 
-        static Array1D_int const ValidWindowShadingControlTypes(
-            NumValidWindowShadingControlTypes,
-            {WSCT_AlwaysOn,
-             WSCT_AlwaysOff,
-             WSCT_OnIfScheduled,
-             WSCT_HiSolar,
-             WSCT_HiHorzSolar,
-             WSCT_HiOutAirTemp,
-             WSCT_HiZoneAirTemp,
-             WSCT_HiZoneCooling,
-             WSCT_HiGlare,
-             WSCT_MeetDaylIlumSetp,
-             WSCT_OnNightLoOutTemp_OffDay,
-             WSCT_OnNightLoInTemp_OffDay,
-             WSCT_OnNightIfHeating_OffDay,
-             WSCT_OnNightLoOutTemp_OnDayCooling,
-             WSCT_OnNightIfHeating_OnDayCooling,
-             WSCT_OffNight_OnDay_HiSolarWindow,
-             WSCT_OnNight_OnDay_HiSolarWindow,
-             WSCT_OnHiOutTemp_HiSolarWindow,
-             WSCT_OnHiOutTemp_HiHorzSolar,
-             WSCT_OnHiZoneTemp_HiSolarWindow,
-             WSCT_OnHiZoneTemp_HiHorzSolar}); // 'ALWAYSON                                    ', & | 'ALWAYSOFF                                   ', &
-                                              // | 'ONIFSCHEDULEALLOWS                          ', & | 'ONIFHIGHSOLARONWINDOW                       ',
-                                              // & | 'ONIFHIGHHORIZONTALSOLAR                     ', & | 'ONIFHIGHOUTDOORAIRTEMPERATURE
-                                              // ', & | 'ONIFHIGHZONEAIRTEMPERATURE                         ', & | 'ONIFHIGHZONECOOLING
-                                              // ', & | 'ONIFHIGHGLARE                               ', & | 'MEETDAYLIGHTILLUMINANCESETPOINT
-                                              // ', & | 'ONNIGHTIFLOWOUTDOORTEMPANDOFFDAY              ', & | 'ONNIGHTIFLOWINSIDETEMPANDOFFDAY
-                                              // ', & | 'ONNIGHTIFHEATINGANDOFFDAY                     ', & |
-                                              // 'ONNIGHTIFLOWOUTDOORTEMPANDONDAYIFCOOLING      ', & | 'ONNIGHTIFHEATINGANDONDAYIFCOOLING
-                                              // ', & | 'OFFNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW ', & |
-                                              // 'ONNIGHTANDONDAYIFCOOLINGANDHIGHSOLARONWINDOW  ', & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHSOLARONWINDOW  ',
-                                              // & | 'ONIFHIGHOUTDOORAIRTEMPANDHIGHHORIZONTALSOLAR', & | 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW
-                                              // ', & | 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR   '/)
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         int IOStat;          // IO Status when calling get input subroutine
         int ControlNumAlpha; // Number of control alpha names being passed
         int ControlNumProp;  // Number of control properties being passed
@@ -8230,7 +8178,6 @@ namespace SurfaceGeometry {
         bool ErrorInName;
         bool IsBlank;
         int Loop;
-        int ShTyp;               // Shading type
         std::string ControlType; // Shading control type
         bool BGShadeBlindError;  // True if problem with construction that is supposed to have between-glass
         // shade or blind
@@ -8417,7 +8364,7 @@ namespace SurfaceGeometry {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(5) + "=\"" +
                                 cAlphaArgs(5) + "\".");
             } else {
-                state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType = ValidWindowShadingControlTypes(Found);
+                state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType = WindowShadingControlType(Found);
             }
 
             // Error checks
@@ -8432,7 +8379,7 @@ namespace SurfaceGeometry {
                                 cAlphaArgs(8) + "\".");
             }
 
-            if ((state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType == WSCT_OnIfScheduled) &&
+            if ((state.dataSurface->WindowShadingControl(ControlNum).ShadingControlType == WindowShadingControlType::OnIfScheduled) &&
                 (!state.dataSurface->WindowShadingControl(ControlNum).ShadingControlIsScheduled)) { // CR 7709 BG
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + " = \"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid, " + cAlphaFieldNames(7) +
@@ -8456,13 +8403,13 @@ namespace SurfaceGeometry {
             if (cAlphaArgs(3) == "INTERIORNONINSULATINGSHADE" || cAlphaArgs(3) == "INTERIORINSULATINGSHADE") {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
                                  cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", changing to \"InteriorShade\"");
-                state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WSC_ST_InteriorShade;
+                state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WinShadingType::IntShade;
                 cAlphaArgs(3) = "INTERIORSHADE";
             }
             if (cAlphaArgs(3) == "EXTERIORNONINSULATINGSHADE" || cAlphaArgs(3) == "EXTERIORINSULATINGSHADE") {
                 ShowWarningError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" is using obsolete " +
                                  cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\", changing to \"ExteriorShade\"");
-                state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WSC_ST_ExteriorShade;
+                state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WinShadingType::ExtShade;
                 cAlphaArgs(3) = "EXTERIORSHADE";
             }
 
@@ -8476,15 +8423,15 @@ namespace SurfaceGeometry {
 
             // Check for illegal shading type name
             Found = UtilityRoutines::FindItemInList(cAlphaArgs(3), cValidShadingTypes, NumValidShadingTypes);
-            if (Found == 0) {
+            if (Found <= 1) {
                 ErrorsFound = true;
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" invalid " + cAlphaFieldNames(3) + "=\"" +
                                 cAlphaArgs(3) + "\".");
             } else {
-                state.dataSurface->WindowShadingControl(ControlNum).ShadingType = ValidShadingTypes(Found);
+                state.dataSurface->WindowShadingControl(ControlNum).ShadingType = WinShadingType(Found);
             }
 
-            ShTyp = state.dataSurface->WindowShadingControl(ControlNum).ShadingType;
+            WinShadingType ShTyp = state.dataSurface->WindowShadingControl(ControlNum).ShadingType;
             IShadedConst = state.dataSurface->WindowShadingControl(ControlNum).getInputShadedConstruction;
             IShadingDevice = state.dataSurface->WindowShadingControl(ControlNum).ShadingDevice;
 
@@ -8493,30 +8440,30 @@ namespace SurfaceGeometry {
                                 "\" has no matching shaded construction or shading device.");
                 ErrorsFound = true;
             } else if (IShadedConst == 0 && IShadingDevice > 0) {
-                if (ShTyp == WSC_ST_SwitchableGlazing) {
+                if (ShTyp == WinShadingType::SwitchableGlazing) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= SwitchableGlazing but no matching shaded construction");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && state.dataMaterial->Material(IShadingDevice).Group != Shade) {
+                if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) && state.dataMaterial->Material(IShadingDevice).Group != Shade) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
                     ShowContinueError(state, cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WSC_ST_ExteriorScreen) && state.dataMaterial->Material(IShadingDevice).Group != Screen) {
+                if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice).Group != Screen) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= ExteriorScreen but matching shading device is not a window screen");
                     ShowContinueError(state, cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
-                if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && state.dataMaterial->Material(IShadingDevice).Group != WindowBlind) {
+                if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) && state.dataMaterial->Material(IShadingDevice).Group != WindowBlind) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind");
                     ShowContinueError(state, cAlphaFieldNames(8) + " in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
                     ErrorsFound = true;
                 }
-                if (ShTyp == WSC_ST_BetweenGlassShade || ShTyp == WSC_ST_BetweenGlassBlind) {
+                if (ShTyp == WinShadingType::BGShade || ShTyp == WinShadingType::BGBlind) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaArgs(3) +
                                     "= BetweenGlassShade or BetweenGlassBlind and");
                     ShowContinueError(state, cAlphaFieldNames(8) + " is specified. This is illegal. Specify shaded construction instead.");
@@ -8537,7 +8484,7 @@ namespace SurfaceGeometry {
                 BGShadeBlindError = false;
                 IShadingDevice = 0;
                 if (state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers) != 0) {
-                    if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_InteriorShade) {
+                    if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::IntShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
                         if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers)).Group != Shade) {
                             ErrorsFound = true;
@@ -8546,7 +8493,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(state, "of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a shade layer on the inside of the window.");
                         }
-                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorShade) {
+                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::ExtShade) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
                         if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group != Shade) {
                             ErrorsFound = true;
@@ -8555,7 +8502,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(state, "of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a shade layer on the outside of the window.");
                         }
-                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorScreen) {
+                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::ExtScreen) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
                         if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group != Screen) {
                             ErrorsFound = true;
@@ -8564,7 +8511,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(state, "of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a screen layer on the outside of the window.");
                         }
-                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_InteriorBlind) {
+                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::IntBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers);
                         if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(NLayers)).Group != WindowBlind) {
                             ErrorsFound = true;
@@ -8573,7 +8520,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(state, "of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a blind layer on the inside of the window.");
                         }
-                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_ExteriorBlind) {
+                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::ExtBlind) {
                         IShadingDevice = state.dataConstruction->Construct(IShadedConst).LayerPoint(1);
                         if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(1)).Group != WindowBlind) {
                             ErrorsFound = true;
@@ -8582,7 +8529,7 @@ namespace SurfaceGeometry {
                             ShowContinueError(state, "of " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                               "\" should have a blind layer on the outside of the window.");
                         }
-                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::BGShade) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
                             if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3)).Group != Shade) BGShadeBlindError = true;
@@ -8598,7 +8545,7 @@ namespace SurfaceGeometry {
                                               "\" should have two or three glass layers and a");
                             ShowContinueError(state, "between-glass shade layer with a gas layer on each side.");
                         }
-                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WSC_ST_BetweenGlassBlind) {
+                    } else if (state.dataSurface->WindowShadingControl(ControlNum).ShadingType == WinShadingType::BGBlind) {
                         if (NLayers != 5 && NLayers != 7) BGShadeBlindError = true;
                         if (NLayers == 5) {
                             if (state.dataMaterial->Material(state.dataConstruction->Construct(IShadedConst).LayerPoint(3)).Group != WindowBlind) BGShadeBlindError = true;
@@ -8616,19 +8563,19 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (IShadingDevice > 0) {
-                    if ((ShTyp == WSC_ST_InteriorShade || ShTyp == WSC_ST_ExteriorShade) && state.dataMaterial->Material(IShadingDevice).Group != Shade) {
+                    if ((ShTyp == WinShadingType::IntShade || ShTyp == WinShadingType::ExtShade) && state.dataMaterial->Material(IShadingDevice).Group != Shade) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= InteriorShade or ExteriorShade but matching shading device is not a window shade");
                         ShowContinueError(state, "Shading Device in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WSC_ST_ExteriorScreen) && state.dataMaterial->Material(IShadingDevice).Group != Screen) {
+                    if ((ShTyp == WinShadingType::ExtScreen) && state.dataMaterial->Material(IShadingDevice).Group != Screen) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= ExteriorScreen but matching shading device is not an exterior window screen.");
                         ShowContinueError(state, "Shading Device in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
                         ErrorsFound = true;
                     }
-                    if ((ShTyp == WSC_ST_InteriorBlind || ShTyp == WSC_ST_ExteriorBlind) && state.dataMaterial->Material(IShadingDevice).Group != WindowBlind) {
+                    if ((ShTyp == WinShadingType::IntBlind || ShTyp == WinShadingType::ExtBlind) && state.dataMaterial->Material(IShadingDevice).Group != WindowBlind) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + state.dataSurface->WindowShadingControl(ControlNum).Name + "\" has " + cAlphaFieldNames(3) +
                                         "= InteriorBlind or ExteriorBlind but matching shading device is not a window blind.");
                         ShowContinueError(state, "Shading Device in error=\"" + state.dataMaterial->Material(IShadingDevice).Name + "\".");
@@ -9150,8 +9097,7 @@ namespace SurfaceGeometry {
                     if (state.dataSurface->Surface(SurfNum).HasShadeControl) {
                         for (std::size_t listIndex = 0; listIndex < state.dataSurface->Surface(SurfNum).windowShadingControlList.size(); ++listIndex) {
                             int WSCPtr = state.dataSurface->Surface(SurfNum).windowShadingControlList[listIndex];
-                            if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                                state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                            if (ANY_BETWEENGLASS_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
                                 ConstrNumSh = state.dataSurface->Surface(SurfNum).shadedConstructionList[listIndex];
                                 if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 2) {
                                     MatGapFlow1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(2);
@@ -11676,7 +11622,7 @@ namespace SurfaceGeometry {
         ShDevName = state.dataMaterial->Material(ShDevNum).Name;
         ConstrNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
         ConstrName = state.dataConstruction->Construct(ConstrNum).Name;
-        if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade || state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
+        if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
             ConstrNameSh = ConstrName + ':' + ShDevName + ":INT";
         } else {
             ConstrNameSh = ConstrName + ':' + ShDevName + ":EXT";
@@ -11703,13 +11649,15 @@ namespace SurfaceGeometry {
             state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
             state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
 
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
+
             TotLayersOld = state.dataConstruction->Construct(ConstrNum).TotLayers;
             TotLayersNew = TotLayersOld + 1;
 
             state.dataConstruction->Construct(ConstrNewSh).LayerPoint = 0;
 
-            if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
+            if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
+                state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
                 // Interior shading device
                 state.dataConstruction->Construct(ConstrNewSh).LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
                 state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew) = ShDevNum;
@@ -12039,8 +11987,6 @@ namespace SurfaceGeometry {
         // DERIVED TYPE DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // unused1208  INTEGER :: TotSurfacesPrev                 ! Total number of surfaces before splitting window
-        // unused1208  INTEGER :: loop                            ! DO loop index
         Real64 H; // Height and width of original window (m)
         Real64 W;
         // unused1208  REAL(r64)    :: MulWidth                        ! Mullion width (m)

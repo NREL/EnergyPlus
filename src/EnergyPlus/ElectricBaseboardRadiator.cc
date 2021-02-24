@@ -1143,7 +1143,7 @@ namespace ElectricBaseboardRadiator {
             Area = state.dataSurface->Surface(SurfNum).Area;
 
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                 }
@@ -1154,8 +1154,7 @@ namespace ElectricBaseboardRadiator {
                                   state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && state.dataSurface->SurfWinShadingFlag(SurfNum) != IntShadeOn &&
-                    state.dataSurface->SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
                                   state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);

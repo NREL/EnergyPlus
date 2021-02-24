@@ -206,7 +206,7 @@ namespace EnergyPlus::UFADManager {
             if (SurfNum == 0) continue;
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment || state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
                 state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-                if (state.dataSurface->SurfWinShadingFlag(SurfNum) == IntShadeOn || state.dataSurface->SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     ++NumShadesDown;
                 }
             }

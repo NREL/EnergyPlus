@@ -250,6 +250,8 @@ namespace EnergyPlus::DataZoneEquipment {
         overallEquipCount = 0;
         int locTermUnitSizingCounter = 0; // will increment for every zone inlet node
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         for (ControlledZoneLoop = 1; ControlledZoneLoop <= NumOfControlledZones; ++ControlledZoneLoop) {
 
             CurrentModuleObject = "ZoneHVAC:EquipmentConnections";
@@ -267,7 +269,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                           cAlphaFields,
                                           cNumericFields); // Get Equipment | data for one zone
 
-            ControlledZoneNum = UtilityRoutines::FindItemInList(AlphArray(1), state.dataHeatBal->Zone);
+            ControlledZoneNum = UtilityRoutines::FindItemInList(AlphArray(1), Zone);
 
             if (ControlledZoneNum == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
@@ -276,14 +278,14 @@ namespace EnergyPlus::DataZoneEquipment {
                 continue;
             } else {
                 //    Zone(ZoneEquipConfig(ControlledZoneNum)%ActualZoneNum)%ZoneEquipConfigNum = ControlledZoneNum
-                if (state.dataHeatBal->Zone(ControlledZoneNum).IsControlled) {
+                if (Zone(ControlledZoneNum).IsControlled) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFields(1) + "=\"" + AlphArray(1) + "\"");
                     ShowContinueError(state, "..Duplicate Controlled Zone entered, only one " + CurrentModuleObject + " per zone is allowed.");
                     state.dataZoneEquip->GetZoneEquipmentDataErrorsFound = true;
                     continue;
                 }
-                state.dataHeatBal->Zone(ControlledZoneNum).IsControlled = true;
-                state.dataHeatBal->Zone(ControlledZoneNum).ZoneEqNum = ControlledZoneNum;
+                Zone(ControlledZoneNum).IsControlled = true;
+                Zone(ControlledZoneNum).ZoneEqNum = ControlledZoneNum;
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).IsControlled = true;
                 state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum = ControlledZoneNum;
             }
@@ -321,7 +323,7 @@ namespace EnergyPlus::DataZoneEquipment {
             }
             // assigned to this node
             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum > 0) {
-                state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+                Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
             } // This error already detected and program will be terminated.
 
             ReturnNodeListName = AlphArray(6);
@@ -1306,6 +1308,8 @@ namespace EnergyPlus::DataZoneEquipment {
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleMaxValue;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Return value
         Real64 OAVolumeFlowRate; // Return value for calculated outdoor air volume flow rate [m3/s]
 
@@ -1401,9 +1405,9 @@ namespace EnergyPlus::DataZoneEquipment {
                     if (MaxOAFlag) {
                         // OAPerPersonMode == PerPersonByDesignLevel (UseOccSchFlag = FALSE)
                         // use total people when requesting MaxOAFlow
-                        DSOAFlowPeople = state.dataHeatBal->Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                        DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                     } else {
-                        DSOAFlowPeople = state.dataHeatBal->Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                        DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                     }
                 }
                 if (PerPersonModeNotSet) DSOAFlowPeople = 0.0; // for Dual Duct if Per Person Ventilation Rate Mode is not entered
@@ -1428,15 +1432,15 @@ namespace EnergyPlus::DataZoneEquipment {
                 OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerZone;
             } else if (SELECT_CASE_var == OAFlowPerArea) {
                 // Multiplied by zone floor area
-                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerArea * state.dataHeatBal->Zone(ActualZoneNum).FloorArea;
+                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
             } else if (SELECT_CASE_var == OAFlowACH) {
                 // Multiplied by zone volume
-                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowACH * state.dataHeatBal->Zone(ActualZoneNum).Volume / 3600.0;
+                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
             } else if ((SELECT_CASE_var == OAFlowSum) || (SELECT_CASE_var == OAFlowMax)) {
                 // Use sum or max of per person and the following
                 DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
-                DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * state.dataHeatBal->Zone(ActualZoneNum).FloorArea;
-                DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * state.dataHeatBal->Zone(ActualZoneNum).Volume / 3600.0;
+                DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
+                DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
                 if (OARequirements(DSOAPtr).OAFlowMethod == OAFlowMax) {
                     OAVolumeFlowRate = max(DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH);
                 } else {
@@ -1444,10 +1448,10 @@ namespace EnergyPlus::DataZoneEquipment {
                 }
             } else if (SELECT_CASE_var == ZOAM_IAQP) {
                 if (state.dataGlobal->DoingSizing) {
-                    DSOAFlowPeople = state.dataHeatBal->Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
                     DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
-                    DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * state.dataHeatBal->Zone(ActualZoneNum).FloorArea;
-                    DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * state.dataHeatBal->Zone(ActualZoneNum).Volume / 3600.0;
+                    DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
+                    DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
                     OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
                 } else {
                     OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / state.dataEnvrn->StdRhoAir;
@@ -1456,10 +1460,10 @@ namespace EnergyPlus::DataZoneEquipment {
             } else if (SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc) {
                 ZoneOAPeople = 0.0;
                 if (OARequirements(DSOAPtr).OAFlowMethod != ZOAM_ProportionalControlDesOcc) {
-                    ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier *
+                    ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
                                    OARequirements(DSOAPtr).OAFlowPerPerson;
                 } else {
-                    ZoneOAPeople = state.dataHeatBal->Zone(ActualZoneNum).TotOccupants * state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier *
+                    ZoneOAPeople = Zone(ActualZoneNum).TotOccupants * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
                                    OARequirements(DSOAPtr).OAFlowPerPerson;
                     CO2PeopleGeneration = 0.0;
                     if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
@@ -1471,20 +1475,20 @@ namespace EnergyPlus::DataZoneEquipment {
                         }
                     }
                 }
-                ZoneOAArea = state.dataHeatBal->Zone(ActualZoneNum).FloorArea * state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier *
+                ZoneOAArea = Zone(ActualZoneNum).FloorArea * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
                              OARequirements(DSOAPtr).OAFlowPerArea;
                 ZoneOAMin = ZoneOAArea;
                 ZoneOAMax = (ZoneOAArea + ZoneOAPeople);
-                if (state.dataHeatBal->Zone(ActualZoneNum).ZoneContamControllerSchedIndex > 0.0) {
+                if (Zone(ActualZoneNum).ZoneContamControllerSchedIndex > 0.0) {
                     // Check the availability schedule value for ZoneControl:ContaminantController
-                    ZoneContamControllerSched = GetCurrentScheduleValue(state, state.dataHeatBal->Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
+                    ZoneContamControllerSched = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneContamControllerSchedIndex);
                     if (ZoneContamControllerSched > 0.0) {
                         if (ZoneOAPeople > 0.0) {
                             if (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) > 0.0) {
-                                if (state.dataHeatBal->Zone(ActualZoneNum).ZoneMinCO2SchedIndex > 0.0) {
+                                if (Zone(ActualZoneNum).ZoneMinCO2SchedIndex > 0.0) {
                                     // Take the schedule value of "Minimum Carbon Dioxide Concentration Schedule Name"
                                     // in the ZoneControl:ContaminantController
-                                    ZoneMinCO2 = GetCurrentScheduleValue(state, state.dataHeatBal->Zone(ActualZoneNum).ZoneMinCO2SchedIndex);
+                                    ZoneMinCO2 = GetCurrentScheduleValue(state, Zone(ActualZoneNum).ZoneMinCO2SchedIndex);
                                 } else {
                                     ZoneMinCO2 = state.dataContaminantBalance->OutdoorCO2;
                                 }
@@ -1492,11 +1496,11 @@ namespace EnergyPlus::DataZoneEquipment {
                                 // Calculate zone maximum target CO2 concentration in PPM
                                 if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
                                     ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
-                                                 (CO2PeopleGeneration * state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
+                                                 (CO2PeopleGeneration * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                      ZoneOAMax;
                                 } else {
-                                    ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 + (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) * state.dataHeatBal->Zone(ActualZoneNum).Multiplier *
-                                                               state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
+                                    ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 + (state.dataContaminantBalance->ZoneCO2GainFromPeople(ActualZoneNum) * Zone(ActualZoneNum).Multiplier *
+                                                               Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                                   ZoneOAMax;
                                 }
 
@@ -1572,7 +1576,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                                             OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, CO2 "
                                                               "generation from people is not greater than zero. Occurs in Zone =\"" +
-                                                              state.dataHeatBal->Zone(ActualZoneNum).Name + "\". ");
+                                                              Zone(ActualZoneNum).Name + "\". ");
                                             ShowContinueError(state, "\"ProportionalControlBasedOnOccupancySchedule\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
@@ -1590,7 +1594,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                                             OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
                                                               "generation from people is not greater than zero. Occurs in Zone =\"" +
-                                                              state.dataHeatBal->Zone(ActualZoneNum).Name + "\". ");
+                                                              Zone(ActualZoneNum).Name + "\". ");
                                             ShowContinueError(state, "\"ProportionalControlBasedOnDesignOccupancy\" will not be modeled. Default "
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
@@ -1625,7 +1629,7 @@ namespace EnergyPlus::DataZoneEquipment {
         }
 
         // Apply zone multipliers and zone list multipliers
-        OAVolumeFlowRate *= state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
+        OAVolumeFlowRate *= Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier;
 
         // Apply schedule as needed. Sizing does not use schedule.
         if (OARequirements(DSOAPtr).OAFlowFracSchPtr > 0 && UseMinOASchFlag) {

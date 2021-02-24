@@ -3474,9 +3474,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     state->dataSurface->WindowShadingControl(1).Name = "TheShadingControl";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = 57;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+    state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
     state->dataSurface->WindowShadingControl(1).Schedule = 83;
     state->dataSurface->WindowShadingControl(1).SetPoint = 200;
     state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;
@@ -3546,11 +3546,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).ShadingType = WSC_ST_BetweenGlassBlind;
+    state->dataSurface->WindowShadingControl(2).ShadingType = WinShadingType::BGBlind;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
-    state->dataSurface->WindowShadingControl(2).ShadingControlType = WSCT_OffNight_OnDay_HiSolarWindow;
+    state->dataSurface->WindowShadingControl(2).ShadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
     EXPECT_FALSE(isWindowShadingControlSimilar(*state, 1, 2));
     state->dataSurface->WindowShadingControl(2) = state->dataSurface->WindowShadingControl(1);
 
@@ -3601,9 +3601,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     state->dataSurface->WindowShadingControl(1).Name = "TheShadingControl";
     state->dataSurface->WindowShadingControl(1).ZoneIndex = 57;
     state->dataSurface->WindowShadingControl(1).SequenceNumber = 3;
-    state->dataSurface->WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+    state->dataSurface->WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     state->dataSurface->WindowShadingControl(1).ShadingDevice = 17;
-    state->dataSurface->WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
+    state->dataSurface->WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
     state->dataSurface->WindowShadingControl(1).Schedule = 83;
     state->dataSurface->WindowShadingControl(1).SetPoint = 200;
     state->dataSurface->WindowShadingControl(1).SetPoint2 = 170;

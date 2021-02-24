@@ -1837,8 +1837,7 @@ namespace EMSManager {
 
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::WSC_ST_SwitchableGlazing;
-        using DataSurfaces::WSC_ST_ExteriorScreen;
+        using DataSurfaces::WinShadingType;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int loopSurfNum(0); // local do loop index
@@ -1864,7 +1863,7 @@ namespace EMSManager {
                                      state.dataSurface->SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
                                      state.dataSurface->SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
-            } else if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WinShadingType::ExtScreen) {
                 SetupEMSActuator(state, "Window Shading Control",
                                  state.dataSurface->Surface(loopSurfNum).Name,
                                  "Control Status",
@@ -1872,7 +1871,7 @@ namespace EMSManager {
                                  state.dataSurface->SurfWinShadingFlagEMSOn(loopSurfNum),
                                  state.dataSurface->SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
-                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (state.dataSurface->WindowShadingControl(state.dataSurface->Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WinShadingType::SwitchableGlazing) {
                     ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +
                                     state.dataConstruction->Construct(state.dataSurface->Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     state.dataSurface->Surface(loopSurfNum).Name + "'.");
@@ -2134,14 +2133,15 @@ namespace EMSManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNum;
+        auto &Zone(state.dataHeatBal->Zone);
 
-        if (allocated(state.dataHeatBal->Zone)) {
+        if (allocated(Zone)) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
-                SetupEMSInternalVariable(state, "Zone Floor Area", state.dataHeatBal->Zone(ZoneNum).Name, "[m2]", state.dataHeatBal->Zone(ZoneNum).FloorArea);
-                SetupEMSInternalVariable(state, "Zone Air Volume", state.dataHeatBal->Zone(ZoneNum).Name, "[m3]", state.dataHeatBal->Zone(ZoneNum).Volume);
-                SetupEMSInternalVariable(state, "Zone Multiplier", state.dataHeatBal->Zone(ZoneNum).Name, "[ ]", state.dataHeatBal->Zone(ZoneNum).Multiplier);
-                SetupEMSInternalVariable(state, "Zone List Multiplier", state.dataHeatBal->Zone(ZoneNum).Name, "[ ]", state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
+                SetupEMSInternalVariable(state, "Zone Floor Area", Zone(ZoneNum).Name, "[m2]", Zone(ZoneNum).FloorArea);
+                SetupEMSInternalVariable(state, "Zone Air Volume", Zone(ZoneNum).Name, "[m3]", Zone(ZoneNum).Volume);
+                SetupEMSInternalVariable(state, "Zone Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).Multiplier);
+                SetupEMSInternalVariable(state, "Zone List Multiplier", Zone(ZoneNum).Name, "[ ]", Zone(ZoneNum).ListMultiplier);
             }
         }
     }
@@ -2168,33 +2168,34 @@ namespace EMSManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // local loop index.
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 
             SetupEMSActuator(state, "Zone",
-                             state.dataHeatBal->Zone(ZoneNum).Name,
+                             Zone(ZoneNum).Name,
                              "Outdoor Air Drybulb Temperature",
                              "[C]",
-                             state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideOn,
-                             state.dataHeatBal->Zone(ZoneNum).OutDryBulbTempEMSOverrideValue);
+                             Zone(ZoneNum).OutDryBulbTempEMSOverrideOn,
+                             Zone(ZoneNum).OutDryBulbTempEMSOverrideValue);
             SetupEMSActuator(state, "Zone",
-                             state.dataHeatBal->Zone(ZoneNum).Name,
+                             Zone(ZoneNum).Name,
                              "Outdoor Air Wetbulb Temperature",
                              "[C]",
-                             state.dataHeatBal->Zone(ZoneNum).OutWetBulbTempEMSOverrideOn,
-                             state.dataHeatBal->Zone(ZoneNum).OutWetBulbTempEMSOverrideValue);
+                             Zone(ZoneNum).OutWetBulbTempEMSOverrideOn,
+                             Zone(ZoneNum).OutWetBulbTempEMSOverrideValue);
             SetupEMSActuator(state, "Zone",
-                             state.dataHeatBal->Zone(ZoneNum).Name,
+                             Zone(ZoneNum).Name,
                              "Outdoor Air Wind Speed",
                              "[m/s]",
-                             state.dataHeatBal->Zone(ZoneNum).WindSpeedEMSOverrideOn,
-                             state.dataHeatBal->Zone(ZoneNum).WindSpeedEMSOverrideValue);
+                             Zone(ZoneNum).WindSpeedEMSOverrideOn,
+                             Zone(ZoneNum).WindSpeedEMSOverrideValue);
             SetupEMSActuator(state, "Zone",
-                             state.dataHeatBal->Zone(ZoneNum).Name,
+                             Zone(ZoneNum).Name,
                              "Outdoor Air Wind Direction",
                              "[degree]",
-                             state.dataHeatBal->Zone(ZoneNum).WindDirEMSOverrideOn,
-                             state.dataHeatBal->Zone(ZoneNum).WindDirEMSOverrideValue);
+                             Zone(ZoneNum).WindDirEMSOverrideOn,
+                             Zone(ZoneNum).WindDirEMSOverrideValue);
         }
     }
 
