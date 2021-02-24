@@ -429,6 +429,9 @@ namespace LowTempRadiantSystem {
         Array1D_string FieldNames;
         int CondCtrlType = 1;                                       // Condensation control type (initialize to simple off)
         Real64 CondDewPtDeltaT = 1.0;                                 // Diff between surface temperature and dew point for cond. shut-off
+
+        ConstantFlowRadDesignData() = default;
+        ~ConstantFlowRadDesignData() = default;
     };
 
     struct ElectricRadiantSystemData : RadiantSystemBaseData
@@ -492,17 +495,6 @@ namespace LowTempRadiantSystem {
         }
     };
 
-    // Object Data
-    extern Array1D<VariableFlowRadiantSystemData> HydrRadSys;
-    extern Array1D<ConstantFlowRadiantSystemData> CFloRadSys;
-    extern Array1D<ElectricRadiantSystemData> ElecRadSys;
-    extern Array1D<RadSysTypeData> RadSysTypes;
-    extern Array1D<ElecRadSysNumericFieldData> ElecRadSysNumericFields;
-    extern Array1D<HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
-
-    extern Array1D<VarFlowRadDesignData> HydronicRadiantSysDesign;
-    extern Array1D<ConstantFlowRadDesignData> CflowRadiantSysDesign;
-
     // Functions
 
     void clear_state();
@@ -532,9 +524,27 @@ namespace LowTempRadiantSystem {
 
 struct LowTempRadiantSystemData : BaseGlobalStruct {
 
+    // Object Data
+    Array1D<LowTempRadiantSystem::VariableFlowRadiantSystemData> HydrRadSys;
+    Array1D<LowTempRadiantSystem::ConstantFlowRadiantSystemData> CFloRadSys;
+    Array1D<LowTempRadiantSystem::ElectricRadiantSystemData> ElecRadSys;
+    Array1D<LowTempRadiantSystem::RadSysTypeData> RadSysTypes;
+    Array1D<LowTempRadiantSystem::ElecRadSysNumericFieldData> ElecRadSysNumericFields;
+    Array1D<LowTempRadiantSystem::HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
+    Array1D<LowTempRadiantSystem::ConstantFlowRadDesignData> CflowRadiantSysDesign;
+    Array1D<LowTempRadiantSystem::VarFlowRadDesignData> HydronicRadiantSysDesign;
+
+
     void clear_state() override
     {
-
+        HydrRadSys.clear();
+        CFloRadSys.clear();
+        ElecRadSys.clear();
+        RadSysTypes.clear();
+        ElecRadSysNumericFields.clear();
+        HydronicRadiantSysNumericFields.clear();
+        HydronicRadiantSysDesign.clear();
+        CflowRadiantSysDesign.clear();
     }
 };
 
