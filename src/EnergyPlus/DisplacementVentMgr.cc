@@ -73,9 +73,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DisplacementVentMgr {
+namespace EnergyPlus::DisplacementVentMgr {
 
     // MODULE INFORMATION:
     //       AUTHOR         G. Carrilho da Graca
@@ -681,11 +679,13 @@ namespace DisplacementVentMgr {
             }
         }
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         MIXFLAG = false;
         FlagApertures = 1;
         state.dataRoomAirMod->DVHcIn = state.dataHeatBal->HConvIn;
         CeilingHeight = state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
-        ZoneMult = state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier;
+        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
         for (Ctd = 1; Ctd <= state.dataRoomAirMod->TotUCSDDV; ++Ctd) {
             if (ZoneNum == state.dataRoomAirMod->ZoneUCSDDV(Ctd).ZonePtr) {
@@ -703,14 +703,14 @@ namespace DisplacementVentMgr {
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
-        if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
+        if (Zone(ZoneNum).NoHeatToReturnAir) {
             SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied, RetAirGain);
             ConvGainsOccupiedSubzone += RetAirGain;
         }
 
         SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone, ConvGainsMixedSubzone);
         ConvGainsMixedSubzone += SumConvHTRadSys(ZoneNum) + SumConvPool(ZoneNum) + 0.5 * SysDepZoneLoadsLagged(ZoneNum);
-        if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
+        if (Zone(ZoneNum).NoHeatToReturnAir) {
             SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone, RetAirGain);
             ConvGainsMixedSubzone += RetAirGain;
         }
@@ -734,7 +734,7 @@ namespace DisplacementVentMgr {
 
         SumMCp = MCPI(ZoneNum) + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
         SumMCpT =
-            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * Zone(ZoneNum).OutDryBulbTemp;
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone) {
             SumMCp = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp;
             SumMCpT = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT;
@@ -795,40 +795,40 @@ namespace DisplacementVentMgr {
                 } else {
 
                     if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                state.dataHeatBal->Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
-                                state.dataHeatBal->Zone(ZoneNum).OriginZ <
+                                Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                Zone(ZoneNum).OriginZ <
                             0.8 &&
                         AirflowNetwork::AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW2 > 0) {
                         FlagApertures = 0;
                         break;
                     }
                     if (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                state.dataHeatBal->Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
-                                state.dataHeatBal->Zone(ZoneNum).OriginZ >
+                                Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone).OriginZ -
+                                Zone(ZoneNum).OriginZ >
                             1.8 &&
                         AirflowNetwork::AirflowNetworkLinkSimu(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).VolFLOW > 0) {
                         FlagApertures = 0;
                         break;
                     }
                     if ((state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                 state.dataHeatBal->Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
-                                 state.dataHeatBal->Zone(ZoneNum).OriginZ >
+                                 Zone(ZoneNum).OriginZ >
                              0.8 &&
                             state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmin +
-                                 state.dataHeatBal->Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
-                                 state.dataHeatBal->Zone(ZoneNum).OriginZ <
+                                 Zone(ZoneNum).OriginZ <
                              1.8) ||
                         (state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                 state.dataHeatBal->Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
-                                 state.dataHeatBal->Zone(ZoneNum).OriginZ >
+                                 Zone(ZoneNum).OriginZ >
                              0.8 &&
                                 state.dataRoomAirMod->SurfParametersCVDV(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).Zmax +
-                                 state.dataHeatBal->Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
+                                 Zone(Surface(AirflowNetwork::MultizoneSurfaceData(state.dataRoomAirMod->AirflowNetworkSurfaceUCSDCV(Loop, ZoneNum)).SurfNum).Zone)
                                      .OriginZ -
-                                 state.dataHeatBal->Zone(ZoneNum).OriginZ <
+                                 Zone(ZoneNum).OriginZ <
                              1.8)) {
                         FlagApertures = 0;
                         break;
@@ -849,15 +849,15 @@ namespace DisplacementVentMgr {
                 // CeilingHeight, 1.0 ); //Tuned This does not vary in loop  EPTeam-replaces above (cause diffs)      HeightFrac =
                 // MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
                 state.dataRoomAirMod->HeightTransition(ZoneNum) = HeightFrac * CeilingHeight;
-                state.dataRoomAirMod->AIRRATFloor(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * min(state.dataRoomAirMod->HeightTransition(ZoneNum), HeightFloorSubzoneTop) / CeilingHeight *
-                                       state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
+                state.dataRoomAirMod->AIRRATFloor(ZoneNum) = Zone(ZoneNum).Volume * min(state.dataRoomAirMod->HeightTransition(ZoneNum), HeightFloorSubzoneTop) / CeilingHeight *
+                                       Zone(ZoneNum).ZoneVolCapMultpSens *
                                        PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATFloor(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                        PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
-                state.dataRoomAirMod->AIRRATOC(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
-                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                state.dataRoomAirMod->AIRRATOC(ZoneNum) = Zone(ZoneNum).Volume * (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
+                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
-                state.dataRoomAirMod->AIRRATMX(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
-                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
+                state.dataRoomAirMod->AIRRATMX(ZoneNum) = Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
+                                    Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
                 if (UseZoneTimeStepHistory) {
@@ -1040,7 +1040,7 @@ namespace DisplacementVentMgr {
             state.dataRoomAirMod->TCMF(ZoneNum) = ZTAveraged;
         } else {
             if (HeightComfort >= 0.0 && HeightComfort < HeightFloorSubzoneAve) {
-                ShowWarningError(state, "Displacement ventilation comfort height is in floor subzone in Zone: " + state.dataHeatBal->Zone(ZoneNum).Name);
+                ShowWarningError(state, "Displacement ventilation comfort height is in floor subzone in Zone: " + Zone(ZoneNum).Name);
                 state.dataRoomAirMod->TCMF(ZoneNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
             } else if (HeightComfort >= HeightFloorSubzoneAve && HeightComfort < HeightOccupiedSubzoneAve) {
                 state.dataRoomAirMod->TCMF(ZoneNum) =
@@ -1056,7 +1056,7 @@ namespace DisplacementVentMgr {
             } else if (HeightComfort >= HeightMixedSubzoneAve && HeightComfort <= CeilingHeight) {
                 state.dataRoomAirMod->TCMF(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             } else {
-                ShowFatalError(state, "Displacement ventilation comfort height is above ceiling or below floor in Zone: " + state.dataHeatBal->Zone(ZoneNum).Name);
+                ShowFatalError(state, "Displacement ventilation comfort height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
             }
         }
 
@@ -1066,7 +1066,7 @@ namespace DisplacementVentMgr {
             TempTstatAir(ZoneNum) = ZTAveraged;
         } else {
             if (HeightThermostat >= 0.0 && HeightThermostat < HeightFloorSubzoneAve) {
-                ShowWarningError(state, "Displacement thermostat is in floor subzone in Zone: " + state.dataHeatBal->Zone(ZoneNum).Name);
+                ShowWarningError(state, "Displacement thermostat is in floor subzone in Zone: " + Zone(ZoneNum).Name);
                 TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
             } else if (HeightThermostat >= HeightFloorSubzoneAve && HeightThermostat < HeightOccupiedSubzoneAve) {
                 TempTstatAir(ZoneNum) =
@@ -1082,7 +1082,7 @@ namespace DisplacementVentMgr {
             } else if (HeightThermostat >= HeightMixedSubzoneAve && HeightThermostat <= CeilingHeight) {
                 TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             } else {
-                ShowFatalError(state, "Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + state.dataHeatBal->Zone(ZoneNum).Name);
+                ShowFatalError(state, "Displacement ventilation thermostat height is above ceiling or below floor in Zone: " + Zone(ZoneNum).Name);
             }
         }
 
@@ -1117,7 +1117,7 @@ namespace DisplacementVentMgr {
         }
 
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
-            ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
+            ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
             Node(ZoneNodeNum).Temp = state.dataRoomAirMod->ZTMX(ZoneNum);
         }
 
@@ -1132,7 +1132,5 @@ namespace DisplacementVentMgr {
             state.dataRoomAirMod->ZoneDVMixedFlagRep(ZoneNum) = 0.0;
         }
     }
-
-} // namespace DisplacementVentMgr
 
 } // namespace EnergyPlus

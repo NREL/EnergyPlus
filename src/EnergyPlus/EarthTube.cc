@@ -147,6 +147,8 @@ namespace EnergyPlus::EarthTube {
         int Loop;
         Array1D_bool RepVarSet;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
         // Following used for reporting
@@ -172,7 +174,7 @@ namespace EnergyPlus::EarthTube {
                                           cNumericFieldNames);
 
             // First Alpha is Zone Name
-            state.dataEarthTube->EarthTubeSys(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(1), state.dataHeatBal->Zone);
+            state.dataEarthTube->EarthTubeSys(Loop).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(1), Zone);
             if (state.dataEarthTube->EarthTubeSys(Loop).ZonePtr == 0) {
                 ShowSevereError(state, cCurrentModuleObject + ": " + cAlphaFieldNames(1) + " not found=" + cAlphaArgs(1));
                 ErrorsFound = true;
@@ -381,67 +383,67 @@ namespace EnergyPlus::EarthTube {
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeHeatLoss,
                                         "System",
                                         "NonState",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Zone Sensible Cooling Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeHeatLossRate,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Zone Sensible Heating Energy",
                                         OutputProcessor::Unit::J,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeHeatGain,
                                         "System",
                                         "NonState",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Zone Sensible Heating Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeHeatGainRate,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Air Flow Volume",
                                         OutputProcessor::Unit::m3,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeVolume,
                                         "System",
                                         "NonState",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Current Density Air Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeVolFlowRate,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Standard Density Air Volume Flow Rate",
                                         OutputProcessor::Unit::m3_s,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeVolFlowRateStd,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Air Flow Mass",
                                         OutputProcessor::Unit::kg,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeMass,
                                         "System",
                                         "NonState",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Air Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeMassFlowRate,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Water Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeWaterMassFlowRate,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeFanElec,
                                         "System",
                                         "NonState",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name,
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name,
                                         _,
                                         "Electricity",
                                         _,
@@ -452,37 +454,37 @@ namespace EnergyPlus::EarthTube {
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeFanElecPower,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Zone Inlet Air Temperature",
                                         OutputProcessor::Unit::C,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeAirTemp,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Ground Interface Temperature",
                                         OutputProcessor::Unit::C,
                                         state.dataEarthTube->EarthTubeSys(Loop).GroundTempz1z2t,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Outdoor Air Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeOATreatmentPower,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Zone Inlet Wet Bulb Temperature",
                                         OutputProcessor::Unit::C,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeWetBulbTemp,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                     SetupOutputVariable(state, "Earth Tube Zone Inlet Humidity Ratio",
                                         OutputProcessor::Unit::kgWater_kgDryAir,
                                         state.dataEarthTube->ZnRptET(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).EarthTubeHumRat,
                                         "System",
                                         "State",
-                                        state.dataHeatBal->Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
+                                        Zone(state.dataEarthTube->EarthTubeSys(Loop).ZonePtr).Name);
                 }
             }
         }

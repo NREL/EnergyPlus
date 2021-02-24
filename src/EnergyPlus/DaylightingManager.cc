@@ -172,6 +172,8 @@ namespace EnergyPlus::DaylightingManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DAVREF
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         SurfaceClass IType;                  // Surface type/class
         Real64 AREA;                // Inside surface area (m2)
         Real64 AInsTot;             // Total inside surface area of a zone (m2)
@@ -196,7 +198,7 @@ namespace EnergyPlus::DaylightingManager {
         AR = 0.0;
         ARH = 0.0;
         // Loop over surfaces in the zone's enclosure
-        auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum));
+        auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum));
         for (int ISurf : thisEnclosure.SurfacePtr) {
             IType = Surface(ISurf).Class;
             // Error if window has multiplier > 1 since this causes incorrect illuminance calc
@@ -291,7 +293,7 @@ namespace EnergyPlus::DaylightingManager {
             if (Surface(IWin).Class == SurfaceClass::Window) {
                 int ISurf = Surface(IWin).BaseSurf;
                 // Ratio of floor-to-window-center height and average floor-to-ceiling height
-                ETA = max(0.0, min(1.0, (SurfaceWindow(IWin).WinCenter(3) - state.dataHeatBal->Zone(ZoneNum).OriginZ) * state.dataHeatBal->Zone(ZoneNum).FloorArea / state.dataHeatBal->Zone(ZoneNum).Volume));
+                ETA = max(0.0, min(1.0, (SurfaceWindow(IWin).WinCenter(3) - Zone(ZoneNum).OriginZ) * Zone(ZoneNum).FloorArea / Zone(ZoneNum).Volume));
                 AP = SurfaceWindow(ISurf).ZoneAreaMinusThisSurf;
                 ARHP = SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf;
                 // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
@@ -387,18 +389,6 @@ namespace EnergyPlus::DaylightingManager {
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;     // Zone number
         int IHR;         // Hour of day counter
@@ -416,6 +406,7 @@ namespace EnergyPlus::DaylightingManager {
         int ISA;
         int ISlatAngle;
 
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (state.dataDaylightingManager->CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput(state);
@@ -466,7 +457,7 @@ namespace EnergyPlus::DaylightingManager {
             // Warning if detailed daylighting has been requested for a zone with no associated exterior windows.
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0) {
-                    ShowWarningError(state, "Detailed daylighting will not be done for zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+                    ShowWarningError(state, "Detailed daylighting will not be done for zone=" + Zone(ZoneNum).Name);
                     ShowContinueError(state, "because it has no associated exterior windows.");
                 }
             }
@@ -579,7 +570,7 @@ namespace EnergyPlus::DaylightingManager {
                             IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                             // For this report, do not include ext wins in zone adjacent to ZoneNum since the inter-reflected
                             // component will not be calculated for these windows until the time-step loop.
-                            if (Surface(IWin).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
+                            if (Surface(IWin).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
                                 // Output for each reference point, for each sky. Group by sky type first
                                 for (const DataDaylighting::SkyType& skyType: {DataDaylighting::SkyType::Clear, DataDaylighting::SkyType::ClearTurbid, DataDaylighting::SkyType::Intermediate, DataDaylighting::SkyType::Overcast}) {
                                     std::string skyTypeString;
@@ -602,7 +593,7 @@ namespace EnergyPlus::DaylightingManager {
                                               " Sky Daylight Factors,{},{},{},{},{},{:.4R}\n",
                                               skyTypeString,
                                               state.dataEnvrn->CurMnDy,
-                                              state.dataHeatBal->Zone(ZoneNum).Name,
+                                              Zone(ZoneNum).Name,
                                               Surface(IWin).Name,
                                               state.dataDaylightingData->DaylRefPt(state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylRefPtNum(refPtNum)).Name,
                                               DaylFac);
@@ -657,7 +648,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 // For this report, do not include ext wins in zone/enclosure adjacent to ZoneNum since the inter-reflected
                 // component will not be calculated for these windows until the time-step loop.
-                if (Surface(IWin).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
+                if (Surface(IWin).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
 
                     if (SurfWinMovableSlats(IWin)) {
                         // variable slat angle - MaxSlatangle sets
@@ -674,14 +665,14 @@ namespace EnergyPlus::DaylightingManager {
                     for (ISlatAngle = 1; ISlatAngle <= ISA; ++ISlatAngle) {
                         if (ISlatAngle == 1) {
                             // base window without shades, screens, or blinds
-                            print(state.files.dfs, "{},{},{},Base Window\n", state.dataEnvrn->CurMnDy, state.dataHeatBal->Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Base Window\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else if (ISlatAngle == 2 && ISA == 2) {
                             // window shade or blind with fixed slat angle
-                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", state.dataEnvrn->CurMnDy, state.dataHeatBal->Zone(ZoneNum).Name, Surface(IWin).Name);
+                            print(state.files.dfs, "{},{},{},Blind or Slat Applied\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name);
                         } else {
                             // blind with variable slat angle
                             SlatAngle = 180.0 / double(MaxSlatAngs - 1) * double(ISlatAngle - 2);
-                            print(state.files.dfs, "{},{},{},{:.1R}\n", state.dataEnvrn->CurMnDy, state.dataHeatBal->Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
+                            print(state.files.dfs, "{},{},{},{:.1R}\n", state.dataEnvrn->CurMnDy, Zone(ZoneNum).Name, Surface(IWin).Name, SlatAngle);
                         }
 
                         for (IHR = 1; IHR <= 24; ++IHR) {
@@ -723,28 +714,10 @@ namespace EnergyPlus::DaylightingManager {
         // This subroutine does the daylighting coefficient calculation for the
         // daylighting and illuminance map reference points.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-
         using General::SafeDivide;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IWin;    // Window counter
@@ -753,6 +726,8 @@ namespace EnergyPlus::DaylightingManager {
         int TZoneNum;
         bool ErrorsFound;
         int MapNum;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (state.dataDaylightingManager->VeryFirstTime) {
             // make sure all necessary surfaces match to pipes
@@ -786,9 +761,9 @@ namespace EnergyPlus::DaylightingManager {
                 for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
                     if (state.dataDaylightingData->IllumMapCalc(MapNum).Zone != ZoneNum) continue;
                     if (state.dataGlobal->WarmupFlag) {
-                        DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+                        DisplayString(state, "Calculating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
                     } else {
-                        DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
+                        DisplayString(state, "Updating Daylighting Coefficients (Map Points), Zone=" + Zone(ZoneNum).Name);
                     }
                 }
                 CalcDayltgCoeffsMapPoints(state, ZoneNum);
@@ -808,33 +783,13 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Provides calculations for Daylighting Coefficients for daylighting reference points
 
-        // METHODOLOGY EMPLOYED:
-        // April 2012 change: Was previously part of CalcDayltgCoeffsRefMapPoints -- broken out to allow multiple
-        // maps per zone
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-
         using General::SafeDivide;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static Vector3<Real64> W2;     // Second vertex of window
         static Vector3<Real64> W3;     // Third vertex of window
         static Vector3<Real64> W21;    // Vector from window vertex 2 to window vertex 1
@@ -850,7 +805,6 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> U21;    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
         static Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
                                        //		static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
-
         static Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
         int IHR;                        // Hour of day counter
         int NRF;                        // Number of daylighting reference points in a zone
@@ -1209,9 +1163,6 @@ namespace EnergyPlus::DaylightingManager {
         // Was previously part of CalcDayltgCoeffsRefMapPoints -- broken out to all multiple
         // maps per zone
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
@@ -1219,21 +1170,7 @@ namespace EnergyPlus::DaylightingManager {
         using General::SafeDivide;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // the daylighting and glare factors
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static Vector3<Real64> W2;      // Second vertex of window
         static Vector3<Real64> W3;      // Third vertex of window
         static Vector3<Real64> U2;      // Second vertex of window for TDD:DOME (if exists)
@@ -1642,27 +1579,11 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // switch as need to serve both reference points and map points based on calledFrom
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
-
         using General::SafeDivide;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ShelfNum;       // Daylighting shelf object number
@@ -1696,18 +1617,12 @@ namespace EnergyPlus::DaylightingManager {
         Real64 SinCornerAng;           // For triangle, sine of corner angle of window element
 
         // Complex fenestration variables
-        //		int CplxFenState; // Current complex fenestration state //Unused Set but never used
-        //		int NReflSurf; // Number of blocked beams for complex fenestration //Unused Set but never used
         int NRefPts; // number of reference points
-                     //		int WinEl; // Current window element //Unused Set but never used
         static Vector3<Real64> RayVector;
-        //		Real64 TransBeam; // Obstructions transmittance for incoming BSDF rays (temporary variable) //Unused Set but never used
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         // Complex fenestration variables
-        //		CplxFenState = 0; //Unused Set but never used
-        //		NReflSurf = 0; //Unused Set but never used
-        //		WinEl = 0; //Unused Set but never used
-        //		TransBeam = 0.0; //Unused Set but never used
         NRefPts = 0;
 
         IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loopwin);
@@ -1719,7 +1634,7 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPt(loopwin, iRefPoint) = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).SolidAngAtMapPtWtd(loopwin, iRefPoint) = 0.0;
         }
-        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
+        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
             ExtWinType = DataDaylighting::iExtWinType::InZoneExtWin;
         } else {
             ExtWinType = DataDaylighting::iExtWinType::AdjZoneExtWin;
@@ -1728,7 +1643,6 @@ namespace EnergyPlus::DaylightingManager {
         IConst = Surface(IWin).Construction;
         if (SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
 
-        // TH Added 6/29/2009.
         // For thermochromic windows, the daylight and glare factors are calculated for a base window cosntruction
         //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
         //  DayltgInteriorMapIllum, and DayltgGlare, the daylight and glare factors are adjusted by the visible
@@ -1828,7 +1742,7 @@ namespace EnergyPlus::DaylightingManager {
                     ShowSevereError(state,
                                     format("CalcDaylightCoeffRefPoints: Daylighting calculation cannot be done for zone {} because reference point "
                                            "#{} is less than 0.15m (6\") from window plane {}",
-                                           state.dataHeatBal->Zone(ZoneNum).Name,
+                                           Zone(ZoneNum).Name,
                                            iRefPoint,
                                            Surface(IWin).Name));
                     ShowContinueError(state, format("Distance=[{:.5R}]. This is too close; check position of reference point.", ALF));
@@ -1836,8 +1750,8 @@ namespace EnergyPlus::DaylightingManager {
                 }
             } else if (ALF < 0.1524 && ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                 if (state.dataDaylightingManager->RefErrIndex(iRefPoint, IWin) == 0) { // only show error message once
-                    ShowWarningError(state, "CalcDaylightCoeffRefPoints: For Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
-                                     "\"in Zone=\"" + state.dataHeatBal->Zone(Surface(IWin).Zone).Name +
+                    ShowWarningError(state, "CalcDaylightCoeffRefPoints: For Zone=\"" + Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
+                                     "\"in Zone=\"" + Zone(Surface(IWin).Zone).Name +
                                      "\" reference point is less than 0.15m (6\") from window plane ");
                     ShowContinueError(state,
                                       format("Distance=[{:.1R} m] to ref point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Daylighting Calcs may result.",
@@ -1851,8 +1765,8 @@ namespace EnergyPlus::DaylightingManager {
         } else if (CalledFrom == DataDaylighting::iCalledFor::MapPoint) {
             if (ALF < 0.1524 && ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                 if (state.dataDaylightingManager->MapErrIndex(iRefPoint, IWin) == 0) { // only show error message once
-                    ShowWarningError(state, "CalcDaylightCoeffMapPoints: For Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
-                                     "\"in Zone=\"" + state.dataHeatBal->Zone(Surface(IWin).Zone).Name + "\" map point is less than 0.15m (6\") from window plane ");
+                    ShowWarningError(state, "CalcDaylightCoeffMapPoints: For Zone=\"" + Zone(ZoneNum).Name + "\" External Window=\"" + Surface(IWin).Name +
+                                     "\"in Zone=\"" + Zone(Surface(IWin).Zone).Name + "\" map point is less than 0.15m (6\") from window plane ");
                     ShowContinueError(state,
                                       format("Distance=[{:.1R} m] map point=[{:.1R},{:.1R},{:.1R}], Inaccuracy in Map Calcs may result.",
                                              ALF,
@@ -2102,9 +2016,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // collect code to do calculations for each window element for daylighting coefficients
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // switch as need to serve both reference points and map points based on calledFrom
 
@@ -2116,15 +2027,6 @@ namespace EnergyPlus::DaylightingManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // from reference point through a window element
         //   efficiency, if appropriate)
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DIS;    // Distance between reference point and center of window element (m)
@@ -2392,17 +2294,6 @@ namespace EnergyPlus::DaylightingManager {
         // For incoming BSDF window direction calculates whether bin is coming from sky, ground or reflected surface.
         // Routine also calculates intersection points with ground and exterior reflection surfaces.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         int NumOfWinEl;  // Number of window elements
         int CurFenState; // Current fenestration state
 
@@ -2416,25 +2307,12 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> W3;
         static Vector3<Real64> W21;
         static Vector3<Real64> W23;
-
-        // window elements counters
-        // integer :: IX ! horizontal elements
-        // integer :: IY ! vertical elements
-
-        // TYPE(Vector) :: HitPt ! surface hit point
-        // REAL(r64), dimension(3) :: RWin ! window element center point (same as centroid)
         static Vector3<Real64> WNorm; // unit vector from window (point towards outside)
 
-        // REAL(r64) :: DotProd     !Temporary variable for manipulating dot product .dot.
-        // REAL(r64) :: LeastHitDsq  ! dist^2 from window element center to hit point
-        // REAL(r64) :: HitDsq
-        // REAL(r64), dimension(3)  ::  V    !vector array
-        // REAL(r64), dimension(3) :: GroundHitPt    ! Coordinates of point that ray hits ground (m)
         int NBasis;    // number of incident basis directions for current state
         int NTrnBasis; // number of outgoing basis directions for current state
 
         // reference point variables
-        // REAL(r64), dimension(3) :: RefPoint ! reference point
         static Vector3<Real64> Ray;        // vector along ray from window to reference point
         static Vector3<Real64> RayNorm;    // unit vector along ray from window to reference point
         static Vector3<Real64> InterPoint; // Intersection point
@@ -2605,18 +2483,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize daylight state data for current
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // integer, intent(in) :: NRefPt
 
         // SUBROUTINE LOCAL VARIABLES
         int curWinEl;
@@ -2831,19 +2697,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Memory allocation for complex fenestration systems reference points geometry
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLES
-
         if (!allocated(StateRefPoint.NSky)) {
             StateRefPoint.NSky.allocate(NumOfWinEl);
             StateRefPoint.NSky = 0;
@@ -2982,18 +2835,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate position factor for given reference point.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // integer, intent(in) :: iRefPoint
-
         // SUBROUTINE LOCAL VARIABLES
         static Vector3<Real64> Ray;
         static Vector3<Real64> RayNorm;
@@ -3038,18 +2879,8 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate position factor for given reference point.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using WindowComplexManager::DaylghtAltAndAzimuth;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // integer, intent(in) :: iRefPoint
 
         // SUBROUTINE LOCAL VARIABLES
         int iTrnRay;
@@ -3099,9 +2930,6 @@ namespace EnergyPlus::DaylightingManager {
         // Divide hemisphere centered at ground hit point into elements of altitude Phi and
         // azimuth Theta and create upward-going ground ray unit vector at each Phi,Theta pair.
         // Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
-
-        // REFERENCES:
-        // <>
 
         // USE STATEMENTS:
         using DataSurfaces::AzimAngStepsForSolReflCalc;
@@ -3359,6 +3187,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 TVisIntWinDiskMult; // Interior window vis trans solar disk multiplier for ext win in adj zone
         Real64 WindowSolidAngleDaylightPoint;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         ++ISunPos;
 
         // Altitude of sun (degrees)
@@ -3595,7 +3425,7 @@ namespace EnergyPlus::DaylightingManager {
                         // adjacent to zones with exterior windows
                         // Does RAYCOS pass through interior window in zone containing RP?
                         // Loop over zone surfaces looking for interior windows between reference point and sun
-                        for (int IntWinDisk = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, IntWinDisk_end = state.dataHeatBal->Zone(ZoneNum).SurfaceLast; IntWinDisk <= IntWinDisk_end;
+                        for (int IntWinDisk = Zone(ZoneNum).SurfaceFirst, IntWinDisk_end = Zone(ZoneNum).SurfaceLast; IntWinDisk <= IntWinDisk_end;
                              ++IntWinDisk) {
                             if (Surface(IntWinDisk).Class == SurfaceClass::Window && Surface(IntWinDisk).ExtBoundCond >= 1) {
                                 if (Surface(Surface(IntWinDisk).ExtBoundCond).Zone == Surface(IWin2).Zone) {
@@ -3904,7 +3734,7 @@ namespace EnergyPlus::DaylightingManager {
             // Interior window visible transmittance multiplier for exterior window in adjacent zone
             TVisIntWinMult = 1.0;
             TVisIntWinDiskMult = 1.0;
-            if (Surface(IWin).SolarEnclIndex != state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
+            if (Surface(IWin).SolarEnclIndex != Zone(ZoneNum).SolarEnclosureNum) {
                 TVisIntWinMult = TVISIntWin;
                 TVisIntWinDiskMult = TVISIntWinDisk;
             }
@@ -3953,29 +3783,13 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // this version is just for reference points.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
-        // the daylighting and glare factors
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
+        Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating the daylighting and glare factors
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ISky;   // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
         int JSH;    // Shading index: J=1 is unshaded window, J=2 is shaded window
-        Real64 VTR; // For switchable glazing, ratio of visible transmittance of
-        //  fully-switched state to that of the unswitched state
+        Real64 VTR; // For switchable glazing, ratio of visible transmittance of fully-switched state to that of the unswitched state
 
         if (SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
@@ -4100,24 +3914,9 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // this version is just for map points.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
         // the daylighting and glare factors
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ISky;   // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
@@ -4242,11 +4041,12 @@ namespace EnergyPlus::DaylightingManager {
         std::string cErrorMsg;  // Each DElight Error Message can be up to 200 characters long
         bool bEndofErrFile;     // End of Error File flag
         bool bRecordsOnErrFile; // true if there are records on the error file
-
         int NumReports;
         int NumNames;
         int NumNumbers;
         int IOStat;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         ErrorsFound = false;
         cCurrentModuleObject = "Daylighting:Controls";
@@ -4391,7 +4191,7 @@ namespace EnergyPlus::DaylightingManager {
             for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
                 if (Surface(SurfLoop).Class == SurfaceClass::Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;
-                    if (state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !state.dataHeatBal->Zone(zoneOfSurf).HasInterZoneWindow &&
+                    if (state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints > 0 && !Zone(zoneOfSurf).HasInterZoneWindow &&
                         state.dataDaylightingData->ZoneDaylight(zoneOfSurf).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                         for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(zoneOfSurf).TotalDaylRefPoints; ++refPtNum) {
                             SetupOutputVariable(state,
@@ -4419,7 +4219,7 @@ namespace EnergyPlus::DaylightingManager {
                         int refPtCount = 0;
                         for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(enclNum).ZoneNums) {
                             if (DataViewFactorInformation::ZoneSolarInfo(enclNum).TotalEnclosureDaylRefPoints > 0 &&
-                                !state.dataHeatBal->Zone(enclZoneNum).HasInterZoneWindow && state.dataDaylightingData->ZoneDaylight(enclZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
+                                !Zone(enclZoneNum).HasInterZoneWindow && state.dataDaylightingData->ZoneDaylight(enclZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                                 for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
                                     ++refPtCount; // Count reference points across each zone in the same enclosure
                                     std::string const varKey =
@@ -4570,6 +4370,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 NewAspectRatio;
         Array1D_bool ZoneMsgDone;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
         SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
         // these are only for Building Rotation for Appendix G when using world coordinate system
@@ -4604,7 +4406,7 @@ namespace EnergyPlus::DaylightingManager {
                                               cAlphaFieldNames,
                                               cNumericFieldNames);
                 state.dataDaylightingData->IllumMap(MapNum).Name = cAlphaArgs(1);
-                state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
+                state.dataDaylightingData->IllumMap(MapNum).Zone = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
 
                 if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) {
                     ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
@@ -4717,7 +4519,7 @@ namespace EnergyPlus::DaylightingManager {
         // Check for illuminance maps associated with this zone
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             if (state.dataDaylightingData->IllumMap(MapNum).Zone > 0) {
-                auto &zone(state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone));
+                auto &zone(Zone(state.dataDaylightingData->IllumMap(MapNum).Zone));
                 // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
                 CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
                 SinZoneRelNorth = std::sin(-zone.RelNorth * DataGlobalConstants::DegToRadians);
@@ -4910,7 +4712,7 @@ namespace EnergyPlus::DaylightingManager {
         for (MapNum = 1; MapNum <= state.dataDaylightingData->TotIllumMaps; ++MapNum) {
             if (state.dataDaylightingData->IllumMap(MapNum).Zone == 0) continue;
             if (state.dataDaylightingData->ZoneDaylight(state.dataDaylightingData->IllumMap(MapNum).Zone).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting && !ZoneMsgDone(state.dataDaylightingData->IllumMap(MapNum).Zone)) {
-                ShowSevereError(state, "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name);
+                ShowSevereError(state, "Zone Name in Output:IlluminanceMap is not used for Daylighting:Controls=" + Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name);
                 ErrorsFound = true;
             }
         }
@@ -4924,7 +4726,7 @@ namespace EnergyPlus::DaylightingManager {
             print(state.files.eio,
                   "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
                   state.dataDaylightingData->IllumMap(MapNum).Name,
-                  state.dataHeatBal->Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name,
+                  Zone(state.dataDaylightingData->IllumMap(MapNum).Zone).Name,
                   state.dataDaylightingData->IllumMap(MapNum).Xmin,
                   state.dataDaylightingData->IllumMap(MapNum).Xmax,
                   state.dataDaylightingData->IllumMap(MapNum).Xinc,
@@ -5408,22 +5210,6 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // loop thru daylighting devices and check that their zones have daylight controls
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-                // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;  // TDD pipe object number
         int ShelfNum; // light shelf object number
@@ -5503,8 +5289,6 @@ namespace EnergyPlus::DaylightingManager {
         // Based on fit to Fig. 8-21, "Efficiency factors for various depths of light wells
         // based on well-interreflectance values," Lighting Handbook, 8th Edition, Illuminating
         // Engineering Society of North America, 1993.
-
-        // REFERENCES: see above.
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
@@ -5627,21 +5411,6 @@ namespace EnergyPlus::DaylightingManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DGLARE.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 GTOT  = 0.0;  // Glare constant
 
@@ -5686,16 +5455,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // REFERENCES:
         // Based on subroutine DayltgGlare.
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
-
-        // SUBROUTINE PARAMETER DEFINITIONS: na
-        // INTERFACE BLOCK SPECIFICATIONS: na
-        // DERIVED TYPE DEFINITIONS: na
 
         Real64 GTOT = 0.0;;   // Glare constant
 
@@ -5750,28 +5509,14 @@ namespace EnergyPlus::DaylightingManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DHILL.
 
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         HISK.dim(4);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  and overcast sky (lux)
-        //   illuminance (lux)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NTH(18);                          // Number of azimuth steps for sky integration
         int const NPH(8);                           // Number of altitude steps for sky integration
         Real64 const DTH((2.0 * DataGlobalConstants::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
         Real64 const DPH(DataGlobalConstants::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IPH;                            // Altitude index for sky integration
@@ -5780,7 +5525,6 @@ namespace EnergyPlus::DaylightingManager {
         static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
-
 
         // Integrate to obtain illuminance from sky.
         // The contribution in lumens/m2 from a patch of sky at altitude PH and azimuth TH
@@ -6134,8 +5878,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Called by InitSurfaceHeatBalance.
 
-        // METHODOLOGY EMPLOYED:na
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DINTIL.
 
@@ -6143,17 +5885,8 @@ namespace EnergyPlus::DaylightingManager {
         using General::InterpSlatAng;
         using General::POLYF;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const tmpSWIterStep(0.05); // step of switching factor, assuming maximum of 20 switching states
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NREFPT; // Number of daylighting reference points
@@ -6234,8 +5967,6 @@ namespace EnergyPlus::DaylightingManager {
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
         tmpSourceLumFromWinAtRefPt = 0.0;
-
-
 
         // Initialize reference point illuminance and window background luminance
         for (int IL = 1; IL <= NREFPT; ++IL) {
@@ -7103,28 +6834,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the TDD Pipe illuminance values
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;                            // TDD pipe object number
         Real64 TDDTransVisDiffNow;              // TDD diffuse visible transmittance at the current hour
@@ -7193,25 +6902,11 @@ namespace EnergyPlus::DaylightingManager {
 
         // Called by InitSurfaceHeatBalance.
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DLTSYS.
 
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TotReduction; // Electric lighting power reduction factor for a zone
@@ -7228,8 +6923,6 @@ namespace EnergyPlus::DaylightingManager {
         int MapNum;   // Illuminance map number
         int ILM;
         bool ScheduledAvailable;
-
-
 
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) return;
 
@@ -7356,30 +7049,11 @@ namespace EnergyPlus::DaylightingManager {
         // the position factor for X = 0, 0.5, 1.0, 1.5, 2.0, 2.5,
         // and 3.0 and Y = 0, 0.5, 1.0, 1.5, 2.0. Called by CalcDayltgCoefficients.
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DPFAC.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 DayltgGlarePositionFactor; // Position factor
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        //  horizontal line of vision, divided by horizontal distance from
-        //  eye of observer
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int IX; // Lateral and vertical displacement indices
@@ -7479,19 +7153,9 @@ namespace EnergyPlus::DaylightingManager {
         using General::InterpProfAng;
         using General::POLYF;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  quantities that do not depend on sun position.
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NPHMAX(10); // Number of sky/ground integration steps in altitude
         int const NTHMAX(16); // Number of sky/ground integration steps in azimuth
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // In the following I,J arrays:
@@ -7578,7 +7242,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 rfshB;  // Beam-diffuse front vis reflectance of bare blind
         Real64 tfshd;  // Diffuse-diffuse front vis trans of bare blind
         Real64 rbshd;  // Diffuse-diffuse back vis reflectance of bare blind
-        // unused  REAL(r64)         :: A                         ! Intermediate value for azimuth limits calculation
         Real64 ZSUObsRefl; // Illuminance on window from beam solar reflected by an
         //  obstruction (for unit beam normal illuminance)
         int NearestHitSurfNum;               // Surface number of nearest obstruction
@@ -8382,26 +8045,12 @@ namespace EnergyPlus::DaylightingManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // exluding beam
-        // due to sun beam
-
         int iIncElem;
         int iSky;
         int SolBmIndex;
         Real64 LambdaInc;
         Real64 Altitude;
         Real64 Azimuth;
-        //  REAL(r64) :: CurCplxFenState
         int CurCplxFenState;
         Real64 SunObstrMultiplier; // sun obstruction multiplier used to determine if sun hit the ground point
         Real64 ObstrTrans;         // product of all surface transmittances intersecting incoming beam
@@ -8552,15 +8201,6 @@ namespace EnergyPlus::DaylightingManager {
         // the center of the window and then reflecting this
         // light from the inside surfaces of the space.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         Array2D<Real64> FLSK;     // Sky related luminous flux
         Array1D<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
         Array1D<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
@@ -8572,8 +8212,6 @@ namespace EnergyPlus::DaylightingManager {
         Array2D<Real64> ElementLuminanceSky;     // sky related luminance at window element (exterior side)
         Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
         Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
-        // Total transmitted flux
-        //		static Vector4< Real64 > FLSKTot; //Unused
         Real64 FLSUTot;
         Real64 FLSUdiskTot;
 
@@ -8708,20 +8346,6 @@ namespace EnergyPlus::DaylightingManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  quantities that do not depend on sun position.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // Luminances from different sources to the window
         Array2D<Real64> ElementLuminanceSky; // sky related luminance at window element (exterior side)
         Array1D<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
@@ -8731,12 +8355,8 @@ namespace EnergyPlus::DaylightingManager {
 
         static Vector4<Real64> WinLumSK; // Sky related window luminance
         Real64 WinLumSU;                 // Sun related window luminance, excluding entering beam
-        // REAL(r64) :: WinLumSUdisk  ! Sun related window luminance, due to entering beam
-
         static Vector4<Real64> EDirSky; // Sky related direct illuminance
         Real64 EDirSun;                 // Sun related direct illuminance, excluding entering beam
-                                        //		Real64 EDirSunDisk; // Sun related direct illuminance, due to entering beam //Unused Set but never used
-
         int CurCplxFenState;
         int NIncBasis;
         int RefPointIndex; // reference point patch number
@@ -8744,9 +8364,7 @@ namespace EnergyPlus::DaylightingManager {
         int iConst;
         int iSky;
 
-        // REAL(r64) :: LambdaInc ! lambda for incident direation
         Real64 dirTrans; // directional BSDF transmittance
-
         Real64 dOmega;      // solid view angle of current element
         Real64 zProjection; // z-axe projection of solid view angle (used to calculate amount of light at horizontal surface
         // laying at reference point)
@@ -8832,18 +8450,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate illuminance from sun disk for complex fenestration systems
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  glare calculation (radians)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurCplxFenState;
@@ -8980,18 +8586,6 @@ namespace EnergyPlus::DaylightingManager {
         // Return value
         Real64 DayltgSkyLuminance(0.0); // Luminance of sky element divided by zenith luminance
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 SPHSKY;    // Sine of PHSKY
         Real64 G(0.0);    // Angle between sun and element of sky (radians)
@@ -9001,9 +8595,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 Z2;
         Real64 Z3;
         Real64 Z4;
-
-        // Autodesk:Return ISky in {1,2,3,4} should be checked or asserted or a default case should be added to SELECT block to set return value
-
 
         SPHSKY = max(std::sin(PHSKY), 0.01); // Prevent floating point underflows
         Z = DataGlobalConstants::PiOvr2 - state.dataDaylightingManager->PHSUN;
@@ -9054,9 +8645,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates profile angle for a surface.
-
-        // REFERENCES: na
-        // USE STATEMENTS:
 
         // Using/Aliasing
         using namespace DataSurfaces;
@@ -9137,31 +8725,13 @@ namespace EnergyPlus::DaylightingManager {
         // Determines surface number and hit point of closest exterior obstruction hit
         // by a ray from a window. If no obstruction is hit, NearestHitSurfNum = 0.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //  = 0 if no obstruction is hit.
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         static Vector3<Real64> HitPt; // Hit point on an obstruction (m)
         bool hit;                     // True iff obstruction is hit
-
-
 
         NearestHitSurfNum = 0;
         Real64 NearestHitDistance_sq(
@@ -9253,24 +8823,9 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates exterior surface luminance due to beam solar diffuse reflection.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //  beam normal illuminance (cd/m2)
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> ReflNorm; // Unit normal to reflecting surface (m)
@@ -9279,8 +8834,6 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> ObsHitPt; // Hit point on obstruction (m)
         Real64 CosIncAngAtHitPt;         // Cosine of angle of incidence of sun at HitPt
         Real64 DiffVisRefl;              // Diffuse visible reflectance of ReflSurfNum
-
-
 
         LumAtReflHitPtFrSun = 0.0;
         // Skip daylighting shelves since reflection from these is separately calculated
@@ -9353,8 +8906,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Called by InitSurfaceHeatBalance.
 
-        // METHODOLOGY EMPLOYED:na
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DINTIL.
 
@@ -9364,17 +8915,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Locals
         static Array1D<Real64> daylight_illum;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NREFPT; // Number of daylighting map reference points
@@ -9411,7 +8951,6 @@ namespace EnergyPlus::DaylightingManager {
         static Array1D<Real64> BACLUM;
         static Array1D<Real64> GLRNDX;
         int ILB;
-
         int IConst;
         Real64 VTRatio;
         Real64 VTNow;
@@ -9814,27 +9353,10 @@ namespace EnergyPlus::DaylightingManager {
         // is placed on a temporary file and later (see CloseReportIllumMaps) coallesced into a single
         // output file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string String;
@@ -9842,7 +9364,6 @@ namespace EnergyPlus::DaylightingManager {
         int X;
         int Y;
         int R;
-        //  REAL(r64)           :: NumOut
         int IllumOut;
 
         static Array1D_bool FirstTimeMaps;
@@ -10022,28 +9543,10 @@ namespace EnergyPlus::DaylightingManager {
         // This subroutine "closes" out the created daylight illuminance maps by merging them
         // into the "eplusout.map" file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (state.dataDaylightingData->TotIllumMaps > 0) {
@@ -10095,30 +9598,6 @@ namespace EnergyPlus::DaylightingManager {
         // Make sure DFSFile is closed at exit time.  Do not rely on operating system to
         // take care of it.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         state.files.dfs.close();
     }
 
@@ -10144,11 +9623,12 @@ namespace EnergyPlus::DaylightingManager {
         int RefSize;
         int MapNum;
 
+        auto &Zone(state.dataHeatBal->Zone);
 
         // Count number of exterior Windows (use to allocate arrays)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             // Count exterior windows in this zone or shared solar enclosure
-            for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+            for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                 if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                     SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                     ++state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows;
@@ -10161,13 +9641,13 @@ namespace EnergyPlus::DaylightingManager {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
             // Find adjacent zones/enclosures
-            int const thisZoneEnclNum = state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
             for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
                 for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
-                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                             AdjZoneHasExtWins = true;
                             break;
@@ -10175,7 +9655,7 @@ namespace EnergyPlus::DaylightingManager {
                     }
                     if (!AdjZoneHasExtWins) continue;
                     // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
-                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
                             // This is an interior window in ZoneNumAdj
                             if (Surface(Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10196,14 +9676,14 @@ namespace EnergyPlus::DaylightingManager {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             // This is a Daylighting:Detailed zone
             // Find adjacent zones
-            int const thisZoneEnclNum = state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
             for (int adjEnclNum = 1; adjEnclNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++adjEnclNum) {
                 if (adjEnclNum == thisZoneEnclNum) continue;
                 for (int ZoneNumAdj : DataViewFactorInformation::ZoneSolarInfo(adjEnclNum).ZoneNums) {
                     if (ZoneNumAdj == ZoneNum) continue;
                     // Require that ZoneNumAdj have a least one exterior window
                     bool AdjZoneHasExtWins = false;
-                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                             AdjZoneHasExtWins = true;
                             break;
@@ -10211,7 +9691,7 @@ namespace EnergyPlus::DaylightingManager {
                     }
                     if (!AdjZoneHasExtWins) continue;
                     // Loop again through surfaces in ZoneNumAdj and see if any are interior windows adjacent to ZoneNum
-                    for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                    for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                         if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond >= 1) {
                             // This is an interior window in ZoneNumAdj
                             if (Surface(Surface(SurfNumAdj).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10235,10 +9715,10 @@ namespace EnergyPlus::DaylightingManager {
                 state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZoneExtWins = 0;
                 continue;
             }
-            int const thisZoneEnclNum = state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum;
+            int const thisZoneEnclNum = Zone(ZoneNum).SolarEnclosureNum;
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
                 int ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
-                for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                     if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZoneExtWins;
                     }
@@ -10251,14 +9731,14 @@ namespace EnergyPlus::DaylightingManager {
             int ExtWinIndex = 0;
             for (int ZoneAdjLoop = 1; ZoneAdjLoop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++ZoneAdjLoop) {
                 int const ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(ZoneAdjLoop);
-                for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                     if (Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) {
                         ++ExtWinIndex;
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).SurfNum = SurfNumAdj;
 
                         // now count interior windows shared by both zones
                         int NumOfIntWindowsCount = 0;
-                        for (int SurfNumAdj2 = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
+                        for (int SurfNumAdj2 = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
                             if (Surface(SurfNumAdj2).Class == SurfaceClass::Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
                                 // This is an interior window in ZoneNumAdj
                                 if (Surface(Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10271,7 +9751,7 @@ namespace EnergyPlus::DaylightingManager {
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).IntWinNum.allocate(NumOfIntWindowsCount);
                         state.dataDaylightingData->ZoneDaylight(ZoneNum).IntWinAdjZoneExtWin(ExtWinIndex).IntWinNum = 0;
                         int IntWinIndex = 0;
-                        for (int SurfNumAdj2 = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
+                        for (int SurfNumAdj2 = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj2 <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj2) {
                             if (Surface(SurfNumAdj2).Class == SurfaceClass::Window && Surface(SurfNumAdj2).ExtBoundCond >= 1) {
                                 // This is an interior window in ZoneNumAdj
                                 if (Surface(Surface(SurfNumAdj2).ExtBoundCond).SolarEnclIndex == thisZoneEnclNum) {
@@ -10293,7 +9773,7 @@ namespace EnergyPlus::DaylightingManager {
                 // This is a Daylighting:Detailed zone
 
                 // Get exterior windows in this zone or shared solar enclosure
-                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWin(ZoneNum);
@@ -10306,7 +9786,7 @@ namespace EnergyPlus::DaylightingManager {
                         int ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop);
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
-                        for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                        for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWin(ZoneNum);
@@ -10361,7 +9841,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 int ZoneExtWinCtr = 0;
 
-                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
+                for (int const surfNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr) {
                     if ((Surface(surfNum).Class == SurfaceClass::Window && Surface(surfNum).ExtBoundCond == ExternalEnvironment) ||
                         SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) {
                         ++ZoneExtWinCtr;
@@ -10375,7 +9855,7 @@ namespace EnergyPlus::DaylightingManager {
                         int const ZoneNumAdj = state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop);
                         // Get exterior windows in ZoneNumAdj -- there must be at least one, otherwise
                         // it would not be an "AdjIntWinZone"
-                        for (int SurfNumAdj = state.dataHeatBal->Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= state.dataHeatBal->Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
+                        for (int SurfNumAdj = Zone(ZoneNumAdj).SurfaceFirst; SurfNumAdj <= Zone(ZoneNumAdj).SurfaceLast; ++SurfNumAdj) {
                             if ((Surface(SurfNumAdj).Class == SurfaceClass::Window && Surface(SurfNumAdj).ExtBoundCond == ExternalEnvironment) ||
                                 SurfWinOriginalClass(SurfNumAdj) == SurfaceClass::TDD_Diffuser) {
                                 ++ZoneExtWinCtr;
@@ -10442,7 +9922,7 @@ namespace EnergyPlus::DaylightingManager {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) continue;
             static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
-            print(state.files.eio, Format_701, state.dataHeatBal->Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows,
+            print(state.files.eio, Format_701, Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows,
                   (state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins - state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalExtWindows));
         }
         static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
@@ -10451,9 +9931,9 @@ namespace EnergyPlus::DaylightingManager {
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) continue;
             static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
-            print(state.files.eio, Format_703, state.dataHeatBal->Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
+            print(state.files.eio, Format_703, Zone(ZoneNum).Name, state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
             for (int loop = 1, loop_end = min(state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
-                print(state.files.eio, ",{}", state.dataHeatBal->Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
+                print(state.files.eio, ",{}", Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
             }
             print(state.files.eio, "\n");
         }
@@ -10502,6 +9982,9 @@ namespace EnergyPlus::DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
+
+        auto &Zone(state.dataHeatBal->Zone);
+
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 &&
             state.dataDaylightingData->ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
             int count = 0;
@@ -10509,7 +9992,7 @@ namespace EnergyPlus::DaylightingManager {
                 for (auto IWinShdOrd : listOfExtWin) {
                     ++count;
                     if (count > state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins)
-                        ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + state.dataHeatBal->Zone(ZoneNum).Name);
+                        ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: too many controlled shaded windows in zone " + Zone(ZoneNum).Name);
                     bool found = false;
                     for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                         int IWinLoop = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
@@ -10520,13 +10003,13 @@ namespace EnergyPlus::DaylightingManager {
                         }
                     }
                     // this should never occur.
-                    if (!found) ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + state.dataHeatBal->Zone(ZoneNum).Name);
+                    if (!found) ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found unassociated window for zone " + Zone(ZoneNum).Name);
                 }
             }
             // double check MapShdOrdToLoopNum array, this should be unnessary but..
             for (int loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).MapShdOrdToLoopNum(loop) == 0) {
-                    ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + state.dataHeatBal->Zone(ZoneNum).Name);
+                    ShowWarningError(state, "MapShadeDeploymentOrderToLoopNumber: found empty map for window in zone " + Zone(ZoneNum).Name);
                 }
             }
         }
@@ -10637,18 +10120,18 @@ namespace EnergyPlus::DaylightingManager {
         Real64 COSB;                  // Cosine of angle between ray from ref pt to center of window
         //  and window outward normal
 
-
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             state.dataDaylightingData->ZoneDaylight(ZoneNum).MinIntWinSolidAng = 2.0 * DataGlobalConstants::Pi;
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0) continue;
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones == 0) continue;
-            for (IWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IWin) {
+            for (IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
                 if (Surface(IWin).Class == SurfaceClass::Window && Surface(IWin).ExtBoundCond >= 1) {
                     ZoneNumAdj = Surface(Surface(IWin).ExtBoundCond).Zone;
                     IntWinNextToIntWinAdjZone = false;
                     for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfIntWinAdjZones; ++loop) {
-                        if (state.dataHeatBal->Zone(ZoneNumAdj).SolarEnclosureNum == state.dataHeatBal->Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).SolarEnclosureNum) {
+                        if (Zone(ZoneNumAdj).SolarEnclosureNum == Zone(state.dataDaylightingData->ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).SolarEnclosureNum) {
                             IntWinNextToIntWinAdjZone = true;
                             break;
                         }

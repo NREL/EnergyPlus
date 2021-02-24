@@ -1619,6 +1619,8 @@ namespace AirflowNetworkBalanceManager {
         ErrorsFound = false;
         AirflowNetworkInitFlag = false;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other
         // simple ventilation objects
         CurrentModuleObject = "AirflowNetwork:OccupantVentilationControl";
@@ -2089,14 +2091,14 @@ namespace AirflowNetworkBalanceManager {
         // ==> Zone data validation
         for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
             // Zone name validation
-            MultizoneZoneData(i).ZoneNum = UtilityRoutines::FindItemInList(MultizoneZoneData(i).ZoneName, state.dataHeatBal->Zone);
+            MultizoneZoneData(i).ZoneNum = UtilityRoutines::FindItemInList(MultizoneZoneData(i).ZoneName, Zone);
             if (MultizoneZoneData(i).ZoneNum == 0) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields(1) + " given.");
                 ShowContinueError(state, "..invalid " + cAlphaFields(1) + " = \"" + MultizoneZoneData(i).ZoneName + "\"");
                 ErrorsFound = true;
             } else {
                 AirflowNetworkZoneFlag(MultizoneZoneData(i).ZoneNum) = true;
-                MultizoneZoneData(i).Height = state.dataHeatBal->Zone(MultizoneZoneData(i).ZoneNum).Centroid.z; // Nodal height
+                MultizoneZoneData(i).Height = Zone(MultizoneZoneData(i).ZoneNum).Centroid.z; // Nodal height
             }
             if (MultizoneZoneData(i).VentCtrNum == VentControlType::None) {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + " object, invalid " + cAlphaFields(2) + " = " + MultizoneZoneData(i).VentControl);
@@ -2564,7 +2566,7 @@ namespace AirflowNetworkBalanceManager {
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + " object, " + cAlphaFields(1) + " = " + MultizoneSurfaceData(i).SurfName);
                 ShowContinueError(state, "..Zone for inside surface must be defined in a AirflowNetwork:MultiZone:Zone object.  Could not find Zone = " +
-                                  state.dataHeatBal->Zone(Surface(MultizoneSurfaceData(i).SurfNum).Zone).Name);
+                                  Zone(Surface(MultizoneSurfaceData(i).SurfNum).Zone).Name);
                 ShowFatalError(state, RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
             }
 
@@ -2716,7 +2718,7 @@ namespace AirflowNetworkBalanceManager {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + " object, " + cAlphaFields(1) + " = " + MultizoneSurfaceData(i).SurfName);
                     ShowContinueError(state,
                         "..Zone for outside surface must be defined in a AirflowNetwork:MultiZone:Zone object.  Could not find Zone = " +
-                        state.dataHeatBal->Zone(Surface(MultizoneSurfaceData(i).SurfNum).Zone).Name);
+                        Zone(Surface(MultizoneSurfaceData(i).SurfNum).Zone).Name);
                     ErrorsFound = true;
                     continue;
                 }
@@ -2735,7 +2737,7 @@ namespace AirflowNetworkBalanceManager {
                         MultizoneSurfaceData(i).NodeNums[1] = j;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + " = " + MultizoneSurfaceData(i).SurfName);
-                        ShowContinueError(state, "An adjacent zone = " + state.dataHeatBal->Zone(Surface(n).Zone).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE");
+                        ShowContinueError(state, "An adjacent zone = " + Zone(Surface(n).Zone).Name + " is not described in AIRFLOWNETWORK:MULTIZONE:ZONE");
                         ErrorsFound = true;
                         continue;
                     }
@@ -3331,7 +3333,7 @@ namespace AirflowNetworkBalanceManager {
                 if (IntraZoneLinkageData(i).NodeNums[0] == 0) {
                     IntraZoneLinkageData(i).NodeNums[0] =
                         UtilityRoutines::FindItemInList(Alphas(2), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
-                    IntraZoneLinkageData(i).NodeHeights[0] = state.dataHeatBal->Zone(MultizoneZoneData(IntraZoneLinkageData(i).NodeNums[0]).ZoneNum).Centroid.z;
+                    IntraZoneLinkageData(i).NodeHeights[0] = Zone(MultizoneZoneData(IntraZoneLinkageData(i).NodeNums[0]).ZoneNum).Centroid.z;
                     if (IntraZoneLinkageData(i).NodeNums[0] == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "='" + Alphas(1) + "': Invalid " + cAlphaFields(2) +
                                         " given = " + Alphas(2) + " in AirflowNetwork:IntraZone:Node and AirflowNetwork:MultiZone:Zone objects");
@@ -3346,7 +3348,7 @@ namespace AirflowNetworkBalanceManager {
                     IntraZoneLinkageData(i).NodeNums[1] =
                         UtilityRoutines::FindItemInList(Alphas(3), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
                     if (IntraZoneLinkageData(i).NodeNums[1] > 0) {
-                        IntraZoneLinkageData(i).NodeHeights[1] = state.dataHeatBal->Zone(MultizoneZoneData(IntraZoneLinkageData(i).NodeNums[1]).ZoneNum).Centroid.z;
+                        IntraZoneLinkageData(i).NodeHeights[1] = Zone(MultizoneZoneData(IntraZoneLinkageData(i).NodeNums[1]).ZoneNum).Centroid.z;
                     } else {
                         if (AirflowNetworkSimu.iWPCCntr == iWPCCntr_Input) { // Surface-Average does not need inputs of external nodes
                             IntraZoneLinkageData(i).NodeNums[1] = MultizoneSurfaceData(IntraZoneLinkageData(i).LinkNum).NodeNums[1];
@@ -3685,7 +3687,7 @@ namespace AirflowNetworkBalanceManager {
                 UtilityRoutines::IsNameEmpty(state, Alphas(1), CurrentModuleObject, ErrorsFound);
                 PressureControllerData(i).Name = Alphas(1);     // Object Name
                 PressureControllerData(i).ZoneName = Alphas(2); // Zone name
-                PressureControllerData(i).ZoneNum = UtilityRoutines::FindItemInList(Alphas(2), state.dataHeatBal->Zone);
+                PressureControllerData(i).ZoneNum = UtilityRoutines::FindItemInList(Alphas(2), Zone);
                 PressureControllerData(i).AFNNodeNum =
                     UtilityRoutines::FindItemInList(Alphas(2), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
                 if (PressureControllerData(i).ZoneNum == 0) {
@@ -4152,11 +4154,11 @@ namespace AirflowNetworkBalanceManager {
             if (!WorldCoordSystem) {
                 if (AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum > 0) {
                     AirflowNetworkLinkageData(count).NodeHeights[0] -=
-                        state.dataHeatBal->Zone(AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum).OriginZ;
+                        Zone(AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[0]).EPlusZoneNum).OriginZ;
                 }
                 if (AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[1]).EPlusZoneNum > 0) {
                     AirflowNetworkLinkageData(count).NodeHeights[1] -=
-                        state.dataHeatBal->Zone(AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[1]).EPlusZoneNum).OriginZ;
+                        Zone(AirflowNetworkNodeData(AirflowNetworkLinkageData(count).NodeNums[1]).EPlusZoneNum).OriginZ;
                 }
             }
             // Find component number
@@ -4233,12 +4235,12 @@ namespace AirflowNetworkBalanceManager {
                     // Get linkage height from upper and lower zones
                     if (MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[0]).ZoneNum > 0) {
                         AirflowNetworkLinkageData(count).NodeHeights[0] =
-                            state.dataHeatBal->Zone(MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[0]).ZoneNum).Centroid.z;
+                            Zone(MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[0]).ZoneNum).Centroid.z;
                     }
                     if (AirflowNetworkLinkageData(count).NodeNums[1] <= AirflowNetworkNumOfZones) {
                         if (MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[1]).ZoneNum > 0) {
                             AirflowNetworkLinkageData(count).NodeHeights[1] =
-                                state.dataHeatBal->Zone(MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[1]).ZoneNum).Centroid.z;
+                                Zone(MultizoneZoneData(AirflowNetworkLinkageData(count).NodeNums[1]).ZoneNum).Centroid.z;
                         }
                     }
                     if (AirflowNetworkLinkageData(count).NodeNums[1] > AirflowNetworkNumOfZones) {
@@ -4402,7 +4404,7 @@ namespace AirflowNetworkBalanceManager {
                 }
 
                 if (!lAlphaBlanks(5)) {
-                    AirflowNetworkLinkageData(count).ZoneNum = UtilityRoutines::FindItemInList(AirflowNetworkLinkageData(count).ZoneName, state.dataHeatBal->Zone);
+                    AirflowNetworkLinkageData(count).ZoneNum = UtilityRoutines::FindItemInList(AirflowNetworkLinkageData(count).ZoneName, Zone);
                     if (AirflowNetworkLinkageData(count).ZoneNum == 0) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + ": Invalid " + cAlphaFields(5) +
                                         " given = " + AirflowNetworkLinkageData(count).ZoneName);
@@ -4773,6 +4775,7 @@ namespace AirflowNetworkBalanceManager {
         int i;
         int j;
         int ZoneNum;
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (initializeOneTimeFlag) {
             exchangeData.allocate(state.dataGlobal->NumOfZones); // AirflowNetwork exchange data due to air-forced system
@@ -4792,35 +4795,35 @@ namespace AirflowNetworkBalanceManager {
                                         exchangeData(i).SumMHr,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHr,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Outdoor Air CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMHrCO,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Mixing CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHrCO,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Total CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).TotalCO2,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                 }
             }
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
@@ -4832,14 +4835,14 @@ namespace AirflowNetworkBalanceManager {
                                             exchangeData(i).SumMHr,
                                             "System",
                                             "Average",
-                                            state.dataHeatBal->Zone(i).Name);
+                                            Zone(i).Name);
                         SetupOutputVariable(state,
                                             "AFN Zone Mixing Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             exchangeData(i).SumMMHr,
                                             "System",
                                             "Average",
-                                            state.dataHeatBal->Zone(i).Name);
+                                            Zone(i).Name);
                     }
                     SetupOutputVariable(state,
                                         "AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate",
@@ -4847,21 +4850,21 @@ namespace AirflowNetworkBalanceManager {
                                         exchangeData(i).SumMHrGC,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Mixing Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHrGC,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Total Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).TotalGC,
                                         "System",
                                         "Average",
-                                        state.dataHeatBal->Zone(i).Name);
+                                        Zone(i).Name);
                 }
             }
         }
@@ -5040,6 +5043,7 @@ namespace AirflowNetworkBalanceManager {
         int ZoneNum;
         int n;
         int SurfNum;
+        auto &Zone(state.dataHeatBal->Zone);
 
         AirflowNetworkNodeSimu.allocate(AirflowNetworkNumOfNodes);   // Node simulation variable in air distribution system
         AirflowNetworkLinkSimu.allocate(AirflowNetworkNumOfLinks);   // Link simulation variable in air distribution system
@@ -5266,361 +5270,361 @@ namespace AirflowNetworkBalanceManager {
                                 AirflowNetworkReportData(i).MultiZoneInfiSenGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentSenGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentSenGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixSenGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneMixSenGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiSenLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentSenLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentSenLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixSenLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneMixSenLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentLatGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentLatGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneVentLatLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Ventilation Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneVentLatLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixLatGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneMixLatGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).MultiZoneMixLatLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Mixing Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).MultiZoneInfiLatLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             // Supply leak losses due to force air systems
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakSenGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakSenGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakSenLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakSenLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakLatGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakLatGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).LeakLatLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Leaked Air Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).LeakLatLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             // Conduction losses due to force air systems
             SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).CondSenGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).CondSenGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).CondSenLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Conduction Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).CondSenLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).DiffLatGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).DiffLatGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).DiffLatLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Diffusion Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).DiffLatLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             // Radiation losses due to forced air systems
             SetupOutputVariable(state, "AFN Zone Duct Radiation Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).RadGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Radiation Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).RadGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Radiation Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).RadLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Duct Radiation Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).RadLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             // Total losses due to force air systems
             SetupOutputVariable(state, "AFN Distribution Sensible Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalSenGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Sensible Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalSenGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Sensible Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalSenLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Sensible Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalSenLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Latent Heat Gain Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalLatGainW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Latent Heat Gain Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalLatGainJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Latent Heat Loss Rate",
                                 OutputProcessor::Unit::W,
                                 AirflowNetworkReportData(i).TotalLatLossW,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Distribution Latent Heat Loss Energy",
                                 OutputProcessor::Unit::J,
                                 AirflowNetworkReportData(i).TotalLatLossJ,
                                 "System",
                                 "Sum",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
         }
 
         for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) {
             SetupOutputVariable(state,
-                "AFN Zone Infiltration Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume, "System", "Sum", state.dataHeatBal->Zone(i).Name);
+                "AFN Zone Infiltration Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume, "System", "Sum", Zone(i).Name);
             SetupOutputVariable(state,
-                "AFN Zone Infiltration Mass", OutputProcessor::Unit::kg, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass, "System", "Sum", state.dataHeatBal->Zone(i).Name);
+                "AFN Zone Infiltration Mass", OutputProcessor::Unit::kg, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass, "System", "Sum", Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Infiltration Air Change Rate",
                                 OutputProcessor::Unit::ach,
                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
-            SetupOutputVariable(state, "AFN Zone Mixing Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", state.dataHeatBal->Zone(i).Name);
-            SetupOutputVariable(state, "AFN Zone Mixing Mass", OutputProcessor::Unit::kg, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass, "System", "Sum", state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
+            SetupOutputVariable(state, "AFN Zone Mixing Volume", OutputProcessor::Unit::m3, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume, "System", "Sum", Zone(i).Name);
+            SetupOutputVariable(state, "AFN Zone Mixing Mass", OutputProcessor::Unit::kg, state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass, "System", "Sum", Zone(i).Name);
 
             SetupOutputVariable(state, "AFN Zone Exfiltration Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Exfiltration Sensible Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilSensiLoss,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
             SetupOutputVariable(state, "AFN Zone Exfiltration Latent Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilLatentLoss,
                                 "System",
                                 "Average",
-                                state.dataHeatBal->Zone(i).Name);
+                                Zone(i).Name);
         }
 
         if (OnOffFanFlag) {
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 SetupOutputVariable(state,
-                    "AFN Zone Average Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZ, "System", "Average", state.dataHeatBal->Zone(i).Name);
+                    "AFN Zone Average Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZ, "System", "Average", Zone(i).Name);
                 SetupOutputVariable(state,
-                    "AFN Zone On Cycle Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZON, "System", "Average", state.dataHeatBal->Zone(i).Name);
+                    "AFN Zone On Cycle Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZON, "System", "Average", Zone(i).Name);
                 SetupOutputVariable(state,
-                    "AFN Zone Off Cycle Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZOFF, "System", "Average", state.dataHeatBal->Zone(i).Name);
+                    "AFN Zone Off Cycle Pressure", OutputProcessor::Unit::Pa, state.dataAirflowNetworkBalanceManager->nodeReport(i).PZOFF, "System", "Average", Zone(i).Name);
             }
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
                 SetupOutputVariable(state, "AFN Linkage Node 1 to 2 Average Mass Flow Rate",
@@ -5676,7 +5680,7 @@ namespace AirflowNetworkBalanceManager {
                 if (WorldCoordSystem) {
                     AirflowNetworkNodeData(i).NodeHeight = 0.0;
                 } else {
-                    AirflowNetworkNodeData(i).NodeHeight = state.dataHeatBal->Zone(ZoneNum).OriginZ;
+                    AirflowNetworkNodeData(i).NodeHeight = Zone(ZoneNum).OriginZ;
                 }
             }
         }
@@ -6584,6 +6588,7 @@ namespace AirflowNetworkBalanceManager {
         // ASTM C1340
 
         Real64 k = airThermConductivity(state, Ts);
+        auto &Zone(state.dataHeatBal->Zone);
 
         Real64 hOut_final = 0;
 
@@ -6607,7 +6612,7 @@ namespace AirflowNetworkBalanceManager {
             // Forced convection
             if (ZoneNum > 0) {
                 Real64 ACH = GetZoneInfilAirChangeRate(state, ZoneNum); // Zone air change rate [1/hr]
-                Real64 Vol = state.dataHeatBal->Zone(ZoneNum).Volume;               // Zone volume [m3]
+                Real64 Vol = Zone(ZoneNum).Volume;               // Zone volume [m3]
                 V = pow(Vol, 0.333) * ACH / 3600;                // Average air speed in zone [m/s]
             } else {
                 V = state.dataEnvrn->WindSpeed;
@@ -7927,8 +7932,10 @@ namespace AirflowNetworkBalanceManager {
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Lam(2.5e6); // Heat of vaporization (J/kg)
+        constexpr Real64 Lam(2.5e6); // Heat of vaporization (J/kg)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -8030,7 +8037,7 @@ namespace AirflowNetworkBalanceManager {
                         CpAir =
                             PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(state, Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, state.dataEnvrn->OutBaroPress));
                     } else {
-                        Tamb = state.dataHeatBal->Zone(ZN1).OutDryBulbTemp;
+                        Tamb = Zone(ZN1).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     }
                     hg = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZN1), MAT(ZN1));
@@ -8086,7 +8093,7 @@ namespace AirflowNetworkBalanceManager {
                         CpAir =
                             PsyCpAirFnW(Psychrometrics::PsyWFnTdbTwbPb(state, Tamb, Surface(MultizoneSurfaceData(i).SurfNum).OutWetBulbTemp, state.dataEnvrn->OutBaroPress));
                     } else {
-                        Tamb = state.dataHeatBal->Zone(ZN2).OutDryBulbTemp;
+                        Tamb = Zone(ZN2).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     }
                     hg = Psychrometrics::PsyHgAirFnWTdb(ZoneAirHumRat(ZN2), MAT(ZN2));
@@ -8313,7 +8320,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                         if (AirflowNetworkNodeData(n).AirLoopNum == 0 && onceSurfFlag(i)) continue;
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
-                        Tamb = state.dataHeatBal->Zone(ZN1).OutDryBulbTemp;
+                        Tamb = Zone(ZN1).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                         if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SCR ||
                             AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SEL) {
@@ -8381,7 +8388,7 @@ namespace AirflowNetworkBalanceManager {
                         }
                         if (AirflowNetworkNodeData(M).AirLoopNum == 0 && onceSurfFlag(i)) continue;
                         ReportingFraction = (1.0 - RepOnOffFanRunTimeFraction);
-                        Tamb = state.dataHeatBal->Zone(ZN2).OutDryBulbTemp;
+                        Tamb = Zone(ZN2).OutDryBulbTemp;
                         CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                         if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SCR ||
                             AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SEL) {
@@ -8497,12 +8504,12 @@ namespace AirflowNetworkBalanceManager {
         if (!(SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS)) return;
 
         for (i = 1; i <= state.dataGlobal->NumOfZones; ++i) { // Start of zone loads report variable update loop ...
-            Tamb = state.dataHeatBal->Zone(i).OutDryBulbTemp;
+            Tamb = Zone(i).OutDryBulbTemp;
             CpAir = PsyCpAirFnW(ZoneAirHumRatAvg(i));
             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(i), ZoneAirHumRatAvg(i));
 
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / AirDensity) * ReportingConstant;
-            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * state.dataHeatBal->Zone(i).Volume);
+            state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilAirChangeRate = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume / (TimeStepSys * Zone(i).Volume);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir) * ReportingConstant;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir / AirDensity) * ReportingConstant;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).MixMass = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMMCp / CpAir) * ReportingConstant;
@@ -8515,13 +8522,13 @@ namespace AirflowNetworkBalanceManager {
             if (state.dataHeatBal->ZonePreDefRep(i).isOccupied) {
                 state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
                 state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
-                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * state.dataHeatBal->Zone(i).Multiplier * state.dataHeatBal->Zone(i).ListMultiplier;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
-                    state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * state.dataHeatBal->Zone(i).Multiplier * state.dataHeatBal->Zone(i).ListMultiplier;
+                    state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
 
-            Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, state.dataHeatBal->Zone(i).OutDryBulbTemp);
+            Real64 H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, Zone(i).OutDryBulbTemp);
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InletMass = 0;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).OutletMass = 0;
             if (state.dataZoneEquip->ZoneEquipConfig(i).IsControlled) {
@@ -8635,6 +8642,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 AFNMass;
         bool WriteFlag;
 
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
             e.SumMCp = 0.0;
@@ -8669,7 +8677,7 @@ namespace AirflowNetworkBalanceManager {
                 ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
                 if (ZN1 > 0 && ZN2 == 0) {
                     // Find a linkage from outdoors to this zone
-                    Tamb = state.dataHeatBal->Zone(ZN1).OutDryBulbTemp;
+                    Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCp += AirflowNetworkLinkSimu(i).FLOW2 * CpAir;
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).SumMCpT += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * Tamb;
@@ -8684,7 +8692,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
                     // Find a linkage from outdoors to this zone
-                    Tamb = state.dataHeatBal->Zone(ZN2).OutDryBulbTemp;
+                    Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCp += AirflowNetworkLinkSimu(i).FLOW * CpAir;
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).SumMCpT += AirflowNetworkLinkSimu(i).FLOW * CpAir * Tamb;
@@ -8809,13 +8817,13 @@ namespace AirflowNetworkBalanceManager {
                 ZN2 = AirflowNetworkNodeData(M).EPlusZoneNum;
                 // Find a linkage from a zone to outdoors
                 if (ZN1 > 0 && ZN2 == 0) {
-                    Tamb = state.dataHeatBal->Zone(ZN1).OutDryBulbTemp;
+                    Tamb = Zone(ZN1).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW2 * CpAir * (Tamb - ANZT(ZN1));
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN1).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW2 * (state.dataEnvrn->OutHumRat - ANZW(ZN1));
                 }
                 if (ZN1 == 0 && ZN2 > 0) {
-                    Tamb = state.dataHeatBal->Zone(ZN2).OutDryBulbTemp;
+                    Tamb = Zone(ZN2).OutDryBulbTemp;
                     CpAir = PsyCpAirFnW(state.dataEnvrn->OutHumRat);
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).MultiZoneSen += AirflowNetworkLinkSimu(i).FLOW * CpAir * (Tamb - ANZT(ZN2));
                     state.dataAirflowNetworkBalanceManager->exchangeData(ZN2).MultiZoneLat += AirflowNetworkLinkSimu(i).FLOW * (state.dataEnvrn->OutHumRat - ANZW(ZN2));
@@ -11259,7 +11267,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 Toperative;  // Operative temperature
         Real64 OutDryBulb;  // Outdoor dry-bulb temperature
 
-        // flow
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (TimeOpenDuration > 0) {
             if (TimeOpenDuration >= MinOpeningTime) {
@@ -11278,10 +11286,10 @@ namespace AirflowNetworkBalanceManager {
 
         if (MinTimeControlOnly) return;
 
-        if (state.dataHeatBal->Zone(ZoneNum).HasLinkedOutAirNode) {
-            OutDryBulb = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+        if (Zone(ZoneNum).HasLinkedOutAirNode) {
+            OutDryBulb = Zone(ZoneNum).OutDryBulbTemp;
         } else {
-            OutDryBulb = OutDryBulbTempAt(state, state.dataHeatBal->Zone(ZoneNum).Centroid.z);
+            OutDryBulb = OutDryBulbTempAt(state, Zone(ZoneNum).Centroid.z);
         }
 
         if (OutDryBulb < ComfortBouPoint) {
