@@ -81,7 +81,7 @@ public:
 		double vals2[] = { 0, 100, 3650, 80, 7300, 50 };
 		calendarLifeMatrix.assign(vals2, 3, 2);
 
-		calendarChoice = lifetime_params::CALENDAR_CHOICE::MODEL;
+		calendarChoice = calendar_cycle_params::CALENDAR_CHOICE::MODEL;
 
 		// thermal
 		mass = 507;
