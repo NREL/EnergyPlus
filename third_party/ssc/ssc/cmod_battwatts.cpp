@@ -228,7 +228,7 @@ battwatts_create(size_t n_recs, size_t n_years, int chem, int meter_pos, double 
     batt_vars->batt_replacement_capacity = 0.;
 
     // Battery lifetime
-    batt_vars->batt_calendar_choice = lifetime_params::CALENDAR_CHOICE::NONE;
+    batt_vars->batt_calendar_choice = calendar_cycle_params::CALENDAR_CHOICE::NONE;
     batt_vars->batt_calendar_lifetime_matrix = util::matrix_t<double>();
     batt_vars->batt_calendar_q0 = 1.0;
 
