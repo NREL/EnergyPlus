@@ -3316,22 +3316,21 @@ namespace HeatBalanceSurfaceManager {
                         } // RoughIndexMovInsul <= 0, no movable insulation
                     } // Surface(SurfNum)%ExtSolar
                 } // end of surface window loop
-                int const firstDome = Zone(zoneNum).TDDDomeFirst;
-                int const lastDome = Zone(zoneNum).TDDDomeLast;
-                for (int SurfNum = firstDome; SurfNum <= lastDome; ++SurfNum) {
-                    int ConstrNum = Surface(SurfNum).Construction;
-                    int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
-                    SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
-                    for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                        AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay);
-                        SurfWinQRadSWwinAbs(Lay, SurfNum) = AbsDiffWin(Lay) * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum)) +
-                                                            SurfWinA(Lay, SurfNum) * currBeamSolar(SurfNum);
-                        SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
-                        SurfWinQRadSWwinAbsTot(SurfNum) += SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
-                    }
+            } // end of zone loop
+            for (int PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
+                int SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome; // TDD: DOME object number
+                int ConstrNum = Surface(SurfNum).Construction;
+                int TotGlassLay = state.dataConstruction->Construct(ConstrNum).TotGlassLayers; // Number of glass layers
+                SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
+                for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
+                    AbsDiffWin(Lay) = state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay);
+                    SurfWinQRadSWwinAbs(Lay, SurfNum) = AbsDiffWin(Lay) * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum)) +
+                                                        SurfWinA(Lay, SurfNum) * currBeamSolar(SurfNum);
+                    SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
+                    SurfWinQRadSWwinAbsTot(SurfNum) += SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
                     SurfWinQRadSWwinAbsTotEnergy(SurfNum) = SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
-            } // end of zone loop
+            }
         } // End of sun-up check
     }
 
@@ -5515,10 +5514,8 @@ namespace HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            std::vector<int> OpaqOrDomeSurfs;
-            for (int SurfNum = Zone(zoneNum).NonWindowSurfaceFirst; SurfNum <= Zone(zoneNum).NonWindowSurfaceLast; ++SurfNum) OpaqOrDomeSurfs.push_back(SurfNum);
-            for (int SurfNum = Zone(zoneNum).TDDDomeFirst; SurfNum <= Zone(zoneNum).TDDDomeLast; ++SurfNum) OpaqOrDomeSurfs.push_back(SurfNum);
-            for (int SurfNum : OpaqOrDomeSurfs) {
+            for (int SurfNum = Zone(zoneNum).HTSurfaceFirst; SurfNum <= Zone(zoneNum).SurfaceLast; ++SurfNum) {
+                if (Surface(SurfNum).Class != SurfaceClass::Window) continue;
                 if (present(ZoneToResimulate)) {
                     if ((zoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone

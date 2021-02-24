@@ -2241,7 +2241,6 @@ namespace EnergyPlus::DaylightingManager {
                 }
                 if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                     // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
-                    //TODO: use WinSurfaceFirst
                     for (IntWin = Zone(ZoneNum).WindowSurfaceFirst; IntWin <= Zone(ZoneNum).WindowSurfaceLast; ++IntWin) {
                         if (Surface(IntWin).ExtBoundCond >= 1) {
                             if (Surface(Surface(IntWin).ExtBoundCond).Zone == Surface(IWin).Zone) {
