@@ -342,7 +342,7 @@ void voltage_dynamic_t::parameter_compute() {
 }
 
 void voltage_dynamic_t::set_initial_SOC(double init_soc) {
-    updateVoltage(init_soc * 0.01 * params->dynamic.Qfull, params->dynamic.Qfull, 0, 25, params->dt_hr);
+    updateVoltage(init_soc * 0.01 * params->dynamic.Qfull * params->num_strings, params->dynamic.Qfull * params->num_strings, 0, 25, params->dt_hr);
 }
 
 // everything in here is on a per-cell basis

@@ -292,8 +292,6 @@ void rate_setup::setup(var_table* vt, int num_recs_yearly, int nyears, rate_data
         }
         else
         { // hourly or sub hourly loads for single year
-            size_t cnt;
-            ssc_number_t* ts_br;
             ts_br = vt->as_array("ur_ts_buy_rate", &cnt);
             size_t ts_step_per_hour = cnt / 8760;
             if (ts_step_per_hour < 1 || ts_step_per_hour > 60 || ts_step_per_hour * 8760 != cnt)
