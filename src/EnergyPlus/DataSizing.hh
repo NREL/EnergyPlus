@@ -73,117 +73,114 @@ namespace DataSizing {
     // MODULE PARAMETER DEFINITIONS:
 
     // parameters for outside air flow method
-    extern int const NumOAFlowMethods;
-
-    extern int const OAFlowNone;
-    extern int const OAFlowPPer;
-    extern int const OAFlow;
-    extern int const OAFlowPerArea;
-    extern int const OAFlowACH;
-    extern int const OAFlowSum;
-    extern int const OAFlowMax;
+    constexpr int NumOAFlowMethods(9);
+    constexpr int OAFlowNone(0);
+    constexpr int OAFlowPPer(1);
+    constexpr int OAFlow(2);
+    constexpr int OAFlowPerArea(3);
+    constexpr int OAFlowACH(4);
+    constexpr int OAFlowSum(5);
+    constexpr int OAFlowMax(6);
 
     extern Array1D_string const cOAFlowMethodTypes;
 
     // parameters for outside air
-    extern int const AllOA;
-    extern int const MinOA;
+    constexpr int AllOA(1);
+    constexpr int MinOA(2);
 
     // parameters for loop fluid type
-    extern int const HeatingLoop;
-    extern int const CoolingLoop;
-    extern int const CondenserLoop;
-    extern int const SteamLoop;
+    constexpr int HeatingLoop(1);
+    constexpr int CoolingLoop(2);
+    constexpr int CondenserLoop(3);
+    constexpr int SteamLoop(4);
 
     // parameters for sizing
-    extern int const NonCoincident;
-    extern int const Coincident;
+    constexpr int NonCoincident(1);
+    constexpr int Coincident(2);
 
-    // parameters for Cooling Peak Load Type
-    extern int const SensibleCoolingLoad;
-    extern int const TotalCoolingLoad;
+    // parameters for Cooling Peak Load TYpe
+    constexpr int SensibleCoolingLoad(1);
+    constexpr int TotalCoolingLoad(2);
 
     // parameters for Central Cooling Capacity Control Method
-    extern int const VAV;
-    extern int const Bypass;
-    extern int const VT;
-    extern int const OnOff;
+    constexpr int VAV(1);
+    constexpr int Bypass(2);
+    constexpr int VT(3);
+    constexpr int OnOff(4);
 
-    // paramters for supply air flow rate method
-    extern int const SupplyAirTemperature;
-    extern int const TemperatureDifference;
+    // parameters for supply air flow rate method
+    constexpr int SupplyAirTemperature(1);
+    constexpr int TemperatureDifference(2);
 
-    // paramters for sizing
-    extern int const FromDDCalc;
-    extern int const InpDesAirFlow;
-    extern int const DesAirFlowWithLim;
+    // parameters for sizing
+    constexpr int FromDDCalc(1);
+    constexpr int InpDesAirFlow(2);
+    constexpr int DesAirFlowWithLim(3);
 
-    // parameters for DOAs control method
-    extern int const DOANeutralSup;
-    extern int const DOANeutralDehumSup;
-    extern int const DOACoolSup;
+    constexpr int DOANeutralSup(1);
+    constexpr int DOANeutralDehumSup(2);
+    constexpr int DOACoolSup(3);
 
     // parameters for Type of Load to Size On
-    extern int const Sensible;
-    extern int const Latent;
-    extern int const Total;
-    extern int const Ventilation;
+    constexpr int Sensible(0);
+    constexpr int Latent(1);
+    constexpr int Total(2);
+    constexpr int Ventilation(3);
 
     // parameter for autosize
-    extern Real64 const AutoSize;
+    constexpr Real64 AutoSize(-99999.0);
 
     // parameter for (time-of-peak) sizing format
     static constexpr auto PeakHrMinFmt("{:02}:{:02}:00");
 
     // Zone Outdoor Air Method
-    extern int const ZOAM_FlowPerPerson; // set the outdoor air flow rate based on number of people in the zone
-    extern int const ZOAM_FlowPerZone;   // sum the outdoor air flow rate per zone based on user input
-    extern int const ZOAM_FlowPerArea;   // sum the outdoor air flow rate based on zone area
-    extern int const ZOAM_FlowPerACH;    // sum the outdoor air flow rate based on number of air changes for the zone
-    extern int const ZOAM_Sum;           // sum the outdoor air flow rate of the people component and the space floor area component
-    extern int const ZOAM_Max;           // use the maximum of the outdoor air flow rate of the people component and
-    // the space floor area component
-    extern int const ZOAM_IAQP;                      // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
-    extern int const ZOAM_ProportionalControlSchOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-                                                     // to calculate the zone level outdoor air flow rates based on scheduled occupancy
-    extern int const ZOAM_ProportionalControlDesOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-                                                     // to calculate the zone level outdoor air flow rates based on design occupancy
+    constexpr int ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone
+    constexpr int ZOAM_FlowPerZone(2);   // sum the outdoor air flow rate per zone based on user input
+    constexpr int ZOAM_FlowPerArea(3);   // sum the outdoor air flow rate based on zone area
+    constexpr int ZOAM_FlowPerACH(4);    // sum the outdoor air flow rate based on number of air changes for the zone
+    constexpr int ZOAM_Sum(5);           // sum the outdoor air flow rate of the people component and the space floor area component
+    constexpr int ZOAM_Max(6);           // use the maximum of the outdoor air flow rate of the people component and the space floor area component
+    constexpr int ZOAM_IAQP(7);          // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
+    constexpr int ZOAM_ProportionalControlSchOcc(8); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+    // to calculate the zone level outdoor air flow rates based on scheduled occupancy
+    constexpr int ZOAM_ProportionalControlDesOcc(9); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+    // to calculate the zone level outdoor air flow rates based on design occupancy
 
     // System Outdoor Air Method
-    extern int const SOAM_ZoneSum; // Sum the outdoor air flow rates of all zones
-    extern int const SOAM_VRP;     // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
+    constexpr int SOAM_ZoneSum(1); // Sum the outdoor air flow rates of all zones
+    constexpr int SOAM_VRP(2);     // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
     //  considering the zone air distribution effectiveness and the system ventilation efficiency
-    extern int const SOAM_IAQP; // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
+    constexpr int SOAM_IAQP(3); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
     // based on the CO2 setpoint
-    extern int const SOAM_ProportionalControlSchOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+    constexpr int SOAM_ProportionalControlSchOcc(4); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
     // to calculate the system level outdoor air flow rates based on scheduled occupancy
-    extern int const SOAM_ProportionalControlDesOcc; // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
+    constexpr int SOAM_IAQPGC(5); // Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
+    // based on the generic contaminant setpoint
+    constexpr int SOAM_IAQPCOM(6); // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
+    // based on the generic contaminant setpoint
+    constexpr int SOAM_ProportionalControlDesOcc(7); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
     // to calculate the system level outdoor air flow rates based on design occupancy
-    extern int const SOAM_IAQPGC; // Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
-    // based on the generic contaminant setpoint
-    extern int const SOAM_IAQPCOM; // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
-    // based on the generic contaminant setpoint
-    extern int const SOAM_ProportionalControlDesOARate; // Calculate the system level outdoor air flow rates based on design OA rate
+    constexpr int SOAM_ProportionalControlDesOARate(8); // Calculate the system level outdoor air flow rates based on design OA rate
 
     // Zone HVAC Equipment Supply Air Sizing Option
-    extern int const None;
-    extern int const SupplyAirFlowRate;
-    extern int const FlowPerFloorArea;
-    extern int const FractionOfAutosizedCoolingAirflow;
-    extern int const FractionOfAutosizedHeatingAirflow;
-    extern int const FlowPerCoolingCapacity;
-    extern int const FlowPerHeatingCapacity;
-    extern int const CoolingDesignCapacity;
-    extern int const HeatingDesignCapacity;
-    extern int const CapacityPerFloorArea;
-    extern int const FractionOfAutosizedCoolingCapacity;
-    extern int const FractionOfAutosizedHeatingCapacity;
+    constexpr int None(1);
+    constexpr int SupplyAirFlowRate(2);
+    constexpr int FlowPerFloorArea(3);
+    constexpr int FractionOfAutosizedCoolingAirflow(4);
+    constexpr int FractionOfAutosizedHeatingAirflow(5);
+    constexpr int FlowPerCoolingCapacity(6);
+    constexpr int FlowPerHeatingCapacity(7);
 
-    // Plant Coincident sizing factor options
-    extern int const NoSizingFactorMode;
-    extern int const GlobalHeatingSizingFactorMode;
-    extern int const GlobalCoolingSizingFactorMode;
-    extern int const LoopComponentSizingFactorMode;
+    constexpr int CoolingDesignCapacity(8);
+    constexpr int HeatingDesignCapacity(9);
+    constexpr int CapacityPerFloorArea(10);
+    constexpr int FractionOfAutosizedCoolingCapacity(11);
+    constexpr int FractionOfAutosizedHeatingCapacity(12);
+
+    constexpr int NoSizingFactorMode(101);
+    constexpr int GlobalHeatingSizingFactorMode(102);
+    constexpr int GlobalCoolingSizingFactorMode(103);
+    constexpr int LoopComponentSizingFactorMode(104);
 
     enum class zoneFanPlacement
     {

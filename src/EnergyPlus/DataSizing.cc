@@ -53,9 +53,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
-namespace EnergyPlus {
-
-namespace DataSizing {
+namespace EnergyPlus::DataSizing {
 
     // MODULE INFORMATION:
     //       AUTHOR         Fred Buhl
@@ -67,17 +65,6 @@ namespace DataSizing {
     // capacities. This data is available to the HVAC component modules
     // for their self sizing calculations.
 
-    // parameters for outside air flow method
-    int const NumOAFlowMethods(9);
-
-    int const OAFlowNone(0);
-    int const OAFlowPPer(1);
-    int const OAFlow(2);
-    int const OAFlowPerArea(3);
-    int const OAFlowACH(4);
-    int const OAFlowSum(5);
-    int const OAFlowMax(6);
-
     Array1D_string const cOAFlowMethodTypes(NumOAFlowMethods,
                                             {"Flow/Person",
                                              "Flow/Zone",
@@ -88,102 +75,6 @@ namespace DataSizing {
                                              "IndoorAirQualityProcedure",
                                              "ProportionalControlBasedOnOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
-
-    // parameters for outside air
-    int const AllOA(1);
-    int const MinOA(2);
-
-    // parameters for loop fluid type
-    int const HeatingLoop(1);
-    int const CoolingLoop(2);
-    int const CondenserLoop(3);
-    int const SteamLoop(4);
-
-    // paramters for sizing
-    int const NonCoincident(1);
-    int const Coincident(2);
-
-    // parameters for Cooling Peak Load TYpe
-    int const SensibleCoolingLoad(1);
-    int const TotalCoolingLoad(2);
-
-    // parameters for Central Cooling Capacity Control Method
-    int const VAV(1);
-    int const Bypass(2);
-    int const VT(3);
-    int const OnOff(4);
-
-    // paramters for supply air flow rate method
-    int const SupplyAirTemperature(1);
-    int const TemperatureDifference(2);
-
-    // paramters for sizing
-    int const FromDDCalc(1);
-    int const InpDesAirFlow(2);
-    int const DesAirFlowWithLim(3);
-
-    int const DOANeutralSup(1);
-    int const DOANeutralDehumSup(2);
-    int const DOACoolSup(3);
-
-    // parameters for Type of Load to Size On
-    int const Sensible(0);
-    int const Latent(1);
-    int const Total(2);
-    int const Ventilation(3);
-
-    // parameter for autosize
-    Real64 const AutoSize(-99999.0);
-
-
-    // Zone Outdoor Air Method
-    int const ZOAM_FlowPerPerson(1); // set the outdoor air flow rate based on number of people in the zone
-    int const ZOAM_FlowPerZone(2);   // sum the outdoor air flow rate per zone based on user input
-    int const ZOAM_FlowPerArea(3);   // sum the outdoor air flow rate based on zone area
-    int const ZOAM_FlowPerACH(4);    // sum the outdoor air flow rate based on number of air changes for the zone
-    int const ZOAM_Sum(5);           // sum the outdoor air flow rate of the people component and the space floor area component
-    int const ZOAM_Max(6);           // use the maximum of the outdoor air flow rate of the people component and the space floor area component
-    int const ZOAM_IAQP(7);          // Use ASHRAE Standard 62.1-2007 IAQP to calculate the zone level outdoor air flow rates
-    int const ZOAM_ProportionalControlSchOcc(8); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-                                                 // to calculate the zone level outdoor air flow rates based on scheduled occupancy
-    int const ZOAM_ProportionalControlDesOcc(9); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-                                                 // to calculate the zone level outdoor air flow rates based on design occupancy
-
-    // System Outdoor Air Method
-    int const SOAM_ZoneSum(1); // Sum the outdoor air flow rates of all zones
-    int const SOAM_VRP(2);     // Use ASHRAE Standard 62.1-2007 to calculate the system level outdoor air flow rates
-    //  considering the zone air distribution effectiveness and the system ventilation efficiency
-    int const SOAM_IAQP(3); // Use ASHRAE Standard 62.1-2007 IAQP to calculate the system level outdoor air flow rates
-    // based on the CO2 setpoint
-    int const SOAM_ProportionalControlSchOcc(4); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    // to calculate the system level outdoor air flow rates based on scheduled occupancy
-    int const SOAM_IAQPGC(5); // Use ASHRAE Standard 62.1-2004 IAQP to calculate the system level outdoor air flow rates
-    // based on the generic contaminant setpoint
-    int const SOAM_IAQPCOM(6); // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
-    // based on the generic contaminant setpoint
-    int const SOAM_ProportionalControlDesOcc(7); // Use ASHRAE Standard 62.1-2004 or Trane Engineer's newsletter (volume 34-5)
-    // to calculate the system level outdoor air flow rates based on design occupancy
-    int const SOAM_ProportionalControlDesOARate(8); // Calculate the system level outdoor air flow rates based on design OA rate
-
-    // Zone HVAC Equipment Supply Air Sizing Option
-    int const None(1);
-    int const SupplyAirFlowRate(2);
-    int const FlowPerFloorArea(3);
-    int const FractionOfAutosizedCoolingAirflow(4);
-    int const FractionOfAutosizedHeatingAirflow(5);
-    int const FlowPerCoolingCapacity(6);
-    int const FlowPerHeatingCapacity(7);
-
-    int const CoolingDesignCapacity(8);
-    int const HeatingDesignCapacity(9);
-    int const CapacityPerFloorArea(10);
-    int const FractionOfAutosizedCoolingCapacity(11);
-    int const FractionOfAutosizedHeatingCapacity(12);
-
-    int const NoSizingFactorMode(101);
-    int const GlobalHeatingSizingFactorMode(102);
-    int const GlobalCoolingSizingFactorMode(103);
-    int const LoopComponentSizingFactorMode(104);
 
     //  days; includes effects of user multiplier
     //  and user set flows)
@@ -969,7 +860,5 @@ namespace DataSizing {
         }
         return zoneEz;
     }
-
-} // namespace DataSizing
 
 } // namespace EnergyPlus
