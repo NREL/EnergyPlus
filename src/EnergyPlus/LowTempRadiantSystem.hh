@@ -563,6 +563,8 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     Array1D_bool MyEnvrnFlagHydr;
     Array1D_bool MyEnvrnFlagCFlo;
     Array1D_bool MyEnvrnFlagElec;
+    Array1D_bool MyPlantScanFlagHydr;
+    Array1D_bool MyPlantScanFlagCFlo;
 
 
     void clear_state() override

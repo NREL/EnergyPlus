@@ -1855,8 +1855,6 @@ namespace LowTempRadiantSystem {
         Real64 TotalEffic;          // Intermediate calculation variable for total pump efficiency
         int ZoneNum;                // Intermediate variable for keeping track of the zone number
         int Loop;
-        static Array1D_bool MyPlantScanFlagHydr;
-        static Array1D_bool MyPlantScanFlagCFlo;
         Real64 mdot; // local fluid mass flow rate
         Real64 rho;  // local fluid density
         bool errFlag;
@@ -1867,10 +1865,10 @@ namespace LowTempRadiantSystem {
             state.dataLowTempRadSys->MyEnvrnFlagHydr.allocate(NumOfHydrLowTempRadSys);
             state.dataLowTempRadSys->MyEnvrnFlagCFlo.allocate(NumOfCFloLowTempRadSys);
             state.dataLowTempRadSys->MyEnvrnFlagElec.allocate(NumOfElecLowTempRadSys);
-            MyPlantScanFlagHydr.allocate(NumOfHydrLowTempRadSys);
-            MyPlantScanFlagCFlo.allocate(NumOfCFloLowTempRadSys);
-            MyPlantScanFlagHydr = true;
-            MyPlantScanFlagCFlo = true;
+            state.dataLowTempRadSys->MyPlantScanFlagHydr.allocate(NumOfHydrLowTempRadSys);
+            state.dataLowTempRadSys->MyPlantScanFlagCFlo.allocate(NumOfCFloLowTempRadSys);
+            state.dataLowTempRadSys->MyPlantScanFlagHydr = true;
+            state.dataLowTempRadSys->MyPlantScanFlagCFlo = true;
             state.dataLowTempRadSys->MyEnvrnFlagHydr = true;
             state.dataLowTempRadSys->MyEnvrnFlagCFlo = true;
             state.dataLowTempRadSys->MyEnvrnFlagElec = true;
@@ -1951,7 +1949,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
-            if (MyPlantScanFlagHydr(RadSysNum) && allocated(state.dataPlnt->PlantLoop)) {
+            if (state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum) && allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
@@ -1989,14 +1987,14 @@ namespace LowTempRadiantSystem {
                         ShowFatalError(state, "InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
                 }
-                MyPlantScanFlagHydr(RadSysNum) = false;
-            } else if (MyPlantScanFlagHydr(RadSysNum) && !state.dataGlobal->AnyPlantInModel) {
-                MyPlantScanFlagHydr(RadSysNum) = false;
+                state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum) = false;
+            } else if (state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum) && !state.dataGlobal->AnyPlantInModel) {
+                state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum) = false;
             }
         }
 
         if (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
-            if (MyPlantScanFlagCFlo(RadSysNum) && allocated(state.dataPlnt->PlantLoop)) {
+            if (state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum) && allocated(state.dataPlnt->PlantLoop)) {
                 errFlag = false;
                 if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                     ScanPlantLoopsForObject(state,
@@ -2034,9 +2032,9 @@ namespace LowTempRadiantSystem {
                         ShowFatalError(state, "InitLowTempRadiantSystem: Program terminated due to previous condition(s).");
                     }
                 }
-                MyPlantScanFlagCFlo(RadSysNum) = false;
-            } else if (MyPlantScanFlagCFlo(RadSysNum) && !state.dataGlobal->AnyPlantInModel) {
-                MyPlantScanFlagCFlo(RadSysNum) = false;
+                state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum) = false;
+            } else if (state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum) && !state.dataGlobal->AnyPlantInModel) {
+                state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum) = false;
             }
         }
 
@@ -2066,7 +2064,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (!state.dataGlobal->SysSizingCalc && (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem)) {
-            if (MySizeFlagHydr(RadSysNum) && !MyPlantScanFlagHydr(RadSysNum)) {
+            if (MySizeFlagHydr(RadSysNum) && !state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
                 MySizeFlagHydr(RadSysNum) = false;
@@ -2128,7 +2126,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (!state.dataGlobal->SysSizingCalc && (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem)) {
-            if (MySizeFlagCFlo(RadSysNum) && !MyPlantScanFlagCFlo(RadSysNum)) {
+            if (MySizeFlagCFlo(RadSysNum) && !state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
 
@@ -2216,7 +2214,7 @@ namespace LowTempRadiantSystem {
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterOutletTemp = 0.0;
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterMassFlowRate = 0.0;
 
-                if (!MyPlantScanFlagHydr(RadSysNum)) {
+                if (!state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum)) {
                     if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).HotWaterInNode > 0) {
                         InitComponentNodes(0.0,
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterFlowMaxHeat,
@@ -2259,7 +2257,7 @@ namespace LowTempRadiantSystem {
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).PumpMassFlowRate = 0.0;
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).PumpHeattoFluid = 0.0;
 
-                if (!MyPlantScanFlagCFlo(RadSysNum)) {
+                if (!state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum)) {
                     if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode > 0) {
                         InitComponentNodes(0.0,
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotDesignWaterMassFlowRate,
