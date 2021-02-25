@@ -554,6 +554,11 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     Array1D<LowTempRadiantSystem::ConstantFlowRadDesignData> CflowRadiantSysDesign;
     Array1D<LowTempRadiantSystem::VarFlowRadDesignData> HydronicRadiantSysDesign;
 
+    Array1D<Real64> Ckj;            // Coefficients for individual surfaces within a radiant system
+    Array1D<Real64> Cmj;
+    Array1D<Real64> WaterTempOut;   // Array of outlet water temperatures for
+                                    // each surface in the radiant system
+
 
     void clear_state() override
     {

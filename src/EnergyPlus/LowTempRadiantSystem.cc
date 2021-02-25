@@ -4618,24 +4618,19 @@ namespace LowTempRadiantSystem {
         Real64 Cl;
         // For more info on Ca through Cl, see comments below
 
-        static Array1D<Real64> Ckj; // Coefficients for individual surfaces within a radiant system
-        static Array1D<Real64> Cmj;
-        static Array1D<Real64> WaterTempOut; // Array of outlet water temperatures for
-                                             // each surface in the radiant system
-
         // First, apply heat exchanger logic to find the heat source/sink to the system.
         // This involves finding out the heat transfer characteristics of the hydronic
         // loop and then applying the equations derived on pp. 113-118 of the dissertation.
         if (FirstTimeFlag) {
-            Ckj.allocate(MaxCloNumOfSurfaces);
-            Cmj.allocate(MaxCloNumOfSurfaces);
-            WaterTempOut.allocate(MaxCloNumOfSurfaces);
+            state.dataLowTempRadSys->Ckj.allocate(MaxCloNumOfSurfaces);
+            state.dataLowTempRadSys->Cmj.allocate(MaxCloNumOfSurfaces);
+            state.dataLowTempRadSys->WaterTempOut.allocate(MaxCloNumOfSurfaces);
             FirstTimeFlag = false;
         }
 
-        Ckj = 0.0;
-        Cmj = 0.0;
-        WaterTempOut = this->WaterInletTemp;
+        state.dataLowTempRadSys->Ckj = 0.0;
+        state.dataLowTempRadSys->Cmj = 0.0;
+        state.dataLowTempRadSys->WaterTempOut = this->WaterInletTemp;
 
         // Set the conditions on the water side inlet
         {
@@ -4772,7 +4767,7 @@ namespace LowTempRadiantSystem {
 
                     if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                         QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
-                    WaterTempOut(RadSurfNum) = WaterTempIn - (QRadSysSource(SurfNum) / (Mdot * Cp));
+                    state.dataLowTempRadSys->WaterTempOut(RadSurfNum) = WaterTempIn - (QRadSysSource(SurfNum) / (Mdot * Cp));
                 } else { // (Iteration)
                     // In this case, we did not know the inlet temperature directly and have
                     // to figure it out as part of the solution.  Thus, we have to do a little
@@ -4806,8 +4801,8 @@ namespace LowTempRadiantSystem {
                     // known quantities.  This requires us to calculate Ck,j and Cm,j for all the radiant
                     // surfaces in the system first and then coming up with a calculation for Twaterin.
                     // After than, individual Twaterout,j can be calculated along with QRadSysSource.
-                    Ckj(RadSurfNum) = Ck;
-                    Cmj(RadSurfNum) = (EpsMdotCp / (Mdot * Cp)) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
+                    state.dataLowTempRadSys->Ckj(RadSurfNum) = Ck;
+                    state.dataLowTempRadSys->Cmj(RadSurfNum) = (EpsMdotCp / (Mdot * Cp)) / (1.0 + (EpsMdotCp * Cl / Surface(SurfNum).Area));
 
                     if (RadSurfNum == this->NumOfSurfaces) { // Last one so we can now do the other calculations
                         // Equation for Twaterin is:
@@ -4819,8 +4814,8 @@ namespace LowTempRadiantSystem {
                         SumFlowFracCkCm = 0.0;
                         SumFlowFracOneMinusCm = 0.0;
                         for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                            SumFlowFracCkCm += (this->SurfaceFrac(RadSurfNum2) * Ckj(RadSurfNum) * Cmj(RadSurfNum2));
-                            SumFlowFracOneMinusCm += (this->SurfaceFrac(RadSurfNum2) * (1.0 - Cmj(RadSurfNum2)));
+                            SumFlowFracCkCm += (this->SurfaceFrac(RadSurfNum2) * state.dataLowTempRadSys->Ckj(RadSurfNum) * state.dataLowTempRadSys->Cmj(RadSurfNum2));
+                            SumFlowFracOneMinusCm += (this->SurfaceFrac(RadSurfNum2) * (1.0 - state.dataLowTempRadSys->Cmj(RadSurfNum2)));
                         }
 
                         LoopTerm = (this->WaterInjectionRate / this->WaterMassFlowRate) * Node(MainLoopNodeIn).Temp +
@@ -4835,10 +4830,10 @@ namespace LowTempRadiantSystem {
                         this->WaterInletTemp = WaterTempIn;
 
                         for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
-                            WaterTempOut(RadSurfNum2) = WaterTempIn * (1.0 - Cmj(RadSurfNum2)) + (Ckj(RadSurfNum2) * Cmj(RadSurfNum2));
+                            state.dataLowTempRadSys->WaterTempOut(RadSurfNum2) = WaterTempIn * (1.0 - state.dataLowTempRadSys->Cmj(RadSurfNum2)) + (state.dataLowTempRadSys->Ckj(RadSurfNum2) * state.dataLowTempRadSys->Cmj(RadSurfNum2));
                             Mdot = WaterMassFlow * this->SurfaceFrac(RadSurfNum2);
                             SurfNum = this->SurfacePtr(RadSurfNum2);
-                            QRadSysSource(SurfNum) = Mdot * Cp * (WaterTempIn - WaterTempOut(RadSurfNum2));
+                            QRadSysSource(SurfNum) = Mdot * Cp * (WaterTempIn - state.dataLowTempRadSys->WaterTempOut(RadSurfNum2));
                             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum)
                                 QRadSysSource(Surface(SurfNum).ExtBoundCond) = QRadSysSource(SurfNum); // Also set the other side of an interzone
                         }
@@ -5019,7 +5014,7 @@ namespace LowTempRadiantSystem {
             for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
                 SurfNum = this->SurfacePtr(RadSurfNum);
                 TotalRadSysPower += QRadSysSource(SurfNum);
-                WaterOutletTempCheck += (this->SurfaceFrac(RadSurfNum) * WaterTempOut(RadSurfNum));
+                WaterOutletTempCheck += (this->SurfaceFrac(RadSurfNum) * state.dataLowTempRadSys->WaterTempOut(RadSurfNum));
             }
             TotalRadSysPower *= ZoneMult;
 
