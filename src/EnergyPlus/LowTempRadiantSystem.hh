@@ -205,6 +205,10 @@ namespace LowTempRadiantSystem {
 
         virtual void reportLowTemperatureRadiantSystem(EnergyPlusData &state) = 0;
 
+        // Default Constructor
+        RadiantSystemBaseData() = default;
+        ~RadiantSystemBaseData() = default;
+
     };
 
     struct HydronicSystemBaseData : RadiantSystemBaseData
@@ -277,6 +281,10 @@ namespace LowTempRadiantSystem {
 
         void checkForOutOfRangeTemperatureResult(EnergyPlusData &state, Real64 const outletTemp, Real64 const inletTemp);
 
+        // Default Constructor
+        HydronicSystemBaseData() = default;
+        ~HydronicSystemBaseData() = default;
+
     };
 
     struct VariableFlowRadiantSystemData : HydronicSystemBaseData
@@ -305,6 +313,10 @@ namespace LowTempRadiantSystem {
         void updateLowTemperatureRadiantSystem(EnergyPlusData &state);
 
         void reportLowTemperatureRadiantSystem(EnergyPlusData &state);
+
+        // Default Constructor
+        VariableFlowRadiantSystemData() = default;
+        ~VariableFlowRadiantSystemData() = default;
 
     };
 
@@ -340,6 +352,10 @@ namespace LowTempRadiantSystem {
                                         // CapacityPerFloorArea, FracOfAutosizedCoolingCapacity)
         Real64 DesignScaledCoolingCapacity = 0.0;   // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment,
                                         // {-}, or {W/m2}
+
+        // Default Constructor
+        VarFlowRadDesignData() = default;
+        ~VarFlowRadDesignData() = default;
     };
 
     struct ConstantFlowRadiantSystemData : HydronicSystemBaseData
@@ -408,6 +424,10 @@ namespace LowTempRadiantSystem {
 
         void reportLowTemperatureRadiantSystem(EnergyPlusData &state);
 
+        // Default Constructor
+        ConstantFlowRadiantSystemData() = default;
+        ~ConstantFlowRadiantSystemData() = default;
+
     };
 
     struct ConstantFlowRadDesignData : ConstantFlowRadiantSystemData
@@ -457,6 +477,9 @@ namespace LowTempRadiantSystem {
 
         void reportLowTemperatureRadiantSystem(EnergyPlusData &state);
 
+        // Default Constructor
+        ElectricRadiantSystemData() = default;
+        ~ElectricRadiantSystemData() = default;
     };
 
     struct RadSysTypeData
@@ -464,13 +487,12 @@ namespace LowTempRadiantSystem {
         // Members
         // This type used to track different components/types for efficiency
         std::string Name; // name of radiant system
-        LowTempRadiantSystem::SystemType SystemType;   // Type of System (see System Types in Parameters)
-        int CompIndex;    // Index in specific system types
+        LowTempRadiantSystem::SystemType SystemType = LowTempRadiantSystem::SystemType::Unassigned;   // Type of System (see System Types in Parameters)
+        int CompIndex = 0;    // Index in specific system types
 
         // Default Constructor
-        RadSysTypeData() : SystemType(LowTempRadiantSystem::SystemType::Unassigned), CompIndex(0)
-        {
-        }
+        RadSysTypeData() = default;
+        ~RadSysTypeData() = default;
     };
 
     struct ElecRadSysNumericFieldData
@@ -479,9 +501,8 @@ namespace LowTempRadiantSystem {
         Array1D_string FieldNames;
 
         // Default Constructor
-        ElecRadSysNumericFieldData()
-        {
-        }
+         ElecRadSysNumericFieldData() = default;
+        ~ElecRadSysNumericFieldData() = default;
     };
 
     struct HydronicRadiantSysNumericFieldData
@@ -490,9 +511,8 @@ namespace LowTempRadiantSystem {
         Array1D_string FieldNames;
 
         // Default Constructor
-        HydronicRadiantSysNumericFieldData()
-        {
-        }
+         HydronicRadiantSysNumericFieldData() = default;
+        ~HydronicRadiantSysNumericFieldData() = default;
     };
 
     // Functions
