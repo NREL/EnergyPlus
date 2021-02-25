@@ -559,6 +559,11 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     Array1D<Real64> WaterTempOut;   // Array of outlet water temperatures for
                                     // each surface in the radiant system
 
+    // For Init:
+    Array1D_bool MyEnvrnFlagHydr;
+    Array1D_bool MyEnvrnFlagCFlo;
+    Array1D_bool MyEnvrnFlagElec;
+
 
     void clear_state() override
     {

@@ -1854,9 +1854,6 @@ namespace LowTempRadiantSystem {
         int SurfNum;                // Intermediate variable for keeping track of the surface number
         Real64 TotalEffic;          // Intermediate calculation variable for total pump efficiency
         int ZoneNum;                // Intermediate variable for keeping track of the zone number
-        static Array1D_bool MyEnvrnFlagHydr;
-        static Array1D_bool MyEnvrnFlagCFlo;
-        static Array1D_bool MyEnvrnFlagElec;
         int Loop;
         static Array1D_bool MyPlantScanFlagHydr;
         static Array1D_bool MyPlantScanFlagCFlo;
@@ -1867,16 +1864,16 @@ namespace LowTempRadiantSystem {
         InitErrorsFound = false;
 
         if (MyOneTimeFlag) {
-            MyEnvrnFlagHydr.allocate(NumOfHydrLowTempRadSys);
-            MyEnvrnFlagCFlo.allocate(NumOfCFloLowTempRadSys);
-            MyEnvrnFlagElec.allocate(NumOfElecLowTempRadSys);
+            state.dataLowTempRadSys->MyEnvrnFlagHydr.allocate(NumOfHydrLowTempRadSys);
+            state.dataLowTempRadSys->MyEnvrnFlagCFlo.allocate(NumOfCFloLowTempRadSys);
+            state.dataLowTempRadSys->MyEnvrnFlagElec.allocate(NumOfElecLowTempRadSys);
             MyPlantScanFlagHydr.allocate(NumOfHydrLowTempRadSys);
             MyPlantScanFlagCFlo.allocate(NumOfCFloLowTempRadSys);
             MyPlantScanFlagHydr = true;
             MyPlantScanFlagCFlo = true;
-            MyEnvrnFlagHydr = true;
-            MyEnvrnFlagCFlo = true;
-            MyEnvrnFlagElec = true;
+            state.dataLowTempRadSys->MyEnvrnFlagHydr = true;
+            state.dataLowTempRadSys->MyEnvrnFlagCFlo = true;
+            state.dataLowTempRadSys->MyEnvrnFlagElec = true;
             MyOneTimeFlag = false;
         }
 
@@ -2210,7 +2207,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
-            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagHydr(RadSysNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && state.dataLowTempRadSys->MyEnvrnFlagHydr(RadSysNum)) {
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).HeatPower = 0.0;
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).HeatEnergy = 0.0;
                 state.dataLowTempRadSys->HydrRadSys(RadSysNum).CoolPower = 0.0;
@@ -2241,13 +2238,13 @@ namespace LowTempRadiantSystem {
                                            state.dataLowTempRadSys->HydrRadSys(RadSysNum).CWCompNum);
                     }
                 }
-                MyEnvrnFlagHydr(RadSysNum) = false;
+                state.dataLowTempRadSys->MyEnvrnFlagHydr(RadSysNum) = false;
             }
         } // NumOfHydrLowTempRadSys > 0
-        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) MyEnvrnFlagHydr(RadSysNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) state.dataLowTempRadSys->MyEnvrnFlagHydr(RadSysNum) = true;
 
         if (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
-            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagCFlo(RadSysNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && state.dataLowTempRadSys->MyEnvrnFlagCFlo(RadSysNum)) {
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).WaterInletTemp = 0.0;
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).WaterOutletTemp = 0.0;
                 state.dataLowTempRadSys->CFloRadSys(RadSysNum).PumpInletTemp = 0.0;
@@ -2284,7 +2281,7 @@ namespace LowTempRadiantSystem {
                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWCompNum);
                     }
                 }
-                MyEnvrnFlagCFlo(RadSysNum) = false;
+                state.dataLowTempRadSys->MyEnvrnFlagCFlo(RadSysNum) = false;
             }
 
             if (anyRadiantSystemUsingRunningMeanAverage) {
@@ -2298,18 +2295,18 @@ namespace LowTempRadiantSystem {
             }
 
         } // NumOfCFloLowTempRadSys > 0
-        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) MyEnvrnFlagCFlo(RadSysNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) state.dataLowTempRadSys->MyEnvrnFlagCFlo(RadSysNum) = true;
 
         if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
-            if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagElec(RadSysNum)) {
+            if (state.dataGlobal->BeginEnvrnFlag && state.dataLowTempRadSys->MyEnvrnFlagElec(RadSysNum)) {
                 state.dataLowTempRadSys->ElecRadSys(RadSysNum).HeatPower = 0.0;
                 state.dataLowTempRadSys->ElecRadSys(RadSysNum).HeatEnergy = 0.0;
                 state.dataLowTempRadSys->ElecRadSys(RadSysNum).ElecPower = 0.0;
                 state.dataLowTempRadSys->ElecRadSys(RadSysNum).ElecEnergy = 0.0;
             }
-            MyEnvrnFlagElec(RadSysNum) = false;
+            state.dataLowTempRadSys->MyEnvrnFlagElec(RadSysNum) = false;
         }
-        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) MyEnvrnFlagElec(RadSysNum) = true;
+        if (!state.dataGlobal->BeginEnvrnFlag && SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) state.dataLowTempRadSys->MyEnvrnFlagElec(RadSysNum) = true;
 
         if (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
 
