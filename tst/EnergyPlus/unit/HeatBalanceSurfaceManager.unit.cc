@@ -280,7 +280,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
-    DataSurfaces::SurfWinShadingFlag(1) = 0;
+    DataSurfaces::SurfWinShadingFlag(1) = DataSurfaces::WinShadingType::ShadeOff;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataConstruction->Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
-    DataHeatBalance::AnyConstructInternalSourceInInput = true;
+    DataHeatBalance::AnyInternalHeatSourceInInput = true;
 
     AllocateSurfaceHeatBalArrays(*state); // allocates a host of variables related to CTF calculations
 
@@ -1946,7 +1946,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
     state->dataConstruction->Construct.allocate(DataHeatBalance::TotConstructs);
-    DataHeatBalance::AnyConstructInternalSourceInInput = true;
+    DataHeatBalance::AnyInternalHeatSourceInInput = true;
 
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(1).HeatTransSurf = true;
