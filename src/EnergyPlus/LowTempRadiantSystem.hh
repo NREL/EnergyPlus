@@ -140,11 +140,6 @@ namespace LowTempRadiantSystem {
     extern Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    // Autosizing variables
-    extern Array1D_bool MySizeFlagHydr;
-    extern Array1D_bool MySizeFlagCFlo;
-    extern Array1D_bool MySizeFlagElec;
-    extern Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
@@ -559,12 +554,17 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     Array1D<Real64> WaterTempOut;   // Array of outlet water temperatures for
                                     // each surface in the radiant system
 
-    // For Init:
+// For Init:
     Array1D_bool MyEnvrnFlagHydr;
     Array1D_bool MyEnvrnFlagCFlo;
     Array1D_bool MyEnvrnFlagElec;
     Array1D_bool MyPlantScanFlagHydr;
     Array1D_bool MyPlantScanFlagCFlo;
+    // Autosizing variables
+    Array1D_bool MySizeFlagHydr;
+    Array1D_bool MySizeFlagCFlo;
+    Array1D_bool MySizeFlagElec;
+    Array1D_bool CheckEquipName;
 
 
     void clear_state() override

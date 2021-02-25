@@ -198,11 +198,6 @@ namespace LowTempRadiantSystem {
     Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    // Autosizing variables
-    Array1D_bool MySizeFlagHydr;
-    Array1D_bool MySizeFlagCFlo;
-    Array1D_bool MySizeFlagElec;
-    Array1D_bool CheckEquipName;
 
     // Object Data
     std::unordered_map<std::string, std::string> LowTempRadUniqueNames;
@@ -233,10 +228,6 @@ namespace LowTempRadiantSystem {
         LastQRadSysSrc.deallocate();
         LastSysTimeElapsed.deallocate();
         LastTimeStepSys.deallocate();
-        MySizeFlagHydr.deallocate();
-        MySizeFlagCFlo.deallocate();
-        MySizeFlagElec.deallocate();
-        CheckEquipName.deallocate();
         LowTempRadUniqueNames.clear();
         GetInputFlag = true;
         FirstTimeFlag = true;
@@ -299,7 +290,7 @@ namespace LowTempRadiantSystem {
                                       TotalNumOfRadSystems,
                                       CompName));
             }
-            if (CheckEquipName(RadSysNum)) {
+            if (state.dataLowTempRadSys->CheckEquipName(RadSysNum)) {
                 if (CompName != state.dataLowTempRadSys->RadSysTypes(RadSysNum).Name) {
                     ShowFatalError(state,
                                    format("SimLowTempRadiantSystem: Invalid CompIndex passed={}, Unit name={}, stored Unit Name for that index={}",
@@ -307,7 +298,7 @@ namespace LowTempRadiantSystem {
                                           CompName,
                                           state.dataLowTempRadSys->RadSysTypes(RadSysNum).Name));
                 }
-                CheckEquipName(RadSysNum) = false;
+                state.dataLowTempRadSys->CheckEquipName(RadSysNum) = false;
             }
         }
 
@@ -445,7 +436,7 @@ namespace LowTempRadiantSystem {
         TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
         state.dataLowTempRadSys->RadSysTypes.allocate(TotalNumOfRadSystems);
         LowTempRadUniqueNames.reserve(static_cast<unsigned>(TotalNumOfRadSystems));
-        CheckEquipName.dimension(TotalNumOfRadSystems, true);
+        state.dataLowTempRadSys->CheckEquipName.dimension(TotalNumOfRadSystems, true);
 
         state.dataLowTempRadSys->HydrRadSys.allocate(NumOfHydrLowTempRadSys);
         if (NumOfHydrLowTempRadSys > 0) {
@@ -1882,12 +1873,12 @@ namespace LowTempRadiantSystem {
             LastQRadSysSrc.dimension(TotSurfaces, 0.0);
             LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
             LastTimeStepSys.dimension(TotSurfaces, 0.0);
-            MySizeFlagHydr.allocate(NumOfHydrLowTempRadSys);
-            MySizeFlagCFlo.allocate(NumOfCFloLowTempRadSys);
-            MySizeFlagElec.allocate(NumOfElecLowTempRadSys);
-            MySizeFlagHydr = true;
-            MySizeFlagCFlo = true;
-            MySizeFlagElec = true;
+            state.dataLowTempRadSys->MySizeFlagHydr.allocate(NumOfHydrLowTempRadSys);
+            state.dataLowTempRadSys->MySizeFlagCFlo.allocate(NumOfCFloLowTempRadSys);
+            state.dataLowTempRadSys->MySizeFlagElec.allocate(NumOfElecLowTempRadSys);
+            state.dataLowTempRadSys->MySizeFlagHydr = true;
+            state.dataLowTempRadSys->MySizeFlagCFlo = true;
+            state.dataLowTempRadSys->MySizeFlagElec = true;
 
             // Initialize total areas for all radiant systems
             for (RadNum = 1; RadNum <= NumOfHydrLowTempRadSys; ++RadNum) {
@@ -2064,10 +2055,10 @@ namespace LowTempRadiantSystem {
         }
 
         if (!state.dataGlobal->SysSizingCalc && (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem)) {
-            if (MySizeFlagHydr(RadSysNum) && !state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum)) {
+            if (state.dataLowTempRadSys->MySizeFlagHydr(RadSysNum) && !state.dataLowTempRadSys->MyPlantScanFlagHydr(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
-                MySizeFlagHydr(RadSysNum) = false;
+                state.dataLowTempRadSys->MySizeFlagHydr(RadSysNum) = false;
 
 
                 int ColdSetptSchedPtr(0), HotSetptSchedPtr(0);
@@ -2126,7 +2117,7 @@ namespace LowTempRadiantSystem {
         }
 
         if (!state.dataGlobal->SysSizingCalc && (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem)) {
-            if (MySizeFlagCFlo(RadSysNum) && !state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum)) {
+            if (state.dataLowTempRadSys->MySizeFlagCFlo(RadSysNum) && !state.dataLowTempRadSys->MyPlantScanFlagCFlo(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
 
@@ -2163,15 +2154,15 @@ namespace LowTempRadiantSystem {
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWBranchNum,
                                        state.dataLowTempRadSys->CFloRadSys(RadSysNum).CWCompNum);
                 }
-                MySizeFlagCFlo(RadSysNum) = false;
+                state.dataLowTempRadSys->MySizeFlagCFlo(RadSysNum) = false;
             }
         }
 
         if (!state.dataGlobal->SysSizingCalc && (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem)) {
-            if (MySizeFlagElec(RadSysNum)) {
+            if (state.dataLowTempRadSys->MySizeFlagElec(RadSysNum)) {
                 // for each radiant system do the sizing once.
                 SizeLowTempRadiantSystem(state, RadSysNum, SystemType);
-                MySizeFlagElec(RadSysNum) = false;
+                state.dataLowTempRadSys->MySizeFlagElec(RadSysNum) = false;
             }
         }
 
