@@ -2744,7 +2744,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
             PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
         }
-            SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
+        SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
         if (SupplyMassFlowRate > 0.0) {
             // compute coil loads
