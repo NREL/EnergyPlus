@@ -1165,11 +1165,11 @@ If all surfaces have the same emissivity that is close to unity, the emissivitie
 
 \subsection{ASHRAE 55 Elevated Air Speed Cooling Effect Model}\label{elevated-air-speed-ce-model}
 
-ASHRAE Standard 55-2017 Section 5.3 requires that the Elevated Air Speed Comfort Zone Method be used when average air speed Va is greater than 0.10 m/s. The method provides cooling credit for elevated air velocity in the space. The method can be used to evaluate passive cooling technologies such as natural ventilation, ceiling fan, and portable fan.
+ASHRAE Standard 55-2017 Section 5.3 requires that the Elevated Air Speed Comfort Zone Method be used when average air speed \(V_{a}\) is greater than 0.10 m/s. The method provides cooling credit for elevated air velocity in the space. The method can be used to evaluate passive cooling technologies such as natural ventilation, ceiling fan, and portable fan.
 
 \subsubsection{Description of the model and algorithm}\label{description-of-the-model-and-algorithm-4}
 
-The Pierce Two-Node Standard Effective Temperature (SET) model is used to account for the cooling effect of air speeds greater than the 0.10 m/s. Specifically, for a given set of environmental and personal variables, including an elevated average air speed, an average air temperature \(t_{a}\), and a mean radiant temperature \(t_{r}\), the SET is first calculated. Then the average air speed Va is replaced by still air (0.1 m/s), and the average air temperature and radiant temperature are adjusted according to the cooling effect (CE). The CE of the elevated air speed is the value that, when subtracted equally from both the average air temperature and the mean radiant temperature, yields the same SET under still air as in the first SET calculation under elevated air speed.
+The Pierce Two-Node Standard Effective Temperature (SET) model is used to account for the cooling effect of air speeds greater than the 0.10 m/s. Specifically, for a given set of environmental and personal variables, including an elevated average air speed, an average air temperature \(t_{a}\), and a mean radiant temperature \(t_{r}\), the SET is first calculated. Then the average air speed \(V_{a}\) is replaced by still air (0.1 m/s), and the average air temperature and radiant temperature are adjusted according to the cooling effect (CE). The CE of the elevated air speed is the value that, when subtracted equally from both the average air temperature and the mean radiant temperature, yields the same SET under still air as in the first SET calculation under elevated air speed.
 
 The following is a formal description of this process. To define the CE, we assert that it satisfies the following:
 

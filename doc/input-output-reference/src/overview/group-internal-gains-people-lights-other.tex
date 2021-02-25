@@ -221,7 +221,7 @@ The final one to five fields are optional and are intended to trigger various th
   ASHRAE 55-2017 Elevated Air Speed Cooling Effect Model is applied to calculate related thermal comfort metrics. Elevated Air Speed Cooling Effect, Cooling Effect Adjusted PMV, and Cooling Effect Adjusted PPD are calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
   \item[AnkleDraftASH55] 
-  ASHRAE 55-2017 Ankle Draft Risk Model is applied to calculate related thermal comfort metrics. Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD is calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, Air Velocity Schedule Name, and Ankle Level Air Velocity Schedule Name.
+  ASHRAE 55-2017 Ankle Draft Risk Model is applied to calculate related thermal comfort metrics. Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD is calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, Air Velocity Schedule Name, and Ankle Level Air Velocity Schedule Name. Ankle draft PPD calculations are only applicable for relative air velocity is below 0.2 m/s, and the subject’s metabolic rate and clothing level should be kept below 1.3 met and 0.7 clo. PPD at ankle draft will be set to -1.0 if if these conditions are not met.
 
 \end{description}
 
@@ -587,6 +587,22 @@ This field reports the weighted average of the outdoor air temperature of the pr
 \paragraph{Zone Thermal Comfort CEN 15251 Adaptive Model Temperature}\label{zone-thermal-comfort-cen-15251-adaptive-model-temperature}
 
 This field reports the ideal indoor operative temperature, or comfort temperature, as determined by the CEN-15251 adaptive comfort model. Category I, II, and II limits for indoor operative temperature are defined as no greater than 2, 3, and 4 degrees C from this value respectively. A value of -1 means not applicable (when running average outdoor temp is outside the range of 10.0 to 30.0C).
+
+\paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect}
+
+This field is the calculated Cooling Effect of the elevated air speed in degree celsius. It is the value that, when subtracted equally from both the average air temperature and the mean radiant temperature, yields the same SET under still air as in the first SET calculation under elevated air speed.
+
+\paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PMV}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect-adjusted-pmv}
+
+This field is the \"predicted mean vote\" (PMV) calculated using the Fanger PMV model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PMV for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). 
+
+\paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PPD}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect-adjusted-ppd}
+
+This field is the \"ppredicted percentage of dissatisfied\" (PPD) calculated using the Fanger PMV-PPD model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). 
+
+\paragraph{Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD}\label{zone-thermal-comfort-ashrae55-ankle-draft-ppd}
+
+This field is the \"ppredicted percentage of dissatisfied\" (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m). 
 
 \subsubsection{Outputs}\label{outputs-1-014}
 
