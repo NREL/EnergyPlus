@@ -149,37 +149,12 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                        .NodeNumIn;
             // Match inlet node name of calling branch to determine if this call is for heating or cooling
             if (compInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
-                // Calculate Node Values
-                // Calculate Equipment and Update Variables
-                this->InCoolingMode = RunFlag != 0;
-                this->initialize(state);
-                this->calculateChiller(state, CurLoad);
-                this->updateCoolRecords(CurLoad, RunFlag);
                 brIdentity = 1;
                 break;
             } else if (compInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
-                // Calculate Node Values
-                // Calculate Equipment and Update Variables
-                this->InHeatingMode = RunFlag != 0;
-                this->initialize(state);
-                this->calculateHeater(state, CurLoad, RunFlag);
-                this->updateHeatRecords(CurLoad, RunFlag);
                 brIdentity = 2;
                 break;
             } else if (compInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
-                if (this->CDLoopNum > 0) {
-                    PlantUtilities::UpdateChillerComponentCondenserSide(state,
-                                                                        this->CDLoopNum,
-                                                                        this->CDLoopSideNum,
-                                                                        DataPlant::TypeOf_Chiller_DFAbsorption,
-                                                                        this->CondReturnNodeNum,
-                                                                        this->CondSupplyNodeNum,
-                                                                        this->TowerLoad,
-                                                                        this->CondReturnTemp,
-                                                                        this->CondSupplyTemp,
-                                                                        this->CondWaterFlowRate,
-                                                                        FirstHVACIteration);
-                }
                 brIdentity = 3;
                 break;
             } else {
@@ -187,7 +162,36 @@ namespace EnergyPlus::ChillerGasAbsorption {
             }
         }
 
-        if (brIdentity == 0) { // Error, nodes do not match
+        if (brIdentity == 1) {
+            // Calculate Node Values
+            // Calculate Equipment and Update Variables
+            this->InCoolingMode = RunFlag != 0;
+            this->initialize(state);
+            this->calculateChiller(state, CurLoad);
+            this->updateCoolRecords(CurLoad, RunFlag);
+        } else if(brIdentity == 2) {
+            // Calculate Node Values
+            // Calculate Equipment and Update Variables
+            this->InHeatingMode = RunFlag != 0;
+            this->initialize(state);
+            this->calculateHeater(state, CurLoad, RunFlag);
+            this->updateHeatRecords(CurLoad, RunFlag);
+        } else if (brIdentity == 3) {
+            if (this->CDLoopNum > 0) {
+                PlantUtilities::UpdateChillerComponentCondenserSide(state,
+                                                                    this->CDLoopNum,
+                                                                    this->CDLoopSideNum,
+                                                                    DataPlant::TypeOf_Chiller_DFAbsorption,
+                                                                    this->CondReturnNodeNum,
+                                                                    this->CondSupplyNodeNum,
+                                                                    this->TowerLoad,
+                                                                    this->CondReturnTemp,
+                                                                    this->CondSupplyTemp,
+                                                                    this->CondWaterFlowRate,
+                                                                    FirstHVACIteration);
+            }
+        } else {
+            // Error, nodes do not match
             ShowSevereError(state, "Invalid call to Gas Absorber Chiller " + this->Name);
             ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
             ShowFatalError(state, "Preceding conditions cause termination.");
