@@ -134,12 +134,6 @@ namespace LowTempRadiantSystem {
     extern bool FirstTimeInit;            // Set to true initially and set to false once the first pass is made through the initialization routine
     extern bool anyRadiantSystemUsingRunningMeanAverage;    // Set to true when there is at least one constant flow radiant system that uses the running mean average
     extern Real64 LoopReqTemp;            // Temperature required at the inlet of the pump (from the loop) to meet control logic
-    extern Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QRadSysSrcAvg locally
-    extern Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
@@ -531,13 +525,21 @@ namespace LowTempRadiantSystem {
                                   LowTempRadiantSystem::SystemType const SystemType // Type of radiant system: hydronic, constant flow, or electric
     );
 
-    void UpdateRadSysSourceValAvg(bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
+    void UpdateRadSysSourceValAvg(EnergyPlusData &state,
+                                  bool &LowTempRadSysOn); // .TRUE. if the radiant system has run this zone time step
 
     Real64 SumHATsurf(int const ZoneNum); // Zone number
 
 } // namespace LowTempRadiantSystem
 
 struct LowTempRadiantSystemData : BaseGlobalStruct {
+
+    Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+    // Record keeping variables used to calculate QRadSysSrcAvg locally
+    Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     // Object Data
     Array1D<LowTempRadiantSystem::VariableFlowRadiantSystemData> HydrRadSys;

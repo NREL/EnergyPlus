@@ -192,12 +192,6 @@ namespace LowTempRadiantSystem {
     bool anyRadiantSystemUsingRunningMeanAverage(
         false);                           // Set to true when there is at least one constant flow radiant system that uses the running mean average
     Real64 LoopReqTemp(0.0);              // Temperature required at the inlet of the pump (from the loop) to meet control logic
-    Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
-    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QRadSysSrcAvg locally
-    Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
     // Object Data
     std::unordered_map<std::string, std::string> LowTempRadUniqueNames;
@@ -223,11 +217,6 @@ namespace LowTempRadiantSystem {
         FirstTimeInit = true;
         anyRadiantSystemUsingRunningMeanAverage = false;
         LoopReqTemp = 0.0;
-        QRadSysSrcAvg.deallocate();
-        ZeroSourceSumHATsurf.deallocate();
-        LastQRadSysSrc.deallocate();
-        LastSysTimeElapsed.deallocate();
-        LastTimeStepSys.deallocate();
         LowTempRadUniqueNames.clear();
         GetInputFlag = true;
         FirstTimeFlag = true;
@@ -1868,11 +1857,11 @@ namespace LowTempRadiantSystem {
 
         if (FirstTimeInit) {
 
-            ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            QRadSysSrcAvg.dimension(TotSurfaces, 0.0);
-            LastQRadSysSrc.dimension(TotSurfaces, 0.0);
-            LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
-            LastTimeStepSys.dimension(TotSurfaces, 0.0);
+            state.dataLowTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataLowTempRadSys->QRadSysSrcAvg.dimension(TotSurfaces, 0.0);
+            state.dataLowTempRadSys->LastQRadSysSrc.dimension(TotSurfaces, 0.0);
+            state.dataLowTempRadSys->LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
+            state.dataLowTempRadSys->LastTimeStepSys.dimension(TotSurfaces, 0.0);
             state.dataLowTempRadSys->MySizeFlagHydr.allocate(NumOfHydrLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagCFlo.allocate(NumOfCFloLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagElec.allocate(NumOfElecLowTempRadSys);
@@ -2167,11 +2156,11 @@ namespace LowTempRadiantSystem {
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlagGeneral) {
-            ZeroSourceSumHATsurf = 0.0;
-            QRadSysSrcAvg = 0.0;
-            LastQRadSysSrc = 0.0;
-            LastSysTimeElapsed = 0.0;
-            LastTimeStepSys = 0.0;
+            state.dataLowTempRadSys->ZeroSourceSumHATsurf = 0.0;
+            state.dataLowTempRadSys->QRadSysSrcAvg = 0.0;
+            state.dataLowTempRadSys->LastQRadSysSrc = 0.0;
+            state.dataLowTempRadSys->LastSysTimeElapsed = 0.0;
+            state.dataLowTempRadSys->LastTimeStepSys = 0.0;
             MyEnvrnFlagGeneral = false;
         }
         if (!state.dataGlobal->BeginEnvrnFlag) MyEnvrnFlagGeneral = true;
@@ -2324,37 +2313,37 @@ namespace LowTempRadiantSystem {
                 if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::HydronicSystem) {
 
                     ZoneNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr;
-                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                        QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
-                        LastQRadSysSrc(SurfNum) = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
-                        LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                        LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
+                        state.dataLowTempRadSys->LastQRadSysSrc(SurfNum) = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
                     }
 
                 } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
 
                     ZoneNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ZonePtr;
-                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                        QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
-                        LastQRadSysSrc(SurfNum) = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
-                        LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                        LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
+                        state.dataLowTempRadSys->LastQRadSysSrc(SurfNum) = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
                     }
 
                 } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ElectricSystem) {
 
                     ZoneNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZonePtr;
-                    ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
-                        QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
-                        LastQRadSysSrc(SurfNum) = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
-                        LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                        LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
+                        state.dataLowTempRadSys->LastQRadSysSrc(SurfNum) = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->LastSysTimeElapsed(SurfNum) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+                        state.dataLowTempRadSys->LastTimeStepSys(SurfNum) = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
                     }
 
                 } else {
@@ -3991,7 +3980,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
+        LoadMet = SumHATsurf(ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -5014,7 +5003,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
+        LoadMet = SumHATsurf(this->ZonePtr) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
     }
 //TODO Write unit tests for baseboard
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state,
@@ -5145,7 +5134,7 @@ namespace LowTempRadiantSystem {
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-                LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
+                LoadMet = SumHATsurf(ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
 
             } else { //  OFF or COOLING MODE (not allowed for an electric low temperature radiant system), turn it off
 
@@ -5180,18 +5169,18 @@ namespace LowTempRadiantSystem {
 
             int surfNum = this->SurfacePtr(radSurfNum);
 
-            if (LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
+            if (state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) == SysTimeElapsed) {
                 // Still iterating or reducing system time step, so subtract old values which were
                 // not valid
-                QRadSysSrcAvg(surfNum) -= LastQRadSysSrc(surfNum) * LastTimeStepSys(surfNum) / state.dataGlobal->TimeStepZone;
+                state.dataLowTempRadSys->QRadSysSrcAvg(surfNum) -= state.dataLowTempRadSys->LastQRadSysSrc(surfNum) * state.dataLowTempRadSys->LastTimeStepSys(surfNum) / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            QRadSysSrcAvg(surfNum) += QRadSysSource(surfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+            state.dataLowTempRadSys->QRadSysSrcAvg(surfNum) += QRadSysSource(surfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
 
-            LastQRadSysSrc(surfNum) = QRadSysSource(surfNum);
-            LastSysTimeElapsed(surfNum) = SysTimeElapsed;
-            LastTimeStepSys(surfNum) = TimeStepSys;
+            state.dataLowTempRadSys->LastQRadSysSrc(surfNum) = QRadSysSource(surfNum);
+            state.dataLowTempRadSys->LastSysTimeElapsed(surfNum) = SysTimeElapsed;
+            state.dataLowTempRadSys->LastTimeStepSys(surfNum) = TimeStepSys;
         }
     }
 
@@ -5696,7 +5685,8 @@ namespace LowTempRadiantSystem {
         return calculateUFromISOStandard;
     }
 
-    void UpdateRadSysSourceValAvg(bool &LowTempRadSysOn) // .TRUE. if the radiant system has run this zone time step
+    void UpdateRadSysSourceValAvg(EnergyPlusData &state,
+                                  bool &LowTempRadSysOn) // .TRUE. if the radiant system has run this zone time step
     {
 
         // SUBROUTINE INFORMATION:
@@ -5725,17 +5715,17 @@ namespace LowTempRadiantSystem {
         LowTempRadSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
-        if (!allocated(QRadSysSrcAvg)) return;
+        if (!allocated(state.dataLowTempRadSys->QRadSysSrcAvg)) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (QRadSysSrcAvg(SurfNum) != 0.0) {
+            if (state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) != 0.0) {
                 LowTempRadSysOn = true;
                 break; // DO loop
             }
         }
 
-        QRadSysSource = QRadSysSrcAvg;
+        QRadSysSource = state.dataLowTempRadSys->QRadSysSrcAvg;
 
         // For interzone surfaces, QRadSysSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
