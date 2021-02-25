@@ -525,8 +525,8 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     int TotalNumOfRadSystems = 0;      // Total number of low temperature radiant systems
 
     // Limit temperatures to indicate that a system cannot heat or cannot cool
-    Real64 LowTempHeating;  // Used to indicate that a user does not have a heating control temperature
-    Real64 HighTempCooling; // Used to indicate that a user does not have a cooling control temperature
+    Real64 LowTempHeating = -200.0;  // Used to indicate that a user does not have a heating control temperature
+    Real64 HighTempCooling = 200.0; // Used to indicate that a user does not have a cooling control temperature
 
     Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -565,10 +565,6 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        TotalNumOfRadSystems = 0;
-        LowTempHeating = -200.0;
-        HighTempCooling = 200.0;
-
         HydrRadSys.clear();
         CFloRadSys.clear();
         ElecRadSys.clear();
