@@ -157,7 +157,7 @@ endif(MSVC)
 #
 #####################################################################################################################
 
-add_library(ssc SHARED ${SSC_SRC})
+add_library(ssc STATIC ${SSC_SRC})
 set_target_properties(ssc
     PROPERTIES
     PREFIX ""
