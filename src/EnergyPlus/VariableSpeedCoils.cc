@@ -3756,18 +3756,18 @@ namespace VariableSpeedCoils {
         RatedWaterFlowAutoSized = false;
         RatedCapHeatAutoSized = false;
         IsAutoSize = false;
-        if (SysSizingRunDone || ZoneSizingRunDone) {
+        if (state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone) {
             HardSizeNoDesRun = false;
         } else {
             HardSizeNoDesRun = true;
         }
-        if (CurSysNum > 0) {
-            CheckThisAirSystemForSizing(CurSysNum, SizingDesRunThisAirSys);
+        if (state.dataSize->CurSysNum > 0) {
+            CheckThisAirSystemForSizing(state, state.dataSize->CurSysNum, SizingDesRunThisAirSys);
         } else {
             SizingDesRunThisAirSys = false;
         }
-        if (CurZoneEqNum > 0) {
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
         } else {
             SizingDesRunThisZone = false;
         }
@@ -3828,7 +3828,7 @@ namespace VariableSpeedCoils {
             RatedAirFlowAutoSized = true;
         }
 
-        if (CurSysNum > 0) {
+        if (state.dataSize->CurSysNum > 0) {
             if (!RatedAirFlowAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                 HardSizeNoDesRunAirFlow = true;
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate > 0.0) {
@@ -3839,15 +3839,15 @@ namespace VariableSpeedCoils {
                 }
             } else {
                 CheckSysSizing(state, "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
-                if (FinalSysSizing(CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    RatedAirVolFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                if (FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    RatedAirVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     RatedAirVolFlowRateDes = 0.0;
                 }
             }
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
             if (!RatedAirFlowAutoSized && !SizingDesRunThisZone) { // Simulation continue
                 HardSizeNoDesRunAirFlow = true;
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate > 0.0) {
@@ -3858,7 +3858,7 @@ namespace VariableSpeedCoils {
                 }
             } else {
                 CheckZoneSizing(state, "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
-                RatedAirVolFlowRateDes = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                RatedAirVolFlowRateDes = max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                 if (RatedAirVolFlowRateDes < SmallAirVolFlow) {
                     RatedAirVolFlowRateDes = 0.0;
                 }
@@ -3882,7 +3882,7 @@ namespace VariableSpeedCoils {
             RatedCapCoolTotalAutoSized = true;
         }
         if (SizingDesRunThisZone || SizingDesRunThisAirSys) HardSizeNoDesRun = false;
-        if (CurSysNum > 0) {
+        if (state.dataSize->CurSysNum > 0) {
             if (!RatedCapCoolTotalAutoSized && !SizingDesRunThisAirSys) { // Simulation continue
                 HardSizeNoDesRun = true;
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0) {
@@ -3895,42 +3895,42 @@ namespace VariableSpeedCoils {
                 CheckSysSizing(state, "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                 VolFlowRate = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
-                    if (CurOASysNum > 0) { // coil is in the OA stream
-                        MixTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                        MixHumRat = FinalSysSizing(CurSysNum).OutHumRatAtCoolPeak;
-                        SupTemp = FinalSysSizing(CurSysNum).PrecoolTemp;
-                        SupHumRat = FinalSysSizing(CurSysNum).PrecoolHumRat;
+                    if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
+                        MixTemp = FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
+                        MixHumRat = FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
+                        SupTemp = FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
+                        SupHumRat = FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
                     } else { // coil is on the main air loop
-                        SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
-                        SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                        if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                            MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
-                            MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
+                        SupTemp = FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
+                        SupHumRat = FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
+                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                            MixTemp = FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
+                            MixHumRat = FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
                             if (VolFlowRate > 0.0) {
-                                OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / VolFlowRate;
+                                OutAirFrac = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
                             } else {
                                 OutAirFrac = 1.0;
                             }
                             OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             MixTemp =
-                                OutAirFrac * FinalSysSizing(CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetTempAtCoolPeak;
-                            MixHumRat = OutAirFrac * FinalSysSizing(CurSysNum).PrecoolHumRat +
-                                        (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
+                                OutAirFrac * FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
+                            MixHumRat = OutAirFrac * FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
+                                        (1.0 - OutAirFrac) * FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
                         }
                     }
-                    OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
+                    OutTemp = FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
                     rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
                     // design fan heat will be added to coil load
-                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, VolFlowRate);
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
-                    if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
+                    if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                    } else if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
+                    } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     }
                     MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -3961,7 +3961,7 @@ namespace VariableSpeedCoils {
                 }
             }
 
-        } else if (CurZoneEqNum > 0) {
+        } else if (state.dataSize->CurZoneEqNum > 0) {
             if (!RatedCapCoolTotalAutoSized && !SizingDesRunThisZone) { // Simulation continue
                 HardSizeNoDesRun = true;
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0) {
@@ -3974,22 +3974,22 @@ namespace VariableSpeedCoils {
                 CheckZoneSizing(state, "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
                 VolFlowRate = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
-                    if (ZoneEqDXCoil) {
-                        if (ZoneEqSizing(CurZoneEqNum).OAVolFlow > 0.0) {
-                            MixTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
-                            MixHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
+                    if (state.dataSize->ZoneEqDXCoil) {
+                        if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
+                            MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                            MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                         } else {
-                            MixTemp = FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak;
-                            MixHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                            MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
+                            MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
                         }
                     } else {
-                        MixTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
-                        MixHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
+                        MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                        MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                     }
-                    SupTemp = FinalZoneSizing(CurZoneEqNum).CoolDesTemp;
-                    SupHumRat = FinalZoneSizing(CurZoneEqNum).CoolDesHumRat;
-                    TimeStepNumAtMax = FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax;
-                    DDNum = FinalZoneSizing(CurZoneEqNum).CoolDDNum;
+                    SupTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
+                    SupHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
+                    TimeStepNumAtMax = FinalZoneSizing(state.dataSize->CurZoneEqNum).TimeStepNumAtCoolMax;
+                    DDNum = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDDNum;
                     if (DDNum > 0 && TimeStepNumAtMax > 0) {
                         OutTemp = DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                     } else {
@@ -4000,11 +4000,11 @@ namespace VariableSpeedCoils {
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);
 
                     // design fan heat will be added to coil load
-                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, VolFlowRate);
+                    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = PsyCpAirFnW(MixHumRat);
 
-                    if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
+                    if (state.dataSize->DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     } else {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
@@ -4074,7 +4074,7 @@ namespace VariableSpeedCoils {
                                                  "User-Specified Rated Total Cooling Capacity [W]",
                                                  RatedCapCoolTotalUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(RatedCapCoolTotalDes - RatedCapCoolTotalUser) / RatedCapCoolTotalUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
@@ -4089,7 +4089,7 @@ namespace VariableSpeedCoils {
             }
 
             coilSelectionReportObj->setCoilEntAirTemp(state,
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType, MixTemp, CurSysNum, CurZoneEqNum);
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType, MixTemp, state.dataSize->CurSysNum, state.dataSize->CurZoneEqNum);
             coilSelectionReportObj->setCoilEntAirHumRat(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType, MixHumRat);
             coilSelectionReportObj->setCoilLvgAirTemp(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType, SupTemp);
             coilSelectionReportObj->setCoilLvgAirHumRat(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType, SupHumRat);
@@ -4098,9 +4098,9 @@ namespace VariableSpeedCoils {
                                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                            RatedCapCoolTotalDes,
                                                            RatedCapCoolTotalAutoSized,
-                                                           CurSysNum,
-                                                           CurZoneEqNum,
-                                                           CurOASysNum,
+                                                           state.dataSize->CurSysNum,
+                                                           state.dataSize->CurZoneEqNum,
+                                                           state.dataSize->CurOASysNum,
                                                            0.0, // no fan load included in sizing
                                                            TotCapTempModFac,
                                                            -999.0,
@@ -4109,7 +4109,7 @@ namespace VariableSpeedCoils {
 
         // Set the global DX cooling coil capacity variable for use by other objects
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "COOLING") {
-            DXCoolCap = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal;
+            state.dataSize->DXCoolCap = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal;
         }
 
         // size rated heating capacity
@@ -4123,7 +4123,7 @@ namespace VariableSpeedCoils {
                 RatedCapHeatDes = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CompanionCoolingCoilNum).RatedCapCoolTotal;
                 state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = RatedCapHeatDes; // AVOID BEING ZERO
             } else {
-                RatedCapHeatDes = DXCoolCap; // previous code, can be risky
+                RatedCapHeatDes = state.dataSize->DXCoolCap; // previous code, can be risky
             }
             // END IF
             if (RatedCapHeatAutoSized) {
@@ -4143,9 +4143,9 @@ namespace VariableSpeedCoils {
                                                            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                            RatedCapHeatDes,
                                                            RatedCapHeatAutoSized,
-                                                           CurSysNum,
-                                                           CurZoneEqNum,
-                                                           CurOASysNum,
+                                                           state.dataSize->CurSysNum,
+                                                           state.dataSize->CurZoneEqNum,
+                                                           state.dataSize->CurOASysNum,
                                                            0.0,
                                                            1.0,
                                                            -999.0,
@@ -4175,7 +4175,7 @@ namespace VariableSpeedCoils {
                                              "User-Specified Nominal Heating Capacity [W]",
                                              RatedCapHeatUser);
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > AutoVsHardSizingThreshold) {
+                    if ((std::abs(RatedCapHeatDes - RatedCapHeatUser) / RatedCapHeatUser) > state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                     CurrentObjSubfix);
                         ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
@@ -4214,7 +4214,7 @@ namespace VariableSpeedCoils {
                                                  "User-Specified Rated Air Flow Rate [m3/s]",
                                                  RatedAirVolFlowRateUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(RatedAirVolFlowRateDes - RatedAirVolFlowRateUser) / RatedAirVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
@@ -4494,7 +4494,7 @@ namespace VariableSpeedCoils {
                                              "User-Specified Rated Water Flow Rate [m3/s]",
                                              RatedWaterVolFlowRateUser);
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > AutoVsHardSizingThreshold) {
+                    if ((std::abs(RatedWaterVolFlowRateDes - RatedWaterVolFlowRateUser) / RatedWaterVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                     CurrentObjSubfix);
                         ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
@@ -4509,11 +4509,11 @@ namespace VariableSpeedCoils {
 
         // Save component design water volumetric flow rate.
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate > 0.0 && state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
-            RegisterPlantCompDesignFlow(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate);
+            RegisterPlantCompDesignFlow(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate);
         }
         // Use 1/2 flow since both cooling and heating coil will save flow yet only 1 will operate at a time
         else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate > 0.0) {
-            RegisterPlantCompDesignFlow(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum, 0.5 * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate);
+            RegisterPlantCompDesignFlow(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterInletNodeNum, 0.5 * state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate);
         }
 
         if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit ||
@@ -4783,7 +4783,7 @@ namespace VariableSpeedCoils {
                                                  EvapCondPumpElecNomPowerUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(EvapCondPumpElecNomPowerDes - EvapCondPumpElecNomPowerUser) / EvapCondPumpElecNomPowerUser) >
-                            AutoVsHardSizingThreshold) {
+                            state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
@@ -4829,7 +4829,7 @@ namespace VariableSpeedCoils {
                                                  "User-Specified Resistive Defrost Heater Capacity [W]",
                                                  DefrostCapacityUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVarSpeedCoil: Potential issue with equipment sizing for " + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + ' ' +
                                         CurrentObjSubfix);
                             ShowContinueError(state, "Coil Name =" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);

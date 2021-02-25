@@ -511,7 +511,7 @@ namespace EnergyPlus::SwimmingPool {
             Real64 Density = FluidProperties::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
             this->WaterMass = state.dataSurface->Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
             this->WaterMassFlowRateMax = this->WaterVolFlowMax * Density;
-            this->initSwimmingPoolPlantNodeFlow();
+            this->initSwimmingPoolPlantNodeFlow(state);
         }
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
@@ -722,7 +722,7 @@ namespace EnergyPlus::SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantNodeFlow() const
+    void SwimmingPoolData::initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) const
     {
 
         if (!this->MyPlantScanFlagPool) {
@@ -735,7 +735,7 @@ namespace EnergyPlus::SwimmingPool {
                                                    this->HWLoopSide,
                                                    this->HWBranchNum,
                                                    this->HWCompNum);
-                PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNode, this->WaterVolFlowMax);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNode, this->WaterVolFlowMax);
             }
         }
     }

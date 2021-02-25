@@ -2010,8 +2010,8 @@ namespace HVACUnitaryBypassVAV {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone sizing arrays.
 
-        int curSysNum = DataSizing::CurSysNum;
-        int curOASysNum = DataSizing::CurOASysNum;
+        int curSysNum = state.dataSize->CurSysNum;
+        int curOASysNum = state.dataSize->CurOASysNum;
 
         if (curSysNum > 0 && curOASysNum == 0) {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
@@ -4012,7 +4012,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FirstPass) {
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, CBVAV(CBVAVNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, CBVAV(CBVAVNum).FirstPass);
             }
         }
 

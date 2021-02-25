@@ -107,9 +107,9 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     errorsFound = false;
 
     // ZONE EQUIPMENT TESTING
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::CurTermUnitSizingNum = 1;
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitSingDuct = true;
 
     // Test #1 - Zone Equipment, no autosizing
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -123,7 +123,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     has_eio_output(true);
     printFlag = true;
 
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     DataSizing::ZoneSizingInput.allocate(1);
     DataSizing::ZoneSizingInput(1).ZoneNum = 1;
 
@@ -159,11 +159,11 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).ATMixerCoolPriHumRat = 0.007;
 
     state->dataPlnt->PlantLoop.allocate(1);
-    DataSizing::DataWaterLoopNum = 1;
-    DataSizing::DataWaterCoilSizHeatDeltaT = 5.0;
+    state->dataSize->DataWaterLoopNum = 1;
+    state->dataSize->DataWaterCoilSizHeatDeltaT = 5.0;
 
     // Test 2 - Zone Equipment, Single Duct TU
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->TermUnitSingDuct = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -178,8 +178,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 3 - Zone Equipment, Zone Eq Fan Coil
-    DataSizing::TermUnitSingDuct = false;
-    DataSizing::ZoneEqFanCoil = true;
+    state->dataSize->TermUnitSingDuct = false;
+    state->dataSize->ZoneEqFanCoil = true;
     DataSizing::ZoneEqSizing(1).DesCoolingLoad = 4000.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -194,7 +194,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // Test 4 - Zone Equipment, Zone Eq Fan Coil, HX assisted water coil
     DataSizing::ZoneEqSizing(1).DesCoolingLoad = 0.0;
-    DataSizing::DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
+    state->dataSize->DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -208,8 +208,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Zone Equipment, Terminal Induction Unit
-    DataSizing::TermUnitIU = true;
-    DataSizing::TermUnitSizing(DataSizing::CurTermUnitSizingNum).DesCoolingLoad = 3500.0;
+    state->dataSize->TermUnitIU = true;
+    DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).DesCoolingLoad = 3500.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -222,7 +222,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment, OA flow > 0
-    DataSizing::ZoneEqFanCoil = false;
+    state->dataSize->ZoneEqFanCoil = false;
     DataSizing::ZoneEqSizing(1).OAVolFlow = 0.05;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -238,7 +238,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // Test 7 - Zone DX Equipment, inlet side AT Mixer
     DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.03;
-    DataSizing::ZoneEqDXCoil = true;
+    state->dataSize->ZoneEqDXCoil = true;
     // start with an auto-sized value as the user input, AT Mixer present
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -293,16 +293,16 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // AIRLOOP Equipment
     // Test 10 - Airloop Equipment, hard size, no sizing run
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::NumZoneSizingInput = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     DataSizing::ZoneEqSizing.deallocate();
     DataSizing::FinalZoneSizing.deallocate();
 
-    DataSizing::CurSysNum = 1;
+    state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizingRunDone = false;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
     inputValue = 2700.8;
     // do sizing
@@ -316,7 +316,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;              // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    DataSizing::SysSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = 1;
@@ -382,7 +382,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-    DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+    state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
     // Test 14 - Airloop Equipment, with OA and precooling of OA stream, add fan heat
     // start with an autosized value
@@ -396,8 +396,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4740.64, sizedValue, 0.01);                              // change in capacity because precool conditions mixed with return
     EXPECT_NEAR(158.33, sizer.primaryAirSystem(1).FanDesCoolLoad, 0.01); // air loop fan heat is saved in sizer class
-    EXPECT_NEAR(DataSizing::DataCoilSizingAirInTemp, 23.44, 0.01);       // does not include fan heat becase PrimaryAirSys fan place not set
-    EXPECT_EQ(1.0, DataSizing::DataFracOfAutosizedCoolingCapacity);
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 23.44, 0.01);       // does not include fan heat because PrimaryAirSys fan place not set
+    EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity);
     sizer.autoSizedValue = 0.0; // reset for next test
     Real64 unScaledCapacity = sizedValue;
 
@@ -416,8 +416,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(unScaledCapacity * 0.5, sizedValue, 0.01);               // change in capacity because precool conditions mixed with return
     EXPECT_NEAR(158.33, sizer.primaryAirSystem(1).FanDesCoolLoad, 0.01); // air loop fan heat is saved in sizer class
-    EXPECT_EQ(1.0, DataSizing::DataFracOfAutosizedCoolingCapacity);      // Data global is not affected
-    EXPECT_NEAR(DataSizing::DataCoilSizingAirInTemp, 24.22, 0.01);       // does include fan heat becase PrimaryAirSys fan place is set
+    EXPECT_EQ(1.0, state->dataSize->DataFracOfAutosizedCoolingCapacity);      // Data global is not affected
+    EXPECT_NEAR(state->dataSize->DataCoilSizingAirInTemp, 24.22, 0.01);       // does include fan heat becase PrimaryAirSys fan place is set
     EXPECT_EQ(0.5, sizer.dataFracOfAutosizedCoolingCapacity);            // sizer class holds fractional value
     sizer.autoSizedValue = 0.0;                                          // reset for next test
 
@@ -469,7 +469,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     DataSizing::UnitarySysEqSizing(1).CoolingCapacity = false;
 
     // Test 19 - OA Equipment, OA Sys capacity sizing
-    DataSizing::CurOASysNum = 1;
+    state->dataSize->CurOASysNum = 1;
     DataSizing::OASysEqSizing.allocate(1);
     DataSizing::OASysEqSizing(1).CoolingCapacity = true;
     DataSizing::OASysEqSizing(1).DesCoolingLoad = 1500.0;

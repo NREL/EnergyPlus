@@ -625,7 +625,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                             }
                             // we can warn here if there is a bit mismatch between hard- and auto-sized
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowWarningMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", hardSizedCapacity));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpCapacity));
@@ -664,7 +664,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                             }
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                     ShowContinueError(state,
                                                       format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedLoadSideFlow));
@@ -802,7 +802,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                     }
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceVolFlow - hardSizedSourceSideFlow) / hardSizedSourceSideFlow) >
-                            DataSizing::AutoVsHardSizingThreshold) {
+                            state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                             ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedSourceSideFlow));
                             ShowContinueError(state,
@@ -820,8 +820,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
         // register the design volume flows with the plant, only doing half of source because the companion
         // is generally on the same loop
-        PlantUtilities::RegisterPlantCompDesignFlow(this->loadSideNodes.inlet, tmpLoadVolFlow);
-        PlantUtilities::RegisterPlantCompDesignFlow(this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->loadSideNodes.inlet, tmpLoadVolFlow);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             // create predefined report

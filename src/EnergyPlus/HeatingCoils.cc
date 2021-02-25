@@ -1540,29 +1540,29 @@ namespace HeatingCoils {
         SizingString = HeatingCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W]";
         CompType = "Coil:" + HeatingCoil(CoilNum).HeatingCoilType + ':' + HeatingCoil(CoilNum).HeatingCoilModel;
         CompName = HeatingCoil(CoilNum).Name;
-        DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
-        DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
+        state.dataSize->DataCoilIsSuppHeater = CoilIsSuppHeater; // set global instead of using optional argument
+        state.dataSize->DataCoolCoilCap = 0.0; // global only used for heat pump heating coils, non-HP heating coils are sized with other global variables
 
         if (TempCap == AutoSize) {
             if (HeatingCoil(CoilNum).DesiccantRegenerationCoil) {
-                DataDesicRegCoil = true;
+                state.dataSize->DataDesicRegCoil = true;
                 bPRINT = false;
-                DataDesicDehumNum = HeatingCoil(CoilNum).DesiccantDehumNum;
+                state.dataSize->DataDesicDehumNum = HeatingCoil(CoilNum).DesiccantDehumNum;
                 HeatingCoilDesAirInletTempSizer sizerHeatingDesInletTemp;
                 bool ErrorsFound = false;
                 sizerHeatingDesInletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                DataDesInletAirTemp = sizerHeatingDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
+                state.dataSize->DataDesInletAirTemp = sizerHeatingDesInletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
                 HeatingCoilDesAirOutletTempSizer sizerHeatingDesOutletTemp;
                 ErrorsFound = false;
                 sizerHeatingDesOutletTemp.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
-                DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
+                state.dataSize->DataDesOutletAirTemp = sizerHeatingDesOutletTemp.size(state, DataSizing::AutoSize, ErrorsFound);
 
-                if (CurOASysNum > 0) {
-                    OASysEqSizing(CurOASysNum).AirFlow = true;
-                    OASysEqSizing(CurOASysNum).AirVolFlow = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
+                if (state.dataSize->CurOASysNum > 0) {
+                    OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
+                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                 }
-                DataDesicDehumNum = 0;
+                state.dataSize->DataDesicDehumNum = 0;
                 bPRINT = true;
             }
         }
@@ -1571,10 +1571,10 @@ namespace HeatingCoils {
         sizerHeatingCapacity.overrideSizingString(SizingString);
         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
         TempCap = sizerHeatingCapacity.size(state, TempCap, errorsFound);
-        DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
-        DataDesicRegCoil = false;     // reset global to false so other heating coils are not affected
-        DataDesInletAirTemp = 0.0;    // reset global data to zero so other heating coils are not
-        DataDesOutletAirTemp = 0.0;   // reset global data to zero so other heating coils are not affected
+        state.dataSize->DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
+        state.dataSize->DataDesicRegCoil = false;     // reset global to false so other heating coils are not affected
+        state.dataSize->DataDesInletAirTemp = 0.0;    // reset global data to zero so other heating coils are not
+        state.dataSize->DataDesOutletAirTemp = 0.0;   // reset global data to zero so other heating coils are not affected
 
         if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingElectric_MultiStage ||
             HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingGas_MultiStage) {
@@ -1609,7 +1609,7 @@ namespace HeatingCoils {
                                                          "User-Specified " + SizingString,
                                                          NominalCapacityUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(NominalCapacityDes - NominalCapacityUser) / NominalCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHeatingCoil: Potential issue with equipment sizing for " + CompType + ", " + CompName);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NominalCapacityUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NominalCapacityDes));

@@ -805,8 +805,8 @@ namespace EnergyPlus::DataZoneEquipment {
 
         // Allocate TermUnitSizing array and set zone number
         if (locTermUnitSizingCounter > 0) {
-            DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
-            DataSizing::TermUnitSizing.allocate(DataSizing::NumAirTerminalUnits);
+            state.dataSize->NumAirTerminalUnits = locTermUnitSizingCounter;
+            DataSizing::TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
             for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
                 {
                     auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(loopZoneNum));
@@ -1339,7 +1339,7 @@ namespace EnergyPlus::DataZoneEquipment {
         if (DSOAPtr == 0) return OAVolumeFlowRate;
 
         if (state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag) {
-            MyEnvrnFlag.allocate(DataSizing::NumOARequirements);
+            MyEnvrnFlag.allocate(state.dataSize->NumOARequirements);
             MyEnvrnFlag = true;
             state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag = false;
         }

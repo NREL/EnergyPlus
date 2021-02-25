@@ -564,29 +564,29 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     state->dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = AutoSize;
     state->dataPowerInductionUnits->PIU(PIUNum).MaxVolHotSteamFlow = AutoSize;
 
-    DataSizing::CurSysNum = 0;
-    DataSizing::SysSizingRunDone = false;
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->SysSizingRunDone = false;
+    state->dataSize->ZoneSizingRunDone = true;
 
     // Test array out of bounds error. Notice that CurZoneEqNum is 2, while CurTermUnitSizingNum is 1
     // CurZoneEqNum = Current Zone Equipment index (0 if not simulating ZoneEq)
     // CurTermUnitSizingNum = Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
-    DataSizing::CurZoneEqNum = 2;
+    state->dataSize->CurZoneEqNum = 2;
     DataSizing::FinalZoneSizing.allocate(2);
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTempTU = 10.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 2.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 10.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
 
-    DataSizing::CurTermUnitSizingNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
     DataSizing::TermUnitSizing.allocate(1);
     DataSizing::TermUnitFinalZoneSizing.allocate(1);
-    DataSizing::TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = 1.0;
-    DataSizing::TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = 0.5;
-    DataSizing::TermUnitSingDuct = true;
-    DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
+    DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 1.0;
+    DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
+    state->dataSize->TermUnitSingDuct = true;
+    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     // Call the sizing routine now
     PoweredInductionUnits::SizePIU(*state, PIUNum);

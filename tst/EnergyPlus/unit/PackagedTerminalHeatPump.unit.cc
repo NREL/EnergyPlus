@@ -480,19 +480,19 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
 
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneSizingRunDone = true;
     DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolVolFlow = 1.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInTemp = 24.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 24.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.05;
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);
     DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(16);
     SizePTUnit(*state, 1);
 
     // This VS coil is rather quirky. It sizes the capacity based on zone sizing air flow rate.
@@ -519,7 +519,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).Name, "LOBBY_ZN_1_FLR_2 WSHP HEATING MODE");
 
     // expect coil air flow to equal PTUnit heating air flow
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowRate(9), state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
 
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitPTUnit(*state, 1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
+    InitPTUnit(*state, 1, state->dataSize->CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
 
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
@@ -873,8 +873,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     TempControlType.allocate(1);
@@ -1219,8 +1219,8 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = false;
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 

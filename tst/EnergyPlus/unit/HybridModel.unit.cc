@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;

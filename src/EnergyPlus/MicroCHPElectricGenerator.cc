@@ -562,7 +562,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
             this->PlantMassFlowRateMax = 2.0; // would like to use plant loop max but not ready yet
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->PlantInletNodeID, this->PlantMassFlowRateMax / rho);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->PlantInletNodeID, this->PlantMassFlowRateMax / rho);
 
         this->A42Model.ElecEff = CurveManager::CurveValue(state,
             this->A42Model.ElecEffCurveID, this->A42Model.MaxElecPower, this->PlantMassFlowRateMax, DataLoopNode::Node(this->PlantInletNodeID).Temp);

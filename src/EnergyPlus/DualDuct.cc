@@ -210,7 +210,7 @@ namespace DualDuct {
         auto &thisDualDuct(dd_airterminal(DDNum));
 
         if (CompIndex > 0) {
-            DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
+            state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
             // With the correct DDNum Initialize
             thisDualDuct.InitDualDuct(state, FirstHVACIteration); // Initialize all Damper related parameters
 
@@ -1140,7 +1140,7 @@ namespace DualDuct {
 
         if (this->MaxAirVolFlowRate == AutoSize) {
 
-            if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if ((state.dataSize->CurZoneEqNum > 0) && (state.dataSize->CurTermUnitSizingNum > 0)) {
                 if (this->DamperType == DualDuct_ConstantVolume) {
                     DamperType = cCMO_DDConstantVolume;
                 } else if (this->DamperType == DualDuct_VariableVolume) {
@@ -1152,11 +1152,11 @@ namespace DualDuct {
                 }
                 CheckZoneSizing(state, DamperType, this->Name);
                 this->MaxAirVolFlowRate =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (this->DamperType == DualDuct_OutdoorAir) {
                     if (this->RecircIsUsed) {
-                        this->DesignRecircFlowRate = max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow,
-                                                         TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                        this->DesignRecircFlowRate = max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow,
+                                                         TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                         this->MaxAirVolFlowRate = this->DesignRecircFlowRate + this->DesignOAFlowRate;
                     } else {
                         this->MaxAirVolFlowRate = this->DesignOAFlowRate;

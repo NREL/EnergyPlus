@@ -132,8 +132,8 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     int RadSysNum;
     int SizingTypesNum;
 
-    DataSizing::DataScalableCapSizingON = false;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->DataScalableCapSizingON = false;
+    state->dataSize->CurZoneEqNum = 1;
 
     RadSysNum = 1;
     HighTempRadSys.allocate(RadSysNum);
@@ -148,10 +148,10 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
     SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
     if (SizingTypesNum < 1) SizingTypesNum = 1;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
     SizeHighTempRadiantSystem(*state, RadSysNum);
-    EXPECT_FALSE(DataSizing::DataScalableSizingON);
+    EXPECT_FALSE(state->dataSize->DataScalableSizingON);
 }
 
 } // namespace EnergyPlus

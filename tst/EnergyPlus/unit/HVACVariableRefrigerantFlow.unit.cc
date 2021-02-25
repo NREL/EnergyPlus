@@ -188,7 +188,7 @@ protected:
         state->dataHeatBal->HeatReclaimDXCoil.allocate(10);
         state->dataDXCoils->NumDXCoils = 10;
         state->dataMixedAir->OAMixer.allocate(5);
-        DataSizing::NumSysSizInput = 1;
+        state->dataSize->NumSysSizInput = 1;
         DataSizing::SysSizInput.allocate(1);
         DataSizing::SysSizInput(1).AirLoopNum = 1;
         state->dataCurveManager->NumCurves = 10;
@@ -210,8 +210,8 @@ protected:
 
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(numZones);
 
-        DataSizing::ZoneSizingRunDone = true;
-        DataSizing::SysSizingRunDone = true;
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->SysSizingRunDone = true;
 
         // set up zone 1
 
@@ -321,7 +321,7 @@ protected:
         state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         DataSizing::PlantSizData.allocate(state->dataPlnt->TotNumLoops);
         // int NumPltSizInput = DataPlant::TotNumLoops;
-        DataSizing::NumPltSizInput = 2;
+        state->dataSize->NumPltSizInput = 2;
 
         for (int loopindex = 1; loopindex <= state->dataPlnt->TotNumLoops; ++loopindex) {
             auto &loop(state->dataPlnt->PlantLoop(loopindex));
@@ -529,7 +529,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
 
     static std::string const RoutineName("VRF_SysModel_inAirloop");
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
-    int curSysNum = DataSizing::CurSysNum = 1;
+    int curSysNum = state->dataSize->CurSysNum = 1;
     int curZoneNum = 1;
     int curTUNum = 1;
 
@@ -2241,7 +2241,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
@@ -3696,19 +3696,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    DataSizing::ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -3732,19 +3732,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
     Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                          // AHRI condition at 95 F db
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                  // AHRI condition at 95 F db
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;                // don't care
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
     bool HeatingActive = false;
     bool CoolingActive = false;
@@ -3757,7 +3757,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -3791,7 +3791,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -3878,7 +3878,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -3964,7 +3964,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4036,7 +4036,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4060,7 +4060,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4077,7 +4077,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4096,7 +4096,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -4685,19 +4685,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -5535,19 +5535,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -5584,19 +5584,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
     DataLoopNode::Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                        // AHRI condition at 95 F db
     DataLoopNode::Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                // AHRI condition at 95 F db
     DataLoopNode::Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;              // don't care
-    DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DataSizing::DesDayWeath.allocate(1);
     DataSizing::DesDayWeath(1).Temp.allocate(1);
-    DataSizing::DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    DataSizing::DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    DataSizing::FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
@@ -5613,7 +5613,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5647,7 +5647,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5692,7 +5692,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5714,7 +5714,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -5734,7 +5734,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -6428,7 +6428,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
@@ -8096,11 +8096,11 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopBranchNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopCompNum = 1;
 
-    NumPltSizInput = 1;
-    PlantSizData.allocate(NumPltSizInput);
-    PlantSizData(NumPltSizInput).PlantLoopName = "HotWaterLoop";
-    PlantSizData(NumPltSizInput).ExitTemp = 60.0; // hot water coil inlet water temp
-    PlantSizData(NumPltSizInput).DeltaT = 10.0;   // loop temperature difference
+    state->dataSize->NumPltSizInput = 1;
+    PlantSizData.allocate(state->dataSize->NumPltSizInput);
+    PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "HotWaterLoop";
+    PlantSizData(state->dataSize->NumPltSizInput).ExitTemp = 60.0; // hot water coil inlet water temp
+    PlantSizData(state->dataSize->NumPltSizInput).DeltaT = 10.0;   // loop temperature difference
 
     // set up plant loop
     state->dataPlnt->TotNumLoops = 1;
@@ -8215,9 +8215,9 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     state->dataSteamCoils->MySizeFlag.allocate(CoilNum);
     state->dataSteamCoils->MySizeFlag(CoilNum) = true;
 
-    NumPltSizInput = 1;
-    PlantSizData.allocate(NumPltSizInput);
-    PlantSizData(NumPltSizInput).PlantLoopName = "SteamLoop";
+    state->dataSize->NumPltSizInput = 1;
+    PlantSizData.allocate(state->dataSize->NumPltSizInput);
+    PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "SteamLoop";
     // set up plant loop
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -11166,19 +11166,19 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(*state);
@@ -11219,15 +11219,15 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0095;
+    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
     auto &thisFan(Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
@@ -11243,7 +11243,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -12897,19 +12897,19 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(*state);
@@ -12951,15 +12951,15 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0095;
+    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
 
     // set pointer to components
     auto &thisFan(Fan(1));
@@ -12976,7 +12976,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,
@@ -14950,7 +14950,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
@@ -15574,19 +15574,19 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
     state->dataAirLoop->AirLoopInputsFilled = true;
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.566337;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(*state);
@@ -15627,15 +15627,15 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0095;
+    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
     auto &thisFan(Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
@@ -15651,7 +15651,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
                 CurZoneNum,
-                state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
                 HeatingActive,
                 CoolingActive,
                 OAUnitNum,

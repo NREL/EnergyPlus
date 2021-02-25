@@ -83,10 +83,10 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // DX Coil SHR Sizing
     inputValue = 0.85;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
 
     // Test #1 - Zone Equipment, no autosizing, missing input data
-    DataSizing::DataFlowUsedForSizing = 0.5; // DataCapacityUsedForSizing not initialized
+    state->dataSize->DataFlowUsedForSizing = 0.5; // DataCapacityUsedForSizing not initialized
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // no sizing error since not autosized
@@ -102,13 +102,13 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // Test #2 - Zone Equipment, no autosizing, has input data, print result
     printFlag = true;
     inputValue = 0.85;
-    DataSizing::DataCapacityUsedForSizing = 10000.0;
+    state->dataSize->DataCapacityUsedForSizing = 10000.0;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.85, sizedValue, 0.01); // hard-sized value
-    Real64 RatedVolFlowPerRatedTotCap = DataSizing::DataFlowUsedForSizing / DataSizing::DataCapacityUsedForSizing;
+    Real64 RatedVolFlowPerRatedTotCap = state->dataSize->DataFlowUsedForSizing / state->dataSize->DataCapacityUsedForSizing;
     Real64 initialSHR = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap; // does not include impact of ValidateADP, which increases SHR
     EXPECT_LT(initialSHR, sizedValue); // hard-sized value > autosized value
     EXPECT_FALSE(sizer.sizingDesRunThisZone);
@@ -125,7 +125,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // Test #3 - Zone Equipment, autosized
     // start with an auto-sized value as the user input
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     inputValue = EnergyPlus::DataSizing::AutoSize;
     DataHVACGlobals::DXCT = DataHVACGlobals::RegularDXCoil;
     // do sizing
@@ -145,7 +145,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // Test #4 - Zone Equipment, repeat with autosized and no initialized DataCapacityUsedForSizing
     inputValue = EnergyPlus::DataSizing::AutoSize;
-    DataSizing::DataCapacityUsedForSizing = 0.0;
+    state->dataSize->DataCapacityUsedForSizing = 0.0;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
@@ -154,8 +154,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_NEAR(1.0, sizedValue, 0.01); // autosizing failed since Data* variables were not both > 0
 
     // Test #5 - Zone Equipment, flow to capacity ratio high
-    DataSizing::DataCapacityUsedForSizing = 10000.0;
-    DataSizing::DataFlowUsedForSizing = 1.0;
+    state->dataSize->DataCapacityUsedForSizing = 10000.0;
+    state->dataSize->DataFlowUsedForSizing = 1.0;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
@@ -166,7 +166,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test #6 - Zone Equipment, flow to capacity ratio low
-    DataSizing::DataFlowUsedForSizing = 0.1;
+    state->dataSize->DataFlowUsedForSizing = 0.1;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -185,7 +185,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     has_eio_output(true);
 
     // Test #7 - Zone Equipment, autosized
-    DataSizing::DataFlowUsedForSizing = 0.3;
+    state->dataSize->DataFlowUsedForSizing = 0.3;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     DataHVACGlobals::DXCT = DataHVACGlobals::DOASDXCoil;
@@ -194,7 +194,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    RatedVolFlowPerRatedTotCap = DataSizing::DataFlowUsedForSizing / DataSizing::DataCapacityUsedForSizing;
+    RatedVolFlowPerRatedTotCap = state->dataSize->DataFlowUsedForSizing / state->dataSize->DataCapacityUsedForSizing;
     initialSHR = 0.389 + 7684.0 * RatedVolFlowPerRatedTotCap;
     EXPECT_NEAR(0.61952, initialSHR, 0.000001); // does not include impact of ValidateADP
     EXPECT_NEAR(0.63152, sizedValue, 0.000001); // includes impact of ValidateADP
@@ -206,7 +206,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test #8 - Zone Equipment, flow to capacity ratio high
-    DataSizing::DataFlowUsedForSizing = 1.0;
+    state->dataSize->DataFlowUsedForSizing = 1.0;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
@@ -217,7 +217,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test #9 - Zone Equipment, flow to capacity ratio low
-    DataSizing::DataFlowUsedForSizing = 0.1;
+    state->dataSize->DataFlowUsedForSizing = 0.1;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -238,14 +238,14 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // AIRLOOP EQUIPMENT TESTING
     // Test #10 - Airloop Equipment
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::NumZoneSizingInput = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->NumZoneSizingInput = 0;
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
 
-    DataSizing::CurSysNum = 1;
+    state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizingRunDone = false;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
     inputValue = 0.67;
     // do sizing
@@ -260,12 +260,12 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test #11 - Airloop Equipment
-    DataSizing::SysSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
     EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
     EnergyPlus::DataSizing::SysSizInput.allocate(1);
     EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
 
-    DataSizing::DataFlowUsedForSizing = 0.5; // flow to capacity ratio within limits
+    state->dataSize->DataFlowUsedForSizing = 0.5; // flow to capacity ratio within limits
     DataHVACGlobals::DXCT = DataHVACGlobals::RegularDXCoil;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
@@ -286,7 +286,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test #12 - Airloop Equipment
-    DataSizing::DataFlowUsedForSizing = 0.6; // flow to capacity ratio high
+    state->dataSize->DataFlowUsedForSizing = 0.6; // flow to capacity ratio high
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -301,7 +301,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test #13 - Airloop Equipment
-    DataSizing::DataFlowUsedForSizing = 0.1; // flow to capacity ratio low
+    state->dataSize->DataFlowUsedForSizing = 0.1; // flow to capacity ratio low
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -321,7 +321,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test #14 - Outdoor Air System Equipment, no DOAS air loop
-    DataSizing::CurOASysNum = 1;
+    state->dataSize->CurOASysNum = 1;
     DataSizing::OASysEqSizing.allocate(1);
     // start with an auto-sized value as the user input
     inputValue = 0.52;

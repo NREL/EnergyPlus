@@ -77,9 +77,9 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     errorsFound = false;
 
     // ZONE EQUIPMENT TESTING
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::CurTermUnitSizingNum = 1;
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitSingDuct = true;
 
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
 
@@ -131,13 +131,13 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     EnergyPlus::DataSizing::ZoneEqSizing(1).ATMixerHeatPriDryBulb = 28.0;
     EnergyPlus::DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.0045;
     state->dataPlnt->PlantLoop.allocate(1);
-    DataSizing::DataWaterLoopNum = 1;
-    DataSizing::DataWaterCoilSizHeatDeltaT = 5.0;
+    state->dataSize->DataWaterLoopNum = 1;
+    state->dataSize->DataWaterCoilSizHeatDeltaT = 5.0;
 
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
 
     // Test 2 - Zone Equipment, Single Duct TU
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->TermUnitSingDuct = true;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -152,8 +152,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 3 - Zone Equipment, Zone Eq Fan Coil
-    DataSizing::TermUnitSingDuct = false;
-    DataSizing::ZoneEqFanCoil = true;
+    state->dataSize->TermUnitSingDuct = false;
+    state->dataSize->ZoneEqFanCoil = true;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -167,7 +167,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
 
     DataSizing::ZoneEqSizing(1).OAVolFlow = 0.05;
     // Test 4 - Zone Equipment, Other Equipment
-    DataSizing::ZoneEqFanCoil = false;
+    state->dataSize->ZoneEqFanCoil = false;
     // start with an auto-sized value as the user input, OA flow > 0
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -195,8 +195,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.0;
 
     // Test 6 - Zone Equipment, Other Equipment
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SystemAirFlow = true;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).AirVolFlow = 0.3;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = true;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.3;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -209,10 +209,10 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 7 - Zone Equipment, Other Equipment
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SystemAirFlow = false;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).AirVolFlow = 0.0;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).HeatingAirFlow = true;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).HeatingAirVolFlow = 0.4;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = false;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow = true;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 0.4;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -225,8 +225,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 8 - Zone Equipment, Other Equipment
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).HeatingAirFlow = false;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).HeatingAirVolFlow = 0.0;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow = false;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 0.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -239,7 +239,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 9 - Zone Equipment, Other Equipment, heating sizing ratio = 0.5
-    DataSizing::DataHeatSizeRatio = 0.5;
+    state->dataSize->DataHeatSizeRatio = 0.5;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing

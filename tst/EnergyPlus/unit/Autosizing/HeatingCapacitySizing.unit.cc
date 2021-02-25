@@ -105,9 +105,9 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     errorsFound = false;
 
     // ZONE EQUIPMENT TESTING
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::CurTermUnitSizingNum = 1;
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitSingDuct = true;
 
     // Test #1 - Zone Equipment, no autosizing
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -121,7 +121,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     has_eio_output(true);
     printFlag = true;
 
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     DataSizing::ZoneSizingInput.allocate(1);
     DataSizing::ZoneSizingInput(1).ZoneNum = 1;
 
@@ -165,11 +165,11 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.007;
 
     state->dataPlnt->PlantLoop.allocate(1);
-    DataSizing::DataWaterLoopNum = 1;
-    DataSizing::DataWaterCoilSizHeatDeltaT = 5.0;
+    state->dataSize->DataWaterLoopNum = 1;
+    state->dataSize->DataWaterCoilSizHeatDeltaT = 5.0;
 
     // Test 2 - Zone Equipment, Single Duct TU
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->TermUnitSingDuct = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -184,8 +184,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 3 - Zone Equipment, Zone Eq Fan Coil
-    DataSizing::TermUnitSingDuct = false;
-    DataSizing::ZoneEqFanCoil = true;
+    state->dataSize->TermUnitSingDuct = false;
+    state->dataSize->ZoneEqFanCoil = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -198,8 +198,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 4 - Zone DX Equipment
-    DataSizing::ZoneEqFanCoil = false;
-    DataSizing::DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesHeatMassFlow / state->dataEnvrn->StdRhoAir;
+    state->dataSize->ZoneEqFanCoil = false;
+    state->dataSize->DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesHeatMassFlow / state->dataEnvrn->StdRhoAir;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -213,7 +213,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Zone Equipment, Terminal Induction Unit
-    DataSizing::TermUnitIU = true;
+    state->dataSize->TermUnitIU = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -226,7 +226,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment
-    DataSizing::TermUnitIU = false;
+    state->dataSize->TermUnitIU = false;
     DataSizing::ZoneEqSizing(1).OAVolFlow = 0.05;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -242,7 +242,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 7 - Zone DX Equipment, inlet side AT Mixer
     DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.03;
-    DataSizing::ZoneEqDXCoil = true;
+    state->dataSize->ZoneEqDXCoil = true;
     // start with an auto-sized value as the user input, AT Mixer present
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -271,7 +271,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 9 - Zone Equipment, powered induction unit
-    DataSizing::TermUnitPIU = true;
+    state->dataSize->TermUnitPIU = true;
     DataSizing::TermUnitSizing(1).MinFlowFrac = 0.3;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -301,7 +301,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).OAVolFlow = 0.0;
 
     // Test 11 - Zone Equipment, powered induction unit
-    DataSizing::DataCoolCoilCap = 4250.0; // overrides capacity
+    state->dataSize->DataCoolCoilCap = 4250.0; // overrides capacity
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -313,7 +313,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4250.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0;        // reset for next test
-    DataSizing::DataCoolCoilCap = 0.0; // reset for next test
+    state->dataSize->DataCoolCoilCap = 0.0; // reset for next test
 
     DataSizing::ZoneEqSizing(1).HeatingCapacity = true;
     // Test 12 - Zone Equipment, parent set heating capacity
@@ -331,8 +331,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(1).HeatingCapacity = false;
 
     // Test 13 - Zone Equipment, parent sets constant and fraction used for sizing
-    DataSizing::DataConstantUsedForSizing = 2800.0;
-    DataSizing::DataFractionUsedForSizing = 1.0;
+    state->dataSize->DataConstantUsedForSizing = 2800.0;
+    state->dataSize->DataFractionUsedForSizing = 1.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -344,12 +344,12 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(2800.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::DataConstantUsedForSizing = 0.0;
-    DataSizing::DataFractionUsedForSizing = 0.0;
+    state->dataSize->DataConstantUsedForSizing = 0.0;
+    state->dataSize->DataFractionUsedForSizing = 0.0;
 
     // Test 14 - Zone Equipment, EMS override
-    DataSizing::DataEMSOverrideON = true;
-    DataSizing::DataEMSOverride = 1500.0;
+    state->dataSize->DataEMSOverrideON = true;
+    state->dataSize->DataEMSOverride = 1500.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -361,8 +361,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(1500.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::DataEMSOverrideON = false;
-    DataSizing::DataEMSOverride = 0.0;
+    state->dataSize->DataEMSOverrideON = false;
+    state->dataSize->DataEMSOverride = 0.0;
 
     // reset eio stream
     has_eio_output(true);
@@ -389,16 +389,16 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // AIRLOOP Equipment
     // Test 16 - Airloop Equipment, hard size, no sizing run
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::NumZoneSizingInput = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     DataSizing::ZoneEqSizing.deallocate();
     DataSizing::FinalZoneSizing.deallocate();
 
-    DataSizing::CurSysNum = 1;
+    state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizingRunDone = false;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizingRunDone = false;
     // start with a hard-sized value as the user input, no system sizing arrays
     inputValue = 2700.8;
     // do sizing
@@ -412,7 +412,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;              // reset for next test
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    DataSizing::SysSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     DataSizing::UnitarySysEqSizing.allocate(1);
@@ -490,9 +490,9 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 21 - Airloop Equipment, desiccant heating coil
     DataSizing::UnitarySysEqSizing(1).HeatingCapacity = false;
-    DataSizing::DataDesicRegCoil = true;
-    DataSizing::DataDesOutletAirTemp = 32.0;
-    DataSizing::DataDesInletAirTemp = 5.0;
+    state->dataSize->DataDesicRegCoil = true;
+    state->dataSize->DataDesOutletAirTemp = 32.0;
+    state->dataSize->DataDesInletAirTemp = 5.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -503,10 +503,10 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(5426.24, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::DataDesicRegCoil = false;
+    state->dataSize->DataDesicRegCoil = false;
 
     // Test 22 - Airloop Equipment, unitary system sets air flow
-    DataSizing::DataFlowUsedForSizing = 0.0;
+    state->dataSize->DataFlowUsedForSizing = 0.0;
     DataSizing::UnitarySysEqSizing(1).AirFlow = true;
     DataSizing::UnitarySysEqSizing(1).AirVolFlow = 0.15;
     // start with an autosized value
@@ -537,7 +537,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::UnitarySysEqSizing(1).HeatingAirFlow = false;
 
     // Test 24 - Airloop Equipment, CurDuctType = Main
-    DataSizing::CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->CurDuctType = DataHVACGlobals::Main;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -563,7 +563,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 26 - Airloop Equipment, CurDuctType = Cooling
-    DataSizing::CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
     DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -590,7 +590,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 28 - Airloop Equipment, CurDuctType = Heating
-    DataSizing::CurDuctType = DataHVACGlobals::Heating;
+    state->dataSize->CurDuctType = DataHVACGlobals::Heating;
     DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -604,7 +604,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 29 - Airloop Equipment, CurDuctType = Other
-    DataSizing::CurDuctType = DataHVACGlobals::Other;
+    state->dataSize->CurDuctType = DataHVACGlobals::Other;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -617,7 +617,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 30 - Airloop Equipment, CurDuctType = RAB
-    DataSizing::CurDuctType = DataHVACGlobals::RAB;
+    state->dataSize->CurDuctType = DataHVACGlobals::RAB;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -632,8 +632,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     // Test 31 - Airloop Equipment, CurDuctType = Main, Unitary system does not set size for HW coils
     // even when AirLoopControlInfo(1).UnitarySysSimulating = true
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
-    DataSizing::UnitaryHeatCap = 4790.0;
-    DataSizing::CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->UnitaryHeatCap = 4790.0;
+    state->dataSize->CurDuctType = DataHVACGlobals::Main;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -659,8 +659,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 33 - Airloop Equipment, CurDuctType = Main, Unitary system has supp heating coil
-    DataSizing::DataCoilIsSuppHeater = true;
-    DataSizing::SuppHeatCap = 5325.0;
+    state->dataSize->DataCoilIsSuppHeater = true;
+    state->dataSize->SuppHeatCap = 5325.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -671,11 +671,11 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(5325.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::DataCoilIsSuppHeater = false;
-    DataSizing::SuppHeatCap = 0.0;
+    state->dataSize->DataCoilIsSuppHeater = false;
+    state->dataSize->SuppHeatCap = 0.0;
 
     // Test 34 - Airloop Equipment, CurDuctType = Main, Unitary system sets heat coil to same size as cool coil
-    DataSizing::DataCoolCoilCap = 4325.0;
+    state->dataSize->DataCoolCoilCap = 4325.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -686,7 +686,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(4325.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::DataCoolCoilCap = 0.0;
+    state->dataSize->DataCoolCoilCap = 0.0;
 
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = false;
 
@@ -721,7 +721,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::FinalSysSizing(1).HeatingTotalCapacity = 0.0;
 
     // Test 37 - OA Equipment, OA Sys capacity sizing
-    DataSizing::CurOASysNum = 1;
+    state->dataSize->CurOASysNum = 1;
     state->dataAirLoop->OutsideAirSys.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
     // start with an autosized value
@@ -782,9 +782,9 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::OASysEqSizing(1).DesHeatingLoad = 0.0;
 
     // Test 41 - OA Equipment, desiccant heating coil
-    DataSizing::DataDesicRegCoil = true;
-    DataSizing::DataDesOutletAirTemp = 38.0;
-    DataSizing::DataDesInletAirTemp = 5.0;
+    state->dataSize->DataDesicRegCoil = true;
+    state->dataSize->DataDesOutletAirTemp = 38.0;
+    state->dataSize->DataDesInletAirTemp = 5.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -795,7 +795,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(795.85, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::DataDesicRegCoil = false;
+    state->dataSize->DataDesicRegCoil = false;
 
     // Test 42 - OA Equipment, DOAS Air loop
     DataSizing::OASysEqSizing(1).HeatingAirFlow = false;

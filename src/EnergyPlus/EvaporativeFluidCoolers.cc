@@ -1053,7 +1053,7 @@ namespace EvaporativeFluidCoolers {
 
             this->setupOutputVars(state);
 
-            this->FluidIndex = state.dataPlnt->PlantLoop(DataSizing::CurLoopNum).FluidIndex;
+            this->FluidIndex = state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).FluidIndex;
             std::string FluidName = FluidProperties::GetGlycolNameByIndex(this->FluidIndex);
 
             if (UtilityRoutines::SameString(this->PerformanceInputMethod, "STANDARDDESIGNCAPACITY")) {
@@ -1062,7 +1062,7 @@ namespace EvaporativeFluidCoolers {
                     ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + " = \"" + this->Name +
                                     R"(". StandardDesignCapacity performance input method is only valid for fluid type = "Water".)");
                     ShowContinueError(state, "Currently, Fluid Type = " + FluidName +
-                                      " in CondenserLoop = " + state.dataPlnt->PlantLoop(DataSizing::CurLoopNum).Name);
+                                      " in CondenserLoop = " + state.dataPlnt->PlantLoop(state.dataSize->CurLoopNum).Name);
                     ErrorsFound = true;
                 }
             }
@@ -1318,7 +1318,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNodeNum, tmpDesignWaterFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNodeNum, tmpDesignWaterFlowRate);
 
         if (this->HighSpeedFanPowerWasAutoSized) {
             // We assume the nominal fan power is 0.0105 times the design load

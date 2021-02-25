@@ -1125,18 +1125,18 @@ namespace EvaporativeCoolers {
         PadDepthDes = 0.0;
         PadDepthUser = 0.0;
 
-        if (SysSizingRunDone || ZoneSizingRunDone) {
+        if (state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone) {
             HardSizeNoDesRun = false;
         } else {
             HardSizeNoDesRun = true;
         }
-        if (CurSysNum > 0) {
-            CheckThisAirSystemForSizing(CurSysNum, SizingDesRunThisAirSys);
+        if (state.dataSize->CurSysNum > 0) {
+            CheckThisAirSystemForSizing(state, state.dataSize->CurSysNum, SizingDesRunThisAirSys);
         } else {
             SizingDesRunThisAirSys = false;
         }
-        if (CurZoneEqNum > 0) {
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
         } else {
             SizingDesRunThisZone = false;
         }
@@ -1160,13 +1160,13 @@ namespace EvaporativeCoolers {
         }
 
         // Search once for the object on an air system
-        if (CurSysNum > 0) { // central system
+        if (state.dataSize->CurSysNum > 0) { // central system
             // where is this cooler located, is it on OA system or main loop?
             // search for this component in Air loop branches.
-            for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-                for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
+            for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumBranches; ++AirSysBranchLoop) {
+                for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
 
-                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                    if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
                                                     EvapCond(EvapCoolNum).EvapCoolerName)) {
                         CoolerOnMainAirLoop = true;
                     }
@@ -1180,10 +1180,10 @@ namespace EvaporativeCoolers {
         if (EvapCond(EvapCoolNum).IndirectVolFlowRate == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
+        if (state.dataSize->CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
             HardSizeNoDesRun = true;
         }
-        if (CurSysNum > 0) { // central system
+        if (state.dataSize->CurSysNum > 0) { // central system
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 if (EvapCond(EvapCoolNum).IndirectVolFlowRate > 0.0) {
                     if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectCELDEKPAD ||
@@ -1198,16 +1198,16 @@ namespace EvaporativeCoolers {
             } else { // Autosize or hardsize with design data
                 CheckSysSizing(state, CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                 if (CoolerOnMainAirLoop) {
-                    IndirectVolFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                    IndirectVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else if (CoolerOnOApath) {
-                    IndirectVolFlowRateDes = max(FinalSysSizing(CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(CurSysNum).DesMainVolFlow);
+                    IndirectVolFlowRateDes = max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                 }
                 // apply scaling factor the secondary air fan flow rate
                 if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
                     IndirectVolFlowRateDes = IndirectVolFlowRateDes * EvapCond(EvapCoolNum).IndirectVolFlowScalingFactor;
                 }
             }
-        } else if (CurZoneEqNum > 0) { // zone equipment
+        } else if (state.dataSize->CurZoneEqNum > 0) { // zone equipment
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 if (EvapCond(EvapCoolNum).IndirectVolFlowRate > 0.0) {
                     // report for the indirect evap cooler types only
@@ -1222,7 +1222,7 @@ namespace EvaporativeCoolers {
                 }
             } else { // Autosize or hardsize with design data
                 // zone equip evap coolers
-                IndirectVolFlowRateDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                IndirectVolFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 // apply scaling factor the secondary air fan flow rate
                 if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
                     IndirectVolFlowRateDes = IndirectVolFlowRateDes * EvapCond(EvapCoolNum).IndirectVolFlowScalingFactor;
@@ -1252,7 +1252,7 @@ namespace EvaporativeCoolers {
                                                  "User-Specified Secondary Fan Flow Rate [m3/s]",
                                                  IndirectVolFlowRateUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(IndirectVolFlowRateDes - IndirectVolFlowRateUser) / IndirectVolFlowRateUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(IndirectVolFlowRateDes - IndirectVolFlowRateUser) / IndirectVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeEvaporativeCooler:Indirect:ResearchSpecial: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, format("User-Specified Secondary Fan Flow Rate of {:.5R} [m3/s]", IndirectVolFlowRateUser));
@@ -1271,10 +1271,10 @@ namespace EvaporativeCoolers {
         if (EvapCond(EvapCoolNum).DesVolFlowRate == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
+        if (state.dataSize->CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
             HardSizeNoDesRun = true;
         }
-        if (CurSysNum > 0) { // central system
+        if (state.dataSize->CurSysNum > 0) { // central system
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 // the .VolFlowRate variable wasn't reported to the eio in develop, so not doing it here
                 // if ( EvapCond( EvapCoolNum ).VolFlowRate > 0.0 ) {
@@ -1284,13 +1284,13 @@ namespace EvaporativeCoolers {
             } else { // Autosize or hardsize with design data
                 CheckSysSizing(state, CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                 if (CoolerOnMainAirLoop) {
-                    volFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                    volFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else if (CoolerOnOApath) {
-                    volFlowRateDes = max(FinalSysSizing(CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(CurSysNum).DesMainVolFlow);
+                    volFlowRateDes = max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                 }
                 // no scaling factor on the volFlowRate in develop, so not doing it here
             }
-        } else if (CurZoneEqNum > 0) { // zone equipment
+        } else if (state.dataSize->CurZoneEqNum > 0) { // zone equipment
             // zone equip evap coolers
 
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
@@ -1300,7 +1300,7 @@ namespace EvaporativeCoolers {
                 //"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
                 //}
             } else { // Autosize or hardsize with design data
-                volFlowRateDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                volFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
             }
 
         } else { // zone equipment
@@ -1351,12 +1351,12 @@ namespace EvaporativeCoolers {
             if (EvapCond(EvapCoolNum).PadArea == AutoSize) {
                 IsAutoSize = true;
             }
-            if (CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
+            if (state.dataSize->CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
             }
             if (SizingDesRunThisAirSys) HardSizeNoDesRun = false; // Check if design infomation is available
             // Design air flow rate
-            if (CurSysNum > 0) { // central system
+            if (state.dataSize->CurSysNum > 0) { // central system
                 if (!IsAutoSize && !SizingDesRunThisAirSys) {
                     HardSizeNoDesRun = true;
                     if (EvapCond(EvapCoolNum).PadArea > 0.0) {
@@ -1368,15 +1368,15 @@ namespace EvaporativeCoolers {
                 } else { // Autosize or hardsize with design data
                     CheckSysSizing(state, CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                     if (CoolerOnMainAirLoop) {
-                        IndirectVolFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                        IndirectVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     } else if (CoolerOnOApath) {
                         IndirectVolFlowRateDes =
-                            std::max(FinalSysSizing(CurSysNum).DesOutAirVolFlow, 0.50 * FinalSysSizing(CurSysNum).DesMainVolFlow);
+                            std::max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.50 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                     }
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
                 }
-            } else if (CurZoneEqNum > 0) { // zone equipment
+            } else if (state.dataSize->CurZoneEqNum > 0) { // zone equipment
                 // zone equip evap coolers
                 if (!IsAutoSize && !SizingDesRunThisAirSys) {
                     HardSizeNoDesRun = true;
@@ -1391,7 +1391,7 @@ namespace EvaporativeCoolers {
                     }
                 } else { // Autosize or hardsize with design data
                     // zone equip evap coolers
-                    IndirectVolFlowRateDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                    IndirectVolFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
                 }
@@ -1413,7 +1413,7 @@ namespace EvaporativeCoolers {
                                                      "User-Specified Celdek Pad Area [m2]",
                                                      PadAreaUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                             EvapCond(EvapCoolNum).EvapCoolerName);
                                 ShowContinueError(state, format("User-Specified Celdek Pad Area of{:.2R} [m2]", PadAreaUser));
@@ -1430,7 +1430,7 @@ namespace EvaporativeCoolers {
             if (EvapCond(EvapCoolNum).PadDepth == AutoSize) {
                 IsAutoSize = true;
             }
-            if (CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
+            if (state.dataSize->CurSysNum > 0 && !IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
             }
             // The following regression equation is used to determine pad depth,
@@ -1452,7 +1452,7 @@ namespace EvaporativeCoolers {
                                                  "User-Specified Celdek Pad Depth [m]",
                                                  PadDepthUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeEvaporativeCooler:Direct:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, format("User-Specified Celdek Pad Depth of{:.2R} [m]", PadDepthUser));
@@ -1475,12 +1475,12 @@ namespace EvaporativeCoolers {
                 HardSizeNoDesRun = false; // Check if design infomation is available
             }
             // Design air flow rate
-            if (CurSysNum > 0) { // central system
+            if (state.dataSize->CurSysNum > 0) { // central system
                 // where is this cooler located, is it on OA system or main loop?
                 // search for this component in Air loop branches.
-                for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumBranches; ++AirSysBranchLoop) {
-                    for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
-                        if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
+                for (AirSysBranchLoop = 1; AirSysBranchLoop <= state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumBranches; ++AirSysBranchLoop) {
+                    for (BranchComp = 1; BranchComp <= state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).Branch(AirSysBranchLoop).TotalComponents; ++BranchComp) {
+                        if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).Branch(AirSysBranchLoop).Comp(BranchComp).Name,
                                                         EvapCond(EvapCoolNum).EvapCoolerName)) {
                             CoolerOnMainAirLoop = true;
                         }
@@ -1500,14 +1500,14 @@ namespace EvaporativeCoolers {
                         CoolerOnOApath = true;
                     }
                     if (CoolerOnMainAirLoop) {
-                        IndirectVolFlowRateDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                        IndirectVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     } else if (CoolerOnOApath) {
-                        IndirectVolFlowRateDes = std::max(FinalSysSizing(CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(CurSysNum).DesMainVolFlow);
+                        IndirectVolFlowRateDes = std::max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                     }
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
                 }
-            } else if (CurZoneEqNum > 0) { // zone equipment
+            } else if (state.dataSize->CurZoneEqNum > 0) { // zone equipment
                 // zone equip evap coolers
                 if (!IsAutoSize && !SizingDesRunThisAirSys) {
                     HardSizeNoDesRun = true;
@@ -1522,7 +1522,7 @@ namespace EvaporativeCoolers {
                     }
                 } else { // Autosize or hardsize with design data
                     // zone equip evap coolers
-                    IndirectVolFlowRateDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                    IndirectVolFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
                 }
@@ -1544,7 +1544,7 @@ namespace EvaporativeCoolers {
                                                      "User-Specified Celdek Pad Area [m2]",
                                                      PadAreaUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(PadAreaDes - PadAreaUser) / PadAreaUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                             EvapCond(EvapCoolNum).EvapCoolerName);
                                 ShowContinueError(state, format("User-Specified Celdek Pad Area {:.2R} [m2]", PadAreaUser));
@@ -1581,7 +1581,7 @@ namespace EvaporativeCoolers {
                                                  "User-Specified Celdek Pad Depth [m]",
                                                  PadDepthUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(PadDepthDes - PadDepthUser) / PadDepthUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeEvaporativeCooler:Indirect:CelDekPad: Potential issue with equipment sizing for " +
                                         EvapCond(EvapCoolNum).EvapCoolerName);
                             ShowContinueError(state, format("User-Specified Celdek Pad Depth of{:.2R} [m]", PadDepthUser));
@@ -4202,35 +4202,14 @@ namespace EvaporativeCoolers {
         //       MODIFIED       January 2013 Daeho Kang, add component sizing table entries
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataSizing::AutoSize;
-        using DataSizing::AutoVsHardSizingThreshold;
-        using DataSizing::CurZoneEqNum;
         using DataSizing::FinalZoneSizing;
-        using DataSizing::ZoneSizingRunDone;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string CompName;     // component name
@@ -4244,44 +4223,44 @@ namespace EvaporativeCoolers {
         int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
                                   // FractionOfAutosizedHeatingAirflow ...)
 
-        DataScalableSizingON = false;
-        ZoneHeatingOnlyFan = false;
-        ZoneCoolingOnlyFan = false;
+        state.dataSize->DataScalableSizingON = false;
+        state.dataSize->ZoneHeatingOnlyFan = false;
+        state.dataSize->ZoneCoolingOnlyFan = false;
 
         CompType = "ZoneHVAC:EvaporativeCoolerUnit";
         CompName = ZoneEvapUnit(UnitNum).Name;
-        DataZoneNumber = ZoneEvapUnit(UnitNum).ZonePtr;
+        state.dataSize->DataZoneNumber = ZoneEvapUnit(UnitNum).ZonePtr;
         PrintFlag = true;
         bool errorsFound = false;
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {
-                ZoneCoolingOnlyFan = true;
+                state.dataSize->ZoneCoolingOnlyFan = true;
                 zoneHVACIndex = ZoneEvapUnit(UnitNum).HVACSizingIndex;
                 SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
                 SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                     SAFMethod == FractionOfAutosizedCoolingAirflow) {
                     if (SAFMethod == SupplyAirFlowRate) {
                         if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                            ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         }
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
                             PrintFlag = false;
                         }
                     } else if (SAFMethod == FlowPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                        DataScalableSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                        DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        state.dataSize->DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         TempSize = AutoSize;
-                        DataScalableSizingON = true;
+                        state.dataSize->DataScalableSizingON = true;
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
@@ -4297,16 +4276,16 @@ namespace EvaporativeCoolers {
                     SizingMethod = CoolingCapacitySizing;
                     TempSize = AutoSize;
                     PrintFlag = false;
-                    DataScalableSizingON = true;
-                    DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
+                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                        DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                        state.dataSize->DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                    state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                    state.dataSize->DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
 
@@ -4317,13 +4296,13 @@ namespace EvaporativeCoolers {
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                 }
-                DataScalableSizingON = false;
-                ZoneCoolingOnlyFan = false;
+                state.dataSize->DataScalableSizingON = false;
+                state.dataSize->ZoneCoolingOnlyFan = false;
             } else {
                 // no scalble sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
                 // N1 , \field Maximum Supply Air Flow Rate
-                ZoneCoolingOnlyFan = true;
+                state.dataSize->ZoneCoolingOnlyFan = true;
                 if (ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate > 0.0) {
                     PrintFlag = false;
                 }
@@ -4334,7 +4313,7 @@ namespace EvaporativeCoolers {
                 sizingCoolingAirFlow.overrideSizingString(stringOverride);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-                ZoneCoolingOnlyFan = false;
+                state.dataSize->ZoneCoolingOnlyFan = false;
             }
         }
     }

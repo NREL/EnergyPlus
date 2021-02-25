@@ -167,8 +167,8 @@ namespace EnergyPlus::SizingManager {
 
 
         TimeStepInDay = 0;
-        SysSizingRunDone = false;
-        ZoneSizingRunDone = false;
+        state.dataSize->SysSizingRunDone = false;
+        state.dataSize->ZoneSizingRunDone = false;
         curName = "Unknown";
         GetOARequirements(state);          // get the OA requirements object
         GetZoneAirDistribution(state);     // get zone air distribution objects
@@ -181,7 +181,7 @@ namespace EnergyPlus::SizingManager {
 
         // okay, check sizing inputs vs desires vs requirements
         if (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing) {
-            if ((NumSysSizInput > 0 && NumZoneSizingInput == 0) || (!state.dataGlobal->DoZoneSizing && state.dataGlobal->DoSystemSizing && NumSysSizInput > 0)) {
+            if ((state.dataSize->NumSysSizInput > 0 && state.dataSize->NumZoneSizingInput == 0) || (!state.dataGlobal->DoZoneSizing && state.dataGlobal->DoSystemSizing && state.dataSize->NumSysSizInput > 0)) {
                 ShowSevereError(state, RoutineName + "Requested System Sizing but did not request Zone Sizing.");
                 ShowContinueError(state, "System Sizing cannot be done without Zone Sizing");
                 ShowFatalError(state, "Program terminates for preceding conditions.");
@@ -193,7 +193,7 @@ namespace EnergyPlus::SizingManager {
         isUserReqCompLoadReport = isCompLoadRepReq(state); // check getinput structure if load component report is requested
         bool fileHasSizingPeriodDays =
             hasSizingPeriodsDays(state); // check getinput if SizingPeriod:DesignDays or SizingPeriod:WeatherFileDays are present
-        if (state.dataGlobal->DoZoneSizing && (NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
+        if (state.dataGlobal->DoZoneSizing && (state.dataSize->NumZoneSizingInput > 0) && fileHasSizingPeriodDays) {
             state.dataGlobal->CompLoadReportIsReq = isUserReqCompLoadReport;
         } else { // produce a warning if the user asked for the report but it will not be generated because sizing is not done
             if (isUserReqCompLoadReport) {
@@ -213,13 +213,13 @@ namespace EnergyPlus::SizingManager {
             numZoneSizeIter = 1;
         }
 
-        if ((state.dataGlobal->DoZoneSizing) && (NumZoneSizingInput == 0)) {
+        if ((state.dataGlobal->DoZoneSizing) && (state.dataSize->NumZoneSizingInput == 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a zone sizing run, there must be at least 1 Sizing:Zone input object. SimulationControl Zone Sizing option ignored.");
         }
 
-        if ((NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
+        if ((state.dataSize->NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
 
             if (state.dataGlobal->DoDesDaySim || state.dataGlobal->DoWeathSim) {
                 state.dataGlobal->DoOutputReporting = false;
@@ -228,9 +228,9 @@ namespace EnergyPlus::SizingManager {
             state.dataGlobal->ZoneSizingCalc = true;
             Available = true;
 
-            if (SizingFileColSep == CharComma) {
+            if (state.dataSize->SizingFileColSep == CharComma) {
                 state.files.zsz.fileName = state.files.outputZszCsvFileName;
-            } else if (SizingFileColSep == CharTab) {
+            } else if (state.dataSize->SizingFileColSep == CharTab) {
                 state.files.zsz.fileName = state.files.outputZszTabFileName;
             } else {
                 state.files.zsz.fileName = state.files.outputZszTxtFileName;
@@ -258,7 +258,7 @@ namespace EnergyPlus::SizingManager {
                 Available = true;
 
                 ResetEnvironmentCounter(state);
-                CurOverallSimDay = 0;
+                state.dataSize->CurOverallSimDay = 0;
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
 
@@ -288,13 +288,13 @@ namespace EnergyPlus::SizingManager {
                     state.dataGlobal->WarmupFlag = true;
                     state.dataGlobal->DayOfSim = 0;
                     state.dataGlobal->DayOfSimChr = "0";
-                    CurEnvirNumSimDay = 1;
-                    ++CurOverallSimDay;
+                    state.dataSize->CurEnvirNumSimDay = 1;
+                    ++state.dataSize->CurOverallSimDay;
                     while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
                         ++state.dataGlobal->DayOfSim;
                         if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim > 1) {
-                            ++CurEnvirNumSimDay;
+                            ++state.dataSize->CurEnvirNumSimDay;
                         }
 
                         state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
@@ -351,11 +351,11 @@ namespace EnergyPlus::SizingManager {
                                 if (!state.dataGlobal->WarmupFlag) {
                                     TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                                     if (state.dataGlobal->HourOfDay == 1 && state.dataGlobal->TimeStep == 1) {
-                                        DesDayWeath(CurOverallSimDay).DateString = fmt::format("{}/{}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
+                                        DesDayWeath(state.dataSize->CurOverallSimDay).DateString = fmt::format("{}/{}", state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth);
                                     }
-                                    DesDayWeath(CurOverallSimDay).Temp(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
-                                    DesDayWeath(CurOverallSimDay).HumRat(TimeStepInDay) = state.dataEnvrn->OutHumRat;
-                                    DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = state.dataEnvrn->OutBaroPress;
+                                    DesDayWeath(state.dataSize->CurOverallSimDay).Temp(TimeStepInDay) = state.dataEnvrn->OutDryBulbTemp;
+                                    DesDayWeath(state.dataSize->CurOverallSimDay).HumRat(TimeStepInDay) = state.dataEnvrn->OutHumRat;
+                                    DesDayWeath(state.dataSize->CurOverallSimDay).Press(TimeStepInDay) = state.dataEnvrn->OutBaroPress;
                                 }
 
                                 ManageHeatBalance(state);
@@ -377,7 +377,7 @@ namespace EnergyPlus::SizingManager {
                         }
 
                         if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn)) {
-                            ++CurOverallSimDay;
+                            ++state.dataSize->CurOverallSimDay;
                         }
 
                     } // ... End day loop.
@@ -390,7 +390,7 @@ namespace EnergyPlus::SizingManager {
                 if (NumSizingPeriodsPerformed > 0) {
                     UpdateZoneSizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::EndZoneSizingCalc);
-                    ZoneSizingRunDone = true;
+                    state.dataSize->ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(state, RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
                     ErrorsFound = true;
@@ -416,21 +416,21 @@ namespace EnergyPlus::SizingManager {
         state.dataEnvrn->Month = LastMonth;
         state.dataEnvrn->DayOfMonth = LastDayOfMonth;
 
-        if ((state.dataGlobal->DoSystemSizing) && (NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {
+        if ((state.dataGlobal->DoSystemSizing) && (state.dataSize->NumSysSizInput == 0) && (state.dataSizingManager->NumAirLoops > 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a system sizing run, there must be at least 1 Sizing:System object input. SimulationControl System Sizing option ignored.");
         }
 
-        if ((NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
+        if ((state.dataSize->NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
 
             ShowMessage(state, "Beginning System Sizing Calculations");
 
             state.dataGlobal->SysSizingCalc = true;
             Available = true;
-            if (SizingFileColSep == CharComma) {
+            if (state.dataSize->SizingFileColSep == CharComma) {
                 state.files.ssz.fileName = state.files.outputSszCsvFileName;
-            } else if (SizingFileColSep == CharTab) {
+            } else if (state.dataSize->SizingFileColSep == CharTab) {
                 state.files.ssz.fileName = state.files.outputSszTabFileName;
             } else {
                 state.files.ssz.fileName = state.files.outputSszTxtFileName;
@@ -445,8 +445,8 @@ namespace EnergyPlus::SizingManager {
             SizingManager::UpdateTermUnitFinalZoneSizing(state); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
             SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
             ResetEnvironmentCounter(state);
-            CurEnvirNumSimDay = 0;
-            CurOverallSimDay = 0;
+            state.dataSize->CurEnvirNumSimDay = 0;
+            state.dataSize->CurOverallSimDay = 0;
             NumSizingPeriodsPerformed = 0;
             while (Available) { // loop over environments
 
@@ -475,14 +475,14 @@ namespace EnergyPlus::SizingManager {
                 state.dataGlobal->WarmupFlag = false;
                 state.dataGlobal->DayOfSim = 0;
                 state.dataGlobal->DayOfSimChr = "0";
-                CurEnvirNumSimDay = 1;
-                ++CurOverallSimDay;
+                state.dataSize->CurEnvirNumSimDay = 1;
+                ++state.dataSize->CurOverallSimDay;
 
                 while ((state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn) || (state.dataGlobal->WarmupFlag)) { // Begin day loop ...
 
                     ++state.dataGlobal->DayOfSim;
                     if (!state.dataGlobal->WarmupFlag && state.dataGlobal->DayOfSim > 1) {
-                        ++CurEnvirNumSimDay;
+                        ++state.dataSize->CurEnvirNumSimDay;
                     }
                     state.dataGlobal->DayOfSimChr = fmt::to_string(state.dataGlobal->DayOfSim);
                     state.dataGlobal->BeginDayFlag = true;
@@ -539,7 +539,7 @@ namespace EnergyPlus::SizingManager {
                     if (state.dataGlobal->EndDayFlag) UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndDay);
 
                     if (!state.dataGlobal->WarmupFlag && (state.dataGlobal->DayOfSim > 0) && (state.dataGlobal->DayOfSim < state.dataGlobal->NumOfDayInEnvrn)) {
-                        ++CurOverallSimDay;
+                        ++state.dataSize->CurOverallSimDay;
                     }
 
                 } // ... End day loop.
@@ -548,12 +548,12 @@ namespace EnergyPlus::SizingManager {
 
             if (NumSizingPeriodsPerformed > 0) {
                 UpdateSysSizing(state, DataGlobalConstants::CallIndicator::EndSysSizingCalc);
-                SysSizingRunDone = true;
+                state.dataSize->SysSizingRunDone = true;
             } else {
                 ShowSevereError(state, RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");
                 ErrorsFound = true;
             }
-        } else if ((NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
+        } else if ((state.dataSize->NumZoneSizingInput > 0) && (state.dataGlobal->DoZoneSizing || state.dataGlobal->DoSystemSizing || state.dataGlobal->DoPlantSizing)) {
             // If zone sizing but no system sizing - still need to set up system zone equipment and transfer zone sizing data to
             // TermUnitFinalZoneSizing
             state.dataGlobal->SysSizingCalc = true; // set true here so equipment does not try to size yet
@@ -566,7 +566,7 @@ namespace EnergyPlus::SizingManager {
         state.dataGlobal->SysSizingCalc = false;
 
         // report sizing results to eio file
-        if (ZoneSizingRunDone) {
+        if (state.dataSize->ZoneSizingRunDone) {
             for (CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
                 ZoneNum = FinalZoneSizing(CtrlZoneNum).ActualZoneNum;
@@ -592,7 +592,7 @@ namespace EnergyPlus::SizingManager {
                                      CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
                                      FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
                                      FinalZoneSizing(CtrlZoneNum).CoolDesDay,
-                                     CoolPeakDateHrMin(CtrlZoneNum),
+                                     state.dataSize->CoolPeakDateHrMin(CtrlZoneNum),
                                      TempAtPeak,
                                      HumRatAtPeak,
                                      state.dataHeatBal->Zone(ZoneNum).FloorArea,
@@ -608,7 +608,7 @@ namespace EnergyPlus::SizingManager {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, FinalZoneSizing(CtrlZoneNum).CoolDesDay);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, CoolPeakDateHrMin(CtrlZoneNum));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, state.dataSize->CoolPeakDateHrMin(CtrlZoneNum));
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, TStatSetPtAtPk);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndHum, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak, 5);
@@ -655,7 +655,7 @@ namespace EnergyPlus::SizingManager {
                                      CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
                                      FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
                                      FinalZoneSizing(CtrlZoneNum).HeatDesDay,
-                                     HeatPeakDateHrMin(CtrlZoneNum),
+                                     state.dataSize->HeatPeakDateHrMin(CtrlZoneNum),
                                      TempAtPeak,
                                      HumRatAtPeak,
                                      state.dataHeatBal->Zone(ZoneNum).FloorArea,
@@ -671,7 +671,7 @@ namespace EnergyPlus::SizingManager {
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, FinalZoneSizing(CtrlZoneNum).HeatDesDay);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, HeatPeakDateHrMin(CtrlZoneNum));
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, state.dataSize->HeatPeakDateHrMin(CtrlZoneNum));
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak, 5);
@@ -701,7 +701,7 @@ namespace EnergyPlus::SizingManager {
             ZoneSizing.deallocate();
             // CalcZoneSizing.deallocate();
         }
-        if (SysSizingRunDone) {
+        if (state.dataSize->SysSizingRunDone) {
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
                 curName = FinalSysSizing(AirLoopNum).AirPriLoopName;
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizCalcClAir, curName, CalcSysSizing(AirLoopNum).DesCoolVolFlow);
@@ -785,13 +785,13 @@ namespace EnergyPlus::SizingManager {
             SysSizing.deallocate();
         }
 
-        if ((state.dataGlobal->DoPlantSizing) && (NumPltSizInput == 0)) {
+        if ((state.dataGlobal->DoPlantSizing) && (state.dataSize->NumPltSizInput == 0)) {
             ShowWarningError(state,
                 RoutineName +
                 "For a plant sizing run, there must be at least 1 Sizing:Plant object input. SimulationControl Plant Sizing option ignored.");
         }
 
-        if ((NumPltSizInput > 0) && (state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
+        if ((state.dataSize->NumPltSizInput > 0) && (state.dataGlobal->DoPlantSizing) && !ErrorsFound) {
 
             ShowMessage(state, "Beginning Plant Sizing Calculations");
         }
@@ -836,7 +836,7 @@ namespace EnergyPlus::SizingManager {
 
         // Also store zone level flow information for Standard 62.1 calculations, Vpz, Vpz_min, Vdz, and Vdz_min for both cooling and heating
 
-        if ((NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing)) { // only if there is system sizing
+        if ((state.dataSize->NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing)) { // only if there is system sizing
 
             // call zone component models to execute their component sizing routines
             bool t_SimZoneEquip(true);
@@ -2055,7 +2055,7 @@ namespace EnergyPlus::SizingManager {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:OutdoorAir";
-        NumOARequirements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataSize->NumOARequirements = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
@@ -2065,11 +2065,11 @@ namespace EnergyPlus::SizingManager {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        if (NumOARequirements > 0) {
-            OARequirements.allocate(NumOARequirements);
+        if (state.dataSize->NumOARequirements > 0) {
+            OARequirements.allocate(state.dataSize->NumOARequirements);
 
             // Start Loading the System Input
-            for (OAIndex = 1; OAIndex <= NumOARequirements; ++OAIndex) {
+            for (OAIndex = 1; OAIndex <= state.dataSize->NumOARequirements; ++OAIndex) {
 
                 inputProcessor->getObjectItem(state,
                                               CurrentModuleObject,
@@ -2323,7 +2323,7 @@ namespace EnergyPlus::SizingManager {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
-        NumZoneAirDistribution = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataSize->NumZoneAirDistribution = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
@@ -2333,11 +2333,11 @@ namespace EnergyPlus::SizingManager {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        if (NumZoneAirDistribution > 0) {
-            ZoneAirDistribution.allocate(NumZoneAirDistribution);
+        if (state.dataSize->NumZoneAirDistribution > 0) {
+            ZoneAirDistribution.allocate(state.dataSize->NumZoneAirDistribution);
 
             // Start Loading the zone air distribution input
-            for (ZADIndex = 1; ZADIndex <= NumZoneAirDistribution; ++ZADIndex) {
+            for (ZADIndex = 1; ZADIndex <= state.dataSize->NumZoneAirDistribution; ++ZADIndex) {
 
                 inputProcessor->getObjectItem(state, CurrentModuleObject,
                                               ZADIndex,
@@ -2462,34 +2462,34 @@ namespace EnergyPlus::SizingManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (lNumericFieldBlanks(1) || rNumericArgs(1) < 0.0) {
-                GlobalHeatSizingFactor = 1.0;
+                state.dataSize->GlobalHeatSizingFactor = 1.0;
             } else {
-                GlobalHeatSizingFactor = rNumericArgs(1);
+                state.dataSize->GlobalHeatSizingFactor = rNumericArgs(1);
             }
             if (lNumericFieldBlanks(2) || rNumericArgs(2) < 0.0) {
-                GlobalCoolSizingFactor = 1.0;
+                state.dataSize->GlobalCoolSizingFactor = 1.0;
             } else {
-                GlobalCoolSizingFactor = rNumericArgs(2);
+                state.dataSize->GlobalCoolSizingFactor = rNumericArgs(2);
             }
             if (lNumericFieldBlanks(3) || rNumericArgs(3) <= 0.0) {
-                NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
+                state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
             } else {
-                NumTimeStepsInAvg = int(rNumericArgs(3));
+                state.dataSize->NumTimeStepsInAvg = int(rNumericArgs(3));
             }
         } else if (NumSizParams == 0) {
-            GlobalHeatSizingFactor = 1.0;
-            GlobalCoolSizingFactor = 1.0;
-            NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
+            state.dataSize->GlobalHeatSizingFactor = 1.0;
+            state.dataSize->GlobalCoolSizingFactor = 1.0;
+            state.dataSize->NumTimeStepsInAvg = state.dataGlobal->NumOfTimeStepInHour;
         } else {
             ShowFatalError(state, cCurrentModuleObject + ": More than 1 occurrence of this object; only 1 allowed");
         }
 
-        if (NumTimeStepsInAvg < state.dataGlobal->NumOfTimeStepInHour) {
+        if (state.dataSize->NumTimeStepsInAvg < state.dataGlobal->NumOfTimeStepInHour) {
             ShowWarningError(state,
                              format("{}: note {} entered value=[{}] is less than 1 hour (i.e., {} timesteps).",
                                     cCurrentModuleObject,
                                     cNumericFieldNames(3),
-                                    NumTimeStepsInAvg,
+                                    state.dataSize->NumTimeStepsInAvg,
                                     state.dataGlobal->NumOfTimeStepInHour));
         }
 
@@ -2498,7 +2498,7 @@ namespace EnergyPlus::SizingManager {
 
         if (Temp == 0) {
             cAlphaArgs(1) = "Comma";
-            SizingFileColSep = CharComma; // comma
+            state.dataSize->SizingFileColSep = CharComma; // comma
         } else if (Temp == 1) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
@@ -2513,16 +2513,16 @@ namespace EnergyPlus::SizingManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (cAlphaArgs(1) == "COMMA") {
-                SizingFileColSep = CharComma; // comma
+                state.dataSize->SizingFileColSep = CharComma; // comma
                 cAlphaArgs(1) = "Comma";
             } else if (cAlphaArgs(1) == "TAB") {
-                SizingFileColSep = CharTab; // tab
+                state.dataSize->SizingFileColSep = CharTab; // tab
                 cAlphaArgs(1) = "Tab";
             } else if (cAlphaArgs(1) == "FIXED" || cAlphaArgs(1) == "SPACE") {
-                SizingFileColSep = CharSpace; // space
+                state.dataSize->SizingFileColSep = CharSpace; // space
                 cAlphaArgs(1) = "Space";
             } else {
-                SizingFileColSep = CharComma; // comma
+                state.dataSize->SizingFileColSep = CharComma; // comma
                 ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(1) + " entered value=\"" + cAlphaArgs(1) +
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
@@ -2601,7 +2601,7 @@ namespace EnergyPlus::SizingManager {
         }
 
         cCurrentModuleObject = "Sizing:Zone";
-        NumZoneSizingInput = 0;
+        state.dataSize->NumZoneSizingInput = 0;
         errFlag = false;
         for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
             inputProcessor->getObjectItem(state,
@@ -2624,14 +2624,14 @@ namespace EnergyPlus::SizingManager {
             ZLItem = 0;
             if (Item1 == 0 && NumZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(1), ZoneListNames);
             if (Item1 > 0) {
-                SizingZoneObjects(Item).StartPtr = NumZoneSizingInput + 1;
-                ++NumZoneSizingInput;
+                SizingZoneObjects(Item).StartPtr = state.dataSize->NumZoneSizingInput + 1;
+                ++state.dataSize->NumZoneSizingInput;
                 SizingZoneObjects(Item).NumOfZones = 1;
                 SizingZoneObjects(Item).ZoneListActive = false;
                 SizingZoneObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                SizingZoneObjects(Item).StartPtr = NumZoneSizingInput + 1;
-                NumZoneSizingInput += ZoneListNames(ZLItem).NumOfZones;
+                SizingZoneObjects(Item).StartPtr = state.dataSize->NumZoneSizingInput + 1;
+                state.dataSize->NumZoneSizingInput += ZoneListNames(ZLItem).NumOfZones;
                 SizingZoneObjects(Item).NumOfZones = ZoneListNames(ZLItem).NumOfZones;
                 SizingZoneObjects(Item).ZoneListActive = true;
                 SizingZoneObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -2645,10 +2645,10 @@ namespace EnergyPlus::SizingManager {
         if (errFlag) {
             ShowSevereError(state, "GetZoneSizingInput: Errors with invalid names in " + cCurrentModuleObject + " objects.");
             ShowContinueError(state, "...These will not be read in.  Other errors may occur.");
-            NumZoneSizingInput = 0;
+            state.dataSize->NumZoneSizingInput = 0;
         }
 
-        if (NumZoneSizingInput > 0) {
+        if (state.dataSize->NumZoneSizingInput > 0) {
             NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
@@ -2656,7 +2656,7 @@ namespace EnergyPlus::SizingManager {
                 ShowSevereError(state, "Zone Sizing calculations need SizingPeriod:* input. None found.");
                 ErrorsFound = true;
             }
-            ZoneSizingInput.allocate(NumZoneSizingInput);
+            ZoneSizingInput.allocate(state.dataSize->NumZoneSizingInput);
 
             ZoneSizIndex = 0;
             for (Item = 1; Item <= NumSizingZoneStatements; ++Item) {
@@ -2855,7 +2855,7 @@ namespace EnergyPlus::SizingManager {
                     //      \note if blank, global heating sizing factor from Sizing:Parameters is used.
                     //      \minimum> 0
                     if (lNumericFieldBlanks(7) || rNumericArgs(7) == 0.0) {
-                        ZoneSizingInput(ZoneSizIndex).HeatSizingFactor = GlobalHeatSizingFactor;
+                        ZoneSizingInput(ZoneSizIndex).HeatSizingFactor = state.dataSize->GlobalHeatSizingFactor;
                     } else if (rNumericArgs(7) < 0.0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                         ShowContinueError(
@@ -2868,7 +2868,7 @@ namespace EnergyPlus::SizingManager {
                     //      \note if blank, global cooling sizing factor from Sizing:Parameters is used.
                     //      \minimum> 0
                     if (lNumericFieldBlanks(8) || rNumericArgs(8) == 0.0) {
-                        ZoneSizingInput(ZoneSizIndex).CoolSizingFactor = GlobalCoolSizingFactor;
+                        ZoneSizingInput(ZoneSizIndex).CoolSizingFactor = state.dataSize->GlobalCoolSizingFactor;
                     } else if (rNumericArgs(8) < 0.0) {
                         ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                         ShowContinueError(
@@ -3286,9 +3286,9 @@ namespace EnergyPlus::SizingManager {
 
         state.dataSizingManager->NumAirLoops = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
         cCurrentModuleObject = "Sizing:System";
-        NumSysSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSize->NumSysSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumSysSizInput > 0) {
+        if (state.dataSize->NumSysSizInput > 0) {
             NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
@@ -3296,10 +3296,10 @@ namespace EnergyPlus::SizingManager {
                 ShowSevereError(state, "System Sizing calculations need SizingPeriod:* input. None found.");
                 ErrorsFound = true;
             }
-            SysSizInput.allocate(NumSysSizInput);
+            SysSizInput.allocate(state.dataSize->NumSysSizInput);
         }
 
-        for (SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex) {
+        for (SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           SysSizIndex,
@@ -3782,9 +3782,9 @@ namespace EnergyPlus::SizingManager {
         int NumDesDays;                 // Number of design days in input
 
         cCurrentModuleObject = "Sizing:Plant";
-        NumPltSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSize->NumPltSizInput = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
-        if (NumPltSizInput > 0) {
+        if (state.dataSize->NumPltSizInput > 0) {
             NumDesDays = inputProcessor->getNumObjectsFound(state, "SizingPeriod:DesignDay") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileDays") +
                          inputProcessor->getNumObjectsFound(state, "SizingPeriod:WeatherFileConditionType");
@@ -3792,7 +3792,7 @@ namespace EnergyPlus::SizingManager {
                 ShowSevereError(state, "Plant Sizing calculations need SizingPeriod:* input");
                 ErrorsFound = true;
             }
-            PlantSizData.allocate(NumPltSizInput);
+            PlantSizData.allocate(state.dataSize->NumPltSizInput);
             for (auto &e : PlantSizData) {
                 e.PlantLoopName.clear();
                 e.ExitTemp = 0.0;
@@ -3800,13 +3800,13 @@ namespace EnergyPlus::SizingManager {
                 e.LoopType = 0;
                 e.DesVolFlowRate = 0.0;
             }
-            for (int i = 1; i <= NumPltSizInput; ++i) {
+            for (int i = 1; i <= state.dataSize->NumPltSizInput; ++i) {
                 PlantSizData(i).ConcurrenceOption = NonCoincident;
                 PlantSizData(i).NumTimeStepsInAvg = 1;
             }
         }
 
-        for (PltSizIndex = 1; PltSizIndex <= NumPltSizInput; ++PltSizIndex) {
+        for (PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
             inputProcessor->getObjectItem(state,
                                           cCurrentModuleObject,
                                           PltSizIndex,
@@ -3906,7 +3906,7 @@ namespace EnergyPlus::SizingManager {
 
         bool Available = true;
 
-        CurOverallSimDay = 0;
+        state.dataSize->CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
             GetNextEnvironment(state, Available, ErrorsFound);
@@ -3925,8 +3925,8 @@ namespace EnergyPlus::SizingManager {
             state.dataGlobal->WarmupFlag = true;
             state.dataGlobal->DayOfSim = 0;
 
-            CurEnvirNumSimDay = 1;
-            ++CurOverallSimDay;
+            state.dataSize->CurEnvirNumSimDay = 1;
+            ++state.dataSize->CurOverallSimDay;
 
             ++state.dataGlobal->DayOfSim;
             state.dataGlobal->BeginDayFlag = true;
@@ -4132,7 +4132,6 @@ namespace EnergyPlus::SizingManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSizing::NumZoneHVACSizing;
         using DataSizing::ZoneHVACSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4211,7 +4210,7 @@ namespace EnergyPlus::SizingManager {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
-        NumZoneHVACSizing = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
+        state.dataSize->NumZoneHVACSizing = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         Alphas.allocate(NumAlphas);
@@ -4221,11 +4220,11 @@ namespace EnergyPlus::SizingManager {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
-        if (NumZoneHVACSizing > 0) {
-            ZoneHVACSizing.allocate(NumZoneHVACSizing);
+        if (state.dataSize->NumZoneHVACSizing > 0) {
+            ZoneHVACSizing.allocate(state.dataSize->NumZoneHVACSizing);
 
             // Start Loading the System Input
-            for (zSIndex = 1; zSIndex <= NumZoneHVACSizing; ++zSIndex) {
+            for (zSIndex = 1; zSIndex <= state.dataSize->NumZoneHVACSizing; ++zSIndex) {
 
                 Alphas = "";
                 cAlphaFields = "";
@@ -4768,14 +4767,14 @@ namespace EnergyPlus::SizingManager {
         bool ErrorsFound(false); // If errors detected in input
 
         cCurrentModuleObject = "DesignSpecification:AirTerminal:Sizing";
-        DataSizing::NumAirTerminalSizingSpec = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataSize->NumAirTerminalSizingSpec = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
-        if (DataSizing::NumAirTerminalSizingSpec > 0) {
-            AirTerminalSizingSpec.allocate(DataSizing::NumAirTerminalSizingSpec);
+        if (state.dataSize->NumAirTerminalSizingSpec > 0) {
+            AirTerminalSizingSpec.allocate(state.dataSize->NumAirTerminalSizingSpec);
 
             // Start Loading the System Input
-            for (int zSIndex = 1; zSIndex <= DataSizing::NumAirTerminalSizingSpec; ++zSIndex) {
+            for (int zSIndex = 1; zSIndex <= state.dataSize->NumAirTerminalSizingSpec; ++zSIndex) {
 
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
@@ -4863,8 +4862,8 @@ namespace EnergyPlus::SizingManager {
             CalcFinalFacilitySizing.HeatLoadSeq = 0.;
         }
         if (CallIndicator == DataGlobalConstants::CallIndicator::BeginDay) {
-            CalcFacilitySizing(CurOverallSimDay).HeatDDNum = CurOverallSimDay;
-            CalcFacilitySizing(CurOverallSimDay).CoolDDNum = CurOverallSimDay;
+            CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatDDNum = state.dataSize->CurOverallSimDay;
+            CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolDDNum = state.dataSize->CurOverallSimDay;
         } else if (CallIndicator == DataGlobalConstants::CallIndicator::DuringDay) {
             int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             // save the results of the ideal zone component calculation in the CalcZoneSizing sequence variables
@@ -4878,45 +4877,45 @@ namespace EnergyPlus::SizingManager {
             Real64 wghtdCoolDOASLatAdd = 0.;
             for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                Real64 curCoolLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolLoadSeq(TimeStepInDay);
+                Real64 curCoolLoad = CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolLoadSeq(TimeStepInDay);
                 if (curCoolLoad > 0.0) {
                     sumCoolLoad += curCoolLoad;
-                    wghtdCoolZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay) * curCoolLoad;
-                    wghtdCoolHumRat += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepInDay) * curCoolLoad;
-                    wghtdCoolDOASHeatAdd += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq(TimeStepInDay) * curCoolLoad;
-                    wghtdCoolDOASLatAdd += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdCoolZoneTemp += CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneTempSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdCoolHumRat += CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).CoolZoneHumRatSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdCoolDOASHeatAdd += CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASHeatAddSeq(TimeStepInDay) * curCoolLoad;
+                    wghtdCoolDOASLatAdd += CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).DOASLatAddSeq(TimeStepInDay) * curCoolLoad;
                 }
-                Real64 curHeatLoad = CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
+                Real64 curHeatLoad = CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatLoadSeq(TimeStepInDay);
                 if (curHeatLoad > 0.0) {
                     sumHeatLoad += curHeatLoad;
-                    wghtdHeatZoneTemp += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
-                    wghtdHeatHumRat += CalcZoneSizing(CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
+                    wghtdHeatZoneTemp += CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneTempSeq(TimeStepInDay) * curHeatLoad;
+                    wghtdHeatHumRat += CalcZoneSizing(state.dataSize->CurOverallSimDay, CtrlZoneNum).HeatZoneHumRatSeq(TimeStepInDay) * curHeatLoad;
                 }
             }
 
-            CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepInDay) = sumCoolLoad;
-            CalcFacilitySizing(CurOverallSimDay).HeatLoadSeq(TimeStepInDay) = sumHeatLoad;
+            CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolLoadSeq(TimeStepInDay) = sumCoolLoad;
+            CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatLoadSeq(TimeStepInDay) = sumHeatLoad;
 
             if (sumCoolLoad != 0.) {
-                CalcFacilitySizing(CurOverallSimDay).CoolZoneTempSeq(TimeStepInDay) = wghtdCoolZoneTemp / sumCoolLoad;
-                CalcFacilitySizing(CurOverallSimDay).CoolOutHumRatSeq(TimeStepInDay) = wghtdCoolHumRat / sumCoolLoad;
-                CalcFacilitySizing(CurOverallSimDay).DOASHeatAddSeq(TimeStepInDay) = wghtdCoolDOASHeatAdd / sumCoolLoad;
-                CalcFacilitySizing(CurOverallSimDay).DOASLatAddSeq(TimeStepInDay) = wghtdCoolDOASLatAdd / sumCoolLoad;
+                CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolZoneTempSeq(TimeStepInDay) = wghtdCoolZoneTemp / sumCoolLoad;
+                CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolOutHumRatSeq(TimeStepInDay) = wghtdCoolHumRat / sumCoolLoad;
+                CalcFacilitySizing(state.dataSize->CurOverallSimDay).DOASHeatAddSeq(TimeStepInDay) = wghtdCoolDOASHeatAdd / sumCoolLoad;
+                CalcFacilitySizing(state.dataSize->CurOverallSimDay).DOASLatAddSeq(TimeStepInDay) = wghtdCoolDOASLatAdd / sumCoolLoad;
             }
             if (sumHeatLoad != 0.) {
-                CalcFacilitySizing(CurOverallSimDay).HeatZoneTempSeq(TimeStepInDay) = wghtdHeatZoneTemp / sumHeatLoad;
-                CalcFacilitySizing(CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
+                CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatZoneTempSeq(TimeStepInDay) = wghtdHeatZoneTemp / sumHeatLoad;
+                CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatOutHumRatSeq(TimeStepInDay) = wghtdHeatHumRat / sumHeatLoad;
             }
 
         } else if (CallIndicator == DataGlobalConstants::CallIndicator::EndDay) {
             for (int TimeStepIndex = 1; TimeStepIndex <= NumOfTimeStepInDay; ++TimeStepIndex) {
-                if (CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex) > CalcFacilitySizing(CurOverallSimDay).DesCoolLoad) {
-                    CalcFacilitySizing(CurOverallSimDay).DesCoolLoad = CalcFacilitySizing(CurOverallSimDay).CoolLoadSeq(TimeStepIndex);
-                    CalcFacilitySizing(CurOverallSimDay).TimeStepNumAtCoolMax = TimeStepIndex;
+                if (CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolLoadSeq(TimeStepIndex) > CalcFacilitySizing(state.dataSize->CurOverallSimDay).DesCoolLoad) {
+                    CalcFacilitySizing(state.dataSize->CurOverallSimDay).DesCoolLoad = CalcFacilitySizing(state.dataSize->CurOverallSimDay).CoolLoadSeq(TimeStepIndex);
+                    CalcFacilitySizing(state.dataSize->CurOverallSimDay).TimeStepNumAtCoolMax = TimeStepIndex;
                 }
-                if (CalcFacilitySizing(CurOverallSimDay).HeatLoadSeq(TimeStepIndex) > CalcFacilitySizing(CurOverallSimDay).DesHeatLoad) {
-                    CalcFacilitySizing(CurOverallSimDay).DesHeatLoad = CalcFacilitySizing(CurOverallSimDay).HeatLoadSeq(TimeStepIndex);
-                    CalcFacilitySizing(CurOverallSimDay).TimeStepNumAtHeatMax = TimeStepIndex;
+                if (CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatLoadSeq(TimeStepIndex) > CalcFacilitySizing(state.dataSize->CurOverallSimDay).DesHeatLoad) {
+                    CalcFacilitySizing(state.dataSize->CurOverallSimDay).DesHeatLoad = CalcFacilitySizing(state.dataSize->CurOverallSimDay).HeatLoadSeq(TimeStepIndex);
+                    CalcFacilitySizing(state.dataSize->CurOverallSimDay).TimeStepNumAtHeatMax = TimeStepIndex;
                 }
             }
 
@@ -4954,7 +4953,7 @@ namespace EnergyPlus::SizingManager {
         // Called once to initialize before system sizing
         // M.J. Witte, July 2017
 
-        for (int termUnitSizingIndex = 1; termUnitSizingIndex <= DataSizing::NumAirTerminalUnits; ++termUnitSizingIndex) {
+        for (int termUnitSizingIndex = 1; termUnitSizingIndex <= state.dataSize->NumAirTerminalUnits; ++termUnitSizingIndex) {
             auto &thisTUFZSizing(TermUnitFinalZoneSizing(termUnitSizingIndex));
             auto &thisTUSizing(TermUnitSizing(termUnitSizingIndex));
             int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
@@ -4964,7 +4963,7 @@ namespace EnergyPlus::SizingManager {
             thisTUFZSizing = thisFZSizing;
             thisTUFZSizing.ADUName = thisTUSizing.ADUName;
 
-            if (DataSizing::NumAirTerminalSizingSpec > 0) {
+            if (state.dataSize->NumAirTerminalSizingSpec > 0) {
                 // Apply DesignSpecification:AirTerminal:Sizing adjustments - default ratios are 1.0
                 Real64 minOAFrac = thisTUSizing.SpecMinOAFrac;
                 // Outdoor air

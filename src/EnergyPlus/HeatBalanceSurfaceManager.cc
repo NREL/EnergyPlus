@@ -5255,7 +5255,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine puts the reporting part of the HBSurface Module in one area.
 
-        using DataSizing::CurOverallSimDay;
         using SolarShading::ReportSurfaceShading;
 
         SumSurfaceHeatEmission = 0.0;
@@ -5284,8 +5283,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                 if (state.dataGlobal->ZoneSizingCalc && state.dataGlobal->CompLoadReportIsReq) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                    state.dataOutRptTab->lightSWRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
-                    state.dataOutRptTab->feneSolarRadSeq(CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
+                    state.dataOutRptTab->lightSWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadLightsInRep(SurfNum);
+                    state.dataOutRptTab->feneSolarRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, SurfNum) = QdotRadSolarInRep(SurfNum);
                 }
             } else { // can we fill these for windows?
             }
@@ -6919,10 +6918,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 if (!state.dataGlobal->WarmupFlag) {
                     int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                     if (state.dataGlobal->isPulseZoneSizing) {
-                        state.dataOutRptTab->loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                        state.dataOutRptTab->loadConvectedWithPulse(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
                     } else {
-                        state.dataOutRptTab->loadConvectedNormal(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
-                        state.dataOutRptTab->netSurfRadSeq(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
+                        state.dataOutRptTab->loadConvectedNormal(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                        state.dataOutRptTab->netSurfRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
                                 SurfNetLWRadToSurf(surfNum) * state.dataSurface->Surface(surfNum).Area;
                     }
                 }
@@ -7606,11 +7605,11 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     if (!state.dataGlobal->WarmupFlag) {
                         int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
                         if (state.dataGlobal->isPulseZoneSizing) {
-                            state.dataOutRptTab->loadConvectedWithPulse(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
+                            state.dataOutRptTab->loadConvectedWithPulse(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
                                 QdotConvInRep(surfNum);
                         } else {
-                            state.dataOutRptTab->loadConvectedNormal(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
-                            state.dataOutRptTab->netSurfRadSeq(DataSizing::CurOverallSimDay, TimeStepInDay, surfNum) =
+                            state.dataOutRptTab->loadConvectedNormal(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) = QdotConvInRep(surfNum);
+                            state.dataOutRptTab->netSurfRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, surfNum) =
                                     SurfNetLWRadToSurf(surfNum) * state.dataSurface->Surface(surfNum).Area;
                         }
                     }
@@ -8220,17 +8219,15 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        using DataSizing::CurOverallSimDay;
-
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-                state.dataOutRptTab->TMULTseq(CurOverallSimDay, TimeStepInDay, enclosureNum) = state.dataHeatBal->TMULT(enclosureNum);
+                state.dataOutRptTab->TMULTseq(state.dataSize->CurOverallSimDay, TimeStepInDay, enclosureNum) = state.dataHeatBal->TMULT(enclosureNum);
             }
             for (int jSurf = 1; jSurf <= state.dataSurface->TotSurfaces; ++jSurf) {
                 if (!state.dataSurface->Surface(jSurf).HeatTransSurf || state.dataSurface->Surface(jSurf).Zone == 0) continue; // Skip non-heat transfer surfaces
                 if (state.dataSurface->Surface(jSurf).Class == SurfaceClass::TDD_Dome) continue;             // Skip tubular daylighting device domes
-                state.dataOutRptTab->ITABSFseq(CurOverallSimDay, TimeStepInDay, jSurf) = state.dataHeatBal->ITABSF(jSurf);
+                state.dataOutRptTab->ITABSFseq(state.dataSize->CurOverallSimDay, TimeStepInDay, jSurf) = state.dataHeatBal->ITABSF(jSurf);
             }
         }
     }

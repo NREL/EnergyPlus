@@ -978,14 +978,14 @@ namespace SteamBaseboardRadiator {
 
         if (PltSizSteamNum > 0) {
 
-            DataScalableCapSizingON = false;
+            state.dataSize->DataScalableCapSizingON = false;
 
-            if (CurZoneEqNum > 0) {
+            if (state.dataSize->CurZoneEqNum > 0) {
 
                 if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax == AutoSize) {
                     IsAutoSize = true;
                 }
-                if (!IsAutoSize && !ZoneSizingRunDone) {
+                if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) {
                     if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0) {
                         BaseSizer::reportSizerOutput(state, state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,
                                                      state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID,
@@ -997,37 +997,37 @@ namespace SteamBaseboardRadiator {
 
                     CompType = state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam;
                     CompName = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID;
-                    DataFracOfAutosizedHeatingCapacity = 1.0;
-                    DataZoneNumber = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+                    state.dataSize->DataZoneNumber = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
                     SizingMethod = HeatingCapacitySizing;
                     FieldNum = 1;
                     PrintFlag = false;
                     SizingString = state.dataSteamBaseboardRadiator->SteamBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
                     CapSizingMethod = SteamBaseboardDesignDataObject.HeatingCapMethod;
-                    ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                     if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                         CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
 
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                                ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                                ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                             }
                             TempSize = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
                         } else if (CapSizingMethod == CapacityPerFloorArea) {
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                            TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                            DataScalableCapSizingON = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                                state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                            TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad;
+                            state.dataSize->DataScalableCapSizingON = true;
                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                             CheckZoneSizing(state, CompType, CompName);
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            DataFracOfAutosizedHeatingCapacity = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                            state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                             TempSize = AutoSize;
-                            DataScalableCapSizingON = true;
+                            state.dataSize->DataScalableCapSizingON = true;
                         } else {
                             TempSize = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
@@ -1036,7 +1036,7 @@ namespace SteamBaseboardRadiator {
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                        DataScalableCapSizingON = false;
+                        state.dataSize->DataScalableCapSizingON = false;
                     } else {
                         DesCoilLoad = 0.0; // FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
@@ -1074,7 +1074,7 @@ namespace SteamBaseboardRadiator {
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 // Report difference between design size and user-specified values
                                 if ((std::abs(SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser) / SteamVolFlowRateMaxUser) >
-                                    AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeSteamBaseboard: Potential issue with equipment sizing for "
                                                 "ZoneHVAC:Baseboard:RadiantConvective:Steam=\"" +
                                                 state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).EquipID + "\".");
@@ -1100,7 +1100,7 @@ namespace SteamBaseboardRadiator {
             }
         }
 
-        RegisterPlantCompDesignFlow(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
+        RegisterPlantCompDesignFlow(state, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode, state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");

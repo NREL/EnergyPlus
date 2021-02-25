@@ -83,114 +83,6 @@ namespace EnergyPlus::DataSizing {
     //  using user input system flow rates.
     //  before applying user input sys flow rates.
 
-    int NumOARequirements(0);                       // Number of OA Requirements objects
-    int NumZoneAirDistribution(0);                  // Number of zone air distribution objects
-    int NumZoneSizingInput(0);                      // Number of Zone Sizing objects
-    int NumSysSizInput(0);                          // Number of System Sizing objects
-    int NumPltSizInput(0);                          // Number of Plant Sizing objects
-    int CurSysNum(0);                               // Current Air System index (0 if not in air loop)
-    int CurOASysNum(0);                             // Current outside air system index (0 if not in OA Sys)
-    int CurZoneEqNum(0);                            // Current Zone Equipment index (0 if not simulating ZoneEq)
-    int CurTermUnitSizingNum;                       // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
-    int CurBranchNum(0);                            // Index of branch being simulated (or 0 if not air loop)
-    int CurDuctType(0);                             // Duct type of current branch
-    int CurLoopNum(0);                              // the current plant loop index
-    int CurCondLoopNum(0);                          // the current condenser loop number
-    int CurEnvirNumSimDay(0);                       // current environment number for day simulated
-    int CurOverallSimDay(0);                        // current day of simulation
-    int NumTimeStepsInAvg(0);                       // number of time steps in the averaging window for the design flow and load sequences
-    int SaveNumPlantComps(0);                       // Number of components using water as an energy source or sink (e.g. water coils)
-    int DataTotCapCurveIndex(0);                    // index to total capacity as a function of temperature curve
-    Real64 DataTotCapCurveValue(0);                 // value of total capacity as a function of temperature curve for CoilVRF_FluidTCtrl_*
-    int DataPltSizCoolNum(0);                       // index to cooling plant sizing data
-    int DataPltSizHeatNum(0);                       // index to heating plant sizing data
-    int DataWaterLoopNum(0);                        // index to plant water loop
-    int DataCoilNum(0);                             // index to coil object
-    int DataFanOpMode(0);                           // fan operating mode (ContFanCycCoil or CycFanCycCoil)
-    bool DataCoilIsSuppHeater(false);               // TRUE if heating coil used as supplemental heater
-    bool DataIsDXCoil(false);                       // TRUE if direct-expansion coil
-    bool DataAutosizable(true);                     // TRUE if component is autosizable
-    bool DataEMSOverrideON(false);                  // boolean determines if user relies on EMS to override autosizing
-    bool DataScalableSizingON(false);               // boolean determines scalable flow sizing is specified
-    bool DataScalableCapSizingON(false);            // boolean determines scalable capacity sizing is specified
-    bool DataSysScalableFlowSizingON(false);        // boolean determines scalable system flow sizing is specified
-    bool DataSysScalableCapSizingON(false);         // boolean determines scalable system capacity sizing is specified
-    bool SysSizingRunDone(false);                   // True if a system sizing run is successfully completed.
-    bool TermUnitSingDuct(false);                   // TRUE if a non-induction single duct terminal unit
-    bool TermUnitPIU(false);                        // TRUE if a powered induction terminal unit
-    bool TermUnitIU(false);                         // TRUE if an unpowered induction terminal unit
-    bool ZoneEqFanCoil(false);                      // TRUE if a 4 pipe fan coil unit is being simulated
-    bool ZoneEqOutdoorAirUnit(false);               // TRUE if an OutdoorAirUnit is being simulated
-    bool ZoneEqUnitHeater(false);                   // TRUE if a unit heater is being simulated
-    bool ZoneEqUnitVent(false);                     // TRUE if a unit ventilator unit is being simulated
-    bool ZoneEqVentedSlab(false);                   // TRUE if a ventilated slab is being simulated
-    bool ZoneEqDXCoil(false);                       // TRUE if a ZoneHVAC DX coil is being simulated
-    bool ZoneEqUnitarySys(false);                   // TRUE if a zone UnitarySystem is being simulated
-    bool ZoneCoolingOnlyFan(false);                 // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
-    bool ZoneHeatingOnlyFan(false);                 // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
-    bool ZoneSizingRunDone(false);                  // True if a zone sizing run has been successfully completed.
-    bool DataErrorsFound(false);                    // used for simulation termination when errors are found
-    Real64 AutoVsHardSizingThreshold(0.1);          // criteria threshold used to determine if user hard size and autosize disagree 10%
-    Real64 AutoVsHardSizingDeltaTempThreshold(1.5); // temperature criteria threshold for autosize versus hard size [C]
-    Real64 DataCoilSizingAirInTemp(0.0);            // saves sizing data for use in coil object reporting
-    Real64 DataCoilSizingAirInHumRat(0.0);          // saves sizing data for use in coil object reporting
-    Real64 DataCoilSizingAirOutTemp(0.0);           // saves sizing data for use in coil object reporting
-    Real64 DataCoilSizingAirOutHumRat(0.0);         // saves sizing data for use in coil object reporting
-    Real64 DataCoilSizingFanCoolLoad(0.0);          // saves sizing data for use in coil object reporting
-    Real64 DataCoilSizingCapFT(1.0);                // saves sizing data for use in coil object reporting
-    bool DataDesAccountForFanHeat(true);            // include fan heat when true
-    Real64 DataDesInletWaterTemp(0.0);              // coil inlet water temperture used for warning messages
-    Real64 DataDesInletAirHumRat(0.0);              // coil inlet air humidity ratio used for warning messages
-    Real64 DataDesInletAirTemp(0.0);                // coil inlet air temperature used for warning messages
-    Real64 DataDesOutletAirTemp(0.0);               // coil outlet air temperature used for sizing
-    Real64 DataDesOutletAirHumRat(0.0);             // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
-    Real64 DataCoolCoilCap(0.0);                    // cooling coil capacity used for sizing with scalable inputs [W]
-    Real64 DataFlowUsedForSizing(0.0);              // air flow rate used for sizing with scalable inputs [m3/s]
-    Real64 DataAirFlowUsedForSizing(0.0);           // air flow rate used for sizing with scalable inputs [m3/s]
-    Real64 DataWaterFlowUsedForSizing(0.0);         // water flow rate used for sizing with scalable inputs [m3/s]
-    Real64 DataCapacityUsedForSizing(0.0);          // capacity used for sizing with scalable inputs [W]
-    Real64 DataDesignCoilCapacity(0.0);             // calculated capacity of coil at end of UA calculation
-    Real64 DataHeatSizeRatio(1.0);                  // heating coil size as a ratio of cooling coil capacity
-    Real64 DataEMSOverride(0.0);                    // value of EMS variable used to override autosizing
-    Real64 DataBypassFrac(0.0);                     // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
-    Real64 DataFracOfAutosizedCoolingAirflow(1.0);  // fraction of design cooling supply air flow rate
-    Real64 DataFracOfAutosizedHeatingAirflow(1.0);  // fraction of design heating supply air flow rate
-    Real64 DataFlowPerCoolingCapacity(0.0);         // cooling supply air flow per unit cooling capacity
-    Real64 DataFlowPerHeatingCapacity(0.0);         // heating supply air flow per unit heating capacity
-    Real64 DataFracOfAutosizedCoolingCapacity(1.0); // fraction of autosized cooling capacity
-    Real64 DataFracOfAutosizedHeatingCapacity(1.0); // fraction of autosized heating capacit
-    Real64 DataAutosizedCoolingCapacity(0.0);       // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
-    Real64 DataAutosizedHeatingCapacity(0.0);       // Autosized heating capacit used for multiplying flow per capacity to get flow rate
-    Real64 DataConstantUsedForSizing(0.0);          // base value used for sizing inputs that are ratios of other inputs
-    Real64 DataFractionUsedForSizing(0.0);          // fractional value of base value used for sizing inputs that are ratios of other inputs
-    Real64 DataNonZoneNonAirloopValue(0.0);         // used when equipment is not located in a zone or airloop
-    Real64 DataSizingFraction(1.0);                 // used when ratios of sizing is required
-    int DataZoneUsedForSizing(0);                   // pointer to control zone for air loop equipment
-    int DataZoneNumber(0);                          // a pointer to a served by zoneHVAC equipment
-    int NumZoneHVACSizing(0);                       // Number of design specification zone HVAC sizing objects
-    int NumAirTerminalSizingSpec(0);                // Number of design specfication air terminal sizing objects
-    int NumAirTerminalUnits(0);                     // Number of air terminal units (same as total number of zone inlet nodes)
-    Real64 DXCoolCap(0.0);                          // The ARI cooling capacity of a DX unit.
-    Real64 GlobalHeatSizingFactor(0.0);             // the global heating sizing ratio
-    Real64 GlobalCoolSizingFactor(0.0);             // the global cooling sizing ratio
-    Real64 SuppHeatCap(0.0);                        // the heating capacity of the supplemental heater in a unitary system
-    Real64 UnitaryHeatCap(0.0);                     // the heating capacity of a unitary system
-    Array1D<Real64> ZoneSizThermSetPtHi;            // highest zone thermostat setpoint during zone sizing calcs
-    Array1D<Real64> ZoneSizThermSetPtLo;            // lowest zone thermostat setpoint during zone sizing calcs
-    Array1D_string CoolPeakDateHrMin;               // date:hr:min of cooling peak
-    Array1D_string HeatPeakDateHrMin;               // date:hr:min of heating peak
-    char SizingFileColSep;                          // Character to separate columns in sizing outputs
-    int DataDesicDehumNum(0);                       // index to desiccant dehumidifier
-    bool DataDesicRegCoil(false);                   // TRUE if heating coil desiccant regeneration coil
-    bool HRFlowSizingFlag(false);                   // True, if it is a heat recovery heat exchanger flow sizing
-    Real64 DataWaterCoilSizCoolDeltaT(0.0);         // used for sizing cooling coil water design flow rate
-    Real64 DataWaterCoilSizHeatDeltaT(0.0);         // used for sizing heating coil water design flow rate
-    bool DataNomCapInpMeth(false);                  // True if heating coil is sized by CoilPerfInpMeth == NomCa
-    int DataFanEnumType(-1);                        // Fan type used during sizing
-    int DataFanIndex(-1);                           // Fan index used during sizing
-    zoneFanPlacement DataFanPlacement(zoneFanPlacement::zoneFanPlaceNotSet); // identifies location of fan wrt coil
-    int DataDXSpeedNum(0);
-
     // Object Data
     Array1D<OARequirementsData> OARequirements;
     Array1D<ZoneAirDistributionData> ZoneAirDistribution;
@@ -265,111 +157,6 @@ namespace EnergyPlus::DataSizing {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumOARequirements = 0;
-        NumZoneAirDistribution = 0;
-        NumZoneSizingInput = 0;
-        NumSysSizInput = 0;
-        NumPltSizInput = 0;
-        CurSysNum = 0;
-        CurOASysNum = 0;
-        CurZoneEqNum = 0;
-        CurTermUnitSizingNum = 0;
-        CurBranchNum = 0;
-        CurDuctType = 0;
-        CurLoopNum = 0;
-        CurCondLoopNum = 0;
-        CurEnvirNumSimDay = 0;
-        CurOverallSimDay = 0;
-        NumTimeStepsInAvg = 0;
-        SaveNumPlantComps = 0;
-        SysSizingRunDone = false;
-        TermUnitSingDuct = false;
-        TermUnitPIU = false;
-        TermUnitIU = false;
-        ZoneEqFanCoil = false;
-        ZoneEqOutdoorAirUnit = false;
-        ZoneEqUnitHeater = false;
-        ZoneEqUnitVent = false;
-        ZoneEqVentedSlab = false;
-        ZoneEqDXCoil = false;
-        ZoneEqUnitarySys = false;
-        ZoneCoolingOnlyFan = false;
-        ZoneHeatingOnlyFan = false;
-        ZoneSizingRunDone = false;
-        DataErrorsFound = false; // used to flag fatal errors in water coils
-        AutoVsHardSizingThreshold = 0.1;
-        AutoVsHardSizingDeltaTempThreshold = 1.5;
-
-        // Data globals used for sizing
-        DataTotCapCurveIndex = 0;
-        DataPltSizCoolNum = 0;
-        DataPltSizHeatNum = 0;
-        DataWaterLoopNum = 0;
-        DataCoilNum = 0;
-        DataFanOpMode = 0;
-        DataCoilIsSuppHeater = false;
-        DataIsDXCoil = false;
-        DataAutosizable = true;
-        DataEMSOverrideON = false;
-        DataScalableSizingON = false;
-        DataScalableCapSizingON = false;
-        DataSysScalableFlowSizingON = false;
-        DataSysScalableCapSizingON = false;
-        DataDesInletWaterTemp = 0.0;
-        DataDesInletAirHumRat = 0.0;
-        DataDesInletAirTemp = 0.0;
-        DataDesOutletAirTemp = 0.0;
-        DataDesOutletAirHumRat = 0.0;
-        DataCoolCoilCap = 0.0;
-        DataFlowUsedForSizing = 0.0;
-        DataAirFlowUsedForSizing = 0.0;
-        DataWaterFlowUsedForSizing = 0.0;
-        DataCapacityUsedForSizing = 0.0;
-        DataDesignCoilCapacity = 0.0;
-        DataHeatSizeRatio = 1.0;
-        DataEMSOverride = 0.0;
-        DataBypassFrac = 0.0;
-        DataFracOfAutosizedCoolingAirflow = 1.0;
-        DataFracOfAutosizedHeatingAirflow = 1.0;
-        DataFlowPerCoolingCapacity = 0.0;
-        DataFlowPerHeatingCapacity = 0.0;
-        DataFracOfAutosizedCoolingCapacity = 1.0;
-        DataFracOfAutosizedHeatingCapacity = 1.0;
-        DataAutosizedCoolingCapacity = 0.0;
-        DataAutosizedHeatingCapacity = 0.0;
-        DataConstantUsedForSizing = 0.0;
-        DataFractionUsedForSizing = 0.0;
-        DataNonZoneNonAirloopValue = 0.0;
-        DataSizingFraction = 1.0;
-        DataZoneNumber = 0;
-        DataFanEnumType = -1;
-        DataFanIndex = -1;
-        DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
-        DataWaterCoilSizCoolDeltaT = 0.0;
-        DataWaterCoilSizHeatDeltaT = 0.0;
-        DataNomCapInpMeth = false;
-        DataCoilSizingAirInTemp = 0.0;
-        DataCoilSizingAirInHumRat = 0.0;
-        DataCoilSizingAirOutTemp = 0.0;
-        DataCoilSizingAirOutHumRat = 0.0;
-        DataCoilSizingFanCoolLoad = 0.0;
-        DataCoilSizingCapFT = 1.0;
-        DataDesAccountForFanHeat = true;
-
-        NumZoneHVACSizing = 0;
-        NumAirTerminalSizingSpec = 0;
-        NumAirTerminalUnits = 0;
-        DXCoolCap = 0.0;
-        GlobalHeatSizingFactor = 0.0;
-        GlobalCoolSizingFactor = 0.0;
-        SuppHeatCap = 0.0;
-        UnitaryHeatCap = 0.0;
-        ZoneSizThermSetPtHi.deallocate();
-        ZoneSizThermSetPtLo.deallocate();
-        CoolPeakDateHrMin.deallocate();
-        HeatPeakDateHrMin.deallocate();
-        SizingFileColSep = char();
-
         OARequirements.deallocate();
         ZoneAirDistribution.deallocate();
         ZoneSizingInput.deallocate();
@@ -392,9 +179,6 @@ namespace EnergyPlus::DataSizing {
         CompDesWaterFlow.deallocate();
         ZoneHVACSizing.deallocate();
         AirTerminalSizingSpec.deallocate();
-        DataDesicDehumNum = 0;
-        DataDesicRegCoil = false;
-
         CalcFacilitySizing.deallocate();
         CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
         CalcFinalFacilitySizing.DOASLatAddSeq.deallocate();
@@ -406,7 +190,6 @@ namespace EnergyPlus::DataSizing {
         CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
         CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
         CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
-
         VbzByZone.deallocate();
         VdzClgByZone.deallocate();
         VdzMinClgByZone.deallocate();
@@ -628,62 +411,62 @@ namespace EnergyPlus::DataSizing {
         this->DOASTotCoolLoadSeq.dimension(numOfTimeStepInDay, 0.0);
     }
 
-    void resetHVACSizingGlobals(int const curZoneEqNum, int const curSysNum, bool &firstPassFlag) // called in zone equipment Report function
+    void resetHVACSizingGlobals(EnergyPlusData &state, int const curZoneEqNum, int const curSysNum, bool &firstPassFlag) // called in zone equipment Report function
     {
-        // reset Data globals so that prevoiusly set variables are not used in other equipment models
-        DataTotCapCurveIndex = 0;
-        DataPltSizCoolNum = 0;
-        DataPltSizHeatNum = 0;
-        DataWaterLoopNum = 0;
-        DataCoilNum = 0;
-        DataFanOpMode = 0;
-        DataCoilIsSuppHeater = false;
-        DataIsDXCoil = false;
-        DataAutosizable = true;
-        DataEMSOverrideON = false;
-        DataScalableSizingON = false;
-        DataScalableCapSizingON = false;
-        DataSysScalableFlowSizingON = false;
-        DataSysScalableCapSizingON = false;
-        DataDesAccountForFanHeat = true;
+        // reset Data globals so that previously set variables are not used in other equipment models
+        state.dataSize->DataTotCapCurveIndex = 0;
+        state.dataSize->DataPltSizCoolNum = 0;
+        state.dataSize->DataPltSizHeatNum = 0;
+        state.dataSize->DataWaterLoopNum = 0;
+        state.dataSize->DataCoilNum = 0;
+        state.dataSize->DataFanOpMode = 0;
+        state.dataSize->DataCoilIsSuppHeater = false;
+        state.dataSize->DataIsDXCoil = false;
+        state.dataSize->DataAutosizable = true;
+        state.dataSize->DataEMSOverrideON = false;
+        state.dataSize->DataScalableSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
+        state.dataSize->DataSysScalableFlowSizingON = false;
+        state.dataSize->DataSysScalableCapSizingON = false;
+        state.dataSize->DataDesAccountForFanHeat = true;
 
-        DataDesInletWaterTemp = 0.0;
-        DataDesInletAirHumRat = 0.0;
-        DataDesInletAirTemp = 0.0;
-        DataDesOutletAirTemp = 0.0;
-        DataDesOutletAirHumRat = 0.0;
-        DataCoolCoilCap = 0.0;
-        DataFlowUsedForSizing = 0.0;
-        DataAirFlowUsedForSizing = 0.0;
-        DataWaterFlowUsedForSizing = 0.0;
-        DataCapacityUsedForSizing = 0.0;
-        DataDesignCoilCapacity = 0.0;
-        DataHeatSizeRatio = 1.0;
-        DataEMSOverride = 0.0;
-        DataBypassFrac = 0.0;
-        DataFracOfAutosizedCoolingAirflow = 1.0;
-        DataFracOfAutosizedHeatingAirflow = 1.0;
-        DataFlowPerCoolingCapacity = 0.0;
-        DataFlowPerHeatingCapacity = 0.0;
-        DataFracOfAutosizedCoolingCapacity = 1.0;
-        DataFracOfAutosizedHeatingCapacity = 1.0;
-        DataAutosizedCoolingCapacity = 0.0;
-        DataAutosizedHeatingCapacity = 0.0;
-        DataConstantUsedForSizing = 0.0;
-        DataFractionUsedForSizing = 0.0;
-        DataNonZoneNonAirloopValue = 0.0;
-        DataZoneNumber = 0;
-        DataFanEnumType = -1;
-        DataFanIndex = -1;
-        DataWaterCoilSizCoolDeltaT = 0.0;
-        DataWaterCoilSizHeatDeltaT = 0.0;
-        DataNomCapInpMeth = false;
-        DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
-        DataDXSpeedNum = 0;
-        DataCoilSizingAirInTemp = 0.0;
-        DataCoilSizingAirInHumRat = 0.0;
-        DataCoilSizingAirOutTemp = 0.0;
-        DataCoilSizingAirOutHumRat = 0.0;
+        state.dataSize->DataDesInletWaterTemp = 0.0;
+        state.dataSize->DataDesInletAirHumRat = 0.0;
+        state.dataSize->DataDesInletAirTemp = 0.0;
+        state.dataSize->DataDesOutletAirTemp = 0.0;
+        state.dataSize->DataDesOutletAirHumRat = 0.0;
+        state.dataSize->DataCoolCoilCap = 0.0;
+        state.dataSize->DataFlowUsedForSizing = 0.0;
+        state.dataSize->DataAirFlowUsedForSizing = 0.0;
+        state.dataSize->DataWaterFlowUsedForSizing = 0.0;
+        state.dataSize->DataCapacityUsedForSizing = 0.0;
+        state.dataSize->DataDesignCoilCapacity = 0.0;
+        state.dataSize->DataHeatSizeRatio = 1.0;
+        state.dataSize->DataEMSOverride = 0.0;
+        state.dataSize->DataBypassFrac = 0.0;
+        state.dataSize->DataFracOfAutosizedCoolingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingAirflow = 1.0;
+        state.dataSize->DataFlowPerCoolingCapacity = 0.0;
+        state.dataSize->DataFlowPerHeatingCapacity = 0.0;
+        state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+        state.dataSize->DataAutosizedCoolingCapacity = 0.0;
+        state.dataSize->DataAutosizedHeatingCapacity = 0.0;
+        state.dataSize->DataConstantUsedForSizing = 0.0;
+        state.dataSize->DataFractionUsedForSizing = 0.0;
+        state.dataSize->DataNonZoneNonAirloopValue = 0.0;
+        state.dataSize->DataZoneNumber = 0;
+        state.dataSize->DataFanEnumType = -1;
+        state.dataSize->DataFanIndex = -1;
+        state.dataSize->DataWaterCoilSizCoolDeltaT = 0.0;
+        state.dataSize->DataWaterCoilSizHeatDeltaT = 0.0;
+        state.dataSize->DataNomCapInpMeth = false;
+        state.dataSize->DataFanPlacement = zoneFanPlacement::zoneFanPlaceNotSet;
+        state.dataSize->DataDXSpeedNum = 0;
+        state.dataSize->DataCoilSizingAirInTemp = 0.0;
+        state.dataSize->DataCoilSizingAirInHumRat = 0.0;
+        state.dataSize->DataCoilSizingAirOutTemp = 0.0;
+        state.dataSize->DataCoilSizingAirOutHumRat = 0.0;
 
         // These zone specific sizing variables are set in zone equipment to use for sizing.
         // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized
@@ -801,7 +584,7 @@ namespace EnergyPlus::DataSizing {
             DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
         } else if (CoolCapCtrl == OnOff) {
             DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
-            DesFlow = DataAirFlowUsedForSizing;
+            DesFlow = state.dataSize->DataAirFlowUsedForSizing;
             DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
         } else if (CoolCapCtrl == VT) {
             if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {

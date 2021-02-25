@@ -1233,8 +1233,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     state->dataAirLoop->AirLoopFlow(AirloopNum).DesSupply = 1.0 * state->dataEnvrn->StdRhoAir;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101250.0;
-    DataSizing::SysSizingRunDone = false;
-    DataSizing::CurSysNum = 1;
+    state->dataSize->SysSizingRunDone = false;
+    state->dataSize->CurSysNum = 1;
 
     GetOutsideAirSysInputs(*state);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);

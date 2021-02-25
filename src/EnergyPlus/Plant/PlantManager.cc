@@ -2173,7 +2173,7 @@ namespace EnergyPlus::PlantManager {
                     for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                         LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                         LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                        CurLoopNum = LoopNum;
+                        state.dataSize->CurLoopNum = LoopNum;
 
                         for (BranchNum = 1;
                              BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2195,7 +2195,7 @@ namespace EnergyPlus::PlantManager {
 
                         LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                         LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                        CurLoopNum = LoopNum;
+                        state.dataSize->CurLoopNum = LoopNum;
                         if (LoopSideNum == SupplySide) {
                             SizePlantLoop(state, LoopNum, FinishSizingFlag);
                         }
@@ -2218,7 +2218,7 @@ namespace EnergyPlus::PlantManager {
                     }
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                    CurLoopNum = LoopNum;
+                    state.dataSize->CurLoopNum = LoopNum;
                     if (LoopSideNum == SupplySide) {
                         SizePlantLoop(state, LoopNum, FinishSizingFlag);
                     }
@@ -2252,7 +2252,7 @@ namespace EnergyPlus::PlantManager {
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                    CurLoopNum = LoopNum;
+                    state.dataSize->CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2275,7 +2275,7 @@ namespace EnergyPlus::PlantManager {
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                    CurLoopNum = LoopNum;
+                    state.dataSize->CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2912,34 +2912,15 @@ namespace EnergyPlus::PlantManager {
             // PURPOSE OF THIS SUBROUTINE:
             // one time init what can be set up related to plant sizing data structure.
 
-            // METHODOLOGY EMPLOYED:
-            // <description>
-
-            // REFERENCES:
-            // na
-
             // Using/Aliasing
-            using DataSizing::NumPltSizInput;
             using DataSizing::PlantSizData;
             using DataSizing::PlantSizingData;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int PlantSizNum(0); // index of Plant Sizing data for this loop
 
             if (state.dataPlnt->PlantLoop(LoopNum).PlantSizNum == 0) {
-                if (NumPltSizInput > 0) {
+                if (state.dataSize->NumPltSizInput > 0) {
                     PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, PlantSizData,
                                                                   &PlantSizingData::PlantLoopName);
                     if (PlantSizNum > 0) {
@@ -2996,7 +2977,7 @@ namespace EnergyPlus::PlantManager {
                 PlantSizNum = state.dataPlnt->PlantLoop(LoopNum).PlantSizNum;
                 // PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
             } else {
-                if (NumPltSizInput > 0) {
+                if (state.dataSize->NumPltSizInput > 0) {
                     PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, PlantSizData,
                                                                   &PlantSizingData::PlantLoopName);
                 }
@@ -3071,7 +3052,7 @@ namespace EnergyPlus::PlantManager {
                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
                             BranchNum).TotalComponents; ++CompNum) {
                         SupNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                        for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
+                        for (WaterCompNum = 1; WaterCompNum <= state.dataSize->SaveNumPlantComps; ++WaterCompNum) {
                             if (SupNodeNum == CompDesWaterFlow(WaterCompNum).SupNode) {
                                 PlantSizData(PlantSizNum).DesVolFlowRate += CompDesWaterFlow(
                                         WaterCompNum).DesVolFlowRate;
@@ -3242,7 +3223,7 @@ namespace EnergyPlus::PlantManager {
                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
                             BranchNum).TotalComponents; ++CompNum) {
                         SupNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                        for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
+                        for (WaterCompNum = 1; WaterCompNum <= state.dataSize->SaveNumPlantComps; ++WaterCompNum) {
                             if (SupNodeNum == CompDesWaterFlow(WaterCompNum).SupNode) {
                                 PlantSizData(PlantSizNum).DesVolFlowRate += CompDesWaterFlow(
                                         WaterCompNum).DesVolFlowRate;

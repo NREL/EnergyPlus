@@ -2700,17 +2700,17 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     int SysNum = 1;
 
     // First test -  design min flow < max flow
-    ZoneSizingRunDone = true;
-    CurZoneEqNum = 1;
-    CurTermUnitSizingNum = 1;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 0.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
     EXPECT_EQ(0.5, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // Second test -  design min flow > max flow
-    ZoneSizingRunDone = true;
-    CurZoneEqNum = 1;
-    CurTermUnitSizingNum = 1;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes = AutoSize; // need to reset this so it sizes again
     DataSizing::TermUnitFinalZoneSizing(1).DesCoolVolFlowMin = 1.5;
     state->dataSingleDuct->sd_airterminal(SysNum).SizeSys(*state);
@@ -2722,9 +2722,9 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    SysSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
     SysSizInput.allocate(1);
-    NumSysSizInput = 1;
+    state->dataSize->NumSysSizInput = 1;
     SysSizInput(1).AirLoopNum = 1;
     SysSizInput(1).AirPriLoopName = "MyAirLoop";
     FinalSysSizing.allocate(1);
@@ -2759,9 +2759,9 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 
     int ATMixerIndex = 1;
     int ControlledZoneNum = 1;
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     // set ATMixer properties used for sizing
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerVolFlow, state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate);
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).CoolSupTemp);
@@ -2772,7 +2772,7 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = false;
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = false;
     // set ATMixer properties used for sizing
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp);
     EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat);
@@ -2781,7 +2781,7 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 
     // set ATMixer properties used for sizing
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate /= 2.0;
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
     EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).PrecoolTemp, 0.0000001);
     EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).PrecoolHumRat, 0.0000001);
@@ -2792,7 +2792,7 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 0;
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate *= 2.0;
 
-    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, CurZoneEqNum);
+    SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
     EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
     EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);

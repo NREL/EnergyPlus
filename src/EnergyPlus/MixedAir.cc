@@ -318,7 +318,7 @@ namespace EnergyPlus::MixedAir {
         //    CtrlName = state.dataAirLoop->OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
         //    CALL SimOAController(CtrlName,FirstHVACIteration)
         //  END DO
-        CurOASysNum = OASysNum;
+        state.dataSize->CurOASysNum = OASysNum;
         auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
             SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
@@ -363,7 +363,7 @@ namespace EnergyPlus::MixedAir {
             if (FatalErrorFlag) ShowFatalError(state, "Previous severe error(s) cause program termination");
         }
 
-        CurOASysNum = 0;
+        state.dataSize->CurOASysNum = 0;
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
         }
@@ -4699,7 +4699,7 @@ namespace EnergyPlus::MixedAir {
         ErrorsFound = false;
         if (this->MaxOA == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
@@ -4709,17 +4709,17 @@ namespace EnergyPlus::MixedAir {
                         CheckSysSizing(state, CurrentModuleObject, this->Name);
 
                         {
-                            auto const SELECT_CASE_var1(CurDuctType);
+                            auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var1 == Main) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var1 == Cooling) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesCoolVolFlow;
+                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var1 == Heating) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesHeatVolFlow;
+                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else if (SELECT_CASE_var1 == Other) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                         }
 
@@ -4729,7 +4729,7 @@ namespace EnergyPlus::MixedAir {
                     }
                 }
 
-            } else if (CurZoneEqNum > 0) {
+            } else if (state.dataSize->CurZoneEqNum > 0) {
 
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
@@ -4737,7 +4737,7 @@ namespace EnergyPlus::MixedAir {
                     if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
 
                         CheckZoneSizing(state, CurrentModuleObject, this->Name);
-                        this->MaxOA = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                        this->MaxOA = max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
 
                     } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
 
@@ -4755,11 +4755,11 @@ namespace EnergyPlus::MixedAir {
 
         if (this->MinOA == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
-                if (FinalSysSizing(CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
-                    this->MinOA = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, this->MaxOA);
+                if (FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
+                    this->MinOA = min(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, this->MaxOA);
                 } else {
                     this->MinOA = 0.0;
                 }
@@ -4785,10 +4785,10 @@ namespace EnergyPlus::MixedAir {
         }
         // If there is an outside air system, loop over components in the OA system; pass the design air flow rate
         // to the coil components that don't have design air flow as an input.
-        if (CurOASysNum > 0) {
-            for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(CurOASysNum).NumComponents; ++CompNum) {
-                CompType = state.dataAirLoop->OutsideAirSys(CurOASysNum).ComponentType(CompNum);
-                CompName = state.dataAirLoop->OutsideAirSys(CurOASysNum).ComponentName(CompNum);
+        if (state.dataSize->CurOASysNum > 0) {
+            for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).NumComponents; ++CompNum) {
+                CompType = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentType(CompNum);
+                CompName = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentName(CompNum);
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
                     UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER") ||
                     UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {

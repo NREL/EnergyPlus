@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     ASSERT_FALSE(errorsFound);
 
     ZoneSizingInput.allocate(3);
-    NumZoneSizingInput = 3;
+    state->dataSize->NumZoneSizingInput = 3;
     ZoneSizingInput(1).ZoneNum = 1;
     ZoneSizingInput(2).ZoneNum = 2;
     ZoneSizingInput(3).ZoneNum = 3;
@@ -390,13 +390,13 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     DataSizing::FinalZoneSizing.allocate(3);
     DataSizing::ZoneEqSizing.allocate(3);
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(3);
 
     BaseboardNum = 1;
     CntrlZoneNum = 1;
-    DataSizing::CurZoneEqNum = CntrlZoneNum;
+    state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
@@ -423,7 +423,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     BaseboardNum = 2;
     CntrlZoneNum = 2;
-    DataSizing::CurZoneEqNum = CntrlZoneNum;
+    state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     BaseboardNum = 3;
     CntrlZoneNum = 3;
-    DataSizing::CurZoneEqNum = CntrlZoneNum;
+    state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =

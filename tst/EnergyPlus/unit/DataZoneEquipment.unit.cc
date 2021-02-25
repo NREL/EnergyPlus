@@ -115,7 +115,7 @@ TEST_F(EnergyPlusFixture, DataZoneEquipment_TestCalcDesignSpecificationOutdoorAi
     state->dataContaminantBalance->OutdoorCO2 = 400.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8 * 5.0;
 
-    DataSizing::NumOARequirements = 1;
+    state->dataSize->NumOARequirements = 1;
     DataSizing::OARequirements(1).Name = "ZONE OA";
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::ZOAM_ProportionalControlSchOcc;
     DataSizing::OARequirements(1).OAFlowPerPerson = 0.002;

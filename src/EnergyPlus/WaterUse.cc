@@ -574,7 +574,7 @@ namespace WaterUse {
                             state.dataWaterUse->WaterEquipment(thisWaterEquipNum).PeakVolFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
                     }
                 }
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataWaterUse->WaterConnections(WaterConnNum).InletNode,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataWaterUse->WaterConnections(WaterConnNum).InletNode,
                                                             state.dataWaterUse->WaterConnections(WaterConnNum).PeakMassFlowRate /
                                                                 Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp));
             }

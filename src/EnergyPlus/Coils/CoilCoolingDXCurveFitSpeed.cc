@@ -359,23 +359,23 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 
     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
-    DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
-    DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
+    state.dataSize->DataFlowUsedForSizing = this->evap_air_flow_rate;
+    state.dataSize->DataCapacityUsedForSizing = this->rated_total_capacity;
     bool errorFound = false;
     CoolingSHRSizer sizerCoolingSHR;
     sizerCoolingSHR.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 2) {
-        DataSizing::DataSizingFraction = 0.667;
+        state.dataSize->DataSizingFraction = 0.667;
         this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     } else if (this->grossRatedSHR == DataSizing::AutoSize && this->parentOperatingMode == 3) {
-        DataSizing::DataSizingFraction = 0.333;
+        state.dataSize->DataSizingFraction = 0.333;
         this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     } else {
         this->grossRatedSHR = sizerCoolingSHR.size(state, this->grossRatedSHR, errorFound);
     }
-    DataSizing::DataFlowUsedForSizing = 0.0;
-    DataSizing::DataCapacityUsedForSizing = 0.0;
-    DataSizing::DataSizingFraction = 1.0;
+    state.dataSize->DataFlowUsedForSizing = 0.0;
+    state.dataSize->DataCapacityUsedForSizing = 0.0;
+    state.dataSize->DataSizingFraction = 1.0;
     //  DataSizing::DataEMSOverrideON = false;
     //  DataSizing::DataEMSOverride = 0.0;
 

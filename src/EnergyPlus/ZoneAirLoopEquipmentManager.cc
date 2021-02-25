@@ -135,7 +135,7 @@ namespace ZoneAirLoopEquipmentManager {
                                       state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
             }
         }
-        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
         InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
         InitZoneAirLoopEquipmentTimeStep(state, AirDistUnitNum);
 

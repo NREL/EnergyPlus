@@ -107,10 +107,10 @@ protected:
 
         FinalZoneSizing.allocate(1);
         ZoneEqSizing.allocate(1);
-        CurZoneEqNum = 1;
-        CurSysNum = 0;
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-        ZoneSizingRunDone = true;
+        state->dataSize->CurZoneEqNum = 1;
+        state->dataSize->CurSysNum = 0;
+        ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+        state->dataSize->ZoneSizingRunDone = true;
 
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 1000.0;
@@ -148,28 +148,28 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
 
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
-    CurSysNum = 0;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(24);
+    state->dataSize->CurSysNum = 0;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).MinOA = 0.0;
-    FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak = 5.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 30.0;
-    FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
-    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
-    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).OutTempAtHeatPeak = 5.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 30.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 80.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesHumRat = 0.008;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
 
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 60.0;
-    FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak = 70.0;
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 2.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 60.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).OutTempAtCoolPeak = 70.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 50.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.008;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
 
     state->dataPurchasedAirMgr->PurchAir.allocate(10);
     state->dataPurchasedAirMgr->PurchAirNumericFields.allocate(10);
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
     state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
     state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
 
-    ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
 
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRateAndCapacity;
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;
@@ -202,28 +202,28 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
 
     int PurchAirNum = 1;
     ZoneEqSizing.allocate(1);
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(24);
-    CurSysNum = 0;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(24);
+    state->dataSize->CurSysNum = 0;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
-    FinalZoneSizing(CurZoneEqNum).OutTempAtHeatPeak = 5.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 30.0; // this isn't used so don't change it
-    FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
-    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 80.0;
-    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).OutTempAtHeatPeak = 5.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 30.0; // this isn't used so don't change it
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 30.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 80.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesHumRat = 0.008;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow * state->dataEnvrn->StdRhoAir;
 
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 65.0; // this is used, so make it higher
-    FinalZoneSizing(CurZoneEqNum).OutTempAtCoolPeak = 70.0; // this is not currently used for cooling
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 50.0;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.008;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 2.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 65.0; // this is used, so make it higher
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).OutTempAtCoolPeak = 70.0; // this is not currently used for cooling
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 50.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.008;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.010;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
 
     state->dataPurchasedAirMgr->PurchAir.allocate(10);
     state->dataPurchasedAirMgr->PurchAirNumericFields.allocate(10);
@@ -233,7 +233,7 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
     state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(7) = "Maximum Cooling Air Flow Rate";
     state->dataPurchasedAirMgr->PurchAirNumericFields(PurchAirNum).FieldNames(8) = "Maximum Total Cooling Capacity";
 
-    ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
 
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).HeatingLimit = LimitType::LimitFlowRateAndCapacity;
     state->dataPurchasedAirMgr->PurchAir(PurchAirNum).MaxHeatVolFlowRate = AutoSize;

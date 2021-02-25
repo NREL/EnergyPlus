@@ -313,7 +313,7 @@ namespace PlantComponentTemperatureSources {
                                                          "User-Specified Design Fluid Flow Rate [m3/s]",
                                                          DesVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Fluid Flow Rate of {:.5R} [m3/s]", DesVolFlowRateUser));
                                     ShowContinueError(state,
@@ -341,7 +341,7 @@ namespace PlantComponentTemperatureSources {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, tmpVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, tmpVolFlowRate);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");

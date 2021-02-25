@@ -2551,7 +2551,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     RefrigRack(RackNum).OutletTempMax = Numbers(5);
                     RefrigRack(RackNum).InletTempMin = Numbers(6);
                     // set flow request for plant sizing.
-                    PlantUtilities::RegisterPlantCompDesignFlow(RefrigRack(RackNum).InletNode, RefrigRack(RackNum).VolFlowRateMax);
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, RefrigRack(RackNum).InletNode, RefrigRack(RackNum).VolFlowRateMax);
                 } // Water cooled condenser data
 
                 // Get evaporative cooled condenser input
@@ -3301,7 +3301,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             ShowContinueError(state, "Revise flow rates.");
                             ErrorsFound = true;
                         }
-                        PlantUtilities::RegisterPlantCompDesignFlow(Condenser(CondNum).InletNode, Condenser(CondNum).DesVolFlowRate);
+                        PlantUtilities::RegisterPlantCompDesignFlow(state, Condenser(CondNum).InletNode, Condenser(CondNum).DesVolFlowRate);
                     }
 
                     // Get maximum flow rates

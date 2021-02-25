@@ -290,15 +290,15 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325;          // sea level
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    ZoneSizingRunDone = true;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -316,18 +316,18 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    FinalZoneSizing(CurZoneEqNum).ZoneTempAtCoolPeak = 26.66667;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtCoolPeak = 26.66667;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
     ZoneInletNode = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(*state, OAUnitNum);
 
@@ -341,12 +341,12 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     SetPredefinedTables(*state);
     OutdoorAirUnit::SimOutdoorAirUnit(*state,
-        "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataZoneEquip->ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+        "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr));
 
-    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OutAirVolFlow);
-    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OutAirMassFlow);
-    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ExtAirVolFlow);
-    EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ExtAirMassFlow);
+    EXPECT_DOUBLE_EQ(FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OutAirVolFlow);
+    EXPECT_DOUBLE_EQ(FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OutAirMassFlow);
+    EXPECT_DOUBLE_EQ(FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ExtAirVolFlow);
+    EXPECT_DOUBLE_EQ(FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA * state->dataEnvrn->StdRhoAir, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).ExtAirMassFlow);
 
     // test that both fans are included in OA unit fan power report
     Real64 SAFanPower = Fans::Fan(1).FanPower;
@@ -579,8 +579,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    DataSizing::NumPltSizInput = 1;
-    PlantSizData.allocate(DataSizing::NumPltSizInput);
+    state->dataSize->NumPltSizInput = 1;
+    PlantSizData.allocate(state->dataSize->NumPltSizInput);
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
@@ -631,24 +631,24 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     TempControlType.allocate(1);
     TempControlType(1) = 4;
 
-    ZoneSizingRunDone = true;
-    DataSizing::CurZoneEqNum = 1;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
 
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 30.0, 0.0);
 
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 12.8;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0080;
-    FinalZoneSizing(CurZoneEqNum).DesCoolDens = state->dataEnvrn->StdRhoAir;
-    FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(CurZoneEqNum).DesCoolDens;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.8;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0080;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolDens = state->dataEnvrn->StdRhoAir;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolDens;
 
     state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
@@ -660,15 +660,15 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_EQ(state->dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
     // calculate fan heat to get fan air-side delta T
-    DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-    DataSizing::DataFanIndex = 0;
-    DataSizing::DataAirFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(*state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+    state->dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+    state->dataSize->DataFanIndex = 0;
+    state->dataSize->DataAirFlowUsedForSizing = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow;
+    Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(*state, state->dataSize->DataFanEnumType, state->dataSize->DataFanIndex, state->dataSize->DataAirFlowUsedForSizing);
 
     // do water flow rate sizing calculation
-    Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow;
-    Real64 EnthalpyAirIn = PsyHFnTdbW(FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp, FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat);
-    Real64 EnthalpyAirOut = PsyHFnTdbW(FinalZoneSizing(CurZoneEqNum).CoolDesTemp, FinalZoneSizing(CurZoneEqNum).CoolDesHumRat);
+    Real64 DesAirMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow;
+    Real64 EnthalpyAirIn = PsyHFnTdbW(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat);
+    Real64 EnthalpyAirOut = PsyHFnTdbW(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp, FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat);
 
     Real64 DesWaterCoolingCoilLoad = DesAirMassFlow * (EnthalpyAirIn - EnthalpyAirOut) + FanCoolLoad;
     Real64 CoilDesWaterDeltaT = PlantSizData(1).DeltaT;
@@ -885,8 +885,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    DataSizing::NumPltSizInput = 1;
-    PlantSizData.allocate(DataSizing::NumPltSizInput);
+    state->dataSize->NumPltSizInput = 1;
+    PlantSizData.allocate(state->dataSize->NumPltSizInput);
 
     for (int l = 1; l <= state->dataPlnt->TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));
@@ -937,25 +937,25 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     TempControlType.allocate(1);
     TempControlType(1) = 4;
 
-    ZoneSizingRunDone = true;
-    DataSizing::CurZoneEqNum = 1;
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurZoneEqNum = 1;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).MinOA = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
-    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 5.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).MinOA = 0.5;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 5.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
 
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 5.0, 0.0);
     state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow = DataSizing::AutoSize;
 
-    FinalZoneSizing(CurZoneEqNum).HeatDesTemp = 50.0;
-    FinalZoneSizing(CurZoneEqNum).HeatDesHumRat = 0.0050;
-    FinalZoneSizing(CurZoneEqNum).DesHeatDens = state->dataEnvrn->StdRhoAir;
-    FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(CurZoneEqNum).DesHeatDens;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 50.0;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesHumRat = 0.0050;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatDens = state->dataEnvrn->StdRhoAir;
+    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow * FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatDens;
 
     state->dataGlobal->BeginEnvrnFlag = true;
     bool FirstHVACIteration(true);
@@ -964,10 +964,10 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     OutdoorAirUnit::InitOutdoorAirUnit(*state, OAUnitNum, ZoneNum, FirstHVACIteration);
     EXPECT_EQ(state->dataSteamCoils->SteamCoil(1).MaxSteamVolFlowRate, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
-    Real64 DesCoilInTemp = FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp;
-    Real64 DesCoilOutTemp = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
-    Real64 DesCoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
-    Real64 DesAirMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
+    Real64 DesCoilInTemp = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp;
+    Real64 DesCoilOutTemp = FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp;
+    Real64 DesCoilOutHumRat = FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesHumRat;
+    Real64 DesAirMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMassFlow;
     // DesVolFlow = DesMassFlow / RhoAirStd;
     Real64 CpAirAvg = PsyCpAirFnW(DesCoilOutHumRat);
     Real64 DesSteamCoilLoad = DesAirMassFlow * CpAirAvg * (DesCoilOutTemp - DesCoilInTemp);

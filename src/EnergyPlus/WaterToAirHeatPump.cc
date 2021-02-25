@@ -418,7 +418,7 @@ namespace WaterToAirHeatPump {
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
-            RegisterPlantCompDesignFlow(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum, 0.5 * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate);
+            RegisterPlantCompDesignFlow(state, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum, 0.5 * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate);
 
             // create predefined report entries
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, CurrentModuleObject);
@@ -552,7 +552,7 @@ namespace WaterToAirHeatPump {
                                 "System");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
-            RegisterPlantCompDesignFlow(state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum, 0.5 * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate);
+            RegisterPlantCompDesignFlow(state, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterInletNodeNum, 0.5 * state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).DesignWaterVolFlowRate);
 
             // create predefined report entries
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name, CurrentModuleObject);

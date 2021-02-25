@@ -983,7 +983,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                 PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(state,
                     "Chiller:Absorption:Indirect", this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
             } else {
-                for (int PltSizIndex = 1; PltSizIndex <= DataSizing::NumPltSizInput; ++PltSizIndex) {
+                for (int PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
                     if (DataSizing::PlantSizData(PltSizIndex).LoopType == DataSizing::SteamLoop) {
                         PltSizSteamNum = PltSizIndex;
                     }
@@ -994,7 +994,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                 PltSizHeatingNum = PlantUtilities::MyPlantSizingIndex(state,
                     "Chiller:Absorption:Indirect", this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
             } else {
-                for (int PltSizIndex = 1; PltSizIndex <= DataSizing::NumPltSizInput; ++PltSizIndex) {
+                for (int PltSizIndex = 1; PltSizIndex <= state.dataSize->NumPltSizInput; ++PltSizIndex) {
                     if (DataSizing::PlantSizData(PltSizIndex).LoopType == DataSizing::HeatingLoop) {
                         PltSizHeatingNum = PltSizIndex;
                     }
@@ -1043,7 +1043,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                                                                     "User-Specified Nominal Capacity [W]",
                                                                     NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
@@ -1098,7 +1098,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                                                                 "User-Specified Nominal Pumping Power [W]",
                                                                 NomPumpPowerUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > DataSizing::AutoVsHardSizingThreshold) {
+                            if ((std::abs(tmpNomPumpPower - NomPumpPowerUser) / NomPumpPowerUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Nominal Pumping Power of {:.2R} [W]", NomPumpPowerUser));
                                 ShowContinueError(state, format("differs from Design Size Nominal Pumping Power of {:.2R} [W]", tmpNomPumpPower));
@@ -1144,7 +1144,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                                                                     EvapVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricIndirect: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
                                                       format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
@@ -1178,9 +1178,9 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
         }
 
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, this->EvapVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, this->EvapVolFlowRate);
         } else {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
         }
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
@@ -1229,7 +1229,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                                                                     CondVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
@@ -1267,9 +1267,9 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, this->CondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, this->CondVolFlowRate);
         } else {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
         }
 
         if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Steam) ||
@@ -1317,7 +1317,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                                                                             GeneratorVolFlowRateUser);
                                     if (state.dataGlobal->DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
-                                            DataSizing::AutoVsHardSizingThreshold) {
+                                            state.dataSize->AutoVsHardSizingThreshold) {
                                             ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                             ShowContinueError(
                                                 state,
@@ -1394,7 +1394,7 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                                                                             GeneratorVolFlowRateUser);
                                     if (state.dataGlobal->DisplayExtraWarnings) {
                                         if ((std::abs(tmpGeneratorVolFlowRate - GeneratorVolFlowRateUser) / GeneratorVolFlowRateUser) >
-                                            DataSizing::AutoVsHardSizingThreshold) {
+                                            state.dataSize->AutoVsHardSizingThreshold) {
                                             ShowMessage(state, "SizeChillerAbsorptionIndirect: Potential issue with equipment sizing for " + this->Name);
                                             ShowContinueError(
                                                 state,
@@ -1444,9 +1444,9 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 
         // save the design steam or hot water volumetric flow rate for use by the steam or hot water loop sizing algorithms
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->GeneratorInletNodeNum, this->GeneratorVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->GeneratorInletNodeNum, this->GeneratorVolFlowRate);
         } else {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->GeneratorInletNodeNum, tmpGeneratorVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->GeneratorInletNodeNum, tmpGeneratorVolFlowRate);
         }
 
         if (this->GeneratorDeltaTempWasAutoSized) {

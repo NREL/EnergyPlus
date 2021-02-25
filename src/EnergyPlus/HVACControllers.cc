@@ -1354,7 +1354,7 @@ namespace HVACControllers {
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
 
         if (ControllerProps(ControlNum).MaxVolFlowActuated == AutoSize) {
-            for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
+            for (WaterCompNum = 1; WaterCompNum <= state.dataSize->SaveNumPlantComps; ++WaterCompNum) {
                 if (CompDesWaterFlow(WaterCompNum).SupNode == ActuatedNode) {
                     ControllerProps(ControlNum).MaxVolFlowActuated = CompDesWaterFlow(WaterCompNum).DesVolFlowRate;
                 }

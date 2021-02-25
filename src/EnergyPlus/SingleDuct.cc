@@ -189,8 +189,8 @@ namespace EnergyPlus::SingleDuct {
 
         auto &thisATU(state.dataSingleDuct->sd_airterminal(SysNum));
 
-        TermUnitSingDuct = true;
-        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisATU.ADUNum).TermUnitSizingNum;
+        state.dataSize->TermUnitSingDuct = true;
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisATU.ADUNum).TermUnitSizingNum;
 
         // With the correct SysNum Initialize the system
         thisATU.InitSys(state, FirstHVACIteration); // Initialize all Sys related parameters
@@ -223,7 +223,7 @@ namespace EnergyPlus::SingleDuct {
         // Report the current Sys
         thisATU.ReportSys(state);
 
-        TermUnitSingDuct = false;
+        state.dataSize->TermUnitSingDuct = false;
     }
 
     // Get Input Section of the Module
@@ -2444,8 +2444,8 @@ namespace EnergyPlus::SingleDuct {
             IsAutoSize = true;
         }
 
-        if (CurTermUnitSizingNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
+        if (state.dataSize->CurTermUnitSizingNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
                 if (this->MaxAirVolFlowRate > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Air Flow Rate [m3/s]", this->MaxAirVolFlowRate);
@@ -2455,7 +2455,7 @@ namespace EnergyPlus::SingleDuct {
                 CheckZoneSizing(state, this->SysType, this->SysName);
 
                 MaxAirVolFlowRateDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
 
                 if (MaxAirVolFlowRateDes < SmallAirVolFlow) {
                     MaxAirVolFlowRateDes = 0.0;
@@ -2473,7 +2473,7 @@ namespace EnergyPlus::SingleDuct {
                                                      "User-Specified Maximum Air Flow Rate [m3/s]",
                                                      MaxAirVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxAirVolFlowRateDes - MaxAirVolFlowRateUser) / MaxAirVolFlowRateUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxAirVolFlowRateDes - MaxAirVolFlowRateUser) / MaxAirVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                             this->SysName + "\".");
                                 ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxAirVolFlowRateUser));
@@ -2492,8 +2492,8 @@ namespace EnergyPlus::SingleDuct {
         if (this->MaxHeatAirVolFlowRate == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurTermUnitSizingNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // simulation should continue
+        if (state.dataSize->CurTermUnitSizingNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation should continue
                 UserInputMaxHeatAirVolFlowRate = this->MaxHeatAirVolFlowRate;
                 if (this->MaxHeatAirVolFlowRate > 0.0) {
                     BaseSizer::reportSizerOutput(state,
@@ -2501,7 +2501,7 @@ namespace EnergyPlus::SingleDuct {
                 }
             } else {
                 CheckZoneSizing(state, this->SysType, this->SysName);
-                MaxHeatAirVolFlowRateDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow;
+                MaxHeatAirVolFlowRateDes = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow;
                 if (MaxHeatAirVolFlowRateDes < SmallAirVolFlow) {
                     MaxHeatAirVolFlowRateDes = 0.0;
                 }
@@ -2522,7 +2522,7 @@ namespace EnergyPlus::SingleDuct {
                                                      MaxHeatAirVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(MaxHeatAirVolFlowRateDes - MaxHeatAirVolFlowRateUser) / MaxHeatAirVolFlowRateUser) >
-                                AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                             this->SysName + "\".");
                                 ShowContinueError(state,
@@ -2551,11 +2551,11 @@ namespace EnergyPlus::SingleDuct {
             IsAutoSize = true;
         }
         if (this->ZoneMinAirFracMethod == MinFlowFraction::Constant) {
-            if (ZoneSizingRunDone) {
-                if (CurTermUnitSizingNum > 0) {
+            if (state.dataSize->ZoneSizingRunDone) {
+                if (state.dataSize->CurTermUnitSizingNum > 0) {
                     // use the combined defaults or other user inputs stored in DesCoolVolFlowMin
                     if (this->MaxAirVolFlowRate > 0.0) {
-                        MinAirFlowFracDes = min(1.0, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlowMin / this->MaxAirVolFlowRate);
+                        MinAirFlowFracDes = min(1.0, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlowMin / this->MaxAirVolFlowRate);
                     } else {
                         MinAirFlowFracDes = 0.0;
                     }
@@ -2585,7 +2585,7 @@ namespace EnergyPlus::SingleDuct {
                                              "User-Specified Constant Minimum Air Flow Fraction",
                                              MinAirFlowFracUser * this->ZoneTurndownMinAirFrac);
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    if ((std::abs(MinAirFlowFracDes - MinAirFlowFracUser) / MinAirFlowFracUser) > AutoVsHardSizingThreshold) {
+                    if ((std::abs(MinAirFlowFracDes - MinAirFlowFracUser) / MinAirFlowFracUser) > state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
                         ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Fraction of {:.5R} [m3/s]", MinAirFlowFracUser));
@@ -2612,11 +2612,11 @@ namespace EnergyPlus::SingleDuct {
             IsAutoSize = true;
         }
         if (this->ZoneMinAirFracMethod == MinFlowFraction::Fixed) {
-            if (ZoneSizingRunDone) {
-                if (CurTermUnitSizingNum > 0) {
+            if (state.dataSize->ZoneSizingRunDone) {
+                if (state.dataSize->CurTermUnitSizingNum > 0) {
                     // use the combined defaults or other user inputs stored in DesCoolVolFlowMin
                     if (this->MaxAirVolFlowRate > 0.0) {
-                        FixedMinAirDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlowMin;
+                        FixedMinAirDes = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlowMin;
                     } else {
                         MinAirFlowFracDes = 0.0;
                     }
@@ -2645,7 +2645,7 @@ namespace EnergyPlus::SingleDuct {
                                              "User-Specified Fixed Minimum Air Flow Rate [m3/s]",
                                              FixedMinAirUser * this->ZoneTurndownMinAirFrac);
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    if ((std::abs(FixedMinAirDes - FixedMinAirUser) / FixedMinAirUser) > AutoVsHardSizingThreshold) {
+                    if ((std::abs(FixedMinAirDes - FixedMinAirUser) / FixedMinAirUser) > state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
                         ShowContinueError(state, format("User-Specified Minimum Cooling Air Flow Rate of {:.5R} [m3/s]", FixedMinAirUser));
@@ -2691,10 +2691,10 @@ namespace EnergyPlus::SingleDuct {
         }
 
         if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
-            if (ZoneSizingRunDone) {
-                if (CurTermUnitSizingNum > 0) {
+            if (state.dataSize->ZoneSizingRunDone) {
+                if (state.dataSize->CurTermUnitSizingNum > 0) {
                     // if zone sizing run done, set the design max reheat air flow to the value from the design calcs
-                    MaxAirVolFlowRateDuringReheatDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlowMax;
+                    MaxAirVolFlowRateDuringReheatDes = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlowMax;
                 }
             } else {
                 // if no design calc use 0.002032 [m3/s-m2] times floor area. That's .40 cfm/ft2
@@ -2740,7 +2740,7 @@ namespace EnergyPlus::SingleDuct {
                 this->MaxAirVolFlowRateDuringReheat = MaxAirVolFlowRateDuringReheatDes;
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFractionDuringReheatDes - MaxAirVolFractionDuringReheatUser) / MaxAirVolFractionDuringReheatUser) >
-                        AutoVsHardSizingThreshold) {
+                        state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
                         ShowContinueError(
@@ -2774,7 +2774,7 @@ namespace EnergyPlus::SingleDuct {
                 this->MaxAirVolFractionDuringReheat = MaxAirVolFractionDuringReheatDes;
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFlowRateDuringReheatDes - MaxAirVolFlowRateDuringReheatUser) / MaxAirVolFlowRateDuringReheatUser) >
-                        AutoVsHardSizingThreshold) {
+                        state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
                         ShowContinueError(state,
@@ -2811,7 +2811,7 @@ namespace EnergyPlus::SingleDuct {
                     max(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFractionDuringReheat * this->MaxAirVolFlowRate);
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFractionDuringReheatDes - MaxAirVolFractionDuringReheatUser) / MaxAirVolFractionDuringReheatUser) >
-                        AutoVsHardSizingThreshold) {
+                        state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
                         ShowContinueError(
@@ -2825,7 +2825,7 @@ namespace EnergyPlus::SingleDuct {
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     if ((std::abs(MaxAirVolFlowRateDuringReheatDes - MaxAirVolFlowRateDuringReheatUser) / MaxAirVolFlowRateDuringReheatUser) >
-                        AutoVsHardSizingThreshold) {
+                        state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" + this->SysName +
                                     "\".");
                         ShowContinueError(state,
@@ -2868,72 +2868,72 @@ namespace EnergyPlus::SingleDuct {
             this->MaxAirVolFractionDuringReheat = max(this->MaxAirVolFractionDuringReheat, 0.0);
         }
 
-        if (CurTermUnitSizingNum > 0) {
-            TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
-            TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = 1.0;
-            if (ZoneSizingRunDone) {
+        if (state.dataSize->CurTermUnitSizingNum > 0) {
+            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
+            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
+            if (state.dataSize->ZoneSizingRunDone) {
                 if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
-                    TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                         max(UserInputMaxHeatAirVolFlowRate,
-                            TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+                            TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                             this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
                 } else {
-                    TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
-                        max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
+                        max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatVolFlow,
                             this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
                 }
             } else {
                 if (this->SysType_Num == SysType::SingleDuctVAVReheatVSFan) {
-                    TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                         max(this->MaxHeatAirVolFlowRate, this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac);
                 } else if (this->SysType_Num == SysType::SingleDuctConstVolReheat || this->SysType_Num == SysType::SingleDuctConstVolNoReheat) {
-                    TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
                 } else {
                     if (this->DamperHeatingAction == Action::ReverseAction) {
-                        TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
+                        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow = this->MaxAirVolFlowRate;
                     } else if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
-                        TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = max(
+                        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow = max(
                             this->MaxAirVolFlowRateDuringReheat, (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac));
                     } else {
-                        TermUnitSizing(CurTermUnitSizingNum).AirVolFlow =
+                        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow =
                             this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
                     }
                 }
             }
 
-            if (TermUnitSizing(CurTermUnitSizingNum).AirVolFlow > SmallAirVolFlow) {
+            if (TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow > SmallAirVolFlow) {
                 if (this->DamperHeatingAction == Action::ReverseActionWithLimits) {
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
-                        min(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate) / TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
+                        min(this->MaxAirVolFlowRateDuringReheat, this->MaxAirVolFlowRate) / TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult;
                 } else if (this->DamperHeatingAction == Action::ReverseAction) {
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
-                        this->MaxAirVolFlowRate / TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
+                        this->MaxAirVolFlowRate / TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult;
                 } else if (this->DamperHeatingAction == Action::Normal && this->MaxAirVolFlowRateDuringReheat > 0.0) {
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
                         min(this->MaxAirVolFlowRateDuringReheat, (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac)) /
-                        TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = 1.0;
+                        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
                 } else if (this->DamperHeatingAction == Action::Normal && this->MaxAirVolFlowRateDuringReheat == 0.0) {
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
                         (this->MaxAirVolFlowRate * this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac) /
-                        TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = 1.0;
+                        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
                 } else {
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult =
-                        this->MaxAirVolFlowRate / TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                    TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult =
+                        this->MaxAirVolFlowRate / TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                    TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult;
                 }
-                TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult = max(1.0, TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult);
-                TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = max(1.0, TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult);
+                TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult = max(1.0, TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult);
+                TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = max(1.0, TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult);
             } else {
-                TermUnitSizing(CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
-                TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult = 1.0;
+                TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult = 1.0;
+                TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult = 1.0;
             }
             if (this->ReheatComp_Index > 0) {
                 coilSelectionReportObj->setCoilReheatMultiplier(state,
-                    this->ReheatName, this->ReheatComp, TermUnitSizing(CurTermUnitSizingNum).ReheatLoadMult);
+                    this->ReheatName, this->ReheatComp, TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatLoadMult);
             }
         }
 
@@ -2941,8 +2941,8 @@ namespace EnergyPlus::SingleDuct {
         if (this->MaxReheatWaterVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurTermUnitSizingNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) {
+        if (state.dataSize->CurTermUnitSizingNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) {
                 if (this->MaxReheatWaterVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Reheat Water Flow Rate [m3/s]", this->MaxReheatWaterVolFlow);
@@ -2961,11 +2961,11 @@ namespace EnergyPlus::SingleDuct {
                             ErrorsFound = true;
                         }
                         if (PltSizHeatNum > 0) {
-                            CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                            DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                            DesZoneHeatLoad = TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatLoad;
-                            ZoneDesTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
-                            ZoneDesHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
+                            CoilInTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                            DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                            DesZoneHeatLoad = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatLoad;
+                            ZoneDesTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak;
+                            ZoneDesHumRat = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
                             // the coil load is the zone design heating load plus (or minus!) the reheat load
                             DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
                             if (DesCoilLoad >= SmallLoad) {
@@ -2997,15 +2997,15 @@ namespace EnergyPlus::SingleDuct {
                         BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Reheat Coil Sizing Air Volume Flow Rate [m3/s]",
-                                                     TermUnitSizing(CurTermUnitSizingNum).AirVolFlow);
+                                                     TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow);
                         BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Reheat Coil Sizing Inlet Air Temperature [C]",
-                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                                                     TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
                         BaseSizer::reportSizerOutput(state, this->SysType,
                                                      this->SysName,
                                                      "Design Size Reheat Coil Sizing Inlet Air Humidity Ratio [kgWater/kgDryAir]",
-                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
+                                                     TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else { // Hard-size with sizing data
                         if (this->MaxReheatWaterVolFlow > 0.0 && MaxReheatWaterVolFlowDes > 0.0) {
                             MaxReheatWaterVolFlowUser = this->MaxReheatWaterVolFlow;
@@ -3017,7 +3017,7 @@ namespace EnergyPlus::SingleDuct {
                                                          MaxReheatWaterVolFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxReheatWaterVolFlowDes - MaxReheatWaterVolFlowUser) / MaxReheatWaterVolFlowUser) >
-                                    AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                                 this->SysName + "\".");
                                     ShowContinueError(
@@ -3041,8 +3041,8 @@ namespace EnergyPlus::SingleDuct {
         if (this->MaxReheatSteamVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurTermUnitSizingNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) {
+        if (state.dataSize->CurTermUnitSizingNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) {
                 if (this->MaxReheatSteamVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         this->SysType, this->SysName, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", this->MaxReheatSteamVolFlow);
@@ -3061,11 +3061,11 @@ namespace EnergyPlus::SingleDuct {
                             ErrorsFound = true;
                         }
                         if (PltSizHeatNum > 0) {
-                            CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                            DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
-                            DesZoneHeatLoad = TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesHeatLoad;
-                            ZoneDesTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
-                            ZoneDesHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
+                            CoilInTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU;
+                            DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
+                            DesZoneHeatLoad = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesHeatLoad;
+                            ZoneDesTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak;
+                            ZoneDesHumRat = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneHumRatAtHeatPeak;
                             // the coil load is the zone design heating load plus (or minus!) the reheat load
                             DesCoilLoad = DesZoneHeatLoad + PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
                             if (DesCoilLoad >= SmallLoad) {
@@ -3101,7 +3101,7 @@ namespace EnergyPlus::SingleDuct {
                                                          MaxReheatSteamVolFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(MaxReheatSteamVolFlowDes - MaxReheatSteamVolFlowUser) / MaxReheatSteamVolFlowUser) >
-                                    AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeHVACSingleDuct: Potential issue with equipment sizing for " + this->SysType + " = \"" +
                                                 this->SysName + "\".");
                                     ShowContinueError(
@@ -3121,17 +3121,17 @@ namespace EnergyPlus::SingleDuct {
             this->MaxReheatSteamVolFlow = 0.0;
         }
 
-        if (CurTermUnitSizingNum > 0) {
-            TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
-            TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow = this->MaxReheatWaterVolFlow;
-            TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = this->MaxReheatSteamVolFlow;
-            TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // Coil Summary report
+        if (state.dataSize->CurTermUnitSizingNum > 0) {
+            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MinFlowFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
+            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MaxHWVolFlow = this->MaxReheatWaterVolFlow;
+            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MaxSTVolFlow = this->MaxReheatSteamVolFlow;
+            TermUnitSizing(state.dataSize->CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // Coil Summary report
             if (this->ReheatComp_Num == HeatingCoilType::SimpleHeating) {
                 if (this->DamperHeatingAction == Action::Normal) {
                     SetCoilDesFlow(state,
                         this->ReheatComp, this->ReheatName, this->ZoneMinAirFracDes * this->MaxAirVolFlowRate, ErrorsFound);
                 } else {
-                    SetCoilDesFlow(state, this->ReheatComp, this->ReheatName, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
+                    SetCoilDesFlow(state, this->ReheatComp, this->ReheatName, TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
                 }
             }
         }
@@ -5374,7 +5374,6 @@ namespace EnergyPlus::SingleDuct {
         using BranchNodeConnections::TestCompSet;
         using DataHVACGlobals::ATMixer_InletSide;
         using DataHVACGlobals::ATMixer_SupplySide;
-        using DataSizing::NumZoneSizingInput;
         using DataSizing::ZoneSizingInput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -5600,7 +5599,7 @@ namespace EnergyPlus::SingleDuct {
 
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
                 if (ZoneSizingInput.allocated()) {
-                    for (int SizingInputNum = 1; SizingInputNum <= NumZoneSizingInput; ++SizingInputNum) {
+                    for (int SizingInputNum = 1; SizingInputNum <= state.dataSize->NumZoneSizingInput; ++SizingInputNum) {
                         if (ZoneSizingInput(SizingInputNum).ZoneNum == state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum) {
                             if (ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
@@ -5997,7 +5996,7 @@ namespace EnergyPlus::SingleDuct {
 
         // must be a system sizing run or calculations are not possible
         bool SizingDesRunThisAirSys = false;                               // Sizing:System object found flag
-        CheckThisAirSystemForSizing(airLoopIndex, SizingDesRunThisAirSys); // check for Sizing:System object
+        CheckThisAirSystemForSizing(state, airLoopIndex, SizingDesRunThisAirSys); // check for Sizing:System object
 
         if (SizingDesRunThisAirSys) {
 

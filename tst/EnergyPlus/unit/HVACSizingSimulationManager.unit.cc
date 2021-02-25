@@ -89,15 +89,15 @@ protected:
         state->dataWeatherManager->Environment(2).DesignDayNum = 2;
 
         // setup plant sizing data structure
-        NumPltSizInput = 1;
-        PlantSizData.allocate(NumPltSizInput);
-        PlantSizData(NumPltSizInput).SizingFactorOption = NoSizingFactorMode;
-        PlantSizData(NumPltSizInput).DesVolFlowRate = 0.002;
-        PlantSizData(NumPltSizInput).DeltaT = 10;
-        PlantSizData(NumPltSizInput).ConcurrenceOption = Coincident;
-        PlantSizData(NumPltSizInput).NumTimeStepsInAvg = 1;
-        PlantSizData(NumPltSizInput).PlantLoopName = "Test Plant Loop 1";
-        PlantSizData(NumPltSizInput).LoopType = HeatingLoop;
+        state->dataSize->NumPltSizInput = 1;
+        PlantSizData.allocate(state->dataSize->NumPltSizInput);
+        PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = NoSizingFactorMode;
+        PlantSizData(state->dataSize->NumPltSizInput).DesVolFlowRate = 0.002;
+        PlantSizData(state->dataSize->NumPltSizInput).DeltaT = 10;
+        PlantSizData(state->dataSize->NumPltSizInput).ConcurrenceOption = Coincident;
+        PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 1;
+        PlantSizData(state->dataSize->NumPltSizInput).PlantLoopName = "Test Plant Loop 1";
+        PlantSizData(state->dataSize->NumPltSizInput).LoopType = HeatingLoop;
 
         // set up a plant loop
         state->dataPlnt->TotNumLoops = 1;
@@ -487,8 +487,8 @@ TEST_F(HVACSizingSimulationManagerTest, TopDownTestSysTimestep1)
     // to coincident plant sizing with HVAC sizing simulation
     // this test runs 1 system timestep for each zone timestep
 
-    GlobalCoolSizingFactor = 1.0;
-    PlantSizData(NumPltSizInput).SizingFactorOption = GlobalCoolingSizingFactorMode;
+    state->dataSize->GlobalCoolSizingFactor = 1.0;
+    PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = GlobalCoolingSizingFactorMode;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 
@@ -570,9 +570,9 @@ TEST_F(HVACSizingSimulationManagerTest, VarySysTimesteps)
     // to coincident plant sizing with HVAC sizing simulation
     // this test run varies the system timestep some to test irregular
 
-    PlantSizData(NumPltSizInput).NumTimeStepsInAvg = 2;
-    GlobalHeatSizingFactor = 1.0;
-    PlantSizData(NumPltSizInput).SizingFactorOption = GlobalHeatingSizingFactorMode;
+    PlantSizData(state->dataSize->NumPltSizInput).NumTimeStepsInAvg = 2;
+    state->dataSize->GlobalHeatSizingFactor = 1.0;
+    PlantSizData(state->dataSize->NumPltSizInput).SizingFactorOption = GlobalHeatingSizingFactorMode;
 
     HVACSizingSimulationManager testSizeSimManagerObj;
 

@@ -669,8 +669,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -1000,8 +1000,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -1414,8 +1414,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -1827,8 +1827,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     Node(state->dataPTHP->PTUnit(PTUnitNum).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -2508,8 +2508,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -3184,8 +3184,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -4936,8 +4936,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -6688,8 +6688,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataHVACVarRefFlow->VRFTU(1).ZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -6925,8 +6925,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     Node(state->dataSingleDuct->SysATMixer(1).SecInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataUnitVentilators->UnitVent(1).ZonePtr = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -7162,8 +7162,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     Node(state->dataUnitVentilators->UnitVent(UnitVentNum).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataUnitVentilators->UnitVent(1).ZonePtr = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
@@ -7526,7 +7526,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     int ZoneNum(1);
     int FanCoilNum(1);
 
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
@@ -7561,8 +7561,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    NumPltSizInput = 2;
-    PlantSizData.allocate(NumPltSizInput);
+    state->dataSize->NumPltSizInput = 2;
+    PlantSizData.allocate(state->dataSize->NumPltSizInput);
     // chilled water coil
     auto &CWCoil(state->dataWaterCoils->WaterCoil(2));
     thisFanCoil.CCoilName_Index = 2;
@@ -7643,7 +7643,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
     TempControlType(1) = 4;
-    ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
 
     FinalZoneSizing.allocate(1);
     auto &finalZoneSizing(FinalZoneSizing(1));
@@ -7697,7 +7697,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     Node(thisATMixer.SecInNode).Enthalpy = Node(zoneEquipConfig.ZoneNode).Enthalpy;
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    ZoneEqFanCoil = true;
+    state->dataSize->ZoneEqFanCoil = true;
 
     // set predicted heating load
     zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 0;
@@ -7739,8 +7739,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     Node(thisFanCoil.ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
     Node(thisFanCoil.ATMixerPriNode).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set predicted cooling load
@@ -7954,7 +7954,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     int ZoneNum(1);
     int FanCoilNum(1);
 
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
@@ -7992,8 +7992,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    NumPltSizInput = 2;
-    PlantSizData.allocate(NumPltSizInput);
+    state->dataSize->NumPltSizInput = 2;
+    PlantSizData.allocate(state->dataSize->NumPltSizInput);
     // chilled water coil
     auto &CWCoil(state->dataWaterCoils->WaterCoil(2));
     thisFanCoil.CCoilName_Index = 2;
@@ -8074,7 +8074,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     TempControlType.allocate(1);
     TempControlType(1) = 4;
-    ZoneSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
 
     FinalZoneSizing.allocate(1);
     auto &finalZoneSizing(FinalZoneSizing(1));
@@ -8128,7 +8128,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     Node(thisATMixer.SecInNode).Enthalpy = Node(zoneEquipConfig.ZoneNode).Enthalpy;
 
     state->dataGlobal->BeginEnvrnFlag = true;
-    ZoneEqFanCoil = true;
+    state->dataSize->ZoneEqFanCoil = true;
     // check availability manager Night Cycle parameters
     EXPECT_EQ(state->dataSystemAvailabilityManager->ThermostatWithMinimumRunTime, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CycRunTimeCntrlType);
     EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).AvailStatus);

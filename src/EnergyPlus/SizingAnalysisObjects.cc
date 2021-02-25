@@ -438,9 +438,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
 void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int const HVACSizingIterCount)
 {
     using DataSizing::GlobalCoolingSizingFactorMode;
-    using DataSizing::GlobalCoolSizingFactor;
     using DataSizing::GlobalHeatingSizingFactorMode;
-    using DataSizing::GlobalHeatSizingFactor;
     using DataSizing::LoopComponentSizingFactorMode;
     using DataSizing::NoSizingFactorMode;
     using DataSizing::PlantSizData;
@@ -497,9 +495,9 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, int 
     if (PlantSizData(plantSizingIndex).SizingFactorOption == NoSizingFactorMode) {
         sizingFac = 1.0;
     } else if (PlantSizData(plantSizingIndex).SizingFactorOption == GlobalHeatingSizingFactorMode) {
-        sizingFac = GlobalHeatSizingFactor;
+        sizingFac = state.dataSize->GlobalHeatSizingFactor;
     } else if (PlantSizData(plantSizingIndex).SizingFactorOption == GlobalCoolingSizingFactorMode) {
-        sizingFac = GlobalCoolSizingFactor;
+        sizingFac = state.dataSize->GlobalCoolSizingFactor;
     } else if (PlantSizData(plantSizingIndex).SizingFactorOption == LoopComponentSizingFactorMode) {
         // multiplier used for pumps, often 1.0, from component level sizing fractions
         sizingFac = state.dataPlnt->PlantLoop(plantLoopIndex).LoopSide(SupplySide).Branch(1).PumpSizFac;

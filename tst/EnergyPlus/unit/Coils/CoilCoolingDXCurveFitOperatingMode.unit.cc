@@ -126,25 +126,25 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::SysSizPeakDDNum.allocate(1);
 
-    DataSizing::CurSysNum = 0;
-    DataSizing::CurOASysNum = 0;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
     state->dataEnvrn->StdBaroPress = 101325.0;
 
-    DataSizing::ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = false;
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(25);
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingRunDone = true;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     Real64 ratedEvapAirFlowRate = 1.005;
 
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolVolFlow = ratedEvapAirFlowRate;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = ratedEvapAirFlowRate;
 
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.001;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 15.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.0006;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.001;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 15.0;
+    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0006;
 
     thisMode.size(*state);
 

@@ -309,7 +309,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    ASSERT_EQ(1, NumZoneSizingInput);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
     ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
@@ -378,7 +378,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    ASSERT_EQ(1, NumZoneSizingInput);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
     ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);

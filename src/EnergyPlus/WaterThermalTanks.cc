@@ -3486,7 +3486,7 @@ namespace EnergyPlus::WaterThermalTanks {
             }
 
             if (Tank.UseSide.loopSideNum == DataPlant::DemandSide && Tank.SourceInletNode != 0) {
-                PlantUtilities::RegisterPlantCompDesignFlow(Tank.SourceInletNode, Tank.SourceDesignVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, Tank.SourceInletNode, Tank.SourceDesignVolFlowRate);
             }
 
         } // WaterThermalTankNum
@@ -3812,7 +3812,7 @@ namespace EnergyPlus::WaterThermalTanks {
             }
 
             if (Tank.UseSide.loopSideNum == DataPlant::DemandSide && Tank.SourceInletNode != 0) {
-                PlantUtilities::RegisterPlantCompDesignFlow(Tank.SourceInletNode, Tank.SourceDesignVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, Tank.SourceInletNode, Tank.SourceDesignVolFlowRate);
             }
 
             if (DataIPShortCuts::lAlphaFieldBlanks(13)) {
@@ -5931,11 +5931,11 @@ namespace EnergyPlus::WaterThermalTanks {
                                                  "Evaporator air flow rate [m3/s]",
                                                  state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate);
                 }
-                DataSizing::DataNonZoneNonAirloopValue = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate;
+                state.dataSize->DataNonZoneNonAirloopValue = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate;
                 state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirMassFlowRate = state.dataWaterThermalTanks->HPWaterHeater(HPNum).OperatingAirFlowRate * state.dataEnvrn->StdRhoAir;
-                if (DataSizing::CurZoneEqNum > 0) {
-                    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).CoolingAirFlow = true;
-                    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).CoolingAirVolFlow = DataSizing::DataNonZoneNonAirloopValue;
+                if (state.dataSize->CurZoneEqNum > 0) {
+                    DataSizing::ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirFlow = true;
+                    DataSizing::ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirVolFlow = state.dataSize->DataNonZoneNonAirloopValue;
                 }
                 if (state.dataPlnt->PlantFirstSizesOkayToReport || !state.dataGlobal->AnyPlantInModel || this->AlreadyRated) this->MyHPSizeFlag = false;
             }
@@ -10248,9 +10248,9 @@ namespace EnergyPlus::WaterThermalTanks {
                                 this->Type, this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, this->UseDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, this->UseDesignVolFlowRate);
                         } else {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, tmpUseDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, tmpUseDesignVolFlowRate);
                         }
 
                         Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->UseSide.loopNum).FluidName,
@@ -10267,7 +10267,7 @@ namespace EnergyPlus::WaterThermalTanks {
                     // do nothing
                 } // plant sizing object
             } else {
-                PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, this->UseDesignVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, this->UseDesignVolFlowRate);
                 Real64 rho;
                 if (this->UseSide.loopNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->UseSide.loopNum).FluidName,
@@ -10310,9 +10310,9 @@ namespace EnergyPlus::WaterThermalTanks {
                                 this->Type, this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, this->SourceDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, this->SourceDesignVolFlowRate);
                         } else {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, tmpSourceDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, tmpSourceDesignVolFlowRate);
                         }
                         Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                        DataGlobalConstants::InitConvTemp,
@@ -10329,7 +10329,7 @@ namespace EnergyPlus::WaterThermalTanks {
                 } // plant sizing object
             } else {
                 if (this->SrcSide.loopSideNum == DataPlant::SupplySide) {
-                    PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, this->SourceDesignVolFlowRate);
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, this->SourceDesignVolFlowRate);
                     Real64 rho;
                     if (this->SrcSide.loopNum > 0) {
                         rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->SrcSide.loopNum).FluidName,
@@ -10901,9 +10901,9 @@ namespace EnergyPlus::WaterThermalTanks {
                                 this->Type, this->Name, "Initial Use Side Design Flow Rate [m3/s]", this->UseDesignVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, this->UseDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, this->UseDesignVolFlowRate);
                         } else {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, tmpUseDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, tmpUseDesignVolFlowRate);
                         }
                         Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->UseSide.loopNum).FluidName,
                                                                        DataGlobalConstants::InitConvTemp,
@@ -10921,7 +10921,7 @@ namespace EnergyPlus::WaterThermalTanks {
 
             } else {
                 // not autosized - report flow to RegisterPlantCompDesignFlow for supply side component sizing
-                PlantUtilities::RegisterPlantCompDesignFlow(this->UseInletNode, this->UseDesignVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, this->UseInletNode, this->UseDesignVolFlowRate);
                 Real64 rho;
                 if (this->UseSide.loopNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->UseSide.loopNum).FluidName,
@@ -10985,9 +10985,9 @@ namespace EnergyPlus::WaterThermalTanks {
                                 this->Type, this->Name, "Initial Source Side Design Flow Rate [m3/s]", this->SourceDesignVolFlowRate);
                         }
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, this->SourceDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, this->SourceDesignVolFlowRate);
                         } else {
-                            PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, tmpSourceDesignVolFlowRate);
+                            PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, tmpSourceDesignVolFlowRate);
                         }
                         Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                        DataGlobalConstants::InitConvTemp,
@@ -11005,7 +11005,7 @@ namespace EnergyPlus::WaterThermalTanks {
 
             } else {
                 // not autosized - report flow to RegisterPlantCompDesignFlow for supply side component sizing
-                PlantUtilities::RegisterPlantCompDesignFlow(this->SourceInletNode, this->SourceDesignVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, this->SourceInletNode, this->SourceDesignVolFlowRate);
                 Real64 rho;
                 if (this->SrcSide.loopNum > 0) {
                     rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->SrcSide.loopNum).FluidName,

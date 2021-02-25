@@ -12783,9 +12783,6 @@ namespace EnergyPlus::OutputReportTabular {
         // METHODOLOGY EMPLOYED:
         //   Save sequence of values for report during sizing.
 
-        // Using/Aliasing
-        using DataSizing::CurOverallSimDay;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iSurf(0);
         static int ZoneNum(0);
@@ -12795,13 +12792,13 @@ namespace EnergyPlus::OutputReportTabular {
 
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-            ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, _) = 0.0;
+            ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, _) = 0.0;
             for (iSurf = 1; iSurf <= state.dataSurface->TotSurfaces; ++iSurf) {
                 ZoneNum = state.dataSurface->Surface(iSurf).Zone;
                 if (ZoneNum == 0) continue;
                 if (state.dataSurface->Surface(iSurf).Class != DataSurfaces::SurfaceClass::Window) continue;
                 // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
-                ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, ZoneNum) +=
+                ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, ZoneNum) +=
                     state.dataSurface->SurfWinGainConvGlazToZoneRep(iSurf) + state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(iSurf) + state.dataSurface->SurfWinGainConvShadeToZoneRep(iSurf) +
                             state.dataSurface->SurfWinGainFrameDividerToZoneRep(iSurf);
                 // for now assume zero instant solar - may change related
@@ -12812,7 +12809,7 @@ namespace EnergyPlus::OutputReportTabular {
             for (int izone = 1; izone <= state.dataGlobal->NumOfZones; ++izone) {
                 Real64 tubularGain = 0.0;
                 InternalHeatGains::SumInternalConvectionGainsByTypes(state, izone, IntGainTypesTubular, tubularGain);
-                ort->feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, izone) += tubularGain;
+                ort->feneCondInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, izone) += tubularGain;
             }
         }
     }
@@ -12833,7 +12830,6 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-        using DataSizing::CurOverallSimDay;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
@@ -12843,47 +12839,47 @@ namespace EnergyPlus::OutputReportTabular {
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                ort->infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
+                ort->infilInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).InfilHeatGain - state.dataHeatBal->ZnAirRpt(iZone).InfilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->infilInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                    ort->infilInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiSenLossW); // air flow network
                 }
-                ort->infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
+                ort->infilLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).InfilLatentGain - state.dataHeatBal->ZnAirRpt(iZone).InfilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone infiltration
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->infilLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                    ort->infilLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneInfiLatLossW); // air flow network
                 }
 
-                ort->zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
+                ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).VentilHeatGain - state.dataHeatBal->ZnAirRpt(iZone).VentilHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                    ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentSenLossW); // air flow network
                 }
-                ort->zoneVentLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
+                ort->zoneVentLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).VentilLatentGain - state.dataHeatBal->ZnAirRpt(iZone).VentilLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone ventilation
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->zoneVentInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                    ort->zoneVentInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneVentLatLossW); // air flow network
                 }
 
-                ort->interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) =
+                ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).MixHeatGain - state.dataHeatBal->ZnAirRpt(iZone).MixHeatLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->interZoneMixInstantSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                    ort->interZoneMixInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixSenLossW); // air flow network
                 }
-                ort->interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) =
+                ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) =
                     ((state.dataHeatBal->ZnAirRpt(iZone).MixLatentGain - state.dataHeatBal->ZnAirRpt(iZone).MixLatentLoss) / (TimeStepSys * DataGlobalConstants::SecInHour)); // zone mixing
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ort->interZoneMixLatentSeq(CurOverallSimDay, TimeStepInDay, iZone) +=
+                    ort->interZoneMixLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone) +=
                         (AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatGainW -
                          AirflowNetwork::AirflowNetworkReportData(iZone).MultiZoneMixLatLossW); // air flow network
                 }
@@ -13646,14 +13642,13 @@ namespace EnergyPlus::OutputReportTabular {
     }
 
     // Used to construct the tabular output for a single cell in the component load summary reports based on moving average
-    Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep)
+    Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep)
     {
-        using DataSizing::NumTimeStepsInAvg;
         using General::MovingAvg;
         Array1D<Real64> AvgData; // sequence data after averaging
         AvgData.allocate(numTimeSteps);
         AvgData = 0.;
-        MovingAvg(dataSeq * 1.0, numTimeSteps, NumTimeStepsInAvg, AvgData);
+        MovingAvg(dataSeq * 1.0, numTimeSteps, state.dataSize->NumTimeStepsInAvg, AvgData);
         return AvgData(maxTimeStep);
     }
 
@@ -13674,7 +13669,6 @@ namespace EnergyPlus::OutputReportTabular {
                                         Array2D<Real64> const &surfDelaySeq)
     {
         using DataSizing::CalcZoneSizing;
-        using DataSizing::NumTimeStepsInAvg;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
@@ -13704,53 +13698,66 @@ namespace EnergyPlus::OutputReportTabular {
         if (desDaySelected != 0 && timeOfMax != 0) {
 
             // PEOPLE
-            resultCells(cSensInst, rPeople) = MovingAvgAtMaxTime(ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rPeople) =
+                MovingAvgAtMaxTime(state, ort->peopleInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rPeople) = true;
-            resultCells(cLatent, rPeople) = MovingAvgAtMaxTime(ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rPeople) =
+                MovingAvgAtMaxTime(state, ort->peopleLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rPeople) = true;
-            resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rPeople) = MovingAvgAtMaxTime(state, peopleDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rPeople) = true;
 
             // LIGHTS
-            resultCells(cSensInst, rLights) = MovingAvgAtMaxTime(ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rLights) =
+                MovingAvgAtMaxTime(state, ort->lightInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rLights) = true;
-            resultCells(cSensRA, rLights) = MovingAvgAtMaxTime(ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensRA, rLights) =
+                MovingAvgAtMaxTime(state, ort->lightRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensRA, rLights) = true;
-            resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rLights) = MovingAvgAtMaxTime(state, lightDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rLights) = true;
 
             // EQUIPMENT
-            resultCells(cSensInst, rEquip) = MovingAvgAtMaxTime(ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rEquip) =
+                MovingAvgAtMaxTime(state, ort->equipInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rEquip) = true;
-            resultCells(cLatent, rEquip) = MovingAvgAtMaxTime(ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rEquip) =
+                MovingAvgAtMaxTime(state, ort->equipLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rEquip) = true;
-            resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rEquip) = MovingAvgAtMaxTime(state, equipDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rEquip) = true;
 
             // REFRIGERATION EQUIPMENT
-            resultCells(cSensInst, rRefrig) = MovingAvgAtMaxTime(ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rRefrig) =
+                MovingAvgAtMaxTime(state, ort->refrigInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rRefrig) = true;
-            resultCells(cSensRA, rRefrig) = MovingAvgAtMaxTime(ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensRA, rRefrig) =
+                MovingAvgAtMaxTime(state, ort->refrigRetAirSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensRA, rRefrig) = true;
-            resultCells(cLatent, rRefrig) = MovingAvgAtMaxTime(ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rRefrig) =
+                MovingAvgAtMaxTime(state, ort->refrigLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rRefrig) = true;
 
             // WATER USE EQUIPMENT
-            resultCells(cSensInst, rWaterUse) = MovingAvgAtMaxTime(ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rWaterUse) =
+                MovingAvgAtMaxTime(state, ort->waterUseInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rWaterUse) = true;
-            resultCells(cLatent, rWaterUse) = MovingAvgAtMaxTime(ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rWaterUse) =
+                MovingAvgAtMaxTime(state, ort->waterUseLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rWaterUse) = true;
 
             // HVAC EQUIPMENT LOSSES
-            resultCells(cSensInst, rHvacLoss) = MovingAvgAtMaxTime(ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rHvacLoss) =
+                MovingAvgAtMaxTime(state, ort->hvacLossInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rHvacLoss) = true;
-            resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rHvacLoss) = MovingAvgAtMaxTime(state, hvacLossDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rHvacLoss) = true;
 
             // POWER GENERATION EQUIPMENT
-            resultCells(cSensInst, rPowerGen) = MovingAvgAtMaxTime(ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rPowerGen) =
+                MovingAvgAtMaxTime(state, ort->powerGenInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rPowerGen) = true;
-            resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rPowerGen) = MovingAvgAtMaxTime(state, powerGenDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rPowerGen) = true;
 
             // DOAS
@@ -13760,30 +13767,36 @@ namespace EnergyPlus::OutputReportTabular {
             resCellsUsd(cLatent, rDOAS) = true;
 
             // INFILTRATION
-            resultCells(cSensInst, rInfil) = MovingAvgAtMaxTime(ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rInfil) =
+                MovingAvgAtMaxTime(state, ort->infilInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rInfil) = true;
-            resultCells(cLatent, rInfil) = MovingAvgAtMaxTime(ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rInfil) =
+                MovingAvgAtMaxTime(state, ort->infilLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rInfil) = true;
 
             // ZONE VENTILATION
-            resultCells(cSensInst, rZoneVent) = MovingAvgAtMaxTime(ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rZoneVent) =
+                MovingAvgAtMaxTime(state, ort->zoneVentInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rZoneVent) = true;
-            resultCells(cLatent, rZoneVent) = MovingAvgAtMaxTime(ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rZoneVent) =
+                MovingAvgAtMaxTime(state, ort->zoneVentLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rZoneVent) = true;
 
             // INTERZONE MIXING
             resultCells(cSensInst, rIntZonMix) =
-                MovingAvgAtMaxTime(ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+                MovingAvgAtMaxTime(state, ort->interZoneMixInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rIntZonMix) = true;
-            resultCells(cLatent, rIntZonMix) = MovingAvgAtMaxTime(ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cLatent, rIntZonMix) =
+                MovingAvgAtMaxTime(state, ort->interZoneMixLatentSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cLatent, rIntZonMix) = true;
 
             // FENESTRATION CONDUCTION
-            resultCells(cSensInst, rFeneCond) = MovingAvgAtMaxTime(feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensInst, rFeneCond) =
+                MovingAvgAtMaxTime(state, feneCondInstantSeq(desDaySelected, _, zoneIndex), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensInst, rFeneCond) = true;
 
             // FENESTRATION SOLAR
-            resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
+            resultCells(cSensDelay, rFeneSolr) = MovingAvgAtMaxTime(state, feneSolarDelaySeq(_), NumOfTimeStepInDay, timeOfMax);
             resCellsUsd(cSensDelay, rFeneSolr) = true;
 
             // opaque surfaces - must combine individual surfaces by class and other side conditions
@@ -13800,7 +13813,7 @@ namespace EnergyPlus::OutputReportTabular {
                     }
                 }
                 seqData = surfDelaySeq(_, kSurf);
-                MovingAvg(seqData, NumOfTimeStepInDay, NumTimeStepsInAvg, AvgData);
+                MovingAvg(seqData, NumOfTimeStepInDay, state.dataSize->NumTimeStepsInAvg, AvgData);
                 singleSurfDelay = AvgData(timeOfMax);
                 {
                     auto const SELECT_CASE_var(state.dataSurface->Surface(kSurf).Class);
@@ -13865,9 +13878,7 @@ namespace EnergyPlus::OutputReportTabular {
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
         using DataSizing::CalcFinalZoneSizing;
-        using DataSizing::CoolPeakDateHrMin;
         using DataSizing::FinalZoneSizing;
-        using DataSizing::HeatPeakDateHrMin;
         using DataSizing::SupplyAirTemperature;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
@@ -13885,7 +13896,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
                                                     coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
-                    compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
+                    compLoad.peakDateHrMin = state.dataSize->CoolPeakDateHrMin(zoneIndex);
                 }
 
                 // Outside Dry Bulb Temperature
@@ -13939,7 +13950,7 @@ namespace EnergyPlus::OutputReportTabular {
                                                     state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth,
                                                     coilSelectionReportObj->getTimeText(state, timeOfMax));
                 } else {
-                    compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);
+                    compLoad.peakDateHrMin = state.dataSize->HeatPeakDateHrMin(zoneIndex);
                 }
 
                 // Outside Dry Bulb Temperature

@@ -7201,13 +7201,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
         // sweep specific data into one pointer to avoid if statements throughout this subroutine
-        if (DataSizing::CurOASysNum > 0) {
-            select_EqSizing = &DataSizing::OASysEqSizing(DataSizing::CurOASysNum);
-        } else if (DataSizing::CurSysNum > 0) {
-            select_EqSizing = &DataSizing::UnitarySysEqSizing(DataSizing::CurSysNum);
-        } else if (DataSizing::CurZoneEqNum > 0) {
-            select_EqSizing = &DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum);
-            DataSizing::ZoneEqUnitarySys = true;
+        if (state.dataSize->CurOASysNum > 0) {
+            select_EqSizing = &DataSizing::OASysEqSizing(state.dataSize->CurOASysNum);
+        } else if (state.dataSize->CurSysNum > 0) {
+            select_EqSizing = &DataSizing::UnitarySysEqSizing(state.dataSize->CurSysNum);
+        } else if (state.dataSize->CurZoneEqNum > 0) {
+            select_EqSizing = &DataSizing::ZoneEqSizing(state.dataSize->CurZoneEqNum);
+            state.dataSize->ZoneEqUnitarySys = true;
         } else {
             assert(false);
         }
@@ -7255,13 +7255,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         EvapCondPumpPowerDes = 0.0;
         EvapCondPumpPowerUser = 0.0;
 
-        DataScalableSizingON = false;
-        DataScalableCapSizingON = false;
-        DataFracOfAutosizedCoolingAirflow = 1.0;
-        DataFracOfAutosizedHeatingAirflow = 1.0;
-        DataFracOfAutosizedCoolingCapacity = 1.0;
-        DataFracOfAutosizedHeatingCapacity = 1.0;
-        SuppHeatCap = 0.0;
+        state.dataSize->DataScalableSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
+        state.dataSize->DataFracOfAutosizedCoolingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+        state.dataSize->SuppHeatCap = 0.0;
 
         if (state.dataHVACVarRefFlow->MyOneTimeSizeFlag) {
             // initialize the environment and sizing flags
@@ -7271,16 +7271,16 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         CompType = DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num);
         CompName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name;
-        DataZoneNumber = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum;
+        state.dataSize->DataZoneNumber = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum;
 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) {
-                DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-                DataSizing::DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
+                state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-                    DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+                    state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
                 } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
-                    DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+                    state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
                 }
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
@@ -7293,12 +7293,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) {
-                DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-                DataSizing::DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
+                state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
-                    DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+                    state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
                 } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
-                    DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+                    state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
                 }
             } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
@@ -7314,7 +7314,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HVACSizingIndex > 0) {
             // initialize OA flow for sizing other inputs (e.g., capacity)
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow == AutoSize) {
-                EqSizing.OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                EqSizing.OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
             } else {
                 EqSizing.OAVolFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow;
             }
@@ -7323,7 +7323,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) { // set up ATMixer conditions for scalable capacity sizing
                 EqSizing.OAVolFlow = 0.0;                                    // Equipment OA flow should always be 0 when ATMixer is used
-                SingleDuct::setATMixerSizingProperties(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerIndex, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum, CurZoneEqNum);
+                SingleDuct::setATMixerSizingProperties(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerIndex, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum, state.dataSize->CurZoneEqNum);
             }
 
             zoneHVACIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HVACSizingIndex;
@@ -7342,13 +7342,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                    DataScalableSizingON = true;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                    DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     TempSize = AutoSize;
-                    DataScalableSizingON = true;
+                    state.dataSize->DataScalableSizingON = true;
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                 }
@@ -7365,16 +7365,16 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 SizingMethod = CoolingCapacitySizing;
                 TempSize = AutoSize;
                 PrintFlag = false;
-                DataScalableSizingON = true;
-                DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+                state.dataSize->DataScalableSizingON = true;
+                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                    DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                    state.dataSize->DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                 }
                 CoolingCapacitySizer sizerCoolingCapacity;
                 sizerCoolingCapacity.overrideSizingString(SizingString);
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                state.dataSize->DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                state.dataSize->DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                 PrintFlag = true;
                 TempSize = AutoSize;
                 CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -7401,13 +7401,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                    DataScalableSizingON = true;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
-                    DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     TempSize = AutoSize;
-                    DataScalableSizingON = true;
+                    state.dataSize->DataScalableSizingON = true;
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 }
@@ -7421,17 +7421,17 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 SizingMethod = HeatingCapacitySizing;
                 TempSize = AutoSize;
                 PrintFlag = false;
-                DataScalableSizingON = true;
-                DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
+                state.dataSize->DataScalableSizingON = true;
+                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                 if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
-                    DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                 }
                 bool errorsFound = false;
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
+                state.dataSize->DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 SizingMethod = HeatingAirflowSizing;
                 PrintFlag = true;
                 TempSize = AutoSize;
@@ -7456,19 +7456,19 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                    DataScalableSizingON = true;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                    DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-                    DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     TempSize = AutoSize;
-                    DataScalableSizingON = true;
+                    state.dataSize->DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
-                    DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-                    DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     TempSize = AutoSize;
-                    DataScalableSizingON = true;
+                    state.dataSize->DataScalableSizingON = true;
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 }
@@ -7497,19 +7497,19 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                    DataScalableSizingON = true;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
-                    DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-                    DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     TempSize = AutoSize;
-                    DataScalableSizingON = true;
+                    state.dataSize->DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                    DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-                    DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     TempSize = AutoSize;
-                    DataScalableSizingON = true;
+                    state.dataSize->DataScalableSizingON = true;
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 }
@@ -7534,11 +7534,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     EqSizing.CoolingCapacity = true;
-                    EqSizing.DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    DataScalableCapSizingON = true;
+                    EqSizing.DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                    DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                    state.dataSize->DataScalableCapSizingON = true;
                 }
             }
 
@@ -7555,11 +7555,11 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     EqSizing.HeatingCapacity = true;
-                    EqSizing.DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    DataScalableCapSizingON = true;
+                    EqSizing.DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                    DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+                    state.dataSize->DataScalableCapSizingON = true;
                 }
             }
         } else {
@@ -7606,8 +7606,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -7616,7 +7616,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             } else {
                 CheckZoneSizing(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
-                CoolOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
+                CoolOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
                 if (CoolOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     CoolOutAirVolFlowDes = 0.0;
                 }
@@ -7637,7 +7637,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " +
                                             DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num) + ' ' + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                                 ShowContinueError(
@@ -7655,10 +7655,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
         } else {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow == DataSizing::AutoSize) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).OASysExists) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).OASysExists) {
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = 0.0;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = min(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
                 }
                 BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -7671,8 +7671,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -7681,7 +7681,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             } else {
                 CheckZoneSizing(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
-                HeatOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
+                HeatOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
                 if (HeatOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     HeatOutAirVolFlowDes = 0.0;
                 }
@@ -7702,7 +7702,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " +
                                             DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num) + ' ' + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                                 ShowContinueError(
@@ -7720,10 +7720,10 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
         } else {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow == DataSizing::AutoSize) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).OASysExists) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).OASysExists) {
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = 0.0;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = min(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
                 }
                 BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -7735,15 +7735,15 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) { // set up ATMixer conditions for use in component sizing
             EqSizing.OAVolFlow = 0.0;                                    // Equipment OA flow should always be 0 when ATMixer is used
-            SingleDuct::setATMixerSizingProperties(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerIndex, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum, CurZoneEqNum);
+            SingleDuct::setATMixerSizingProperties(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerIndex, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum, state.dataSize->CurZoneEqNum);
         }
 
         IsAutoSize = false;
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -7753,7 +7753,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             } else {
                 CheckZoneSizing(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                 NoCoolHeatOutAirVolFlowDes =
-                    min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
+                    min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
                 if (NoCoolHeatOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     NoCoolHeatOutAirVolFlowDes = 0.0;
                 }
@@ -7775,7 +7775,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      NoCoolHeatOutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
-                                AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " +
                                             DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num) + ' ' + state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                                 ShowContinueError(state,
@@ -7794,7 +7794,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
         } else {
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow == DataSizing::AutoSize) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).OASysExists) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).OASysExists) {
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = 0.0;
                 } else {
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = min(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
@@ -7861,8 +7861,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (CheckVRFCombinationRatio(VRFCond)) {
             OnOffAirFlowRat = 1.0;
             // set up the outside air data for sizing the DX coils
-            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) ZoneEqDXCoil = true;
-            if (CurZoneEqNum > 0) {
+            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) state.dataSize->ZoneEqDXCoil = true;
+            if (state.dataSize->CurZoneEqNum > 0) {
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0 || state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow > 0.0) {
                     EqSizing.OAVolFlow = max(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow);
                 } else {
@@ -7932,7 +7932,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      "User-Specified Rated Total Cooling Capacity (gross) [W]",
                                                      CoolingCapacityUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                                 ShowContinueError(state,
@@ -7976,7 +7976,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      "User-Specified Rated Total Heating Capacity [W]",
                                                      HeatingCapacityUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                                 ShowContinueError(state, format("User-Specified Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityUser));
@@ -8106,7 +8106,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                  HeatingCapacityUser);
 
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(CoolingCapacityDes - CoolingCapacityUser) / CoolingCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                         state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                             ShowContinueError(state,
@@ -8117,7 +8117,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                             ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
                         }
 
-                        if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > AutoVsHardSizingThreshold) {
+                        if ((std::abs(HeatingCapacityDes - HeatingCapacityUser) / HeatingCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                         state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                             ShowContinueError(state, format("User-Specified Rated Total Heating Capacity of {:.2R} [W]", HeatingCapacityUser));
@@ -8157,7 +8157,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      "User-Specified Resistive Defrost Heater Capacity",
                                                      DefrostCapacityUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                                 ShowContinueError(state,
@@ -8194,7 +8194,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      EvapCondAirVolFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(EvapCondAirVolFlowRateDes - EvapCondAirVolFlowRateUser) / EvapCondAirVolFlowRateUser) >
-                                AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                                 ShowContinueError(
@@ -8232,7 +8232,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                      "User-Specified Evaporative Condenser Pump Rated Power Consumption [W]",
                                                      EvapCondPumpPowerUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(EvapCondPumpPowerDes - EvapCondPumpPowerUser) / EvapCondPumpPowerUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(EvapCondPumpPowerDes - EvapCondPumpPowerUser) / EvapCondPumpPowerUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVRF: Potential issue with equipment sizing for " + std::string(cVRFTypes(state.dataHVACVarRefFlow->VRF(VRFCond).VRFSystemTypeNum)) + ' ' +
                                             state.dataHVACVarRefFlow->VRFTU(VRFCond).Name);
                                 ShowContinueError(
@@ -8271,7 +8271,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
         }
 
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
     }
 
     void VRFCondenserEquipment::SizeVRFCondenser(EnergyPlusData &state)
@@ -8354,7 +8354,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 ShowFatalError(state, "Preceding sizing errors cause program termination");
             }
 
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondenserNodeNum, this->WaterCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondenserNodeNum, this->WaterCondVolFlowRate);
         }
     }
 
@@ -9105,7 +9105,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).firstPass) {
             if (!state.dataHVACVarRefFlow->MySizeFlag(VRFTUNum)) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).firstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).firstPass);
             }
         }
 

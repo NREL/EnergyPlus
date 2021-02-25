@@ -979,7 +979,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
 
-    DataSizing::NumPltSizInput = 1;
+    state->dataSize->NumPltSizInput = 1;
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).DeltaT = 5.0;
     DataSizing::PlantSizData(1).ExitTemp = 6.0;

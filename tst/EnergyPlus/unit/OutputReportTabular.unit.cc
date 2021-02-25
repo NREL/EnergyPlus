@@ -6465,7 +6465,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     CalcFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
@@ -6968,7 +6968,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int coolTimeOfMax = 64;
     DataSizing::CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
     DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
     DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
     DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
@@ -6988,7 +6988,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int heatTimeOfMax = 4;
     DataSizing::CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
     DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
-    DataSizing::HeatPeakDateHrMin.allocate(1);
+    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
     DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
     DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;

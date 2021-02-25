@@ -843,7 +843,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                 }
             }
         }
-        PlantUtilities::RegisterPlantCompDesignFlow(this->SupplySideLoop.inletNodeNum, tmpSupSideDesignVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->SupplySideLoop.inletNodeNum, tmpSupSideDesignVolFlowRate);
 
         // second deal with Loop Demand Side
         Real64 tmpDmdSideDesignVolFlowRate = this->DemandSideLoop.DesignVolumeFlowRate;
@@ -868,7 +868,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                              this->DemandSideLoop.DesignVolumeFlowRate);
             }
         }
-        PlantUtilities::RegisterPlantCompDesignFlow(this->DemandSideLoop.inletNodeNum, tmpDmdSideDesignVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->DemandSideLoop.inletNodeNum, tmpDmdSideDesignVolFlowRate);
 
         // size UA if needed
         if (this->UAWasAutoSized) {
