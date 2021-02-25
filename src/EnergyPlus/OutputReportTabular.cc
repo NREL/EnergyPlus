@@ -4571,9 +4571,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
-        using LowTempRadiantSystem::NumOfCFloLowTempRadSys;
-        using LowTempRadiantSystem::NumOfElecLowTempRadSys;
-        using LowTempRadiantSystem::NumOfHydrLowTempRadSys;
 
         static int iZone(0);
         static int iRadiant(0);
@@ -4691,7 +4688,7 @@ namespace EnergyPlus::OutputReportTabular {
                 radiantCool(curZone) = -state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfHydrLowTempRadSys; ++iRadiant) {
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++iRadiant) {
             curZone = state.dataLowTempRadSys->HydrRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
@@ -4701,7 +4698,7 @@ namespace EnergyPlus::OutputReportTabular {
                 radiantCool(curZone) -= state.dataLowTempRadSys->HydrRadSys(iRadiant).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfCFloLowTempRadSys; ++iRadiant) {
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++iRadiant) {
             curZone = state.dataLowTempRadSys->CFloRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
@@ -4711,7 +4708,7 @@ namespace EnergyPlus::OutputReportTabular {
                 radiantCool(curZone) -= state.dataLowTempRadSys->CFloRadSys(iRadiant).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfElecLowTempRadSys; ++iRadiant) {
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++iRadiant) {
             curZone = state.dataLowTempRadSys->ElecRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {

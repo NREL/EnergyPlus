@@ -113,27 +113,6 @@ namespace LowTempRadiantSystem {
     extern int const CalculateFromLength; // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
     extern std::string const OnePerSurf;
     extern std::string const CalcFromLength;
-    // Limit temperatures to indicate that a system cannot heat or cannot cool
-    extern Real64 LowTempHeating;  // Used to indicate that a user does not have a heating control temperature
-    extern Real64 HighTempCooling; // Used to indicate that a user does not have a cooling control temperature
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables...
-    extern int NumOfHydrLowTempRadSys;    // Number of hydronic low tempererature radiant systems
-    extern int NumOfHydrLowTempRadSysDes; // Number of hydronic low tempererature radiant design systems
-    extern int NumOfCFloLowTempRadSys;    // Number of constant flow (hydronic) low tempererature radiant systems
-    extern int NumOfCFloLowTempRadSysDes; // Number of constant flow (hydronic) low tempererature radiant design systems
-    extern int NumOfElecLowTempRadSys;    // Number of electric low tempererature radiant systems
-    extern int CFloCondIterNum;           // Number of iterations for a constant flow radiant system--controls variable cond sys ctrl
-    extern int TotalNumOfRadSystems;      // Total number of low temperature radiant systems
-    extern int OperatingMode;             // Used to keep track of whether system is in heating or cooling mode
-    extern int MaxCloNumOfSurfaces;       // Used to set allocate size in CalcClo routine
-    extern bool VarOffCond;               // Set to true when in cooling for constant flow system + variable off condensation predicted
-    extern bool FirstTimeInit;            // Set to true initially and set to false once the first pass is made through the initialization routine
-    extern bool anyRadiantSystemUsingRunningMeanAverage;    // Set to true when there is at least one constant flow radiant system that uses the running mean average
-    extern Real64 LoopReqTemp;            // Temperature required at the inlet of the pump (from the loop) to meet control logic
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 
@@ -534,6 +513,21 @@ namespace LowTempRadiantSystem {
 
 struct LowTempRadiantSystemData : BaseGlobalStruct {
 
+    // DERIVED TYPE DEFINITIONS:
+
+    // MODULE VARIABLE DECLARATIONS:
+    // Standard, run-of-the-mill variables...
+    int NumOfHydrLowTempRadSys = 0;    // Number of hydronic low tempererature radiant systems
+    int NumOfHydrLowTempRadSysDes = 0; // Number of hydronic low tempererature radiant design systems
+    int NumOfCFloLowTempRadSys = 0;    // Number of constant flow (hydronic) low tempererature radiant systems
+    int NumOfCFloLowTempRadSysDes = 0 ; // Number of constant flow (hydronic) low tempererature radiant design systems
+    int NumOfElecLowTempRadSys = 0;    // Number of electric low tempererature radiant systems
+    int TotalNumOfRadSystems = 0;      // Total number of low temperature radiant systems
+
+    // Limit temperatures to indicate that a system cannot heat or cannot cool
+    Real64 LowTempHeating;  // Used to indicate that a user does not have a heating control temperature
+    Real64 HighTempCooling; // Used to indicate that a user does not have a cooling control temperature
+
     Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QRadSysSrcAvg locally
@@ -571,6 +565,10 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        TotalNumOfRadSystems = 0;
+        LowTempHeating = -200.0;
+        HighTempCooling = 200.0;
+
         HydrRadSys.clear();
         CFloRadSys.clear();
         ElecRadSys.clear();
