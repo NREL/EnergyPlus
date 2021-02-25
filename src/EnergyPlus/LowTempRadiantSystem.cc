@@ -1864,15 +1864,6 @@ namespace LowTempRadiantSystem {
         Real64 rho;  // local fluid density
         bool errFlag;
 
-//
-//        if  (SystemType == LowTempRadiantSystem::SystemType::HydronicSystem) {
-//            VarFlowRadDesignData variableFlowDesignDataObject{HydronicRadiantSysDesign(HydrRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems;
-//        }
-//
-//        if  (SystemType == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
-//            ConstantFlowRadDesignData constantFlowDesignDataObject{CflowRadiantSysDesign(CFloRadSys(RadSysNum).DesignObjectPtr)}; // Contains the data for constant flow hydronic systems
-//        }
-
         InitErrorsFound = false;
 
         if (MyOneTimeFlag) {
