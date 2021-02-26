@@ -520,37 +520,27 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     int NumOfHydrLowTempRadSys = 0;    // Number of hydronic low tempererature radiant systems
     int NumOfHydrLowTempRadSysDes = 0; // Number of hydronic low tempererature radiant design systems
     int NumOfCFloLowTempRadSys = 0;    // Number of constant flow (hydronic) low tempererature radiant systems
-    int NumOfCFloLowTempRadSysDes = 0 ; // Number of constant flow (hydronic) low tempererature radiant design systems
+    int NumOfCFloLowTempRadSysDes = 0; // Number of constant flow (hydronic) low tempererature radiant design systems
     int NumOfElecLowTempRadSys = 0;    // Number of electric low tempererature radiant systems
     int TotalNumOfRadSystems = 0;      // Total number of low temperature radiant systems
 
     // Limit temperatures to indicate that a system cannot heat or cannot cool
-    Real64 LowTempHeating = -200.0;  // Used to indicate that a user does not have a heating control temperature
+    Real64 LowTempHeating = -200.0; // Used to indicate that a user does not have a heating control temperature
     Real64 HighTempCooling = 200.0; // Used to indicate that a user does not have a cooling control temperature
 
-    Array1D<Real64> QRadSysSrcAvg; // Average source over the time step for a particular radiant surface
+    Array1D<Real64> QRadSysSrcAvg;        // Average source over the time step for a particular radiant surface
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     // Record keeping variables used to calculate QRadSysSrcAvg locally
     Array1D<Real64> LastQRadSysSrc;     // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
 
-    // Object Data
-    Array1D<LowTempRadiantSystem::VariableFlowRadiantSystemData> HydrRadSys;
-    Array1D<LowTempRadiantSystem::ConstantFlowRadiantSystemData> CFloRadSys;
-    Array1D<LowTempRadiantSystem::ElectricRadiantSystemData> ElecRadSys;
-    Array1D<LowTempRadiantSystem::RadSysTypeData> RadSysTypes;
-    Array1D<LowTempRadiantSystem::ElecRadSysNumericFieldData> ElecRadSysNumericFields;
-    Array1D<LowTempRadiantSystem::HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
-    Array1D<LowTempRadiantSystem::ConstantFlowRadDesignData> CflowRadiantSysDesign;
-    Array1D<LowTempRadiantSystem::VarFlowRadDesignData> HydronicRadiantSysDesign;
-
-    Array1D<Real64> Ckj;            // Coefficients for individual surfaces within a radiant system
+    Array1D<Real64> Ckj; // Coefficients for individual surfaces within a radiant system
     Array1D<Real64> Cmj;
-    Array1D<Real64> WaterTempOut;   // Array of outlet water temperatures for
-                                    // each surface in the radiant system
+    Array1D<Real64> WaterTempOut; // Array of outlet water temperatures for
+    // each surface in the radiant system
 
-// For Init:
+    // For Init:
     Array1D_bool MyEnvrnFlagHydr;
     Array1D_bool MyEnvrnFlagCFlo;
     Array1D_bool MyEnvrnFlagElec;
@@ -562,10 +552,45 @@ struct LowTempRadiantSystemData : BaseGlobalStruct {
     Array1D_bool MySizeFlagElec;
     Array1D_bool CheckEquipName;
 
+    // Object Data
+    Array1D<LowTempRadiantSystem::VariableFlowRadiantSystemData> HydrRadSys;
+    Array1D<LowTempRadiantSystem::ConstantFlowRadiantSystemData> CFloRadSys;
+    Array1D<LowTempRadiantSystem::ElectricRadiantSystemData> ElecRadSys;
+    Array1D<LowTempRadiantSystem::RadSysTypeData> RadSysTypes;
+    Array1D<LowTempRadiantSystem::ElecRadSysNumericFieldData> ElecRadSysNumericFields;
+    Array1D<LowTempRadiantSystem::HydronicRadiantSysNumericFieldData> HydronicRadiantSysNumericFields;
+    Array1D<LowTempRadiantSystem::ConstantFlowRadDesignData> CflowRadiantSysDesign;
+    Array1D<LowTempRadiantSystem::VarFlowRadDesignData> HydronicRadiantSysDesign;
 
     void clear_state() override
     {
-        HydrRadSys.clear();
+        LowTempHeating = -200.0;
+        HighTempCooling = 200.0;
+        NumOfHydrLowTempRadSys = 0;
+        NumOfHydrLowTempRadSysDes = 0;
+        NumOfCFloLowTempRadSys = 0;
+        NumOfCFloLowTempRadSysDes = 0;
+        NumOfElecLowTempRadSys = 0;
+        TotalNumOfRadSystems = 0;
+
+        QRadSysSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQRadSysSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        Ckj.clear();
+        Cmj.clear();
+        WaterTempOut.clear();
+        MyEnvrnFlagHydr.clear();
+        MyEnvrnFlagCFlo.clear();
+        MyEnvrnFlagElec.clear();
+        MyPlantScanFlagHydr.clear();
+        MyPlantScanFlagCFlo.clear();
+        MySizeFlagHydr.clear();
+        MySizeFlagCFlo.clear();
+        MySizeFlagElec.clear();
+        CheckEquipName.clear();
+        HydrRadSys.clear(); //
         CFloRadSys.clear();
         ElecRadSys.clear();
         RadSysTypes.clear();
