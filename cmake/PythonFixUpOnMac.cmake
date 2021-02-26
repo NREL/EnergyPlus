@@ -45,11 +45,6 @@ execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
 # then we set the ID on the Python dylib; # TODO: Try without this...
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
 
-# With the addition of the SSC lib, a couple more things need fixing up, but they are easy
-# Both the EnergyPlus binary and the shared library depend on @rpath/ssc.dylib, and should be @loader_path/ssc.dylib
-execute_process(COMMAND "install_name_tool" -change "@rpath/ssc.dylib" "@loader_path/ssc.dylib" "${EXECUTABLE_PATH}")
-execute_process(COMMAND "install_name_tool" -change "@rpath/ssc.dylib" "@loader_path/ssc.dylib" "${ENERGYPLUS_API_PATH}")
-
 # for the energyplus executable, just find the python dynamic library right next to it for sure
 get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
 foreach(PREREQ IN LISTS PREREQUISITES)
