@@ -488,17 +488,18 @@ namespace LowTempRadiantSystem {
 
         ElecRadSys.allocate(NumOfElecLowTempRadSys);
         ElecRadSysNumericFields.allocate(NumOfElecLowTempRadSys);
+
         HydronicRadiantSysNumericFields.allocate(NumOfHydrLowTempRadSys);
         HydronicRadiantSysDesign.allocate(NumOfHydrLowTempRadSysDes);
-        CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
         VarFlowRadDesignNames.allocate(NumOfHydrLowTempRadSysDes);
+
+        CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
         CFlowRadDesignNames.allocate(NumOfCFloLowTempRadSysDes);
 
         // make sure data is gotten for surface lists
         GetNumberOfSurfaceLists(state);
 
         // Obtain all of the design data related to hydronic low temperature radiant systems...
-        BaseNum = 0;
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design";
         for (Item = 1; Item <= NumOfHydrLowTempRadSysDes; ++Item) {
 
@@ -522,7 +523,6 @@ namespace LowTempRadiantSystem {
             HydronicRadiantSysDesign(Item).FieldNames = cNumericFields;
             GlobalNames::VerifyUniqueInterObjectName(state, LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-            ++BaseNum;
             auto &thisRadSysDesign(HydronicRadiantSysDesign(Item));
 
             // General user input data
@@ -893,7 +893,6 @@ namespace LowTempRadiantSystem {
         }
 
         // Obtain all of the design data related to Constant flow low temperature radiant systems...
-        BaseNum = 0;
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design";
         for (Item = 1; Item <= NumOfCFloLowTempRadSysDes; ++Item) {
 
@@ -917,7 +916,6 @@ namespace LowTempRadiantSystem {
             CflowRadiantSysDesign(Item).FieldNames = cNumericFields;
             GlobalNames::VerifyUniqueInterObjectName(state, LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-            ++BaseNum;
             auto &thisRadSysDesign(CflowRadiantSysDesign(Item));
 
             // General user input data
@@ -963,7 +961,6 @@ namespace LowTempRadiantSystem {
         }
 
         // Obtain all of the user data related to constant flow (hydronic) low temperature radiant systems...
-        BaseNum = 0;
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow";
         for (Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item) {
 
