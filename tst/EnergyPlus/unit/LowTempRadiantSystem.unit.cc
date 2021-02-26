@@ -3563,3 +3563,216 @@ TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
     EXPECT_NEAR(expectedResult, actualResult, allowedDifference);
 
 }
+
+
+
+TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
+{
+    // #8564 - GetLowTempRadiantSystem fails when you have more a LowTempRadVarFlow AND at least one other type
+    std::string const idf_objects = delimited_string({
+
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow,",
+        "  West Zone Radiant Floor,                !- Name",
+        "  West Zone Radiant Floor Design,         !- Design Object",
+        "  RadiantSysAvailSched,                   !- Availability Schedule Name",
+        "  West Zone,                              !- Zone Name",
+        "  West Zone Surface Group,                !- Surface Name or Radiant Surface Group Name",
+        "  Autosize,                               !- Hydronic Tubing Length {m}",
+        "  Autosize,                               !- Heating Design Capacity {W}",
+        "  Autosize,                               !- Maximum Hot Water Flow {m3/s}",
+        "  Node 276,                               !- Heating Water Inlet Node Name",
+        "  Node 277,                               !- Heating Water Outlet Node Name",
+        "  Autosize,                               !- Cooling Design Capacity {W}",
+        "  Autosize,                               !- Maximum Cold Water Flow {m3/s}",
+        "  Node 278,                               !- Cooling Water Inlet Node Name",
+        "  Node 279,                               !- Cooling Water Outlet Node Name",
+        "  OnePerSurface,                          !- Number of Circuits",
+        "  106.7;                                  !- Circuit Length {m}",
+
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design,",
+        "  West Zone Radiant Floor Design,         !- Name",
+        "  ConvectionOnly,                         !- Fluid to Radiant Surface Heat Transfer Model",
+        "  0.013,                                  !- Hydronic Tubing Inside Diameter {m}",
+        "  0.016,                                  !- Hydronic Tubing Outside Diameter {m}",
+        "  0.35,                                   !- Hydronic Tubing Conductivity {W/m-K}",
+        "  MeanAirTemperature,                     !- Temperature Control Type",
+        "  HalfFlowPower,                          !- Setpoint Control Type",
+        "  HeatingDesignCapacity,                  !- Heating Design Capacity Method",
+        "  0,                                      !- Heating Design Capacity Per Floor Area {W/m2}",
+        "  1,                                      !- Fraction of Autosized Heating Design Capacity",
+        "  0.5,                                    !- Heating Control Throttling Range {deltaC}",
+        "  Radiant Heating Setpoints,              !- Heating Control Temperature Schedule Name",
+        "  CoolingDesignCapacity,                  !- Cooling Design Capacity Method",
+        "  0,                                      !- Cooling Design Capacity Per Floor Area {W/m2}",
+        "  1,                                      !- Fraction of Autosized Cooling Design Capacity",
+        "  0.5,                                    !- Cooling Control Throttling Range {deltaC}",
+        "  Radiant Cooling Setpoints,              !- Cooling Control Temperature Schedule Name",
+        "  SimpleOff,                              !- Condensation Control Type",
+        "  1;                                      !- Condensation Control Dewpoint Offset {C}",
+
+
+        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow,",
+        "  South Zone LowTempRad,                  !- Name",
+        "  South Zone LowTempRad Design,           !- Design Object",
+        "  RadiantSysAvailSched,                   !- Availability Schedule Name",
+        "  South Zone,                             !- Zone Name",
+        "  South Zone Surface Group,               !- Surface Name or Radiant Surface Group Name",
+        "  Autosize,                               !- Hydronic Tubing Length {m}",
+        "  Autosize,                               !- Rated Flow Rate {m3/s}",
+        "  ,                                       !- Pump Flow Rate Schedule Name",
+        "  179352,                                 !- Rated Pump Head {Pa}",
+        "  ,                                       !- Rated Power Consumption {W}",
+        "  ,                                       !- Heating Water Inlet Node Name",
+        "  ,                                       !- Heating Water Outlet Node Name",
+        "  Radiant Heating Setpoints,              !- Heating High Water Temperature Schedule Name",  // I'm not testing schedules...
+        "  Radiant Heating Setpoints,              !- Heating Low Water Temperature Schedule Name",
+        "  Radiant Heating Setpoints,              !- Heating High Control Temperature Schedule Name",
+        "  Radiant Heating Setpoints,              !- Heating Low Control Temperature Schedule Name",
+        "  ,                                       !- Cooling Water Inlet Node Name",
+        "  ,                                       !- Cooling Water Outlet Node Name",
+        "  Radiant Cooling Setpoints,              !- Cooling High Water Temperature Schedule Name",
+        "  Radiant Cooling Setpoints,              !- Cooling Low Water Temperature Schedule Name",
+        "  Radiant Cooling Setpoints,              !- Cooling High Control Temperature Schedule Name",
+        "  Radiant Cooling Setpoints,              !- Cooling Low Control Temperature Schedule Name",
+        "  OnePerSurface,                          !- Number of Circuits",
+        "  106.7;                                  !- Circuit Length {m}",
+
+        "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design,",
+        "  South Zone LowTempRad Design, !- Name",
+        "  ConvectionOnly,                         !- Fluid to Radiant Surface Heat Transfer Model",
+        "  0.013,                                  !- Hydronic Tubing Inside Diameter {m}",
+        "  0.016,                                  !- Hydronic Tubing Outside Diameter {m}",
+        "  0.35,                                   !- Hydronic Tubing Conductivity {W/m-K}",
+        "  MeanAirTemperature,                     !- Temperature Control Type",
+        "  0.8,                                    !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor",
+        "  0.9,                                    !- Motor Efficiency",
+        "  0,                                      !- Fraction of Motor Inefficiencies to Fluid Stream",
+        "  SimpleOff,                              !- Condensation Control Type",
+        "  1;                                      !- Condensation Control Dewpoint Offset {C}",
+
+
+        "  ZoneHVAC:LowTemperatureRadiant:Electric,",
+        "    East Zone Radiant Floor, !- Name",
+        "    RadiantSysAvailSched,    !- Availability Schedule Name",
+        "    East Zone,               !- Zone Name",
+        "    East Zone Surface Group, !- Surface Name or Radiant Surface Group Name",
+        "    heatingdesigncapacity,   !- Heating Design Capacity Method",
+        "    100,                     !- Heating Design Capacity{ W }",
+        "    ,                        !- Heating Design Capacity Per Floor Area{ W/m2 }",
+        "    1.0,                     !- Fraction of Autosized Heating Design Capacity",
+        "    MeanAirTemperature,      !- Temperature Control Type",
+        "    HalfFlowPower,           !- Setpoint Type",
+        "    2.0,                     !- Heating Throttling Range {deltaC}",
+        "    Radiant Heating Setpoints;  !- Heating Control Temperature Schedule Name",
+
+        "  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+        "    East Zone Surface Group, !- Name",
+        "    Zn002:Flr001,             !- Surface 1 Name",
+        "     0.5,                     !- Flow Fraction for Surface 1",
+        "    Zn002:Flr002,             !- Surface 2 Name",
+        "     0.5;                     !- Flow Fraction for Surface 2",
+
+        "  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+        "    West Zone Surface Group, !- Name",
+        "    Zn001:Flr001,             !- Surface 1 Name",
+        "     0.5,                     !- Flow Fraction for Surface 1",
+        "    Zn001:Flr002,             !- Surface 2 Name",
+        "     0.5;                     !- Flow Fraction for Surface 2",
+
+        "  ZoneHVAC:LowTemperatureRadiant:SurfaceGroup,",
+        "    South Zone Surface Group, !- Name",
+        "    Zn003:Flr001,             !- Surface 1 Name",
+        "     0.5,                     !- Flow Fraction for Surface 1",
+        "    Zn003:Flr002,             !- Surface 2 Name",
+        "     0.5;                     !- Flow Fraction for Surface 2",
+
+        "  Schedule:Compact,",
+        "    RADIANTSYSAVAILSCHED,    !- Name",
+        "    FRACTION,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Alldays,            !- Field 2",
+        "    Until: 24:00,1.00;       !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Radiant Heating Setpoints,   !- Name",
+        "    TEMPERATURE,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Alldays,            !- Field 2",
+        "    Until: 24:00,20.0;       !- Field 3",
+
+        "  Schedule:Compact,",
+        "    Radiant Cooling Setpoints,   !- Name",
+        "    TEMPERATURE,             !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: Alldays,            !- Field 2",
+        "    Until: 24:00,15.0;       !- Field 3",
+
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    Zone.allocate(3);
+    Zone(1).Name = "WEST ZONE";
+    Zone(2).Name = "EAST ZONE";
+    Zone(3).Name = "SOUTH ZONE";
+
+    DataSurfaces::TotSurfaces = 6;
+    Surface.allocate(DataSurfaces::TotSurfaces);
+    Surface(1).Name = "ZN001:FLR001";
+    Surface(1).ZoneName = "WEST ZONE";
+    Surface(1).Zone = 1;
+    Surface(1).Construction = 1;
+    Surface(2).Name = "ZN001:FLR002";
+    Surface(2).ZoneName = "WEST ZONE";
+    Surface(2).Zone = 1;
+    Surface(2).Construction = 1;
+    Surface(3).Name = "ZN002:FLR001";
+    Surface(3).ZoneName = "EAST ZONE";
+    Surface(3).Zone = 2;
+    Surface(3).Construction = 1;
+    Surface(4).Name = "ZN002:FLR002";
+    Surface(4).ZoneName = "EAST ZONE";
+    Surface(4).Zone = 2;
+    Surface(4).Construction = 1;
+    Surface(5).Name = "ZN003:FLR001";
+    Surface(5).ZoneName = "SOUTH ZONE";
+    Surface(5).Zone = 3;
+    Surface(5).Construction = 1;
+    Surface(6).Name = "ZN003:FLR002";
+    Surface(6).ZoneName = "SOUTH ZONE";
+    Surface(6).Zone = 3;
+    Surface(6).Construction = 1;
+    state->dataConstruction->Construct.allocate(1);
+    state->dataConstruction->Construct(1).SourceSinkPresent = true;
+
+    GetLowTempRadiantSystem(*state);
+
+    EXPECT_EQ(3, state->dataLowTempRadSys->TotalNumOfRadSystems);
+
+    EXPECT_EQ(1, state->dataLowTempRadSys->NumOfHydrLowTempRadSys);
+    EXPECT_EQ(1, state->dataLowTempRadSys->NumOfHydrLowTempRadSysDes);
+
+    EXPECT_EQ(1, state->dataLowTempRadSys->NumOfCFloLowTempRadSys);
+    EXPECT_EQ(1, state->dataLowTempRadSys->NumOfCFloLowTempRadSysDes);
+
+    EXPECT_EQ(1, state->dataLowTempRadSys->NumOfElecLowTempRadSys);
+
+    EXPECT_EQ("WEST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(1).Name);
+    EXPECT_EQ(LowTempRadiantSystem::SystemType::HydronicSystem, state->dataLowTempRadSys->RadSysTypes(1).SystemType);
+    EXPECT_EQ(state->dataLowTempRadSys->HydrRadSys(1).ZoneName, "WEST ZONE");
+    EXPECT_EQ(state->dataLowTempRadSys->HydrRadSys(1).SurfListName, "WEST ZONE SURFACE GROUP");
+    EXPECT_EQ("WEST ZONE RADIANT FLOOR DESIGN", state->dataLowTempRadSys->HydrRadSys(1).designObjectName);
+    EXPECT_EQ(1, state->dataLowTempRadSys->HydrRadSys(1).DesignObjectPtr);
+
+    EXPECT_EQ("SOUTH ZONE LOWTEMPRAD", state->dataLowTempRadSys->RadSysTypes(2).Name);
+    EXPECT_EQ(LowTempRadiantSystem::SystemType::ConstantFlowSystem, state->dataLowTempRadSys->RadSysTypes(2).SystemType);
+    EXPECT_EQ(state->dataLowTempRadSys->CFloRadSys(1).ZoneName, "SOUTH ZONE");
+    EXPECT_EQ(state->dataLowTempRadSys->CFloRadSys(1).SurfListName, "SOUTH ZONE SURFACE GROUP");
+    EXPECT_EQ("SOUTH ZONE LOWTEMPRAD DESIGN", state->dataLowTempRadSys->CFloRadSys(1).designObjectName);
+    EXPECT_EQ(1, state->dataLowTempRadSys->CFloRadSys(1).DesignObjectPtr);
+
+    EXPECT_EQ("EAST ZONE RADIANT FLOOR", state->dataLowTempRadSys->RadSysTypes(3).Name);
+    EXPECT_EQ(LowTempRadiantSystem::SystemType::ElectricSystem, state->dataLowTempRadSys->RadSysTypes(3).SystemType);
+    EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).ZoneName, "EAST ZONE");
+    EXPECT_EQ(state->dataLowTempRadSys->ElecRadSys(1).SurfListName, "EAST ZONE SURFACE GROUP");
+
+}
