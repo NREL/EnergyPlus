@@ -93,18 +93,18 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
         "Curve:QuadLinear,",
         "  MinDsnWBCurveName, ! Curve Name",
         "  -3.3333,           ! CoefficientC1",
-        "  0.0,               ! CoefficientC2",
+        "  0.1,               ! CoefficientC2",
         "  38.9,              ! CoefficientC3",
-        "  0.,                ! CoefficientC4",
-        "  0.,                ! CoefficientC5",
+        "  0.1,                ! CoefficientC4",
+        "  0.5,                ! CoefficientC5",
         "  -30.,              ! Minimum Value of w",
         "  40.,               ! Maximum Value of w",
         "  0.,                ! Minimum Value of x",
         "  1.,                ! Maximum Value of x",
-        "  10.,               ! Minimum Value of y",
+        "  5.,                ! Minimum Value of y",
         "  38.,               ! Maximum Value of y",
-        "  1E-8,              ! Minimum Value of z",
-        "  8E-8,              ! Maximum Value of z",
+        "  0,                 ! Minimum Value of z",
+        "  20,                ! Maximum Value of z",
         "  0.,                ! Minimum Curve Output",
         "  38.;               ! Maximum Curve Output",
     });
@@ -120,6 +120,52 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
 
     EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).CurveMin);
     EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+    
+    double var1 = 1, var2 = 0.1, var3 = 20, var4 = 10;
+    double expected_value = -3.3333 + (0.1*1) + (38.9*0.1) + (0.1*20) + (0.5 * 10);
+    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4));
+}
+
+TEST_F(EnergyPlusFixture, QuintLinearCurve)
+{
+    std::string const idf_objects = delimited_string({
+        "Curve:QuintLinear,",
+        "  MinDsnWBCurveName, ! Curve Name",
+        "  -3.3333,           ! CoefficientC1",
+        "  0.1,               ! CoefficientC2",
+        "  38.9,              ! CoefficientC3",
+        "  0.1,                ! CoefficientC4",
+        "  0.5,                ! CoefficientC5",
+        "  1.5,                ! CoefficientC6",
+        "  0.,                ! Minimum Value of v",
+        "  10.,               ! Maximum Value of v",
+        "  -30.,              ! Minimum Value of w",
+        "  40.,               ! Maximum Value of w",
+        "  0.,                ! Minimum Value of x",
+        "  1.,                ! Maximum Value of x",
+        "  5.,                ! Minimum Value of y",
+        "  38.,               ! Maximum Value of y",
+        "  0,                 ! Minimum Value of z",
+        "  20,                ! Maximum Value of z",
+        "  0.,                ! Minimum Curve Output",
+        "  38.;               ! Maximum Curve Output",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(*state);
+    state->dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state->dataCurveManager->NumCurves);
+
+    EXPECT_EQ(38.0, state->dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMaxPresent);
+
+    EXPECT_EQ(0., state->dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state->dataCurveManager->PerfCurve(1).CurveMinPresent);
+    
+    double var1 = 1, var2 = 0.1, var3 = 0.5, var4 = 10, var5 = 15;
+    double expected_value = -3.3333 + (0.1*1) + (38.9*0.1) + (0.1*0.5) + (0.5 * 10) + (1.5 * 15);
+    EXPECT_EQ(expected_value, CurveManager::CurveValue(*state, 1, var1, var2, var3, var4, var5));
 }
 
 TEST_F(EnergyPlusFixture, TableLookup)

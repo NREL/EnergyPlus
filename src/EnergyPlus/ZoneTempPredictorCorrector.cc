@@ -338,7 +338,7 @@ namespace ZoneTempPredictorCorrector {
         static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
         static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
-        // FLOW:
+
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::TStat));
         state.dataZoneCtrls->NumTStatStatements = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         state.dataZoneCtrls->TStatObjects.allocate(state.dataZoneCtrls->NumTStatStatements);
@@ -2640,7 +2640,7 @@ namespace ZoneTempPredictorCorrector {
         int TRefFlag; // Flag for Reference Temperature process in Zones
         int SurfNum;
 
-        // FLOW:
+
         if (state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag) {
             TempZoneThermostatSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
             AdapComfortCoolingSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
@@ -3752,7 +3752,7 @@ namespace ZoneTempPredictorCorrector {
         int OccStartTime;            // Occupancy start time - for optimum start
         Real64 DeltaT;               // Temperature difference between cutout and setpoint
 
-        // FLOW:
+
         TempControlType = 0; // Default
 
         // Place holder for occupied heating and cooling set points - for optimum start
@@ -3971,7 +3971,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 LoadToCoolingSetPoint;
         Real64 ZoneSetPoint;
 
-        // FLOW:
+
         state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = false;
         ZoneSetPoint = 0.0;
         LoadToHeatingSetPoint = 0.0;
@@ -4376,7 +4376,7 @@ namespace ZoneTempPredictorCorrector {
         bool SingleSetPoint;                // This determines whether both setpoint are equal or not
         int RoomAirNode;
 
-        // FLOW:
+
         LoadToHumidifySetPoint = 0.0;
         LoadToDehumidifySetPoint = 0.0;
         SingleSetPoint = false;
@@ -4747,7 +4747,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 ZoneMult;
         int LoopNode;
 
-        // FLOW:
+
         // Initializations
         ZoneTempChange = DataPrecisionGlobals::constant_zero;
 
@@ -5419,7 +5419,7 @@ namespace ZoneTempPredictorCorrector {
         int ADUInNode;
         int ADUOutNode;
 
-        // FLOW:
+
         MoistureMassFlowRate = 0.0;
         ZoneMassFlowRate = 0.0;
         ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
@@ -6127,7 +6127,7 @@ namespace ZoneTempPredictorCorrector {
         int ADUOutNode;
         Real64 RetAirGain;
 
-        // FLOW:
+
         SumIntGain = 0.0;
         SumHA = 0.0;
         SumHATsurf = 0.0;
@@ -6257,7 +6257,7 @@ namespace ZoneTempPredictorCorrector {
                 auto const shading_flag(SurfWinShadingFlag(SurfNum));
 
                 // Add to the convective internal gains
-                if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -6271,7 +6271,7 @@ namespace ZoneTempPredictorCorrector {
                 if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
                 if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
@@ -6299,7 +6299,7 @@ namespace ZoneTempPredictorCorrector {
                     HA += HA_surf;
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && shading_flag != IntShadeOn && shading_flag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     Real64 const HA_surf(HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)));
                     SumHATsurf += HA_surf * SurfWinDividerTempSurfIn(SurfNum);
@@ -6588,7 +6588,7 @@ namespace ZoneTempPredictorCorrector {
             if (Surface(SurfNum).Class == SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -6602,7 +6602,7 @@ namespace ZoneTempPredictorCorrector {
                 if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum)))
                     SumIntGains += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
@@ -6621,8 +6621,7 @@ namespace ZoneTempPredictorCorrector {
                                     (SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHADTsurfs += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                     (SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
@@ -6933,7 +6932,7 @@ namespace ZoneTempPredictorCorrector {
         int originZoneAirSetPoint = ZoneAirSetPoint;
         int AdaptiveComfortModelTypeIndex = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).AdaptiveComfortModelTypeIndex;
 
-        // FLOW:
+
         // adjust zone operative setpoint
         if (!(state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).AdaptiveComfortTempControl)) return; // do nothing to setpoint
         if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::DesignDay) && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != DataGlobalConstants::KindOfSim::HVACSizeDesignDay)) {
@@ -7015,7 +7014,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 NumberOccupants;
         Real64 Tset;
 
-        // FLOW:
+
         // Call thermal comfort module to read zone control comfort object
         if (state.dataZoneTempPredictorCorrector->CalcZoneAirComfortSetPointsFirstTimeFlag) {
             ManageThermalComfort(state, true);

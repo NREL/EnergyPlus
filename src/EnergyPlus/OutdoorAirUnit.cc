@@ -209,8 +209,6 @@ namespace OutdoorAirUnit {
 
         CalcOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
-        // CALL UpdateOutdoorAirUnit(OAUnitNum, FirstHVACIteration)
-
         ReportOutdoorAirUnit(state, OAUnitNum);
 
         ZoneEqOutdoorAirUnit = false;
@@ -307,7 +305,7 @@ namespace OutdoorAirUnit {
         Array1D_string AlphArray;
         static bool errFlag(false);
 
-        // FLOW:
+
         // Figure out how many outdoor air units there are in the input file
 
         if (!state.dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag) return;
@@ -1098,7 +1096,7 @@ namespace OutdoorAirUnit {
         Real64 rho;
         bool errFlag;
 
-        // FLOW:
+
         // Do the one time initializations
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);

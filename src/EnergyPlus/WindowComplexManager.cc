@@ -2638,7 +2638,7 @@ namespace WindowComplexManager {
         int k;             // Layer counter
         int SurfNumAdj;    // An interzone surface's number in the adjacent zone
         int ZoneNumAdj;    // An interzone surface's adjacent zone number
-        int ShadeFlag;     // Flag indicating whether shade or blind is on, and shade/blind position
+        WinShadingType ShadeFlag;     // Flag indicating whether shade or blind is on, and shade/blind position
         int IMix;
 
         Real64 IncidentSolar;       // Solar incident on outside of window (W)
@@ -2897,7 +2897,7 @@ namespace WindowComplexManager {
             // outdoor wind speed
             if (!Surface(SurfNum).ExtWind) {
                 wso = 0.0; // No wind exposure
-                           // ELSE IF (Surface(SurfNum)%Class == SurfaceClass::Window .AND. SurfaceWindow(SurfNum)%ShadingFlag == ExtShadeOn) THEN
+                           // ELSE IF (Surface(SurfNum)%Class == SurfaceClass::Window .AND. SurfaceWindow(SurfNum)%ShadingFlag == WinShadingType::ExtShade) THEN
                 //  wso =  0.0  ! Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
                 wso = Surface(SurfNum).WindSpeed;
@@ -3294,7 +3294,7 @@ namespace WindowComplexManager {
             SurfOutsideEmiss = emis(1);
 
             IncidentSolar = Surface(SurfNum).Area * SurfQRadSWOutIncident(SurfNum);
-            if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
+            if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 // Interior shade or blind
                 ConvHeatFlowNatural = -qv(nlayer) * height * width;
 
@@ -3340,7 +3340,7 @@ namespace WindowComplexManager {
                 SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
                 SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
                 // need to report convective heat flow from the gap in case of exterior shade
-                if (ShadeFlag == ExtShadeOn) {
+                if (ShadeFlag == WinShadingType::ExtShade) {
                     ConvHeatFlowNatural = -qv(2) * height * width; // qv(1) is exterior environment
 
                     SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
@@ -3400,9 +3400,9 @@ namespace WindowComplexManager {
             // TransDiff = Construct(ConstrNum).TransDiff;
             int IState = SurfaceWindow(SurfNum).ComplexFen.NumStates;
             Real64 TransDiff = SurfaceWindow(SurfNum).ComplexFen.State(IState).WinDiffTrans;
-            // ELSE IF(ShadeFlag==IntShadeOn .OR. ShadeFlag==ExtShadeOn) THEN
+            // ELSE IF(ShadeFlag==WinShadingType::IntShade .OR. ShadeFlag==WinShadingType::ExtShade) THEN
             //  TransDiff = Construct(ConstrNum)%TransDiff
-            // ELSE IF(ShadeFlag==IntBlindOn .OR. ShadeFlag==ExtBlindOn .OR.ShadeFlag==BGBlindOn) THEN
+            // ELSE IF(ShadeFlag==WinShadingType::IntBlind .OR. ShadeFlag==WinShadingType::ExtBlind .OR.ShadeFlag==WinShadingType::BGBlind) THEN
             //  TransDiff = InterpSlatAng(SurfaceWindow(SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum)%MovableSlats, &
             //                             Construct(ConstrNumSh)%BlTransDiff)
             // ELSE IF(ShadeFlag == SwitchableGlazing) THEN
@@ -3413,7 +3413,7 @@ namespace WindowComplexManager {
             SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
             SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
-            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn) {
+            if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -3431,9 +3431,9 @@ namespace WindowComplexManager {
             }
 
             // Save hcv for use in divider calc with interior or exterior shade (see CalcWinFrameAndDividerTemps)
-            if (ShadeFlag == IntShadeOn) SurfWinConvCoeffWithShade(SurfNum) = 0.0;
+            if (ShadeFlag == WinShadingType::IntShade) SurfWinConvCoeffWithShade(SurfNum) = 0.0;
 
-            if (ShadeFlag == IntShadeOn) {
+            if (ShadeFlag == WinShadingType::IntShade) {
                 SurfInsideTemp = theta(2 * ngllayer + 2) - DataGlobalConstants::KelvinConv;
 
                 // // Get properties of inside shading layer

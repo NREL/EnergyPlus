@@ -247,7 +247,7 @@ namespace EMSManager {
         int tmpInteger;
         //  INTEGER  :: ProgramNum
 
-        // FLOW:
+
         anyProgramRan = false;
         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
@@ -516,7 +516,7 @@ namespace EMSManager {
         static int TotalArgs(0);       // argument for call to GetObjectDefMaxArgs
         bool errFlag;
 
-        // FLOW:
+
         cCurrentModuleObject = "EnergyManagementSystem:Sensor";
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNums);
         MaxNumNumbers = NumNums;
@@ -1260,7 +1260,7 @@ namespace EMSManager {
         Array1D_int KeyIndex;
         bool Found;
 
-        // FLOW:
+
         VarType = 0;
         VarIndex = 0;
         Found = false;
@@ -1415,30 +1415,12 @@ namespace EMSManager {
         // METHODOLOGY EMPLOYED:
         // Loop over node structures and make calls to SetupEMSActuator
         // the pattern for the basic node setpoints is a little different in that the actuators directly
-        // affect the node variables, rather than using seperate logical override flag and ems values
-
-        // REFERENCES:
-        // na
+        // affect the node variables, rather than using separate logical override flag and ems values
 
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
         using DataLoopNode::NumOfNodes;
-        using OutAirNodeManager::NumOutsideAirNodes;
-        using OutAirNodeManager::OutsideAirNodeList;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int LoopNode;       // local do loop index
@@ -1492,9 +1474,9 @@ namespace EMSManager {
 
         } // NumOfNodes > 0
 
-        if (NumOutsideAirNodes > 0) {
-            for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= NumOutsideAirNodes; ++OutsideAirNodeNum) {
-                NodeNum = OutsideAirNodeList(OutsideAirNodeNum);
+        if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
+            for (OutsideAirNodeNum = 1; OutsideAirNodeNum <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++OutsideAirNodeNum) {
+                NodeNum = state.dataOutAirNodeMgr->OutsideAirNodeList(OutsideAirNodeNum);
                 SetupEMSActuator(state, "Outdoor Air System Node",
                                  NodeID(NodeNum),
                                  "Drybulb Temperature",
@@ -1861,8 +1843,7 @@ namespace EMSManager {
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
-        using DataSurfaces::WSC_ST_SwitchableGlazing;
-        using DataSurfaces::WSC_ST_ExteriorScreen;
+        using DataSurfaces::WinShadingType;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1901,7 +1882,7 @@ namespace EMSManager {
                                      DataSurfaces::SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
                                      DataSurfaces::SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
-            } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WinShadingType::ExtScreen) {
                 SetupEMSActuator(state, "Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
@@ -1909,7 +1890,7 @@ namespace EMSManager {
                                  DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
                                  DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
-                if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WinShadingType::SwitchableGlazing) {
                     ShowSevereError(state, "Missing shade or blind layer in window construction name = '" +
                                     state.dataConstruction->Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");

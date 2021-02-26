@@ -245,7 +245,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);
 
-        // FLOW:
+
 
         GetAirFlowFlag(state, ErrorsFound);
 
@@ -316,7 +316,7 @@ namespace HeatBalanceAirManager {
 
         // flow
 
-        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
+        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
             for (Loop = 1; Loop <= TotMixing; ++Loop) {
                 ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
                 ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
@@ -3860,7 +3860,7 @@ namespace HeatBalanceAirManager {
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
             // Check for infiltration in zone which are only a mixing source zone
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if ((ZoneAirMassFlow.BalanceMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
+                if ((ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
                     (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow)) {
                     if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
                         ShowSevereError(state, RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
@@ -3888,7 +3888,7 @@ namespace HeatBalanceAirManager {
                                     "System",
                                     "Average",
                                     Zone(ZoneNum).Name);
-                if (ZoneAirMassFlow.BalanceMixing &&
+                if ((ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) &&
                     ((MassConservation(ZoneNum).NumSourceZonesMixingObject + MassConservation(ZoneNum).NumReceivingZonesMixingObject) > 0)) {
                     SetupOutputVariable(state, "Zone Air Mass Balance Mixing Receiving Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -3964,7 +3964,7 @@ namespace HeatBalanceAirManager {
         bool ErrorsFound;
         bool IsNotOK;
 
-        // FLOW:
+
 
         // Initialize default values for air model parameters
         state.dataRoomAirMod->AirModel.allocate(state.dataGlobal->NumOfZones);

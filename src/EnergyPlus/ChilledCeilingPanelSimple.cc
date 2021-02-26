@@ -1552,7 +1552,7 @@ namespace CoolingPanelSimple {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoolingPanelNum; // DO loop counter for surface index
 
-        // FLOW:
+
         CoolingPanelSysOn = false;
 
         // If this was never allocated, then there are no radiant systems in this input file (just RETURN)
@@ -1608,7 +1608,7 @@ namespace CoolingPanelSimple {
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
-        // FLOW:
+
         // Initialize arrays
         QCoolingPanelSurf = 0.0;
         QCoolingPanelToPerson = 0.0;
@@ -1696,8 +1696,7 @@ namespace CoolingPanelSimple {
         using DataHeatBalance::HConvIn;
         using DataHeatBalance::Zone;
         using DataHeatBalSurface::TempSurfInTmp;
-        using DataSurfaces::IntBlindOn;
-        using DataSurfaces::IntShadeOn;
+        using DataSurfaces::WinShadingType;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfWinShadingFlag;
         using DataSurfaces::SurfWinFrameArea;
@@ -1714,7 +1713,7 @@ namespace CoolingPanelSimple {
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
 
-        // FLOW:
+
         SumHATsurf = 0.0;
 
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
@@ -1727,7 +1726,7 @@ namespace CoolingPanelSimple {
 
             if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
 
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
                     Area += DataSurfaces::SurfWinDividerArea(SurfNum);
                 }
@@ -1737,7 +1736,7 @@ namespace CoolingPanelSimple {
                     SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn && SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf +=
                         HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);

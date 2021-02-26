@@ -701,6 +701,17 @@ namespace Psychrometrics {
                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
 
+
+    // we are disabling these warnings on Windows because the cache value lookups are using 64bit integers,
+    // but the () and [] operator overloads for Array1D (which stores the cache) only uses 32bit lookups
+    // this seems ... very bad. This problem will be fixed when we get rid of Array1D
+    // at which time this warning disable should be removed.
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4244)
+#endif
+
+
     inline Real64 PsyPsatFnTemp(EnergyPlusData &state,
                                 Real64 const T,                              // dry-bulb temperature {C}
                                 std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
@@ -729,6 +740,8 @@ namespace Psychrometrics {
 #endif
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+
 
         Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
@@ -1196,6 +1209,12 @@ namespace Psychrometrics {
 
         return cTsat.Tsat; // saturation temperature
     }
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 
 #else
     Real64 PsyTsatFnPb(EnergyPlusData &state,

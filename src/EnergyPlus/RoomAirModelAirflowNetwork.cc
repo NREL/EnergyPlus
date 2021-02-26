@@ -174,7 +174,7 @@ namespace RoomAirModelAirflowNetwork {
         int ThisRoomAirNode;
         int RAFNNum;
 
-        // FLOW:
+
         RAFNNum = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).RAFNNum;
 
         if (RAFNNum == 0) {
@@ -227,7 +227,7 @@ namespace RoomAirModelAirflowNetwork {
         ////////////////////////////////////////////////////////////////////////////////////
         int RAFNNum;
 
-        // FLOW:
+
         if (LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag) {
             RAFN.allocate(state.dataRoomAirMod->NumOfRoomAirflowNetControl);
             LoadPredictionRoomAirModelAirflowNetworkOneTimeFlag = false;
@@ -896,7 +896,7 @@ namespace RoomAirModelAirflowNetwork {
         Real64 SumLinkM;   //               !Zone sum of MassFlowRate from the AirflowNetwork model
         Real64 SumLinkMW;  //             !Zone sum of MassFlowRate*W from the AirflowNetwork model
 
-        // FLOW
+
         SumIntGain = 0.0;
         SumHA = 0.0;
         SumHATsurf = 0.0;
@@ -1051,14 +1051,14 @@ namespace RoomAirModelAirflowNetwork {
             if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
                     Area += SurfWinDividerArea(SurfNum);
                     SumIntGain += SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum)))
                     SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
@@ -1088,8 +1088,7 @@ namespace RoomAirModelAirflowNetwork {
                     HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);

@@ -107,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.4;
+  Version,9.5;
 
   Building,
     Building,                !- Name
@@ -122,7 +122,7 @@
   Timestep,4;
 
   ZoneAirMassFlowConservation,
-    Yes,                     !- Adjust Zone Mixing For Zone Air Mass Flow Balance
+    AdjustMixingOnly,        !- Adjust Zone Mixing and Return For Air Mass Flow Balance
     AdjustInfiltrationFlow,  !- Infiltration Balancing Method
     AllZones;                !- Infiltration Balancing Zones
 

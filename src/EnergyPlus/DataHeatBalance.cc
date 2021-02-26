@@ -196,6 +196,7 @@ namespace DataHeatBalance {
     int const DOE2HcOutside(7);   // Only valid for outside use
     int const BLASTHcOutside(8);  // Only valid for outside use
     int const AdaptiveConvectionAlgorithm(9);
+    int const ASTMC1340(10);
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
@@ -256,7 +257,15 @@ namespace DataHeatBalance {
     int const MixingSourceZonesOnly(1);
     int const AllZones(2);
 
-    int const NumZoneIntGainDeviceTypes(53);
+    // Parameter for zone air flow mass balancing method
+    int const AdjustMixingOnly(1);
+    int const AdjustReturnOnly(2);
+    int const AdjustMixingThenReturn(3);
+    int const AdjustReturnThenMixing(4);
+    int const NoAdjustReturnAndMixing(0);
+    // | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 |
+
+    int const NumZoneIntGainDeviceTypes(54);
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
@@ -279,6 +288,7 @@ namespace DataHeatBalance {
                                                  "ELECTRICLOADCENTER:INVERTER:SIMPLE",
                                                  "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER",
                                                  "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE",
+                                                 "ELECTRICLOADCENTER:STORAGE:LIIONNMCBATTERY",
                                                  "ELECTRICLOADCENTER:STORAGE:BATTERY",
                                                  "ELECTRICLOADCENTER:STORAGE:SIMPLE",
                                                  "PIPE:INDOOR",
@@ -313,7 +323,7 @@ namespace DataHeatBalance {
                                                  "FAN:SYSTEMMODEL"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16
                                                                       // | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 |
                                                                       // 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47
-                                                                      // | 48 | 49 | 50 | 51 | 52 | 53
+                                                                      // | 48 | 49 | 50 | 51 | 52 | 53 | 54
 
     Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                   {"People",
@@ -337,6 +347,7 @@ namespace DataHeatBalance {
                                                    "ElectricLoadCenter:Inverter:Simple",
                                                    "ElectricLoadCenter:Inverter:FunctionOfPower",
                                                    "ElectricLoadCenter:Inverter:LookUpTable",
+                                                   "ElectricLoadCenter:Storage:LiIonNMCBattery",
                                                    "ElectricLoadCenter:Storage:Battery",
                                                    "ElectricLoadCenter:Storage:Simple",
                                                    "Pipe:Indoor",
@@ -371,7 +382,7 @@ namespace DataHeatBalance {
                                                    "Fan:SystemModel"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 |
                                                                         // 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 |
                                                                         // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
-                                                                        // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
+                                                                        // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54
 
     int const IntGainTypeOf_People(1);
     int const IntGainTypeOf_Lights(2);
@@ -394,38 +405,39 @@ namespace DataHeatBalance {
     int const IntGainTypeOf_ElectricLoadCenterInverterSimple(19);
     int const IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower(20);
     int const IntGainTypeOf_ElectricLoadCenterInverterLookUpTable(21);
-    int const IntGainTypeOf_ElectricLoadCenterStorageBattery(22);
-    int const IntGainTypeOf_ElectricLoadCenterStorageSimple(23);
-    int const IntGainTypeOf_PipeIndoor(24);
-    int const IntGainTypeOf_RefrigerationCase(25);
-    int const IntGainTypeOf_RefrigerationCompressorRack(26);
-    int const IntGainTypeOf_RefrigerationSystemAirCooledCondenser(27);
-    int const IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(28);
-    int const IntGainTypeOf_RefrigerationSystemSuctionPipe(29);
-    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(30);
-    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(31);
-    int const IntGainTypeOf_RefrigerationSecondaryReceiver(32);
-    int const IntGainTypeOf_RefrigerationSecondaryPipe(33);
-    int const IntGainTypeOf_RefrigerationWalkIn(34);
-    int const IntGainTypeOf_Pump_VarSpeed(35);
-    int const IntGainTypeOf_Pump_ConSpeed(36);
-    int const IntGainTypeOf_Pump_Cond(37);
-    int const IntGainTypeOf_PumpBank_VarSpeed(38);
-    int const IntGainTypeOf_PumpBank_ConSpeed(39);
-    int const IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(40);
-    int const IntGainTypeOf_PlantComponentUserDefined(41);
-    int const IntGainTypeOf_CoilUserDefined(42);
-    int const IntGainTypeOf_ZoneHVACForcedAirUserDefined(43);
-    int const IntGainTypeOf_AirTerminalUserDefined(44);
-    int const IntGainTypeOf_PackagedTESCoilTank(45);
-    int const IntGainTypeOf_ElectricEquipmentITEAirCooled(46);
-    int const IntGainTypeOf_SecCoolingDXCoilSingleSpeed(47);
-    int const IntGainTypeOf_SecHeatingDXCoilSingleSpeed(48);
-    int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed(49);
-    int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed(50);
-    int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed(51);
-    int const IntGainTypeOf_ElectricLoadCenterConverter(52);
-    int const IntGainTypeOf_FanSystemModel(53);
+    int const IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery(22);
+    int const IntGainTypeOf_ElectricLoadCenterStorageBattery(23);
+    int const IntGainTypeOf_ElectricLoadCenterStorageSimple(24);
+    int const IntGainTypeOf_PipeIndoor(25);
+    int const IntGainTypeOf_RefrigerationCase(26);
+    int const IntGainTypeOf_RefrigerationCompressorRack(27);
+    int const IntGainTypeOf_RefrigerationSystemAirCooledCondenser(28);
+    int const IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(29);
+    int const IntGainTypeOf_RefrigerationSystemSuctionPipe(30);
+    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(31);
+    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(32);
+    int const IntGainTypeOf_RefrigerationSecondaryReceiver(33);
+    int const IntGainTypeOf_RefrigerationSecondaryPipe(34);
+    int const IntGainTypeOf_RefrigerationWalkIn(35);
+    int const IntGainTypeOf_Pump_VarSpeed(36);
+    int const IntGainTypeOf_Pump_ConSpeed(37);
+    int const IntGainTypeOf_Pump_Cond(38);
+    int const IntGainTypeOf_PumpBank_VarSpeed(39);
+    int const IntGainTypeOf_PumpBank_ConSpeed(40);
+    int const IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(41);
+    int const IntGainTypeOf_PlantComponentUserDefined(42);
+    int const IntGainTypeOf_CoilUserDefined(43);
+    int const IntGainTypeOf_ZoneHVACForcedAirUserDefined(44);
+    int const IntGainTypeOf_AirTerminalUserDefined(45);
+    int const IntGainTypeOf_PackagedTESCoilTank(46);
+    int const IntGainTypeOf_ElectricEquipmentITEAirCooled(47);
+    int const IntGainTypeOf_SecCoolingDXCoilSingleSpeed(48);
+    int const IntGainTypeOf_SecHeatingDXCoilSingleSpeed(49);
+    int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed(50);
+    int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed(51);
+    int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed(52);
+    int const IntGainTypeOf_ElectricLoadCenterConverter(53);
+    int const IntGainTypeOf_FanSystemModel(54);
 
     // Parameters for checking surface heat transfer models
     Real64 const HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
@@ -573,9 +585,13 @@ namespace DataHeatBalance {
     bool StormWinChangeThisDay(false); // True if a storm window has been added or removed from any
     // window during the current day; can only be true for first
     // time step of the day.
-    bool AnyConstructInternalSourceInInput(false); // true if the user has entered any constructions with internal sources
+    bool AnyInternalHeatSourceInInput(false); // true if the user has entered any constructions with internal sources
     bool AdaptiveComfortRequested_CEN15251(false); // true if people objects have adaptive comfort requests. CEN15251
     bool AdaptiveComfortRequested_ASH55(false);    // true if people objects have adaptive comfort requests. ASH55
+    bool AnyThermalComfortPierceModel(false);      // true if people objects use pierce thermal comfort model
+    bool AnyThermalComfortKSUModel(false);         // true if people objects use KSU thermal comfort model
+    bool AnyThermalComfortCoolingEffectModel(false);  // true if people objects use ASH55 cooling effect adjusted thermal comfort model
+    bool AnyThermalComfortAnkleDraftModel(false);     // true if people objects use ASH55 ankle draft thermal comfort model
 
     bool NoFfactorConstructionsUsed(true);
     bool NoCfactorConstructionsUsed(true);
@@ -929,9 +945,13 @@ namespace DataHeatBalance {
         TotCO2Gen = 0;
         CalcWindowRevealReflection = false;
         StormWinChangeThisDay = false;
-        AnyConstructInternalSourceInInput = false;
+        AnyInternalHeatSourceInInput = false;
         AdaptiveComfortRequested_CEN15251 = false;
         AdaptiveComfortRequested_ASH55 = false;
+        AnyThermalComfortPierceModel = false;
+        AnyThermalComfortKSUModel = false;
+        AnyThermalComfortCoolingEffectModel = false;
+        AnyThermalComfortAnkleDraftModel = false;
         NoFfactorConstructionsUsed = true;
         NoCfactorConstructionsUsed = true;
         NoRegularMaterialsUsed = true;
