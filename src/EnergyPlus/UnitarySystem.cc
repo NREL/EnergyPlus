@@ -7022,6 +7022,12 @@ namespace UnitarySystems {
                         thisSys.m_RunOnLatentLoad = false;
                         thisSys.m_RunOnLatentOnlyWithSensible = false;
                     }
+                    if (thisSys.m_MaxNoCoolHeatAirVolFlow == 0.0) { // 0 min air flow not allowed for SZVAV
+                        ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                        ShowContinueError(state, "Control Type = " + loc_m_ControlType);
+                        ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
+                        errorsFound = true;
+                    }
                 }
 
                 if (sysNum == -1) {
