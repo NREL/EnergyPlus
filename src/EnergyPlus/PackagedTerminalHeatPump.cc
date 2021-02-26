@@ -4805,7 +4805,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             if (state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex > 0) {
                 // initialize OA flow for sizing other inputs (e.g., capacity)
                 if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 } else {
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
                 }
@@ -4856,7 +4856,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     TempSize = AutoSize;
                     PrintFlag = false;
                     state.dataSize->DataScalableSizingON = true;
-                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                         state.dataSize->DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
@@ -4914,7 +4914,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     TempSize = AutoSize;
                     PrintFlag = false;
                     state.dataSize->DataScalableSizingON = true;
-                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                     bool errorsFound = false;
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -5021,7 +5021,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
                 // initialize OA flow for sizing other inputs (e.g., capacity)
                 if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 } else {
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
                 }
@@ -5157,7 +5157,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                CoolOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow);
+                CoolOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow);
                 if (CoolOutAirVolFlowDes < SmallAirVolFlow) {
                     CoolOutAirVolFlowDes = 0.0;
                 }
@@ -5210,7 +5210,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                HeatOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
+                HeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
                 if (HeatOutAirVolFlowDes < SmallAirVolFlow) {
                     HeatOutAirVolFlowDes = 0.0;
                 }
@@ -5263,7 +5263,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                NoCoolHeatOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow);
+                NoCoolHeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow);
                 if (NoCoolHeatOutAirVolFlowDes < SmallAirVolFlow) {
                     NoCoolHeatOutAirVolFlowDes = 0.0;
                 }
@@ -5318,7 +5318,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                MaxSATSupHeatDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesTemp;
+                MaxSATSupHeatDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesTemp;
                 if (IsAutoSize) {
                     state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat = MaxSATSupHeatDes;
                     BaseSizer::reportSizerOutput(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -5378,7 +5378,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             Real64 capacityMultiplier = 0.5; // one-half of design zone load
             if (SizingDesRunThisZone) {
-                state.dataSize->DataCapacityUsedForSizing = FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
             } else {
                 state.dataSize->DataCapacityUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).DesignCoolingCapacity * capacityMultiplier;
             }
@@ -5390,7 +5390,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             state.dataPTHP->PTUnit(PTUnitNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, state.dataPTHP->PTUnit(PTUnitNum).DesignMinOutletTemp, ErrorsFound);
 
             if (SizingDesRunThisZone) {
-                state.dataSize->DataCapacityUsedForSizing = FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
             } else {
                 state.dataSize->DataCapacityUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).DesignHeatingCapacity * capacityMultiplier;
             }

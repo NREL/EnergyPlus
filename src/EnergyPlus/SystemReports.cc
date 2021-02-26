@@ -4333,7 +4333,7 @@ namespace EnergyPlus::SystemReports {
             if (state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex > 0) {
                 state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) =
                     state.dataSysRpts->ZoneTargetVentilationFlowVoz(CtrlZoneNum) /
-                    DataSizing::ZoneAirDistribution(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
+                    state.dataSize->ZoneAirDistribution(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneAirDistributionIndex).calculateEz(state, ActualZoneNum);
             }
 
 

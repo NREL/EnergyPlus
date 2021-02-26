@@ -6481,8 +6481,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     CalcFinalZoneSizing(1).CoolDesTemp = 13.;
     CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     CollectPeakZoneConditions(*state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
@@ -6943,11 +6943,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataWeatherManager->DesDayInput(2).Month = 1;
     state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
-
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
-
 
     // One Zone
     state->dataGlobal->NumOfZones = 1;
@@ -6958,8 +6956,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     // Trick E+ into not iterating on Surfaces
     state->dataHeatBal->Zone(1).SurfaceFirst = 1;
     state->dataHeatBal->Zone(1).SurfaceLast = 0;
-
-
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
     DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
@@ -6983,7 +6979,6 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalZoneSizing(1).CoolDesTemp = 13.;
     DataSizing::CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
-
     int heatDDNum = 2;
     int heatTimeOfMax = 4;
     DataSizing::CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
@@ -6995,8 +6990,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
     DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
 
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     // One airloop, that serves this zone.
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -7017,11 +7012,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
 
 
-    DataSizing::CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;

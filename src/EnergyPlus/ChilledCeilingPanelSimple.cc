@@ -883,7 +883,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::CoolingDesignCapacity;
-        using DataSizing::FinalZoneSizing;
         using DataSizing::FractionOfAutosizedCoolingCapacity;
         using DataSizing::PlantSizData;
         using DataSizing::ZoneEqSizing;
@@ -965,7 +964,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                         if (state.dataSize->ZoneSizingRunDone) {
                             CheckZoneSizing(state, CompType, CompName);
                             SizingMethod = AutoCalculateSizing;
-                            state.dataSize->DataConstantUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                            state.dataSize->DataConstantUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                             state.dataSize->DataFractionUsedForSizing = 1.0;
                         }
                         if (ThisCP.ScaledCoolingCapacity == AutoSize) {
@@ -977,14 +976,14 @@ namespace EnergyPlus::CoolingPanelSimple {
                         if (state.dataSize->ZoneSizingRunDone) {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
-                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                         }
                         TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
                         state.dataSize->DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         CheckZoneSizing(state, CompType, CompName);
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
-                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                         TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
                         state.dataSize->DataScalableCapSizingON = true;
 

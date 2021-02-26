@@ -857,10 +857,10 @@ namespace SteamCoils {
                         DesVolFlow =
                             TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow * TermUnitSizing(state.dataSize->CurTermUnitSizingNum).ReheatAirFlowMult; // coil report
                     } else {
-                        CoilInTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInTemp;
-                        CoilOutTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesTemp;
-                        CoilOutHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesHumRat;
-                        DesMassFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow;
+                        CoilInTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInTemp;
+                        CoilOutTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesTemp;
+                        CoilOutHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesHumRat;
+                        DesMassFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow;
                         DesVolFlow = DesMassFlow / RhoAirStd;
                         DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                         if (DesCoilLoad >= SmallLoad) {

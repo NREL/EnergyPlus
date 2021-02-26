@@ -1458,7 +1458,7 @@ namespace EnergyPlus::MixedAir {
                     //     Getting OA details from design specification OA object
                     if (!lAlphaBlanks((groupNum - 1) * 3 + 6)) {
                         state.dataMixedAir->DesignSpecOAObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 6);
-                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), OARequirements);
+                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), state.dataSize->OARequirements);
                         state.dataMixedAir->DesignSpecOAObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
@@ -1472,7 +1472,7 @@ namespace EnergyPlus::MixedAir {
                     // Get zone air distribution details from design specification Zone Air Distribution object
                     if (!lAlphaBlanks((groupNum - 1) * 3 + 7)) {
                         state.dataMixedAir->DesignSpecZoneADObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 7);
-                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), ZoneAirDistribution);
+                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), state.dataSize->ZoneAirDistribution);
                         state.dataMixedAir->DesignSpecZoneADObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
@@ -1551,12 +1551,12 @@ namespace EnergyPlus::MixedAir {
                             } else {
                                 if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
-                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                         thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
                                     }
                                 }
                             }
@@ -1568,12 +1568,12 @@ namespace EnergyPlus::MixedAir {
                             } else {
                                 if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
-                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                         thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
                                     }
                                 }
                             }
@@ -1605,12 +1605,12 @@ namespace EnergyPlus::MixedAir {
                                     } else {
                                         if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
-                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
                                                 thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                                 thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
                                             }
                                         }
                                     }
@@ -1622,12 +1622,12 @@ namespace EnergyPlus::MixedAir {
                                     } else {
                                         if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
-                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
                                                 thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                                 thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
                                             }
                                         }
                                     }
@@ -1644,7 +1644,7 @@ namespace EnergyPlus::MixedAir {
                 for (int ventMechZoneNum = 1; ventMechZoneNum <= MechVentZoneCount; ++ventMechZoneNum) {
                     int zoneOAReqObjIndex = thisVentilationMechanical.ZoneDesignSpecOAObjIndex(ventMechZoneNum);
                     if (zoneOAReqObjIndex > 0) {
-                        auto const &curOARequirements(OARequirements(zoneOAReqObjIndex));
+                        auto const &curOARequirements(state.dataSize->OARequirements(zoneOAReqObjIndex));
                         thisVentilationMechanical.ZoneOAAreaRate(ventMechZoneNum) = curOARequirements.OAFlowPerArea;
                         thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) = curOARequirements.OAFlowPerPerson;
                         thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = curOARequirements.OAFlowPerZone;
@@ -1678,7 +1678,7 @@ namespace EnergyPlus::MixedAir {
                     }
                     int zoneAirDistObjIndex = thisVentilationMechanical.ZoneDesignSpecADObjIndex(ventMechZoneNum);
                     if (zoneAirDistObjIndex > 0) {
-                        auto const &curZoneAirDistribution(ZoneAirDistribution(zoneAirDistObjIndex));
+                        auto const &curZoneAirDistribution(state.dataSize->ZoneAirDistribution(zoneAirDistObjIndex));
                         thisVentilationMechanical.ZoneADEffCooling(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffCooling;
                         thisVentilationMechanical.ZoneADEffHeating(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffHeating;
                         thisVentilationMechanical.ZoneADEffSchPtr(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffSchPtr;
@@ -3763,7 +3763,7 @@ namespace EnergyPlus::MixedAir {
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                     if (OAIndex > 0) {
                         {
-                            auto const SELECT_CASE_var(OARequirements(OAIndex).OAFlowMethod);
+                            auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
                             if (SELECT_CASE_var == OAFlowPPer) {
                                 ZoneOABZ = ZoneOAPeople;
                             } else if (SELECT_CASE_var == OAFlow) {
@@ -3852,7 +3852,7 @@ namespace EnergyPlus::MixedAir {
                         OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                         if (OAIndex > 0) {
                             {
-                                auto const SELECT_CASE_var(OARequirements(OAIndex).OAFlowMethod);
+                                auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
                                 if (SELECT_CASE_var == OAFlowPPer) {
                                     ZoneOABZ = ZoneOAPeople;
                                 } else if (SELECT_CASE_var == OAFlow) {
@@ -4737,7 +4737,7 @@ namespace EnergyPlus::MixedAir {
                     if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
 
                         CheckZoneSizing(state, CurrentModuleObject, this->Name);
-                        this->MaxOA = max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
+                        this->MaxOA = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
 
                     } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
 

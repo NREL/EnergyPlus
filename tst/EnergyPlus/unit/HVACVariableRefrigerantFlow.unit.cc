@@ -159,7 +159,7 @@ protected:
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
-        DataSizing::FinalZoneSizing.allocate(numZones);
+        state->dataSize->FinalZoneSizing.allocate(numZones);
         DataSizing::FinalSysSizing.allocate(numAirloops);
         DataSizing::OASysEqSizing.allocate(numAirloops);
         DataSizing::OASysEqSizing(1).SizingMethod.allocate(30);
@@ -270,7 +270,7 @@ protected:
         thisZoneEqList.HeatingPriority(1) = 1;
         thisZoneEqList.EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
 
-        auto &finalZoneSizing(DataSizing::FinalZoneSizing(zoneNum));
+        auto &finalZoneSizing(state->dataSize->FinalZoneSizing(zoneNum));
         finalZoneSizing.DesCoolVolFlow = 1.5;
         finalZoneSizing.DesHeatVolFlow = 1.2;
         finalZoneSizing.DesCoolCoilInTemp = 25.0;
@@ -3706,9 +3706,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -3732,19 +3732,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
     state->dataAirLoop->AirLoopInputsFilled = true;
 
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
     Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                          // AHRI condition at 95 F db
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                  // AHRI condition at 95 F db
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;                // don't care
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
     bool HeatingActive = false;
     bool CoolingActive = false;
@@ -4695,9 +4695,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -5545,9 +5545,9 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
 
@@ -5584,19 +5584,19 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
     DataLoopNode::Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 35.0;                        // AHRI condition at 95 F db
     DataLoopNode::Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 35.0;                // AHRI condition at 95 F db
     DataLoopNode::Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).HumRat = 0.01;              // don't care
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DataSizing::DesDayWeath.allocate(1);
     DataSizing::DesDayWeath(1).Temp.allocate(1);
-    DataSizing::DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
+    DataSizing::DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = 35.0;
 
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;                   // 55.58 F
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.009297628698818194; // humrat at 12.77777 C db / 12.6 C wb
 
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
@@ -11176,9 +11176,9 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(*state);
@@ -11219,15 +11219,15 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
+    DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
     auto &thisFan(Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
@@ -12907,9 +12907,9 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(*state);
@@ -12951,15 +12951,15 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
+    DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
 
     // set pointer to components
     auto &thisFan(Fan(1));
@@ -15584,9 +15584,9 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(*state);
@@ -15627,15 +15627,15 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
 
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).Temp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = Node(thisVRFTU.VRFTUInletNodeNum).HumRat;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 1;
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(1);
-    DesDayWeath(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
+    DesDayWeath(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Temp(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax) = state->dataEnvrn->OutDryBulbTemp;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
     auto &thisFan(Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));

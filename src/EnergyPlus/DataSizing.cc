@@ -84,12 +84,6 @@ namespace EnergyPlus::DataSizing {
     //  before applying user input sys flow rates.
 
     // Object Data
-    Array1D<OARequirementsData> OARequirements;
-    Array1D<ZoneAirDistributionData> ZoneAirDistribution;
-    Array1D<ZoneSizingInputData> ZoneSizingInput;             // Input data for zone sizing
-    Array2D<ZoneSizingData> ZoneSizing;                       // Data for zone sizing (all data, all design)
-    Array1D<ZoneSizingData> FinalZoneSizing;                  // Final data for zone sizing including effects
-    Array2D<ZoneSizingData> CalcZoneSizing;                   // Data for zone sizing (all data)
     Array1D<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
     Array1D<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units (indexed per terminal unit)
     Array1D<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
@@ -111,7 +105,7 @@ namespace EnergyPlus::DataSizing {
     FacilitySizingData CalcFinalFacilitySizing;     // Final data for zone sizing
     Array1D<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
     Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
-    Array1D<Real64> VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
+    Array1D<Real64> VdzMinClgByZone; // minimum discharge flow for cooling, Vdz includes secondary and primary flows for dual path
     Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
     Array1D<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
     Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
@@ -147,7 +141,7 @@ namespace EnergyPlus::DataSizing {
     Array1D<Real64> VotHtgBySys;     // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
     Array1D<Real64> VozSumClgBySys;  // saved value of cooling ventilation required at clg zones
     Array1D<Real64> VozSumHtgBySys;  // saved value of cooling ventilation required at htg zones
-    Array1D<Real64> TotCoolCapTemp;  // scratch variable used for calulating peak load [W]
+    Array1D<Real64> TotCoolCapTemp;  // scratch variable used for calculating peak load [W]
     Array1D<Real64> EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
     Array1D<Real64> EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
     Array1D<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
@@ -157,12 +151,6 @@ namespace EnergyPlus::DataSizing {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        OARequirements.deallocate();
-        ZoneAirDistribution.deallocate();
-        ZoneSizingInput.deallocate();
-        ZoneSizing.deallocate();
-        FinalZoneSizing.deallocate();
-        CalcZoneSizing.deallocate();
         CalcFinalZoneSizing.deallocate();
         TermUnitFinalZoneSizing.deallocate();
         SysSizInput.deallocate();

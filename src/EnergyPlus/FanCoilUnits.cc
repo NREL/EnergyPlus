@@ -1479,7 +1479,7 @@ namespace FanCoilUnits {
 
                 // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
                 if (FanCoil(FanCoilNum).OutAirVolFlow == AutoSize) {
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 } else {
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
                 }
@@ -1580,7 +1580,7 @@ namespace FanCoilUnits {
                         state.dataSize->DataScalableSizingON = true;
                         // initialize OA flow for sizing capacity
                         if (FanCoil(FanCoilNum).OutAirVolFlow == AutoSize) {
-                            ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                         } else {
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FanCoil(FanCoilNum).OutAirVolFlow;
                         }
@@ -1716,7 +1716,7 @@ namespace FanCoilUnits {
                 }
             } else {
                 CheckZoneSizing(state, FanCoil(FanCoilNum).UnitType, FanCoil(FanCoilNum).Name);
-                OutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, FanCoil(FanCoilNum).MaxAirVolFlow);
+                OutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, FanCoil(FanCoilNum).MaxAirVolFlow);
                 if (OutAirVolFlowDes < SmallAirVolFlow) {
                     OutAirVolFlowDes = 0.0;
                 }
@@ -1794,11 +1794,11 @@ namespace FanCoilUnits {
                         }
                         if (DoWaterCoilSizing) {
                             SizingMethod = HeatingCapacitySizing;
-                            if (FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow > 0.0) {
-                                FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatOAFlowFrac =
-                                    min(FanCoil(FanCoilNum).OutAirVolFlow / FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow, 1.0);
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow > 0.0) {
+                                state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatOAFlowFrac =
+                                    min(FanCoil(FanCoilNum).OutAirVolFlow / state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow, 1.0);
                             } else {
-                                FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatOAFlowFrac = 0.0;
+                                state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatOAFlowFrac = 0.0;
                             }
                             if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
                                 zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
@@ -1816,7 +1816,7 @@ namespace FanCoilUnits {
                                         if (state.dataSize->ZoneSizingRunDone) {
                                             PrintFlag = false;
                                             TempSize = AutoSize;
-                                            state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                            state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                             bool errorsFound = false;
                                             HeatingCapacitySizer sizerHeatingCapacity;
                                             sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1830,7 +1830,7 @@ namespace FanCoilUnits {
                                         CheckZoneSizing(state, CompType, CompName);
                                         PrintFlag = false;
                                         TempSize = AutoSize;
-                                        state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                        state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                         bool errorsFound = false;
                                         HeatingCapacitySizer sizerHeatingCapacity;
                                         sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1969,11 +1969,11 @@ namespace FanCoilUnits {
 
                     if (DoWaterCoilSizing) {
                         SizingMethod = CoolingCapacitySizing;
-                        if (FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow > 0.0) {
-                            FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolOAFlowFrac =
-                                min(FanCoil(FanCoilNum).OutAirVolFlow / FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow, 1.0);
+                        if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow > 0.0) {
+                            state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolOAFlowFrac =
+                                min(FanCoil(FanCoilNum).OutAirVolFlow / state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow, 1.0);
                         } else {
-                            FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolOAFlowFrac = 0.0;
+                            state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolOAFlowFrac = 0.0;
                         }
                         if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
                             zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
@@ -1986,7 +1986,7 @@ namespace FanCoilUnits {
                                         ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
                                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                                     } else {
-                                        state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                        state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                     }
                                     TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                                 } else if (CapSizingMethod == CapacityPerFloorArea) {
@@ -1994,7 +1994,7 @@ namespace FanCoilUnits {
                                         CheckZoneSizing(state, CompType, CompName);
                                         PrintFlag = false;
                                         TempSize = AutoSize;
-                                        state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                        state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                         CoolingCapacitySizer sizerCoolingCapacity;
                                         sizerCoolingCapacity.overrideSizingString(SizingString);
                                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -2006,7 +2006,7 @@ namespace FanCoilUnits {
                                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                                     PrintFlag = false;
                                     TempSize = AutoSize;
-                                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                     CoolingCapacitySizer sizerCoolingCapacity2;
                                     sizerCoolingCapacity2.overrideSizingString(SizingString);
                                     sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -2028,7 +2028,7 @@ namespace FanCoilUnits {
                             SizingString = "Cooling Design Capacity [W]";
                             PrintFlag = false;
                             TempSize = AutoSize;
-                            state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                            state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                             CoolingCapacitySizer sizerCoolingCapacity;
                             sizerCoolingCapacity.overrideSizingString(SizingString);
                             sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -2095,7 +2095,7 @@ namespace FanCoilUnits {
                 sizerZoneHeatingLoad.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 FanCoil(FanCoilNum).DesZoneHeatingLoad = sizerZoneHeatingLoad.size(state, FanCoil(FanCoilNum).DesZoneHeatingLoad, ErrorsFound);
 
-                FanCoil(FanCoilNum).DSOAPtr = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneDesignSpecOAIndex;
+                FanCoil(FanCoilNum).DSOAPtr = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneDesignSpecOAIndex;
 
             } else if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_ASHRAE && FanCoil(FanCoilNum).ASHRAETempControl) {
 
@@ -2105,22 +2105,22 @@ namespace FanCoilUnits {
                 state.dataSize->DataCapacityUsedForSizing = FanCoil(FanCoilNum).DesCoolingLoad * capacityMultiplier;
                 CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
                 if (SizingDesRunThisZone) {
-                    state.dataSize->DataCapacityUsedForSizing = FinalZoneSizing(FanCoil(FanCoilNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
+                    state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(FanCoil(FanCoilNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
                 } else {
                     state.dataSize->DataCapacityUsedForSizing = FanCoil(FanCoilNum).DesCoolingLoad * capacityMultiplier;
                 }
-                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 PrintFlag = true;
                 ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
                 sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 FanCoil(FanCoilNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, FanCoil(FanCoilNum).DesignMinOutletTemp, ErrorsFound);
 
                 if (SizingDesRunThisZone) {
-                    state.dataSize->DataCapacityUsedForSizing = FinalZoneSizing(FanCoil(FanCoilNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
+                    state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(FanCoil(FanCoilNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
                 } else {
                     state.dataSize->DataCapacityUsedForSizing = FanCoil(FanCoilNum).DesHeatingLoad * capacityMultiplier;
                 }
-                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                 ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
                 sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 FanCoil(FanCoilNum).DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(state, FanCoil(FanCoilNum).DesignMaxOutletTemp, ErrorsFound);
@@ -2134,9 +2134,9 @@ namespace FanCoilUnits {
                 if (SizingDesRunThisZone) {
 
                     FanCoil(FanCoilNum).DesZoneCoolingLoad =
-                        -1.0 * (FanCoil(FanCoilNum).DesCoolingLoad / FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolSizingFactor);
-                    FanCoil(FanCoilNum).DesZoneHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad / FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatSizingFactor;
-                    FanCoil(FanCoilNum).DSOAPtr = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneDesignSpecOAIndex;
+                        -1.0 * (FanCoil(FanCoilNum).DesCoolingLoad / state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolSizingFactor);
+                    FanCoil(FanCoilNum).DesZoneHeatingLoad = FanCoil(FanCoilNum).DesHeatingLoad / state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatSizingFactor;
+                    FanCoil(FanCoilNum).DSOAPtr = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneDesignSpecOAIndex;
 
                 } else {
 
@@ -2156,8 +2156,8 @@ namespace FanCoilUnits {
             CoolingCoilType = FanCoil(FanCoilNum).CCoilType;
         }
         if (state.dataSize->ZoneSizingRunDone) {
-            WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, ErrorsFound);
-            WaterCoils::SetCoilDesFlow(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow, ErrorsFound);
+            WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, ErrorsFound);
+            WaterCoils::SetCoilDesFlow(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow, ErrorsFound);
         } else {
             WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, FanCoil(FanCoilNum).MaxAirVolFlow, ErrorsFound);
             WaterCoils::SetCoilDesFlow(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, FanCoil(FanCoilNum).MaxAirVolFlow, ErrorsFound);

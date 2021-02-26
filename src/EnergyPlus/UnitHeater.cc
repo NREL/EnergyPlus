@@ -1034,7 +1034,7 @@ namespace UnitHeater {
                     TempSize = AutoSize;
                     PrintFlag = false;
                     state.dataSize->DataScalableSizingON = true;
-                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                     bool errorsFound = false;
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1123,7 +1123,7 @@ namespace UnitHeater {
                                     CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                                     if (CapSizingMethod == HeatingDesignCapacity) {
                                         if (ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity == AutoSize) {
-                                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
+                                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
                                         } else {
                                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                         }
@@ -1152,7 +1152,7 @@ namespace UnitHeater {
                                 PrintFlag = false;
                                 TempSize = AutoSize;
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
-                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
+                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
                                 bool errorsFound = false;
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1241,7 +1241,7 @@ namespace UnitHeater {
                                     CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                                     if (CapSizingMethod == HeatingDesignCapacity) {
                                         if (ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity == AutoSize) {
-                                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
+                                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
                                         } else {
                                             ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                         }
@@ -1267,7 +1267,7 @@ namespace UnitHeater {
                                 DesCoilLoad = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 state.dataSize->DataScalableCapSizingON = false;
                             } else {
-                                DesCoilLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
+                                DesCoilLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatLoad;
                             }
                             if (DesCoilLoad >= SmallLoad) {
                                 TempSteamIn = 100.00;

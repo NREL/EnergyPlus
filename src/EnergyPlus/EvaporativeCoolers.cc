@@ -1222,7 +1222,7 @@ namespace EvaporativeCoolers {
                 }
             } else { // Autosize or hardsize with design data
                 // zone equip evap coolers
-                IndirectVolFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                IndirectVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 // apply scaling factor the secondary air fan flow rate
                 if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
                     IndirectVolFlowRateDes = IndirectVolFlowRateDes * EvapCond(EvapCoolNum).IndirectVolFlowScalingFactor;
@@ -1300,7 +1300,7 @@ namespace EvaporativeCoolers {
                 //"User-Specified Secondary Fan Flow Rate [m3/s]", EvapCond( EvapCoolNum ).VolFlowRate );
                 //}
             } else { // Autosize or hardsize with design data
-                volFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                volFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
             }
 
         } else { // zone equipment
@@ -1391,7 +1391,7 @@ namespace EvaporativeCoolers {
                     }
                 } else { // Autosize or hardsize with design data
                     // zone equip evap coolers
-                    IndirectVolFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                    IndirectVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
                 }
@@ -1522,7 +1522,7 @@ namespace EvaporativeCoolers {
                     }
                 } else { // Autosize or hardsize with design data
                     // zone equip evap coolers
-                    IndirectVolFlowRateDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                    IndirectVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
                 }
@@ -4206,7 +4206,6 @@ namespace EvaporativeCoolers {
         using namespace DataSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataSizing::AutoSize;
-        using DataSizing::FinalZoneSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
@@ -4277,7 +4276,7 @@ namespace EvaporativeCoolers {
                     TempSize = AutoSize;
                     PrintFlag = false;
                     state.dataSize->DataScalableSizingON = true;
-                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                         state.dataSize->DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }

@@ -719,7 +719,6 @@ namespace Humidifiers {
         using DataHVACGlobals::Other;
         using DataSizing::AutoSize;
         using DataSizing::FinalSysSizing;
-        using DataSizing::FinalZoneSizing;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
@@ -786,11 +785,11 @@ namespace Humidifiers {
                 } else { // Sizing run done
 
                     CheckZoneSizing(state, "Humidifier:SizeHumidifier", Name);
-                    AirDensity = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolDens;
-                    MassFlowDes = max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow) * AirDensity;
-                    InletHumRatDes = std::min(FinalZoneSizing(state.dataSize->CurZoneEqNum).OutHumRatAtHeatPeak, FinalZoneSizing(state.dataSize->CurZoneEqNum).OutHumRatAtCoolPeak);
+                    AirDensity = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolDens;
+                    MassFlowDes = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow) * AirDensity;
+                    InletHumRatDes = std::min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).OutHumRatAtHeatPeak, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).OutHumRatAtCoolPeak);
                     OutletHumRatDes =
-                        std::max(FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak, FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak);
+                        std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak);
                 }
             } else if (state.dataSize->CurSysNum > 0) {
                 if (!IsAutoSize && !state.dataSize->SysSizingRunDone) {

@@ -595,7 +595,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(2).ZonePtr, 2);
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(3).ZonePtr, 3);
 
-    DataSizing::FinalZoneSizing.allocate(3);
+    state->dataSize->FinalZoneSizing.allocate(3);
     DataSizing::ZoneEqSizing.allocate(3);
     state->dataSize->ZoneSizingRunDone = true;
 
@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     // do electric baseboard sizing
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
     // check user specified hardsized nominal capacity
@@ -624,7 +624,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);
@@ -644,7 +644,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         ElectricBaseboardRadiator::ElecBaseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do electric baseboard sizing
     ElectricBaseboardRadiator::SizeElectricBaseboard(*state, BaseboardNum);

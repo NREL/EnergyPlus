@@ -113,8 +113,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     EnergyPlus::DataSizing::TermUnitFinalZoneSizing.allocate(1);
     EnergyPlus::DataSizing::TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU = 15;
     EnergyPlus::DataSizing::TermUnitFinalZoneSizing(1).ZoneTempAtHeatPeak = 20;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
 
     state->dataSize->ZoneSizingRunDone = true;
@@ -224,7 +224,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletTempSizingGauntlet)
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

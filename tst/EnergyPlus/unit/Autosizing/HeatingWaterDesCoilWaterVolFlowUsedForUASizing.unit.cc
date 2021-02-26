@@ -103,8 +103,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
 
     DataSizing::PlantSizData.allocate(1);
     state->dataSize->DataWaterFlowUsedForSizing = 0.0001;
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
     state->dataSize->ZoneSizingRunDone = true;
 
     // Test 2 - Zone Equipment, Single Duct TU

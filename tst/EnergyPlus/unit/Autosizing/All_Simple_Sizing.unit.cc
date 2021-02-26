@@ -215,10 +215,10 @@ TEST_F(AutoSizingFixture, MaxHeaterOutletTempSizingGauntlet)
                     " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Maximum Supply Air Temperature [C], 37.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 32.6;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatDesTemp = 32.6;
     state->dataSize->ZoneSizingRunDone = true;
 
     // Test 2 - Zone Equipment, Single Duct TU (doesn't matter)
@@ -243,7 +243,7 @@ TEST_F(AutoSizingFixture, MaxHeaterOutletTempSizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -349,10 +349,10 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
                     " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 3007.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 2500.0;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 2500.0;
     state->dataSize->ZoneSizingRunDone = true;
 
     // Test 2 - Zone Equipment, Single Duct TU (doesn't matter)
@@ -377,7 +377,7 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -483,10 +483,10 @@ TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
                     " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Heating Sensible Load [W], 3007.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 2500.0;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 2500.0;
     state->dataSize->ZoneSizingRunDone = true;
 
     // Test 2 - Zone Equipment, Single Duct TU (doesn't matter)
@@ -511,7 +511,7 @@ TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -616,11 +616,11 @@ TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
                                         "Temperature in Cooling Mode [C], 16.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(1).ZoneTempAtCoolPeak = 23.9;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).ZoneHumRatAtCoolPeak = 0.009;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak = 23.9;
+    state->dataSize->FinalZoneSizing(1).ZoneHumRatAtCoolPeak = 0.009;
     state->dataSize->DataCapacityUsedForSizing = 2500.0;
     state->dataSize->DataFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     state->dataSize->ZoneSizingRunDone = true;
@@ -783,11 +783,11 @@ TEST_F(AutoSizingFixture, ASHRAEMaxSATHeatingSizingGauntlet)
                                         "Temperature in Heating Mode [C], 26.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::FinalZoneSizing(1).ZoneTempAtHeatPeak = 21.9;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).ZoneHumRatAtHeatPeak = 0.007;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak = 21.9;
+    state->dataSize->FinalZoneSizing(1).ZoneHumRatAtHeatPeak = 0.007;
     state->dataSize->DataCapacityUsedForSizing = 2500.0;
     state->dataSize->DataFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     state->dataSize->ZoneSizingRunDone = true;
@@ -944,9 +944,9 @@ TEST_F(AutoSizingFixture, DesiccantDehumidifierBFPerfDataFaceVelocitySizingGaunt
                                         compType + ", MyDesiccantHX, User-Specified Nominal Air Face Velocity [m/s], 4.50000\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->DataAirFlowUsedForSizing = 0.125; // = 0.00005 m3/s/W
     state->dataSize->ZoneSizingRunDone = true;
 

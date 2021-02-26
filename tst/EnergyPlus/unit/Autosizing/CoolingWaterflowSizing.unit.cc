@@ -124,14 +124,14 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     has_eio_output(true);
 
     // now allocate sizing arrays for testing autosized field
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     EnergyPlus::DataSizing::ZoneEqSizing(1).MaxCWVolFlow = 0.3;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).DesCoolMassFlow = 0.3;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).CoolDesTemp = 12.0;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).CoolDesHumRat = 0.006;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).DesCoolCoilInTemp = 25.0;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).DesCoolCoilInHumRat = 0.009;
+    state->dataSize->FinalZoneSizing(1).DesCoolMassFlow = 0.3;
+    state->dataSize->FinalZoneSizing(1).CoolDesTemp = 12.0;
+    state->dataSize->FinalZoneSizing(1).CoolDesHumRat = 0.006;
+    state->dataSize->FinalZoneSizing(1).DesCoolCoilInTemp = 25.0;
+    state->dataSize->FinalZoneSizing(1).DesCoolCoilInHumRat = 0.009;
     state->dataSize->ZoneSizingRunDone = true;
 
     // Test 3 - Zone Equipment, Single Duct TU, cooling coil water flow sizes > 0
@@ -139,8 +139,8 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
-    DataSizing::ZoneSizingInput.allocate(1);
-    DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
@@ -172,7 +172,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     EXPECT_GT(sizedValue, previousWaterFlow); // water flow rate is greater with fan heat than without
 
     // test fan heat
-    Real64 desVolFlow = DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
+    Real64 desVolFlow = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
     Real64 desFanHeat = sizer.calcFanDesHeatGain(desVolFlow);
     EXPECT_FALSE(sizer.fanCompModel); // fan is not a component model type
     EXPECT_NEAR(237.5, desFanHeat, 0.001);
@@ -263,7 +263,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

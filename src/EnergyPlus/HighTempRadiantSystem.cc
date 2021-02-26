@@ -833,7 +833,7 @@ namespace HighTempRadiantSystem {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (HighTempRadSys(RadSysNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad /
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad /
                                                                     (HighTempRadSys(RadSysNum).FracRadiant + HighTempRadSys(RadSysNum).FracConvect);
                     } else {
                         ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
@@ -849,7 +849,7 @@ namespace HighTempRadiantSystem {
                     CheckZoneSizing(state, CompType, CompName);
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad /
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad /
                                                                 (HighTempRadSys(RadSysNum).FracRadiant + HighTempRadSys(RadSysNum).FracConvect);
                     TempSize = AutoSize;
                     state.dataSize->DataScalableCapSizingON = true;

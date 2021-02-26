@@ -13668,7 +13668,6 @@ namespace EnergyPlus::OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeq,
                                         Array2D<Real64> const &surfDelaySeq)
     {
-        using DataSizing::CalcZoneSizing;
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
@@ -13761,9 +13760,9 @@ namespace EnergyPlus::OutputReportTabular {
             resCellsUsd(cSensDelay, rPowerGen) = true;
 
             // DOAS
-            resultCells(cSensInst, rDOAS) = CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
+            resultCells(cSensInst, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASHeatAddSeq(timeOfMax);
             resCellsUsd(cSensInst, rDOAS) = true;
-            resultCells(cLatent, rDOAS) = CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
+            resultCells(cLatent, rDOAS) = state.dataSize->CalcZoneSizing(desDaySelected, zoneIndex).DOASLatAddSeq(timeOfMax);
             resCellsUsd(cLatent, rDOAS) = true;
 
             // INFILTRATION
@@ -13878,7 +13877,6 @@ namespace EnergyPlus::OutputReportTabular {
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
         using DataSizing::CalcFinalZoneSizing;
-        using DataSizing::FinalZoneSizing;
         using DataSizing::SupplyAirTemperature;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyTwbFnTdbWPb;
@@ -13929,7 +13927,7 @@ namespace EnergyPlus::OutputReportTabular {
                 compLoad.peakDesSensLoad = CalcFinalZoneSizing(zoneIndex).DesCoolLoad / mult; // change sign
 
                 // Design Peak Load
-                compLoad.designPeakLoad = FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
+                compLoad.designPeakLoad = state.dataSize->FinalZoneSizing(zoneIndex).DesCoolLoad / mult;
 
                 // Supply air temperature
                 if (CalcFinalZoneSizing(zoneIndex).ZnCoolDgnSAMethod == SupplyAirTemperature) {
@@ -13983,7 +13981,7 @@ namespace EnergyPlus::OutputReportTabular {
                 compLoad.peakDesSensLoad = -CalcFinalZoneSizing(zoneIndex).DesHeatLoad / mult; // change sign
 
                 // Design Peak Load
-                compLoad.designPeakLoad = -FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
+                compLoad.designPeakLoad = -state.dataSize->FinalZoneSizing(zoneIndex).DesHeatLoad / mult;
 
                 // Supply air temperature
                 if (CalcFinalZoneSizing(zoneIndex).ZnHeatDgnSAMethod == SupplyAirTemperature) {

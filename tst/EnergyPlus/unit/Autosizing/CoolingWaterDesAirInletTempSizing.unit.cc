@@ -114,21 +114,21 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     has_eio_output(true);
 
     // now allocate sizing arrays for testing autosized field
-    DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     DataSizing::ZoneEqSizing.allocate(1);
 
     // Sizing Type Prerequisites:
     // TermUnitIU, ZoneEqFanCoil w/ no OA
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtCoolPeak = 21.77;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtCoolPeak = 21.77;
     // All other TU types (TermUnitSingDuct, TermUnitPIU)
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 22.88;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 22.88;
     // ZoneEqFanCoil w/ OA
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = 0.01;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).OutTempAtCoolPeak = 29.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 23.9;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = 0.01;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).OutTempAtCoolPeak = 29.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 23.9;
 
-    DataSizing::ZoneSizingInput.allocate(1);
-    DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
 
     state->dataSize->ZoneSizingRunDone = true;
 
@@ -188,7 +188,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     state->dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
     state->dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
     state->dataSize->DataDesInletAirHumRat = 0.008;
-    state->dataSize->DataAirFlowUsedForSizing = DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow;
+    state->dataSize->DataAirFlowUsedForSizing = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow;
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -219,7 +219,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
 
     // Test 9 - Zone Equipment w/ 10% OA
     DataSizing::ZoneEqSizing(1).OAVolFlow =
-        DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow / (10.0 * state->dataEnvrn->StdRhoAir);
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow / (10.0 * state->dataEnvrn->StdRhoAir);
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -259,7 +259,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->NumZoneSizingInput = 0;
     DataSizing::ZoneEqSizing.deallocate();
-    DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

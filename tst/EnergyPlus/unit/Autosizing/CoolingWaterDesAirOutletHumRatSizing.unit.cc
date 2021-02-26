@@ -113,7 +113,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletHumRatSizingGauntlet)
     has_eio_output(true);
 
     // now allocate sizing arrays for testing autosized field
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
 
     // Sizing Type Prerequisites:
     // TermUnitIU
@@ -121,7 +121,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletHumRatSizingGauntlet)
     state->dataSize->DataDesOutletAirTemp = 12.0;
     state->dataSize->DataDesInletWaterTemp = 7.0;
     // All other TU types
-    EnergyPlus::DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.008;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.008;
 
     state->dataSize->ZoneSizingRunDone = true;
 
@@ -197,7 +197,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletHumRatSizingGauntlet)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->NumZoneSizingInput = 0;
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

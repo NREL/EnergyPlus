@@ -548,13 +548,13 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 0;
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0085;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 28.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.0075;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolOAFlowFrac = 0.2;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.30;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0085;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 28.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.0075;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolOAFlowFrac = 0.2;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.30;
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataEnvrn->StdBaroPress = 101325.0;
@@ -562,11 +562,11 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 
     // Need this to prevent crash in Sizers
     ZoneEqSizing.allocate(1);
-    ZoneSizingInput.allocate(1);
-    ZoneSizingInput(1).ZoneNum = ZoneNum;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = ZoneNum;
     state->dataSize->NumZoneSizingInput = 1;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
-    state->dataSize->DataFlowUsedForSizing = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow;
+    state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow;
 
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
@@ -589,7 +589,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
     CompName = "Chilled Water Cooling Coil";
     SizingResult = DataSizing::AutoSize;
     state->dataEnvrn->StdRhoAir = 1.18;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataSize->DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
@@ -675,8 +675,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_setZoneCoilInletConditions)
     DataSizing::ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     DataSizing::ZoneEqSizingData &zoneEqSizing = ZoneEqSizing(state->dataSize->CurZoneEqNum);
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->FinalZoneSizing.allocate(1);
+    DataSizing::ZoneSizingData &finalZoneSizing = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     zoneEqSizing.OAVolFlow = 0.34;
     zoneEqSizing.ATMixerVolFlow = 0.0;
@@ -904,18 +904,18 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 0;
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.30;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.30;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
     // Time of peak, should equal to 18:00:00
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 72;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 72;
 
     // Fake a design day
     state->dataWeatherManager->DesDayInput.allocate(1);
     std::string DDTitle = "CHICAGO ANN CLG 1% CONDNS DB=>MWB";
-    state->dataWeatherManager->DesDayInput(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Title = DDTitle;
-    state->dataWeatherManager->DesDayInput(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Month = 7;
-    state->dataWeatherManager->DesDayInput(FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
+    state->dataWeatherManager->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Title = DDTitle;
+    state->dataWeatherManager->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).Month = 7;
+    state->dataWeatherManager->DesDayInput(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
     // Also need to set this, it's used to check if DDNum <= TotDesDays
     state->dataEnvrn->TotDesDays = 1;
 
@@ -923,8 +923,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 
     // Need this to prevent crash in Sizers
     ZoneEqSizing.allocate(1);
-    ZoneSizingInput.allocate(1);
-    ZoneSizingInput(1).ZoneNum = ZoneNum;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = ZoneNum;
     state->dataSize->NumZoneSizingInput = 1;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
@@ -1432,13 +1432,13 @@ TEST_F(EnergyPlusFixture, BaseSizer_SupplyAirTempLessThanZoneTStatTest)
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay, "PHOENIX SKY HARBOR INTL AP ANN HTG 99.6% CONDNS DB");
     // actual zone air temperature at peak load
     EXPECT_NEAR(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.08, 0.01);
-    EXPECT_NEAR(DataSizing::FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.08, 0.01);
+    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.08, 0.01);
     // Check heating design flow rates, expected to be zero due the above conditions
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);  // expects zero
     EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0); // expects zero
-    EXPECT_EQ(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
-    EXPECT_EQ(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
     // expects non-zero peak heating load
     EXPECT_NEAR(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
-    EXPECT_NEAR(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
+    EXPECT_NEAR(state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
 }

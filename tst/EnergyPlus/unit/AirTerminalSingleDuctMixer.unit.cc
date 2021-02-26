@@ -7645,8 +7645,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     TempControlType(1) = 4;
     state->dataSize->ZoneSizingRunDone = true;
 
-    FinalZoneSizing.allocate(1);
-    auto &finalZoneSizing(FinalZoneSizing(1));
+    state->dataSize->FinalZoneSizing.allocate(1);
+    auto &finalZoneSizing(state->dataSize->FinalZoneSizing(1));
     finalZoneSizing.DesCoolVolFlow = DesignHeatAirVolFlow;
     finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     finalZoneSizing.DesHeatVolFlow = DesignCoolAirVolFlow;
@@ -8076,8 +8076,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     TempControlType(1) = 4;
     state->dataSize->ZoneSizingRunDone = true;
 
-    FinalZoneSizing.allocate(1);
-    auto &finalZoneSizing(FinalZoneSizing(1));
+    state->dataSize->FinalZoneSizing.allocate(1);
+    auto &finalZoneSizing(state->dataSize->FinalZoneSizing(1));
     finalZoneSizing.DesCoolVolFlow = DesignHeatAirVolFlow;
     finalZoneSizing.DesCoolMassFlow = finalZoneSizing.DesCoolVolFlow * state->dataEnvrn->StdRhoAir;
     finalZoneSizing.DesHeatVolFlow = DesignCoolAirVolFlow;

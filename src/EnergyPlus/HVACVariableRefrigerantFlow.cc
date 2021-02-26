@@ -7314,7 +7314,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HVACSizingIndex > 0) {
             // initialize OA flow for sizing other inputs (e.g., capacity)
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow == AutoSize) {
-                EqSizing.OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                EqSizing.OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
             } else {
                 EqSizing.OAVolFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow;
             }
@@ -7366,7 +7366,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 TempSize = AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;
-                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                     state.dataSize->DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                 }
@@ -7422,7 +7422,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 TempSize = AutoSize;
                 PrintFlag = false;
                 state.dataSize->DataScalableSizingON = true;
-                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                 if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                 }
@@ -7616,7 +7616,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             } else {
                 CheckZoneSizing(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
-                CoolOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
+                CoolOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
                 if (CoolOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     CoolOutAirVolFlowDes = 0.0;
                 }
@@ -7681,7 +7681,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             } else {
                 CheckZoneSizing(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
-                HeatOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
+                HeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
                 if (HeatOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     HeatOutAirVolFlowDes = 0.0;
                 }
@@ -7753,7 +7753,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             } else {
                 CheckZoneSizing(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
                 NoCoolHeatOutAirVolFlowDes =
-                    min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
+                    min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
                 if (NoCoolHeatOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
                     NoCoolHeatOutAirVolFlowDes = 0.0;
                 }

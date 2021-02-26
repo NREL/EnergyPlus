@@ -358,11 +358,11 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     SurfaceGeometry::GetSurfaceData(*state, errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    ZoneSizingInput.allocate(3);
+    state->dataSize->ZoneSizingInput.allocate(3);
     state->dataSize->NumZoneSizingInput = 3;
-    ZoneSizingInput(1).ZoneNum = 1;
-    ZoneSizingInput(2).ZoneNum = 2;
-    ZoneSizingInput(3).ZoneNum = 3;
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput(2).ZoneNum = 2;
+    state->dataSize->ZoneSizingInput(3).ZoneNum = 3;
 
     int TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(TotNumLoops);
@@ -388,7 +388,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     // get electric baseboard inputs
     BaseboardRadiator::GetBaseboardInput(*state);
 
-    DataSizing::FinalZoneSizing.allocate(3);
+    state->dataSize->FinalZoneSizing.allocate(3);
     DataSizing::ZoneEqSizing.allocate(3);
     state->dataSize->ZoneSizingRunDone = true;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
@@ -401,11 +401,11 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP = 2000.0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
-    FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
-    FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     // do baseboard sizing
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).LoopNum = 1;
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).ZonePtr = 1;
@@ -428,10 +428,10 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
-    FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
-    FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do baseboard sizing
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).LoopNum = 1;
@@ -455,10 +455,10 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
     DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
-    DataSizing::FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
-    FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
-    FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneTempAtHeatPeak = 20.0;
+    state->dataSize->FinalZoneSizing(CntrlZoneNum).ZoneHumRatAtHeatPeak = 0.005;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
     // do baseboard sizing
     state->dataBaseboardRadiator->Baseboard(BaseboardNum).LoopNum = 1;

@@ -735,15 +735,15 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
-    OARequirements.allocate(1);
-    OARequirements(1).Name = "CM DSOA WEST ZONE";
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerPerson = 0.003149;
-    OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
 
-    ZoneAirDistribution.allocate(1);
-    ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
-    ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "WEST ZONE";
@@ -800,8 +800,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     EXPECT_NEAR(0.0194359, state->dataMixedAir->OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.009527, state->dataMixedAir->OAController(1).MinOAFracLimit, 0.00001);
 
-    OARequirements(1).OAFlowMethod = 9;
-    state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1) = OARequirements(1).OAFlowMethod;
+    state->dataSize->OARequirements(1).OAFlowMethod = 9;
+    state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1) = state->dataSize->OARequirements(1).OAFlowMethod;
     state->dataAirLoop->NumOASystems = 1;
 
     state->dataAirLoop->OutsideAirSys.allocate(1);
@@ -946,10 +946,10 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
-    OARequirements.allocate(1);
-    ZoneAirDistribution.allocate(1);
-    ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
-    ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
@@ -5598,16 +5598,16 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
-    OARequirements.allocate(1);
-    OARequirements(1).Name = "CM DSOA WEST ZONE";
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerPerson = 0.003149;
-    OARequirements(1).OAFlowPerArea = 0.000407;
-    OARequirements(1).OAPropCtlMinRateSchPtr = 8;
+    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements(1).OAPropCtlMinRateSchPtr = 8;
 
-    ZoneAirDistribution.allocate(1);
-    ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
-    ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "WEST ZONE";
@@ -5688,8 +5688,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    OARequirements.deallocate();
-    ZoneAirDistribution.deallocate();
+    state->dataSize->OARequirements.deallocate();
+    state->dataSize->ZoneAirDistribution.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataHeatBal->People.deallocate();

@@ -719,7 +719,7 @@ namespace BaseboardRadiator {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
+                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                             }
@@ -735,7 +735,7 @@ namespace BaseboardRadiator {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
-                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                             TempSize = AutoSize;
                             state.dataSize->DataScalableCapSizingON = true;
                         } else {
@@ -816,8 +816,8 @@ namespace BaseboardRadiator {
                     }
                 } else {
                     baseboard->Baseboard(BaseboardNum).WaterInletTemp = PlantSizData(PltSizHeatNum).ExitTemp;
-                    baseboard->Baseboard(BaseboardNum).AirInletTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneTempAtHeatPeak;
-                    baseboard->Baseboard(BaseboardNum).AirInletHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak;
+                    baseboard->Baseboard(BaseboardNum).AirInletTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneTempAtHeatPeak;
+                    baseboard->Baseboard(BaseboardNum).AirInletHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak;
                     WaterInletNode = baseboard->Baseboard(BaseboardNum).WaterInletNode;
                     rho = GetDensityGlycol(state,
                                             state.dataPlnt->PlantLoop(baseboard->Baseboard(BaseboardNum).LoopNum).FluidName,
@@ -841,7 +841,7 @@ namespace BaseboardRadiator {
                         if (CapSizingMethod == HeatingDesignCapacity) {
                             if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                                 CheckZoneSizing(state, CompType, CompName);
-                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
+                                ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                             } else {
                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                             }
@@ -857,7 +857,7 @@ namespace BaseboardRadiator {
                             CheckZoneSizing(state, CompType, CompName);
                             ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                             state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
-                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                             TempSize = AutoSize;
                             state.dataSize->DataScalableCapSizingON = true;
                         } else {
@@ -1052,7 +1052,7 @@ namespace BaseboardRadiator {
         ZoneNum = baseboard->Baseboard(BaseboardNum).ZonePtr;
         QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         if (baseboard->Baseboard(BaseboardNum).MySizeFlag)
-            QZnReq = FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad; // If in sizing, assign design condition
+            QZnReq = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad; // If in sizing, assign design condition
 
         WaterInletTemp = baseboard->Baseboard(BaseboardNum).WaterInletTemp;
         AirInletTemp = baseboard->Baseboard(BaseboardNum).AirInletTemp;

@@ -2701,7 +2701,7 @@ namespace UnitarySystems {
 
             capacityMultiplier = 0.5; // one-half of design zone load
             if (SizingDesRunThisSys) {
-                state.dataSize->DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesCoolLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(this->ControlZoneNum).DesCoolLoad * capacityMultiplier;
             } else {
                 state.dataSize->DataCapacityUsedForSizing = this->m_DesignCoolingCapacity * capacityMultiplier;
             }
@@ -2715,7 +2715,7 @@ namespace UnitarySystems {
             this->DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, this->DesignMinOutletTemp, ErrFound);
 
             if (SizingDesRunThisSys) {
-                state.dataSize->DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesHeatLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(this->ControlZoneNum).DesHeatLoad * capacityMultiplier;
             } else {
                 state.dataSize->DataCapacityUsedForSizing = this->m_DesignHeatingCapacity * capacityMultiplier;
             }

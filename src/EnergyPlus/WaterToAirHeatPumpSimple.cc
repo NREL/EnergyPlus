@@ -1250,7 +1250,7 @@ namespace WaterToAirHeatPumpSimple {
             } else {
                 CheckZoneSizing(state, "COIL:" + state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType + ":WATERTOAIRHEATPUMP:EQUATIONFIT",
                                 state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).Name);
-                RatedAirVolFlowRateDes = max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
+                RatedAirVolFlowRateDes = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                 if (RatedAirVolFlowRateDes < SmallAirVolFlow) {
                     RatedAirVolFlowRateDes = 0.0;
                 }
@@ -1403,23 +1403,23 @@ namespace WaterToAirHeatPumpSimple {
                     if (VolFlowRate >= SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
-                                MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
-                                MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
+                                MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                                MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                             } else {
-                                MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
-                                MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                                MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
+                                MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
                             }
                         } else {
-                            MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
-                            MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
+                            MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                            MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                         }
-                        SupTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
-                        SupHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
+                        SupTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
+                        SupHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
                         SupTemp = min(MixTemp, SupTemp);
                         SupHumRat = min(MixHumRat, SupHumRat);
-                        TimeStepNumAtMax = FinalZoneSizing(state.dataSize->CurZoneEqNum).TimeStepNumAtCoolMax;
-                        DDNum = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDDNum;
+                        TimeStepNumAtMax = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).TimeStepNumAtCoolMax;
+                        DDNum = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDDNum;
                         if (DDNum > 0 && TimeStepNumAtMax > 0) {
                             OutTemp = DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                         } else {
@@ -1580,23 +1580,23 @@ namespace WaterToAirHeatPumpSimple {
                     if (VolFlowRate >= SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
-                                MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
-                                MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
+                                MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                                MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                             } else {
-                                MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
-                                MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                                MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
+                                MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
                             }
                         } else {
-                            MixTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
-                            MixHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
+                            MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                            MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                         }
-                        SupTemp = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
-                        SupHumRat = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
+                        SupTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
+                        SupHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
                         // supply air condition is capped with that of mixed air to avoid SHR > 1.0
                         SupTemp = min(MixTemp, SupTemp);
                         SupHumRat = min(MixHumRat, SupHumRat);
-                        TimeStepNumAtMax = FinalZoneSizing(state.dataSize->CurZoneEqNum).TimeStepNumAtCoolMax;
-                        DDNum = FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDDNum;
+                        TimeStepNumAtMax = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).TimeStepNumAtCoolMax;
+                        DDNum = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDDNum;
                         if (DDNum > 0 && TimeStepNumAtMax > 0) {
                             OutTemp = DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                         } else {

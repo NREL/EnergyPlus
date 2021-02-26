@@ -572,13 +572,13 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     // CurZoneEqNum = Current Zone Equipment index (0 if not simulating ZoneEq)
     // CurTermUnitSizingNum = Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
     state->dataSize->CurZoneEqNum = 2;
-    DataSizing::FinalZoneSizing.allocate(2);
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 2.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 10.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
+    state->dataSize->FinalZoneSizing.allocate(2);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 2.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 10.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
 
     state->dataSize->CurTermUnitSizingNum = 1;
     DataSizing::TermUnitSizing.allocate(1);
@@ -586,7 +586,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 1.0;
     DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
     state->dataSize->TermUnitSingDuct = true;
-    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     // Call the sizing routine now
     PoweredInductionUnits::SizePIU(*state, PIUNum);

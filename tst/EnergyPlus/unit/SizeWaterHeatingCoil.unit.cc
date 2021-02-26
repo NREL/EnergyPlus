@@ -220,7 +220,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
@@ -282,35 +282,35 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->CurTermUnitSizingNum = 1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.7;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.7;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
     TermUnitSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
-                FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
+    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
@@ -458,7 +458,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
@@ -520,34 +520,34 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     state->dataSize->CurTermUnitSizingNum = 1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
-                FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
+    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
@@ -695,7 +695,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
@@ -759,32 +759,32 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSize->CurTermUnitSizingNum = 1;
     TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesCoolVolFlow = 0.28794;
     TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
-                FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
+    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
@@ -794,7 +794,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
@@ -932,7 +932,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     TermUnitFinalZoneSizing.allocate(1);
     CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
@@ -996,32 +996,32 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSize->CurTermUnitSizingNum = 1;
     TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesCoolVolFlow = 0.28794;
     TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 16.6;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.28794;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatVolFlow = 0.12046;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 3191.7;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.099;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.0038485;
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 0.12046;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
-            FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
-        max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
-            max(FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
-                FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlowMin =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2,
+            state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow * state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlowMax =
+        max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlow2,
+            max(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow) *
+                state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMaxAirFlowFrac);
+    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
     state->dataSingleDuct->sd_airterminal(1).ZoneFloorArea = state->dataHeatBal->Zone(1).FloorArea;
     state->dataSingleDuct->sd_airterminal(1).SizeSys(*state);
     SizeWaterCoil(*state, 1);
@@ -1031,7 +1031,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
     TermUnitFinalZoneSizing.deallocate();
     CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();

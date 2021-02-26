@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     // Allocate
     CalcSysSizing.allocate(NumPrimaryAirSys);
     FinalSysSizing.allocate(NumPrimaryAirSys);
-    FinalZoneSizing.allocate(NumPrimaryAirSys);
+    state->dataSize->FinalZoneSizing.allocate(NumPrimaryAirSys);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys);
 
     // Inputs: system configurations:
@@ -134,24 +134,24 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
         CtrlZoneNum = AirLoopNum;
 
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(*state, AirLoopNum);
-        FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(*state, AirLoopNum);
+        state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInTempTU = GetHeatingSATempForSizing(*state, AirLoopNum);
+        state->dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatCoilInHumRatTU = GetHeatingSATempHumRatForSizing(*state, AirLoopNum);
     }
 
     // Check
-    EXPECT_EQ(17.0, FinalZoneSizing(1).DesHeatCoilInTempTU);
-    EXPECT_NEAR(14.5, FinalZoneSizing(2).DesHeatCoilInTempTU, 0.05);
-    EXPECT_NEAR(14.5, FinalZoneSizing(3).DesHeatCoilInTempTU, 0.05);
-    EXPECT_EQ(10.0, FinalZoneSizing(4).DesHeatCoilInTempTU);
-    EXPECT_EQ(0.006, FinalZoneSizing(1).DesHeatCoilInHumRatTU);
-    EXPECT_EQ(0.0055, FinalZoneSizing(2).DesHeatCoilInHumRatTU);
-    EXPECT_EQ(0.0055, FinalZoneSizing(3).DesHeatCoilInHumRatTU);
-    EXPECT_EQ(0.004, FinalZoneSizing(4).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(17.0, state->dataSize->FinalZoneSizing(1).DesHeatCoilInTempTU);
+    EXPECT_NEAR(14.5, state->dataSize->FinalZoneSizing(2).DesHeatCoilInTempTU, 0.05);
+    EXPECT_NEAR(14.5, state->dataSize->FinalZoneSizing(3).DesHeatCoilInTempTU, 0.05);
+    EXPECT_EQ(10.0, state->dataSize->FinalZoneSizing(4).DesHeatCoilInTempTU);
+    EXPECT_EQ(0.006, state->dataSize->FinalZoneSizing(1).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(0.0055, state->dataSize->FinalZoneSizing(2).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(0.0055, state->dataSize->FinalZoneSizing(3).DesHeatCoilInHumRatTU);
+    EXPECT_EQ(0.004, state->dataSize->FinalZoneSizing(4).DesHeatCoilInHumRatTU);
 
     // Clean up
     CalcSysSizing.deallocate();
     FinalSysSizing.deallocate();
-    FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
 }
 

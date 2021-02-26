@@ -1449,9 +1449,9 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     state->dataSize->CurZoneEqNum = 1;
 
     // Need this to prevent crash in Sizers
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.1;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.1;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.1;
     state->dataSize->DataFlowUsedForSizing = 0.1;
     ZoneEqSizing.allocate(1);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = true;
@@ -1459,8 +1459,8 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    ZoneSizingInput.allocate(1);
-    ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     state->dataSize->NumZoneSizingInput = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataEnvrn->StdBaroPress = 101325.0;

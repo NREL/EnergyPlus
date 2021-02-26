@@ -6886,7 +6886,7 @@ namespace EnergyPlus::DXCoils {
                     TempSize = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
                     SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
                     if (state.dataSize->CurZoneEqNum > 0) {
-                        CoilInTemp = state.dataSize->ZoneSizingRunDone ? FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp : 26;
+                        CoilInTemp = state.dataSize->ZoneSizingRunDone ? state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp : 26;
                     } else {
                         if (state.dataSize->CurOASysNum > 0) {
                             CoilInTemp = state.dataSize->SysSizingRunDone ? FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak : 32;

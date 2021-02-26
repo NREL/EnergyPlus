@@ -122,7 +122,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     EXPECT_EQ(DataSizing::AutoSize, thisMode.nominalEvaporativePumpPower);
 
 
-    DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::SysSizPeakDDNum.allocate(1);
 
@@ -139,12 +139,12 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
 
     Real64 ratedEvapAirFlowRate = 1.005;
 
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = ratedEvapAirFlowRate;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = ratedEvapAirFlowRate;
 
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.001;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 15.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0006;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.001;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 15.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0006;
 
     thisMode.size(*state);
 

@@ -482,12 +482,12 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->ZoneSizingRunDone = true;
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 24.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.0;
-    DataSizing::FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.05;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 24.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.05;
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);

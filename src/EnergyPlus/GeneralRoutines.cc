@@ -783,16 +783,13 @@ void CheckThisZoneForSizing(EnergyPlusData &state,
     // utility routine to see if a particular zone has a Sizing:Zone object for it
     // and that sizing was done.
 
-    // Using/Aliasing
-    using DataSizing::ZoneSizingInput;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisSizingInput;
 
     ZoneWasSized = false;
     if (state.dataSize->ZoneSizingRunDone) {
         for (ThisSizingInput = 1; ThisSizingInput <= state.dataSize->NumZoneSizingInput; ++ThisSizingInput) {
-            if (ZoneSizingInput(ThisSizingInput).ZoneNum == ZoneNum) {
+            if (state.dataSize->ZoneSizingInput(ThisSizingInput).ZoneNum == ZoneNum) {
                 ZoneWasSized = true;
                 break;
             }

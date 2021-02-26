@@ -232,9 +232,9 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
-    FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0;
 
     state->dataHeatBal->TotPeople = 2; // Total number of people objects
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);

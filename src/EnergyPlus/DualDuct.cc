@@ -554,7 +554,7 @@ namespace DualDuct {
                     }
                 }
                 if (!lAlphaBlanks(6)) {
-                    dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), OARequirements);
+                    dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
                     if (dd_airterminal(DDNum).OARequirementsPtr == 0) {
                         ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                         ShowContinueError(state, "Occurs in " + cCMO_DDVariableVolume + " = " + dd_airterminal(DDNum).Name);
@@ -739,7 +739,7 @@ namespace DualDuct {
                         }
                     }
                 }
-                dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), OARequirements);
+                dd_airterminal(DDNum).OARequirementsPtr = UtilityRoutines::FindItemInList(AlphArray(6), state.dataSize->OARequirements);
                 if (dd_airterminal(DDNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(6) + " = " + AlphArray(6) + " not found.");
                     ShowContinueError(state, "Occurs in " + cCMO_DDVarVolOA + " = " + dd_airterminal(DDNum).Name);
@@ -780,7 +780,7 @@ namespace DualDuct {
                 }
 
                 if (dd_airterminal(DDNum).OAPerPersonMode == PerPersonModeNotSet) {
-                    DummyOAFlow = OARequirements(dd_airterminal(DDNum).OARequirementsPtr).OAFlowPerPerson;
+                    DummyOAFlow = state.dataSize->OARequirements(dd_airterminal(DDNum).OARequirementsPtr).OAFlowPerPerson;
                     if ((DummyOAFlow == 0.0) && (lAlphaBlanks(7))) {       // no worries
                                                                            // do nothing, okay since no per person requirement involved
                     } else if ((DummyOAFlow > 0.0) && (lAlphaBlanks(7))) { // missing input
@@ -951,9 +951,9 @@ namespace DualDuct {
                 PeopleFlow = 0.0;
                 for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
                     if (state.dataHeatBal->People(Loop).ZonePtr != this->ActualZoneNum) continue;
-                    int damperOAFlowMethod = OARequirements(this->OARequirementsPtr).OAFlowMethod;
+                    int damperOAFlowMethod = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowMethod;
                     if (damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax) {
-                        PeopleFlow += state.dataHeatBal->People(Loop).NumberOfPeople * OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
+                        PeopleFlow += state.dataHeatBal->People(Loop).NumberOfPeople * state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
                     }
                 }
                 this->OAPerPersonByDesignLevel = PeopleFlow;

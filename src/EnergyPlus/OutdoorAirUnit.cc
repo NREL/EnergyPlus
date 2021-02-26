@@ -1446,7 +1446,7 @@ namespace OutdoorAirUnit {
                 }
             } else {
                 CheckZoneSizing(state, CurrentModuleObjects(CurrentObject::OAUnit), OutAirUnit(OAUnitNum).Name);
-                OutAirVolFlowDes = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                OutAirVolFlowDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 if (OutAirVolFlowDes < SmallAirVolFlow) {
                     OutAirVolFlowDes = 0.0;
                 }

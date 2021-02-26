@@ -1259,14 +1259,14 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     // zone floor area of zone 1 = 0, zone 2 > 0. Expect TU MaxAirVolFlowRateDuringReheat = 0 only for zone 1.
     // this test isn't relevant anymore since defaulting is done differently
-    Real64 MaxAirVolFlowRateDuringReheatDes = min(FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
+    Real64 MaxAirVolFlowRateDuringReheatDes = min(state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate);
     // Real64 MaxAirVolFlowRateDuringReheatDes = min( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea, state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate );
     // apply limit based on min stop
     MaxAirVolFlowRateDuringReheatDes =
         max(MaxAirVolFlowRateDuringReheatDes, (state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac));
 
     // This isn't relevant any more since the default is calculated differently
-    Real64 MaxAirVolFractionDuringReheatDes = min(1.0, (FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
+    Real64 MaxAirVolFractionDuringReheatDes = min(1.0, (state->dataSize->FinalZoneSizing(1).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRate));
     // Real64 MaxAirVolFractionDuringReheatDes = min( 1.0, ( 0.002032 * state->dataSingleDuct->sd_airterminal( 1 ).ZoneFloorArea / state->dataSingleDuct->sd_airterminal( 1 ).MaxAirVolFlowRate )
     // ); apply limit based on min stop
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).ZoneMinAirFrac);
@@ -1279,10 +1279,10 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(1).MaxAirVolFlowRateDuringReheat, MaxAirVolFlowRateDuringReheatDes, 0.0000000000001);
     EXPECT_NEAR(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(1).MaxAirVolFractionDuringReheat, 0.0000000000001);
 
-    MaxAirVolFlowRateDuringReheatDes = min(FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
+    MaxAirVolFlowRateDuringReheatDes = min(state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax, state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate);
     MaxAirVolFlowRateDuringReheatDes =
         max(MaxAirVolFlowRateDuringReheatDes, (state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate * state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac));
-    MaxAirVolFractionDuringReheatDes = min(1.0, (FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
+    MaxAirVolFractionDuringReheatDes = min(1.0, (state->dataSize->FinalZoneSizing(2).DesHeatVolFlowMax / state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate));
     MaxAirVolFractionDuringReheatDes = max(MaxAirVolFractionDuringReheatDes, state->dataSingleDuct->sd_airterminal(2).ZoneMinAirFrac);
     MaxAirVolFlowRateDuringReheatDes =
         min(max(MaxAirVolFlowRateDuringReheatDes, MaxAirVolFractionDuringReheatDes * state->dataSingleDuct->sd_airterminal(2).MaxAirVolFlowRate),
@@ -1309,7 +1309,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    DataSizing::OARequirements.allocate(1);
+    state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
@@ -1324,10 +1324,10 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.4;
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
-    DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
-    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
-    DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
-    DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
@@ -1341,7 +1341,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    DataSizing::OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
@@ -2471,9 +2471,9 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     state->dataEnvrn->StdRhoAir = 1.2027389349552706;
     Real64 CoilInTemp = TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
     Real64 DesMassFlow = state->dataEnvrn->StdRhoAir * TermUnitSizing(1).AirVolFlow;
-    Real64 DesZoneHeatLoad = FinalZoneSizing(1).DesHeatLoad * FinalZoneSizing(1).HeatSizingFactor;
-    Real64 ZoneDesTemp = FinalZoneSizing(1).ZoneTempAtHeatPeak;
-    Real64 ZoneDesHumRat = FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
+    Real64 DesZoneHeatLoad = state->dataSize->FinalZoneSizing(1).DesHeatLoad * state->dataSize->FinalZoneSizing(1).HeatSizingFactor;
+    Real64 ZoneDesTemp = state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak;
+    Real64 ZoneDesHumRat = state->dataSize->FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
 
     Real64 DesCoilLoad = DesZoneHeatLoad + Psychrometrics::PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
 
@@ -2498,7 +2498,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
-    DataSizing::OARequirements.allocate(1);
+    state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -2514,9 +2514,9 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerZone = 0.1;
-    OARequirements(1).OAFlowPerPerson = 0.1;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerZone = 0.1;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.1;
 
     DataLoopNode::Node(2).Press = 101325.0;
     DataLoopNode::Node(2).Temp = 23.0;
@@ -2543,7 +2543,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
-    DataSizing::OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 }
@@ -2561,7 +2561,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
-    DataSizing::OARequirements.allocate(1);
+    state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -2580,11 +2580,11 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerZone = 0.5;
-    OARequirements(1).OAFlowPerPerson = 0.0;
-    OARequirements(1).OAFlowPerArea = 0.0;
-    OARequirements(1).OAFlowACH = 0.0;
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerZone = 0.5;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.0;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.0;
+    state->dataSize->OARequirements(1).OAFlowACH = 0.0;
 
     DataLoopNode::Node(2).Press = 101325.0;
     DataLoopNode::Node(2).Temp = 23.0;
@@ -2626,7 +2626,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
-    DataSizing::OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 }
@@ -2692,7 +2692,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     DataZoneEquipment::GetZoneEquipmentData(*state);
     DataSizing::TermUnitFinalZoneSizing.allocate(1);
     DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));

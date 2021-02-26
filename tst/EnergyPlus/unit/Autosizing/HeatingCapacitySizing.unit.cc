@@ -122,8 +122,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     printFlag = true;
 
     state->dataSize->ZoneSizingRunDone = true;
-    DataSizing::ZoneSizingInput.allocate(1);
-    DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
 
     DataSizing::ZoneEqSizing(1).DesignSizeFromParent = true;
     DataSizing::ZoneEqSizing(1).DesHeatingLoad = sizedValue;
@@ -151,15 +151,15 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::TermUnitSizing.allocate(1);
     DataSizing::TermUnitSizing(1).InducRat = 0.5;
     DataSizing::TermUnitSizing(1).AirVolFlow = 0.2;
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
-    DataSizing::FinalZoneSizing(1).ZoneRetTempAtHeatPeak = 24.0;
-    DataSizing::FinalZoneSizing(1).ZoneHumRatAtHeatPeak = 0.006;
-    DataSizing::FinalZoneSizing(1).DesHeatMassFlow = 0.2;
-    DataSizing::FinalZoneSizing(1).HeatDesTemp = 30.0;
-    DataSizing::FinalZoneSizing(1).HeatDesHumRat = 0.004;
-    DataSizing::FinalZoneSizing(1).OutTempAtHeatPeak = 5.0;
-    DataSizing::FinalZoneSizing(1).OutHumRatAtHeatPeak = 0.002;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
+    state->dataSize->FinalZoneSizing(1).ZoneRetTempAtHeatPeak = 24.0;
+    state->dataSize->FinalZoneSizing(1).ZoneHumRatAtHeatPeak = 0.006;
+    state->dataSize->FinalZoneSizing(1).DesHeatMassFlow = 0.2;
+    state->dataSize->FinalZoneSizing(1).HeatDesTemp = 30.0;
+    state->dataSize->FinalZoneSizing(1).HeatDesHumRat = 0.004;
+    state->dataSize->FinalZoneSizing(1).OutTempAtHeatPeak = 5.0;
+    state->dataSize->FinalZoneSizing(1).OutHumRatAtHeatPeak = 0.002;
 
     DataSizing::ZoneEqSizing(1).ATMixerHeatPriDryBulb = 20.0;
     DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.007;
@@ -199,7 +199,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 4 - Zone DX Equipment
     state->dataSize->ZoneEqFanCoil = false;
-    state->dataSize->DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesHeatMassFlow / state->dataEnvrn->StdRhoAir;
+    state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalZoneSizing(1).DesHeatMassFlow / state->dataEnvrn->StdRhoAir;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -393,7 +393,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     DataSizing::ZoneEqSizing.deallocate();
-    DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

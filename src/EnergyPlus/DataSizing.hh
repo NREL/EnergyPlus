@@ -64,14 +64,6 @@ struct EnergyPlusData;
 
 namespace DataSizing {
 
-    // Using/Aliasing
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
     // parameters for outside air flow method
     constexpr int NumOAFlowMethods(9);
     constexpr int OAFlowNone(0);
@@ -1026,12 +1018,6 @@ namespace DataSizing {
     };
 
     // Object Data
-    extern Array1D<OARequirementsData> OARequirements;
-    extern Array1D<ZoneAirDistributionData> ZoneAirDistribution;
-    extern Array1D<ZoneSizingInputData> ZoneSizingInput;             // Input data for zone sizing
-    extern Array2D<ZoneSizingData> ZoneSizing;                       // Data for zone sizing (all data, all design)
-    extern Array1D<ZoneSizingData> FinalZoneSizing;                  // Final data for zone sizing including effects
-    extern Array2D<ZoneSizingData> CalcZoneSizing;                   // Data for zone sizing (all data)
     extern Array1D<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
     extern Array1D<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units
     extern Array1D<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
@@ -1122,7 +1108,6 @@ namespace DataSizing {
 
 struct SizingData : BaseGlobalStruct
 {
-
     int NumOARequirements = 0;                       // Number of OA Requirements objects
     int NumZoneAirDistribution = 0;                  // Number of zone air distribution objects
     int NumZoneSizingInput = 0;                      // Number of Zone Sizing objects
@@ -1230,6 +1215,12 @@ struct SizingData : BaseGlobalStruct
     int DataFanIndex = -1;                           // Fan index used during sizing
     DataSizing::zoneFanPlacement DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
+    Array1D<DataSizing::OARequirementsData> OARequirements;
+    Array1D<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
+    Array1D<DataSizing::ZoneSizingInputData> ZoneSizingInput; // Input data for zone sizing
+    Array2D<DataSizing::ZoneSizingData> ZoneSizing;           // Data for zone sizing (all data, all design)
+    Array1D<DataSizing::ZoneSizingData> FinalZoneSizing;      // Final data for zone sizing including effects
+    Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;       // Data for zone sizing (all data)
 
     void clear_state() override
     {
@@ -1340,6 +1331,12 @@ struct SizingData : BaseGlobalStruct
         this->DataFanIndex = -1;
         this->DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet;
         this->DataDXSpeedNum = 0;
+        this->OARequirements.deallocate();
+        this->ZoneAirDistribution.deallocate();
+        this->ZoneSizingInput.deallocate();
+        this->ZoneSizing.deallocate();
+        this->FinalZoneSizing.deallocate();
+        this->CalcZoneSizing.deallocate();
     }
 };
 

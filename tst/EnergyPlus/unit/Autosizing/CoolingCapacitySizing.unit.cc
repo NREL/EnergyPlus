@@ -124,8 +124,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     printFlag = true;
 
     state->dataSize->ZoneSizingRunDone = true;
-    DataSizing::ZoneSizingInput.allocate(1);
-    DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
 
     DataSizing::ZoneEqSizing(1).DesignSizeFromParent = true;
     DataSizing::ZoneEqSizing(1).DesCoolingLoad = sizedValue;
@@ -145,15 +145,15 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // now allocate sizing arrays for testing autosized field
     DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(1).DesCoolMassFlow = 0.2;
-    DataSizing::FinalZoneSizing(1).DesCoolCoilInTemp = 24.0;
-    DataSizing::FinalZoneSizing(1).DesCoolCoilInHumRat = 0.009;
-    DataSizing::FinalZoneSizing(1).CoolDesTemp = 7.0;
-    DataSizing::FinalZoneSizing(1).CoolDesHumRat = 0.006;
-    DataSizing::FinalZoneSizing(1).ZoneRetTempAtCoolPeak = 22.0;
-    DataSizing::FinalZoneSizing(1).ZoneTempAtCoolPeak = 23.0;
-    DataSizing::FinalZoneSizing(1).ZoneHumRatAtCoolPeak = 0.008;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolMassFlow = 0.2;
+    state->dataSize->FinalZoneSizing(1).DesCoolCoilInTemp = 24.0;
+    state->dataSize->FinalZoneSizing(1).DesCoolCoilInHumRat = 0.009;
+    state->dataSize->FinalZoneSizing(1).CoolDesTemp = 7.0;
+    state->dataSize->FinalZoneSizing(1).CoolDesHumRat = 0.006;
+    state->dataSize->FinalZoneSizing(1).ZoneRetTempAtCoolPeak = 22.0;
+    state->dataSize->FinalZoneSizing(1).ZoneTempAtCoolPeak = 23.0;
+    state->dataSize->FinalZoneSizing(1).ZoneHumRatAtCoolPeak = 0.008;
 
     DataSizing::ZoneEqSizing(1).ATMixerCoolPriDryBulb = 20.0;
     DataSizing::ZoneEqSizing(1).ATMixerCoolPriHumRat = 0.007;
@@ -194,7 +194,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // Test 4 - Zone Equipment, Zone Eq Fan Coil, HX assisted water coil
     DataSizing::ZoneEqSizing(1).DesCoolingLoad = 0.0;
-    state->dataSize->DataFlowUsedForSizing = DataSizing::FinalZoneSizing(1).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
+    state->dataSize->DataFlowUsedForSizing = state->dataSize->FinalZoneSizing(1).DesCoolMassFlow / state->dataEnvrn->StdRhoAir;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -297,7 +297,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     DataSizing::ZoneEqSizing.deallocate();
-    DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

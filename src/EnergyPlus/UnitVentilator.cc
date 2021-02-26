@@ -1667,7 +1667,7 @@ namespace UnitVentilator {
 
                 // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow == AutoSize) {
-                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 } else {
                     ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataUnitVentilators->UnitVent(UnitVentNum).OutAirVolFlow;
                 }
@@ -1719,7 +1719,7 @@ namespace UnitVentilator {
                         TempSize = AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
-                        state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                        state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                         CoolingCapacitySizer sizerCoolingCapacity;
                         sizerCoolingCapacity.overrideSizingString(SizingString);
                         sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1774,7 +1774,7 @@ namespace UnitVentilator {
                         TempSize = AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
-                        state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                        state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                         bool errorsFound = false;
                         HeatingCapacitySizer sizerHeatingCapacity;
                         sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1834,7 +1834,7 @@ namespace UnitVentilator {
                                 TempSize = AutoSize;
                                 PrintFlag = false;
                                 state.dataSize->DataScalableSizingON = true;
-                                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                 CoolingCapacitySizer sizerCoolingCapacity;
                                 sizerCoolingCapacity.overrideSizingString(SizingString);
                                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -1888,7 +1888,7 @@ namespace UnitVentilator {
                                 TempSize = AutoSize;
                                 PrintFlag = false;
                                 state.dataSize->DataScalableSizingON = true;
-                                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                 bool errorsFound = false;
                                 HeatingCapacitySizer sizerHeatingCapacity;
                                 sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -1913,7 +1913,7 @@ namespace UnitVentilator {
                         FieldNum = 1;
                         SizingString = state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames(FieldNum) + " [m3/s]";
                         if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
-                            TempSize = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                            TempSize = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                         } else {
                             TempSize = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
                         }
@@ -1937,7 +1937,7 @@ namespace UnitVentilator {
                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).CoilOption == state.dataUnitVentilators->NoneOption) {
 
                     if (state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow == AutoSize) {
-                        TempSize = FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
+                        TempSize = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                     } else {
                         TempSize = state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow;
                     }
@@ -2017,7 +2017,7 @@ namespace UnitVentilator {
                 }
             } else {
                 CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, state.dataUnitVentilators->UnitVent(UnitVentNum).Name);
-                MinOutAirVolFlowDes = min(FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow);
+                MinOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataUnitVentilators->UnitVent(UnitVentNum).MaxAirVolFlow);
                 if (MinOutAirVolFlowDes < SmallAirVolFlow) {
                     MinOutAirVolFlowDes = 0.0;
                 }
@@ -2091,7 +2091,7 @@ namespace UnitVentilator {
                         }
 
                         if (DoWaterCoilSizing) {
-                            if (FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
                                 SizingMethod = HeatingCapacitySizing;
                                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                                     zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
@@ -2104,7 +2104,7 @@ namespace UnitVentilator {
                                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                             } else {
-                                                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                             }
                                             TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                         } else if (CapSizingMethod == CapacityPerFloorArea) {
@@ -2114,7 +2114,7 @@ namespace UnitVentilator {
                                             state.dataSize->DataScalableCapSizingON = true;
                                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                                             state.dataSize->DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-                                            state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                            state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                             TempSize = AutoSize;
                                             state.dataSize->DataScalableCapSizingON = true;
                                         }
@@ -2131,7 +2131,7 @@ namespace UnitVentilator {
                                     SizingString = "";
                                     PrintFlag = false;
                                     TempSize = AutoSize;
-                                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                     bool errorsFound = false;
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -2208,7 +2208,7 @@ namespace UnitVentilator {
                         PltSizHeatNum = MyPlantSizingIndex(state,
                             "Coil:Heating:Steam", state.dataUnitVentilators->UnitVent(UnitVentNum).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
-                            if (FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= SmallAirVolFlow) {
                                 SizingMethod = HeatingCapacitySizing;
                                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                                     zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
@@ -2221,7 +2221,7 @@ namespace UnitVentilator {
                                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                             } else {
-                                                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                             }
                                             TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                                         } else if (CapSizingMethod == CapacityPerFloorArea) {
@@ -2231,7 +2231,7 @@ namespace UnitVentilator {
                                             state.dataSize->DataScalableCapSizingON = true;
                                         } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                                             state.dataSize->DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-                                            state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                            state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                             TempSize = AutoSize;
                                             state.dataSize->DataScalableCapSizingON = true;
                                         }
@@ -2248,7 +2248,7 @@ namespace UnitVentilator {
                                     SizingString = "";
                                     PrintFlag = false;
                                     TempSize = AutoSize;
-                                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
+                                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                                     bool errorsFound = false;
                                     HeatingCapacitySizer sizerHeatingCapacity;
                                     sizerHeatingCapacity.overrideSizingString(SizingString);
@@ -2349,7 +2349,7 @@ namespace UnitVentilator {
                             }
                         }
                         if (DoWaterCoilSizing) {
-                            if (FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow >= SmallAirVolFlow) {
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow >= SmallAirVolFlow) {
                                 SizingMethod = CoolingCapacitySizing;
                                 if (state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex > 0) {
                                     zoneHVACIndex = state.dataUnitVentilators->UnitVent(UnitVentNum).HVACSizingIndex;
@@ -2362,7 +2362,7 @@ namespace UnitVentilator {
                                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
                                                 ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                                             } else {
-                                                state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                                state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                             }
                                             TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                                         } else if (CapSizingMethod == CapacityPerFloorArea) {
@@ -2372,7 +2372,7 @@ namespace UnitVentilator {
                                             state.dataSize->DataScalableCapSizingON = true;
                                         } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                                             state.dataSize->DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                                            state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                            state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                             TempSize = AutoSize;
                                             state.dataSize->DataScalableCapSizingON = true;
                                         }
@@ -2388,7 +2388,7 @@ namespace UnitVentilator {
                                     SizingString = "";
                                     PrintFlag = false;
                                     TempSize = AutoSize;
-                                    state.dataSize->DataFlowUsedForSizing = FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                                     CoolingCapacitySizer sizerCoolingCapacity;
                                     sizerCoolingCapacity.overrideSizingString(SizingString);
                                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);

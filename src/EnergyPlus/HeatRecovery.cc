@@ -1649,7 +1649,7 @@ namespace HeatRecovery {
                     // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
                     state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
                 } else {
-                    state.dataSize->DataConstantUsedForSizing = std::max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
+                    state.dataSize->DataConstantUsedForSizing = std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                 }
                 state.dataSize->DataFractionUsedForSizing = 1.0;
             } else {
@@ -1660,7 +1660,7 @@ namespace HeatRecovery {
                         state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
                     } else {
                         state.dataSize->DataConstantUsedForSizing =
-                            std::max(FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
+                            std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                     }
                     state.dataSize->DataFractionUsedForSizing = 1.0;
                 }

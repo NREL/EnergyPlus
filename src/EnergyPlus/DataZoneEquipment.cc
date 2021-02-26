@@ -1300,7 +1300,6 @@ namespace EnergyPlus::DataZoneEquipment {
         using DataSizing::OAFlowPerArea;
         using DataSizing::OAFlowPPer;
         using DataSizing::OAFlowSum;
-        using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataSizing::ZOAM_IAQP;
         using DataSizing::ZOAM_ProportionalControlDesOcc;
         using DataSizing::ZOAM_ProportionalControlSchOcc;
@@ -1356,27 +1355,27 @@ namespace EnergyPlus::DataZoneEquipment {
             MaxOAFlag = false;
         }
 
-        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag(DSOAPtr)) {
+        if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_IAQP && MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
+                ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                 R"(" valid Outdoor Air Method =" IndoorAirQualityProcedure" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
             MyEnvrnFlag(DSOAPtr) = false;
         }
-        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag(DSOAPtr)) {
+        if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc && MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
+                ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                 R"(" valid Outdoor Air Method =" ProportionalControlBasedOnDesignOccupancy" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
             }
             MyEnvrnFlag(DSOAPtr) = false;
         }
-        if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag(DSOAPtr)) {
+        if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc && MyEnvrnFlag(DSOAPtr)) {
             if (!state.dataContaminantBalance->Contaminant.CO2Simulation) {
-                ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + OARequirements(DSOAPtr).Name +
+                ShowSevereError(state, "DesignSpecification:OutdoorAir=\"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                 R"(" valid Outdoor Air Method =" ProportionalControlBasedOnOccupancySchedule" requires CO2 simulation.)");
                 ShowContinueError(state, "The choice must be Yes for the field Carbon Dioxide Concentration in ZoneAirContaminantBalance");
                 ShowFatalError(state, "CalcDesignSpecificationOutdoorAir: Errors found in input. Preceding condition(s) cause termination.");
@@ -1386,7 +1385,7 @@ namespace EnergyPlus::DataZoneEquipment {
 
         // Calculate people outdoor air flow rate as needed
         {
-            auto const SELECT_CASE_var(OARequirements(DSOAPtr).OAFlowMethod);
+            auto const SELECT_CASE_var(state.dataSize->OARequirements(DSOAPtr).OAFlowMethod);
             if ((SELECT_CASE_var == OAFlowPPer) || (SELECT_CASE_var == OAFlowSum) || (SELECT_CASE_var == OAFlowMax)) {
                 if (UseOccSchFlag) {
                     if (MaxOAFlag) {
@@ -1397,17 +1396,17 @@ namespace EnergyPlus::DataZoneEquipment {
                             if (ActualZoneNum != state.dataHeatBal->People(Loop).ZonePtr) continue;
                             PeopleCount += state.dataHeatBal->People(Loop).NumberOfPeople * GetScheduleMaxValue(state, state.dataHeatBal->People(Loop).NumberOfPeoplePtr);
                         }
-                        DSOAFlowPeople = PeopleCount * OARequirements(DSOAPtr).OAFlowPerPerson;
+                        DSOAFlowPeople = PeopleCount * state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
                     } else {
-                        DSOAFlowPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * OARequirements(DSOAPtr).OAFlowPerPerson;
+                        DSOAFlowPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
                     }
                 } else {
                     if (MaxOAFlag) {
                         // OAPerPersonMode == PerPersonByDesignLevel (UseOccSchFlag = FALSE)
                         // use total people when requesting MaxOAFlow
-                        DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                        DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
                     } else {
-                        DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
+                        DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
                     }
                 }
                 if (PerPersonModeNotSet) DSOAFlowPeople = 0.0; // for Dual Duct if Per Person Ventilation Rate Mode is not entered
@@ -1418,7 +1417,7 @@ namespace EnergyPlus::DataZoneEquipment {
 
         // Calculate minimum outdoor air flow rate
         {
-            auto const SELECT_CASE_var(OARequirements(DSOAPtr).OAFlowMethod);
+            auto const SELECT_CASE_var(state.dataSize->OARequirements(DSOAPtr).OAFlowMethod);
             if (SELECT_CASE_var == OAFlowNone) {
                 // Special case for no DesignSpecification:OutdoorAir object in Sizing:Zone object
                 // probably won't get to this CASE statement since it will RETURN above (Ptr=0)
@@ -1429,29 +1428,29 @@ namespace EnergyPlus::DataZoneEquipment {
                 OAVolumeFlowRate = DSOAFlowPeople;
             } else if (SELECT_CASE_var == OAFlow) {
                 // User input
-                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerZone;
+                OAVolumeFlowRate = state.dataSize->OARequirements(DSOAPtr).OAFlowPerZone;
             } else if (SELECT_CASE_var == OAFlowPerArea) {
                 // Multiplied by zone floor area
-                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
+                OAVolumeFlowRate = state.dataSize->OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
             } else if (SELECT_CASE_var == OAFlowACH) {
                 // Multiplied by zone volume
-                OAVolumeFlowRate = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
+                OAVolumeFlowRate = state.dataSize->OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
             } else if ((SELECT_CASE_var == OAFlowSum) || (SELECT_CASE_var == OAFlowMax)) {
                 // Use sum or max of per person and the following
-                DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
-                DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
-                DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
-                if (OARequirements(DSOAPtr).OAFlowMethod == OAFlowMax) {
+                DSOAFlowPerZone = state.dataSize->OARequirements(DSOAPtr).OAFlowPerZone;
+                DSOAFlowPerArea = state.dataSize->OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
+                DSOAFlowACH = state.dataSize->OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
+                if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == OAFlowMax) {
                     OAVolumeFlowRate = max(DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH);
                 } else {
                     OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
                 }
             } else if (SELECT_CASE_var == ZOAM_IAQP) {
                 if (state.dataGlobal->DoingSizing) {
-                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * OARequirements(DSOAPtr).OAFlowPerPerson;
-                    DSOAFlowPerZone = OARequirements(DSOAPtr).OAFlowPerZone;
-                    DSOAFlowPerArea = OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
-                    DSOAFlowACH = OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
+                    DSOAFlowPeople = Zone(ActualZoneNum).TotOccupants * state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
+                    DSOAFlowPerZone = state.dataSize->OARequirements(DSOAPtr).OAFlowPerZone;
+                    DSOAFlowPerArea = state.dataSize->OARequirements(DSOAPtr).OAFlowPerArea * Zone(ActualZoneNum).FloorArea;
+                    DSOAFlowACH = state.dataSize->OARequirements(DSOAPtr).OAFlowACH * Zone(ActualZoneNum).Volume / 3600.0;
                     OAVolumeFlowRate = DSOAFlowPeople + DSOAFlowPerZone + DSOAFlowPerArea + DSOAFlowACH;
                 } else {
                     OAVolumeFlowRate = state.dataContaminantBalance->ZoneSysContDemand(ActualZoneNum).OutputRequiredToCO2SP / state.dataEnvrn->StdRhoAir;
@@ -1459,14 +1458,14 @@ namespace EnergyPlus::DataZoneEquipment {
 
             } else if (SELECT_CASE_var == ZOAM_ProportionalControlSchOcc || SELECT_CASE_var == ZOAM_ProportionalControlDesOcc) {
                 ZoneOAPeople = 0.0;
-                if (OARequirements(DSOAPtr).OAFlowMethod != ZOAM_ProportionalControlDesOcc) {
+                if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod != ZOAM_ProportionalControlDesOcc) {
                     ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ActualZoneNum).NOFOCC * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
-                                   OARequirements(DSOAPtr).OAFlowPerPerson;
+                                   state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
                 } else {
                     ZoneOAPeople = Zone(ActualZoneNum).TotOccupants * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
-                                   OARequirements(DSOAPtr).OAFlowPerPerson;
+                                   state.dataSize->OARequirements(DSOAPtr).OAFlowPerPerson;
                     CO2PeopleGeneration = 0.0;
-                    if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
+                    if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
                         // Accumulate CO2 generation from people at design occupancy and current activity level
                         for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                             if (state.dataHeatBal->People(PeopleNum).ZonePtr != ActualZoneNum) continue;
@@ -1476,7 +1475,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     }
                 }
                 ZoneOAArea = Zone(ActualZoneNum).FloorArea * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier *
-                             OARequirements(DSOAPtr).OAFlowPerArea;
+                             state.dataSize->OARequirements(DSOAPtr).OAFlowPerArea;
                 ZoneOAMin = ZoneOAArea;
                 ZoneOAMax = (ZoneOAArea + ZoneOAPeople);
                 if (Zone(ActualZoneNum).ZoneContamControllerSchedIndex > 0.0) {
@@ -1494,7 +1493,7 @@ namespace EnergyPlus::DataZoneEquipment {
                                 }
 
                                 // Calculate zone maximum target CO2 concentration in PPM
-                                if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
+                                if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
                                     ZoneMaxCO2 = state.dataContaminantBalance->OutdoorCO2 +
                                                  (CO2PeopleGeneration * Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier * 1.0e6) /
                                                      ZoneOAMax;
@@ -1505,11 +1504,11 @@ namespace EnergyPlus::DataZoneEquipment {
                                 }
 
                                 if (ZoneMaxCO2 <= ZoneMinCO2) {
-                                    ++OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount;
-                                    if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc) {
-                                        if (OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount < 2) {
+                                    ++state.dataSize->OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount;
+                                    if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc) {
+                                        if (state.dataSize->OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
-                                                            OARequirements(DSOAPtr).Name + "\".");
+                                                            state.dataSize->OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(
                                                 state,
                                                 format("For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, maximum target "
@@ -1521,16 +1520,16 @@ namespace EnergyPlus::DataZoneEquipment {
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(state,
-                                                "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
+                                                "DesignSpecification:OutdoorAir = \"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                                     "\", For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, maximum target "
                                                     "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
-                                                OARequirements(DSOAPtr).CO2MaxMinLimitErrorIndex);
+                                                state.dataSize->OARequirements(DSOAPtr).CO2MaxMinLimitErrorIndex);
                                         }
                                     }
-                                    if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
-                                        if (OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount < 2) {
+                                    if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
+                                        if (state.dataSize->OARequirements(DSOAPtr).CO2MaxMinLimitErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
-                                                            OARequirements(DSOAPtr).Name + "\".");
+                                                            state.dataSize->OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(
                                                 state,
                                                 format("For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, maximum target "
@@ -1542,10 +1541,10 @@ namespace EnergyPlus::DataZoneEquipment {
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
                                             ShowRecurringWarningErrorAtEnd(state,
-                                                "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
+                                                "DesignSpecification:OutdoorAir = \"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                                     "\", For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, maximum target "
                                                     "CO2 concentration is not greater than minimum target CO2 concentration. Error continues...",
-                                                OARequirements(DSOAPtr).CO2MaxMinLimitErrorIndex);
+                                                state.dataSize->OARequirements(DSOAPtr).CO2MaxMinLimitErrorIndex);
                                         }
                                     }
 
@@ -1569,11 +1568,11 @@ namespace EnergyPlus::DataZoneEquipment {
                                 }
                             } else {
                                 if (state.dataGlobal->DisplayExtraWarnings) {
-                                    ++OARequirements(DSOAPtr).CO2GainErrorCount;
-                                    if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc) {
-                                        if (OARequirements(DSOAPtr).CO2GainErrorCount < 2) {
+                                    ++state.dataSize->OARequirements(DSOAPtr).CO2GainErrorCount;
+                                    if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlSchOcc) {
+                                        if (state.dataSize->OARequirements(DSOAPtr).CO2GainErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
-                                                            OARequirements(DSOAPtr).Name + "\".");
+                                                            state.dataSize->OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedOnOccupancySchedule, CO2 "
                                                               "generation from people is not greater than zero. Occurs in Zone =\"" +
                                                               Zone(ActualZoneNum).Name + "\". ");
@@ -1581,17 +1580,17 @@ namespace EnergyPlus::DataZoneEquipment {
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
+                                            ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
                                                                                "ProportionalControlBasedOnOccupancySchedule, CO2 generation from "
                                                                                "people is not greater than zero. Error continues...",
-                                                                           OARequirements(DSOAPtr).CO2GainErrorIndex);
+                                                                           state.dataSize->OARequirements(DSOAPtr).CO2GainErrorIndex);
                                         }
                                     }
-                                    if (OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
-                                        if (OARequirements(DSOAPtr).CO2GainErrorCount < 2) {
+                                    if (state.dataSize->OARequirements(DSOAPtr).OAFlowMethod == ZOAM_ProportionalControlDesOcc) {
+                                        if (state.dataSize->OARequirements(DSOAPtr).CO2GainErrorCount < 2) {
                                             ShowSevereError(state, "CalcDesignSpecificationOutdoorAir DesignSpecification:OutdoorAir = \"" +
-                                                            OARequirements(DSOAPtr).Name + "\".");
+                                                            state.dataSize->OARequirements(DSOAPtr).Name + "\".");
                                             ShowContinueError(state, "For System Outdoor Air Method = ProportionalControlBasedOnDesignOccupancy, CO2 "
                                                               "generation from people is not greater than zero. Occurs in Zone =\"" +
                                                               Zone(ActualZoneNum).Name + "\". ");
@@ -1599,11 +1598,11 @@ namespace EnergyPlus::DataZoneEquipment {
                                                               "\"Flow/Person+Flow/Area\" will be modeled. Simulation continues...");
                                             ShowContinueErrorTimeStamp(state, "");
                                         } else {
-                                            ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + OARequirements(DSOAPtr).Name +
+                                            ShowRecurringWarningErrorAtEnd(state, "DesignSpecification:OutdoorAir = \"" + state.dataSize->OARequirements(DSOAPtr).Name +
                                                                                "\", For System Outdoor Air Method = "
                                                                                "ProportionalControlBasedOnDesignOccupancy, CO2 generation from "
                                                                                "people is not greater than zero. Error continues...",
-                                                                           OARequirements(DSOAPtr).CO2GainErrorIndex);
+                                                                           state.dataSize->OARequirements(DSOAPtr).CO2GainErrorIndex);
                                         }
                                     }
                                 }
@@ -1632,11 +1631,11 @@ namespace EnergyPlus::DataZoneEquipment {
         OAVolumeFlowRate *= Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier;
 
         // Apply schedule as needed. Sizing does not use schedule.
-        if (OARequirements(DSOAPtr).OAFlowFracSchPtr > 0 && UseMinOASchFlag) {
+        if (state.dataSize->OARequirements(DSOAPtr).OAFlowFracSchPtr > 0 && UseMinOASchFlag) {
             if (MaxOAFlag) {
-                OAVolumeFlowRate *= GetScheduleMaxValue(state, OARequirements(DSOAPtr).OAFlowFracSchPtr);
+                OAVolumeFlowRate *= GetScheduleMaxValue(state, state.dataSize->OARequirements(DSOAPtr).OAFlowFracSchPtr);
             } else {
-                OAVolumeFlowRate *= GetCurrentScheduleValue(state, OARequirements(DSOAPtr).OAFlowFracSchPtr);
+                OAVolumeFlowRate *= GetCurrentScheduleValue(state, state.dataSize->OARequirements(DSOAPtr).OAFlowFracSchPtr);
             }
         }
 

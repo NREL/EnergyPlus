@@ -457,16 +457,16 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = state->dataHeatBal->Zone(1).Name;
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
-    DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;
-    DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak = RatedCoilOutDb;
-    DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak = RatedCoilOutHumRat;
-    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak = 21.6;
-    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak = 0.007;
-    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak = 21.0;
-    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp = 30.0;
-    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat = 0.007;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
+    state->dataSize->FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak = RatedCoilOutDb;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak = RatedCoilOutHumRat;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak = 21.6;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak = 0.007;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak = 21.0;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesTemp = 30.0;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesHumRat = 0.007;
 
     Real64 fanHeatGain = 1.3;
     Real64 coilCapFunTempFac = 1.0;
@@ -518,6 +518,6 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
                                                    DXFlowPerCapMaxRatio);
     EXPECT_EQ(RatedCoilInDb, c1->coilDesEntTemp);
     EXPECT_EQ(RatedCoilInHumRat, c1->coilDesEntHumRat);
-    EXPECT_EQ(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp, c1->coilDesLvgTemp);
-    EXPECT_EQ(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat, c1->coilDesLvgHumRat);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesTemp, c1->coilDesLvgTemp);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesHumRat, c1->coilDesLvgHumRat);
 }

@@ -136,7 +136,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // now allocate sizing arrays for testing autosized field
     EnergyPlus::DataSizing::TermUnitSizing.allocate(1);
     EnergyPlus::DataSizing::TermUnitSizing(1).AirVolFlow = 0.0008;
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
 
     state->dataSize->ZoneSizingRunDone = true;
@@ -146,8 +146,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
-    DataSizing::ZoneSizingInput.allocate(1);
-    DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
@@ -205,7 +205,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     state->dataSize->TermUnitIU = false;
     state->dataSize->ZoneEqFanCoil = true;
     EnergyPlus::DataSizing::TermUnitSizing(1).AirVolFlow = 0.0;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).DesHeatVolFlow = 5.0;
+    state->dataSize->FinalZoneSizing(1).DesHeatVolFlow = 5.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -220,7 +220,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 7 - Zone Equipment, Other Equipment
     state->dataSize->ZoneEqFanCoil = false;
     // baseFlags.otherEqType = true; set in initialize function based on other flags
-    EnergyPlus::DataSizing::FinalZoneSizing(1).DesHeatVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing(1).DesHeatVolFlow = 0.0;
     EnergyPlus::DataSizing::ZoneEqSizing(1).AirVolFlow = 5.0;
     EnergyPlus::DataSizing::ZoneEqSizing(1).SystemAirFlow = true;
     // start with an auto-sized value as the user input
@@ -253,7 +253,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 9 - Zone Equipment, Other Equipment
     EnergyPlus::DataSizing::ZoneEqSizing(1).HeatingAirVolFlow = 0.0;
     EnergyPlus::DataSizing::ZoneEqSizing(1).HeatingAirFlow = false;
-    EnergyPlus::DataSizing::FinalZoneSizing(1).DesHeatMassFlow = 5.0;
+    state->dataSize->FinalZoneSizing(1).DesHeatMassFlow = 5.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
@@ -276,7 +276,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;

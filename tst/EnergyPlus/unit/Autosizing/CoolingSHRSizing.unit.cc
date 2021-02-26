@@ -58,8 +58,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     static std::string const routineName("CoolingSHRSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -129,8 +129,8 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     inputValue = EnergyPlus::DataSizing::AutoSize;
     DataHVACGlobals::DXCT = DataHVACGlobals::RegularDXCoil;
     // do sizing
-    DataSizing::ZoneSizingInput.allocate(1);
-    DataSizing::ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_CoolingSingleSpeed), "MyDXCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);

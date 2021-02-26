@@ -259,7 +259,6 @@ namespace EnergyPlus::SingleDuct {
         using namespace DataHeatBalance;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
-        using DataSizing::OARequirements;
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetSysInput: "); // include trailing blank
 
@@ -609,7 +608,7 @@ namespace EnergyPlus::SingleDuct {
             }
 
             if (!lAlphaBlanks(11)) {
-                state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(11), OARequirements);
+                state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(11), state.dataSize->OARequirements);
                 if (state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(11) + " = " + Alphas(11) + " not found.");
                     ShowContinueError(state, "Occurs in " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " + state.dataSingleDuct->sd_airterminal(SysNum).SysName);
@@ -1224,7 +1223,7 @@ namespace EnergyPlus::SingleDuct {
             if (lAlphaBlanks(5)) {
                 state.dataSingleDuct->sd_airterminal(SysNum).NoOAFlowInputFromUser = true;
             } else {
-                state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(5), DataSizing::OARequirements);
+                state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(5), state.dataSize->OARequirements);
                 if (state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
                     ShowContinueError(state, "..invalid " + cAlphaFields(5) + "=\"" + Alphas(5) + "\".");
@@ -1437,7 +1436,7 @@ namespace EnergyPlus::SingleDuct {
                 }
             }
             if (!lAlphaBlanks(7)) {
-                state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(7), OARequirements);
+                state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(7), state.dataSize->OARequirements);
                 if (state.dataSingleDuct->sd_airterminal(SysNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, cAlphaFields(7) + " = " + Alphas(7) + " not found.");
                     ShowContinueError(state, "Occurs in " + state.dataSingleDuct->sd_airterminal(SysNum).SysType + " = " + state.dataSingleDuct->sd_airterminal(SysNum).SysName);
@@ -1952,13 +1951,13 @@ namespace EnergyPlus::SingleDuct {
             for (SysIndex = 1; SysIndex <= state.dataSingleDuct->NumSDAirTerminal; ++SysIndex) {
                 for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSiz; ++ZoneSizIndex) {
                     if (state.dataGlobal->DoZoneSizing) {
-                        if (FinalZoneSizing(ZoneSizIndex).ActualZoneNum == state.dataSingleDuct->sd_airterminal(SysIndex).ActualZoneNum) {
-                            if (FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
+                        if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ActualZoneNum == state.dataSingleDuct->sd_airterminal(SysIndex).ActualZoneNum) {
+                            if (state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation > 0.0) {
                                 ShowWarningError(state, RoutineName + "A zone secondary recirculation fraction is specified for zone served by ");
                                 ShowContinueError(state, "...terminal unit \"" + state.dataSingleDuct->sd_airterminal(SysIndex).SysName +
                                                   "\" , that indicates a single path system");
                                 ShowContinueError(state, "...The zone secondary recirculation for that zone was set to 0.0");
-                                FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation = 0.0;
+                                state.dataSize->FinalZoneSizing(ZoneSizIndex).ZoneSecondaryRecirculation = 0.0;
                                 goto SizLoop_exit;
                             }
                         }
@@ -5374,7 +5373,6 @@ namespace EnergyPlus::SingleDuct {
         using BranchNodeConnections::TestCompSet;
         using DataHVACGlobals::ATMixer_InletSide;
         using DataHVACGlobals::ATMixer_SupplySide;
-        using DataSizing::ZoneSizingInput;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumNums;    // Number of REAL(r64) numbers returned by GetObjectItem
@@ -5472,7 +5470,7 @@ namespace EnergyPlus::SingleDuct {
             if (lAlphaFieldBlanks(8)) {
                 state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = true;
             } else {
-                state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = UtilityRoutines::FindItemInList(cAlphaArgs(8), DataSizing::OARequirements);
+                state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = UtilityRoutines::FindItemInList(cAlphaArgs(8), state.dataSize->OARequirements);
                 if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
                     ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                     ShowContinueError(state, "..invalid " + cAlphaFieldNames(8) + "=\"" + cAlphaArgs(8) + "\".");
@@ -5598,16 +5596,16 @@ namespace EnergyPlus::SingleDuct {
             TestCompSet(state, cCurrentModuleObject, state.dataSingleDuct->SysATMixer(ATMixerNum).Name, cAlphaArgs(5), cAlphaArgs(4), "Air Nodes");
 
             if (state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr == 0) {
-                if (ZoneSizingInput.allocated()) {
+                if (state.dataSize->ZoneSizingInput.allocated()) {
                     for (int SizingInputNum = 1; SizingInputNum <= state.dataSize->NumZoneSizingInput; ++SizingInputNum) {
-                        if (ZoneSizingInput(SizingInputNum).ZoneNum == state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum) {
-                            if (ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
+                        if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneNum == state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum) {
+                            if (state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex == 0) {
                                 ShowWarningError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid data.");
                                 ShowContinueError(state, cAlphaFieldNames(8) + " is blank in both the mixer and the Sizing:Zone object for the same zone.");
                                 ShowContinueError(state, "The mixer outdoor airflow rate is set to zero.");
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = 0.0;
                             } else {
-                                state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex;
+                                state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr = state.dataSize->ZoneSizingInput(SizingInputNum).ZoneDesignSpecOAIndex;
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).DesignPrimaryAirVolRate = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(state,
                                     state.dataSingleDuct->SysATMixer(ATMixerNum).OARequirementsPtr, state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneNum, false, false);
                                 state.dataSingleDuct->SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
@@ -5966,25 +5964,25 @@ namespace EnergyPlus::SingleDuct {
         // ATMixer properties only affect coil sizing when the mixer is on the inlet side of zone equipment
         if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).MixerType == DataHVACGlobals::ATMixer_SupplySide) {
             // check if user has selected No to account for DOAS system
-            if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
-                if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
+            if (state.dataSize->FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
+                if (!state.dataSize->FinalZoneSizing(curZoneEqNum).AccountForDOAS && state.dataSize->FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
                     ShowWarningError(state, "AirTerminal:SingleDuct:Mixer: " + state.dataSingleDuct->SysATMixer(inletATMixerIndex).Name);
                     ShowContinueError(state,
                         " Supply side Air Terminal Mixer does not adjust zone equipment coil sizing and may result in inappropriately sized coils.");
                     ShowContinueError(state, " Set Account for Dedicated Outdoor Air System = Yes in Sizing:Zone object for zone = " +
-                                      FinalZoneSizing(curZoneEqNum).ZoneName);
+                                      state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneName);
                 }
                 state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning = false;
             }
             return; // do nothing else if this is a supply side ATMixer
         }
         // check if user has selected Yes to account for DOAS system
-        if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
-            if (FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
+        if (state.dataSize->FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
+            if (state.dataSize->FinalZoneSizing(curZoneEqNum).AccountForDOAS && state.dataSize->FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOANeutralSup) {
                 ShowWarningError(state, "AirTerminal:SingleDuct:Mixer: " + state.dataSingleDuct->SysATMixer(inletATMixerIndex).Name);
                 ShowContinueError(state, " Inlet side Air Terminal Mixer automatically adjusts zone equipment coil sizing.");
                 ShowContinueError(state, " Set Account for Dedicated Outdoor Air System = No in Sizing:Zone object for zone = " +
-                                  FinalZoneSizing(curZoneEqNum).ZoneName);
+                                  state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneName);
                 state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning = false;
             }
         }

@@ -114,7 +114,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     has_eio_output(true);
 
     // now allocate sizing arrays for testing autosized field
-    EnergyPlus::DataSizing::FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing.allocate(1);
     EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     EnergyPlus::DataSizing::PlantSizData.allocate(1);
@@ -123,9 +123,9 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     state->dataSize->DataDesInletWaterTemp = 7.0;
 
     // Sizing Type Prerequisites:
-    EnergyPlus::DataSizing::FinalZoneSizing(1).CoolDesTemp = 12.88;
-    EnergyPlus::DataSizing::ZoneSizingInput.allocate(1);
-    EnergyPlus::DataSizing::ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
+    state->dataSize->FinalZoneSizing(1).CoolDesTemp = 12.88;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
 
     state->dataSize->ZoneSizingRunDone = true;
 
@@ -244,7 +244,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->NumZoneSizingInput = 0;
     EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
-    EnergyPlus::DataSizing::FinalZoneSizing.deallocate();
+    state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
