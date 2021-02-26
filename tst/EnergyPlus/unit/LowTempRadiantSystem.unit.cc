@@ -3710,10 +3710,10 @@ TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Zone.allocate(3);
-    Zone(1).Name = "WEST ZONE";
-    Zone(2).Name = "EAST ZONE";
-    Zone(3).Name = "SOUTH ZONE";
+    state->dataHeatBal->Zone.allocate(3);
+    state->dataHeatBal->Zone(1).Name = "WEST ZONE";
+    state->dataHeatBal->Zone(2).Name = "EAST ZONE";
+    state->dataHeatBal->Zone(3).Name = "SOUTH ZONE";
 
     DataSurfaces::TotSurfaces = 6;
     Surface.allocate(DataSurfaces::TotSurfaces);
