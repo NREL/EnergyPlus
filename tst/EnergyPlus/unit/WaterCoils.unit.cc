@@ -1863,5 +1863,5 @@ TEST_F(WaterCoilsTest, LiqDesiccantCoil_HvacFlexibilityTest_DesHdAvVt)
                                                       ma,  // Air mass flow rate IN to this function(kg/s)
                                                       DesEffectNom);
 
-    EXPECT_NEAR(0.13, DesHdAvVt, 0.01);
+    EXPECT_NEAR(7.66746, DesHdAvVt, 0.01);
 }
