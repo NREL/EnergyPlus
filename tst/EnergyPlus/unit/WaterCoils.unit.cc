@@ -1776,3 +1776,92 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
 
 }
+
+TEST_F(WaterCoilsTest, LiqDesiccantCoil_HvacFlexibilityTest_Ntu)
+{
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    // set up water coil
+    int CoilNum = 1;
+    int MatlOfLiqDesiccant = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).MatlLiqDesiccant = MatlOfLiqDesiccant;
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 SolnMassFlowRateIn = 1.0;     // Solution mass flow rate IN to this function (kg/s)
+    Real64 SolnTempIn = 1.0;             // Solution temperature IN to this function (C)
+    Real64 SolnConcIn = 1.0;             // Solution concentration IN to this function (weight fraction)
+    Real64 AirMassFlowRateIn = 1.0;      // Air mass flow rate IN to this function (kg/s)
+    Real64 AirTempIn = 1.0;              // Air dry bulb temperature IN to this function(C)
+    Real64 AirHumRat = 1.0;              // Air Humidity Ratio IN to this funcation (C)
+    Real64 Coeff_HdAvVt = 1.0;           // Mass Tansfer Coefficient Area Product
+    Real64 LewisNum = 1.0;               // External overall heat transfer coefficient(W/m2 C)
+    Real64 OutletSolnTemp = 0.0;         // Leaving solution temperature (C)
+    Real64 OutletSolnConc = 0.0;         // Leaving solution concentration (weight fraction)
+    Real64 OutletSolnMassFlowRate = 0.0; // Leaving solution mass flow rate (kg/s)
+    Real64 OutletAirTemp = 0.0;          // Leaving air dry bulb temperature(C)
+    Real64 OutletAirHumRat = 0.0;        // Leaving air humidity ratio
+    Real64 TotWaterCoilLoad = 0.0;       // Total heat transfer rate(W)
+    Real64 SenWaterCoilLoad = 0.0;       // Total water evaporate (kg)
+    Real64 OutletSolnEnthaly = 0.0;      // Leaving  solution enthalpy
+    Real64 InletSolnEnthaly = 0.0;       //  Entering solution enthalpy
+    Real64 DesiccantWaterLoss = 0.0;     // Total sensiable heat transfer rate(W)
+
+    SolnMassFlowRateIn = 0.000125997881 * 622.294;
+    SolnTempIn = (65.395 - 32) * 5 / 9.0;
+    SolnConcIn = 0.2768;
+    AirMassFlowRateIn = 0.000125997881 * 2251.74;
+    AirTempIn = (57.0 - 32) * 5.0 / 9.0;
+    AirHumRat = 0.007889;
+    Coeff_HdAvVt = 1.5 * AirMassFlowRateIn;
+    LewisNum = 1.0;
+
+    WaterCoils::LiqDesiccantCoil_Ntu(*state,
+                                     1,                      // Number of Coil
+                                     SolnMassFlowRateIn,     // Solution mass flow rate IN to this function(kg/s)
+                                     SolnTempIn,             // Solution temperature IN to this function (C)
+                                     SolnConcIn,             // Solution concentration IN to this function (weight fraction)
+                                     AirMassFlowRateIn,      // Air mass flow rate IN to this function(kg/s)
+                                     AirTempIn,              // Air dry bulb temperature IN to this function(C)
+                                     AirHumRat,              // Air Humidity Ratio IN to this funcation (C)
+                                     Coeff_HdAvVt,           // Mass Tansfer Coefficient Area Product (kg/s)
+                                     LewisNum,               // External overall heat transfer coefficient(W/m2 C)
+                                     OutletSolnTemp,         // Leaving solution temperature (C)
+                                     OutletSolnConc,         // Leaving solution concentration (weight fraction)
+                                     OutletSolnMassFlowRate, // Leaving solution mass flow rate (kg/s)
+                                     OutletAirTemp,          // Leaving air dry bulb temperature(C)
+                                     OutletAirHumRat,        // Leaving air humidity ratio
+                                     OutletSolnEnthaly,      // Leaving solution enthalpy
+                                     InletSolnEnthaly,       // Entering solution enthalpy
+                                     TotWaterCoilLoad,       // Total heat transfer rate(W)
+                                     SenWaterCoilLoad,
+                                     DesiccantWaterLoss); // Total sensiable heat transfer rate(W)
+    EXPECT_NEAR(17.7804, OutletSolnTemp, 0.01);
+    EXPECT_NEAR(0.27563, OutletSolnConc, 0.01);
+    EXPECT_NEAR(0.07874, OutletSolnMassFlowRate, 0.01);
+    EXPECT_NEAR(17.4575, OutletAirTemp, 0.01);
+    EXPECT_NEAR(0.0067, OutletAirHumRat, 0.001);
+    EXPECT_NEAR(46790.70, OutletSolnEnthaly, 0.1);
+}
+
+TEST_F(WaterCoilsTest, LiqDesiccantCoil_HvacFlexibilityTest_DesHdAvVt)
+{
+    int CoilNum = 1;
+    int MatlOfLiqDesiccant = 1;
+    state->dataWaterCoils->WaterCoil(CoilNum).MatlLiqDesiccant = MatlOfLiqDesiccant;
+
+    Real64 DesHdAvVt;
+    Real64 msi = 1.2;           // Solution mass flow rate IN to this function(kg/s)
+    Real64 Tsi = 15;            // Solution temperature IN to this function (C)
+    Real64 Xsi = 0.5;           // Solution concentration IN to this function (weight fraction)
+    Real64 ma = 1.3;            // Air mass flow rate IN to this function(kg/s)
+    Real64 DesEffectNom = 0.98; // Deisgn effectiveness at normal condition
+
+    DesHdAvVt = WaterCoils::CalculateDesHdAvVt_EffNtu(*state,
+                                                      1,
+                                                      msi, // Solution mass flow rate IN to this function(kg/s)
+                                                      Tsi, // Solution temperature IN to this function (C)
+                                                      Xsi, // Solution concentration IN to this function (weight fraction)
+                                                      ma,  // Air mass flow rate IN to this function(kg/s)
+                                                      DesEffectNom);
+
+    EXPECT_NEAR(0.13, DesHdAvVt, 0.01);
+}

@@ -154,3 +154,22 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     ExpectedValue = 1.951;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 }
+
+TEST_F(EnergyPlusFixture, PcmThermalStorage_HvacFlexibilityTest_GetIceStorageInput)
+{
+
+    std::string const idf_objects = delimited_string({
+        "  ThermalStorage:Pcm:Simple,",
+        "    Ice Tank,                !- Name",
+        "    IceOnCoilInternal,       !- Pcm Storage Type",
+        "    1.0,                     !- Capacity {GJ} 0.5",
+        "    Ice Tank Inlet Node,     !- Inlet Node Name",
+        "    CW Supply Outlet Node,    !- Outlet Node Name",
+        "    5.0,                     !- Onset temperature of phase change",
+        "    6.0,                     !- Finish temperature of phase change",
+        "    2000.0,                   !- Onset UA of phase change material",
+        "    2000.0;                   !- Finish UA of phase change material",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+    IceThermalStorage::GetIceStorageInput(*state);
+}
