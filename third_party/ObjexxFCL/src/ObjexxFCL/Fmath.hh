@@ -1302,7 +1302,7 @@ pow_2( T const x )
 } */
 double pow_2(double x)
 {
-    return 2^(2*log2(x));
+    return exp(2*log(x));
 }
 // pow_3( x ) == x^3
 /*
@@ -1315,7 +1315,7 @@ pow_3( T const x )
 } */
 double pow_3(double x)
 {
-    return 2^(3*log2(x));
+    return exp(3*log(x));
     
 }
 
@@ -1333,7 +1333,7 @@ pow_4( T const x )
 
 double pow_4 (float x)
 {
-    return 2^(4*log2(x));
+    return exp(4*log(x));
 }
 
 
@@ -1361,7 +1361,7 @@ pow_6( T const x )
 
 double pow_6(float x)
 {
-    return 2^(6*log2(x));
+    return exp(6*log(x));
     
 }
 
@@ -1378,7 +1378,7 @@ pow_7( T const x )
  */
  double pow_7(float x)
  {
-     return 2^(7*log2(x))
+     return exp(7*log(x))
  }
 
 // pow_8( x ) == x^8
