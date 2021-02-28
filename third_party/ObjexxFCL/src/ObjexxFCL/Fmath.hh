@@ -32,86 +32,146 @@ typedef  std::intmax_t  SSize;
 // min /////
 
 // min( short, short )
-inline
+/*
+ inline
 short int
 min( short int const a, short int const b )
 {
 	return ( a < b ? a : b );
+} */
+short int min(short int const x, short int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
 }
 
 // min( int, int )
-inline
+/* inline
 int
 min( int const a, int const b )
 {
 	return ( a < b ? a : b );
+} */
+
+int min(int const x, int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
 }
 
 // min( long, long )
-inline
+/*inline
 long int
 min( long int const a, long int const b )
 {
 	return ( a < b ? a : b );
+} */
+
+long int min(long int const x, long int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
 }
 
 // min( unsigned short, unsigned short )
-inline
+/* inline
 unsigned short int
 min( unsigned short int const a, unsigned short int const b )
 {
 	return ( a < b ? a : b );
+} */
+
+unsigned short int min(unsigned short int const x, unsigned short int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
 }
 
 // min( unsigned, unsigned )
-inline
+/*inline
 unsigned int
 min( unsigned int const a, unsigned int const b )
 {
 	return ( a < b ? a : b );
+} */
+
+unsigned int min(unsigned int const x, unsigned int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
 }
 
 // min( unsigned long, unsigned long )
-inline
+/*inline
 unsigned long int
 min( unsigned long int const a, unsigned long int const b )
 {
 	return ( a < b ? a : b );
 }
+*/
+
+unsigned long int min(unsigned long int const x, unsigned long int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
+}
+  
 
 // min( float, float )
+/*
 inline
 float
 min( float const a, float const b )
 {
 	return ( a < b ? a : b );
 }
+*/
+float min(float const x, float const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
+}
 
 // min( double, double )
+/*
 inline
 double
 min( double const a, double const b )
 {
 	return ( a < b ? a : b );
 }
+*/
+double min(double const x, double const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
+}
+
 
 // min( long double, long double )
-inline
+/*
+ inline
 long double
 min( long double const a, long double const b )
 {
 	return ( a < b ? a : b );
 }
+ */
+
+long double min(long double const x, long double const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
+}
+
+
 
 // Use std::min for 2 arguments not covered by the above overloads
 using std::min;
 
 // min( short, short, short )
+/*
 inline
 short int
 min( short int const a, short int const b, short int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+}
+*/
+short int min(short int const x, short int const y, short int const z)
+{
+    return min(x, min(y,z));
 }
 
 // min( short, short, short, short, ... )
@@ -124,11 +184,16 @@ min( short int const a, short int const b, short int const c, short int const d,
 }
 
 // min( int, int, int )
-inline
+/* inline
 int
 min( int const a, int const b, int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+} */
+
+int min(int x, int y, int z)
+{
+    return min(x, min(y,z));
 }
 
 // min( int, int, int, int, ... )
@@ -141,11 +206,16 @@ min( int const a, int const b, int const c, int const d, Ts const &... o )
 }
 
 // min( long, long, long )
-inline
+/* inline
 long int
 min( long int const a, long int const b, long int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+} */
+
+long int min(long int const x, long int const y, long int const z)
+{
+    return min(x, min(y,z));
 }
 
 // min( long, long, long, long, ... )
@@ -158,11 +228,16 @@ min( long int const a, long int const b, long int const c, long int const d, Ts 
 }
 
 // min( unsigned short, unsigned short, unsigned short )
-inline
+/*inline
 unsigned short int
 min( unsigned short int const a, unsigned short int const b, unsigned short int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+}
+*/
+unsigned short int min(unsigned short int const x, unsigned short int const y, unsigned short int const z)
+{
+    return min(x, min(y,z));
 }
 
 // min( unsigned short, unsigned short, unsigned short, unsigned short, ... )
@@ -175,11 +250,15 @@ min( unsigned short int const a, unsigned short int const b, unsigned short int 
 }
 
 // min( unsigned, unsigned, unsigned )
-inline
+/*inline
 unsigned int
 min( unsigned int const a, unsigned int const b, unsigned int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+} */
+unsigned int min(unsigned int const x, unsigned int const y)
+{
+    return y ^ ((x ^ y) & -(x < y));
 }
 
 // min( unsigned, unsigned, unsigned, unsigned, ... )
@@ -192,11 +271,15 @@ min( unsigned int const a, unsigned int const b, unsigned int const c, unsigned 
 }
 
 // min( unsigned long, unsigned long, unsigned long )
-inline
+/*inline
 unsigned long int
 min( unsigned long int const a, unsigned long int const b, unsigned long int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+} */
+unsigned long int min(unsigned long int const x, unsigned long int const y, unsigned long int const z)
+{
+    return min(x,min(y,z));
 }
 
 // min( unsigned long, unsigned long, unsigned long, unsigned long, ... )
@@ -209,11 +292,16 @@ min( unsigned long int const a, unsigned long int const b, unsigned long int con
 }
 
 // min( float, float, float )
-inline
+/* inline
 float
 min( float const a, float const b, float const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+}*/
+
+float min(float const x, float const y, float const z)
+{
+    return min(x,min(y,z));
 }
 
 // min( float, float, float, float, ... )
@@ -226,11 +314,16 @@ min( float const a, float const b, float const c, float const d, Ts const &... o
 }
 
 // min( double, double, double )
-inline
+/*inline
 double
 min( double const a, double const b, double const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+}*/
+
+double min(double const x, double const y, double const z)
+{
+    return min(x,min(y,z));
 }
 
 // min( double, double, double, double, ... )
@@ -243,12 +336,18 @@ min( double const a, double const b, double const c, double const d, Ts const &.
 }
 
 // min( long double, long double, long double )
-inline
+/* inline
 long double
 min( long double const a, long double const b, long double const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
+} */
+
+long double min(long double const x, long double const y, long double const z)
+{
+    return min(x, min(y,z));
 }
+
 
 // min( long double, long double, long double, long double, ... )
 template< typename... Ts >
@@ -280,87 +379,149 @@ min( T const & a, T const & b, T const & c, T const & d, Ts const &... o )
 // max /////
 
 // max( short, short )
-inline
+/* inline
 short int
 max( short int const a, short int const b )
 {
 	return ( a < b ? b : a );
+} */
+
+short int max(short int const x, short int const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
 
 // max( int, int )
-inline
+/* inline
 int
 max( int const a, int const b )
 {
 	return ( a < b ? b : a );
+} */
+
+ int max( int const x, int const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
 
 // max( long, long )
-inline
+/*inline
 long int
 max( long int const a, long int const b )
 {
 	return ( a < b ? b : a );
+} */
+
+long int max(long int const x, long int const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
 
+
 // max( unsigned short, unsigned short )
+/*
 inline
 unsigned short int
 max( unsigned short int const a, unsigned short int const b )
 {
 	return ( a < b ? b : a );
+}  */
+
+unsigned short int max(unsigned short int const x, unaigned short int const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
 
+
 // max( unsigned, unsigned )
+/*
 inline
 unsigned int
 max( unsigned int const a, unsigned int const b )
 {
 	return ( a < b ? b : a );
 }
+*/
+
+unsigned int max(unsigned int x, unsigned int y)
+{
+    return x ^ ((x ^ y) & -(x < y));
+}
+
 
 // max( unsigned long, unsigned long )
-inline
+/* inline
 unsigned long int
 max( unsigned long int const a, unsigned long int const b )
 {
 	return ( a < b ? b : a );
+}  */
+
+unsigned long int max(unsigned long int const x, unsigned long int const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
 
+
 // max( float, float )
-inline
+/* inline
 float
 max( float const a, float const b )
 {
 	return ( a < b ? b : a );
+} */
+
+float max(float const x, float const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
 
+
 // max( double, double )
-inline
+/*inline
 double
 max( double const a, double const b )
 {
 	return ( a < b ? b : a );
 }
+*/
+
+double max(double const x, double const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
+}
+
 
 // max( long double, long double )
-inline
+/*inline
 long double
 max( long double const a, long double const b )
 {
 	return ( a < b ? b : a );
+} */
+
+long double max(long double const x, long double const y)
+{
+    return x ^ ((x ^ y) & -(x < y));
 }
+
 
 // Use std::max for 2 arguments not covered by the above overloads
 using std::max;
 
 // max( short, short, short )
-inline
+/*inline
 short int
 max( short int const a, short int const b, short int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}   */
+
+short int max(short int const x, short int const y, short int const z)
+{
+    return max(x,max(y,z));
 }
+
 
 // max( short, short, short, short, ... )
 template< typename... Ts >
@@ -372,12 +533,18 @@ max( short int const a, short int const b, short int const c, short int const d,
 }
 
 // max( int, int, int )
-inline
+/* inline
 int
 max( int const a, int const b, int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}  */
+
+int max( int const x, int const y, int const z)
+{
+    return max(x,max(y,z));
 }
+
 
 // max( int, int, int, int, ... )
 template< typename... Ts >
@@ -389,12 +556,19 @@ max( int const a, int const b, int const c, int const d, Ts const &... o )
 }
 
 // max( long, long, long )
-inline
+/*inline
 long int
 max( long int const a, long int const b, long int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}  */
+
+
+long int max(long int const x, long int const y, long int const z)
+{
+    return max(x,max(y,z));
 }
+
 
 // max( long, long, long, long, ... )
 template< typename... Ts >
@@ -406,11 +580,16 @@ max( long int const a, long int const b, long int const c, long int const d, Ts 
 }
 
 // max( unsigned short, unsigned short, unsigned short )
-inline
+/* inline
 unsigned short int
 max( unsigned short int const a, unsigned short int const b, unsigned short int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}   */
+
+unsigned short int max(unsigned short int const x, unsigned short int const y, unsigned short int const z)
+{
+    return max(x,max(y,z));
 }
 
 // max( unsigned short, unsigned short, unsigned short, unsigned short, ... )
@@ -423,12 +602,18 @@ max( unsigned short int const a, unsigned short int const b, unsigned short int 
 }
 
 // max( unsigned, unsigned, unsigned )
-inline
+/* inline
 unsigned int
 max( unsigned int const a, unsigned int const b, unsigned int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+} */
+
+unsigned int max(unsigned int const x, unsigned int const y, unsigned int const z)
+{
+    return max(x,max(y,z));
 }
+
 
 // max( unsigned, unsigned, unsigned, unsigned, ... )
 template< typename... Ts >
@@ -440,12 +625,18 @@ max( unsigned int const a, unsigned int const b, unsigned int const c, unsigned 
 }
 
 // max( unsigned long, unsigned long, unsigned long )
-inline
+/* inline
 unsigned long int
 max( unsigned long int const a, unsigned long int const b, unsigned long int const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}  */
+
+unsigned long int max(unsigned long int const x, unsigned long int const y, unsigned long int const z)
+{
+    return max(x,max(y,z));
 }
+
 
 // max( unsigned long, unsigned long, unsigned long, unsigned long, ... )
 template< typename... Ts >
@@ -457,11 +648,16 @@ max( unsigned long int const a, unsigned long int const b, unsigned long int con
 }
 
 // max( float, float, float )
-inline
+/*  inline
 float
 max( float const a, float const b, float const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}  */
+
+float max(float const x, float const y, float const z)
+{
+    return max(x,max(y,z));
 }
 
 // max( float, float, float, float, ... )
@@ -474,12 +670,18 @@ max( float const a, float const b, float const c, float const d, Ts const &... o
 }
 
 // max( double, double, double )
-inline
+/* inline
 double
 max( double const a, double const b, double const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+}  */
+
+double max(double const x, double const y, double const z)
+{
+    return max(x,max(y,z));
 }
+
 
 // max( double, double, double, double, ... )
 template< typename... Ts >
@@ -498,6 +700,12 @@ max( long double const a, long double const b, long double const c )
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
 
+long double max(long double const x, long double const y, long double const z)
+{
+    return max(x,max(y,z));
+}
+
+
 // max( long double, long double, long double, long double, ... )
 template< typename... Ts >
 inline
@@ -515,6 +723,8 @@ max( T const & a, T const & b, T const & c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
+
+
 
 // max( a, b, c, d, ... )
 template< typename T, typename... Ts >
@@ -1078,24 +1288,34 @@ quad( T const x )
 }
 
 // pow_2( x ) == x^2
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_2( T const x )
 {
 	return x * x;
+} */
+double pow_2(double x)
+{
+    return 2^(2*log2(x));
 }
-
 // pow_3( x ) == x^3
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+/*
+ template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_3( T const x )
 {
 	return x * x * x;
+} */
+double pow_3(double x)
+{
+    return 2^(3*log2(x));
+    
 }
 
-// pow_4( x ) == x^4
+//// pow_4( x ) == x^4
+/*
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
@@ -1103,10 +1323,18 @@ pow_4( T const x )
 {
 	T const t( x * x );
 	return t * t;
+} */
+
+
+double pow_4 (float x)
+{
+    return 2^(4*log2(x));
 }
 
+
 // pow_5( x ) == x^5
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+/*
+ template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_5( T const x )
@@ -1114,18 +1342,26 @@ pow_5( T const x )
 	T const t( x * x );
 	return t * t * x;
 }
+*/
 
 // pow_6( x ) == x^6
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_6( T const x )
 {
 	T const t( x * x * x );
 	return t * t;
+} */
+
+double pow_6(float x)
+{
+    return  return 2^(6*log2(x));
+    
 }
 
 // pow_7( x ) == x^7
+/*
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
@@ -1134,9 +1370,14 @@ pow_7( T const x )
 	T const t( x * x * x );
 	return t * t * x;
 }
+ */
+ double pow_7(float x)
+ {
+     return 2^(7*log2(x))
+ }
 
 // pow_8( x ) == x^8
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_8( T const x )
@@ -1144,10 +1385,10 @@ pow_8( T const x )
 	T t( x * x );
 	t *= t;
 	return t * t;
-}
+} */
 
 // pow_9( x ) == x^9
-template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_9( T const x )
@@ -1155,6 +1396,8 @@ pow_9( T const x )
 	T const t( x * x * x );
 	return t * t * t;
 }
+*/
+
 
 // root_4( x ) == x^(1/4)
 template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
@@ -1203,24 +1446,25 @@ quad( T const & x )
 }
 
 // pow_2( x ) == x^2
-template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_2( T const & x )
 {
 	return x * x;
-}
+} */
 
 // pow_3( x ) == x^3
-template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_3( T const & x )
 {
 	return x * x * x;
-}
+} */
 
 // pow_4( x ) == x^4
+/*
 template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
@@ -1228,29 +1472,46 @@ pow_4( T const & x )
 {
 	T const t( x * x );
 	return t * t;
+} */
+ 
+double pow_4 (double x)
+{
+    return 2^(4*log2(x));
 }
 
 // pow_5( x ) == x^5
-template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_5( T const & x )
 {
 	T const t( x * x );
 	return t * t * x;
+} */
+
+double pow_5(double x)
+{
+    return  return 2^(5*log2(x));
+    
 }
 
 // pow_6( x ) == x^6
-template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_6( T const & x )
 {
 	T const t( x * x * x );
 	return t * t;
+} */
+double pow_6(double x)
+{
+    return  return 2^(6*log2(x));
+    
 }
 
 // pow_7( x ) == x^7
+/*
 template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
@@ -1259,9 +1520,15 @@ pow_7( T const & x )
 	T const t( x * x * x );
 	return t * t * x;
 }
+*/
+double pow_7(double x)
+{
+    return  return 2^(7*log2(x));
+    
+}
 
 // pow_8( x ) == x^8
-template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+/*template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_8( T const & x )
@@ -1269,16 +1536,27 @@ pow_8( T const & x )
 	T t( x * x );
 	t *= t;
 	return t * t;
+} */
+double pow_8(double x)
+{
+    return  return 2^(8*log2(x));
+    
 }
 
 // pow_9( x ) == x^9
-template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+/* template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 pow_9( T const & x )
 {
 	T const t( x * x * x );
 	return t * t * t;
+} */
+
+double pow_9(double x)
+{
+    return  return 2^(9*log2(x));
+    
 }
 
 // Tolerant Comparisons /////
@@ -1346,3 +1624,4 @@ gt_tol( T const & x, T const & y, T const & r_tol, T const & a_tol = T( 0 ) )
 } // ObjexxFCL
 
 #endif // ObjexxFCL_Fmath_hh_INCLUDED
+
