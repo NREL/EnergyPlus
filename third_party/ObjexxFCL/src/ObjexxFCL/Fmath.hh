@@ -1378,7 +1378,7 @@ pow_7( T const x )
  */
  double pow_7(float x)
  {
-     return exp(7*log(x))
+     return exp(7*log(x));
  }
 
 // pow_8( x ) == x^8
