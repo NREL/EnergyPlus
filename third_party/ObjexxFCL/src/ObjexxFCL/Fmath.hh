@@ -256,10 +256,13 @@ min( unsigned int const a, unsigned int const b, unsigned int const c )
 {
 	return ( a < b ? ( a < c ? a : c ) : ( b < c ? b : c ) );
 } */
+
+/*
 unsigned int min(unsigned int const x, unsigned int const y)
 {
     return y ^ ((x ^ y) & -(x < y));
 }
+*/
 
 // min( unsigned, unsigned, unsigned, unsigned, ... )
 template< typename... Ts >
@@ -427,7 +430,7 @@ max( unsigned short int const a, unsigned short int const b )
 	return ( a < b ? b : a );
 }  */
 
-unsigned short int max(unsigned short int const x, unaigned short int const y)
+unsigned short int max(unsigned short int const x, unsigned short int const y)
 {
     return x ^ ((x ^ y) & -(x < y));
 }
@@ -693,12 +696,14 @@ max( double const a, double const b, double const c, double const d, Ts const &.
 }
 
 // max( long double, long double, long double )
+/*
 inline
 long double
 max( long double const a, long double const b, long double const c )
 {
 	return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 }
+*/
 
 long double max(long double const x, long double const y, long double const z)
 {
@@ -1356,7 +1361,7 @@ pow_6( T const x )
 
 double pow_6(float x)
 {
-    return  return 2^(6*log2(x));
+    return 2^(6*log2(x));
     
 }
 
@@ -1491,7 +1496,7 @@ pow_5( T const & x )
 
 double pow_5(double x)
 {
-    return  return 2^(5*log2(x));
+    return 2^(5*log2(x));
     
 }
 
@@ -1506,7 +1511,7 @@ pow_6( T const & x )
 } */
 double pow_6(double x)
 {
-    return  return 2^(6*log2(x));
+     return 2^(6*log2(x));
     
 }
 
@@ -1523,7 +1528,7 @@ pow_7( T const & x )
 */
 double pow_7(double x)
 {
-    return  return 2^(7*log2(x));
+    return 2^(7*log2(x));
     
 }
 
@@ -1539,7 +1544,7 @@ pow_8( T const & x )
 } */
 double pow_8(double x)
 {
-    return  return 2^(8*log2(x));
+    return 2^(8*log2(x));
     
 }
 
@@ -1555,7 +1560,7 @@ pow_9( T const & x )
 
 double pow_9(double x)
 {
-    return  return 2^(9*log2(x));
+     return 2^(9*log2(x));
     
 }
 
