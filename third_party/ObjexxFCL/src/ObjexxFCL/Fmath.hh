@@ -29,6 +29,16 @@ namespace ObjexxFCL {
 
 typedef  std::intmax_t  SSize;
 
+float myxor(float x, float y)
+{
+    unsigned long long* xPtr = (unsigned long long*)&x;
+    unsigned long long* yPtr = (unsigned long long*)&y;
+    unsigned long long uXor = (*xPtr) ^ (*yPtr);
+    float dXor = *((float*)&uXor);
+    return dXor;
+}
+
+
 // min /////
 
 // min( short, short )
@@ -112,49 +122,50 @@ unsigned long int min(unsigned long int const x, unsigned long int const y)
   
 
 // min( float, float )
-/*
+
 inline
 float
 min( float const a, float const b )
 {
 	return ( a < b ? a : b );
 }
-*/
+/*
 float min(float const x, float const y)
 {
-    return y ^ ((x ^ y) & -(x < y));
-}
+   return y ^ ((x ^ y) & -(x < y));
+}*/
+
 
 // min( double, double )
-/*
+
 inline
 double
 min( double const a, double const b )
 {
 	return ( a < b ? a : b );
 }
-*/
+/*
 double min(double const x, double const y)
 {
     return y ^ ((x ^ y) & -(x < y));
 }
-
+*/
 
 // min( long double, long double )
-/*
+
  inline
 long double
 min( long double const a, long double const b )
 {
 	return ( a < b ? a : b );
 }
- */
-
+ 
+/*
 long double min(long double const x, long double const y)
 {
     return y ^ ((x ^ y) & -(x < y));
 }
-
+*/
 
 
 // Use std::min for 2 arguments not covered by the above overloads
@@ -467,47 +478,48 @@ unsigned long int max(unsigned long int const x, unsigned long int const y)
 
 
 // max( float, float )
-/* inline
+ inline
 float
 max( float const a, float const b )
 {
 	return ( a < b ? b : a );
-} */
-
+} 
+/*
 float max(float const x, float const y)
 {
     return x ^ ((x ^ y) & -(x < y));
 }
-
+*/
 
 // max( double, double )
-/*inline
+inline
 double
 max( double const a, double const b )
 {
 	return ( a < b ? b : a );
 }
-*/
 
+/*
 double max(double const x, double const y)
 {
     return x ^ ((x ^ y) & -(x < y));
-}
+}*/
+
 
 
 // max( long double, long double )
-/*inline
+inline
 long double
 max( long double const a, long double const b )
 {
 	return ( a < b ? b : a );
-} */
-
+} 
+/*
 long double max(long double const x, long double const y)
 {
     return x ^ ((x ^ y) & -(x < y));
 }
-
+*/
 
 // Use std::max for 2 arguments not covered by the above overloads
 using std::max;
