@@ -176,6 +176,11 @@ namespace WaterThermalTanks {
         }
 
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
+            // Delay the setup of Stratified Nodes until sizing (for SizeTankForSupplySide) has occured.
+            // Height is needed and might be autosized (#8412)
+            if ((this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
+                this->SetupStratifiedNodes(state);
+            }
             if (!this->IsChilledWaterTank) {
                 this->CalcStandardRatings(state);
             } else {
@@ -3189,8 +3194,6 @@ namespace WaterThermalTanks {
                                  ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
             }
 
-            Tank.SetupStratifiedNodes(state);
-
             if (!DataIPShortCuts::lAlphaFieldBlanks(21)) {
                 {
                     auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(21));
@@ -3857,8 +3860,6 @@ namespace WaterThermalTanks {
                 ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                  ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
             }
-
-            Tank.SetupStratifiedNodes(state);
         }
 
         return ErrorsFound;
@@ -5181,7 +5182,7 @@ namespace WaterThermalTanks {
         // the Newton-Raphson iterative method.  For vertical cylinders and other shapes, the node heights are calculated
         // using basic geometry.
 
-        static std::string const RoutineName("GetWaterThermalTankInput");
+        static std::string const RoutineName("SetupStratifiedNodes");
 
         const Real64 Tolerance(1.0e-8); // Tolerance for Newton-Raphson solution
         const Real64 FluidCond(0.6);    // Conductivity of water (W/m-K)
@@ -6175,8 +6176,11 @@ namespace WaterThermalTanks {
             if (this->IsChilledWaterTank) {
                 this->AlreadyRated = true;
             } else {
-                if (!state.dataGlobal->AnyPlantInModel || state.dataPlnt->PlantFirstSizesOkayToReport || this->MaxCapacity > 0.0 || this->HeatPumpNum > 0) {
-                    this->CalcStandardRatings(state);
+                if (!state.dataGlobal->AnyPlantInModel || state.dataPlnt->PlantFirstSizesOkayToReport || this->MaxCapacity > 0.0 || this->HeatPumpNum > 0 ) {
+                    if (this->Height > 0) {
+                        // In case Height is autosized, we need to wait
+                        this->CalcStandardRatings(state);
+                    }
                 }
             }
         }
@@ -11394,7 +11398,7 @@ namespace WaterThermalTanks {
         Real64 RecoveryEfficiency;
         Real64 EnergyFactor;
         Real64 RatedDXCoilTotalCapacity = 0.0;
-        if (this->MaxCapacity > 0.0 || this->HeatPumpNum > 0) {
+        if (this->Height > 0 && (this->MaxCapacity > 0.0 || this->HeatPumpNum > 0)) {
             // Set test conditions
             this->AmbientTemp = 19.7222;   // 67.5 F
             this->UseInletTemp = 14.4444;  // 58 F
@@ -11862,7 +11866,7 @@ namespace WaterThermalTanks {
         // and can be excluded from an airflow network.
 
         // Return value
-        bool HeatPumpWaterHeaterNodeException; 
+        bool HeatPumpWaterHeaterNodeException;
 
         int HeatPumpWaterHeaterIndex;
 
