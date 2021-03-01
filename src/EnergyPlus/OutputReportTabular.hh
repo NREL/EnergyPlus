@@ -620,6 +620,8 @@ namespace OutputReportTabular {
 
     int unitsFromHeading(EnergyPlusData &state, std::string &heading);
 
+    int unitsFromHeading(EnergyPlusData &state, std::string &heading, iUnitsStyle unitsStyle_para);
+
     std::vector<std::string> splitCommaString(std::string const &inputString);
 
     void AddTOCLoadComponentTableSummaries(EnergyPlusData &state);
@@ -683,13 +685,18 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal);
 
+    void LoadSummaryUnitConversion(EnergyPlusData &state, CompLoadTablesType &compLoadTotal, iUnitsStyle unitsStyle_para);
+
     void CreateListOfZonesForAirLoop(EnergyPlusData &state, CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
 
     void OutputCompLoadSummary(EnergyPlusData &state,
                                iOutputType const &kind,
                                CompLoadTablesType const &compLoadCool,
                                CompLoadTablesType const &compLoadHeat,
-                               int const &zoneOrAirLoopIndex);
+                               int const &zoneOrAirLoopIndex,
+                               iUnitsStyle unitsStyle_para,
+                               bool produceTabular_para,
+                               bool produceSQLite_para);
 
     void WriteReportHeaders(EnergyPlusData &state, std::string const &reportName, std::string const &objectName, OutputProcessor::StoreType const averageOrSum);
 
@@ -704,6 +711,13 @@ namespace OutputReportTabular {
                     Array1D_int &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
+
+    bool produceDualUnitsFlags(const int &iUnit_Sys,
+                               const iUnitsStyle &unitsStyle_Tab,
+                               const iUnitsStyle &unitsStyle_Sql,
+                               iUnitsStyle &unitsStyle_Cur,
+                               bool &produce_Tab,
+                               bool &produce_Sql);
 
     std::string MakeAnchorName(std::string const &reportString, std::string const &objectString);
 
@@ -818,6 +832,7 @@ namespace OutputReportTabular {
 struct OutputReportTabularData : BaseGlobalStruct {
 
     OutputReportTabular::iUnitsStyle unitsStyle = OutputReportTabular::iUnitsStyle::None;
+    OutputReportTabular::iUnitsStyle unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
     int OutputTableBinnedCount = 0;
     int BinResultsTableCount = 0;
     int BinResultsIntervalCount = 0;
@@ -1067,6 +1082,7 @@ struct OutputReportTabularData : BaseGlobalStruct {
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::iUnitsStyle::None;
+        this->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;
         this->OutputTableBinnedCount = 0;
         this->BinResultsTableCount = 0;
         this->BinResultsIntervalCount = 0;
