@@ -73,6 +73,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -9609,4 +9610,99 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_DualUnits)
 
         ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
     }
+}
+
+
+TEST_F(SQLiteFixture, OutputReportTabularTest_EscapeHTML)
+{
+    // Test for #8542 - Ensures strings are escaped before going to HTML
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    auto &ort(state->dataOutRptTab);
+    ort->numStyles = 1;
+    ort->TableStyle(1) = OutputReportTabular::iTableStyle::HTML;
+    ort->del(1) = DataStringGlobals::CharSpace; // space - this is not used much for HTML output
+
+    ort->WriteTabularFiles = true;
+
+    SetupUnitConversions(*state);
+    ort->unitsStyle = OutputReportTabular::iUnitsStyle::JtoKWH;
+
+    SetPredefinedTables(*state);
+    std::string CompName = "My Coil <coil is DX>";
+
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    // This would normally be called with numerics such as CompName, 0.006, 8, but I don't really care
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdch2CoilLvgHumRatIdealPeak, CompName,  "My Design Day where it's >= 8\u00B0");
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdst2CoilSummaryCoilSelection, CompName,  "My Design Day where it's >= 8\u00B0"); // this is >= 8 degree sign
+
+    // We enable the reports we care about, making sure we have the right ones
+    EXPECT_EQ("HVACSizingSummary", state->dataOutRptPredefined->reportName(6).name);
+    state->dataOutRptPredefined->reportName(6).show = true;
+
+    OutputReportTabular::OpenOutputTabularFile(*state);
+
+    WritePredefinedTables(*state);
+
+    OutputReportTabular::CloseOutputTabularFile(*state);
+
+    std::vector<std::string> lines = read_lines_in_file(DataStringGlobals::outputTblHtmFileName);
+
+    // Lambda helper to locate a line in the html file, and compare that line with the expected html after trimming
+    auto compare_html_output = [this, &lines](const std::string& lookup, const std::string& expectedHTMLString) {
+        std::string found_cell;
+        for (const auto& line: lines) {
+            if (line.find(lookup) != std::string::npos) {
+                found_cell = line;
+                break;
+            }
+        }
+        EXPECT_FALSE(found_cell.empty())
+            << "Did not find the lookup string '" << lookup
+            << "' string in the html output at '" << DataStringGlobals::outputTblHtmFileName
+            << "'..." << '\n' << delimited_string(lines);
+
+        // Trim leading and trailing spaces
+        found_cell.erase(0, found_cell.find_first_not_of(' ')); // ltrim
+        found_cell.erase(found_cell.find_last_not_of(' ') + 1); // rtrim
+
+        EXPECT_EQ(expectedHTMLString, found_cell) << found_cell;
+    };
+
+    compare_html_output("My Coil", "<td align=\"right\">My Coil &lt;coil is DX&gt;</td>");
+
+    // Note that I DO NOT expect `'` to be escaped by `&apos;` like it would in xml. Technically HTML4 doesn't support that, though most browsers
+    // would anyways. Also, escaping single and double quotes is only needed inside attributes
+    compare_html_output("My Design Day", "<td align=\"right\">My Design Day where it's &gt;= 8&deg;</td>");
+
+
+    // We ensure that SQL doesn't have the same escape
+    for (const std::string reportName: {"HVACSizingSummary"}) {
+
+
+        auto result = queryResult("SELECT RowName, Value From TabularDataWithStrings "
+                                 "WHERE ReportName = \"" + reportName + "\""
+                                 "  AND ColumnName = \"Coil Leaving Air Humidity Ratio at Ideal Loads Peak\"",
+                                 "TabularDataWithStrings");
+
+        EnergyPlus::sqlite->sqliteCommit();
+
+        EXPECT_EQ(1u, result.size());
+        // Because the table has 8 cols
+        EXPECT_EQ(8u, result[0].size());
+
+        // 0.006 is a ratio, so unitconv = 1
+        std::string s = result[0][0];
+        // Trim the string, it has leading spaces
+        //s.erase(std::remove_if(s.begin(), s.end(), ::isspace), s.end());
+
+        EXPECT_EQ("My Coil <coil is DX>", s);
+
+        EXPECT_EQ("My Design Day where it's >= 8\u00B0", result[0][1]);
+    }
+
+    // Clean up
+    FileSystem::removeFile(DataStringGlobals::outputTblHtmFileName);
+
 }

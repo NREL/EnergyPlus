@@ -6450,7 +6450,7 @@ namespace SolarShading {
                         // Need to check what effect, if any, defining these here has
                         TBmBm = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                 .WinDirSpecTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
-                        TBmDif = SurfaceWindow(SurfNum) .ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
+                        TBmDif = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                          .WinDirHemiTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep) - TBmBm;
                     } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
                         // get ASHWAT fenestration model beam-beam and beam-diffuse properties

@@ -795,23 +795,23 @@ namespace ThermalComfort {
 
 
         // Thermal const
-        Real64 const CloFac(0.25);              // Clothing factor determined experimentally (var KCLO)
-        Real64 const BodyWeight(69.9);          // (var BODYWEIGHT)
-        Real64 const SweatContConst(170.0);     // Proportionality constant for sweat control; g/m2.hr (var CSW)
-        Real64 const DriCoeffVasodilation(120);  // driving coefficient for vasodilation (var CDIL)
-        Real64 const DriCoeffVasoconstriction(0.5);  // (var CSTR)
-        Real64 const MaxSkinBloodFlow(90.0);    // Max. value of skin blood flow
-        Real64 const MinSkinBloodFlow(0.5);     // Min. value of skin blood flow
-        Real64 const RegSweatMax(500);          // Max. value of regulatory sweating; w/m2
+        constexpr Real64 CloFac(0.25);              // Clothing factor determined experimentally (var KCLO)
+        constexpr Real64 BodyWeight(69.9);          // (var BODYWEIGHT)
+        constexpr Real64 SweatContConst(170.0);     // Proportionality constant for sweat control; g/m2.hr (var CSW)
+        constexpr Real64 DriCoeffVasodilation(120);  // driving coefficient for vasodilation (var CDIL)
+        constexpr Real64 DriCoeffVasoconstriction(0.5);  // (var CSTR)
+        constexpr Real64 MaxSkinBloodFlow(90.0);    // Max. value of skin blood flow
+        constexpr Real64 MinSkinBloodFlow(0.5);     // Min. value of skin blood flow
+        constexpr Real64 RegSweatMax(500);          // Max. value of regulatory sweating; w/m2
 
         // Standard condition const
         // Definition of vascular control signals CoreTempSet, SkinTempSet, and AvgBodyTempSet are the setpoints for core, skin and
         // average body temperatures corresponding to physiol.  neutrality SkinMassRatSet is the ratio of skin mass to total body mass (skin+core)
         // Typical values for CoreTempSet, SkinTempSet and SkinMassRatSet are 36.8, 33.7 and 0.10 SkinMassRat is the actual skin to total body mass ratio
-        Real64 const SkinTempSet(33.7);  // (var TempSkinNeutral)
-        Real64 const CoreTempSet(36.8);  // (var TempCoreNeutral)
-        Real64 const SkinBloodFlowSet(6.3);  // (var SkinBloodFlowNeutral)
-        Real64 const SkinMassRatSet(0.1);    // (var ALFA)
+        constexpr Real64 SkinTempSet(33.7);  // (var TempSkinNeutral)
+        constexpr Real64 CoreTempSet(36.8);  // (var TempCoreNeutral)
+        constexpr Real64 SkinBloodFlowSet(6.3);  // (var SkinBloodFlowNeutral)
+        constexpr Real64 SkinMassRatSet(0.1);    // (var ALFA)
 
         if (AirVel < 0.1) AirVel = 0.1;
 
@@ -1174,12 +1174,10 @@ namespace ThermalComfort {
                                                                                 upperBound, ce_root_termination);
             CoolingEffect = (solverResult.first + solverResult.second) / 2;
         } catch (const std::exception &e) {
+            ShowRecurringWarningErrorAtEnd(state, "The cooling effect could not be solved for People=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\"" +
+                                                   "As a result, no cooling effect will be applied to adjust the PMV and PPD results.",
+                                           state.dataThermalComforts->CoolingEffectWarningInd);
             CoolingEffect = 0;
-            if (state.dataThermalComforts->FirstTimeCoolingEffectWarning) {
-                ShowWarningError(state, "The cooling effect could not be solved for People=\"" + People(state.dataThermalComforts->PeopleNum).Name + "\"");
-                ShowContinueError(state, "As a result, no cooling effect will be applied to adjust the PMV and PPD results.");
-                state.dataThermalComforts->FirstTimeCoolingEffectWarning = false;
-            }
         }
 
         if (CoolingEffect > 0) {
@@ -1214,11 +1212,27 @@ namespace ThermalComfort {
                 PPD_AD = (std::exp(-2.58 + 3.05 * AnkleAirVel - 1.06 * PMV) / (1 + std::exp(-2.58 + 3.05 * AnkleAirVel - 1.06 * PMV))) * 100.0;
 
             } else {
-                if (state.dataThermalComforts->FirstTimeAnkleDraftWarning) {
-                    ShowWarningError(state, "Ankle draft PPD calculations are only applicable for relative air velocity is below 0.2 m/s,");
-                    ShowContinueError(state,"and the subject’s metabolic rate and clothing level should be kept below 1.3 met and 0.7 clo.");
-                    ShowContinueError(state,"PPD at ankle draft will be set to -1.0 if if these conditions are not met.");
-                    state.dataThermalComforts->FirstTimeAnkleDraftWarning = false;
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    if (RelAirVel >= 0.2) {
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Relative air velocity is above 0.2 m/s in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
+                                                       state.dataThermalComforts->AnkleDraftAirVelWarningInd, RelAirVel,
+                                                       RelAirVel, _, "[m/s]", "[m/s]");
+                    }
+                    if (state.dataThermalComforts->ActMet >= 1.3) {
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Metabolic rate is above 1.3 met in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
+                                                       state.dataThermalComforts->AnkleDraftActMetWarningInd,
+                                                       state.dataThermalComforts->ActMet, state.dataThermalComforts->ActMet,
+                                                       _, "[m/s]", "[m/s]");
+                    }
+                    if (state.dataThermalComforts->CloUnit >= 0.7) {
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Clothing unit is above 0.7 in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
+                                                       state.dataThermalComforts->AnkleDraftCloUnitWarningInd,
+                                                       state.dataThermalComforts->CloUnit,
+                                                       state.dataThermalComforts->CloUnit, _, "[m/s]", "[m/s]");
+                    }
                 }
             }
             state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).AnkleDraftPPDASH55 = PPD_AD;

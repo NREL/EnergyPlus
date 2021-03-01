@@ -4530,7 +4530,7 @@ namespace HeatBalanceSurfaceManager {
         bool SwimmingPoolOn;      // true if a pool is present (running)
 
 
-        UpdateRadSysSourceValAvg(LowTempRadSysOn);
+        UpdateRadSysSourceValAvg(state, LowTempRadSysOn);
         UpdateHTRadSourceValAvg(state, HighTempRadSysOn);
         UpdateBBRadSourceValAvg(state, HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(state, SteamBaseboardSysOn);
