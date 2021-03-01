@@ -6364,13 +6364,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
         "  SensibleOnlyLoadControl, !- Latent Load Control",
         "  ,                       !- Supplemental Heating Coil Object Type",
         "  ,                       !- Supplemental Heating Coil Name",
-        "  ,                       !- Supply Air Flow Rate Method During Cooling Operation",
-        "  ,                       !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
+        "  SupplyAirFlowRate,      !- Supply Air Flow Rate Method During Cooling Operation",
+        "  autosize,               !- Supply Air Flow Rate During Cooling Operation{ m3/s }",
         "  ,                       !- Supply Air Flow Rate Per Floor Area During Cooling Operation{ m3/s-m2 }",
         "  ,                       !- Fraction of Autosized Design Cooling Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
-        "  ,                       !- Supply air Flow Rate Method During Heating Operation", // blank input not allowed with gas heating coil
-        "  ,                       !- Supply Air Flow Rate During Heating Operation{ m3/s }",
+        "  SupplyAirFlowRate,      !- Supply air Flow Rate Method During Heating Operation", // blank input not allowed with gas heating coil
+        "  autosize,               !- Supply Air Flow Rate During Heating Operation{ m3/s }",
         "  ,                       !- Supply Air Flow Rate Per Floor Area during Heating Operation{ m3/s-m2 }",
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
@@ -6488,8 +6488,15 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInputSZVAV)
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound);                                                           // expect error on ill-formed input
-    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.6);
+    EXPECT_FALSE(ErrorsFound);                                                           // expect no error on ill-formed input
+    EXPECT_TRUE(has_err_output(false));
+    std::string erroutput =
+        std::string("   ** Warning ** Input errors for AirLoopHVAC:UnitarySystem:UNITARY SYSTEM MODEL\n"
+                    "   **   ~~~   ** Control Type = SingleZoneVAV\n"
+                    "   **   ~~~   ** Input for No Load Supply Air Flow Rate cannot be blank.\n"
+                    "   **   ~~~   ** Input for No Load Supply Air Flow Rate has been set to AutoSize and the simulation continues.\n");
+    EXPECT_TRUE(compare_err_stream(erroutput, true));
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
 }

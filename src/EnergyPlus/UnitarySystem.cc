@@ -6098,6 +6098,11 @@ namespace UnitarySystems {
                     thisSys.m_HeatingSAFMethod = state.dataUnitarySystems->None;
                     if (thisSys.m_HeatCoilExists && thisSys.m_MaxHeatAirVolFlow == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                        if (loc_m_HeatingSAFMethod == "") {
+                            ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method is blank.");
+                        } else {
+                            ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = None.");
+                        }
                         if (thisSys.m_CoolCoilExists) {
                             ShowContinueError(state, "Blank field not allowed for this coil type when cooling coil air flow rate is not AutoSized.");
                         } else {
