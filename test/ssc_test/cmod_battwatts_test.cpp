@@ -87,7 +87,7 @@ TEST_F(CMBattwatts_cmod_battwatts, ResidentialDefaults) {
 
     auto cycles = data.as_vector_ssc_number_t("batt_cycles");
     ssc_number_t maxCycles = *std::max_element(cycles.begin(), cycles.end());
-    EXPECT_NEAR(maxCycles, 611, 0.1);
+    EXPECT_NEAR(maxCycles, 614, 0.1);
 }
 
 TEST_F(CMBattwatts_cmod_battwatts, ResidentialDefaultsLeadAcid) {
@@ -117,7 +117,7 @@ TEST_F(CMBattwatts_cmod_battwatts, ResidentialDefaultsLeadAcid) {
 
     auto cycles = data.as_vector_ssc_number_t("batt_cycles");
     ssc_number_t maxCycles = *std::max_element(cycles.begin(), cycles.end());
-    EXPECT_NEAR(maxCycles, 612, 0.1);
+    EXPECT_NEAR(maxCycles, 614, 0.1);
 }
 
 TEST_F(CMBattwatts_cmod_battwatts, NoPV) {
