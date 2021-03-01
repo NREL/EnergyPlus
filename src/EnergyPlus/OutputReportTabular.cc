@@ -3075,11 +3075,11 @@ namespace EnergyPlus::OutputReportTabular {
                     tbl_stream << "<a name=top></a>\n";
                     tbl_stream << "<p>Program Version:<b>" << VerString << "</b></p>\n";
                     tbl_stream << "<p>Tabular Output Report in Format: <b>HTML</b></p>\n";
-                    tbl_stream << "<p>Building: <b>" << BuildingName << "</b></p>\n";
+                    tbl_stream << "<p>Building: <b>" << ConvertToEscaped(BuildingName, false) << "</b></p>\n";
                     if (state.dataEnvrn->EnvironmentName == state.dataEnvrn->WeatherFileLocationTitle) {
-                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << "</b></p>\n";
+                        tbl_stream << "<p>Environment: <b>" << ConvertToEscaped(state.dataEnvrn->EnvironmentName, false) << "</b></p>\n";
                     } else {
-                        tbl_stream << "<p>Environment: <b>" << state.dataEnvrn->EnvironmentName << " ** " << state.dataEnvrn->WeatherFileLocationTitle << "</b></p>\n";
+                        tbl_stream << "<p>Environment: <b>" << ConvertToEscaped(state.dataEnvrn->EnvironmentName, false) << " ** " << ConvertToEscaped(state.dataEnvrn->WeatherFileLocationTitle, false) << "</b></p>\n";
                     }
                     tbl_stream << "<p>Simulation Timestamp: <b>" << std::setw(4) << ort->td(1) << '-' << std::setfill('0') << std::setw(2) << ort->td(2) << '-'
                                << std::setw(2) << ort->td(3) << '\n';
@@ -4571,12 +4571,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
-        using LowTempRadiantSystem::CFloRadSys;
-        using LowTempRadiantSystem::ElecRadSys;
-        using LowTempRadiantSystem::HydrRadSys;
-        using LowTempRadiantSystem::NumOfCFloLowTempRadSys;
-        using LowTempRadiantSystem::NumOfElecLowTempRadSys;
-        using LowTempRadiantSystem::NumOfHydrLowTempRadSys;
 
         static int iZone(0);
         static int iRadiant(0);
@@ -4694,32 +4688,32 @@ namespace EnergyPlus::OutputReportTabular {
                 radiantCool(curZone) = -state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfHydrLowTempRadSys; ++iRadiant) {
-            curZone = HydrRadSys(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++iRadiant) {
+            curZone = state.dataLowTempRadSys->HydrRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += HydrRadSys(iRadiant).HeatEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= HydrRadSys(iRadiant).CoolEnergy * mult;
-                radiantHeat(curZone) += HydrRadSys(iRadiant).HeatPower * mult;
-                radiantCool(curZone) -= HydrRadSys(iRadiant).CoolPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataLowTempRadSys->HydrRadSys(iRadiant).HeatEnergy * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfCl -= state.dataLowTempRadSys->HydrRadSys(iRadiant).CoolEnergy * mult;
+                radiantHeat(curZone) += state.dataLowTempRadSys->HydrRadSys(iRadiant).HeatPower * mult;
+                radiantCool(curZone) -= state.dataLowTempRadSys->HydrRadSys(iRadiant).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfCFloLowTempRadSys; ++iRadiant) {
-            curZone = CFloRadSys(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++iRadiant) {
+            curZone = state.dataLowTempRadSys->CFloRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += CFloRadSys(iRadiant).HeatEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= CFloRadSys(iRadiant).CoolEnergy * mult;
-                radiantHeat(curZone) += CFloRadSys(iRadiant).HeatPower * mult;
-                radiantCool(curZone) -= CFloRadSys(iRadiant).CoolPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataLowTempRadSys->CFloRadSys(iRadiant).HeatEnergy * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfCl -= state.dataLowTempRadSys->CFloRadSys(iRadiant).CoolEnergy * mult;
+                radiantHeat(curZone) += state.dataLowTempRadSys->CFloRadSys(iRadiant).HeatPower * mult;
+                radiantCool(curZone) -= state.dataLowTempRadSys->CFloRadSys(iRadiant).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfElecLowTempRadSys; ++iRadiant) {
-            curZone = ElecRadSys(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++iRadiant) {
+            curZone = state.dataLowTempRadSys->ElecRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += ElecRadSys(iRadiant).HeatEnergy * mult;
-                radiantHeat(curZone) += ElecRadSys(iRadiant).HeatPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataLowTempRadSys->ElecRadSys(iRadiant).HeatEnergy * mult;
+                radiantHeat(curZone) += state.dataLowTempRadSys->ElecRadSys(iRadiant).HeatPower * mult;
             }
         }
         // Opaque Surface Conduction and Other Heat Addition
@@ -15331,7 +15325,7 @@ namespace EnergyPlus::OutputReportTabular {
                 for (iCol = 1; iCol <= colsColumnLabels; ++iCol) {
                     outputLine = "    <td align=\"right\">";
                     for (jRow = 1; jRow <= maxNumColLabelRows; ++jRow) {
-                        outputLine += colLabelMulti(iCol, jRow);
+                        outputLine += ConvertToEscaped(colLabelMulti(iCol, jRow), false);
                         if (jRow < maxNumColLabelRows) {
                             outputLine += "<br>";
                         }
@@ -15343,13 +15337,13 @@ namespace EnergyPlus::OutputReportTabular {
                 for (jRow = 1; jRow <= rowsBody; ++jRow) {
                     tbl_stream << "  <tr>\n";
                     if (rowLabels(jRow) != "") {
-                        tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(state, rowLabels(jRow), true) << "</td>\n";
+                        tbl_stream << "    <td align=\"right\">" << ConvertToEscaped(InsertCurrencySymbol(state, rowLabels(jRow), true), false) << "</td>\n";
                     } else {
                         tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                     }
                     for (iCol = 1; iCol <= colsBody; ++iCol) {
                         if (body(iCol, jRow) != "") {
-                            tbl_stream << "    <td align=\"right\">" << InsertCurrencySymbol(state, body(iCol, jRow), true) << "</td>\n";
+                            tbl_stream << "    <td align=\"right\">" << ConvertToEscaped(InsertCurrencySymbol(state, body(iCol, jRow), true), false) << "</td>\n";
                         } else {
                             tbl_stream << "    <td align=\"right\">&nbsp;</td>\n";
                         }
@@ -15684,7 +15678,7 @@ namespace EnergyPlus::OutputReportTabular {
         return s;
     }
 
-    std::string ConvertToEscaped(std::string const &inString) // Input String
+    std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input String
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -15695,7 +15689,10 @@ namespace EnergyPlus::OutputReportTabular {
         // PURPOSE OF THIS SUBROUTINE:
         //   Convert to XML safe escaped character string
         //   so it excludes:
-        //               " ' < > &
+        //               " ' < > & degree-sign
+        //   If isXML=false, it does an HTML conversion, so only ` < > & ` and degree sign
+        //   Technically HTML4 doesn't support &quot, though most browsers would anyways.
+        //   Also, escaping single and double quotes is only needed inside attributes
 
         if (inString.empty()) return "";
 
@@ -15708,11 +15705,11 @@ namespace EnergyPlus::OutputReportTabular {
         while (true) {
             if (index == inputSize) break;
             c = inString[index++];
-            if (c == '\"') {
+            if ((c == '\"') && isXML) {
                 s += "&quot;";
             } else if (c == '&') {
                 s += "&amp;";
-            } else if (c == '\'') {
+            } else if ((c == '\'') && isXML) {
                 s += "&apos;";
             } else if (c == '<') {
                 s += "&lt;";
@@ -15737,9 +15734,9 @@ namespace EnergyPlus::OutputReportTabular {
             } else if (c == '\\') {
                 if (index == inputSize) break;
                 c = inString[index++];
-                if (c == '"') {
+                if ((c == '"')  && isXML) {
                     s += "&quot;";
-                } else if (c == '\'') {
+                } else if ((c == '\'') && isXML) {
                     s += "&apos;";
                 } else if (c == 'u' || c == 'x') {
                     int remainingLen = inputSize - index;
