@@ -137,11 +137,8 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                   .Branch(calledFromLocation.branchNum)
                                   .TotalComponents;
 
-        // // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
-        // int BranchInletNodeNum =
-        //    DataPlant::PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
-
         for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
+            // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
             int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
                                        .LoopSide(calledFromLocation.loopSideNum)
                                        .Branch(calledFromLocation.branchNum)
@@ -207,11 +204,8 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                   .Branch(calledFromLocation.branchNum)
                                   .TotalComponents;
 
-        // // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
-        // int BranchInletNodeNum =
-           // state.dataPlnt->PlantLoop(calledFromLocation.loopNum).LoopSide(calledFromLocation.loopSideNum).Branch(calledFromLocation.branchNum).NodeNumIn;
-
         for (int iComp = 1; iComp <= branchTotalComp; iComp++) {
+            // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
             int compInletNodeNum = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
                                        .LoopSide(calledFromLocation.loopSideNum)
                                        .Branch(calledFromLocation.branchNum)
@@ -242,7 +236,8 @@ namespace EnergyPlus::ChillerGasAbsorption {
             }
         }
 
-        if (!matchfound) { // Error, nodes do not match
+        if (!matchfound) {
+            // Error, nodes do not match
             ShowSevereError(state, "SimGasAbsorber: Invalid call to Gas Absorbtion Chiller-Heater " + this->Name);
             ShowContinueError(state, "Node connections in branch are not consistent with object nodes.");
             ShowFatalError(state, "Preceding conditions cause termination.");
