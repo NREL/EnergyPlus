@@ -8435,73 +8435,73 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_1)
 
     // Test the regular scenario (No missing or default values) Case 1: UseoutputControlTableStyle
     std::string const idf_objects =
-        delimited_string({"Output:SQLite,", 
-            "SimpleAndTabular, !-Option Type", 
+        delimited_string({"Output:SQLite,",
+            "SimpleAndTabular, !-Option Type",
             "UseOutputControlTableStyle; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
-    DataStringGlobals::outputSqlFileName = "eplussqlite1.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout1.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite1.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout1.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_2)
 {
     // Test the regular scenario (No missing or default values) Case 2: InchPound
-    std::string const idf_objects = delimited_string({"Output:SQLite,", 
-        "SimpleAndTabular, !-Option Type", 
+    std::string const idf_objects = delimited_string({"Output:SQLite,",
+        "SimpleAndTabular, !-Option Type",
         "InchPound; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite2.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout2.sql";
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    DataStringGlobals::outputSqlFilePath = "eplussqlite2.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout2.sql";
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::InchPound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Regular_Case_3)
 {
     // Test the regular scenario (No missing or default values) Case 3: None
-    std::string const idf_objects = delimited_string({"Output:SQLite,", 
-        "SimpleAndTabular, !-Option Type", 
+    std::string const idf_objects = delimited_string({"Output:SQLite,",
+        "SimpleAndTabular, !-Option Type",
         "None; !-Tabular Unit Conversion"});
 
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite3.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout3.sql";
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    DataStringGlobals::outputSqlFilePath = "eplussqlite3.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout3.sql";
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::None);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
@@ -8516,9 +8516,9 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite4.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout4.sql";
-    
+    DataStringGlobals::outputSqlFilePath = "eplussqlite4.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout4.sql";
+
     EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
@@ -8526,8 +8526,8 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_1)
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
@@ -8543,18 +8543,18 @@ TEST_F(EnergyPlusFixture, ORT_DualUnits_Process_Missing_Case_2)
 
     state->files.outputControl.sqlite = true;
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite5.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout5.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite5.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout5.sql";
 
-    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state); 
+    EnergyPlus::sqlite = EnergyPlus::CreateSQLiteDatabase(*state);
 
     EXPECT_EQ(state->dataOutRptTab->unitsStyle_SQLite, iUnitsStyle::NotFound);
     EXPECT_NE(sqlite, nullptr);
     EXPECT_EQ(sqlite->writeOutputToSQLite(), true);
     EXPECT_EQ(sqlite->writeTabularDataToSQLite(), true);
 
-    DataStringGlobals::outputSqlFileName = "eplussqlite.err";
-    DataStringGlobals::outputSqliteErrFileName = "eplusout.sql";
+    DataStringGlobals::outputSqlFilePath = "eplussqlite.err";
+    DataStringGlobals::outputSqliteErrFilePath = "eplusout.sql";
 }
 
 TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
@@ -8607,7 +8607,7 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
             std::string query("SELECT Value From TabularDataWithStrings"
                               "  WHERE ReportName = '" + reportName + "'"
                               "  AND TableName = '" + tableName + "'"
-                              "  AND RowName = '" + rowName + "'" 
+                              "  AND RowName = '" + rowName + "'"
                               "  AND ColumnName = '" + columnName + "'"
                               "  AND Units = '" + unitsName + "'"
             );
@@ -8674,12 +8674,12 @@ TEST_F(SQLiteFixture, ORT_DualUnits_Heat_Emission)
         }
     }
 
-    // Test Combination 2: 
+    // Test Combination 2:
     state->dataOutRptTab->unitsStyle = iUnitsStyle::JtoKWH;
     state->dataOutRptTab->unitsStyle_SQLite = iUnitsStyle::InchPound;
 
-    // Test 2.5: 
-    // Actually here is an additonal test unit for the getSpecificUnitDivider: 
+    // Test 2.5:
+    // Actually here is an additonal test unit for the getSpecificUnitDivider:
     SetupUnitConversions(*state);
     Real64 rconv = getSpecificUnitDivider(*state, "GJ", "kBtu");
     energyconversion = 1.0 / rconv; // 948.45
@@ -8884,7 +8884,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     EXPECT_EQ(expectedBuildingGrossFloorArea, state->dataOutRptTab->buildingGrossFloorArea);
     EXPECT_EQ(expectedBuildingConditionedFloorArea, state->dataOutRptTab->buildingConditionedFloorArea);
 
-    //expectedBuildingGrossFloorArea /= areaConv; 
+    //expectedBuildingGrossFloorArea /= areaConv;
     //expectedBuildingConditionedFloorArea /= areaConv;
 
     //eleckWh /= largeConv;
