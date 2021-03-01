@@ -1212,32 +1212,27 @@ namespace ThermalComfort {
                 PPD_AD = (std::exp(-2.58 + 3.05 * AnkleAirVel - 1.06 * PMV) / (1 + std::exp(-2.58 + 3.05 * AnkleAirVel - 1.06 * PMV))) * 100.0;
 
             } else {
-                if (RelAirVel >= 0.2) {
-                    ShowRecurringWarningErrorAtEnd(state, "Relative air velocity is above 0.2 m/s in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
-                                                   state.dataThermalComforts->AnkleDraftAirVelWarningInd,
-                                                   RelAirVel,
-                                                   RelAirVel,
-                                                   _,
-                                                   "[m/s]",
-                                                   "[m/s]");
-                }
-                if (state.dataThermalComforts->ActMet >= 1.3) {
-                    ShowRecurringWarningErrorAtEnd(state, "Metabolic rate is above 1.3 met in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
-                                                   state.dataThermalComforts->AnkleDraftActMetWarningInd,
-                                                   state.dataThermalComforts->ActMet,
-                                                   state.dataThermalComforts->ActMet,
-                                                   _,
-                                                   "[m/s]",
-                                                   "[m/s]");
-                }
-                if (state.dataThermalComforts->CloUnit >= 0.7) {
-                    ShowRecurringWarningErrorAtEnd(state, "Clothing unit is above 0.7 in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
-                                                   state.dataThermalComforts->AnkleDraftCloUnitWarningInd,
-                                                   state.dataThermalComforts->CloUnit,
-                                                   state.dataThermalComforts->CloUnit,
-                                                   _,
-                                                   "[m/s]",
-                                                   "[m/s]");
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    if (RelAirVel >= 0.2) {
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Relative air velocity is above 0.2 m/s in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
+                                                       state.dataThermalComforts->AnkleDraftAirVelWarningInd, RelAirVel,
+                                                       RelAirVel, _, "[m/s]", "[m/s]");
+                    }
+                    if (state.dataThermalComforts->ActMet >= 1.3) {
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Metabolic rate is above 1.3 met in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
+                                                       state.dataThermalComforts->AnkleDraftActMetWarningInd,
+                                                       state.dataThermalComforts->ActMet, state.dataThermalComforts->ActMet,
+                                                       _, "[m/s]", "[m/s]");
+                    }
+                    if (state.dataThermalComforts->CloUnit >= 0.7) {
+                        ShowRecurringWarningErrorAtEnd(state,
+                                                       "Clothing unit is above 0.7 in Ankle draft PPD calculations. PPD at ankle draft will be set to -1.0.",
+                                                       state.dataThermalComforts->AnkleDraftCloUnitWarningInd,
+                                                       state.dataThermalComforts->CloUnit,
+                                                       state.dataThermalComforts->CloUnit, _, "[m/s]", "[m/s]");
+                    }
                 }
             }
             state.dataThermalComforts->ThermalComfortData(state.dataThermalComforts->PeopleNum).AnkleDraftPPDASH55 = PPD_AD;
