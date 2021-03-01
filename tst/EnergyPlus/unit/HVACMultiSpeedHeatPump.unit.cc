@@ -1347,34 +1347,34 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.363295, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796611, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43744.6339, 0.0001);
-    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.123500, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43748.243, 0.0001);
+    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1232, 0.0001);
 
     // Direct solution
     state->dataGlobal->DoCoilDirectSolutions = true;
     MSHeatPump(2).FullOutput.allocate(2);
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     // Check outlet conditions
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.3641, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796613, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43745.5237, 0.0001);
-    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.123430, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.363295, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796611, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43748.243, 0.0001);
+    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1232, 0.0001);
 
     QZnReq = -10000.00;
 
     state->dataGlobal->DoCoilDirectSolutions = false;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.45298, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
-    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41691.15, 0.0001);
+    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285417, 0.0001);
 
     state->dataGlobal->DoCoilDirectSolutions = true;
     SimMSHP(*state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
-    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.4545, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.45298, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8507, 0.0001);
-    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285914, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41691.15, 0.0001);
+    EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.285417, 0.0001);
 
     // Heating
     QZnReq = 10000.00;
