@@ -356,6 +356,8 @@ public:
 
     JsonOutputStreams json; // Internal streams used for json outputs
 
+    void flushAll(); // For RunningEnergyPlusViaAPI only
+
 private:
     static IOFiles *&getSingletonInternal();
 };
