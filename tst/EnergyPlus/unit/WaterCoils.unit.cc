@@ -143,7 +143,7 @@ public:
         ZoneEqSizing.allocate(1);
         UnitarySysEqSizing.allocate(1);
         OASysEqSizing.allocate(1);
-        SysSizInput.allocate(1);
+        state->dataSize->SysSizInput.allocate(1);
         state->dataSize->ZoneSizingInput.allocate(1);
         SysSizPeakDDNum.allocate(1);
         SysSizPeakDDNum(1).TimeStepAtSensCoolPk.allocate(1);
@@ -152,7 +152,7 @@ public:
         SysSizPeakDDNum(1).SensCoolPeakDD = 1;
         SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
         SysSizPeakDDNum(1).TotCoolPeakDD = 1;
-        FinalSysSizing.allocate(1);
+        state->dataSize->FinalSysSizing.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
         state->dataAirLoop->AirLoopControlInfo.allocate(1);
@@ -167,9 +167,7 @@ public:
         ZoneEqSizing.clear();
         UnitarySysEqSizing.clear();
         OASysEqSizing.clear();
-        SysSizInput.clear();
         SysSizPeakDDNum.clear();
-        FinalSysSizing.clear();
         SysSizPeakDDNum.clear();
         cached_Twb.clear();
         cached_Psat.clear();
@@ -206,13 +204,13 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(1).CoolSupTemp = 10.0;
-    FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
-    FinalSysSizing(1).DesMainVolFlow = 0.00159;
-    FinalSysSizing(1).HeatSupTemp = 25.0;
-    FinalSysSizing(1).HeatOutTemp = 5.0;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.00159;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 25.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
 
     // set up water coil
     int CoilNum = 1;
@@ -235,10 +233,10 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
     PlantSizData(1).ExitTemp = 5.7;
     PlantSizData(1).DeltaT = 5.0;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataSize->DataWaterLoopNum = 1;
     NumOfGlycols = 1;
 
@@ -262,8 +260,8 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->DataDesInletWaterTemp);
 
     // set second cooling coil to size at a different air flow, adjust sizing data, and autosize input data
-    FinalSysSizing(1).DesMainVolFlow = 0.00259;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.00259;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Cooling Coil 2";
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
@@ -295,8 +293,8 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    FinalSysSizing(1).DesMainVolFlow = 0.00359;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.00359;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
 
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Heating Coil";
@@ -327,8 +325,8 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     EXPECT_DOUBLE_EQ(0.0, state->dataSize->DataDesInletWaterTemp);
 
     // size 2nd heating coil
-    FinalSysSizing(1).DesMainVolFlow = 0.00459;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.00459;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Heating Coil 2";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
@@ -442,11 +440,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).HeatSupTemp = 40.0;
-    FinalSysSizing(1).HeatOutTemp = 5.0;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
-    FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
 
     // set up water coil
     int CoilNum = 1;
@@ -519,7 +517,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSize->CurSysNum = 0;
     TermUnitSizing.allocate(1);
-    TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate / 3.0;
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
@@ -552,7 +550,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     state->dataWaterCoils->MySizeFlag(1) = true;
     // run water coil sizing
@@ -594,11 +592,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).HeatSupTemp = 40.0;
-    FinalSysSizing(1).HeatOutTemp = 5.0;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
-    FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
 
     // set up water coil
     int CoilNum = 1;
@@ -671,7 +669,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurTermUnitSizingNum = 1;
     TermUnitSizing.allocate(1);
-    TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow =
         state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate / 1500.0; // DesAirVolFlowRate = 1.0 so TU air flow = 0.00067 (lower than 0.001)
     TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate / 1500.0;
@@ -705,7 +703,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     state->dataWaterCoils->MySizeFlag(1) = true;
     // run water coil sizing
@@ -750,11 +748,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).HeatSupTemp = 40.0;
-    FinalSysSizing(1).HeatOutTemp = 5.0;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
-    FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
 
     // set up water coil
     int CoilNum = 1;
@@ -865,12 +863,12 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
-    FinalSysSizing(1).CoolSupTemp = 10.0;
-    FinalSysSizing(1).CoolSupHumRat = 0.0085;
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).CoolSupHumRat = 0.0085;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     // set up water coil
     int CoilNum = 1;
@@ -899,7 +897,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
     PlantSizData(1).ExitTemp = 5.7;
     PlantSizData(1).DeltaT = 5.0;
 
@@ -966,12 +964,12 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
-    FinalSysSizing(1).CoolSupTemp = 10.0;
-    FinalSysSizing(1).CoolSupHumRat = 0.0085;
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).CoolSupHumRat = 0.0085;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     // set up water coil
     int CoilNum = 1;
@@ -1016,7 +1014,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
     PlantSizData(1).ExitTemp = 5.7;
     PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
@@ -1031,8 +1029,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     Real64 CoilInEnth = 0.0;
     Real64 CoilOutEnth = 0.0;
 
-    CoilInEnth = PsyHFnTdbW(FinalSysSizing(1).MixTempAtCoolPeak, FinalSysSizing(1).MixHumRatAtCoolPeak);
-    CoilOutEnth = PsyHFnTdbW(FinalSysSizing(1).CoolSupTemp, FinalSysSizing(1).CoolSupHumRat);
+    CoilInEnth = PsyHFnTdbW(state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak, state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak);
+    CoilOutEnth = PsyHFnTdbW(state->dataSize->FinalSysSizing(1).CoolSupTemp, state->dataSize->FinalSysSizing(1).CoolSupHumRat);
     DesCoilCoolingLoad = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate * state->dataEnvrn->StdRhoAir * (CoilInEnth - CoilOutEnth);
     // check cooling coil design load
     EXPECT_DOUBLE_EQ(DesCoilCoolingLoad, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
@@ -1079,12 +1077,12 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
-    FinalSysSizing(1).CoolSupTemp = 10.0;
-    FinalSysSizing(1).CoolSupHumRat = 0.0085;
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).CoolSupHumRat = 0.0085;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     // set up water coil
     int CoilNum = 1;
@@ -1139,7 +1137,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    SysSizInput(1).CoolCapControl = VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = VAV;
     PlantSizData(1).ExitTemp = 5.7;
     PlantSizData(1).DeltaT = 5.0;
     state->dataSize->DataWaterLoopNum = 1;
@@ -1156,8 +1154,8 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     Real64 CoilInEnth = 0.0;
     Real64 CoilOutEnth = 0.0;
 
-    CoilInEnth = PsyHFnTdbW(FinalSysSizing(1).MixTempAtCoolPeak, FinalSysSizing(1).MixHumRatAtCoolPeak);
-    CoilOutEnth = PsyHFnTdbW(FinalSysSizing(1).CoolSupTemp, FinalSysSizing(1).CoolSupHumRat);
+    CoilInEnth = PsyHFnTdbW(state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak, state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak);
+    CoilOutEnth = PsyHFnTdbW(state->dataSize->FinalSysSizing(1).CoolSupTemp, state->dataSize->FinalSysSizing(1).CoolSupHumRat);
     DesCoilCoolingLoad = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate * state->dataEnvrn->StdRhoAir * (CoilInEnth - CoilOutEnth);
     // check cooling coil design load
     EXPECT_DOUBLE_EQ(DesCoilCoolingLoad, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterCoolingCoilRate);
@@ -1262,11 +1260,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).HeatSupTemp = 40.0;
-    FinalSysSizing(1).HeatOutTemp = 5.0;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
-    FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
 
     // set up water coil
     int CoilNum = 1;
@@ -1311,7 +1309,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     Real64 DesCoilHeatingLoad = 0.0;
 
     CpAirStd = PsyCpAirFnW(0.0);
-    DesMassFlow = FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    DesMassFlow = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
     // check heating coil design load
@@ -1360,11 +1358,11 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 
     // set up sizing data
-    FinalSysSizing(1).DesMainVolFlow = 1.00;
-    FinalSysSizing(1).HeatSupTemp = 40.0;
-    FinalSysSizing(1).HeatOutTemp = 5.0;
-    FinalSysSizing(1).HeatRetTemp = 20.0;
-    FinalSysSizing(1).HeatOAOption = 1;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 40.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = 1;
 
     // set up water coil
     int CoilNum = 1;

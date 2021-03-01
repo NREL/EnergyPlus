@@ -1198,9 +1198,9 @@ namespace EvaporativeCoolers {
             } else { // Autosize or hardsize with design data
                 CheckSysSizing(state, CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                 if (CoolerOnMainAirLoop) {
-                    IndirectVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    IndirectVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else if (CoolerOnOApath) {
-                    IndirectVolFlowRateDes = max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
+                    IndirectVolFlowRateDes = max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                 }
                 // apply scaling factor the secondary air fan flow rate
                 if (EvapCond(EvapCoolNum).evapCoolerType == EvapCoolerType::IndirectRDDSpecial) {
@@ -1284,9 +1284,9 @@ namespace EvaporativeCoolers {
             } else { // Autosize or hardsize with design data
                 CheckSysSizing(state, CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                 if (CoolerOnMainAirLoop) {
-                    volFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    volFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else if (CoolerOnOApath) {
-                    volFlowRateDes = max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
+                    volFlowRateDes = max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                 }
                 // no scaling factor on the volFlowRate in develop, so not doing it here
             }
@@ -1368,10 +1368,10 @@ namespace EvaporativeCoolers {
                 } else { // Autosize or hardsize with design data
                     CheckSysSizing(state, CompType, EvapCond(EvapCoolNum).EvapCoolerName);
                     if (CoolerOnMainAirLoop) {
-                        IndirectVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        IndirectVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     } else if (CoolerOnOApath) {
                         IndirectVolFlowRateDes =
-                            std::max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.50 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
+                            std::max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.50 * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                     }
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;
@@ -1500,9 +1500,9 @@ namespace EvaporativeCoolers {
                         CoolerOnOApath = true;
                     }
                     if (CoolerOnMainAirLoop) {
-                        IndirectVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        IndirectVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     } else if (CoolerOnOApath) {
-                        IndirectVolFlowRateDes = std::max(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
+                        IndirectVolFlowRateDes = std::max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, 0.5 * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow);
                     }
                     // Face air velocity of 3m/s is assumed
                     PadAreaDes = IndirectVolFlowRateDes / 3.0;

@@ -146,7 +146,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     ZoneEqSizing.allocate(2);
     state->dataHeatBal->Zone.allocate(2);
     state->dataSize->CalcZoneSizing.allocate(1, 2);
-    CalcFinalZoneSizing.allocate(2);
+    state->dataSize->CalcFinalZoneSizing.allocate(2);
     NonAirSystemResponse.allocate(2);
     SysDepZoneLoads.allocate(2);
     state->dataZoneEquip->ZoneEquipConfig.allocate(2);
@@ -220,8 +220,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASHighSetpoint = 14.4;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASLowSetpoint = 12.2;
     state->dataEnvrn->StdBaroPress = 101325.;
-    CalcFinalZoneSizing(1).MinOA = 0.1;
-    CalcFinalZoneSizing(2).MinOA = 0.11;
+    state->dataSize->CalcFinalZoneSizing(1).MinOA = 0.1;
+    state->dataSize->CalcFinalZoneSizing(2).MinOA = 0.11;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 1).DOASControlStrategy = 3;
     state->dataSize->CalcZoneSizing(state->dataSize->CurOverallSimDay, 2).DOASControlStrategy = 3;
     state->dataEnvrn->OutDryBulbTemp = 28.;

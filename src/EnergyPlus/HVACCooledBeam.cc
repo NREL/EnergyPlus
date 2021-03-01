@@ -738,7 +738,7 @@ namespace HVACCooledBeam {
 
                 CheckZoneSizing(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name);
                 CoolBeam(CBNum).MaxAirVolFlow =
-                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (CoolBeam(CBNum).MaxAirVolFlow < SmallAirVolFlow) {
                     CoolBeam(CBNum).MaxAirVolFlow = 0.0;
                 }
@@ -755,19 +755,19 @@ namespace HVACCooledBeam {
 
                 if (PltSizCoolNum > 0) {
 
-                    if (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
+                    if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
                         DesAirVolFlow = CoolBeam(CBNum).MaxAirVolFlow;
-                        CpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).CoolDesHumRat);
+                        CpAir = PsyCpAirFnW(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).CoolDesHumRat);
                         // the design cooling coil load is the zone load minus whatever the central system does. Note that
                         // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
-                        if (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
-                            DesCoilLoad = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesCoolLoad -
+                        if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
+                            DesCoilLoad = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesCoolLoad -
                                           CpAir * RhoAir * DesAirVolFlow *
-                                              (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak -
-                                               TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU);
+                                              (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak -
+                                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU);
                         } else {
                             DesCoilLoad = CpAir * RhoAir * DesAirVolFlow *
-                                          (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU - state.dataSize->ZoneSizThermSetPtHi(state.dataSize->CurZoneEqNum));
+                                          (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU - state.dataSize->ZoneSizThermSetPtHi(state.dataSize->CurZoneEqNum));
                         }
 
                         rho = GetDensityGlycol(state,
@@ -841,8 +841,8 @@ namespace HVACCooledBeam {
                         DesAirFlowPerBeam = CoolBeam(CBNum).MaxAirVolFlow / NumBeams;
                         WaterVolFlowPerBeam = CoolBeam(CBNum).MaxCoolWaterVolFlow / NumBeams;
                         WaterVel = WaterVolFlowPerBeam / (DataGlobalConstants::Pi * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
-                        if (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
-                            DT = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak -
+                        if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
+                            DT = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak -
                                  0.5 * (CoolBeam(CBNum).DesInletWaterTemp + CoolBeam(CBNum).DesOutletWaterTemp);
                             if (DT <= 0.0) {
                                 DT = 7.8;

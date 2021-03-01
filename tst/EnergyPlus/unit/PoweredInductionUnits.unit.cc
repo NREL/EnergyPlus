@@ -582,11 +582,11 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
 
     state->dataSize->CurTermUnitSizingNum = 1;
     DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 1.0;
     DataSizing::TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
     state->dataSize->TermUnitSingDuct = true;
-    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     // Call the sizing routine now
     PoweredInductionUnits::SizePIU(*state, PIUNum);

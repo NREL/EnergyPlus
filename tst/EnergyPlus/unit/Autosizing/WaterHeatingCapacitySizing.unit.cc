@@ -61,7 +61,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     state->dataEnvrn->StdRhoAir = 1.2;
     static std::string const routineName("WaterHeatingCapacitySizingGauntlet");
 
-    EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::ZoneEqSizing.allocate(1);
 
     // create the sizer and set up the flags to specify the sizing configuration
     WaterHeatingCapacitySizer sizer;
@@ -108,11 +108,11 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // now allocate sizing arrays for testing autosized field
-    EnergyPlus::DataSizing::TermUnitSizing.allocate(1);
-    EnergyPlus::DataSizing::TermUnitFinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU = 15.0;
-    EnergyPlus::DataSizing::TermUnitFinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
-    EnergyPlus::DataSizing::TermUnitSizing(1).MaxHWVolFlow = 0.0005;
+    DataSizing::TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU = 15.0;
+    state->dataSize->TermUnitFinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
+    DataSizing::TermUnitSizing(1).MaxHWVolFlow = 0.0005;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
     state->dataSize->FinalZoneSizing(1).ZoneRetTempAtHeatPeak = 24.0;
@@ -126,10 +126,10 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
 
-    EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    EnergyPlus::DataSizing::ZoneEqSizing(1).MaxHWVolFlow = 0.0002;
-    EnergyPlus::DataSizing::ZoneEqSizing(1).ATMixerHeatPriDryBulb = 28.0;
-    EnergyPlus::DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.0045;
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::ZoneEqSizing(1).MaxHWVolFlow = 0.0002;
+    DataSizing::ZoneEqSizing(1).ATMixerHeatPriDryBulb = 28.0;
+    DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.0045;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataSize->DataWaterLoopNum = 1;
     state->dataSize->DataWaterCoilSizHeatDeltaT = 5.0;
@@ -139,7 +139,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     // Test 2 - Zone Equipment, Single Duct TU
     state->dataSize->TermUnitSingDuct = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.zoneSizingInput.allocate(1);
     sizer.zoneSizingInput(1).ZoneNum = 1;
@@ -155,7 +155,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     state->dataSize->TermUnitSingDuct = false;
     state->dataSize->ZoneEqFanCoil = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -169,7 +169,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     // Test 4 - Zone Equipment, Other Equipment
     state->dataSize->ZoneEqFanCoil = false;
     // start with an auto-sized value as the user input, OA flow > 0
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -182,7 +182,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     // Test 5 - Zone Equipment, Other Equipment
     DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.03;
     // start with an auto-sized value as the user input, AT Mixer present
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -198,7 +198,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = true;
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.3;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -214,7 +214,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow = true;
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 0.4;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -228,7 +228,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow = false;
     DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 0.0;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);
@@ -241,7 +241,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCapacitySizingGauntlet)
     // Test 9 - Zone Equipment, Other Equipment, heating sizing ratio = 0.5
     state->dataSize->DataHeatSizeRatio = 0.5;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater), "MyWaterCoil", printFlag, routineName);

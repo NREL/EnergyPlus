@@ -3839,8 +3839,8 @@ namespace VariableSpeedCoils {
                 }
             } else {
                 CheckSysSizing(state, "COIL:" + state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name);
-                if (FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    RatedAirVolFlowRateDes = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    RatedAirVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     RatedAirVolFlowRateDes = 0.0;
                 }
@@ -3896,30 +3896,30 @@ namespace VariableSpeedCoils {
                 VolFlowRate = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
                     if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                        MixTemp = FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
-                        MixHumRat = FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
-                        SupTemp = FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
-                        SupHumRat = FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
+                        MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
+                        MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
+                        SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
+                        SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
                     } else { // coil is on the main air loop
-                        SupTemp = FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
-                        SupHumRat = FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
+                        SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
+                        SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
                         if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                            MixTemp = FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
-                            MixHumRat = FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
+                            MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
+                            MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
                             if (VolFlowRate > 0.0) {
-                                OutAirFrac = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
+                                OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
                             } else {
                                 OutAirFrac = 1.0;
                             }
                             OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             MixTemp =
-                                OutAirFrac * FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
-                            MixHumRat = OutAirFrac * FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
-                                        (1.0 - OutAirFrac) * FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
+                                OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
+                            MixHumRat = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
+                                        (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
                         }
                     }
-                    OutTemp = FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
+                    OutTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
                     rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     SupEnth = PsyHFnTdbW(SupTemp, SupHumRat);

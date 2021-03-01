@@ -318,16 +318,16 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     state->dataSize->SysSizingRunDone = true;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::FinalSysSizing(1).CoolSupTemp = 7.0;
-    DataSizing::FinalSysSizing(1).CoolSupHumRat = 0.006;
-    DataSizing::FinalSysSizing(1).MixTempAtCoolPeak = 24.0;
-    DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak = 0.009;
-    DataSizing::FinalSysSizing(1).RetTempAtCoolPeak = 25.0;
-    DataSizing::FinalSysSizing(1).RetHumRatAtCoolPeak = 0.0085;
-    DataSizing::FinalSysSizing(1).OutTempAtCoolPeak = 35.0;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 7.0;
+    state->dataSize->FinalSysSizing(1).CoolSupHumRat = 0.006;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 24.0;
+    state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak = 0.009;
+    state->dataSize->FinalSysSizing(1).RetTempAtCoolPeak = 25.0;
+    state->dataSize->FinalSysSizing(1).RetHumRatAtCoolPeak = 0.0085;
+    state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak = 35.0;
 
     // Test 11 - Airloop Equipment, no OA
     // start with an autosized value
@@ -344,7 +344,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 12 - Airloop Equipment, with OA but no precooling of OA stream
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.02;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.02;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -359,8 +359,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
 
     // Test 13 - Airloop Equipment, with OA and precooling of OA stream
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 1;
-    DataSizing::FinalSysSizing(1).PrecoolTemp = 12.0;
-    DataSizing::FinalSysSizing(1).PrecoolHumRat = 0.008;
+    state->dataSize->FinalSysSizing(1).PrecoolTemp = 12.0;
+    state->dataSize->FinalSysSizing(1).PrecoolHumRat = 0.008;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -402,8 +402,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     Real64 unScaledCapacity = sizedValue;
 
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
-    DataSizing::FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
-    DataSizing::FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
+    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
+    state->dataSize->FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -422,8 +422,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;                                          // reset for next test
 
     // Test 16 - Airloop Equipment, with OA and precooling of OA stream, add scalable capacity per floor area sizing
-    DataSizing::FinalSysSizing(1).CoolingCapMethod = DataSizing::CapacityPerFloorArea;
-    DataSizing::FinalSysSizing(1).CoolingTotalCapacity = 4500.0;
+    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(1).CoolingTotalCapacity = 4500.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -437,8 +437,8 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0;            // reset for next test
 
     // Test 17 - Airloop Equipment, with OA and precooling of OA stream, add scalable capacity sizing
-    DataSizing::FinalSysSizing(1).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
-    DataSizing::FinalSysSizing(1).CoolingTotalCapacity = 3500.0;
+    state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::CoolingDesignCapacity;
+    state->dataSize->FinalSysSizing(1).CoolingTotalCapacity = 3500.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing

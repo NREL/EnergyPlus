@@ -94,27 +94,27 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestVentEffLimit)
     Real64 SysCoolingEv; // system ventilation effectiveness
     int CtrlZoneNum;     // controlled zone number
 
-    TermUnitFinalZoneSizing.allocate(2);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(2);
 
     Xs = 0.2516;
     ZoneOAFrac = 0.8265;
     VozClg = .06245;
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
     CtrlZoneNum = 1;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
     LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_DOUBLE_EQ(0.7, SysCoolingEv);
-    EXPECT_NEAR(0.5516, TermUnitFinalZoneSizing(CtrlZoneNum).ZpzClgByZone, 0.0001);
-    EXPECT_NEAR(0.1132, TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.0001);
+    EXPECT_NEAR(0.5516, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZpzClgByZone, 0.0001);
+    EXPECT_NEAR(0.1132, state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).DesCoolVolFlowMin, 0.0001);
     ZoneOAFrac = 0.4894;
     VozClg = 0.02759;
     SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
     CtrlZoneNum = 2;
-    TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
+    state->dataSize->TermUnitFinalZoneSizing(CtrlZoneNum).ZoneVentilationEff = 0.7;
     LimitZoneVentEff(*state, Xs, VozClg, CtrlZoneNum, SysCoolingEv);
     EXPECT_NEAR(0.7622, SysCoolingEv, .0001);
 
-    TermUnitFinalZoneSizing.deallocate();
+    state->dataSize->TermUnitFinalZoneSizing.deallocate();
 }
 TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
 {
@@ -235,8 +235,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->NumAirTerminalSizingSpec = 1;
-    TermUnitFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
@@ -255,8 +255,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
@@ -291,8 +291,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
-    TermUnitFinalZoneSizing.deallocate();
-    CalcFinalZoneSizing.deallocate();
+    state->dataSize->TermUnitFinalZoneSizing.deallocate();
+    state->dataSize->CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
@@ -414,9 +414,9 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
-    TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->NumAirTerminalSizingSpec = 1;
-    CalcFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
@@ -435,8 +435,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
@@ -471,8 +471,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
-    TermUnitFinalZoneSizing.deallocate();
-    CalcFinalZoneSizing.deallocate();
+    state->dataSize->TermUnitFinalZoneSizing.deallocate();
+    state->dataSize->CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
@@ -594,8 +594,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
-    TermUnitFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
@@ -611,13 +611,13 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataHeatBal->Zone(1).FloorArea = 96.48;
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesCoolVolFlow = 0.21081;
-    TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatVolFlow = 0.11341;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesCoolVolFlow = 0.21081;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatVolFlow = 0.11341;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
@@ -651,8 +651,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
-    TermUnitFinalZoneSizing.deallocate();
-    CalcFinalZoneSizing.deallocate();
+    state->dataSize->TermUnitFinalZoneSizing.deallocate();
+    state->dataSize->CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
@@ -775,8 +775,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataSize->FinalZoneSizing.allocate(1);
-    TermUnitFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
@@ -800,8 +800,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
-    TermUnitFinalZoneSizing.deallocate();
-    CalcFinalZoneSizing.deallocate();
+    state->dataSize->TermUnitFinalZoneSizing.deallocate();
+    state->dataSize->CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
@@ -925,8 +925,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->NumAirTerminalSizingSpec = 1;
-    TermUnitFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
     TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
@@ -945,8 +945,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.21081;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
-    CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.11341;
+    state->dataSize->CalcFinalZoneSizing(state->dataSize->CurZoneEqNum).HeatSizingFactor = 1.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowFrac;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMinAirFlow2 = state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).DesCoolMinAirFlowPerArea * state->dataHeatBal->Zone(1).FloorArea;
@@ -981,8 +981,8 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
-    TermUnitFinalZoneSizing.deallocate();
-    CalcFinalZoneSizing.deallocate();
+    state->dataSize->TermUnitFinalZoneSizing.deallocate();
+    state->dataSize->CalcFinalZoneSizing.deallocate();
     TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }

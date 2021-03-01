@@ -2470,10 +2470,10 @@ namespace WaterCoils {
                 if (state.dataWaterCoils->WaterCoil(CoilNum).DesTotWaterCoilLoad > 0.0) {
                     NomCapUserInp = true;
                 } else if (state.dataSize->CurSysNum > 0 && state.dataSize->CurSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
-                    if (FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
+                    if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == CapacityPerFloorArea) {
                         NomCapUserInp = true;
-                    } else if (FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
-                               FinalSysSizing(state.dataSize->CurSysNum).HeatingTotalCapacity > 0.0) {
+                    } else if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingCapMethod == HeatingDesignCapacity &&
+                               state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatingTotalCapacity > 0.0) {
                         NomCapUserInp = true;
                     }
                 } else {
@@ -2499,7 +2499,7 @@ namespace WaterCoils {
 
                     if (state.dataSize->CurOASysNum > 0) {
                         OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                        OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                        OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                     }
                     TempSize = AutoSize; // reset back
                 }

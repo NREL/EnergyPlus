@@ -718,7 +718,6 @@ namespace Humidifiers {
         using DataHVACGlobals::Main;
         using DataHVACGlobals::Other;
         using DataSizing::AutoSize;
-        using DataSizing::FinalSysSizing;
         using FluidProperties::FindGlycol;
         using FluidProperties::FindRefrigerant;
         using FluidProperties::GetSatEnthalpyRefrig;
@@ -801,48 +800,48 @@ namespace Humidifiers {
                     CheckSysSizing(state, "Humidifier:SizeHumidifier", Name);
                     if (state.dataSize->CurOASysNum > 0) {
                         // size to outdoor air volume flow rate if available
-                        if (FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow > 0.0) {
+                        if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow > 0.0) {
                             AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat, CalledFrom);
-                            MassFlowDes = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow * AirDensity;
-                            InletHumRatDes = std::min(FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak, FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat);
-                            OutletHumRatDes = std::max(FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat, FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
+                            MassFlowDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow * AirDensity;
+                            InletHumRatDes = std::min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutHumRat);
+                            OutletHumRatDes = std::max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
                         } else { // ELSE size to supply air duct flow rate
                             auto const SELECT_CASE_var(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var == Main) {
-                                AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var == Cooling) {
-                                AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                                AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var == Heating) {
-                                AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                                AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else if (SELECT_CASE_var == Other) {
-                                AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else {
-                                AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                             AirDensity = PsyRhoAirFnPbTdbW(state,
-                                state.dataEnvrn->OutBaroPress, FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak, FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
+                                state.dataEnvrn->OutBaroPress, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
                             MassFlowDes = AirVolFlow * AirDensity;
-                            InletHumRatDes = min(FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, FinalSysSizing(state.dataSize->CurSysNum).HeatMixHumRat);
-                            OutletHumRatDes = max(FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat, FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
+                            InletHumRatDes = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatMixHumRat);
+                            OutletHumRatDes = max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
                         }
                     } else {
                         auto const SELECT_CASE_var(state.dataSize->CurDuctType);
                         if (SELECT_CASE_var == Main) {
-                            AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } else if (SELECT_CASE_var == Cooling) {
-                            AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                            AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                         } else if (SELECT_CASE_var == Heating) {
-                            AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                            AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                         } else if (SELECT_CASE_var == Other) {
-                            AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } else {
-                            AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         }
                         AirDensity = PsyRhoAirFnPbTdbW(state,
-                            state.dataEnvrn->OutBaroPress, FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak, FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
+                            state.dataEnvrn->OutBaroPress, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, CalledFrom);
                         MassFlowDes = AirVolFlow * AirDensity;
-                        InletHumRatDes = std::min(FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, FinalSysSizing(state.dataSize->CurSysNum).HeatMixHumRat);
-                        OutletHumRatDes = std::max(FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat, FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
+                        InletHumRatDes = std::min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatMixHumRat);
+                        OutletHumRatDes = std::max(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat, state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupHumRat);
                     }
                 }
             }

@@ -150,22 +150,22 @@ protected:
         state->dataSize->CurZoneEqNum = 0;
         state->dataSize->CurOASysNum = 0;
 
-        DataSizing::FinalSysSizing.allocate(1);
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.5;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 1.5;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesHeatVolFlow = 1.2;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.3;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 25.0;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.009;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 15.0;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.006;
+        state->dataSize->FinalSysSizing.allocate(1);
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.5;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 1.5;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesHeatVolFlow = 1.2;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.3;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 25.0;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.009;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 15.0;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.006;
 
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatSupTemp = 35.0;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatRetTemp = 20.0;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatRetHumRat = 0.007;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = 10.0;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat = 0.004;
-        DataSizing::FinalSysSizing(state->dataSize->CurSysNum).CoolDDNum = 1;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupTemp = 35.0;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatRetTemp = 20.0;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatRetHumRat = 0.007;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = 10.0;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat = 0.004;
+        state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolDDNum = 1;
         DataSizing::DesDayWeath.allocate(1);
         DataSizing::DesDayWeath(1).Temp.allocate(1);
         DataSizing::DesDayWeath(1).Temp(1) = 35.0;
@@ -720,7 +720,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
 
     //  reference CBVAV and FinalSysSizing data
     auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
-    auto &finalSysSizing(DataSizing::FinalSysSizing(state->dataSize->CurSysNum));
+    auto &finalSysSizing(state->dataSize->FinalSysSizing(state->dataSize->CurSysNum));
 
     state->dataSize->SysSizingRunDone = true; // inform sizing that system sizing run is done
     // override CBVAVSys fixture set up of hard sized inputs to AutoSize

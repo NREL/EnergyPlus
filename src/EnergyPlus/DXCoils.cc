@@ -6889,9 +6889,9 @@ namespace EnergyPlus::DXCoils {
                         CoilInTemp = state.dataSize->ZoneSizingRunDone ? state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp : 26;
                     } else {
                         if (state.dataSize->CurOASysNum > 0) {
-                            CoilInTemp = state.dataSize->SysSizingRunDone ? FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak : 32;
+                            CoilInTemp = state.dataSize->SysSizingRunDone ? state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak : 32;
                         } else {
-                            CoilInTemp = state.dataSize->SysSizingRunDone ? FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak : 26;
+                            CoilInTemp = state.dataSize->SysSizingRunDone ? state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak : 26;
                         }
                     }
                     CalcVRFCoilCapModFac(state, 0, _, CompName, CoilInTemp, _, _, _, state.dataSize->DataTotCapCurveValue);

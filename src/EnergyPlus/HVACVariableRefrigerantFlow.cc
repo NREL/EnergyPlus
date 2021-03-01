@@ -7658,7 +7658,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).OASysExists) {
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = 0.0;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = min(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
                 }
                 BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -7723,7 +7723,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).OASysExists) {
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = 0.0;
                 } else {
-                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = min(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
                 }
                 BaseSizer::reportSizerOutput(state, DataHVACGlobals::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,

@@ -60,7 +60,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     state->dataEnvrn->StdRhoAir = 1.2;
-    EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::ZoneEqSizing.allocate(1);
     static std::string const routineName("CoolingWaterflowSizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -125,8 +125,8 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     // now allocate sizing arrays for testing autosized field
     state->dataSize->FinalZoneSizing.allocate(1);
-    EnergyPlus::DataSizing::ZoneEqSizing.allocate(1);
-    EnergyPlus::DataSizing::ZoneEqSizing(1).MaxCWVolFlow = 0.3;
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::ZoneEqSizing(1).MaxCWVolFlow = 0.3;
     state->dataSize->FinalZoneSizing(1).DesCoolMassFlow = 0.3;
     state->dataSize->FinalZoneSizing(1).CoolDesTemp = 12.0;
     state->dataSize->FinalZoneSizing(1).CoolDesHumRat = 0.006;
@@ -137,7 +137,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     // Test 3 - Zone Equipment, Single Duct TU, cooling coil water flow sizes > 0
     state->dataSize->TermUnitSingDuct = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
@@ -184,7 +184,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->TermUnitSingDuct = false;
     state->dataSize->TermUnitPIU = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -198,7 +198,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->TermUnitPIU = false;
     state->dataSize->TermUnitIU = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -213,7 +213,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->TermUnitIU = false;
     state->dataSize->ZoneEqFanCoil = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -221,14 +221,14 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.3, sizedValue, 0.0001);
-    EXPECT_NEAR(EnergyPlus::DataSizing::ZoneEqSizing(1).MaxCWVolFlow, sizedValue, 0.0001);
+    EXPECT_NEAR(DataSizing::ZoneEqSizing(1).MaxCWVolFlow, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 8 - Zone Equipment, Unit Ventilator
     state->dataSize->ZoneEqFanCoil = false;
     state->dataSize->ZoneEqUnitVent = true;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -242,7 +242,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->ZoneEqUnitVent = false;
     state->dataSize->DataWaterCoilSizCoolDeltaT = 5.0;
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
     sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
@@ -262,7 +262,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
-    EnergyPlus::DataSizing::ZoneEqSizing.deallocate();
+    DataSizing::ZoneEqSizing.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
@@ -286,13 +286,13 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     // Test 11 - Airloop Equipment - CurDuctType not set
     state->dataSize->SysSizingRunDone = true;
-    EnergyPlus::DataSizing::FinalSysSizing.allocate(1);
-    EnergyPlus::DataSizing::SysSizInput.allocate(1);
-    EnergyPlus::DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
-    EnergyPlus::DataSizing::FinalSysSizing(1).DesMainVolFlow = 5.0; // CurDuctType not set
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 5.0; // CurDuctType not set
     // start with an auto-sized value as the user input
-    inputValue = EnergyPlus::DataSizing::AutoSize;
+    inputValue = DataSizing::AutoSize;
 
     // do sizing
     sizer.wasAutoSized = false;

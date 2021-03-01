@@ -89,13 +89,13 @@ TEST_F(EnergyPlusFixture, Humidifiers_Sizing)
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(state->dataSize->CurSysNum);
-    FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
-    FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.090;
-    FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.090;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     // autosize nominal gas use rate
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -124,13 +124,13 @@ TEST_F(EnergyPlusFixture, Humidifiers_AutoSizing)
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(state->dataSize->CurSysNum);
-    FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
-    FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.090;
-    FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 30.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.090;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     // volumetric capacity autosize unit test
@@ -166,13 +166,13 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(state->dataSize->CurSysNum);
-    FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.00089;
-    FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.00089;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     // resize the humidifier nominal capacity and gas use rate
     thisHum.NomCapVol = 4.00E-5;
@@ -257,13 +257,13 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     thisHum.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
-    FinalSysSizing.allocate(state->dataSize->CurSysNum);
-    FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
-    FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.00089;
-    FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
-    FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
-    FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.00089;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.60894;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatMixHumRat = 0.05;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.07;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatSupHumRat = 0.10;
 
     // calculate gas use rate and energy at full load
     thisHum.AirInMassFlowRate = 1.8919;

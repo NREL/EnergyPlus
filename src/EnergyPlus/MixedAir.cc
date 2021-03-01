@@ -4711,15 +4711,15 @@ namespace EnergyPlus::MixedAir {
                         {
                             auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var1 == Main) {
-                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var1 == Cooling) {
-                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var1 == Heating) {
-                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else if (SELECT_CASE_var1 == Other) {
-                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else {
-                                this->MaxOA = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                         }
 
@@ -4758,8 +4758,8 @@ namespace EnergyPlus::MixedAir {
             if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
-                if (FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
-                    this->MinOA = min(FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, this->MaxOA);
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
+                    this->MinOA = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, this->MaxOA);
                 } else {
                     this->MinOA = 0.0;
                 }

@@ -281,13 +281,13 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
 
     // Test 12 - Airloop Equipment - DataDesInletAirTemp > 0, NumOACoils = 1
     state->dataSize->SysSizingRunDone = true;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
-    DataSizing::FinalSysSizing(1).MixTempAtCoolPeak = 20.15;
-    DataSizing::FinalSysSizing(1).RetTempAtCoolPeak = 24.11;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).OutTempAtCoolPeak = 27.88;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 20.15;
+    state->dataSize->FinalSysSizing(1).RetTempAtCoolPeak = 24.11;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).OutTempAtCoolPeak = 27.88;
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -327,7 +327,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
 
     // Test 14 - Airloop Equipment - 1 OA coil, use PrecoolHumRat
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 1;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).PrecoolTemp = 12.21;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).PrecoolTemp = 12.21;
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -343,7 +343,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 15 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.01;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.01;
     state->dataSize->DataFlowUsedForSizing = 0.1; // system volume flow
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -371,12 +371,12 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    Real64 outAirTemp = DataSizing::FinalSysSizing(state->dataSize->CurSysNum).OutTempAtCoolPeak;
+    Real64 outAirTemp = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).OutTempAtCoolPeak;
     EXPECT_NEAR(outAirTemp, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 17 - Outdoor Air System Equipment with DOAS system
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     state->dataAirLoop->OutsideAirSys(1).AirLoopDOASNum = 0;
     state->dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
     state->dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 27.44;

@@ -262,7 +262,7 @@ public:
         DataSizing::ZoneEqSizing.allocate(2);
         DataSizing::UnitarySysEqSizing.allocate(2);
         DataSizing::OASysEqSizing.allocate(2);
-        DataSizing::SysSizInput.allocate(1);
+        state->dataSize->SysSizInput.allocate(1);
         state->dataSize->ZoneSizingInput.allocate(1);
         DataSizing::SysSizPeakDDNum.allocate(1);
         DataSizing::SysSizPeakDDNum(1).TimeStepAtSensCoolPk.allocate(1);
@@ -271,7 +271,7 @@ public:
         DataSizing::SysSizPeakDDNum(1).SensCoolPeakDD = 1;
         DataSizing::SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
         DataSizing::SysSizPeakDDNum(1).TotCoolPeakDD = 1;
-        DataSizing::FinalSysSizing.allocate(1);
+        state->dataSize->FinalSysSizing.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
         DataHVACGlobals::NumPrimaryAirSys = 1;
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -288,9 +288,7 @@ public:
         DataSizing::ZoneEqSizing.clear();
         DataSizing::UnitarySysEqSizing.clear();
         DataSizing::OASysEqSizing.clear();
-        DataSizing::SysSizInput.clear();
         DataSizing::SysSizPeakDDNum.clear();
-        DataSizing::FinalSysSizing.clear();
         DataSizing::SysSizPeakDDNum.clear();
         DataHVACGlobals::NumPrimaryAirSys = 0;
         Psychrometrics::cached_Twb.clear();
@@ -341,15 +339,15 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
 
     // set up sizing data
-    DataSizing::FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
-    DataSizing::FinalSysSizing(1).CoolSupTemp = 10.0;
-    DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 0.159;
-    DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.159;
-    DataSizing::FinalSysSizing(1).DesHeatVolFlow = 0.159;
-    DataSizing::FinalSysSizing(1).HeatSupTemp = 25.0;
-    DataSizing::FinalSysSizing(1).HeatOutTemp = 5.0;
-    DataSizing::FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak = 20.0;
+    state->dataSize->FinalSysSizing(1).CoolSupTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak = 0.01;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.159;
+    state->dataSize->FinalSysSizing(1).DesCoolVolFlow = 0.159;
+    state->dataSize->FinalSysSizing(1).DesHeatVolFlow = 0.159;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 25.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
 
     // set up water coil
     int CoilNum = 1;
@@ -379,12 +377,12 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 0;
-    DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.3;
+    state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.3;
     Real64 heatFlowRat = 0.3;
-    DataSizing::SysSizInput(1).CoolCapControl = DataSizing::VAV;
+    state->dataSize->SysSizInput(1).CoolCapControl = DataSizing::VAV;
     DataSizing::PlantSizData(1).ExitTemp = 5.7;
     DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = DataSizing::FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state->dataWaterCoils->WaterCoil(CoilNum).Name;
     state->dataSize->DataWaterLoopNum = 1;
@@ -412,7 +410,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // size heating coil
     CoilNum = 2;
-    DataSizing::FinalSysSizing(1).MassFlowAtCoolPeak = DataSizing::FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
+    state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum = 5;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum = 6;
@@ -525,8 +523,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // the water cooling coil sizes are only different by the air density used in capacity calculation
     // water coils use StdRhoAir and UnitarySystem coils use actual air density
-    Real64 CoilInTemp = DataSizing::FinalSysSizing(1).MixTempAtCoolPeak;
-    Real64 CoilInHumRat = DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak;
+    Real64 CoilInTemp = state->dataSize->FinalSysSizing(1).MixTempAtCoolPeak;
+    Real64 CoilInHumRat = state->dataSize->FinalSysSizing(1).MixHumRatAtCoolPeak;
     Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat);
     // this is the ratio of UnitarySystem cooling coil size to coil-on-branch water cooling coil size
     Real64 rhoRatio = state->dataEnvrn->StdRhoAir / rhoair;
@@ -11211,13 +11209,13 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataSize->DataDesOutletAirTemp = 0.0;
 
     state->dataSize->CurSysNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 28.0;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0075;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 1.005;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 28.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0075;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 1.005;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
@@ -11226,8 +11224,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::fanModelTypeNotYetSet;
 
     state->dataSize->SysSizingRunDone = true;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
@@ -11294,9 +11292,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
 
     // clean
     state->dataSize->NumSysSizInput = 0;
-    DataSizing::FinalSysSizing.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
-    DataSizing::SysSizInput.deallocate();
+    state->dataSize->SysSizInput.deallocate();
     DataSizing::UnitarySysEqSizing.deallocate();
     DataSizing::OASysEqSizing.deallocate();
 }

@@ -160,7 +160,7 @@ protected:
         state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
         state->dataSize->FinalZoneSizing.allocate(numZones);
-        DataSizing::FinalSysSizing.allocate(numAirloops);
+        state->dataSize->FinalSysSizing.allocate(numAirloops);
         DataSizing::OASysEqSizing.allocate(numAirloops);
         DataSizing::OASysEqSizing(1).SizingMethod.allocate(30);
         DataSizing::ZoneEqSizing.allocate(numZones);
@@ -189,8 +189,8 @@ protected:
         state->dataDXCoils->NumDXCoils = 10;
         state->dataMixedAir->OAMixer.allocate(5);
         state->dataSize->NumSysSizInput = 1;
-        DataSizing::SysSizInput.allocate(1);
-        DataSizing::SysSizInput(1).AirLoopNum = 1;
+        state->dataSize->SysSizInput.allocate(1);
+        state->dataSize->SysSizInput(1).AirLoopNum = 1;
         state->dataCurveManager->NumCurves = 10;
         state->dataCurveManager->PerfCurve.allocate(10);
         state->dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
@@ -287,7 +287,7 @@ protected:
         finalZoneSizing.TimeStepNumAtCoolMax = 1;
         finalZoneSizing.CoolDDNum = 1;
 
-        auto &finalSysSizing(DataSizing::FinalSysSizing(thisAirLoop));
+        auto &finalSysSizing(state->dataSize->FinalSysSizing(thisAirLoop));
         finalSysSizing.DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
         finalSysSizing.DesHeatVolFlow = 0.566337;
         finalSysSizing.CoolSupTemp = 12.7;

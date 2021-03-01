@@ -2716,7 +2716,7 @@ namespace HVACMultiSpeedHeatPump {
                 if (state.dataSize->CurSysNum > 0) {
                     if (i == NumOfSpeedCooling) {
                         CheckSysSizing(state, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name);
-                        MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) &&
                             MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                             MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).FanVolFlow;
@@ -2753,7 +2753,7 @@ namespace HVACMultiSpeedHeatPump {
                 if (state.dataSize->CurSysNum > 0) {
                     if (i == NumOfSpeedHeating) {
                         CheckSysSizing(state, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name);
-                        MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                        MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) &&
                             MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                             MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).FanVolFlow;
@@ -2788,7 +2788,7 @@ namespace HVACMultiSpeedHeatPump {
         if (MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate == AutoSize) {
             if (state.dataSize->CurSysNum > 0) {
                 CheckSysSizing(state, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name);
-                MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate &&
                     MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                     MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = MSHeatPump(MSHeatPumpNum).FanVolFlow;
@@ -2816,7 +2816,7 @@ namespace HVACMultiSpeedHeatPump {
                 } else {
                     CheckZoneSizing(state, "Coil:Heating:Electric", MSHeatPump(MSHeatPumpNum).Name);
                 }
-                MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp = FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
+                MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
                 BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                              MSHeatPump(MSHeatPumpNum).Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
@@ -2831,7 +2831,7 @@ namespace HVACMultiSpeedHeatPump {
                 } else {
                     CheckSysSizing(state, "Coil:Heating:Electric", MSHeatPump(MSHeatPumpNum).Name);
                 }
-                MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
+                MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
             } else {
                 MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = 0.0;
             }

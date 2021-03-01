@@ -728,7 +728,7 @@ namespace SteamCoils {
 
                         if (state.dataSize->CurOASysNum > 0) {
                             OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                            OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                            OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                         }
                         TempSize = AutoSize; // reset back
                     }
@@ -737,15 +737,15 @@ namespace SteamCoils {
                     {
                         auto const SELECT_CASE_var(state.dataSize->CurDuctType);
                         if (SELECT_CASE_var == Main) {
-                            DesVolFlow = FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat * FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } else if (SELECT_CASE_var == Cooling) {
-                            DesVolFlow = FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat * FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                         } else if (SELECT_CASE_var == Heating) {
-                            DesVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                         } else if (SELECT_CASE_var == Other) {
-                            DesVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         } else {
-                            DesVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                            DesVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         }
                     }
                     if (state.dataSize->DataDesicRegCoil) {
@@ -760,9 +760,9 @@ namespace SteamCoils {
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
                     // get the outside air fraction
-                    if (FinalSysSizing(state.dataSize->CurSysNum).HeatOAOption == MinOA) {
+                    if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOAOption == MinOA) {
                         if (DesVolFlow > 0.0) {
-                            OutAirFrac = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / DesVolFlow;
+                            OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / DesVolFlow;
                         } else {
                             OutAirFrac = 1.0;
                         }
@@ -775,9 +775,9 @@ namespace SteamCoils {
                         DesCoilLoad = CpAirStd * DesMassFlow * (state.dataSize->DataDesOutletAirTemp - state.dataSize->DataDesInletAirTemp);
                     } else {
                         // mixed air temp
-                        CoilInTemp = OutAirFrac * FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp + (1.0 - OutAirFrac) * FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
+                        CoilInTemp = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatOutTemp + (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatRetTemp;
                         // coil load
-                        DesCoilLoad = CpAirStd * DesMassFlow * (FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp - CoilInTemp);
+                        DesCoilLoad = CpAirStd * DesMassFlow * (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp - CoilInTemp);
                     }
                     // AUTOSTEAMCOIL
                     if (DesCoilLoad >= SmallLoad) {

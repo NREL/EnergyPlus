@@ -450,10 +450,10 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     // Test coil reporting
     curZoneEqNum = 1;
     DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->CurTermUnitSizingNum = curZoneEqNum;
-    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
-    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = state->dataHeatBal->Zone(1).Name;

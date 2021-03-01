@@ -740,20 +740,20 @@ namespace PhotovoltaicThermalCollectors {
                 } else {
                     CheckSysSizing(state, "SolarCollector:FlatPlate:PhotovoltaicThermal", this->Name);
                     if (state.dataSize->CurOASysNum > 0) {
-                        DesignVolFlowRateDes = DataSizing::FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                        DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                     } else {
                         {
                             auto const SELECT_CASE_var(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var == DataHVACGlobals::Main) {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                                       DataSizing::FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
+                                                       state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var == DataHVACGlobals::Cooling) {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
-                                                       DataSizing::FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).SysAirMinFlowRat *
+                                                       state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var == DataHVACGlobals::Heating) {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else {
-                                DesignVolFlowRateDes = DataSizing::FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                                DesignVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                         }
                     }

@@ -116,15 +116,15 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     state->dataSize->FinalZoneSizing.allocate(1);
     DataSizing::ZoneEqSizing.allocate(1);
     DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
 
     // Sizing Type Prerequisites:
     // TermUnitPIU, TermUnitSingDuct
-    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.008;
     // TermUnitPIU
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.007;
     // TermUnitIU
-    DataSizing::TermUnitFinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.006;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.006;
     // all others
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.008;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMassFlow = 0.01;
@@ -329,12 +329,12 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataSize->NumSysSizInput = 1;
     state->dataSize->SysSizingRunDone = true;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
 
-    DataSizing::FinalSysSizing(1).HeatRetHumRat = 0.012;
-    DataSizing::FinalSysSizing(1).HeatOutHumRat = 0.006;
+    state->dataSize->FinalSysSizing(1).HeatRetHumRat = 0.012;
+    state->dataSize->FinalSysSizing(1).HeatOutHumRat = 0.006;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 
@@ -356,8 +356,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // Test 15 - Airloop Equipment - 1 OA coil
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 1;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).RetHumRatAtCoolPeak = 0.015;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).PrecoolHumRat = 0.01;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).RetHumRatAtCoolPeak = 0.015;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).PrecoolHumRat = 0.01;
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -373,8 +373,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 16 - Airloop Equipment - 1 OA coil use mixture of outdoor and return hum rat since DataFlowUsedForSizing > 0
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.01;
-    DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::MinOA;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.01;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOAOption = DataSizing::MinOA;
     state->dataSize->DataFlowUsedForSizing = 0.1; // system volume flow
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -402,12 +402,12 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
-    Real64 outAirHumRat = DataSizing::FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat;
+    Real64 outAirHumRat = state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat;
     EXPECT_NEAR(outAirHumRat, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 18 - Outdoor Air System Equipment with DOAS system
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     state->dataAirLoop->OutsideAirSys(1).AirLoopDOASNum = 0;
     state->dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
     state->dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutHumRat = 0.0036;

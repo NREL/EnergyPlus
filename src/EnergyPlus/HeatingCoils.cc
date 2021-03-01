@@ -1560,7 +1560,7 @@ namespace HeatingCoils {
 
                 if (state.dataSize->CurOASysNum > 0) {
                     OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = true;
-                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
+                    OASysEqSizing(state.dataSize->CurOASysNum).AirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                 }
                 state.dataSize->DataDesicDehumNum = 0;
                 bPRINT = true;

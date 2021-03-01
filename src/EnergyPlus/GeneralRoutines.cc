@@ -720,16 +720,13 @@ void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bo
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // Using/Aliasing
-    using DataSizing::SysSizInput;
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisAirSysSizineInputLoop;
 
     AirLoopWasSized = false;
     if (state.dataSize->SysSizingRunDone) {
         for (ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= state.dataSize->NumSysSizInput; ++ThisAirSysSizineInputLoop) {
-            if (SysSizInput(ThisAirSysSizineInputLoop).AirLoopNum == AirLoopNum) {
+            if (state.dataSize->SysSizInput(ThisAirSysSizineInputLoop).AirLoopNum == AirLoopNum) {
                 AirLoopWasSized = true;
                 break;
             }

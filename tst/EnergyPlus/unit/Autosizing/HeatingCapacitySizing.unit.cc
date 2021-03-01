@@ -141,13 +141,13 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // now allocate sizing arrays for testing autosized field
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
-    DataSizing::TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU = 15.0;
-    DataSizing::TermUnitFinalZoneSizing(1).DesHeatCoilInHumRatTU = 0.007;
-    DataSizing::TermUnitFinalZoneSizing(1).HeatDesTemp = 30.0;
-    DataSizing::TermUnitFinalZoneSizing(1).HeatDesHumRat = 0.007;
-    DataSizing::TermUnitFinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
-    DataSizing::TermUnitFinalZoneSizing(1).ZoneHumRatAtHeatPeak = 0.006;
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU = 15.0;
+    state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInHumRatTU = 0.007;
+    state->dataSize->TermUnitFinalZoneSizing(1).HeatDesTemp = 30.0;
+    state->dataSize->TermUnitFinalZoneSizing(1).HeatDesHumRat = 0.007;
+    state->dataSize->TermUnitFinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
+    state->dataSize->TermUnitFinalZoneSizing(1).ZoneHumRatAtHeatPeak = 0.006;
     DataSizing::TermUnitSizing.allocate(1);
     DataSizing::TermUnitSizing(1).InducRat = 0.5;
     DataSizing::TermUnitSizing(1).AirVolFlow = 0.2;
@@ -416,19 +416,19 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::FinalSysSizing(1).HeatRetTemp = 20.0;
-    DataSizing::FinalSysSizing(1).HeatOutTemp = 5.0;
-    DataSizing::FinalSysSizing(1).HeatSupTemp = 30.0;
-    DataSizing::FinalSysSizing(1).HeatRetHumRat = 0.006;
-    DataSizing::FinalSysSizing(1).HeatOutHumRat = 0.004;
-    DataSizing::FinalSysSizing(1).PreheatTemp = 10.0;
-    DataSizing::FinalSysSizing(1).PreheatHumRat = 0.005;
-    DataSizing::FinalSysSizing(1).DesMainVolFlow = 0.3;
-    DataSizing::FinalSysSizing(1).DesHeatVolFlow = 0.27;
-    DataSizing::FinalSysSizing(1).DesCoolVolFlow = 0.24;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(1).HeatRetTemp = 20.0;
+    state->dataSize->FinalSysSizing(1).HeatOutTemp = 5.0;
+    state->dataSize->FinalSysSizing(1).HeatSupTemp = 30.0;
+    state->dataSize->FinalSysSizing(1).HeatRetHumRat = 0.006;
+    state->dataSize->FinalSysSizing(1).HeatOutHumRat = 0.004;
+    state->dataSize->FinalSysSizing(1).PreheatTemp = 10.0;
+    state->dataSize->FinalSysSizing(1).PreheatHumRat = 0.005;
+    state->dataSize->FinalSysSizing(1).DesMainVolFlow = 0.3;
+    state->dataSize->FinalSysSizing(1).DesHeatVolFlow = 0.27;
+    state->dataSize->FinalSysSizing(1).DesCoolVolFlow = 0.24;
 
     // Test 17 - Airloop Equipment, no OA
     // start with an autosized value
@@ -444,8 +444,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     Real64 unAdjustedSize = sizedValue;
 
     // Test 18 - Airloop Equipment, no OA, fraction of autosized heating capacity
-    DataSizing::FinalSysSizing(1).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
-    DataSizing::FinalSysSizing(1).FractionOfAutosizedHeatingCapacity = 0.5;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::FractionOfAutosizedHeatingCapacity;
+    state->dataSize->FinalSysSizing(1).FractionOfAutosizedHeatingCapacity = 0.5;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -456,12 +456,12 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(unAdjustedSize * 0.5, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::FinalSysSizing(1).HeatingCapMethod = DataSizing::None;
-    DataSizing::FinalSysSizing(1).FractionOfAutosizedHeatingCapacity = 0.0;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::None;
+    state->dataSize->FinalSysSizing(1).FractionOfAutosizedHeatingCapacity = 0.0;
 
     // Test 19 - Airloop Equipment, with min OA
-    DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.02;
-    DataSizing::FinalSysSizing(1).HeatOAOption = DataSizing::MinOA;
+    state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 0.02;
+    state->dataSize->FinalSysSizing(1).HeatOAOption = DataSizing::MinOA;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 1;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
@@ -550,7 +550,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 25 - Airloop Equipment, CurDuctType = Main, SysAirMinFlowRat > 0
-    DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.3;
+    state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.3;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -564,7 +564,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 26 - Airloop Equipment, CurDuctType = Cooling
     state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
-    DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.0;
+    state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -577,7 +577,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 27 - Airloop Equipment, CurDuctType = Main, SysAirMinFlowRat > 0
-    DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.3;
+    state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.3;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -591,7 +591,7 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
 
     // Test 28 - Airloop Equipment, CurDuctType = Heating
     state->dataSize->CurDuctType = DataHVACGlobals::Heating;
-    DataSizing::FinalSysSizing(1).SysAirMinFlowRat = 0.0;
+    state->dataSize->FinalSysSizing(1).SysAirMinFlowRat = 0.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -691,8 +691,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = false;
 
     // Test 35 - Airloop Equipment, CurDuctType = Main, air loop uses scaled sizing
-    DataSizing::FinalSysSizing(1).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
-    DataSizing::FinalSysSizing(1).HeatingTotalCapacity = 3325.0;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
+    state->dataSize->FinalSysSizing(1).HeatingTotalCapacity = 3325.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -705,8 +705,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 36 - Airloop Equipment, CurDuctType = Main, air loop uses scaled sizing
-    DataSizing::FinalSysSizing(1).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
-    DataSizing::FinalSysSizing(1).HeatingTotalCapacity = 2325.0;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::HeatingDesignCapacity;
+    state->dataSize->FinalSysSizing(1).HeatingTotalCapacity = 2325.0;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -717,8 +717,8 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(2325.0, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
-    DataSizing::FinalSysSizing(1).HeatingCapMethod = DataSizing::None;
-    DataSizing::FinalSysSizing(1).HeatingTotalCapacity = 0.0;
+    state->dataSize->FinalSysSizing(1).HeatingCapMethod = DataSizing::None;
+    state->dataSize->FinalSysSizing(1).HeatingTotalCapacity = 0.0;
 
     // Test 37 - OA Equipment, OA Sys capacity sizing
     state->dataSize->CurOASysNum = 1;

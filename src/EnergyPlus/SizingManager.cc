@@ -164,7 +164,7 @@ namespace EnergyPlus::SizingManager {
         Real64 DOASHeatGainRateAtClPk(0.0); // zone heat gain rate from the DOAS at the cooling peak [W]
         Real64 TStatSetPtAtPk(0.0);         // thermostat set point at peak
 
-
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
 
         TimeStepInDay = 0;
         state.dataSize->SysSizingRunDone = false;
@@ -587,9 +587,9 @@ namespace EnergyPlus::SizingManager {
                     ReportZoneSizing(state,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Cooling",
-                                     CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
+                                     state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad,
-                                     CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
+                                     state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay,
                                      state.dataSize->CoolPeakDateHrMin(CtrlZoneNum),
@@ -600,18 +600,18 @@ namespace EnergyPlus::SizingManager {
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
                                      DOASHeatGainRateAtClPk);
                     curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad);
                     if (state.dataHeatBal->Zone(ZoneNum).FloorArea != 0.0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesLdPerArea, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolLoad / state.dataHeatBal->Zone(ZoneNum).FloorArea);
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClCalcDesAirFlow, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClUserDesAirFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesCoolVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClDesDay, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).CoolDesDay);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTime, curName, state.dataSize->CoolPeakDateHrMin(CtrlZoneNum));
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkTstatTemp, curName, TStatSetPtAtPk);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndHum, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak, 5);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndTemp, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtCoolPeak);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkIndHum, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtCoolPeak, 5);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOATemp, curName, TempAtPeak);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAHum, curName, HumRatAtPeak, 5);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnClPkOAMinFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA, 3);
@@ -650,9 +650,9 @@ namespace EnergyPlus::SizingManager {
                     ReportZoneSizing(state,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Heating",
-                                     CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
+                                     state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad,
-                                     CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
+                                     state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow,
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay,
                                      state.dataSize->HeatPeakDateHrMin(CtrlZoneNum),
@@ -663,18 +663,18 @@ namespace EnergyPlus::SizingManager {
                                      state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA,
                                      DOASHeatGainRateAtHtPk);
                     curName = state.dataSize->FinalZoneSizing(CtrlZoneNum).ZoneName;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesLd, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLd, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad);
                     if (state.dataHeatBal->Zone(ZoneNum).FloorArea != 0.0) {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesLdPerArea, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatLoad / state.dataHeatBal->Zone(ZoneNum).FloorArea);
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 3);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtCalcDesAirFlow, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtUserDesAirFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 3);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtDesDay, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).HeatDesDay);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTime, curName, state.dataSize->HeatPeakDateHrMin(CtrlZoneNum));
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkTstatTemp, curName, TStatSetPtAtPk);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak, 5);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndTemp, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkIndHum, curName, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum).ZoneHumRatAtHeatPeak, 5);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOATemp, curName, TempAtPeak);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAHum, curName, HumRatAtPeak, 5);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchZnHtPkOAMinFlow, curName, state.dataSize->FinalZoneSizing(CtrlZoneNum).MinOA, 3);
@@ -782,7 +782,7 @@ namespace EnergyPlus::SizingManager {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchSysSizUserHtAir, curName, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
             }
             // Deallocate arrays no longer needed
-            SysSizing.deallocate();
+            state.dataSize->SysSizing.deallocate();
         }
 
         if ((state.dataGlobal->DoPlantSizing) && (state.dataSize->NumPltSizInput == 0)) {
@@ -836,6 +836,10 @@ namespace EnergyPlus::SizingManager {
 
         // Also store zone level flow information for Standard 62.1 calculations, Vpz, Vpz_min, Vdz, and Vdz_min for both cooling and heating
 
+        auto &AirDistUnit(state.dataDefineEquipment->AirDistUnit);
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
+        auto &sd_airterminal(state.dataSingleDuct->sd_airterminal);
+
         if ((state.dataSize->NumSysSizInput > 0) && (state.dataGlobal->DoSystemSizing)) { // only if there is system sizing
 
             // call zone component models to execute their component sizing routines
@@ -852,63 +856,63 @@ namespace EnergyPlus::SizingManager {
                 Real64 airLoopHeatingMaximumFlowRateSum(0.0);
 
                 // sum up heating and max flows for any single duct systems, store 62.1 values by zone
-                if (allocated(state.dataSingleDuct->sd_airterminal) && state.dataSingleDuct->NumSDAirTerminal > 0) {
+                if (allocated(sd_airterminal) && state.dataSingleDuct->NumSDAirTerminal > 0) {
                     for (int singleDuctATUNum = 1; singleDuctATUNum <= state.dataSingleDuct->NumSDAirTerminal; ++singleDuctATUNum) {
-                        if (AirLoopNum == state.dataSingleDuct->sd_airterminal(singleDuctATUNum).AirLoopNum) {
+                        if (AirLoopNum == sd_airterminal(singleDuctATUNum).AirLoopNum) {
                             int termUnitSizingIndex =
-                                state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
-                            airLoopMaxFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
+                                AirDistUnit(sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
+                            airLoopMaxFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
 
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
-                                state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
+                                sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
 
-                            if (state.dataSingleDuct->sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolReheat ||
-                                state.dataSingleDuct->sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolNoReheat) {
-                                airLoopHeatingMinimumFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
-                                airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
+                            if (sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolReheat ||
+                                sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolNoReheat) {
+                                airLoopHeatingMinimumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
+                                airLoopHeatingMaximumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
 
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
+                                    sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
+                                    sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
+                                    sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
 
                             } else {
-                                airLoopHeatingMinimumFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
+                                airLoopHeatingMinimumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                                    sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
+                                    sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                    sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                    state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
-                                if (state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate >
+                                    sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                    sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
+                                if (sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate >
                                     0.0) { // VS fan ATU has this non zero, so use it
-                                    airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate;
+                                    airLoopHeatingMaximumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate;
                                     DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                        state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate; // store std 62.1 values
+                                        sd_airterminal(singleDuctATUNum).MaxHeatAirVolFlowRate; // store std 62.1 values
                                 } else {
-                                    if (state.dataSingleDuct->sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseAction) {
-                                        airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
+                                    if (sd_airterminal(singleDuctATUNum).DamperHeatingAction == SingleDuct::Action::ReverseAction) {
+                                        airLoopHeatingMaximumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                            state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                                    } else if (state.dataSingleDuct->sd_airterminal(singleDuctATUNum).DamperHeatingAction ==
+                                            sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
+                                    } else if (sd_airterminal(singleDuctATUNum).DamperHeatingAction ==
                                                SingleDuct::Action::ReverseActionWithLimits) {
                                         airLoopHeatingMaximumFlowRateSum +=
-                                            max(state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
-                                                (state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                                 state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac));
+                                            max(sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
+                                                (sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                 sd_airterminal(singleDuctATUNum).ZoneMinAirFrac));
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                            max(state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
-                                                (state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                                 state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac)); // store std 62.1 values
+                                            max(sd_airterminal(singleDuctATUNum).MaxAirVolFlowRateDuringReheat,
+                                                (sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                 sd_airterminal(singleDuctATUNum).ZoneMinAirFrac)); // store std 62.1 values
                                     } else {
-                                        airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                                                            state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
+                                        airLoopHeatingMaximumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                                                            sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
                                         DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                            state.dataSingleDuct->sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
-                                            state.dataSingleDuct->sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
+                                            sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
+                                            sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
                                     }
                                 }
                             }
@@ -927,7 +931,7 @@ namespace EnergyPlus::SizingManager {
                 if (allocated(DualDuct::dd_airterminal) && DualDuct::NumDDAirTerminal > 0) {
                     for (int dualDuctATUNum = 1; dualDuctATUNum <= DualDuct::NumDDAirTerminal; ++dualDuctATUNum) {
                         if (AirLoopNum == DualDuct::dd_airterminal(dualDuctATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                             DataSizing::VpzClgByZone(termUnitSizingIndex) =
                                 DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
@@ -993,7 +997,7 @@ namespace EnergyPlus::SizingManager {
                 if (allocated(state.dataPowerInductionUnits->PIU) && state.dataPowerInductionUnits->NumPIUs > 0) {
                     for (int pIUATUNum = 1; pIUATUNum <= state.dataPowerInductionUnits->NumPIUs; ++pIUATUNum) {
                         if (AirLoopNum == state.dataPowerInductionUnits->PIU(pIUATUNum).AirLoopNum) {
-                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = AirDistUnit(state.dataPowerInductionUnits->PIU(pIUATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
                             if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
@@ -1023,10 +1027,10 @@ namespace EnergyPlus::SizingManager {
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
 
                                 // store Ep for 62.1 calculations
-                                DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
+                                state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
                                     DataSizing::VpzMinClgByZone(termUnitSizingIndex) /
                                     DataSizing::VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
-                                DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
+                                state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
                                     DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / DataSizing::VdzHtgByZone(termUnitSizingIndex);
 
                             } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
@@ -1060,10 +1064,10 @@ namespace EnergyPlus::SizingManager {
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
 
-                                DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
+                                state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
                                     DataSizing::VpzMinClgByZone(termUnitSizingIndex) /
                                     DataSizing::VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
-                                DataSizing::TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
+                                state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
                                     DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / DataSizing::VdzHtgByZone(termUnitSizingIndex);
                             }
                         }
@@ -1075,7 +1079,7 @@ namespace EnergyPlus::SizingManager {
                 if (allocated(HVACSingleDuctInduc::IndUnit) && (HVACSingleDuctInduc::NumIndUnits > 0)) {
                     for (int indUnitNum = 1; indUnitNum <= HVACSingleDuctInduc::NumIndUnits; ++indUnitNum) {
                         if (AirLoopNum == HVACSingleDuctInduc::IndUnit(indUnitNum).AirLoopNum) {
-                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = AirDistUnit(HVACSingleDuctInduc::IndUnit(indUnitNum).ADUNum).TermUnitSizingNum;
 
                             airLoopHeatingMaximumFlowRateSum +=
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
@@ -1103,7 +1107,7 @@ namespace EnergyPlus::SizingManager {
                 if (allocated(HVACCooledBeam::CoolBeam) && (HVACCooledBeam::NumCB > 0)) {
                     for (int coolBeamNum = 1; coolBeamNum <= HVACCooledBeam::NumCB; ++coolBeamNum) {
                         if (AirLoopNum == HVACCooledBeam::CoolBeam(coolBeamNum).AirLoopNum) {
-                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(HVACCooledBeam::CoolBeam(coolBeamNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = AirDistUnit(HVACCooledBeam::CoolBeam(coolBeamNum).ADUNum).TermUnitSizingNum;
                             airLoopHeatingMaximumFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                             airLoopHeatingMinimumFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                             airLoopMaxFlowRateSum += HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
@@ -1123,31 +1127,31 @@ namespace EnergyPlus::SizingManager {
                 }
 
                 // sum up heating and max flows for any four pipe cooled beam terminal units (the only one using the airTerminalPtr at this point)
-                if (allocated(state.dataDefineEquipment->AirDistUnit) && state.dataDefineEquipment->NumAirDistUnits > 0) {
+                if (allocated(AirDistUnit) && state.dataDefineEquipment->NumAirDistUnits > 0) {
                     for (int aDUNum = 1; aDUNum <= state.dataDefineEquipment->NumAirDistUnits; ++aDUNum) {
-                        if (state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
-                            if (AirLoopNum == state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
-                                airLoopHeatingMaximumFlowRateSum += state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                airLoopHeatingMinimumFlowRateSum += state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                airLoopMaxFlowRateSum += state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                        if (AirDistUnit(aDUNum).airTerminalPtr.get() != nullptr) {
+                            if (AirLoopNum == AirDistUnit(aDUNum).airTerminalPtr->getAirLoopNum()) {
+                                airLoopHeatingMaximumFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                airLoopHeatingMinimumFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                airLoopMaxFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 // store Std 62.1 values, have no modeling of secondary flow rates for induced flow from beam
-                                int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getTermUnitSizingIndex();
+                                int termUnitSizingIndex = AirDistUnit(aDUNum).airTerminalPtr->getTermUnitSizingIndex();
                                 DataSizing::VpzClgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzClgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzHtgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
-                                    state.dataDefineEquipment->AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
+                                    AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                             }
                         }
                     }
@@ -1157,7 +1161,7 @@ namespace EnergyPlus::SizingManager {
                 if (allocated(state.dataSingleDuct->SysATMixer) && (state.dataSingleDuct->NumATMixers > 0)) {
                     for (int aTMixerNum = 1; aTMixerNum <= state.dataSingleDuct->NumATMixers; ++aTMixerNum) {
                         if (AirLoopNum == state.dataSingleDuct->SysATMixer(aTMixerNum).AirLoopNum) {
-                            int termUnitSizingIndex = state.dataDefineEquipment->AirDistUnit(state.dataSingleDuct->SysATMixer(aTMixerNum).ADUNum).TermUnitSizingNum;
+                            int termUnitSizingIndex = AirDistUnit(state.dataSingleDuct->SysATMixer(aTMixerNum).ADUNum).TermUnitSizingNum;
                             airLoopHeatingMaximumFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             airLoopHeatingMinimumFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             airLoopMaxFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
@@ -1271,14 +1275,18 @@ namespace EnergyPlus::SizingManager {
 
     void ManageSystemVentilationAdjustments(EnergyPlusData &state)
     {
+        auto &AirDistUnit(state.dataDefineEquipment->AirDistUnit);
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
+        auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
+
         // redo std 62.1 calculations using latest information on zone flows and report to tables
 
         // redo 62.1 zone calculations with final (or user) zone terminal flow sizes, only redo calculations that might change with final flows
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             int SysSizNum =
-                UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+                UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
-            if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
+            if (FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
                 state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones > 1 && FinalSysSizing(AirLoopNum).LoadSizeType != Ventilation) {
 
                 // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
@@ -1443,7 +1451,7 @@ namespace EnergyPlus::SizingManager {
                     FinalSysSizing(AirLoopNum).DesOutAirVolFlow = max(VotClgBySys(AirLoopNum), VotHtgBySys(AirLoopNum));
                 }
             } // system OA is autosized and VRP
-            else if ((FinalSysSizing(AirLoopNum).OAAutoSized && SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
+            else if ((FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
                       state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1)) { // single zone VRP
                 int termUnitSizingIndex = 0;
                 termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
@@ -1695,11 +1703,11 @@ namespace EnergyPlus::SizingManager {
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
                         for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
-                            if (state.dataDefineEquipment->AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
+                            if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchS62zcdBox,
                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                    state.dataDefineEquipment->AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
+                                    AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
                                 break;                                                        // if it has been found no more searching is needed
                             }
                         }
@@ -1757,11 +1765,11 @@ namespace EnergyPlus::SizingManager {
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
                                                                  state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
                         for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
-                            if (state.dataDefineEquipment->AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
+                            if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(state,
                                     state.dataOutRptPredefined->pdchS62zhdBox,
                                     TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                    state.dataDefineEquipment->AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
+                                    AirDistUnit(iAirDistUnit).EquipType(1)); // use first type of equipment listed
                                 break;                                                        // if it has been found no more searching is needed
                             }
                         }
@@ -1893,6 +1901,9 @@ namespace EnergyPlus::SizingManager {
 
     void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     {
+
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
+
         // determine Pz sum, Ps, and D for each air system for standard 62.1
 
         // first determine if any airloops use VRP, if not then don't need to march thru year of schedules for performance
@@ -1906,7 +1917,7 @@ namespace EnergyPlus::SizingManager {
         // First get the design (max) level of people in all zones connected to air loop
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             int SysSizNum =
-                UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+                UtilityRoutines::FindItemInList(FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
             if (FinalSysSizing(AirLoopNum).OAAutoSized) {
                 PzSumBySys(AirLoopNum) = 0.0;
@@ -1950,7 +1961,7 @@ namespace EnergyPlus::SizingManager {
                     if (state.dataGlobal->NumOfTimeStepInHour > 0.0) TSfraction = 1.0 / double(state.dataGlobal->NumOfTimeStepInHour);
                     for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) { // loop over all the air systems
                         int SysSizNum = UtilityRoutines::FindItemInList(
-                            FinalSysSizing(AirLoopNum).AirPriLoopName, SysSizInput, &SystemSizingInputData::AirPriLoopName);
+                            FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
                         if (SysSizNum == 0) SysSizNum = 1; // use first when none applicable
                         if (FinalSysSizing(AirLoopNum).OAAutoSized) {
 
@@ -3238,43 +3249,43 @@ namespace EnergyPlus::SizingManager {
         using namespace DataIPShortCuts;
 
         // Sizing:System;
-        int const iNameAlphaNum = 1;                          // A1, \field AirLoop Name
-        int const iLoadTypeSizeAlphaNum = 2;                  // A2, \field Type of Load to Size On
-        int const iCoolCapControlAlphaNum = 11;               // A11 \field Central Cooling Capacity Control Method
-        int const iDesignOAVolFlowNumericNum = 1;             // N1, \field Design Outdoor Air Flow Rate
-        int const iMinSysAirFlowRatioNumericNum = 2;          // N2, \field Minimum System Air Flow Ratio
-        int const iPreheatDesignTempNumericNum = 3;           // N3, \field Preheat Design Temperature
-        int const iPreheatDesignHumRatNumericNum = 4;         // N4, \field Preheat Design Humidity Ratio
-        int const iPrecoolDesignTempNumericNum = 5;           // N5, \field Precool Design Temperature
-        int const iPrecoolDesignHumRatNumericNum = 6;         // N6, \field Precool Design Humidity Ratio
-        int const iCentralCoolDesignSATempNumericNum = 7;     // N7, \field Central Cooling Design Supply Air Temperature
-        int const iCentralHeatDesignSATempNumericNum = 8;     // N8, \field Central Heating Design Supply Air Temperature
-        int const iSizingOptionAlphaNum = 3;                  //  A3, \field Sizing Option
-        int const i100PercentOACoolingAlphaNum = 4;           //  A4, \field 100% Outdoor Air in Cooling
-        int const i100PercentOAHeatingAlphaNum = 5;           //  A5, \field 100% Outdoor Air in Heating
-        int const iCentralCoolDesignSAHumRatNumericNum = 9;   // N9, \field Central Cooling Design Supply Air Humidity Ratio
-        int const iCentralHeatDesignSAHumRatNumericNum = 10;  // N10, \field Central Heating Design Supply Air Humidity Ratio
-        int const iCoolSAFMAlphaNum = 6;                      // A6, \field Cooling Design Air Flow Method
-        int const iMaxCoolAirVolFlowNumericNum = 11;          // N11, \field Cooling Design Air Flow Rate {m3/s}
-        int const iCoolFlowPerFloorAreaNumericNum = 12;       // N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-        int const iCoolFlowPerFracCoolNumericNum = 13;        // N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-        int const iCoolFlowPerCoolCapNumericNum = 14;         // N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
-        int const iHeatSAFMAlphaNum = 7;                      // A7, \field Heating Design Air Flow Method
-        int const iMaxHeatAirVolFlowNumericNum = 15;          // N15, \field Heating Design Air Flow Rate {m3/s}
-        int const iHeatFlowPerFloorAreaNumericNum = 16;       // N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-        int const iHeatFlowPerFracHeatNumericNum = 17;        // N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-        int const iHeatFlowPerFracCoolNumericNum = 18;        // N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-        int const iHeatFlowPerHeatCapNumericNum = 19;         // N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-        int const iSystemOASMethodAlphaNum = 8;               // A8,  \field System Outdoor Air Method
-        int const iZoneMaxOAFractionNumericNum = 20;          // N20, \field Zone Maximum Outdoor Air Fraction
-        int const iCoolCAPMAlphaNum(9);                       // A9, \field Cooling Design Capacity Method
-        int const iCoolDesignCapacityNumericNum(21);          // N21, \field Cooling Design Capacity {W}
-        int const iCoolCapacityPerFloorAreaNumericNum(22);    // N22, \field Cooling Design Capacity Per Floor Area {W/m2}
-        int const iCoolFracOfAutosizedCapacityNumericNum(23); // N23, \field Fraction of Autosized Cooling Design Capacity {-}
-        int const iHeatCAPMAlphaNum(10);                      // A10, \field Heating Design Capacity Method
-        int const iHeatDesignCapacityNumericNum(24);          // N24, \field Heating Design Capacity {W}
-        int const iHeatCapacityPerFloorAreaNumericNum(25);    // N25, \field Heating Design Capacity Per Floor Area {W/m2}
-        int const iHeatFracOfAutosizedCapacityNumericNum(26); // N26, \field Fraction of Autosized Cooling Design Capacity {-}
+        constexpr int iNameAlphaNum = 1;                          // A1, \field AirLoop Name
+        constexpr int iLoadTypeSizeAlphaNum = 2;                  // A2, \field Type of Load to Size On
+        constexpr int iCoolCapControlAlphaNum = 11;               // A11 \field Central Cooling Capacity Control Method
+        constexpr int iDesignOAVolFlowNumericNum = 1;             // N1, \field Design Outdoor Air Flow Rate
+        constexpr int iMinSysAirFlowRatioNumericNum = 2;          // N2, \field Minimum System Air Flow Ratio
+        constexpr int iPreheatDesignTempNumericNum = 3;           // N3, \field Preheat Design Temperature
+        constexpr int iPreheatDesignHumRatNumericNum = 4;         // N4, \field Preheat Design Humidity Ratio
+        constexpr int iPrecoolDesignTempNumericNum = 5;           // N5, \field Precool Design Temperature
+        constexpr int iPrecoolDesignHumRatNumericNum = 6;         // N6, \field Precool Design Humidity Ratio
+        constexpr int iCentralCoolDesignSATempNumericNum = 7;     // N7, \field Central Cooling Design Supply Air Temperature
+        constexpr int iCentralHeatDesignSATempNumericNum = 8;     // N8, \field Central Heating Design Supply Air Temperature
+        constexpr int iSizingOptionAlphaNum = 3;                  //  A3, \field Sizing Option
+        constexpr int i100PercentOACoolingAlphaNum = 4;           //  A4, \field 100% Outdoor Air in Cooling
+        constexpr int i100PercentOAHeatingAlphaNum = 5;           //  A5, \field 100% Outdoor Air in Heating
+        constexpr int iCentralCoolDesignSAHumRatNumericNum = 9;   // N9, \field Central Cooling Design Supply Air Humidity Ratio
+        constexpr int iCentralHeatDesignSAHumRatNumericNum = 10;  // N10, \field Central Heating Design Supply Air Humidity Ratio
+        constexpr int iCoolSAFMAlphaNum = 6;                      // A6, \field Cooling Design Air Flow Method
+        constexpr int iMaxCoolAirVolFlowNumericNum = 11;          // N11, \field Cooling Design Air Flow Rate {m3/s}
+        constexpr int iCoolFlowPerFloorAreaNumericNum = 12;       // N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+        constexpr int iCoolFlowPerFracCoolNumericNum = 13;        // N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+        constexpr int iCoolFlowPerCoolCapNumericNum = 14;         // N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+        constexpr int iHeatSAFMAlphaNum = 7;                      // A7, \field Heating Design Air Flow Method
+        constexpr int iMaxHeatAirVolFlowNumericNum = 15;          // N15, \field Heating Design Air Flow Rate {m3/s}
+        constexpr int iHeatFlowPerFloorAreaNumericNum = 16;       // N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+        constexpr int iHeatFlowPerFracHeatNumericNum = 17;        // N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate {-}
+        constexpr int iHeatFlowPerFracCoolNumericNum = 18;        // N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+        constexpr int iHeatFlowPerHeatCapNumericNum = 19;         // N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+        constexpr int iSystemOASMethodAlphaNum = 8;               // A8,  \field System Outdoor Air Method
+        constexpr int iZoneMaxOAFractionNumericNum = 20;          // N20, \field Zone Maximum Outdoor Air Fraction
+        constexpr int iCoolCAPMAlphaNum(9);                       // A9, \field Cooling Design Capacity Method
+        constexpr int iCoolDesignCapacityNumericNum(21);          // N21, \field Cooling Design Capacity {W}
+        constexpr int iCoolCapacityPerFloorAreaNumericNum(22);    // N22, \field Cooling Design Capacity Per Floor Area {W/m2}
+        constexpr int iCoolFracOfAutosizedCapacityNumericNum(23); // N23, \field Fraction of Autosized Cooling Design Capacity {-}
+        constexpr int iHeatCAPMAlphaNum(10);                      // A10, \field Heating Design Capacity Method
+        constexpr int iHeatDesignCapacityNumericNum(24);          // N24, \field Heating Design Capacity {W}
+        constexpr int iHeatCapacityPerFloorAreaNumericNum(25);    // N25, \field Heating Design Capacity Per Floor Area {W/m2}
+        constexpr int iHeatFracOfAutosizedCapacityNumericNum(26); // N26, \field Fraction of Autosized Cooling Design Capacity {-}
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SysSizIndex;                // loop index
@@ -3283,6 +3294,8 @@ namespace EnergyPlus::SizingManager {
         int IOStatus;                   // Used in GetObjectItem
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int NumDesDays;                 // Number of design days in input
+
+        auto &SysSizInput(state.dataSize->SysSizInput);
 
         state.dataSizingManager->NumAirLoops = inputProcessor->getNumObjectsFound(state, "AirLoopHVAC");
         cCurrentModuleObject = "Sizing:System";
@@ -3996,25 +4009,8 @@ namespace EnergyPlus::SizingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes one item of zone sizing data to the "eio" file..
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataStringGlobals::VerString;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -4954,12 +4950,12 @@ namespace EnergyPlus::SizingManager {
         // M.J. Witte, July 2017
 
         for (int termUnitSizingIndex = 1; termUnitSizingIndex <= state.dataSize->NumAirTerminalUnits; ++termUnitSizingIndex) {
-            auto &thisTUFZSizing(TermUnitFinalZoneSizing(termUnitSizingIndex));
+            auto &thisTUFZSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
             auto &thisTUSizing(TermUnitSizing(termUnitSizingIndex));
             int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
             auto const &thisFZSizing(state.dataSize->FinalZoneSizing(ctrlZoneNum));
 
-            // Copy everything from FinalZoneSizing to TermUnitFinalZoneSizing
+            // Copy everything from FinalZoneSizing to state.dataSize->TermUnitFinalZoneSizing
             thisTUFZSizing = thisFZSizing;
             thisTUFZSizing.ADUName = thisTUSizing.ADUName;
 

@@ -1152,11 +1152,11 @@ namespace DualDuct {
                 }
                 CheckZoneSizing(state, DamperType, this->Name);
                 this->MaxAirVolFlowRate =
-                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (this->DamperType == DualDuct_OutdoorAir) {
                     if (this->RecircIsUsed) {
-                        this->DesignRecircFlowRate = max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow,
-                                                         TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                        this->DesignRecircFlowRate = max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow,
+                                                         state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                         this->MaxAirVolFlowRate = this->DesignRecircFlowRate + this->DesignOAFlowRate;
                     } else {
                         this->MaxAirVolFlowRate = this->DesignOAFlowRate;

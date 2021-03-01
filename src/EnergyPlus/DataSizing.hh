@@ -1018,11 +1018,6 @@ namespace DataSizing {
     };
 
     // Object Data
-    extern Array1D<ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
-    extern Array1D<ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units
-    extern Array1D<SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
-    extern Array2D<SystemSizingData> SysSizing;                      // Data array for system sizing (all data)
-    extern Array1D<SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
     extern Array1D<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
     extern Array1D<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines
     extern Array1D<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
@@ -1221,6 +1216,11 @@ struct SizingData : BaseGlobalStruct
     Array2D<DataSizing::ZoneSizingData> ZoneSizing;           // Data for zone sizing (all data, all design)
     Array1D<DataSizing::ZoneSizingData> FinalZoneSizing;      // Final data for zone sizing including effects
     Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;       // Data for zone sizing (all data)
+    Array1D<DataSizing::ZoneSizingData> CalcFinalZoneSizing;              // Final data for zone sizing (calculated only)
+    Array1D<DataSizing::ZoneSizingData> TermUnitFinalZoneSizing;          // Final data for sizing terminal units (indexed per terminal unit)
+    Array1D<DataSizing::SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
+    Array2D<DataSizing::SystemSizingData> SysSizing;                      // Data array for system sizing (all data)
+    Array1D<DataSizing::SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
 
     void clear_state() override
     {
@@ -1337,6 +1337,11 @@ struct SizingData : BaseGlobalStruct
         this->ZoneSizing.deallocate();
         this->FinalZoneSizing.deallocate();
         this->CalcZoneSizing.deallocate();
+        this->CalcFinalZoneSizing.deallocate();
+        this->TermUnitFinalZoneSizing.deallocate();
+        this->SysSizInput.deallocate();
+        this->SysSizing.deallocate();
+        this->FinalSysSizing.deallocate();
     }
 };
 

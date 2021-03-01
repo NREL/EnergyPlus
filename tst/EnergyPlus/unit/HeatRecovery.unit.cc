@@ -3840,11 +3840,11 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
     state->dataSize->CurSysNum = 1;    // primary air system
     state->dataSize->CurOASysNum = 0;  // no OA system
     state->dataSize->CurZoneEqNum = 0; // size it based on system
-    DataSizing::SysSizInput(state->dataSize->CurSysNum).AirLoopNum = 1;
+    state->dataSize->SysSizInput(state->dataSize->CurSysNum).AirLoopNum = 1;
 
     // initialize sizing required variables
     ExchCond.allocate(ExchNum);
@@ -3866,8 +3866,8 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
 
     // initialize sizing variables
     state->dataSize->CurDuctType = DataHVACGlobals::Main;
-    FinalSysSizing.allocate(state->dataSize->CurSysNum);
-    FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
 
     // initialize UnitarySysEqSizing capacity flag to false; not unitary system
     UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
@@ -4174,7 +4174,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     // set up sizing parameters
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->ZoneSizingRunDone = true;
-    FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing.allocate(1);
 
     int OAContrllerNum = 1;
     state->dataMixedAir->OAController.allocate(OAContrllerNum);
@@ -4189,8 +4189,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
 
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 1;
-    FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
-    FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.20;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.20;
     state->dataSize->CurDuctType = Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass

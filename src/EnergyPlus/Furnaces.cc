@@ -6222,8 +6222,8 @@ namespace Furnaces {
             if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    Furnace(FurnaceNum).DesignFanVolFlowRate = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    Furnace(FurnaceNum).DesignFanVolFlowRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     Furnace(FurnaceNum).DesignFanVolFlowRate = 0.0;
                 }
@@ -6244,8 +6244,8 @@ namespace Furnaces {
             if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    Furnace(FurnaceNum).MaxHeatAirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    Furnace(FurnaceNum).MaxHeatAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     Furnace(FurnaceNum).MaxHeatAirVolFlow = 0.0;
                 }
@@ -6265,8 +6265,8 @@ namespace Furnaces {
             if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    Furnace(FurnaceNum).MaxCoolAirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    Furnace(FurnaceNum).MaxCoolAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     Furnace(FurnaceNum).MaxCoolAirVolFlow = 0.0;
                 }
@@ -6287,8 +6287,8 @@ namespace Furnaces {
             if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = 0.0;
                 }
@@ -6318,7 +6318,7 @@ namespace Furnaces {
 
                     CheckSysSizing(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
 
-                    Furnace(FurnaceNum).DesignHeatingCapacity = FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
+                    Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
                 }
 
                 if (Furnace(FurnaceNum).DesignHeatingCapacity < SmallLoad) {
@@ -6354,7 +6354,7 @@ namespace Furnaces {
             if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num), Furnace(FurnaceNum).Name);
-                Furnace(FurnaceNum).DesignMaxOutletTemp = FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
+                Furnace(FurnaceNum).DesignMaxOutletTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
                 BaseSizer::reportSizerOutput(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num),
                                              Furnace(FurnaceNum).Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
@@ -6370,7 +6370,7 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ||
                     Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir) {
                     // set the supplemental heating capacity to the actual heating load
-                    Furnace(FurnaceNum).DesignSuppHeatingCapacity = FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
+                    Furnace(FurnaceNum).DesignSuppHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
                     // if reheat needed for humidity control, make sure supplemental heating is at least as big
                     // as the cooling capacity
                     if (Furnace(FurnaceNum).Humidistat && Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat) {

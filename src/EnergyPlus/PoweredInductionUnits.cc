@@ -1018,7 +1018,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxPriAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxPriAirVolFlowDes < SmallAirVolFlow) {
                     MaxPriAirVolFlowDes = 0.0;
                 }
@@ -1064,7 +1064,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxTotAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxTotAirVolFlowDes < SmallAirVolFlow) {
                     MaxTotAirVolFlowDes = 0.0;
                 }
@@ -1111,7 +1111,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxSecAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxSecAirVolFlowDes < SmallAirVolFlow) {
                     MaxSecAirVolFlowDes = 0.0;
                 }
@@ -1156,8 +1156,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
-                    MinPriAirFlowFracDes = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
+                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
+                    MinPriAirFlowFracDes = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
                 } else {
                     MinPriAirFlowFracDes = 0.0;
                 }
@@ -1263,11 +1263,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                             MyPlantSizingIndex(state, "Coil:Heating:Water", state.dataPowerInductionUnits->PIU(PIUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                CoilInTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
-                                             TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
-                                CoilOutTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesTemp;
-                                CoilOutHumRat = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesHumRat;
+                            if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                                CoilInTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
+                                             state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
+                                CoilOutTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesTemp;
+                                CoilOutHumRat = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesHumRat;
                                 DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
@@ -1299,11 +1299,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                         BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Temperature [C]",
-                                                     TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                                                     state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
                         BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]",
-                                                     TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
+                                                     state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else { // Hardsize with sizing data
                         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
@@ -1356,11 +1356,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                             MyPlantSizingIndex(state, "Coil:Heating:Steam", state.dataPowerInductionUnits->PIU(PIUNum).HCoil, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                CoilInTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
-                                             TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
-                                CoilOutTemp = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesTemp;
-                                CoilOutHumRat = TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesHumRat;
+                            if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                                CoilInTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
+                                             state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
+                                CoilOutTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesTemp;
+                                CoilOutHumRat = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).HeatDesHumRat;
                                 DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(state.dataSize->CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                                 TempSteamIn = 100.00;
