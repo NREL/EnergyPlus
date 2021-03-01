@@ -723,8 +723,8 @@ namespace HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaque = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaque = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
                 auto const &surface(Surface(SurfNum));
                 if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF &&
@@ -806,7 +806,7 @@ namespace HeatBalanceSurfaceManager {
         // Zero out all of the radiant system heat balance coefficient arrays
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
             int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            int const lastSurf = Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 RadSysTiHBConstCoef(SurfNum) = 0.0;
                 RadSysTiHBToutCoef(SurfNum) = 0.0;
@@ -2093,7 +2093,7 @@ namespace HeatBalanceSurfaceManager {
             TempEffBulkAir(zoneNum) = 23.0;
             TempTstatAir(zoneNum) = 23.0;
             int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            int const lastSurf = Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 SUMH(SurfNum) = 0;             // module level array
                 TempSurfIn(SurfNum) = 23.0;    // module level array
@@ -2133,8 +2133,8 @@ namespace HeatBalanceSurfaceManager {
                 QAirExtReport(SurfNum) = 0.0;
                 QHeatEmiReport(SurfNum) = 0.0;
             } // end of  Surf array
-            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             if (firstSurfOpaq >= 0) {
                 for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                     SurfOpaqInsFaceConduction(SurfNum) = 0.0;
@@ -2302,8 +2302,8 @@ namespace HeatBalanceSurfaceManager {
             ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = 0.0;
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
@@ -2768,8 +2768,8 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                     int ConstrNum = Surface(SurfNum).Construction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
@@ -3451,8 +3451,8 @@ namespace HeatBalanceSurfaceManager {
 
         // COMPUTE RADIANT GAINS ON SURFACES
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaque = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaque = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaque = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
             int const solEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
@@ -3815,7 +3815,7 @@ namespace HeatBalanceSurfaceManager {
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            int const lastSurf = Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 int ConstrNum = Surface(SurfNum).Construction;
                 ITABSF(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
@@ -4614,8 +4614,8 @@ namespace HeatBalanceSurfaceManager {
         auto const l111(TH.index(1, 1, 1));
         auto const l211(TH.index(2, 1, 1));
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
             // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
                 int l11 = l111 + SurfNum - 1;
@@ -4683,8 +4683,8 @@ namespace HeatBalanceSurfaceManager {
         } // ...end of loop over all (heat transfer) surfaces...
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
                 int l11 = l111 + SurfNum - 1;
@@ -4710,8 +4710,8 @@ namespace HeatBalanceSurfaceManager {
         // SHIFT AIR TEMP AND FLUX SHIFT VALUES WHEN AT BOTTOM OF ARRAY SPACE.
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 auto const &surface(Surface(SurfNum));
 
@@ -4893,7 +4893,7 @@ namespace HeatBalanceSurfaceManager {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
             SumAET = 0.0;
-            for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 SumAET += SurfaceAE(SurfNum) * TempSurfIn(SurfNum);
             }
             if (ZoneAESum(ZoneNum) > 0.01) {
@@ -5320,8 +5320,8 @@ namespace HeatBalanceSurfaceManager {
             }
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            int const firstSurfOpaq = Zone(ZoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = Zone(ZoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 // inside face conduction updates
                 SurfOpaqInsFaceConductionEnergy(SurfNum) = SurfOpaqInsFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -5514,7 +5514,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            for (int SurfNum = Zone(zoneNum).HTSurfaceFirst; SurfNum <= Zone(zoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = Zone(zoneNum).HTSurfaceFirst; SurfNum <= Zone(zoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
                 if (present(ZoneToResimulate)) {
                     if ((zoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
@@ -6090,7 +6090,7 @@ namespace HeatBalanceSurfaceManager {
             DataHeatBalSurface::Zone_has_mixed_HT_models.resize(state.dataGlobal->NumOfZones + 1, false);
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 auto const &zone(Zone(iZone));
-                for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf) {
+                for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.HTSurfaceLast; iSurf <= eSurf; ++iSurf) {
                     auto const alg(Surface(iSurf).HeatTransferAlgorithm);
                     if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
                         DataHeatBalSurface::Zone_has_mixed_HT_models[iZone] = true;
@@ -7029,8 +7029,8 @@ namespace HeatBalanceSurfaceManager {
         if (calcHeatBalInsideSurfCTFOnlyFirstTime) {
             // Set up coefficient arrays that never change - loop over non-window HT surfaces
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                int const firstSurf = Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastSurf = Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstSurf = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastSurf = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     int const ConstrNum = Surface(surfNum).Construction;
                     auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -7062,7 +7062,7 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
             // loop over all heat transfer surface except TDD Dome.
             int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-            int const lastSurf = Zone(zoneNum).NonDomeLast;
+            int const lastSurf = Zone(zoneNum).OpaqOrWinSurfaceLast;
             // determine reference air temperatures and other variable terms - loop over all surfaces
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
 
@@ -7163,8 +7163,8 @@ namespace HeatBalanceSurfaceManager {
             }
 
             // Set up coefficient arrays prior to calculations and precalc terms that do no change during iteration - non-window surfaces
-            int const firstNonWinSurf = Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastNonWinSurf = Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstNonWinSurf = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastNonWinSurf = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             Real64 const timeStepZoneSeconds = state.dataGlobal->TimeStepZoneSec; // local for vectorization
             Real64 const iterDampConstant = IterDampConst;      // local for vectorization
             // this loop auto-vectorizes
@@ -7200,8 +7200,8 @@ namespace HeatBalanceSurfaceManager {
                 ConvectionCoefficients::InitInteriorConvectionCoeffs(state, TempSurfIn, ZoneToResimulate);
                 // Since HConvIn has changed re-calculate a few terms - non-window surfaces
                 for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                    int const firstSurf = Zone(zoneNum).NonWindowSurfaceFirst;
-                    int const lastSurf = Zone(zoneNum).NonWindowSurfaceLast;
+                    int const firstSurf = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                    int const lastSurf = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                     Real64 const timeStepZoneSeconds = state.dataGlobal->TimeStepZoneSec; // local for vectorization
                     Real64 const iterDampConstant = IterDampConst;      // local for vectorization
                     // this loop auto-vectorizes
@@ -7219,8 +7219,8 @@ namespace HeatBalanceSurfaceManager {
 
             // Loop over non-window surfaces
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                int const firstNonWinSurf = Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastNonWinSurf = Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstNonWinSurf = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastNonWinSurf = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 Real64 const iterDampConstant = IterDampConst; // local for vectorization
                 // this loop auto-vectorizes
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
@@ -7484,7 +7484,7 @@ namespace HeatBalanceSurfaceManager {
                 }
 
                 int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-                int const lastSurf = Zone(zoneNum).NonDomeLast;
+                int const lastSurf = Zone(zoneNum).OpaqOrWinSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     auto &surface(Surface(surfNum));
                     auto &zone(Zone(zoneNum));
@@ -7536,8 +7536,8 @@ namespace HeatBalanceSurfaceManager {
             // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
             Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                int const firstNonWinSurf = Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastNonWinSurf = Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstNonWinSurf = Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastNonWinSurf = Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                     Real64 delta = TempSurfIn(surfNum) - TempInsOld(surfNum);
                     Real64 absDif = std::abs(delta);
@@ -7581,7 +7581,7 @@ namespace HeatBalanceSurfaceManager {
         // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
             int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
-            int const lastSurf = Zone(zoneNum).NonDomeLast;
+            int const lastSurf = Zone(zoneNum).OpaqOrWinSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                 // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
                 auto const HConvInTemp_fac(-HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));

@@ -1716,7 +1716,7 @@ namespace CoolingPanelSimple {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             auto &ThisSurf(Surface(SurfNum));
 

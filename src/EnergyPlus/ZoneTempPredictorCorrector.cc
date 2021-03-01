@@ -2722,7 +2722,7 @@ namespace ZoneTempPredictorCorrector {
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 FirstSurfFlag = true;
                 if (Zone(Loop).HTSurfaceFirst > 0) {
-                    for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).SurfaceLast; ++SurfNum) {
+                    for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
                         if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
                         if (FirstSurfFlag) {
@@ -4542,7 +4542,7 @@ namespace ZoneTempPredictorCorrector {
 
             // if no surface in the zone uses EMPD or HAMT then zero
             bool no_ht_EMPD_or_HAMT(true);
-            for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).SurfaceLast; i <= e; ++i) {
+            for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
                 auto const &htAlgo(Surface(i).HeatTransferAlgorithm);
                 if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
                     no_ht_EMPD_or_HAMT = false;
@@ -5491,7 +5491,7 @@ namespace ZoneTempPredictorCorrector {
         // SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
         // are currently set to zero to remind us where they need to be in the future
         bool no_ht_EMPD_or_HAMT(true);
-        for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).SurfaceLast; i <= e; ++i) {
+        for (int i = Zone(ZoneNum).HTSurfaceFirst, e = Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
             auto const &htAlgo(Surface(i).HeatTransferAlgorithm);
             if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
                 no_ht_EMPD_or_HAMT = false;
@@ -6246,7 +6246,7 @@ namespace ZoneTempPredictorCorrector {
             SumSysMCpT /= ZoneMult;
         }
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
@@ -6542,7 +6542,7 @@ namespace ZoneTempPredictorCorrector {
         SumNonAirSystem = NonAirSystemResponse(ZoneNum) + SumConvHTRadSys(ZoneNum) + SumConvPool(ZoneNum);
 
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 

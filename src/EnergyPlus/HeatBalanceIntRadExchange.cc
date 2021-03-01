@@ -545,7 +545,7 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
                 }
             }
@@ -568,13 +568,13 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     if (!Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
+                for (int allSurfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).HTSurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
                     if (!Surface(DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
                     for (int enclSNum = priorZoneTotEnclSurfs+1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]) {
@@ -847,7 +847,7 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Include only heat transfer surfaces
                     if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
                 }
@@ -867,7 +867,7 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces
                     if (!Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
@@ -877,7 +877,7 @@ namespace HeatBalanceIntRadExchange {
                     Surface(surfNum).SolarEnclIndex = enclosureNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
+                for (int allSurfNum = Zone(zoneNum).HTSurfaceFirst, surfNum_end = Zone(zoneNum).HTSurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
                     if (!Surface(DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]) {

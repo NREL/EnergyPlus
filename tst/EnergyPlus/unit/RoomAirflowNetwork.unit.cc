@@ -248,7 +248,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     Zone(ZoneNum).Volume = 100;
     Zone(ZoneNum).IsControlled = true;
     Zone(ZoneNum).HTSurfaceFirst = 1;
-    Zone(ZoneNum).SurfaceLast = 2;
+    Zone(ZoneNum).HTSurfaceLast = 2;
     Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
 
     ZoneIntGain(ZoneNum).NumberOfDevices = 1;

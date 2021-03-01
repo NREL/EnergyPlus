@@ -481,7 +481,7 @@ namespace SurfaceGeometry {
                                                                     Zone(ZoneNum).ExtWindowArea);
             }
             // Use AllSurfaceFirst which includes air boundaries
-            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
@@ -558,7 +558,7 @@ namespace SurfaceGeometry {
                 Zone(ZoneNum).MinimumZ = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
                 Zone(ZoneNum).MaximumZ = Surface(Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
             }
-            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::IntMass) continue;
                 nonInternalMassSurfacesPresent = true;
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || (Surface(SurfNum).Class == SurfaceClass::Roof) ||
@@ -1968,14 +1968,14 @@ namespace SurfaceGeometry {
                     if (Zone(ZoneNum).HTSurfaceFirst == 0) {
                         Zone(ZoneNum).HTSurfaceFirst = SurfNum;
                         // Non window surfaces are grouped next within each zone
-                        Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
+                        Zone(ZoneNum).OpaqOrIntMassSurfaceFirst = SurfNum;
                     }
                     if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) ||
                                                                     (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
                                                                     (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Diffuser))) {
                         // Window surfaces are grouped last within each zone
                         Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
-                        Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
+                        Zone(ZoneNum).OpaqOrIntMassSurfaceLast = SurfNum - 1;
                     }
                     if ((Zone(ZoneNum).TDDDomeFirst == 0) && (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome)) {
                         // Window surfaces are grouped last within each zone
@@ -1984,7 +1984,7 @@ namespace SurfaceGeometry {
                             Zone(ZoneNum).WindowSurfaceLast = SurfNum - 1;
                         } else {
                             // No window in the zone.
-                            Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
+                            Zone(ZoneNum).OpaqOrIntMassSurfaceLast = SurfNum - 1;
                             Zone(ZoneNum).WindowSurfaceLast = -1;
                         }
                         break;
@@ -1994,28 +1994,30 @@ namespace SurfaceGeometry {
         }
         //  Surface First pointers are set, set last
         if (state.dataGlobal->NumOfZones > 0) {
-            Zone(state.dataGlobal->NumOfZones).SurfaceLast = TotSurfaces;
+            Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = TotSurfaces;
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones - 1; ++ZoneNum) {
-            Zone(ZoneNum).SurfaceLast = Zone(ZoneNum + 1).AllSurfaceFirst - 1;
+            Zone(ZoneNum).AllSurfaceLast = Zone(ZoneNum + 1).AllSurfaceFirst - 1;
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
-                Zone(ZoneNum).TDDDomeLast = Zone(ZoneNum).SurfaceLast;
-            } else if ((Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
-                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
-                (Surface(Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
+            if (Surface(Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
+                Zone(ZoneNum).TDDDomeLast = Zone(ZoneNum).AllSurfaceLast;
+            } else if ((Surface(Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
+                (Surface(Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                (Surface(Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
                 Zone(ZoneNum).TDDDomeLast = - 1;
-                Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum).SurfaceLast;
+                Zone(ZoneNum).WindowSurfaceLast = Zone(ZoneNum).AllSurfaceLast;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
                 // execute
                 Zone(ZoneNum).TDDDomeLast = - 1;
                 Zone(ZoneNum).WindowSurfaceLast = -1;
-                Zone(ZoneNum).NonWindowSurfaceLast = Zone(ZoneNum).SurfaceLast;
+                Zone(ZoneNum).OpaqOrIntMassSurfaceLast = Zone(ZoneNum).AllSurfaceLast;
             }
-            Zone(ZoneNum).NonDomeLast = std::max(Zone(ZoneNum).NonWindowSurfaceLast, Zone(ZoneNum).WindowSurfaceLast);
+            Zone(ZoneNum).OpaqOrWinSurfaceLast = std::max(Zone(ZoneNum).OpaqOrIntMassSurfaceLast, Zone(ZoneNum).WindowSurfaceLast);
+            Zone(ZoneNum).HTSurfaceLast = Zone(ZoneNum).AllSurfaceLast;
         }
+
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (Zone(ZoneNum).HTSurfaceFirst == 0) {
@@ -2027,7 +2029,7 @@ namespace SurfaceGeometry {
         // Set up Floor Areas for Zones
         if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                     if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                         Zone(ZoneNum).FloorArea += Surface(SurfNum).Area;
                         Zone(ZoneNum).HasFloor = true;
@@ -2161,7 +2163,7 @@ namespace SurfaceGeometry {
             OpaqueHTSurfsWithWin = 0;
             InternalMassSurfs = 0;
             if (Zone(ZoneNum).HTSurfaceFirst == 0) continue; // Zone with no surfaces
-            for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Floor || Surface(SurfNum).Class == SurfaceClass::Wall ||
                     Surface(SurfNum).Class == SurfaceClass::Roof)
                     ++OpaqueHTSurfs;
@@ -10344,14 +10346,14 @@ namespace SurfaceGeometry {
             SumAreas = 0.0;
             SurfCount = 0.0;
             // Use AllSurfaceFirst which includes air boundaries
-            NFaces = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).AllSurfaceFirst + 1;
+            NFaces = Zone(ZoneNum).AllSurfaceLast - Zone(ZoneNum).AllSurfaceFirst + 1;
             notused = 0;
             ZoneStruct.NumSurfaceFaces = NFaces;
             ZoneStruct.SurfaceFace.allocate(NFaces);
             NActFaces = 0;
             surfacenotused.dimension(NFaces, 0);
 
-            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = Zone(ZoneNum).AllSurfaceFirst; SurfNum <= Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
 
                 // Only include Base Surfaces in Calc.
 

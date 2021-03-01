@@ -246,7 +246,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Zone(1).Multiplier = 1;
     Zone(1).SystemZoneNodeNumber = 1;
     Zone(1).HTSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 2;
+    Zone(1).HTSurfaceLast = 2;
     Zone(1).Volume = 1061.88;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Zone(1).Multiplier = 1;
     Zone(1).SystemZoneNodeNumber = 1;
     Zone(1).HTSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 2;
+    Zone(1).HTSurfaceLast = 2;
     Zone(1).Volume = 4000;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;

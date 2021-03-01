@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CorrectZoneHumRatTest)
     ZoneAirHumRat.allocate(1);
 
     Zone(1).HTSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 2;
+    Zone(1).HTSurfaceLast = 2;
     Surface.allocate(2);
 
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
@@ -1001,7 +1001,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_CalcZoneSums_SurfConvection
     ZoneAirHumRat(1) = 0.001;
 
     Zone(1).HTSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 3;
+    Zone(1).HTSurfaceLast = 3;
     Surface.allocate(3);
     HConvIn.allocate(3);
     Node.allocate(4);

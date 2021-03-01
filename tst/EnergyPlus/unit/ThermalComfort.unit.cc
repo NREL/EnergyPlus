@@ -780,7 +780,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
     Zone(1).HTSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 3;
+    Zone(1).HTSurfaceLast = 3;
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
     TH(2, 1, 3) = 10.0;

@@ -7935,7 +7935,7 @@ namespace HeatBalanceManager {
         ZoneUnscheduled = false;
         ZoneScheduled = false;
 
-        for (iSurf = Zone(ZoneNum).HTSurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
+        for (iSurf = Zone(ZoneNum).HTSurfaceFirst; iSurf <= Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
             iConst = Surface(iSurf).Construction;
             if (Surface(iSurf).Class == SurfaceClass::Window) {
                 SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
@@ -7969,7 +7969,7 @@ namespace HeatBalanceManager {
         }
 
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            for (iSurf = Zone(ZoneNum).HTSurfaceFirst; iSurf <= Zone(ZoneNum).SurfaceLast; ++iSurf) {
+            for (iSurf = Zone(ZoneNum).HTSurfaceFirst; iSurf <= Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
                 iConst = Surface(iSurf).Construction;
                 if (Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
