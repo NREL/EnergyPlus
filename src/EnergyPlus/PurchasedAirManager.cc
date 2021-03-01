@@ -2901,6 +2901,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         PurchAir(PurchAirNum).OALatOutput = 0.0;
         PurchAir(PurchAirNum).MixedAirTemp = Node(RecircNodeNum).Temp;
         PurchAir(PurchAirNum).MixedAirHumRat = Node(RecircNodeNum).HumRat;
+        PurchAir(PurchAirNum).SupplyTemp = Node(InNodeNum).Temp;
+        PurchAir(PurchAirNum).SupplyHumRat = Node(InNodeNum).HumRat;
     }
 
     PurchAir(PurchAirNum).OutdoorAirMassFlowRate = OAMassFlowRate;
