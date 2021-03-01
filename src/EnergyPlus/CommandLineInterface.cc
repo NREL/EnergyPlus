@@ -194,7 +194,8 @@ namespace CommandLineInterface {
         if (opt.isSet("-h")) {
             DisplayString(state, usage);
             if (eplusRunningViaAPI) {
-                return EXIT_SUCCESS;
+                // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
+                return static_cast<int>(ReturnCodes::SuccessButHelper);
             } else {
                 exit(EXIT_SUCCESS);
             }
@@ -203,7 +204,8 @@ namespace CommandLineInterface {
         if (opt.isSet("-v")) {
             DisplayString(state, VerString);
             if (eplusRunningViaAPI) {
-                return EXIT_SUCCESS;
+                // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
+                return static_cast<int>(ReturnCodes::SuccessButHelper);
             } else {
                 exit(EXIT_SUCCESS);
             }
@@ -236,7 +238,7 @@ namespace CommandLineInterface {
             if (invalidOptionFound) {
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -248,7 +250,7 @@ namespace CommandLineInterface {
                 }
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -285,7 +287,7 @@ namespace CommandLineInterface {
         } else {
             DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -386,7 +388,7 @@ namespace CommandLineInterface {
             DisplayString(state, "ERROR: Unrecognized argument for output suffix style: " + suffixType);
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -492,7 +494,7 @@ namespace CommandLineInterface {
             }
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -505,7 +507,7 @@ namespace CommandLineInterface {
             }
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -522,7 +524,7 @@ namespace CommandLineInterface {
             }
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -533,7 +535,7 @@ namespace CommandLineInterface {
             DisplayString(state, "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -547,7 +549,7 @@ namespace CommandLineInterface {
             if (!iniFile.good()) {
                 DisplayString(state, "ERROR: Could not open file " + iniFile.fileName + " for input (read).");
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -571,7 +573,7 @@ namespace CommandLineInterface {
             DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(inputFileName) + ".");
             DisplayString(state, errorFollowUp);
             if (eplusRunningViaAPI) {
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             } else {
                 exit(EXIT_FAILURE);
             }
@@ -582,7 +584,7 @@ namespace CommandLineInterface {
                 DisplayString(state, "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -597,7 +599,7 @@ namespace CommandLineInterface {
             if (!FileSystem::fileExists(epMacroPath)) {
                 DisplayString(state, "ERROR: Could not find EPMacro executable: " + FileSystem::getAbsolutePath(epMacroPath) + ".");
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -619,7 +621,7 @@ namespace CommandLineInterface {
             if (!FileSystem::fileExists(expandObjectsPath)) {
                 DisplayString(state, "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(expandObjectsPath) + ".");
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -632,7 +634,7 @@ namespace CommandLineInterface {
                 DisplayString(state, "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(inputIddFileName) + ".");
                 DisplayString(state, errorFollowUp);
                 if (eplusRunningViaAPI) {
-                    return EXIT_FAILURE;
+                    return static_cast<int>(ReturnCodes::Failure);
                 } else {
                     exit(EXIT_FAILURE);
                 }
@@ -652,7 +654,7 @@ namespace CommandLineInterface {
             }
         }
 
-        return 0;
+        return static_cast<int>(ReturnCodes::Success);
     }
 
     // Fix This is Fortranic code that needs to be brought up to C++ style
@@ -801,7 +803,7 @@ namespace CommandLineInterface {
             readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(readVarsPath)) {
                 DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath) + ".");
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             }
         }
 
@@ -844,7 +846,7 @@ namespace CommandLineInterface {
         if (!mviFileExists) FileSystem::removeFile(MVIfile.c_str());
 
         FileSystem::moveFile("readvars.audit", outputRvauditFileName);
-        return EXIT_SUCCESS;
+        return static_cast<int>(ReturnCodes::Success);
     }
 
 } // namespace CommandLineInterface
