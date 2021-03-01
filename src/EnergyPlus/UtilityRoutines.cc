@@ -741,6 +741,11 @@ namespace UtilityRoutines {
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
+
+        if (state.dataGlobal->eplusRunningViaAPI) {
+            state.files.flushAll();
+        }
+
         return EXIT_FAILURE;
     }
 
@@ -890,6 +895,11 @@ namespace UtilityRoutines {
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
+
+        if (state.dataGlobal->eplusRunningViaAPI) {
+            state.files.flushAll();
+        }
+
         return EXIT_SUCCESS;
     }
 
