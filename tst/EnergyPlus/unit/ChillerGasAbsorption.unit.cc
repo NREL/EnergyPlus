@@ -216,6 +216,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
     thisChillerHeater.MaxPartLoadRat = 0.9;
     thisChillerHeater.OptPartLoadRat = 0.8;
 
+    // Chiller
     thisChillerHeater.getDesignCapacities(*state, loc_1, maxload, minload, optload);
 
     EXPECT_NEAR(minload, 10000.0, 0.001);
@@ -224,13 +225,19 @@ TEST_F(EnergyPlusFixture, GasAbsorption_getDesignCapacities_Test)
 
     thisChillerHeater.NomHeatCoolRatio = 0.9;
     PlantLocation loc_2 = PlantLocation(2, 1, 1, 1);
+
+    // Heater
     thisChillerHeater.getDesignCapacities(*state, loc_2, maxload, minload, optload);
+
     EXPECT_NEAR(minload, 9000.0, 0.001);
     EXPECT_NEAR(maxload, 81000.0, 0.001);
     EXPECT_NEAR(optload, 72000.0, 0.001);
 
     PlantLocation loc_3 = PlantLocation(3, 1, 1, 1);
+
+    // Condenser
     thisChillerHeater.getDesignCapacities(*state, loc_3, maxload, minload, optload);
+
     EXPECT_NEAR(minload, 0.0, 0.001);
     EXPECT_NEAR(maxload, 0.0, 0.001);
     EXPECT_NEAR(optload, 0.0, 0.001);
