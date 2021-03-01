@@ -3112,26 +3112,6 @@ namespace UnitarySystems {
                     thisSys.m_ControlType = ControlType::CCMASHRAE;
                     thisSys.m_ValidASHRAECoolCoil = true;
                     thisSys.m_ValidASHRAEHeatCoil = true;
-                    if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
-                        if (loc_m_NoCoolHeatSAFMethod_SAFlow == -99999.0) { // no load air flow is autosized
-                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
-                            thisSys.m_RequestAutoSize = true;
-                        } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == -999.0) { // no load air flow is blank
-                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
-                            thisSys.m_RequestAutoSize = true;
-                            ShowWarningError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                            ShowContinueError(state, "Control Type = " + loc_m_ControlType);
-                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be blank.");
-                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate has been set to AutoSize and the simulation continues.");
-                        } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == 0.0) { // no load air flow for SZVAV cannot be 0
-                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
-                            thisSys.m_RequestAutoSize = true;
-                            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                            ShowContinueError(state, "Control Type = " + loc_m_ControlType);
-                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
-                            errorsFound = true;
-                        }
-                    }
                 } else {
                     ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                     ShowContinueError(state, "Invalid Control Type = " + loc_m_ControlType);
@@ -6301,6 +6281,24 @@ namespace UnitarySystems {
                     }
                 } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
                     thisSys.m_NoCoolHeatSAFMethod = state.dataUnitarySystems->None;
+                    if (thisSys.m_ControlType == ControlType::CCMASHRAE) {
+                        if (loc_m_NoCoolHeatSAFMethod_SAFlow == -99999.0) { // no load air flow is autosized
+                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
+                            thisSys.m_RequestAutoSize = true;
+                        } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == -999.0) { // no load air flow is blank
+                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
+                            thisSys.m_RequestAutoSize = true;
+                            ShowWarningError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                            ShowContinueError(state, "Control Type = " + loc_m_ControlType);
+                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be blank.");
+                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate has been set to AutoSize and the simulation continues.");
+                        } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == 0.0) { // no load air flow for SZVAV cannot be 0
+                            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                            ShowContinueError(state, "Control Type = " + loc_m_ControlType);
+                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
+                            errorsFound = true;
+                        }
+                    }
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                     ShowContinueError(state, "Illegal No Load Supply Air Flow Rate Method = " + loc_m_NoCoolHeatSAFMethod);
