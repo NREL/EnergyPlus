@@ -125,15 +125,24 @@ namespace FileSystem {
          * of the link.
          */
 
-        fs::path p(path);
-        while (fs::is_symlink(p)) {
-            p = fs::read_symlink(p);
-        }
-
         // Not available in experimental/filesystem
         // return fs::weakly_canonical(fs::absolute(p));
 
-        p = fs::absolute(p);
+        fs::path p = fs::absolute(path);
+
+        while (fs::is_symlink(p)) {
+            auto linkpath = fs::read_symlink(p);
+            if (linkpath.is_absolute()) {
+                p = linkpath;
+            } else {
+                // Note: temp will end up absolute but not canonical yet
+                // eg:
+                // temp="/home/a_folder/a_symlink"
+                // linkpath="../another_folder/a_file"
+                p = p.parent_path() / linkpath;
+                // eg: temp ="/home/a_folder/../another_folder/a_file"
+            }
+        }
 
         fs::path result;
         // `p` now is absolute, but it isn't necessarilly canonical.
