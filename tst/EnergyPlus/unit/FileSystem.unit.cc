@@ -231,3 +231,38 @@ TEST(FileSystem, Elaborate)
 
     fs::remove_all("sandbox");
 }
+
+// Windows support for symlink isn't great, you'd need admin priviledges
+#ifndef _WIN32
+TEST(FileSystem, getAbsolutePath_WithSymlink)
+{
+    fs::remove_all("sandbox");
+
+    fs::path productsDir = "sandbox/Products";
+    fs::create_directories(productsDir);
+
+    fs::path exeName = "energyplus-9.5.0";
+    fs::path exePath = productsDir / exeName;
+    fs::path symlinkPath = productsDir / "energyplus";
+
+    EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(exePath));
+    EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(symlinkPath));
+
+    std::ofstream(exePath).put('a');
+    EXPECT_TRUE(EnergyPlus::FileSystem::fileExists(exePath));
+    EXPECT_FALSE(EnergyPlus::FileSystem::fileExists(symlinkPath));
+
+    fs::create_symlink("energyplus-9.5.0", symlinkPath);
+    EXPECT_TRUE(EnergyPlus::FileSystem::fileExists(exePath));
+    EXPECT_TRUE(EnergyPlus::FileSystem::fileExists(symlinkPath));
+    EXPECT_FALSE(fs::is_symlink(exePath));
+    EXPECT_TRUE(fs::is_symlink(symlinkPath));
+    EXPECT_EQ(exeName, fs::read_symlink(symlinkPath));
+
+    // Now, we check that we can actually resolve it correctly
+    EXPECT_EQ(EnergyPlus::FileSystem::getAbsolutePath(exePath),
+              EnergyPlus::FileSystem::getAbsolutePath(symlinkPath));
+
+    fs::remove_all("sandbox");
+}
+#endif
