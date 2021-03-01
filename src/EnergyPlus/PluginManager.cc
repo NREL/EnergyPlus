@@ -1245,7 +1245,7 @@ namespace EnergyPlus::PluginManagement {
     }
 #endif
 
-    void PluginManager::updatePluginValues(EnergyPlusData &state)
+    void PluginManager::updatePluginValues([[maybe_unused]] EnergyPlusData &state)
     {
 #if LINK_WITH_PYTHON == 1
         for (auto &trend : state.dataPluginManager->trends) {

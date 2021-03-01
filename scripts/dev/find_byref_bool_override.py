@@ -191,6 +191,10 @@ CHECKED_AND_OKED = {
         "simulateSimpleBucketModel": [
             "charging",
             "discharging"
+        ],
+        "simulateLiIonNmcBatteryModel": [
+            "charging",
+            "discharging"
         ]
     },
     "EMSManager.cc": {
@@ -341,6 +345,10 @@ CHECKED_AND_OKED = {
             "heatingDesignlinepassed",
             "coolingDesignlinepassed",
             "desConditionlinepassed"
+        ],
+        "produceDualUnitsFlags": [
+            "produce_Sql",
+            "produce_Tab"
         ]
     },
     "PackagedTerminalHeatPump.cc": {
