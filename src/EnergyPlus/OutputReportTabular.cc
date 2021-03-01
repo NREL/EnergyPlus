@@ -4571,12 +4571,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::TimeStepSys;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
-        using LowTempRadiantSystem::CFloRadSys;
-        using LowTempRadiantSystem::ElecRadSys;
-        using LowTempRadiantSystem::HydrRadSys;
-        using LowTempRadiantSystem::NumOfCFloLowTempRadSys;
-        using LowTempRadiantSystem::NumOfElecLowTempRadSys;
-        using LowTempRadiantSystem::NumOfHydrLowTempRadSys;
 
         static int iZone(0);
         static int iRadiant(0);
@@ -4694,32 +4688,32 @@ namespace EnergyPlus::OutputReportTabular {
                 radiantCool(curZone) = -state.dataVentilatedSlab->VentSlab(iRadiant).RadCoolingPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfHydrLowTempRadSys; ++iRadiant) {
-            curZone = HydrRadSys(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++iRadiant) {
+            curZone = state.dataLowTempRadSys->HydrRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += HydrRadSys(iRadiant).HeatEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= HydrRadSys(iRadiant).CoolEnergy * mult;
-                radiantHeat(curZone) += HydrRadSys(iRadiant).HeatPower * mult;
-                radiantCool(curZone) -= HydrRadSys(iRadiant).CoolPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataLowTempRadSys->HydrRadSys(iRadiant).HeatEnergy * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfCl -= state.dataLowTempRadSys->HydrRadSys(iRadiant).CoolEnergy * mult;
+                radiantHeat(curZone) += state.dataLowTempRadSys->HydrRadSys(iRadiant).HeatPower * mult;
+                radiantCool(curZone) -= state.dataLowTempRadSys->HydrRadSys(iRadiant).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfCFloLowTempRadSys; ++iRadiant) {
-            curZone = CFloRadSys(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfCFloLowTempRadSys; ++iRadiant) {
+            curZone = state.dataLowTempRadSys->CFloRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += CFloRadSys(iRadiant).HeatEnergy * mult;
-                ZonePreDefRep(curZone).SHGSAnSurfCl -= CFloRadSys(iRadiant).CoolEnergy * mult;
-                radiantHeat(curZone) += CFloRadSys(iRadiant).HeatPower * mult;
-                radiantCool(curZone) -= CFloRadSys(iRadiant).CoolPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataLowTempRadSys->CFloRadSys(iRadiant).HeatEnergy * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfCl -= state.dataLowTempRadSys->CFloRadSys(iRadiant).CoolEnergy * mult;
+                radiantHeat(curZone) += state.dataLowTempRadSys->CFloRadSys(iRadiant).HeatPower * mult;
+                radiantCool(curZone) -= state.dataLowTempRadSys->CFloRadSys(iRadiant).CoolPower * mult;
             }
         }
-        for (iRadiant = 1; iRadiant <= NumOfElecLowTempRadSys; ++iRadiant) {
-            curZone = ElecRadSys(iRadiant).ZonePtr;
+        for (iRadiant = 1; iRadiant <= state.dataLowTempRadSys->NumOfElecLowTempRadSys; ++iRadiant) {
+            curZone = state.dataLowTempRadSys->ElecRadSys(iRadiant).ZonePtr;
             mult = Zone(curZone).Multiplier * Zone(curZone).ListMultiplier;
             if ((curZone > 0) && (curZone <= state.dataGlobal->NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnSurfHt += ElecRadSys(iRadiant).HeatEnergy * mult;
-                radiantHeat(curZone) += ElecRadSys(iRadiant).HeatPower * mult;
+                ZonePreDefRep(curZone).SHGSAnSurfHt += state.dataLowTempRadSys->ElecRadSys(iRadiant).HeatEnergy * mult;
+                radiantHeat(curZone) += state.dataLowTempRadSys->ElecRadSys(iRadiant).HeatPower * mult;
             }
         }
         // Opaque Surface Conduction and Other Heat Addition
