@@ -491,17 +491,18 @@ namespace LowTempRadiantSystem {
 
         ElecRadSys.allocate(NumOfElecLowTempRadSys);
         ElecRadSysNumericFields.allocate(NumOfElecLowTempRadSys);
+
         HydronicRadiantSysNumericFields.allocate(NumOfHydrLowTempRadSys);
         HydronicRadiantSysDesign.allocate(NumOfHydrLowTempRadSysDes);
-        CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
         VarFlowRadDesignNames.allocate(NumOfHydrLowTempRadSysDes);
+
+        CflowRadiantSysDesign.allocate(NumOfCFloLowTempRadSysDes);
         CFlowRadDesignNames.allocate(NumOfCFloLowTempRadSysDes);
 
         // make sure data is gotten for surface lists
         GetNumberOfSurfaceLists(state);
 
         // Obtain all of the design data related to hydronic low temperature radiant systems...
-        BaseNum = 0;
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:VariableFlow:Design";
         for (Item = 1; Item <= NumOfHydrLowTempRadSysDes; ++Item) {
 
@@ -525,7 +526,6 @@ namespace LowTempRadiantSystem {
             HydronicRadiantSysDesign(Item).FieldNames = cNumericFields;
             GlobalNames::VerifyUniqueInterObjectName(state, LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-            ++BaseNum;
             auto &thisRadSysDesign(HydronicRadiantSysDesign(Item));
 
             // General user input data
@@ -896,7 +896,6 @@ namespace LowTempRadiantSystem {
         }
 
         // Obtain all of the design data related to Constant flow low temperature radiant systems...
-        BaseNum = 0;
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow:Design";
         for (Item = 1; Item <= NumOfCFloLowTempRadSysDes; ++Item) {
 
@@ -920,7 +919,6 @@ namespace LowTempRadiantSystem {
             CflowRadiantSysDesign(Item).FieldNames = cNumericFields;
             GlobalNames::VerifyUniqueInterObjectName(state, LowTempRadUniqueNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-            ++BaseNum;
             auto &thisRadSysDesign(CflowRadiantSysDesign(Item));
 
             // General user input data
@@ -966,7 +964,6 @@ namespace LowTempRadiantSystem {
         }
 
         // Obtain all of the user data related to constant flow (hydronic) low temperature radiant systems...
-        BaseNum = 0;
         CurrentModuleObject = "ZoneHVAC:LowTemperatureRadiant:ConstantFlow";
         for (Item = 1; Item <= NumOfCFloLowTempRadSys; ++Item) {
 
@@ -5820,7 +5817,7 @@ namespace LowTempRadiantSystem {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass::Window) {
-                if (SurfWinShadingFlag(surfNum) == IntShadeOn || SurfWinShadingFlag(surfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(surfNum))) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(surfNum);
                 }
@@ -5831,8 +5828,7 @@ namespace LowTempRadiantSystem {
                                   SurfWinFrameTempSurfIn(surfNum);
                 }
 
-                if (SurfWinDividerArea(surfNum) > 0.0 && SurfWinShadingFlag(surfNum) != IntShadeOn &&
-                    SurfWinShadingFlag(surfNum) != IntBlindOn) {
+                if (SurfWinDividerArea(surfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     sumHATsurf += HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
                                   SurfWinDividerTempSurfIn(surfNum);

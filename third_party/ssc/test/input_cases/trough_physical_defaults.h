@@ -1,65 +1,61 @@
-#ifndef _TROUGH_PHYSICAL_IPH_COMMON_DATA_H_
-#define _TROUGH_PHYSICAL_IPH_COMMON_DATA_H_
+#ifndef _TROUGH_PHYSICAL_DEFAULTS_H_
+#define _TROUGH_PHYSICAL_DEFAULTS_H_
 
 #include <stdio.h>
-
 #include "../input_cases/code_generator_utilities.h"
 
-char wlim_series_path2[512];
+//const char * SSCDIR = std::getenv("SSCDIR");
+//const char * SAMNTDIR = std::getenv("SAMNTDIR");
 
-int ntpiph1 = sprintf(wlim_series_path2, "%s/test/input_cases/tcstrough_data/wlim_series.csv", std::getenv("SSCDIR"));
+char dispatch_factors_path_tp[512];
+char ud_ind_od_path_tp[512];
+char wlim_series_path_tp[512];
+int ntp1 = sprintf(dispatch_factors_path_tp, "%s/test/input_cases/moltensalt_data/dispatch_factors_ts.csv", std::getenv("SSCDIR"));
+int ntp2 = sprintf(ud_ind_od_path_tp, "%s/test/input_cases/moltensalt_data/ud_ind_od.csv", std::getenv("SSCDIR"));
+int ntp3 = sprintf(wlim_series_path_tp, "%s/test/input_cases/moltensalt_data/wlim_series.csv", std::getenv("SSCDIR"));
 
 /**
-*  Default data for trough_physical_process_heat run that can be further modified
+*  Default data for trough_physical technology model
 */
-void trough_physical_iph_default(ssc_data_t &data)
+ssc_data_t trough_physical_defaults()
 {
-	const char * SSCDIR = std::getenv("SSCDIR");
+    ssc_data_t data = ssc_data_create();
 
 	char solar_resource_path[512];
-	//char load_profile_path[512];
-
-
-	int n1 = sprintf(solar_resource_path, "%s/test/input_cases/tcstrough_data/tucson_az_32.116521_-110.933042_psmv3_60_tmy.csv", SSCDIR);
-	//int n2 = sprintf(load_profile_path, "%s/test/input_cases/pvsamv1_data/pvsamv1_residential_load.csv", SSCDIR);
+    int n1 = sprintf(solar_resource_path, "%s/test/input_cases/tcstrough_data/tucson_az_32.116521_-110.933042_psmv3_60_tmy.csv", std::getenv("SSCDIR"));
 
     ssc_data_set_string(data, "file_name", solar_resource_path);
-    ssc_data_set_number(data, "track_mode", 1);
-    ssc_data_set_number(data, "tilt", 0);
-    ssc_data_set_number(data, "azimuth", 0);
-    ssc_data_set_number(data, "I_bn_des", 950);
-    ssc_data_set_number(data, "solar_mult", 2.6771607398986816);
-    ssc_data_set_number(data, "T_loop_in_des", 90);
-    ssc_data_set_number(data, "T_loop_out", 150);
-    ssc_data_set_number(data, "q_pb_design", 5.1879099999999996);
-    ssc_data_set_number(data, "tshours", 6);
-    ssc_data_set_number(data, "nSCA", 4);
+    ssc_data_set_number(data, "nSCA", 8);
     ssc_data_set_number(data, "nHCEt", 4);
     ssc_data_set_number(data, "nColt", 4);
     ssc_data_set_number(data, "nHCEVar", 4);
-    ssc_data_set_number(data, "nLoops", 8);
+    ssc_data_set_number(data, "nLoops", 181);
+    ssc_data_set_number(data, "FieldConfig", 2);
+    ssc_data_set_number(data, "include_fixed_power_block_runner", 1);
+    ssc_data_set_number(data, "L_power_block_piping", 50);
     ssc_data_set_number(data, "eta_pump", 0.84999999999999998);
+    ssc_data_set_number(data, "Fluid", 21);
+    ssc_data_set_number(data, "accept_loc", 1);
     ssc_data_set_number(data, "HDR_rough", 4.57e-05);
     ssc_data_set_number(data, "theta_stow", 170);
     ssc_data_set_number(data, "theta_dep", 10);
     ssc_data_set_number(data, "Row_Distance", 15);
-    ssc_data_set_number(data, "FieldConfig", 1);
-    ssc_data_set_number(data, "is_model_heat_sink_piping", 0);
-    ssc_data_set_number(data, "L_heat_sink_piping", 50);
+    ssc_data_set_number(data, "T_loop_in_des", 293);
+    ssc_data_set_number(data, "T_loop_out", 391);
     ssc_data_set_number(data, "m_dot_htfmin", 1);
     ssc_data_set_number(data, "m_dot_htfmax", 12);
-    ssc_data_set_number(data, "Fluid", 31);
-    ssc_data_set_number(data, "wind_stow_speed", 25);
-    ssc_number_t p_field_fl_props[77] = { 20, 4.1799999999999997, 999, 0.001, 9.9999999999999995e-07, 0.58699999999999997, 85.299999999999997, 40, 4.1799999999999997, 993, 0.00065300000000000004, 6.5799999999999999e-07, 0.61799999999999999, 169, 60, 4.1799999999999997, 984, 0.00046700000000000002, 4.75e-07, 0.64200000000000002, 252, 80, 4.1900000000000004, 972, 0.00035500000000000001, 3.65e-07, 0.65700000000000003, 336, 100, 4.21, 959, 0.00028200000000000002, 2.9400000000000001e-07, 0.66600000000000004, 420, 120, 4.25, 944, 0.000233, 2.4600000000000001e-07, 0.67000000000000004, 505, 140, 4.2800000000000002, 927, 0.00019699999999999999, 2.1199999999999999e-07, 0.67000000000000004, 590, 160, 4.3399999999999999, 908, 0.00017100000000000001, 1.8799999999999999e-07, 0.66700000000000004, 676, 180, 4.4000000000000004, 887, 0.00014999999999999999, 1.6899999999999999e-07, 0.66100000000000003, 764, 200, 4.4900000000000002, 865, 0.000134, 1.55e-07, 0.65100000000000002, 852, 220, 4.5800000000000001, 842, 0.000118, 1.4100000000000001e-07, 0.64100000000000001, 941 };
-    ssc_data_set_matrix(data, "field_fl_props", p_field_fl_props, 11, 7);
-    ssc_data_set_number(data, "T_fp", 10);
+    ssc_number_t p_field_fl_props[1] = { 0 };
+    ssc_data_set_matrix(data, "field_fl_props", p_field_fl_props, 1, 1);
+    ssc_data_set_number(data, "T_fp", 150);
+    ssc_data_set_number(data, "I_bn_des", 950);
     ssc_data_set_number(data, "Pipe_hl_coef", 0.45000000000000001);
     ssc_data_set_number(data, "SCA_drives_elec", 125);
-    ssc_data_set_number(data, "water_usage_per_wash", 0.69999999999999996);
-    ssc_data_set_number(data, "washing_frequency", 12);
+    ssc_data_set_number(data, "tilt", 0);
+    ssc_data_set_number(data, "azimuth", 0);
+    ssc_data_set_number(data, "wind_stow_speed", 25);
     ssc_data_set_number(data, "accept_mode", 0);
     ssc_data_set_number(data, "accept_init", 0);
-    ssc_data_set_number(data, "accept_loc", 1);
+    ssc_data_set_number(data, "solar_mult", 2);
     ssc_data_set_number(data, "mc_bal_hot", 0.20000000000000001);
     ssc_data_set_number(data, "mc_bal_cold", 0.20000000000000001);
     ssc_data_set_number(data, "mc_bal_sca", 4.5);
@@ -89,7 +85,7 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_array(data, "Distance_SCA", p_Distance_SCA, 4);
     ssc_number_t p_IAM_matrix[12] = { 1, 0.0327, -0.1351, 1, 0.0327, -0.1351, 1, 0.0327, -0.1351, 1, 0.0327, -0.1351 };
     ssc_data_set_matrix(data, "IAM_matrix", p_IAM_matrix, 4, 3);
-    ssc_number_t p_HCE_FieldFrac[16] = { 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 };
+    ssc_number_t p_HCE_FieldFrac[16] = { 0.98499999999999999, 0.01, 0.0050000000000000001, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 };
     ssc_data_set_matrix(data, "HCE_FieldFrac", p_HCE_FieldFrac, 4, 4);
     ssc_number_t p_D_2[16] = { 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998, 0.075999999999999998 };
     ssc_data_set_matrix(data, "D_2", p_D_2, 4, 4);
@@ -151,7 +147,7 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_matrix(data, "GlazingIntactIn", p_GlazingIntactIn, 4, 4);
     ssc_number_t p_P_a[16] = { 0.0001, 750, 750, 0, 0.0001, 750, 750, 0, 0.0001, 750, 750, 0, 0.0001, 750, 750, 0 };
     ssc_data_set_matrix(data, "P_a", p_P_a, 4, 4);
-    ssc_number_t p_AnnulusGas[16] = { 27, 1, 1, 1, 27, 1, 1, 1, 27, 1, 1, 27, 27, 1, 1, 27 };
+    ssc_number_t p_AnnulusGas[16] = { 27, 1, 1, 27, 27, 1, 1, 27, 27, 1, 1, 27, 27, 1, 1, 27 };
     ssc_data_set_matrix(data, "AnnulusGas", p_AnnulusGas, 4, 4);
     ssc_number_t p_AbsorberMaterial[16] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
     ssc_data_set_matrix(data, "AbsorberMaterial", p_AbsorberMaterial, 4, 4);
@@ -161,20 +157,60 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_matrix(data, "Dirt_HCE", p_Dirt_HCE, 4, 4);
     ssc_number_t p_Design_loss[16] = { 190, 1270, 1500, 0, 190, 1270, 1500, 0, 190, 1270, 1500, 0, 190, 1270, 1500, 0 };
     ssc_data_set_matrix(data, "Design_loss", p_Design_loss, 4, 4);
-    ssc_number_t p_SCAInfoArray[8] = { 1, 1, 1, 1, 1, 1, 1, 1 };
-    ssc_data_set_matrix(data, "SCAInfoArray", p_SCAInfoArray, 4, 2);
-    ssc_number_t p_SCADefocusArray[4] = { 4, 3, 2, 1 };
-    ssc_data_set_array(data, "SCADefocusArray", p_SCADefocusArray, 4);
+    ssc_number_t p_SCAInfoArray[16] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+    ssc_data_set_matrix(data, "SCAInfoArray", p_SCAInfoArray, 8, 2);
+    ssc_number_t p_SCADefocusArray[8] = { 8, 7, 6, 5, 4, 3, 2, 1 };
+    ssc_data_set_array(data, "SCADefocusArray", p_SCADefocusArray, 8);
+    ssc_data_set_number(data, "rec_su_delay", 0.20000000000000001);
+    ssc_data_set_number(data, "rec_qf_delay", 0.25);
+    ssc_data_set_number(data, "p_start", 0.021000000000000001);
+    ssc_data_set_number(data, "pc_config", 0);
+    ssc_data_set_number(data, "P_ref", 111);
+    ssc_data_set_number(data, "eta_ref", 0.35599999999999998);
+    ssc_data_set_number(data, "cycle_max_frac", 1.05);
+    ssc_data_set_number(data, "cycle_cutoff_frac", 0.20000000000000001);
+    ssc_data_set_number(data, "q_sby_frac", 0.20000000000000001);
+    ssc_data_set_number(data, "startup_time", 0.5);
+    ssc_data_set_number(data, "startup_frac", 0.20000000000000001);
     ssc_data_set_number(data, "pb_pump_coef", 0.55000000000000004);
-    ssc_data_set_number(data, "init_hot_htf_percent", 30);
-    ssc_data_set_number(data, "h_tank", 15);
-    ssc_data_set_number(data, "cold_tank_max_heat", 0.5);
-    ssc_data_set_number(data, "u_tank", 0.29999999999999999);
+    ssc_data_set_number(data, "dT_cw_ref", 10);
+    ssc_data_set_number(data, "T_amb_des", 42);
+    ssc_data_set_number(data, "P_boil", 100);
+    ssc_data_set_number(data, "CT", 2);
+    ssc_data_set_number(data, "tech_type", 1);
+    ssc_data_set_number(data, "T_approach", 5);
+    ssc_data_set_number(data, "T_ITD_des", 16);
+    ssc_data_set_number(data, "P_cond_ratio", 1.0027999999999999);
+    ssc_data_set_number(data, "pb_bd_frac", 0.02);
+    ssc_data_set_number(data, "P_cond_min", 1.25);
+    ssc_data_set_number(data, "n_pl_inc", 8);
+    ssc_number_t p_F_wc[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    ssc_data_set_array(data, "F_wc", p_F_wc, 9);
+    ssc_data_set_number(data, "ud_T_amb_des", 43);
+    ssc_data_set_number(data, "ud_f_W_dot_cool_des", 0);
+    ssc_data_set_number(data, "ud_m_dot_water_cool_des", 0);
+    ssc_data_set_number(data, "ud_T_htf_low", 300);
+    ssc_data_set_number(data, "ud_T_htf_high", 410);
+    ssc_data_set_number(data, "ud_T_amb_low", 0);
+    ssc_data_set_number(data, "ud_T_amb_high", 55);
+    ssc_data_set_number(data, "ud_m_dot_htf_low", 0.29999999999999999);
+    ssc_data_set_number(data, "ud_m_dot_htf_high", 1.2);
+    set_matrix(data, "ud_ind_od", ud_ind_od_path_tp, 180, 7);
+    ssc_data_set_number(data, "store_fluid", 18);
+    ssc_number_t p_store_fl_props[1] = { 1 };
+    ssc_data_set_matrix(data, "store_fl_props", p_store_fl_props, 1, 1);
+    ssc_data_set_number(data, "is_hx", 1);
+    ssc_data_set_number(data, "tshours", 6);
+    ssc_data_set_number(data, "h_tank", 12);
+    ssc_data_set_number(data, "u_tank", 0.40000000000000002);
     ssc_data_set_number(data, "tank_pairs", 1);
-    ssc_data_set_number(data, "cold_tank_Thtr", 60);
-    ssc_data_set_number(data, "h_tank_min", 0.5);
-    ssc_data_set_number(data, "hot_tank_Thtr", 110);
-    ssc_data_set_number(data, "hot_tank_max_heat", 1);
+    ssc_data_set_number(data, "hot_tank_Thtr", 365);
+    ssc_data_set_number(data, "hot_tank_max_heat", 25);
+    ssc_data_set_number(data, "cold_tank_Thtr", 250);
+    ssc_data_set_number(data, "cold_tank_max_heat", 25);
+    ssc_data_set_number(data, "dt_hot", 5);
+    ssc_data_set_number(data, "h_tank_min", 1);
+    ssc_data_set_number(data, "init_hot_htf_percent", 30);
     ssc_number_t p_weekday_schedule[288] = { 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5 };
     ssc_data_set_matrix(data, "weekday_schedule", p_weekday_schedule, 12, 24);
     ssc_number_t p_weekend_schedule[288] = { 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 };
@@ -190,7 +226,7 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_number(data, "disp_csu_cost", 10000);
     ssc_data_set_number(data, "disp_pen_delta_w", 0.10000000000000001);
     ssc_data_set_number(data, "is_wlim_series", 0);
-    set_array(data, "wlim_series", wlim_series_path2, 8760);
+    set_array(data, "wlim_series", wlim_series_path_tp, 8760);
     ssc_number_t p_f_turb_tou_periods[9] = { 1.05, 1, 1, 1, 1, 1, 1, 1, 1 };
     ssc_data_set_array(data, "f_turb_tou_periods", p_f_turb_tou_periods, 9);
     ssc_data_set_number(data, "is_dispatch_series", 0);
@@ -201,6 +237,9 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_array(data, "bop_array", p_bop_array, 5);
     ssc_number_t p_aux_array[5] = { 0.023, 1, 0.48299999999999998, 0.57099999999999995, 0 };
     ssc_data_set_array(data, "aux_array", p_aux_array, 5);
+    ssc_data_set_number(data, "gross_net_conversion_factor", 0.90000000000000002);
+    ssc_data_set_number(data, "water_usage_per_wash", 0.69999999999999996);
+    ssc_data_set_number(data, "washing_frequency", 63);
     ssc_data_set_number(data, "calc_design_pipe_vals", 1);
     ssc_data_set_number(data, "V_hdr_cold_max", 3);
     ssc_data_set_number(data, "V_hdr_cold_min", 2);
@@ -215,15 +254,14 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_number(data, "northsouth_field_sep", 20);
     ssc_data_set_number(data, "N_hdr_per_xpan", 2);
     ssc_data_set_number(data, "offset_xpan_hdr", 1);
-    ssc_data_set_number(data, "tanks_in_parallel", 1);
-    ssc_number_t p_K_cpnt[77] = { 0.90000000000000002, 0, 0.19, 0, 0.90000000000000002, -1, -1, -1, -1, -1, -1, 0, 0.59999999999999998, 0.050000000000000003, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.14999999999999999, 0.59999999999999998, 0, 0.90000000000000002, 0, 0.19, 0, 0.90000000000000002, -1, -1, -1, -1, -1, -1 };
-    ssc_data_set_matrix(data, "K_cpnt", p_K_cpnt, 7, 11);
-    ssc_number_t p_D_cpnt[77] = { 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, -1, -1, -1, -1, -1, -1, 0.085000000000000006, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, -1, -1, -1, -1, -1, -1 };
-    ssc_data_set_matrix(data, "D_cpnt", p_D_cpnt, 7, 11);
-    ssc_number_t p_L_cpnt[77] = { 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1 };
-    ssc_data_set_matrix(data, "L_cpnt", p_L_cpnt, 7, 11);
-    ssc_number_t p_Type_cpnt[77] = { 0, 1, 0, 1, 0, -1, -1, -1, -1, -1, -1, 1, 0, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 0, 1, 0, 1, 0, 1, 0, -1, -1, -1, -1, -1, -1 };
-    ssc_data_set_matrix(data, "Type_cpnt", p_Type_cpnt, 7, 11);
+    ssc_number_t p_K_cpnt[121] = { 0.90000000000000002, 0, 0.19, 0, 0.90000000000000002, -1, -1, -1, -1, -1, -1, 0, 0.59999999999999998, 0.050000000000000003, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.41999999999999998, 0, 0.14999999999999999, 0.050000000000000003, 0, 0.41999999999999998, 0, 0.59999999999999998, 0, 0.59999999999999998, 0, 0.14999999999999999, 0.59999999999999998, 0, 0.90000000000000002, 0, 0.19, 0, 0.90000000000000002, -1, -1, -1, -1, -1, -1 };
+    ssc_data_set_matrix(data, "K_cpnt", p_K_cpnt, 11, 11);
+    ssc_number_t p_D_cpnt[121] = { 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, -1, -1, -1, -1, -1, -1, 0.085000000000000006, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.063500000000000001, 0.085000000000000006, 0.085000000000000006, 0.085000000000000006, 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, 0.063500000000000001, 0.085000000000000006, -1, -1, -1, -1, -1, -1 };
+    ssc_data_set_matrix(data, "D_cpnt", p_D_cpnt, 11, 11);
+    ssc_number_t p_L_cpnt[121] = { 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1 };
+    ssc_data_set_matrix(data, "L_cpnt", p_L_cpnt, 11, 11);
+    ssc_number_t p_Type_cpnt[121] = { 0, 1, 0, 1, 0, -1, -1, -1, -1, -1, -1, 1, 0, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 2, 0, 0, 2, 0, 2, 0, 1, 0, 2, 0, 0, 1, 0, 1, 0, 1, 0, -1, -1, -1, -1, -1, -1 };
+    ssc_data_set_matrix(data, "Type_cpnt", p_Type_cpnt, 11, 11);
     ssc_data_set_number(data, "custom_sf_pipe_sizes", 0);
     ssc_number_t p_sf_rnr_diams[1] = { -1 };
     ssc_data_set_matrix(data, "sf_rnr_diams", p_sf_rnr_diams, 1, 1);
@@ -237,26 +275,25 @@ void trough_physical_iph_default(ssc_data_t &data)
     ssc_data_set_matrix(data, "sf_hdr_wallthicks", p_sf_hdr_wallthicks, 1, 1);
     ssc_number_t p_sf_hdr_lengths[1] = { -1 };
     ssc_data_set_matrix(data, "sf_hdr_lengths", p_sf_hdr_lengths, 1, 1);
+    ssc_data_set_number(data, "tanks_in_parallel", 1);
+    ssc_data_set_number(data, "has_hot_tank_bypass", 0);
+    ssc_data_set_number(data, "T_tank_hot_inlet_min", 400);
+    ssc_data_set_number(data, "tes_pump_coef", 0.14999999999999999);
+    ssc_data_set_number(data, "V_tes_des", 1.8500000000000001);
+    ssc_data_set_number(data, "custom_tes_p_loss", 0);
+    ssc_number_t p_k_tes_loss_coeffs[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    ssc_data_set_matrix(data, "k_tes_loss_coeffs", p_k_tes_loss_coeffs, 1, 11);
+    ssc_data_set_number(data, "custom_tes_pipe_sizes", 0);
+    ssc_number_t p_tes_diams[1] = { -1 };
+    ssc_data_set_matrix(data, "tes_diams", p_tes_diams, 1, 1);
+    ssc_number_t p_tes_wallthicks[1] = { -1 };
+    ssc_data_set_matrix(data, "tes_wallthicks", p_tes_wallthicks, 1, 1);
+    ssc_number_t p_tes_lengths[11] = { 0, 90, 100, 120, 0, 0, 0, 0, 80, 120, 80 };
+    ssc_data_set_matrix(data, "tes_lengths", p_tes_lengths, 1, 11);
+    ssc_data_set_number(data, "DP_SGS", 0);
     ssc_data_set_number(data, "adjust:constant", 4);
-}
 
-/**
-*  Default data for iph_to_lcoefcr run that can be further modified
-*/
-void convert_and_adjust_fixed_charge(ssc_data_t &data)
-{
-    ssc_data_set_number(data, "electricity_rate", 0.059999998658895493);
-    ssc_data_set_number(data, "fixed_operating_cost", 103758.203125);
-}
-
-/**
-*  Default data for lcoefcr run that can be further modified
-*/
-void fixed_charge_rate_default(ssc_data_t &data)
-{
-    ssc_data_set_number(data, "capital_cost", 7263074);
-    ssc_data_set_number(data, "variable_operating_cost", 0.0010000000474974513);
-    ssc_data_set_number(data, "fixed_charge_rate", 0.10807877779006958);
+    return data;
 }
 
 #endif

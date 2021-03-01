@@ -184,6 +184,10 @@ CHECKED_AND_OKED = {
         "simulateSimpleBucketModel": [
             "charging",
             "discharging"
+        ],
+        "simulateLiIonNmcBatteryModel": [
+            "charging",
+            "discharging"
         ]
     },
     "EMSManager.cc": {
