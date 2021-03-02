@@ -1916,7 +1916,7 @@ namespace ThermalComfort {
         SumAET = 0.0;
         ZoneAESum(ZoneNum) = 0.0;
         for (SurfNum2 = Zone(ZoneNum).HTSurfaceFirst; SurfNum2 <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum2) {
-            if ((Surface(SurfNum2).HeatTransSurf) && (SurfNum2 != SurfNum)) {
+            if (SurfNum2 != SurfNum) {
                 SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                 SumAET += SurfaceAE(SurfNum2) * TH(2, 1, SurfNum2);
                 ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);

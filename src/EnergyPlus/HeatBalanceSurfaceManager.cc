@@ -7060,7 +7060,7 @@ namespace HeatBalanceSurfaceManager {
 
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
             // loop over all heat transfer surface except TDD Dome.
-            int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
+            int const firstSurf = Zone(zoneNum).OpaqOrWinSurfaceFirst;
             int const lastSurf = Zone(zoneNum).OpaqOrWinSurfaceLast;
             // determine reference air temperatures and other variable terms - loop over all surfaces
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
@@ -7482,7 +7482,7 @@ namespace HeatBalanceSurfaceManager {
                     }
                 }
 
-                int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
+                int const firstSurf = Zone(zoneNum).OpaqOrWinSurfaceFirst;
                 int const lastSurf = Zone(zoneNum).OpaqOrWinSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     auto &surface(Surface(surfNum));
@@ -7579,7 +7579,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-            int const firstSurf = Zone(zoneNum).HTSurfaceFirst;
+            int const firstSurf = Zone(zoneNum).OpaqOrWinSurfaceFirst;
             int const lastSurf = Zone(zoneNum).OpaqOrWinSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                 // Inside Face Convection - sign convention is positive means energy going into inside face from the air.

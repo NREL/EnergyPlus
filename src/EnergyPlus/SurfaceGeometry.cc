@@ -850,12 +850,14 @@ namespace SurfaceGeometry {
         // The order of surfaces does not matter and the surfaces are resorted into
         // the hierarchical order:
         //  Detached Surfaces
-        //  Base Surface for zone x
+        //  Airwall for zone x1
+        //  Base Surface for zone x1
         //    Subsurfaces for base surface
-        //  Base Surface for zone x
+        //  TDD Dome Surface for zone x1
+        //  Airwall for zone x2
+        //  Base Surface for zone x2
         //    etc
-        //  Heat Transfer Surfaces and Shading surfaces are mixed in the list
-        //  Pointers are set in the zones (First, Last)
+        //  Pointers are set in the zones (AllSurfaceFirst/Last, HTSurfaceFirst/Last, OpaqOrIntMassSurfaceFirst/Last, WindowSurfaceFirst/Last, OpaqOrWinSurfaceFirst/Last, TDDDomeFirst/Last)
 
         // REFERENCES:
         //   This routine manages getting the input for the following Objects:
@@ -1324,8 +1326,9 @@ namespace SurfaceGeometry {
         //      Floors
         //      Roofs/Ceilings
         //      Internal Mass
-        //      Non-Window subsurfaces (doors and TubularDaylightingDomes)
+        //      Non-Window subsurfaces (including doors)
         //      Window subsurfaces (including TubularDaylightingDiffusers)
+        //      TubularDaylightingDomes
         //    After reordering, MovedSurfs should equal TotSurfaces
 
         // For reporting purposes, the legacy surface order is also saved in DataSurfaces::AllSurfaceListReportOrder:
@@ -1994,6 +1997,7 @@ namespace SurfaceGeometry {
                 Zone(ZoneNum).WindowSurfaceLast = -1;
                 Zone(ZoneNum).OpaqOrIntMassSurfaceLast = Zone(ZoneNum).AllSurfaceLast;
             }
+            Zone(ZoneNum).OpaqOrWinSurfaceFirst = Zone(ZoneNum).HTSurfaceFirst;
             Zone(ZoneNum).OpaqOrWinSurfaceLast = std::max(Zone(ZoneNum).OpaqOrIntMassSurfaceLast, Zone(ZoneNum).WindowSurfaceLast);
             Zone(ZoneNum).HTSurfaceLast = Zone(ZoneNum).AllSurfaceLast;
         }

@@ -699,8 +699,8 @@ namespace DataHeatBalance {
         int AllSurfaceLast;        // Last  surface in zone including air boundaries
         int HTSurfaceFirst;        // First Heat Transfer Surface in Zone
         int HTSurfaceLast;         // Last  Heat Transfer Surface in Zone
-        int OpaqOrIntMassSurfaceFirst; // First Opaque or Interior Mass Heat Transfer Surface in Zone
-        int OpaqOrIntMassSurfaceLast;  // Last  Opaque or Interior Mass Heat Transfer Surface in Zone
+        int OpaqOrIntMassSurfaceFirst; // First Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
+        int OpaqOrIntMassSurfaceLast;  // Last  Opaque or Interior Mass Heat Transfer Surface (including opaque doors) in Zone
         int WindowSurfaceFirst;    // First Window Heat Transfer Surface in Zone
         int WindowSurfaceLast;     // Last  Window Heat Transfer Surface in Zone
         int OpaqOrWinSurfaceFirst; // First opaque (including IntMass) or window (non TDD Dome) Surface in Zone
