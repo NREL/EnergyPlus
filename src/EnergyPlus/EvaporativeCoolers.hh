@@ -107,10 +107,6 @@ namespace EvaporativeCoolers {
         DirectResearchSpecial
     };
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
-
-    // Types
-
     struct EvapConditions
     {
         // Members
@@ -513,7 +509,6 @@ struct EvaporativeCoolersData :  BaseGlobalStruct {
     Array1D<EvaporativeCoolers::EvapConditions> EvapCond;
     Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
     Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
-    std::unordered_map<std::string, std::string> UniqueEvapCondNames;
 
     void clear_state() override
     {
@@ -524,7 +519,6 @@ struct EvaporativeCoolersData :  BaseGlobalStruct {
         this->ZoneEvapCoolerUnitFields.clear();
         this->GetInputEvapComponentsFlag = true;
         this->GetInputZoneEvapUnit = true;
-        this->UniqueEvapCondNames.clear();
         this->CheckEquipName.clear();
         this->CheckZoneEvapUnitName.clear();
     }
