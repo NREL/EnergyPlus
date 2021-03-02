@@ -314,9 +314,6 @@ namespace Furnaces {
         }
     };
 
-    // Object Data
-    extern Array1D<FurnaceEquipConditions> Furnace;
-
     // Functions
 
     void clear_state();
@@ -423,7 +420,8 @@ namespace Furnaces {
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to AVERAGE airflow over timestep
     );
 
-    void HeatPumpRunFrac(int const FurnaceNum, // Furnace Index Number
+    void HeatPumpRunFrac(EnergyPlusData &state,
+                         int const FurnaceNum, // Furnace Index Number
                          Real64 const PLR,     // part load ratio
                          bool &errFlag,        // part load factor out of range flag
                          Real64 &RuntimeFrac   // the required run time fraction to meet part load
@@ -559,6 +557,9 @@ struct FurnacesData : BaseGlobalStruct {
     Real64 SaveCompressorPLR = 0.0;  // holds compressor PLR from active DX coil
     std::string CurrentModuleObject; // Object type for getting and error messages
 
+    // Object Data
+    Array1D<Furnaces::FurnaceEquipConditions> Furnace;
+
     void clear_state() override
     {
         NumFurnaces = 0;
@@ -581,6 +582,7 @@ struct FurnacesData : BaseGlobalStruct {
         TempSteamIn = 100.0;
         SaveCompressorPLR = 0.0;
         CurrentModuleObject = "";
+        Furnace.clear();
     }
 };
 
