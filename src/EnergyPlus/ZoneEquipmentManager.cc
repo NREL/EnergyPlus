@@ -4006,7 +4006,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 Node(ZoneNode).MassFlowRateMin = TotInletAirMassFlowRateMin;
                 Node(ZoneNode).MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
 
-                if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+                if (ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
                     // do not include adjusted for "balanced" exhaust flow
                     StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate - TotExhaustAirMassFlowRate;
                 } else {
