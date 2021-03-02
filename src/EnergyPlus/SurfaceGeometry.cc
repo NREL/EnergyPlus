@@ -849,14 +849,15 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // The order of surfaces does not matter and the surfaces are resorted into
         // the hierarchical order:
-        //  Detached Surfaces
-        //  Airwall for zone x1
-        //  Base Surface for zone x1
-        //    Subsurfaces for base surface
-        //  TDD Dome Surface for zone x1
-        //  Airwall for zone x2
-        //  Base Surface for zone x2
-        //    etc
+        //  All Shading Surfaces
+        //  Airwalls for zone x1
+        //  Base Surfaces for zone x1
+        //  Opaque Subsurfaces for zone x1
+        //  Window Subsurfaces for zone x1
+        //  TDD Dome Surfaces for zone x1
+        //  Airwalls for zone x2
+        //  Base Surfaces for zone x2
+        //  etc
         //  Pointers are set in the zones (AllSurfaceFirst/Last, HTSurfaceFirst/Last, OpaqOrIntMassSurfaceFirst/Last, WindowSurfaceFirst/Last, OpaqOrWinSurfaceFirst/Last, TDDDomeFirst/Last)
 
         // REFERENCES:
