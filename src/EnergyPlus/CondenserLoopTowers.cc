@@ -5445,8 +5445,6 @@ namespace CondenserLoopTowers {
         // These limits are tested in this subroutine each time step and returned for use by the calling routine.
         // The independent variables capped here may or may not be passed to the empirical model in the calling
         // routine depending on their use.
-        // REFERENCES:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string OutputChar;     // character string for warning messages

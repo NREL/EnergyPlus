@@ -194,14 +194,14 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataHeatBalance::NumOfZoneLists = 1;
-    DataHeatBalance::ZoneList.allocate(DataHeatBalance::NumOfZoneLists);
-    DataHeatBalance::ZoneList(1).Name = "LIST_ZONES";
-    DataHeatBalance::ZoneList(1).NumOfZones = 3;
-    DataHeatBalance::ZoneList(1).Zone.allocate(3);
-    DataHeatBalance::ZoneList(1).Zone(1) = 1;
-    DataHeatBalance::ZoneList(1).Zone(2) = 2;
-    DataHeatBalance::ZoneList(1).Zone(3) = 3;
+    state->dataHeatBal->NumOfZoneLists = 1;
+    state->dataHeatBal->ZoneList.allocate(state->dataHeatBal->NumOfZoneLists);
+    state->dataHeatBal->ZoneList(1).Name = "LIST_ZONES";
+    state->dataHeatBal->ZoneList(1).NumOfZones = 3;
+    state->dataHeatBal->ZoneList(1).Zone.allocate(3);
+    state->dataHeatBal->ZoneList(1).Zone(1) = 1;
+    state->dataHeatBal->ZoneList(1).Zone(2) = 2;
+    state->dataHeatBal->ZoneList(1).Zone(3) = 3;
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     state->dataAirLoop->PriAirSysAvailMgr.allocate(3);
@@ -266,13 +266,13 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
 
     state->dataGlobal->NumOfZones = 6;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
-    DataHeatBalance::Zone(2).Name = "ZONE 2";
-    DataHeatBalance::Zone(3).Name = "ZONE 3";
-    DataHeatBalance::Zone(4).Name = "ZONE 4";
-    DataHeatBalance::Zone(5).Name = "ZONE 5";
-    DataHeatBalance::Zone(6).Name = "ZONE 6";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
+    state->dataHeatBal->Zone(3).Name = "ZONE 3";
+    state->dataHeatBal->Zone(4).Name = "ZONE 4";
+    state->dataHeatBal->Zone(5).Name = "ZONE 5";
+    state->dataHeatBal->Zone(6).Name = "ZONE 6";
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
 
@@ -443,9 +443,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData.allocate(1);
     DataHVACGlobals::HybridVentSysAvailVentCtrl.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
-    DataHeatBalance::Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalance::MRT.allocate(1);
+    state->dataHeatBal->MRT.allocate(1);
     state->dataContaminantBalance->ZoneAirCO2.allocate(1);
     state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
@@ -474,30 +474,30 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeVentDuration = 0.0;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 0.0;
 
-    DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
-    DataHeatBalance::Zone(1).WindSpeed = 5.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
+    state->dataHeatBal->Zone(1).WindSpeed = 5.0;
 
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 5; // 80% acceptance
     state->dataThermalComforts->runningAverageASH = 20.0;
     DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalance::MRT(1) = 27.0;
+    state->dataHeatBal->MRT(1) = 27.0;
 
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     DataHeatBalFanSys::MAT(1) = 26.0;
-    DataHeatBalance::MRT(1) = 30.0;
+    state->dataHeatBal->MRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 6; // 90% acceptance
     DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalance::MRT(1) = 27.0;
+    state->dataHeatBal->MRT(1) = 27.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     DataHeatBalFanSys::MAT(1) = 26.0;
-    DataHeatBalance::MRT(1) = 30.0;
+    state->dataHeatBal->MRT(1) = 30.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
 
@@ -539,7 +539,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
     // time duration test
-    DataHeatBalance::Zone(1).OutDryBulbTemp = 40.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 40.0;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).ControlMode = 1;     // Temperature control
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl = 1; // Open
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 5.0;
@@ -552,7 +552,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl = 2; // close
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeOperDuration = 0.0;
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeVentDuration = 5.0;
-    DataHeatBalance::Zone(1).OutDryBulbTemp = 20.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // No change
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).TimeVentDuration = 11.0;
@@ -564,9 +564,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData.deallocate();
     DataHVACGlobals::HybridVentSysAvailVentCtrl.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
-    DataHeatBalance::Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     DataHeatBalFanSys::MAT.deallocate();
-    DataHeatBalance::MRT.deallocate();
+    state->dataHeatBal->MRT.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
     state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
@@ -651,8 +651,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     int const CompNum = 1;
 
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(NumZones);
-    DataHeatBalance::Zone(1).Name = "SPACE1-1";
+    state->dataHeatBal->Zone.allocate(NumZones);
+    state->dataHeatBal->Zone(1).Name = "SPACE1-1";
     DataHVACGlobals::ZoneComp.allocate(1);
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs.allocate(1);
     DataHVACGlobals::ZoneComp(1).TotalNumComp = 1;
@@ -672,11 +672,11 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).FanSchedPtr = 2;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).TempTolRange = 0.4;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CyclingTimeSteps = 4;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZoneListName = DataHeatBalance::Zone(1).Name;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZoneListName = state->dataHeatBal->Zone(1).Name;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCtrlZones = NumZones;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs.allocate(1);
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs(1) = 1;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = DataHeatBalance::Zone(1).Name;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCoolingZones = NumZones;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZonePtrs = NumZones;
     ScheduleManager::Schedule.allocate(2);
@@ -785,8 +785,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::SingleCoolingSetPoint;
     DataHeatBalFanSys::TempZoneThermostatSetPoint(1) = 25.0;
     DataHeatBalFanSys::TempTstatAir(1) = 25.1;
-    DataHeatBalance::Zone.allocate(NumZones);
-    DataHeatBalance::Zone(1).Name = "SPACE1-1";
+    state->dataHeatBal->Zone.allocate(NumZones);
+    state->dataHeatBal->Zone(1).Name = "SPACE1-1";
 
     state->dataAirLoop->AirToZoneNodeInfo.allocate(1);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
@@ -803,11 +803,11 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).FanSchedPtr = 2;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).TempTolRange = 0.4;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CyclingTimeSteps = 4;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZoneListName = DataHeatBalance::Zone(1).Name;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZoneListName = state->dataHeatBal->Zone(1).Name;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCtrlZones = NumZones;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs.allocate(1);
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CtrlZonePtrs(1) = 1;
-    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = DataHeatBalance::Zone(1).Name;
+    state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCoolingZones = NumZones;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZonePtrs = NumZones;
     ScheduleManager::Schedule.allocate(2);

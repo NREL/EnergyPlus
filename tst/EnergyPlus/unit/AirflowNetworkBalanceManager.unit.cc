@@ -48,7 +48,6 @@
 // EnergyPlus::AirflowNetworkBalanceManager unit tests
 
 // Google test headers
-#include <exception>
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
@@ -63,7 +62,6 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -135,8 +133,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
 
     // Unit test for #5021
 
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
     Surface.allocate(2);
     Surface(1).Name = "WINDOW AULA 1";
@@ -230,7 +228,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
 }
@@ -240,8 +238,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
 
     // Unit test for #5384
 
-    Zone.allocate(1);
-    Zone(1).Name = "WEST_ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "WEST_ZONE";
 
     Surface.allocate(3);
     Surface(1).Name = "SURFACE_1";
@@ -358,7 +356,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     AirflowNetwork::AirflowNetworkNodeData.deallocate();
     AirflowNetwork::AirflowNetworkCompData.deallocate();
     AirflowNetwork::MultizoneExternalNodeData.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
 }
@@ -2407,8 +2405,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     // Unit test for #5490
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
     Surface.allocate(2);
     Surface(1).Name = "WINDOW 1";
@@ -2433,12 +2431,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -2498,10 +2496,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
-    People.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
@@ -2509,8 +2507,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
 
     // Unit test for a new feature
 
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     Surface.allocate(14);
     // Rectangular base surface
@@ -3061,7 +3059,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(9).Width, 0.0001);
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(9).Height, 0.0001);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
 }
@@ -5706,7 +5704,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -6410,7 +6408,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -7033,7 +7031,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -7722,7 +7720,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -8356,7 +8354,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -9090,7 +9088,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
@@ -9564,7 +9562,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -13195,11 +13193,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.001;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
@@ -13653,7 +13651,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -13677,7 +13675,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     int iter = 1;
     bool resimu = false;
 
-    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
     state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
@@ -15656,8 +15654,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 {
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
 
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
@@ -15724,8 +15722,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 {
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
 
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
@@ -20018,8 +20016,8 @@ std::string const idf_objects = delimited_string({
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
 {
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
     Surface.allocate(3);
     Surface(1).Name = "WINDOW AULA 1";
@@ -20148,8 +20146,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
 {
     // Create zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     // Create surfaces
     DataSurfaces::Surface.allocate(1);
@@ -20285,8 +20283,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
 {
     // Create zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     // Create surfaces
     DataSurfaces::Surface.allocate(1);
@@ -20413,8 +20411,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
 {
     // Create zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     // Create surfaces
     DataSurfaces::Surface.allocate(1);
@@ -20550,8 +20548,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
 {
     // Create zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     // Create surfaces
     DataSurfaces::Surface.allocate(1);
@@ -20662,8 +20660,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
 {
     // Create zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     // Create surfaces
     DataSurfaces::Surface.allocate(1);
@@ -20767,8 +20765,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
 {
     // Create zone
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     // Create surfaces
     DataSurfaces::Surface.allocate(1);

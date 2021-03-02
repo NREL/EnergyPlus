@@ -233,7 +233,6 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataPhotovoltaics::iSimplePVModel;
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
@@ -246,6 +245,7 @@ namespace CostEstimateManager {
         int ThisZoneID;      // hold result from findItem
 
         std::string ThisConstructStr;
+        auto &Zone(state.dataHeatBal->Zone);
 
         int thisCoil; // index of named coil in its derived type
         int thisChil;
@@ -490,8 +490,6 @@ namespace CostEstimateManager {
         // Calculates the Cost Estimate based on inputs.
 
         // Using/Aliasing
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::Zone;
         using DataPhotovoltaics::iSimplePVModel;
         using DataPhotovoltaics::PVarray;
         using DataSurfaces::Surface;
@@ -505,6 +503,7 @@ namespace CostEstimateManager {
         int ThisSurfID;      // hold result from findItem
         int ThisZoneID;      // hold result from findItem
 
+        auto &Zone(state.dataHeatBal->Zone);
         std::string ThisConstructStr;
 
         Array1D_bool uniqueSurfMask;
@@ -743,7 +742,7 @@ namespace CostEstimateManager {
                             ThisZoneID = UtilityRoutines::FindItem(state.dataCostEstimateManager->CostLineItem(Item).ParentObjName, Zone);
                             if (ThisZoneID > 0) {
                                 Real64 Qty(0.0);
-                                for (auto const &e : Lights)
+                                for (auto const &e : state.dataHeatBal->Lights)
                                     if (e.ZonePtr == ThisZoneID) Qty += e.DesignLevel;
                                 state.dataCostEstimateManager->CostLineItem(Item).Qty = (Zone(ThisZoneID).Multiplier * Zone(ThisZoneID).ListMultiplier / 1000.0) *
                                                          Qty; // this handles more than one light object per zone.

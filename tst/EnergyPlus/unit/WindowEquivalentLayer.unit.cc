@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
             break;
         }
     }
-    EXPECT_EQ(1, DataHeatBalance::TotBlindsEQL);
+    EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
     EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
 
@@ -933,11 +933,11 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotMaterials);
+    EXPECT_EQ(1, state->dataHeatBal->TotMaterials);
     EXPECT_EQ(state->dataMaterial->Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction returns error forund true due to invalid layer
     GetConstructData(*state, ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
     EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
     EXPECT_TRUE(state->dataConstruction->Construct(1).TypeIsWindow);
     EXPECT_TRUE(state->dataConstruction->Construct(1).WindowTypeEQL);
@@ -1950,14 +1950,14 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
         }
     }
     // get venetian blind material index
-    for (int i = 1; i <= DataHeatBalance::TotMaterials; i++) {
+    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
         if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // get equivalent layer window contruction index
-    for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
+    for (int ConstrPtr = 1; ConstrPtr <= state->dataHeatBal->TotConstructs; ++ConstrPtr) {
         if (state->dataConstruction->Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;
         }

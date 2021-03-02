@@ -224,7 +224,6 @@ namespace EnergyPlus::ZonePlenum {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataZoneEquipment::EquipConfiguration;
         using NodeInputManager::CheckUniqueNodes;
         using NodeInputManager::EndUniqueNodeCheck;
@@ -319,14 +318,14 @@ namespace EnergyPlus::ZonePlenum {
             }
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneName = AlphArray(2);
             // put the X-Ref to the zone heat balance data structure
-            state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), Zone);
+            state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), state.dataHeatBal->Zone);
             if (state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum == 0) {
                 ShowSevereError(state, "For " + CurrentModuleObject + " = " + AlphArray(1) + ", " + cAlphaFields(2) + " = " + AlphArray(2) + " not found.");
                 ErrorsFound = true;
                 continue;
             } else {
-                Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).IsReturnPlenum = true;
-                Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).PlenumCondNum = ZonePlenumNum;
+                state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).IsReturnPlenum = true;
+                state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).PlenumCondNum = ZonePlenumNum;
             }
             //  Check if this zone is used as a controlled zone
             ZoneEquipConfigLoop = UtilityRoutines::FindItemInList(AlphArray(2), state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
@@ -341,7 +340,7 @@ namespace EnergyPlus::ZonePlenum {
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(state,
                 AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
-            Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
+            state.dataHeatBal->Zone(state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).ZoneNodeNum;
 
             state.dataZonePlenum->ZoneRetPlenCond(ZonePlenumNum).OutletNode = GetOnlySingleNode(state,
                 AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
@@ -492,14 +491,14 @@ namespace EnergyPlus::ZonePlenum {
             }
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneName = AlphArray(2);
             // put the X-Ref to the zone heat balance data structure
-            state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), Zone);
+            state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum = UtilityRoutines::FindItemInList(AlphArray(2), state.dataHeatBal->Zone);
             if (state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum == 0) {
                 ShowSevereError(state, "For " + CurrentModuleObject + " = " + AlphArray(1) + ", " + cAlphaFields(2) + " = " + AlphArray(2) + " not found.");
                 ErrorsFound = true;
                 continue;
             } else {
-                Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).IsSupplyPlenum = true;
-                Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).PlenumCondNum = ZonePlenumNum;
+                state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).IsSupplyPlenum = true;
+                state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).PlenumCondNum = ZonePlenumNum;
             }
             //  Check if this zone is used as a controlled zone
             if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) { return e.IsControlled; })) {
@@ -528,7 +527,7 @@ namespace EnergyPlus::ZonePlenum {
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum = GetOnlySingleNode(state,
                 AlphArray(3), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_ZoneNode, 1, ObjectIsNotParent);
             // Insert the Plenum Zone Number into the Zone Heat Balance data structure for later reference
-            Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
+            state.dataHeatBal->Zone(state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ActualZoneNum).SystemZoneNodeNumber = state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).ZoneNodeNum;
 
             state.dataZonePlenum->ZoneSupPlenCond(ZonePlenumNum).InletNode = GetOnlySingleNode(state,
                 AlphArray(4), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);

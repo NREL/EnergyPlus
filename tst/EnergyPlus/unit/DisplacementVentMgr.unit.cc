@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV(1) = true;
     Surface.allocate(TotSurfaces);
-    TempEffBulkAir.allocate(TotSurfaces);
+    state->dataHeatBal->TempEffBulkAir.allocate(TotSurfaces);
     EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
     state->dataRoomAirMod->DVHcIn.allocate(TotSurfaces);
     state->dataRoomAirMod->ZTMX.allocate(state->dataGlobal->NumOfZones);
@@ -238,7 +238,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
 
     state->dataRoomAirMod->IsZoneDV.deallocate();
     Surface.deallocate();
-    TempEffBulkAir.deallocate();
+    state->dataHeatBal->TempEffBulkAir.deallocate();
     EnergyPlus::DataHeatBalSurface::TempSurfIn.deallocate();
     state->dataRoomAirMod->DVHcIn.deallocate();
     state->dataRoomAirMod->ZTMX.deallocate();
