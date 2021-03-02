@@ -73,9 +73,14 @@ namespace Furnaces {
         HeatingMode, // last compressor operating mode was in heating
         NoCoolHeat,  // last operating mode was coil off
     };
+
     // Airflow control for contant fan mode
-    extern int const UseCompressorOnFlow;  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    extern int const UseCompressorOffFlow; // set compressor OFF air flow rate equal to user defined value
+    enum class AirFlowControlConstFan {
+        Unassigned,           // default
+        UseCompressorOnFlow,  // set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow, // set compressor OFF air flow rate equal to user defined value
+    };
+
     // Compressor operation
     constexpr int On(1);  // normal compressor operation
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
@@ -171,7 +176,7 @@ namespace Furnaces {
         int OpMode;                         // operation mode: 1 = cycling fan, cycling coils
         //                 2 = continuous fan, cycling coils
         Furnaces::ModeOfOperation LastMode; // last mode of operation, coolingmode or heatingmode
-        int AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
+        AirFlowControlConstFan AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         int FanPlace;                       // fan placement; 1=blow through, 2=draw through
         int NodeNumOfControlledZone;        // Node number of controlled zone air node
         int WatertoAirHPType;               // Type of water to air heat pump model used
@@ -297,7 +302,7 @@ namespace Furnaces {
             HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
               SuppCoilControlNode(0), FanType_Num(0), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0),
               LastMode(Furnaces::ModeOfOperation::Unassigned),
-            AirFlowControl(0), FanPlace(0), NodeNumOfControlledZone(0), WatertoAirHPType(0), CoolingConvergenceTolerance(0.0),
+            AirFlowControl(AirFlowControlConstFan::Unassigned), FanPlace(0), NodeNumOfControlledZone(0), WatertoAirHPType(0), CoolingConvergenceTolerance(0.0),
             HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0),
             HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0), DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0),
             DesignFanVolFlowRateEMSOverrideOn(false), DesignFanVolFlowRateEMSOverrideValue(0.0), DesignMassFlowRate(0.0), MaxCoolAirVolFlow(0.0),

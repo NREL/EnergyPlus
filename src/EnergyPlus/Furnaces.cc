@@ -182,10 +182,6 @@ namespace Furnaces {
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
-    // Airflow control for contant fan mode
-    int const UseCompressorOnFlow(1);  // set compressor OFF air flow rate equal to compressor ON air flow rate
-    int const UseCompressorOffFlow(2); // set compressor OFF air flow rate equal to user defined value
-
     static std::string const fluidNameSteam("STEAM");
     bool GetFurnaceInputFlag(true); // Logical to allow "GetInput" only once per simulation
 
@@ -1551,7 +1547,7 @@ namespace Furnaces {
             Furnace(FurnaceNum).MaxHeatAirVolFlow = Furnace(FurnaceNum).DesignFanVolFlowRate;
             Furnace(FurnaceNum).MaxCoolAirVolFlow = Furnace(FurnaceNum).DesignFanVolFlowRate;
             Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = Furnace(FurnaceNum).DesignFanVolFlowRate;
-            Furnace(FurnaceNum).AirFlowControl = UseCompressorOnFlow;
+            Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOnFlow;
 
             // Set heating convergence tolerance
             Furnace(FurnaceNum).HeatingConvergenceTolerance = 0.001;
@@ -2746,9 +2742,9 @@ namespace Furnaces {
                     //             UseCompressorOffFlow = operate at value specified by user
                     //           AirFlowControl only valid if fan opmode = ContFanCycComp
                     if (Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                        Furnace(FurnaceNum).AirFlowControl = UseCompressorOnFlow;
+                        Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOnFlow;
                     } else {
-                        Furnace(FurnaceNum).AirFlowControl = UseCompressorOffFlow;
+                        Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOffFlow;
                     }
                 }
             }
@@ -3571,9 +3567,9 @@ namespace Furnaces {
                     //             UseCompressorOffFlow = operate at value specified by user
                     //           AirFlowControl only valid if fan opmode = ContFanCycComp
                     if (Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow == 0.0) {
-                        Furnace(FurnaceNum).AirFlowControl = UseCompressorOnFlow;
+                        Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOnFlow;
                     } else {
-                        Furnace(FurnaceNum).AirFlowControl = UseCompressorOffFlow;
+                        Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOffFlow;
                     }
                 }
             }
@@ -4396,7 +4392,7 @@ namespace Furnaces {
                 Furnace(FurnaceNum).DesignFanVolFlowRate = AutoSize;
             }
 
-            Furnace(FurnaceNum).AirFlowControl = UseCompressorOnFlow;
+            Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOnFlow;
 
             if (FanVolFlowRate != AutoSize && Furnace(FurnaceNum).DesignFanVolFlowRate != AutoSize) {
                 if (Furnace(FurnaceNum).DesignFanVolFlowRate > FanVolFlowRate) {
@@ -5970,7 +5966,7 @@ namespace Furnaces {
 
                 //     Set the compressor or coil OFF mass flow rate based on LOGICAL flag
                 //     UseCompressorOnFlow is used when the user does not enter a value for no cooling or heating flow rate
-                if (Furnace(FurnaceNum).AirFlowControl == UseCompressorOnFlow) {
+                if (Furnace(FurnaceNum).AirFlowControl == AirFlowControlConstFan::UseCompressorOnFlow) {
                     if (Furnace(FurnaceNum).LastMode == Furnaces::ModeOfOperation::HeatingMode) {
                         if (MoistureLoad < 0.0 && Furnace(FurnaceNum).Humidistat &&
                             Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
@@ -11598,7 +11594,7 @@ namespace Furnaces {
 
             // Set up fan flow rate during compressor off time
             if (Furnace(FurnaceNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-                if (Furnace(FurnaceNum).AirFlowControl == UseCompressorOnFlow && CompOnMassFlow > 0.0) {
+                if (Furnace(FurnaceNum).AirFlowControl == AirFlowControlConstFan::UseCompressorOnFlow && CompOnMassFlow > 0.0) {
                     CompOffMassFlow = GetAirMassFlowRateIHP(state, Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 1.0, false);
                     CompOffFlowRatio = CompOffMassFlow /
                                        GetAirMassFlowRateIHP(state,
@@ -11666,7 +11662,7 @@ namespace Furnaces {
 
             // Set up fan flow rate during compressor off time
             if (Furnace(FurnaceNum).OpMode == ContFanCycCoil && present(SpeedNum)) {
-                if (Furnace(FurnaceNum).AirFlowControl == UseCompressorOnFlow && CompOnMassFlow > 0.0) {
+                if (Furnace(FurnaceNum).AirFlowControl == AirFlowControlConstFan::UseCompressorOnFlow && CompOnMassFlow > 0.0) {
                     if (SpeedNum == 1) { // LOWEST SPEED USE IDLE FLOW
                         CompOffMassFlow = Furnace(FurnaceNum).IdleMassFlowRate;
                         CompOffFlowRatio = Furnace(FurnaceNum).IdleSpeedRatio;
