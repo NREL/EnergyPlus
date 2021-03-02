@@ -790,7 +790,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
 
     // determine operating mode
     OperatingMode Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
-        EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
+        *state, EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
     // check operating mode
     EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull);
     // get outlet temperature in full wet operating mode

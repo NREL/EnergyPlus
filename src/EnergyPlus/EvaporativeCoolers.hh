@@ -481,7 +481,7 @@ namespace EvaporativeCoolers {
                                   Array1D<Real64> const &Par // parameters
     );
 
-    void ReportZoneEvaporativeCoolerUnit(int UnitNum); // unit number
+    void ReportZoneEvaporativeCoolerUnit(EnergyPlusData &state, int UnitNum); // unit number
 
     //        End of Reporting subroutines for the EvaporativeCoolers Module
     // *****************************************************************************
