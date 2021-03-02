@@ -75,10 +75,9 @@ using namespace EnergyPlus::EvaporativeCoolers;
 
 namespace EnergyPlus {
 
-auto &EvapCond(state.dataEvapCoolers->EvapCond);
-
 TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     EvapCond.allocate(1);
     int const EvapCoolNum(1);
@@ -132,6 +131,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
 
 TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int const EvapCoolNum(1);
     EvapCond.allocate(EvapCoolNum);
@@ -167,6 +167,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
 
 TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int const EvapCoolNum(1);
     Real64 PrimaryAirDesignFlow(0.0);
@@ -259,6 +260,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
 
 TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int const EvapCoolNum(1);
     Real64 PrimaryAirDesignFlow(0.0);
@@ -325,6 +327,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     EvapCond.allocate(1);
     int const EvapCoolNum(1);
@@ -381,6 +384,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     EvapCond.allocate(1);
@@ -415,6 +419,8 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     int CurveNum;
 
     EvapCond.allocate(1);
@@ -469,6 +475,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     // one-time setup of evap cooler instance
     int const EvapCoolNum(1);
@@ -613,6 +620,8 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
 
     GetEvapInput(*state);
 
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).IndirectVolFlowRate);
@@ -689,6 +698,9 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     GetEvapInput(*state);
+
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).RecircPumpPower);
@@ -711,6 +723,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
 
 TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     // one-time setup of evap cooler instance
     int const EvapCoolNum(1);
@@ -763,6 +776,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
 {
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     state->dataEnvrn->OutBaroPress = 101325.0;
     int const EvapCoolNum(1);
@@ -843,6 +857,9 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
     ASSERT_TRUE(process_idf(idf_objects));
 
     GetEvapInput(*state);
+    
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
+
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
 
@@ -888,6 +905,8 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     EvaporativeCoolers::GetEvapInput(*state);
     ASSERT_FALSE(ErrorsFound);
+
+    auto &EvapCond(state->dataEvapCoolers->EvapCond);
 
     int AirLoopNum = 1;
     int EvapCoolNum = 1;
