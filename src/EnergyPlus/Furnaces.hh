@@ -96,25 +96,9 @@ namespace Furnaces {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern int NumFurnaces; // The number of furnaces found in the input data file
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern Real64 ModifiedHeatCoilLoad; // used to adjust heating coil capacity if outlet temp > DesignMaxOutletTemp,
+
     // used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
-    extern Real64 OnOffAirFlowRatioSave;        // Saves the OnOffAirFlowRatio calculated in RegulaFalsi CALLs.
-    extern Real64 OnOffFanPartLoadFractionSave; // Global part-load fraction passed to fan object
-    extern Real64 CompOnMassFlow;               // Supply air mass flow rate w/ compressor ON [kg/s]
-    extern Real64 CompOffMassFlow;              // Supply air mass flow rate w/ compressor OFF [kg/s]
-    extern Real64 CompOnFlowRatio;              // fan flow ratio when coil on
-    extern Real64 CompOffFlowRatio;             // fan flow ratio when coil off
-    extern Real64 FanSpeedRatio;                // ratio of air flow ratio passed to fan object
-    extern Real64 CoolHeatPLRRat;               // ratio of cooling to heating PLR, used for cycling fan RH control
-    extern bool HeatingLoad;
-    extern bool CoolingLoad;
-    extern bool EconomizerFlag;             // holds air loop economizer status
-    extern int AirLoopPass;                 // Number of air loop pass
-    extern bool HPDehumidificationLoadFlag; // true if there is dehumidification load (heat pumps only)
-    extern Real64 TempSteamIn;              // steam coil steam inlet temperature
+
     // starting add variables for variable speed water source heat pump
     extern Real64 SaveCompressorPLR;        // holds compressor PLR from active DX coil
     extern std::string CurrentModuleObject; // Object type for getting and error messages
@@ -552,9 +536,51 @@ namespace Furnaces {
 
 struct FurnacesData : BaseGlobalStruct {
 
+    int NumFurnaces = 0; // The number of furnaces found in the input data file
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+    Real64 ModifiedHeatCoilLoad; // used to adjust heating coil capacity if outlet temp > DesignMaxOutletTemp,
+    // used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
+    Real64 OnOffAirFlowRatioSave = 0.0;        // Saves the OnOffAirFlowRatio calculated in RegulaFalsi CALLs.
+    Real64 OnOffFanPartLoadFractionSave = 0.0; // Global part-load fraction passed to fan object
+    Real64 CompOnMassFlow = 0.0;               // Supply air mass flow rate w/ compressor ON [kg/s]
+    Real64 CompOffMassFlow = 0.0;              // Supply air mass flow rate w/ compressor OFF [kg/s]
+    Real64 CompOnFlowRatio = 0.0;              // fan flow ratio when coil on
+    Real64 CompOffFlowRatio = 0.0;             // fan flow ratio when coil off
+    Real64 FanSpeedRatio = 0.0;                // ratio of air flow ratio passed to fan object
+    Real64 CoolHeatPLRRat = 1.0;               // ratio of cooling to heating PLR, used for cycling fan RH control
+    bool HeatingLoad = false;
+    bool CoolingLoad = false;
+    bool EconomizerFlag = false;             // holds air loop economizer status
+    int AirLoopPass = 0;                     // Number of air loop pass
+    bool HPDehumidificationLoadFlag = false; // true if there is dehumidification load (heat pumps only)
+    Real64 TempSteamIn = 100.0;              // steam coil steam inlet temperature
+    // starting add variables for variable speed water source heat pump
+    Real64 SaveCompressorPLR = 0.0;  // holds compressor PLR from active DX coil
+    std::string CurrentModuleObject; // Object type for getting and error messages
+
     void clear_state() override
     {
-
+        NumFurnaces = 0;
+        MySizeFlag.clear();
+        CheckEquipName.clear();
+        ModifiedHeatCoilLoad = 0.0;
+        OnOffAirFlowRatioSave = 0.0;
+        OnOffFanPartLoadFractionSave = 0.0;
+        CompOnMassFlow = 0.0;
+        CompOffMassFlow = 0.0;
+        CompOnFlowRatio = 0.0;
+        CompOffFlowRatio = 0.0;
+        FanSpeedRatio = 0.0;
+        CoolHeatPLRRat = 1.0;
+        HeatingLoad = false;
+        CoolingLoad = false;
+        EconomizerFlag = false;
+        AirLoopPass = 0;
+        HPDehumidificationLoadFlag = false;
+        TempSteamIn = 100.0;
+        SaveCompressorPLR = 0.0;
+        CurrentModuleObject = "";
     }
 };
 
