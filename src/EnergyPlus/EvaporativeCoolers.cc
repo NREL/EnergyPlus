@@ -131,8 +131,6 @@ namespace EvaporativeCoolers {
     // Object Data
     std::unordered_map<std::string, std::string> UniqueEvapCondNames;
     
-    auto &EvapCond(state.dataEvapCoolers->EvapCond);
-    auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
     auto &ZoneEvapCoolerUnitFields(state.dataEvapCoolers->ZoneEvapCoolerUnitFields);
 
     // Functions
@@ -156,6 +154,7 @@ namespace EvaporativeCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapCoolNum; // The EvapCooler that you are currently loading input into
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
 
         // Obtains and Allocates EvapCooler related parameters from input file
@@ -260,6 +259,8 @@ namespace EvaporativeCoolers {
         int NumNums;
         int IOStat;
         bool ErrorsFound(false);
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
         // Start getting the input data
@@ -919,6 +920,7 @@ namespace EvaporativeCoolers {
         int EvapUnitNum;
         bool localSetPointCheck(false);
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         // Check that setpoint is active
         if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
@@ -1083,6 +1085,8 @@ namespace EvaporativeCoolers {
         PadAreaUser = 0.0;
         PadDepthDes = 0.0;
         PadDepthUser = 0.0;
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         if (SysSizingRunDone || ZoneSizingRunDone) {
             HardSizeNoDesRun = false;
@@ -1632,6 +1636,8 @@ namespace EvaporativeCoolers {
         Real64 TEWB;     // Entering Wet Bulb Temperature
         Real64 RhoWater;
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
         // If the Evaporative Cooler  is operating there should be some mass flow rate
         //  Also the evap cooler has to be scheduled to be available
         if ((EvapCond(EvapCoolNum).InletMassFlowRate > 0.0) && (GetCurrentScheduleValue(state, EvapCond(EvapCoolNum).SchedPtr) > 0.0)) {
@@ -1761,6 +1767,8 @@ namespace EvaporativeCoolers {
         Real64 CpAir;  // Cp of the primary side air
         Real64 CFMAir;
         Real64 CFMSec;
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         // If the Evaporative Cooler  is operating there should be some mass flow rate
         //  Also the evap cooler has to be scheduled to be available
@@ -1923,6 +1931,8 @@ namespace EvaporativeCoolers {
         Real64 CFMSec;
         Real64 TWBSec; // wet bulb of secondary air
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
         // If the Evaporative Cooler  is operating there should be some mass flow rate
         //  Also the evap cooler has to be scheduled to be available
         if ((EvapCond(EvapCoolNum).InletMassFlowRate > 0.0) && (GetCurrentScheduleValue(state, EvapCond(EvapCoolNum).SchedPtr) > 0.0)) {
@@ -2073,8 +2083,10 @@ namespace EvaporativeCoolers {
         Real64 PartLoadFrac;
         Real64 DesOutTemp;
         // Set local variables
-        // Retrieve the load on the controlled zone
+        
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
+        // Retrieve the load on the controlled zone
         OutletNode = EvapCond(EvapCoolNum).OutletNode;
         InletNode = EvapCond(EvapCoolNum).InletNode;
         ControlNode = EvapCond(EvapCoolNum).EvapControlNodeNum;
@@ -2203,6 +2215,8 @@ namespace EvaporativeCoolers {
         Real64 BlowDownVdot(0.0);
         Real64 DriftVdot(0.0);
         Real64 EvapVdot(0.0);
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         // If the Evaporative Cooler  is operating there should be some mass flow rate
         //  Also the evap cooler has to be scheduled to be available
@@ -2410,20 +2424,9 @@ namespace EvaporativeCoolers {
 
         using Psychrometrics::PsyHfgAirFnWTdb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIte(500);      // Maximum number of iterations for solver
         Real64 const TempTol(0.01); // convergence tollerance
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TEDB;      // Entering Dry Bulb Temperature
@@ -2455,6 +2458,8 @@ namespace EvaporativeCoolers {
         Real64 BlowDownVdot(0.0);
         Real64 DriftVdot(0.0);
         Real64 EvapVdot(0.0);
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         FlowRatioSecDry = 0.0;
         FlowRatioSecWet = 0.0;
@@ -2837,6 +2842,8 @@ namespace EvaporativeCoolers {
         Real64 SysTempSetPoint;      // evaporative cooler outlet setpoint temperature, drybulb
         OperatingMode OperatingMode; // current operating mode of indrect evaporative cooler
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
         InletDryBulbTempPri = EvapCond(EvapCoolNum).InletTemp;
         SysTempSetPoint = EvapCond(EvapCoolNum).DesiredOutletTemp;
 
@@ -2896,13 +2903,15 @@ namespace EvaporativeCoolers {
         Real64 SysTempSetPoint;    // evaporative cooler outlet setpoint temperature, drybulb
         Real64 Residuum;           // Residual to be minimized to zero
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
         EvapCoolIndex = int(Par(1));
         DryOrWetOperatingMode = OperatingMode(Par(2));
         SysTempSetPoint = Par(3);
         EDBTSecAirSide = Par(4);
         EWBTSecAirSide = Par(5);
         EHumRatSecAirSide = Par(6);
-        EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
+        state.dataEvapCoolers->EvapCond(EvapCoolIndex).SecInletMassFlowRate = AirMassFlowSec;
         CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolIndex, DryOrWetOperatingMode, AirMassFlowSec, EDBTSecAirSide, EWBTSecAirSide, EHumRatSecAirSide);
         OutletAirTemp = EvapCond(EvapCoolIndex).OutletTemp;
         Residuum = SysTempSetPoint - OutletAirTemp;
@@ -2970,6 +2979,8 @@ namespace EvaporativeCoolers {
         Real64 OutletTempSec;      // secondary air outlet temperature
         Real64 SecOutletAirHumRat; // secondary air humidity ratio at constant temperature (Pure mass transfer)
         Real64 SecOutletEnthalpy;  // secondary air outlet enthalpy
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         if (EvapCond(EvapCoolNum).InletMassFlowRate > 0.0) {
             FlowRatio = AirMassFlowSec / EvapCond(EvapCoolNum).InletMassFlowRate; // ratio of current secondary air flow to current primary air flow
@@ -3069,23 +3080,13 @@ namespace EvaporativeCoolers {
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SecOutletAirHumRat; // secondary air humidity ratio at the outlet node
         Real64 SecOutletEnthalpy;  // secondary air outlet enthalpy
         Real64 CpAirSec;           // specific heat of secondary air at inlet condition
         Real64 hfg;                // secondary air side enthaly of evaporation
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         QHXLatent = 0.0;
         if (AirMassFlowSec > 0.0) {
@@ -3145,22 +3146,12 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FanPowerModCurveValue;  // fan power modifier curve value
         Real64 PumpPowerModCurveValue; // fan power modifier curve value
         Real64 EvapCoolertotalPower;   // current evaporative cooler total electric power
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         EvapCoolertotalPower = 0.0;
         if (FlowRatio > 0.0) {
@@ -3207,18 +3198,6 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SatEff; // Saturation Efficiency of the CelDek Pad
         Real64 TEDB;   // Entering Dry Bulb Temperature
@@ -3235,6 +3214,8 @@ namespace EvaporativeCoolers {
         Real64 DriftVdot(0.0);
         Real64 EvapVdot(0.0);
         bool EvapCoolerOperatingLimitFlag(false);
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         EvapCoolerOperatingLimitFlag = false;
         TEDB = EvapCond(EvapCoolNum).InletTemp;
@@ -3385,6 +3366,8 @@ namespace EvaporativeCoolers {
         int InletNodeSec;
         Real64 AvailWaterRate(0.0);
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+
         OutletNode = EvapCond(EvapCoolNum).OutletNode;
         InletNode = EvapCond(EvapCoolNum).InletNode;
 
@@ -3466,20 +3449,8 @@ namespace EvaporativeCoolers {
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         // report the Evap Cooler energy from this component
         EvapCond(EvapCoolNum).EvapCoolerPower = EvapCond(EvapCoolNum).EvapCoolerPower;
         EvapCond(EvapCoolNum).EvapCoolerEnergy = EvapCond(EvapCoolNum).EvapCoolerPower * TimeStepSys * DataGlobalConstants::SecInHour;
@@ -3512,10 +3483,11 @@ namespace EvaporativeCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // public simulation routine for managing zone hvac evaporative cooler unit
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         if (state.dataEvapCoolers->GetInputZoneEvapUnit) {
             GetInputZoneEvaporativeCoolerUnit(state);
@@ -3605,6 +3577,9 @@ namespace EvaporativeCoolers {
         int UnitLoop;
         int CtrlZone; // index to loop counter
         int NodeNum;  // index to loop counter
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         if (state.dataEvapCoolers->GetInputEvapComponentsFlag) {
             GetEvapInput(state);
@@ -4017,6 +3992,9 @@ namespace EvaporativeCoolers {
         int Loop;
         Real64 TimeElapsed;
 
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+
         if (allocated(ZoneComp)) {
             if (ZoneEvapUnit(UnitNum).MyZoneEq) { // initialize the name of each availability manager list and zone number
                 ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailManagerListName = ZoneEvapUnit(UnitNum).AvailManagerListName;
@@ -4213,6 +4191,8 @@ namespace EvaporativeCoolers {
         int SAFMethod(0);         // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow,
                                   // FractionOfAutosizedHeatingAirflow ...)
 
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+
         DataScalableSizingON = false;
         ZoneHeatingOnlyFan = false;
         ZoneCoolingOnlyFan = false;
@@ -4335,9 +4315,9 @@ namespace EvaporativeCoolers {
         Real64 PartLoadRatio;
 
         {
-            auto const SELECT_CASE_var(ZoneEvapUnit(UnitNum).ControlSchemeType);
-
-            if (SELECT_CASE_var == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
+            auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+            
+            if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
                 ZoneTemp = Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp;
                 CoolSetLowThrottle = ZoneThermostatSetPointHi(ZoneNum) - (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
                 CoolSetHiThrottle = ZoneThermostatSetPointHi(ZoneNum) + (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
@@ -4375,7 +4355,7 @@ namespace EvaporativeCoolers {
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
-            } else if (SELECT_CASE_var == ControlType::ZoneCoolingLoadOnOffCycling) {
+            } else if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneCoolingLoadOnOffCycling) {
 
                 // get zone loads
                 ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
@@ -4401,7 +4381,7 @@ namespace EvaporativeCoolers {
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
-            } else if (SELECT_CASE_var == ControlType::ZoneCoolingLoadVariableSpeedFan) {
+            } else if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) {
                 // get zone loads
                 ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
@@ -4432,6 +4412,8 @@ namespace EvaporativeCoolers {
 
         Real64 MinHumRat; // minimum humidity ratio
 
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+
         int const ZoneNodeNum = ZoneEvapUnit(UnitNum).ZoneNodeNum;
         int const OAInletNodeNum = ZoneEvapUnit(UnitNum).OAInletNodeNum;
         int const OutletNodeNum = ZoneEvapUnit(UnitNum).UnitOutletNodeNum;
@@ -4440,6 +4422,8 @@ namespace EvaporativeCoolers {
         int const FanOutletNodeNum = ZoneEvapUnit(UnitNum).FanOutletNodeNum;
         int const EvapCooler_1_Index = ZoneEvapUnit(UnitNum).EvapCooler_1_Index;
         int const EvapCooler_2_Index = ZoneEvapUnit(UnitNum).EvapCooler_2_Index;
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         // calculate unit sensible cooling output
         if (PartLoadRatio > 0) {
@@ -4536,6 +4520,8 @@ namespace EvaporativeCoolers {
         Real64 FullFlowSensibleOutput; // full flow sensible cooling output
         Real64 FullFlowLatentOutput;   // full flow sensible cooling output
 
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+
         // get full flow sensible cooling output
         PartLoadRatio = 1.0;
         CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullFlowSensibleOutput, FullFlowLatentOutput);
@@ -4594,6 +4580,8 @@ namespace EvaporativeCoolers {
         Real64 QSensOutputProvided; // sensible output at a given PLR
         Real64 QLatOutputProvided;  // latent output at a given PLR
 
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
+
         UnitNum = int(Par(1));
         LoadToBeMet = Par(2);
 
@@ -4651,6 +4639,8 @@ namespace EvaporativeCoolers {
         Real64 ErrorToler(0.001); // error tolerance
         int SolFla;               // Flag of RegulaFalsi solver
         Real64 FullFlowSensibleOutputProvided;
+
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         // first get full load result
         ErrorToler = 0.01;
@@ -4749,35 +4739,12 @@ namespace EvaporativeCoolers {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS FUNCTION:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
 
         // Return value
         Real64 Residual;
-
-        // Argument array dimensioning
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int UnitNum;
@@ -4786,6 +4753,9 @@ namespace EvaporativeCoolers {
         Real64 LoadToBeMet; // sensible load to be met
         Real64 MinHumRat;
         Real64 SensibleOutputProvided;
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         UnitNum = int(Par(1));
         ZoneNum = int(Par(2));
@@ -4850,26 +4820,8 @@ namespace EvaporativeCoolers {
         // PURPOSE OF THIS SUBROUTINE:
         // update output variables for the zone evap unit
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNodeNum;
@@ -4878,6 +4830,9 @@ namespace EvaporativeCoolers {
         Real64 MinHumRat;
         Real64 QTotUnitOut;
         Real64 QSensUnitOut;
+
+        auto &EvapCond(state.dataEvapCoolers->EvapCond);
+        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         ZoneNodeNum = ZoneEvapUnit(UnitNum).ZoneNodeNum;
         UnitOutletNodeNum = ZoneEvapUnit(UnitNum).UnitOutletNodeNum;
@@ -4933,7 +4888,7 @@ namespace EvaporativeCoolers {
         WhichEvapCond = UtilityRoutines::FindItemInList(
             EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::EvapCoolerName, state.dataEvapCoolers->NumEvapCool);
         if (WhichEvapCond != 0) {
-            NodeNum = EvapCond(WhichEvapCond).InletNode;
+            NodeNum = state.dataEvapCoolers->EvapCond(WhichEvapCond).InletNode;
         } else {
             ShowSevereError(state, "GetInletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
             ErrorsFound = true;
@@ -4968,7 +4923,7 @@ namespace EvaporativeCoolers {
         WhichEvapCond = UtilityRoutines::FindItemInList(
             EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::EvapCoolerName, state.dataEvapCoolers->NumEvapCool);
         if (WhichEvapCond != 0) {
-            NodeNum = EvapCond(WhichEvapCond).OutletNode;
+            NodeNum = state.dataEvapCoolers->EvapCond(WhichEvapCond).OutletNode;
         } else {
             ShowSevereError(state, "GetOutletNodeNum: Could not find EvaporativeCooler = \"" + EvapCondName + "\"");
             ErrorsFound = true;
