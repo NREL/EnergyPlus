@@ -4315,8 +4315,6 @@ namespace EnergyPlus::OutputReportTabular {
         using DataHVACGlobals::EvapCooled;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::WaterCooled;
-        using EvaporativeCoolers::EvapCond;
-        using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
         using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using HeatingCoils::HeatingCoil;
@@ -4491,8 +4489,9 @@ namespace EnergyPlus::OutputReportTabular {
         }
 
         // Evaporative coolers
-        for (int iCooler = 1; iCooler <= NumEvapCool; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC + EvapCond(iCooler).EvapCoolerEnergy;
+        for (int iCooler = 1; iCooler <= state.dataEvapCoolers->NumEvapCool; ++iCooler) {
+            SysTotalHVACRejectHeatLoss += state.dataEvapCoolers->EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC +
+                                          state.dataEvapCoolers->EvapCond(iCooler).EvapCoolerEnergy;
         }
     }
 
