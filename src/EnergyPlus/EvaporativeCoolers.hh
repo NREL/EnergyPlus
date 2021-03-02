@@ -376,7 +376,8 @@ namespace EvaporativeCoolers {
                                                        Real64 InletDewPointTempSec,
                                                        Real64 InletHumRatioSec);
 
-    OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(int EvapCoolNum,
+    OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(EnergyPlusData &state,
+                                                       int EvapCoolNum,
                                                        Real64 InletDryBulbTempSec,
                                                        Real64 InletWetBulbTempSec,
                                                        Real64 TdbOutSysWetMin,
@@ -429,7 +430,7 @@ namespace EvaporativeCoolers {
     // Beginning of Reporting subroutines for the EvapCooler Module
     // *****************************************************************************
 
-    void ReportEvapCooler(int EvapCoolNum);
+    void ReportEvapCooler(EnergyPlusData &state, int EvapCoolNum);
 
     //***************
     // Begin routines for zone HVAC Evaporative cooler unit
