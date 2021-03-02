@@ -2881,13 +2881,13 @@ namespace HeatingCoils {
 
         HeatingCoil(CoilNum).FuelUseRate = HeatingCoil(CoilNum).FuelUseLoad;
         HeatingCoil(CoilNum).ElecUseRate = HeatingCoil(CoilNum).ElecUseLoad;
-        HeatingCoil(CoilNum).FuelUseLoad *= ReportingConstant;
-        HeatingCoil(CoilNum).ElecUseLoad *= ReportingConstant;
         if (coilIsSuppHeater) {
             DataHVACGlobals::SuppHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
         } else {
             DataHVACGlobals::ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
         }
+        HeatingCoil(CoilNum).FuelUseLoad *= ReportingConstant;
+        HeatingCoil(CoilNum).ElecUseLoad *= ReportingConstant;
 
         HeatingCoil(CoilNum).ParasiticFuelLoad = HeatingCoil(CoilNum).ParasiticFuelRate * ReportingConstant;
 
