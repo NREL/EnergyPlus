@@ -867,7 +867,8 @@ namespace InternalHeatGains {
                             } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(9) +
-                                                    " is required for this item.");
+                                                    ". " + cAlphaFieldNames(9) + " is required when Thermal Comfort Model Type is one of "
+                                                                                 "\"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\"" );
                                     ErrorsFound = true;
                                 }
                             }
@@ -881,7 +882,7 @@ namespace InternalHeatGains {
                                         if (People(Loop).ClothingPtr == 0 && ModelWithAdditionalInputs) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                                cAlphaFieldNames(12) + " entered=" + AlphaName(12));
+                                                                cAlphaFieldNames(12) + " entered=\"" + AlphaName(12) + "\".");
                                                 ErrorsFound = true;
                                             }
                                         } else { // check min/max on schedule
@@ -933,7 +934,7 @@ namespace InternalHeatGains {
                                         if (People(Loop).ClothingMethodPtr == 0) {
                                             if (Item1 == 1) {
                                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                                cAlphaFieldNames(11) + " entered=" + AlphaName(11));
+                                                                cAlphaFieldNames(11) + " entered=\"" + AlphaName(11) + "\".");
                                                 ErrorsFound = true;
                                             }
                                         }
@@ -942,7 +943,7 @@ namespace InternalHeatGains {
                                             if (People(Loop).ClothingPtr == 0) {
                                                 if (Item1 == 1) {
                                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                                    cAlphaFieldNames(12) + " entered=" + AlphaName(12));
+                                                                    cAlphaFieldNames(12) + " entered=\"" + AlphaName(12) + "\".");
                                                     ErrorsFound = true;
                                                 }
                                             }
@@ -963,7 +964,7 @@ namespace InternalHeatGains {
                                 if (People(Loop).AirVelocityPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                        cAlphaFieldNames(13) + " entered=" + AlphaName(13));
+                                                        cAlphaFieldNames(13) + " entered=\"" + AlphaName(13) + "\".");
                                         ErrorsFound = true;
                                     }
                                 } else { // check min/max on schedule
@@ -995,7 +996,8 @@ namespace InternalHeatGains {
                             } else if (ModelWithAdditionalInputs) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(13) +
-                                                    " is required for this item.");
+                                                                                 ". " + cAlphaFieldNames(13) + " is required when Thermal Comfort Model Type is one of "
+                                                                                 "\"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\"");
                                     ErrorsFound = true;
                                 }
                             }
@@ -1006,14 +1008,15 @@ namespace InternalHeatGains {
                                 if (People(Loop).AnkleAirVelocityPtr == 0) {
                                     if (Item1 == 1) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", invalid " +
-                                                               cAlphaFieldNames(indexAnkleAirVelPtr) + " entered=" + AlphaName(indexAnkleAirVelPtr));
+                                                               cAlphaFieldNames(indexAnkleAirVelPtr) + " entered=\"" + AlphaName(indexAnkleAirVelPtr) + "\".");
                                         ErrorsFound = true;
                                     }
                                 }
                             } else if (People(Loop).AnkleDraftASH55) {
                                 if (Item1 == 1) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", blank " + cAlphaFieldNames(indexAnkleAirVelPtr) +
-                                                           " is required for this item.");
+                                            ". " + cAlphaFieldNames(indexAnkleAirVelPtr) + " is required when Thermal Comfort Model Type is one of "
+                                            "\"Fanger\", \"Pierce\", \"KSU\", \"CoolingEffectASH55\" or \"AnkleDraftASH55\"");
                                     ErrorsFound = true;
                                 }
                             }
