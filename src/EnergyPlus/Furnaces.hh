@@ -81,9 +81,12 @@ namespace Furnaces {
     constexpr int Off(0); // signal DXCoil that compressor shouldn't run
 
     // Dehumidification control modes (DehumidControlMode)
-    extern int const DehumidControl_None;
-    extern int const DehumidControl_Multimode;
-    extern int const DehumidControl_CoolReheat;
+    enum class DehumidificationControlMode
+    {
+        DehumidControl_None,
+        DehumidControl_Multimode,
+        DehumidControl_CoolReheat,
+    };
 
     // DERIVED TYPE DEFINITIONS
 
@@ -220,7 +223,7 @@ namespace Furnaces {
         // shut off after compressor cycle off  [s]
         bool Humidistat;                        // Humidistat control (heatcool units only and not heatpump)
         bool InitHeatPump;                      // Heat pump initialization flag (for error reporting)
-        int DehumidControlType_Num;             // 0 = None, 1=MultiMode, 2=CoolReheat
+        DehumidificationControlMode DehumidControlType_Num;             // 0 = None, 1=MultiMode, 2=CoolReheat
         int LatentMaxIterIndex;                 // Index to recurring warning message
         int LatentRegulaFalsiFailedIndex;       // Index to recurring warning message
         int LatentRegulaFalsiFailedIndex2;      // Index to recurring warning message
@@ -305,7 +308,7 @@ namespace Furnaces {
             ControlZoneMassFlowFrac(0.0), DesignMaxOutletTemp(9999.0), MdotFurnace(0.0), FanPartLoadRatio(0.0), CompPartLoadRatio(0.0),
             WSHPRuntimeFrac(0.0), CoolPartLoadRatio(0.0), HeatPartLoadRatio(0.0), MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0),
             MaxOATSuppHeat(0.0), CondenserNodeNum(0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), OnCyclePowerFraction(0.0), FanDelayTime(0.0),
-            Humidistat(false), InitHeatPump(false), DehumidControlType_Num(0), LatentMaxIterIndex(0), LatentRegulaFalsiFailedIndex(0),
+            Humidistat(false), InitHeatPump(false), DehumidControlType_Num(DehumidificationControlMode::DehumidControl_None), LatentMaxIterIndex(0), LatentRegulaFalsiFailedIndex(0),
             LatentRegulaFalsiFailedIndex2(0), SensibleMaxIterIndex(0), SensibleRegulaFalsiFailedIndex(0), WSHPHeatMaxIterIndex(0),
             WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
             HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
