@@ -529,6 +529,15 @@ namespace Furnaces {
 
 struct FurnacesData : BaseGlobalStruct {
 
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    Array1D_bool MyEnvrnFlag;             // environment flag
+    Array1D_bool MySecondOneTimeFlag;     // additional one time flag
+    Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
+    Array1D_bool MyCheckFlag;             // Used to obtain the zone inlet node number in the controlled zone
+    Array1D_bool MyFlowFracFlag;          // Used for calculatig flow fraction once
+    Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
+    Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
+
     int NumFurnaces = 0; // The number of furnaces found in the input data file
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
@@ -578,6 +587,14 @@ struct FurnacesData : BaseGlobalStruct {
         SaveCompressorPLR = 0.0;
         CurrentModuleObject = "";
         Furnace.clear();
+
+        MyEnvrnFlag.clear();
+        MySecondOneTimeFlag.clear();
+        MyFanFlag.clear();
+        MyCheckFlag.clear();
+        MyFlowFracFlag.clear();
+        MyPlantScanFlag.clear();
+        MySuppCoilPlantScanFlag.clear();
     }
 };
 

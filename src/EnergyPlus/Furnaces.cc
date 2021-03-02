@@ -4773,13 +4773,6 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;             // environment flag
-        static Array1D_bool MySecondOneTimeFlag;     // additional one time flag
-        static Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
-        static Array1D_bool MyCheckFlag;             // Used to obtain the zone inlet node number in the controlled zone
-        static Array1D_bool MyFlowFracFlag;          // Used for calculatig flow fraction once
-        static Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
-        static Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
         bool errFlag;                                // error flag for mining functions
         Real64 FanVolFlowRate;                       // fan volumetric flow rate (m3/s)
         Real64 QZnReq;                               // furnace load based on control zone frac (W)
@@ -4827,23 +4820,23 @@ namespace Furnaces {
 
         if (InitFurnaceMyOneTimeFlag) {
             // initialize the environment and sizing flags
-            MyEnvrnFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MyEnvrnFlag.allocate(state.dataFurnaces->NumFurnaces);
             state.dataFurnaces->MySizeFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MySecondOneTimeFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MyFanFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MyCheckFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MyFlowFracFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MyPlantScanFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MySuppCoilPlantScanFlag.allocate(state.dataFurnaces->NumFurnaces);
-            MyEnvrnFlag = true;
+            state.dataFurnaces->MySecondOneTimeFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MyFanFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MyCheckFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MyFlowFracFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MyPlantScanFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MySuppCoilPlantScanFlag.allocate(state.dataFurnaces->NumFurnaces);
+            state.dataFurnaces->MyEnvrnFlag = true;
             state.dataFurnaces->MySizeFlag = true;
-            MySecondOneTimeFlag = true;
-            MyFanFlag = true;
-            MyCheckFlag = true;
-            MyFlowFracFlag = true;
+            state.dataFurnaces->MySecondOneTimeFlag = true;
+            state.dataFurnaces->MyFanFlag = true;
+            state.dataFurnaces->MyCheckFlag = true;
+            state.dataFurnaces->MyFlowFracFlag = true;
             InitFurnaceMyOneTimeFlag = false;
-            MyPlantScanFlag = true;
-            MySuppCoilPlantScanFlag = true;
+            state.dataFurnaces->MyPlantScanFlag = true;
+            state.dataFurnaces->MySuppCoilPlantScanFlag = true;
         }
 
         if (state.dataGlobal->BeginEnvrnFlag && MyAirLoopPass) {
@@ -4880,7 +4873,7 @@ namespace Furnaces {
             }
         }
 
-        if (!state.dataGlobal->DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
+        if (!state.dataGlobal->DoingSizing && state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
             FanVolFlowRate = GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, state.dataFurnaces->Furnace(FurnaceNum).FanIndex);
@@ -4904,12 +4897,12 @@ namespace Furnaces {
                     ShowContinueError(state, format("... Entered value={:.2R}", state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate));
                 }
 
-                MySecondOneTimeFlag(FurnaceNum) = false;
+                state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum) = false;
             }
         }
 
         // Scan hot water and steam heating coil plant components for one time initializations
-        if (MyPlantScanFlag(FurnaceNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataFurnaces->MyPlantScanFlag(FurnaceNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) || (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingSteam)) {
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
@@ -4973,16 +4966,16 @@ namespace Furnaces {
                                                          .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNum)
                                                          .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNum)
                                                          .NodeNumOut;
-                MyPlantScanFlag(FurnaceNum) = false;
+                state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
-                MyPlantScanFlag(FurnaceNum) = false;
+                state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
             }
-        } else if (MyPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
-            MyPlantScanFlag(FurnaceNum) = false;
+        } else if (state.dataFurnaces->MyPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
+            state.dataFurnaces->MyPlantScanFlag(FurnaceNum) = false;
         }
 
         // Scan Supplemental hot water and steam heating coil plant components for one time initializations
-        if (MySuppCoilPlantScanFlag(FurnaceNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) && allocated(state.dataPlnt->PlantLoop)) {
             if ((state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) || (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingSteam)) {
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
@@ -5044,17 +5037,17 @@ namespace Furnaces {
                                                              .Branch(state.dataFurnaces->Furnace(FurnaceNum).BranchNumSupp)
                                                              .Comp(state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp)
                                                              .NodeNumOut;
-                MySuppCoilPlantScanFlag(FurnaceNum) = false;
+                state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
             } else { // pthp not connected to plant
-                MySuppCoilPlantScanFlag(FurnaceNum) = false;
+                state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
             }
 
-        } else if (MySuppCoilPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
-            MySuppCoilPlantScanFlag(FurnaceNum) = false;
+        } else if (state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) && !state.dataGlobal->AnyPlantInModel) {
+            state.dataFurnaces->MySuppCoilPlantScanFlag(FurnaceNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FurnaceNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataFurnaces->MyEnvrnFlag(FurnaceNum)) {
             // Change the Volume Flow Rates to Mass Flow Rates
             state.dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate * state.dataEnvrn->StdRhoAir;
             state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow * state.dataEnvrn->StdRhoAir;
@@ -5152,14 +5145,14 @@ namespace Furnaces {
                                        state.dataFurnaces->Furnace(FurnaceNum).CompNumSupp);
                 }
             }
-            MyEnvrnFlag(FurnaceNum) = false;
+            state.dataFurnaces->MyEnvrnFlag(FurnaceNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(FurnaceNum) = true;
+            state.dataFurnaces->MyEnvrnFlag(FurnaceNum) = true;
         }
 
-        if (MyFanFlag(FurnaceNum)) {
+        if (state.dataFurnaces->MyFanFlag(FurnaceNum)) {
             if (state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate != AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate > 0.0) {
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow / state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate;
@@ -5180,14 +5173,14 @@ namespace Furnaces {
                                           format("...Unitary system volumetric flow rate = {:.5R} m3/s.", state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow));
                     }
                 }
-                MyFanFlag(FurnaceNum) = false;
+                state.dataFurnaces->MyFanFlag(FurnaceNum) = false;
             } else {
                 state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate =
                     GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, state.dataFurnaces->Furnace(FurnaceNum).FanIndex);
             }
         }
 
-        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && MyCheckFlag(FurnaceNum)) {
+        if (allocated(state.dataZoneEquip->ZoneEquipConfig) && state.dataFurnaces->MyCheckFlag(FurnaceNum)) {
             int zoneNum = Zone(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum).ZoneEqNum;
             int zoneInlet = state.dataFurnaces->Furnace(FurnaceNum).ZoneInletNode;
             int coolingPriority = 0;
@@ -5198,7 +5191,7 @@ namespace Furnaces {
                 state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceCoolingNum = coolingPriority;
                 state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceHeatingNum = heatingPriority;
             }
-            MyCheckFlag(FurnaceNum) = false;
+            state.dataFurnaces->MyCheckFlag(FurnaceNum) = false;
             if (state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceCoolingNum == 0 || state.dataFurnaces->Furnace(FurnaceNum).ZoneSequenceHeatingNum == 0) {
                 ShowSevereError(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " \"" + state.dataFurnaces->Furnace(FurnaceNum).Name +
                                 "\": Airloop air terminal in the zone equipment list for zone = " + Zone(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum).Name +
@@ -5210,7 +5203,7 @@ namespace Furnaces {
 
         // Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
         NumAirLoopZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-        if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && MyFlowFracFlag(FurnaceNum)) {
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && state.dataFurnaces->MyFlowFracFlag(FurnaceNum)) {
             FlowFracFlagReady = true;
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                 // zone inlet nodes for cooling
@@ -5230,7 +5223,7 @@ namespace Furnaces {
             }
         }
 
-        if (MyFlowFracFlag(FurnaceNum)) {
+        if (state.dataFurnaces->MyFlowFracFlag(FurnaceNum)) {
             if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && FlowFracFlagReady) {
                 SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
                 for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
@@ -5251,7 +5244,7 @@ namespace Furnaces {
                                                  state.dataFurnaces->Furnace(FurnaceNum).Name,
                                                  "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                  state.dataFurnaces->Furnace(FurnaceNum).ControlZoneMassFlowFrac);
-                    MyFlowFracFlag(FurnaceNum) = false;
+                    state.dataFurnaces->MyFlowFracFlag(FurnaceNum) = false;
                 }
             }
         }
