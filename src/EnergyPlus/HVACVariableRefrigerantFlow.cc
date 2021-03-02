@@ -8761,7 +8761,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Simulates the unit components sequentially in the air flow direction.
 
         using DXCoils::SimDXCoil;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -11677,8 +11676,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         using General::SolveRoot;
-
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using ScheduleManager::GetCurrentScheduleValue;
         using TempSolveRoot::SolveRoot;
 
@@ -11941,7 +11938,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         //		A new physics based VRF model applicable for Fluid Temperature Control.
         using DXCoils::SimDXCoil;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
