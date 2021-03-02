@@ -7092,6 +7092,49 @@ namespace UnitarySystems {
                                     "System",
                                     "Average",
                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
+                if (state.dataUnitarySystems->unitarySys[sysNum].m_CoolCoilExists) {
+                    SetupOutputVariable(state,
+                                        "Unitary System Cooling Ancillary Electricity Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_CoolingAuxElecConsumption,
+                                        "System",
+                                        "Sum",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                        _,
+                                        "Electricity",
+                                        "Cooling",
+                                        _,
+                                        "System");
+                }    
+                if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists || state.dataUnitarySystems->unitarySys[sysNum].m_SuppCoilExists) {
+                    SetupOutputVariable(state,
+                                        "Unitary System Heating Ancillary Electricity Energy",
+                                        OutputProcessor::Unit::J,
+                                        state.dataUnitarySystems->unitarySys[sysNum].m_HeatingAuxElecConsumption,
+                                        "System",
+                                        "Sum",
+                                        state.dataUnitarySystems->unitarySys[sysNum].Name,
+                                        _,
+                                        "Electricity",
+                                        "Heating",
+                                        _,
+                                        "System");
+                }
+
+                SetupOutputVariable(state,
+                                    "Unitary System Electricity Rate",
+                                    OutputProcessor::Unit::W,
+                                    state.dataUnitarySystems->unitarySys[sysNum].m_ElecPower,
+                                    "System",
+                                    "Average",
+                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
+                SetupOutputVariable(state,
+                                    "Unitary System Electricity Energy",
+                                    OutputProcessor::Unit::J,
+                                    state.dataUnitarySystems->unitarySys[sysNum].m_ElecPowerConsumption,
+                                    "System",
+                                    "Sum",
+                                    state.dataUnitarySystems->unitarySys[sysNum].Name);
 
                 // report predicted load as determined by Unitary System for load control only
                 if (state.dataUnitarySystems->unitarySys[sysNum].m_ControlType != ControlType::Setpoint) {
@@ -7141,20 +7184,6 @@ namespace UnitarySystems {
                                     "Average",
                                     state.dataUnitarySystems->unitarySys[sysNum].Name);
 
-                if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists) {
-                    SetupOutputVariable(state, "Unitary System Heating Ancillary Electricity Energy",
-                                        OutputProcessor::Unit::J,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_HeatingAuxElecConsumption,
-                                        "System",
-                                        "Sum",
-                                        state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                        _,
-                                        "Electricity",
-                                        "Heating",
-                                        _,
-                                        "System");
-                }
-
                 {
                     auto const SELECT_CASE_var(state.dataUnitarySystems->unitarySys[sysNum].m_CoolingCoilType_Num);
                     if (SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
@@ -7171,29 +7200,6 @@ namespace UnitarySystems {
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
                     } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling || (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling)) {
-                        SetupOutputVariable(state, "Unitary System Cooling Ancillary Electricity Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_CoolingAuxElecConsumption,
-                                            "System",
-                                            "Sum",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name,
-                                            _,
-                                            "Electricity",
-                                            "Cooling",
-                                            _,
-                                            "System");
-                        SetupOutputVariable(state, "Unitary System Electricity Rate",
-                                            OutputProcessor::Unit::W,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_ElecPower,
-                                            "System",
-                                            "Average",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
-                        SetupOutputVariable(state, "Unitary System Electricity Energy",
-                                            OutputProcessor::Unit::J,
-                                            state.dataUnitarySystems->unitarySys[sysNum].m_ElecPowerConsumption,
-                                            "System",
-                                            "Sum",
-                                            state.dataUnitarySystems->unitarySys[sysNum].Name);
                         if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatRecActive) {
                             SetupOutputVariable(state, "Unitary System Heat Recovery Rate",
                                                 OutputProcessor::Unit::W,
@@ -7264,20 +7270,16 @@ namespace UnitarySystems {
 
                 {
                     auto const SELECT_CASE_var(state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilType_Num);
-                    if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedHeating) ||
-                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage) ||
-                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGas_MultiStage)) {
-                    } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
-                               (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
-                               (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) ||
-                               (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP)) {
+                    if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed) ||
+                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
+                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) ||
+                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP)) {
                         SetupOutputVariable(state, "Unitary System Requested Heating Rate",
                                             OutputProcessor::Unit::W,
                                             state.dataUnitarySystems->unitarySys[sysNum].m_HeatingCoilSensDemand,
                                             "System",
                                             "Average",
                                             state.dataUnitarySystems->unitarySys[sysNum].Name);
-                    } else {
                     }
                 }
 
@@ -7355,12 +7357,10 @@ namespace UnitarySystems {
                                      "[m3/s]",
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideOn,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_MaxNoCoolHeatAirVolFlowEMSOverrideValue);
-
+                }
+                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSInternalVariable(state,
                         "Unitary System Control Zone Mass Flow Fraction", state.dataUnitarySystems->unitarySys[sysNum].Name, "[]", state.dataUnitarySystems->unitarySys[sysNum].ControlZoneMassFlowFrac);
-                }
-                //                    }
-                if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     SetupEMSInternalVariable(state,
                         "Unitary HVAC Design Heating Capacity", state.dataUnitarySystems->unitarySys[sysNum].Name, "[W]", state.dataUnitarySystems->unitarySys[sysNum].m_DesignHeatingCapacity);
                     SetupEMSInternalVariable(state,
@@ -7377,7 +7377,6 @@ namespace UnitarySystems {
                                      "[W]",
                                      state.dataUnitarySystems->unitarySys[sysNum].m_EMSOverrideMoistZoneLoadRequest,
                                      state.dataUnitarySystems->unitarySys[sysNum].m_EMSMoistureZoneLoadValue);
-                    //                        }
                 }
                 // can this be called each time a system is gottem?
                 bool anyEMSRan;
@@ -13979,8 +13978,6 @@ namespace UnitarySystems {
         if (this->m_FanExists && OutletNode > 0) {
             if (state.dataUnitarySystems->CompOnMassFlow > 0.0) {
                 this->FanPartLoadRatio = DataLoopNode::Node(OutletNode).MassFlowRate / state.dataUnitarySystems->CompOnMassFlow;
-            } else {
-                this->FanPartLoadRatio = 0.0;
             }
             if (AirLoopNum > 0) {
                 if (this->m_FanOpMode == DataHVACGlobals::CycFanCycCoil) {
@@ -13998,6 +13995,10 @@ namespace UnitarySystems {
             locFanElecPower = Fans::GetFanPower(this->m_FanIndex);
         }
 
+        Real64 elecCoolingPower = 0.0;
+        Real64 elecHeatingPower = 0.0;
+        Real64 suppHeatingPower = 0.0;
+
         {
             auto const SELECT_CASE_var(this->m_CoolingCoilType_Num);
 
@@ -14006,6 +14007,15 @@ namespace UnitarySystems {
                 this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);
                 this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
                 this->m_SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
+                // see :setSpeedVariables
+                if (state.dataUnitarySystems->CoolingLoad && this->m_SpeedNum <= 1) {
+                    this->m_TotalAuxElecPower = this->m_AncillaryOnPower * this->m_CycRatio + this->m_AncillaryOffPower * (1.0 - this->m_CycRatio);
+                    this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * this->m_CycRatio * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
+                    this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_CycRatio) * ReportingConstant;
+                }
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling) ||
                        ((SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) && (this->m_NumOfSpeedCooling > 1))) {
@@ -14015,16 +14025,13 @@ namespace UnitarySystems {
 
                 Real64 CompPartLoadFrac = this->m_CompPartLoadRatio;
                 if (state.dataUnitarySystems->CoolingLoad) {
-
                     this->m_TotalAuxElecPower = this->m_AncillaryOnPower * CompPartLoadFrac + this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac);
                     this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * CompPartLoadFrac * ReportingConstant;
                 }
                 if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
                     this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                this->m_ElecPower = locFanElecPower + DataHVACGlobals::DXElecCoolingPower + DataHVACGlobals::DXElecHeatingPower +
-                                    DataHVACGlobals::ElecHeatingCoilPower + this->m_TotalAuxElecPower;
-                this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWater || SELECT_CASE_var == DataHVACGlobals::Coil_CoolingWaterDetailed) {
 
@@ -14032,6 +14039,25 @@ namespace UnitarySystems {
                     this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);
                     this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
                     this->m_SpeedNum = max(this->m_CoolingSpeedNum, this->m_HeatingSpeedNum);
+                    if (state.dataUnitarySystems->CoolingLoad) {
+                        // if discrete, the coil cycles on and off
+                        this->m_TotalAuxElecPower =
+                            this->m_AncillaryOnPower * this->m_CycRatio + this->m_AncillaryOffPower * (1.0 - this->m_CycRatio);
+                        this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * this->m_CycRatio * ReportingConstant;
+                    }
+                    if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
+                        this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_CycRatio) * ReportingConstant;
+                    }
+                } else {
+                    if (state.dataUnitarySystems->CoolingLoad) {
+                        // if not discrete, the coil runs the entire time step.
+                        this->m_TotalAuxElecPower =
+                            this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                        this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+                    }
+                    if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
+                        this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+                    }
                 }
                 this->m_ElecPower = locFanElecPower;
                 this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
@@ -14042,7 +14068,36 @@ namespace UnitarySystems {
                         this->CoilSHR = coilCoolingDXs[this->m_CoolingCoilIndex].performance.NormalSHR;
                     }
                 }
-            } else {
+                Real64 CompPartLoadFrac = this->m_CompPartLoadRatio;
+                if (state.dataUnitarySystems->CoolingLoad) {
+                    this->m_TotalAuxElecPower = this->m_AncillaryOnPower * CompPartLoadFrac + this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac);
+                    this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * CompPartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
+                    this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
+                }
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
+            } else if (SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined || SELECT_CASE_var == DataHVACGlobals::CoilWater_CoolingHXAssisted ||
+                       SELECT_CASE_var == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
+                if (state.dataUnitarySystems->CoolingLoad) {
+                    this->m_TotalAuxElecPower =
+                        this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                    this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
+                    this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+                }
+                // these coil types do not consume electricity or report electricity at the plant
+            } else { // all other DX cooling coils
+                Real64 CompPartLoadFrac = this->m_CompPartLoadRatio;
+                if (state.dataUnitarySystems->CoolingLoad) {
+                    this->m_TotalAuxElecPower = this->m_AncillaryOnPower * CompPartLoadFrac + this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac);
+                    this->m_CoolingAuxElecConsumption = this->m_AncillaryOnPower * CompPartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->CoolingMode) {
+                    this->m_CoolingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
+                }
+                elecCoolingPower = DataHVACGlobals::DXElecCoolingPower;
             }
         }
 
@@ -14056,29 +14111,86 @@ namespace UnitarySystems {
 
                 Real64 CompPartLoadFrac = this->m_CompPartLoadRatio;
                 if (state.dataUnitarySystems->HeatingLoad) {
-
                     this->m_TotalAuxElecPower = this->m_AncillaryOnPower * CompPartLoadFrac + this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac);
                     this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * CompPartLoadFrac * ReportingConstant;
                 }
                 if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
                     this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - CompPartLoadFrac) * ReportingConstant;
                 }
-                this->m_ElecPower =
-                    locFanElecPower + DataHVACGlobals::DXElecCoolingPower + DataHVACGlobals::DXElecHeatingPower + this->m_TotalAuxElecPower;
-                this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
+                elecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_HeatingGas_MultiStage) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric_MultiStage)) {
                 this->m_CycRatio = max(this->m_CoolingCycRatio, this->m_HeatingCycRatio);
                 this->m_SpeedRatio = max(this->m_CoolingSpeedRatio, this->m_HeatingSpeedRatio);
 
-                this->m_ElecPower =
-                    locFanElecPower + DataHVACGlobals::DXElecCoolingPower + DataHVACGlobals::ElecHeatingCoilPower + this->m_TotalAuxElecPower;
-                this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
+                if (state.dataUnitarySystems->HeatingLoad) {
+                    this->m_TotalAuxElecPower =
+                        this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                    this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
+                    this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+                }
 
-            } else {
+                elecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
+
+            } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_HeatingEmpirical) ||
+                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHP) ||
+                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple) ||
+                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
+                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingAirToAirVariableSpeed)) {
+
+                if (state.dataUnitarySystems->HeatingLoad) {
+                    this->m_TotalAuxElecPower =
+                        this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                    this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
+                    this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+                }
+
+                elecHeatingPower = DataHVACGlobals::DXElecHeatingPower;
+
+            } else if ((SELECT_CASE_var == DataHVACGlobals::Coil_UserDefined) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
+                       (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingDesuperheater)) {
+
+                if (state.dataUnitarySystems->HeatingLoad) {
+                    this->m_TotalAuxElecPower =
+                        this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                    this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
+                    this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+                }
+
+            } else if (this->m_HeatCoilExists) {
+                if (state.dataUnitarySystems->HeatingLoad) {
+                    // if discrete, the coil cycles on and off
+                    this->m_TotalAuxElecPower =
+                        this->m_AncillaryOnPower * this->m_PartLoadFrac + this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac);
+                    this->m_HeatingAuxElecConsumption = this->m_AncillaryOnPower * this->m_PartLoadFrac * ReportingConstant;
+                }
+                if (this->m_LastMode == state.dataUnitarySystems->HeatingMode) {
+                    this->m_HeatingAuxElecConsumption += this->m_AncillaryOffPower * (1.0 - this->m_PartLoadFrac) * ReportingConstant;
+                }
+                elecHeatingPower = DataHVACGlobals::ElecHeatingCoilPower;
             }
         }
+
+        if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad) {
+            this->m_TotalAuxElecPower = this->m_AncillaryOffPower;
+        }
+
+        if (this->m_SuppCoilExists) {
+            auto const SELECT_CASE_var(this->m_HeatingCoilType_Num);
+            if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) {
+                suppHeatingPower = DataHVACGlobals::SuppHeatingCoilPower;
+            }
+        }
+
+        this->m_ElecPower = locFanElecPower + elecCoolingPower + elecHeatingPower + suppHeatingPower + this->m_TotalAuxElecPower;
+        this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
 
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {

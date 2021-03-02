@@ -60,6 +60,9 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
+
+#include <EnergyPlus/Data/CommonIncludes.hh>
+
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -633,8 +636,8 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
         "  ,                               !- Heat Pump Time Constant",
         "  ,                               !- Fraction of On-Cycle Power Use",
         "  ,                               !- Heat Pump Fan Delay Time",
-        "  ,                               !- Ancilliary On-Cycle Electric Power",
-        "  ,                               !- Ancilliary Off-Cycle Electric Power",
+        "  100,                            !- Ancilliary On-Cycle Electric Power",
+        "  50,                             !- Ancilliary Off-Cycle Electric Power",
         "  ,                               !- Design Heat Recovery Water Flow Rate",
         "  ,                               !- Maximum Temperature for Heat Recovery",
         "  ,                               !- Heat Recovery Water Inlet Node Name",
@@ -843,6 +846,14 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
                       sensOut,
                       latOut);
     EXPECT_EQ(compName, thisSys->Name);
+    EXPECT_NEAR(100.0, thisSys->m_AncillaryOnPower, 0.00000001);
+    EXPECT_NEAR(50.0, thisSys->m_AncillaryOffPower, 0.00000001);
+    EXPECT_NEAR(0.49388, thisSys->m_PartLoadFrac, 0.000001);
+    Real64 totalAncillaryPower =
+        thisSys->m_AncillaryOnPower * thisSys->m_PartLoadFrac + thisSys->m_AncillaryOffPower * (1.0 - thisSys->m_PartLoadFrac);
+    EXPECT_NEAR(totalAncillaryPower, thisSys->m_TotalAuxElecPower, 0.00000001);
+    // at PLR very near 0.5, m_TotalAuxElecPower should be very near 75 W.
+    EXPECT_NEAR(74.694, thisSys->m_TotalAuxElecPower, 0.0001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
@@ -15666,6 +15677,195 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
      EXPECT_NEAR(thisSys->m_CycRatio, 1.000, 0.001);
      EXPECT_NEAR(thisSys->m_SpeedRatio, 0.228062, 0.02);
      EXPECT_NEAR(sensOut, -11998.0, 210.0);
+}
+
+TEST_F(EnergyPlusFixture, UnitarySystemModel_reportUnitarySystemAncillaryPowerTest) {
+    DataHVACGlobals::TimeStepSys = 0.25;
+    DataLoopNode::Node.allocate(2);
+    UnitarySys thisSys;
+    thisSys.AirInNode = 1;
+    thisSys.AirOutNode = 2;
+    thisSys.m_AncillaryOnPower = 100.0;
+    thisSys.m_AncillaryOffPower = 50.0;
+    thisSys.m_ControlType = UnitarySys::ControlType::Setpoint;
+    EnergyPlusData state;
+    state.dataUnitarySystems = std::unique_ptr<UnitarySystemsData>(new UnitarySystemsData);
+    state.dataUnitarySystems->unitarySys.push_back(thisSys);
+    Real64 onElectricEnergy =
+            thisSys.m_AncillaryOnPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    Real64 offElectricEnergy =
+            thisSys.m_AncillaryOffPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+
+    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingTwoSpeed;
+    thisSys.m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
+    thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+    state.dataUnitarySystems->CoolingLoad = true;
+    thisSys.reportUnitarySystem(state, 0);
+    // cooling coil is off
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
+
+    // cooling coil is on
+    thisSys.m_CoolingCycRatio = 1.0;
+    thisSys.reportUnitarySystem(state, 0);
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, onElectricEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
+
+    state.dataUnitarySystems->CoolingLoad = false;
+    state.dataUnitarySystems->HeatingLoad = true;
+    thisSys.m_CoolingCycRatio = 0.0;
+    thisSys.m_HeatingPartLoadFrac = 0.0;
+    thisSys.reportUnitarySystem(state, 0);
+    // heating coil is off
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001); // last mode is cooling mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);               // heating coil is off
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
+
+    // heating coil is on
+    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+    thisSys.m_HeatingPartLoadFrac = 1.0;
+    thisSys.reportUnitarySystem(state, 0);
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001);              // last mode is heating mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, onElectricEnergy, 0.000001); // heating coil is on
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
+
+    thisSys.m_HeatingPartLoadFrac = 0.5; // test PLR other than 0 or 1
+    thisSys.reportUnitarySystem(state, 0);
+    // average power and energy should be in between on and off values
+    Real64 ancillaryAvgPower = (thisSys.m_AncillaryOnPower + thisSys.m_AncillaryOffPower) / 2.0;
+    Real64 ancillaryAvgEnergy = (onElectricEnergy + offElectricEnergy) / 2.0;
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, ancillaryAvgPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001); // last mode is heating mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, ancillaryAvgEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, ancillaryAvgPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, ancillaryAvgEnergy, 0.000001);
+
+    // test with discrete speed water coils
+    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
+    thisSys.m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+    // coil cycles on and off just like DX coils
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
+    // switch on-off power values, should have opposite results but uses same code
+    thisSys.m_AncillaryOnPower = 50.0;
+    thisSys.m_AncillaryOffPower = 100.0;
+    onElectricEnergy = thisSys.m_AncillaryOnPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    offElectricEnergy = thisSys.m_AncillaryOffPower * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+    thisSys.m_HeatingPartLoadFrac = 0.0;
+    state.dataUnitarySystems->HeatingLoad = false;
+    state.dataUnitarySystems->CoolingLoad = true;
+    thisSys.reportUnitarySystem(state, 0);
+    // cooling coil is off
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
+
+    // cooling coil is on
+    thisSys.m_CoolingCycRatio = 1.0;
+    thisSys.reportUnitarySystem(state, 0);
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, onElectricEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
+
+    state.dataUnitarySystems->CoolingLoad = false;
+    state.dataUnitarySystems->HeatingLoad = true;
+    thisSys.m_CoolingCycRatio = 0.0;
+    thisSys.m_HeatingPartLoadFrac = 0.0;
+    thisSys.reportUnitarySystem(state, 0);
+    // heating coil is off
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001); // last mode is cooling mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);               // heating coil is off
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
+
+    // heating coil is on
+    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+    thisSys.m_HeatingPartLoadFrac = 1.0;
+    thisSys.reportUnitarySystem(state, 0);
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001);              // last mode is heating mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, onElectricEnergy, 0.000001); // heating coil is on
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
+
+    thisSys.m_HeatingPartLoadFrac = 0.5; // test PLR other than 0 or 1
+    thisSys.reportUnitarySystem(state, 0);
+    // average power and energy should be in between on and off values
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, ancillaryAvgPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001); // last mode is heating mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, ancillaryAvgEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, ancillaryAvgPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, ancillaryAvgEnergy, 0.000001);
+
+    // test with non-discrete speed water coils
+    // coil runs the entire time step
+    thisSys.m_DiscreteSpeedCoolingCoil = false;
+    thisSys.m_LastMode = state.dataUnitarySystems->CoolingMode;
+    thisSys.m_HeatingPartLoadFrac = 0.0;
+    state.dataUnitarySystems->HeatingLoad = false;
+    state.dataUnitarySystems->CoolingLoad = true;
+    thisSys.reportUnitarySystem(state, 0);
+    // cooling coil is off
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
+
+    // cooling coil is on
+    thisSys.m_CoolingPartLoadFrac = 1.0;
+    thisSys.reportUnitarySystem(state, 0);
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, onElectricEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
+
+    state.dataUnitarySystems->CoolingLoad = false;
+    state.dataUnitarySystems->HeatingLoad = true;
+    thisSys.m_CoolingPartLoadFrac = 0.0;
+    thisSys.m_HeatingPartLoadFrac = 0.0;
+    thisSys.reportUnitarySystem(state, 0);
+    // heating coil is off
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, offElectricEnergy, 0.000001); // last mode is cooling mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, 0.0, 0.000001);               // heating coil is off
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOffPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, offElectricEnergy, 0.000001);
+
+    // heating coil is on
+    thisSys.m_LastMode = state.dataUnitarySystems->HeatingMode;
+    thisSys.m_HeatingPartLoadFrac = 1.0;
+    thisSys.reportUnitarySystem(state, 0);
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001);              // last mode is heating mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, onElectricEnergy, 0.000001); // heating coil is on
+    EXPECT_NEAR(thisSys.m_ElecPower, thisSys.m_AncillaryOnPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, onElectricEnergy, 0.000001);
+
+    thisSys.m_HeatingPartLoadFrac = 0.5; // test PLR other than 0 or 1
+    thisSys.reportUnitarySystem(state, 0);
+    // average power and energy should be in between on and off values
+    EXPECT_NEAR(thisSys.m_TotalAuxElecPower, ancillaryAvgPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_CoolingAuxElecConsumption, 0.0, 0.000001); // last mode is heating mode
+    EXPECT_NEAR(thisSys.m_HeatingAuxElecConsumption, ancillaryAvgEnergy, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPower, ancillaryAvgPower, 0.000001);
+    EXPECT_NEAR(thisSys.m_ElecPowerConsumption, ancillaryAvgEnergy, 0.000001);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_SetpointControlCyclingFan)
