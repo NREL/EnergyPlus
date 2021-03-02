@@ -121,19 +121,6 @@ namespace EvaporativeCoolers {
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace DataGlobalConstants;
-    // Use statements for access to subroutines in other modules
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    int const WaterSupplyFromMains(101);
-    int const WaterSupplyFromTank(102);
-
-    int const BlowThruFan(50);
-    int const DrawThruFan(51);
-
-    int const ZoneTemperatureDeadBandOnOffCycling(20);
-    int const ZoneCoolingLoadOnOffCycling(21);
-    int const ZoneCoolingLoadVariableSpeedFan(22);
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -156,19 +143,13 @@ namespace EvaporativeCoolers {
     Array1D_bool CheckZoneEvapUnitName;
     bool GetInputZoneEvapUnit(true);
 
-    // Indirect Evaporative Coolers Research Special Operating Modes
-    int const None(0);            // the indirect evaporative cooler Research Special is scheduled off or turned off
-    int const DryModulated(1);    // the indirect evaporative cooler Research Special is modulated in Dry Mode
-    int const DryFull(2);         // the indirect evaporative cooler Research Special is run in full capacity in Dry Mode
-    int const DryWetModulated(3); // the indirect evaporative cooler Research Special is modulated in Dry Mode or wet Mode
-    int const WetModulated(4);    // the indirect evaporative cooler Research Special is modulated in wet Mode
-    int const WetFull(5);         // the indirect evaporative cooler Research Special is run in full capacity in Wet Mode
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
-
-    // component model routines
-
-    // zone unit routines
+    //// Indirect Evaporative Coolers Research Special Operating Modes
+    //int const None(0);            // the indirect evaporative cooler Research Special is scheduled off or turned off
+    //int const DryModulated(1);    // the indirect evaporative cooler Research Special is modulated in Dry Mode
+    //int const DryFull(2);         // the indirect evaporative cooler Research Special is run in full capacity in Dry Mode
+    //int const DryWetModulated(3); // the indirect evaporative cooler Research Special is modulated in Dry Mode or wet Mode
+    //int const WetModulated(4);    // the indirect evaporative cooler Research Special is modulated in wet Mode
+    //int const WetFull(5);         // the indirect evaporative cooler Research Special is run in full capacity in Wet Mode
 
     // Object Data
     Array1D<EvapConditions> EvapCond;
@@ -376,9 +357,9 @@ namespace EvaporativeCoolers {
             // A6 ; \Field Name of Water Supply Storage Tank
             EvapCond(EvapCoolNum).EvapWaterSupplyName = cAlphaArgs(6);
             if (lAlphaFieldBlanks(6)) {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromMains;
             } else {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromTank;
                 SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
@@ -459,9 +440,9 @@ namespace EvaporativeCoolers {
             // A6 ; \Field Name of Water Supply Storage Tank
             EvapCond(EvapCoolNum).EvapWaterSupplyName = cAlphaArgs(6);
             if (lAlphaFieldBlanks(6)) {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromMains;
             } else {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromTank;
                 SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
@@ -555,9 +536,9 @@ namespace EvaporativeCoolers {
             //  A6 ; \Field Name of Water Supply Storage Tank
             EvapCond(EvapCoolNum).EvapWaterSupplyName = cAlphaArgs(6);
             if (lAlphaFieldBlanks(6)) {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromMains;
             } else {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromTank;
                 SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
@@ -651,9 +632,9 @@ namespace EvaporativeCoolers {
 
             EvapCond(EvapCoolNum).EvapWaterSupplyName = cAlphaArgs(13);
             if (lAlphaFieldBlanks(13)) {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromMains;
             } else {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromTank;
                 SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
@@ -777,9 +758,9 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapWaterSupplyName = cAlphaArgs(8);
 
             if (lAlphaFieldBlanks(8)) {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromMains;
             } else {
-                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
+                EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupply::FromTank;
                 SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
@@ -849,7 +830,7 @@ namespace EvaporativeCoolers {
                                 "Average",
                                 EvapCond(EvapCoolNum).EvapCoolerName);
             // this next report variable is setup differently depending on how the water should be metered here.
-            if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupplyFromMains) {
+            if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromMains) {
                 SetupOutputVariable(state, "Evaporative Cooler Water Volume",
                                     OutputProcessor::Unit::m3,
                                     EvapCond(EvapCoolNum).EvapWaterConsump,
@@ -873,7 +854,7 @@ namespace EvaporativeCoolers {
                                     _,
                                     "System");
 
-            } else if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+            } else if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
                 SetupOutputVariable(state, "Evaporative Cooler Storage Tank Water Volume",
                                     OutputProcessor::Unit::m3,
                                     EvapCond(EvapCoolNum).EvapWaterConsump,
@@ -2499,15 +2480,15 @@ namespace EvaporativeCoolers {
 
         FlowRatioSecDry = 0.0;
         FlowRatioSecWet = 0.0;
-        EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = None;
+        EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = OperatingMode::None;
         TEDB = EvapCond(EvapCoolNum).InletTemp;
         TEWB = EvapCond(EvapCoolNum).InletWetBulbTemp;
         SysTempSetPoint = EvapCond(EvapCoolNum).DesiredOutletTemp;
         SecRho = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, InletDryBulbTempSec, InletHumRatioSec);
         MassFlowRateSecMax = SecRho * EvapCond(EvapCoolNum).IndirectVolFlowRate;
-        CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+        CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, OperatingMode::WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
         TdbOutSysWetMin = EvapCond(EvapCoolNum).OutletTemp;
-        CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+        CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, OperatingMode::DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
         TdbOutSysDryMin = EvapCond(EvapCoolNum).OutletTemp;
 
         // get current operating modes of indirect evaporative cooler research special
@@ -2518,10 +2499,9 @@ namespace EvaporativeCoolers {
         AirMassFlowSec = MassFlowRateSecMax;
         PartLoad = EvapCond(EvapCoolNum).PartLoadFract;
         {
-            auto const SELECT_CASE_var(EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode);
-            if (SELECT_CASE_var == DryModulated) {
+            if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
                 Par(1) = double(EvapCoolNum);
-                Par(2) = double(DryModulated);
+                Par(2) = OperatingMode::DryModulated;
                 Par(3) = SysTempSetPoint;
                 Par(4) = InletDryBulbTempSec;
                 Par(5) = InletWetBulbTempSec;
@@ -2570,23 +2550,22 @@ namespace EvaporativeCoolers {
                 } else {
                     FlowRatioSec = 0.0;
                 }
-                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, DryModulated, FlowRatioSec);
+                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSec);
                 EvapCond(EvapCoolNum).IECOperatingStatus = 1;
-            } else if (SELECT_CASE_var == DryFull) {
-                CalcIndirectRDDEvapCoolerOutletTemp(state,
-                    EvapCoolNum, DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+            } else if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::DryFull) {
+                CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, OperatingMode::DryFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
                 EvapCond(EvapCoolNum).SecInletMassFlowRate = MassFlowRateSecMax;
                 FlowRatioSec = 1.0;
-                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, DryFull, FlowRatioSec);
+                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryFull, FlowRatioSec);
                 EvapCond(EvapCoolNum).IECOperatingStatus = 1;
-            } else if (SELECT_CASE_var == DryWetModulated) {
+            } else if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::DryWetModulated) {
                 Par(1) = double(EvapCoolNum);
                 Par(3) = SysTempSetPoint;
                 Par(4) = InletDryBulbTempSec;
                 Par(5) = InletWetBulbTempSec;
                 Par(6) = InletHumRatioSec;
                 // get dry operation performance first
-                Par(2) = double(DryModulated);
+                Par(2) = double(OperatingMode::DryModulated);
                 TempSolveRoot::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
@@ -2632,9 +2611,9 @@ namespace EvaporativeCoolers {
                 }
                 FlowRatioSecDry = FlowRatioSec;
                 AirMassFlowSecDry = AirMassFlowSec;
-                EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower(state, EvapCoolNum, DryModulated, FlowRatioSecDry);
+                EvapCoolerTotalElectricPowerDry = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSecDry);
                 // get wet operation performance
-                Par(2) = double(WetModulated);
+                Par(2) = double(OperatingMode::WetModulated);
                 TempSolveRoot::SolveRoot(state, TempTol, MaxIte, SolFla, AirMassFlowSec, CalcEvapCoolRDDSecFlowResidual, MassFlowRateSecMin, MassFlowRateSecMax, Par);
                 // if the numerical inversion failed, issue error messages.
                 if (SolFla == -1) {
@@ -2680,28 +2659,38 @@ namespace EvaporativeCoolers {
                 }
                 FlowRatioSecWet = FlowRatioSec;
                 AirMassFlowSecWet = AirMassFlowSec;
-                EvapCoolerTotalElectricPowerWet = IndEvapCoolerPower(state, EvapCoolNum, WetModulated, FlowRatioSecWet);
+                EvapCoolerTotalElectricPowerWet = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::WetModulated, FlowRatioSecWet);
                 // compare the dry and wet operation total electric power
                 if (EvapCoolerTotalElectricPowerDry < EvapCoolerTotalElectricPowerWet) {
-                    EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = DryModulated;
+                    EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = OperatingMode::DryModulated;
                     FlowRatioSec = FlowRatioSecDry;
                     EvapCond(EvapCoolNum).SecInletMassFlowRate = AirMassFlowSecDry;
                     CalcIndirectRDDEvapCoolerOutletTemp(state,
-                        EvapCoolNum, DryModulated, AirMassFlowSecDry, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
-                    EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, DryModulated, FlowRatioSec);
+                                                        EvapCoolNum,
+                                                        OperatingMode::DryModulated,
+                                                        AirMassFlowSecDry,
+                                                        InletDryBulbTempSec,
+                                                        InletWetBulbTempSec,
+                                                        InletHumRatioSec);
+                    EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::DryModulated, FlowRatioSec);
                     EvapCond(EvapCoolNum).IECOperatingStatus = 1;
                 } else {
-                    EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = WetModulated;
+                    EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode = OperatingMode::WetModulated;
                     FlowRatioSec = FlowRatioSecWet;
                     EvapCond(EvapCoolNum).SecInletMassFlowRate = AirMassFlowSecWet;
                     CalcIndirectRDDEvapCoolerOutletTemp(state,
-                        EvapCoolNum, WetModulated, AirMassFlowSecWet, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
-                    EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, WetModulated, FlowRatioSec);
+                                                        EvapCoolNum,
+                                                        OperatingMode::WetModulated,
+                                                        AirMassFlowSecWet,
+                                                        InletDryBulbTempSec,
+                                                        InletWetBulbTempSec,
+                                                        InletHumRatioSec);
+                    EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::WetModulated, FlowRatioSec);
                     EvapCond(EvapCoolNum).IECOperatingStatus = 2;
                 }
-            } else if (SELECT_CASE_var == WetModulated) {
+            } else if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::WetModulated) {
                 Par(1) = double(EvapCoolNum);
-                Par(2) = double(WetModulated);
+                Par(2) = double(OperatingMode::WetModulated);
                 Par(3) = SysTempSetPoint;
                 Par(4) = InletDryBulbTempSec;
                 Par(5) = InletWetBulbTempSec;
@@ -2750,19 +2739,19 @@ namespace EvaporativeCoolers {
                 } else {
                     FlowRatioSec = 0.0;
                 }
-                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, WetModulated, FlowRatioSec);
+                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::WetModulated, FlowRatioSec);
                 EvapCond(EvapCoolNum).IECOperatingStatus = 2;
-            } else if (SELECT_CASE_var == WetFull) {
-                CalcIndirectRDDEvapCoolerOutletTemp(state,
-                    EvapCoolNum, WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
+            } else if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::WetFull) {
+                CalcIndirectRDDEvapCoolerOutletTemp(state, EvapCoolNum, OperatingMode::WetFull, MassFlowRateSecMax, InletDryBulbTempSec, InletWetBulbTempSec, InletHumRatioSec);
                 EvapCond(EvapCoolNum).SecInletMassFlowRate = MassFlowRateSecMax;
                 FlowRatioSec = 1.0;
-                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, WetFull, FlowRatioSec);
+                EvapCond(EvapCoolNum).EvapCoolerPower = IndEvapCoolerPower(state, EvapCoolNum, OperatingMode::WetFull, FlowRatioSec);
                 EvapCond(EvapCoolNum).IECOperatingStatus = 2;
             }
         }
         if (PartLoad == 1.0) {
-            if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == WetModulated || EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == WetFull) {
+            if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::WetModulated ||
+                EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::WetFull) {
                 BoundTemp = TEDB - EvapCond(EvapCoolNum).DPBoundFactor * (TEDB - InletDewPointTempSec);
                 if (EvapCond(EvapCoolNum).OutletTemp < BoundTemp) {
                     EvapCond(EvapCoolNum).OutletTemp = BoundTemp;
@@ -2778,7 +2767,7 @@ namespace EvaporativeCoolers {
             // part load set to zero so no cooling
             EvapCond(EvapCoolNum).OutletTemp = EvapCond(EvapCoolNum).InletTemp;
         }
-        if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode != None) {
+        if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode != OperatingMode::None) {
             // There is a constant humidity ratio across the primary side but a reduction in the dry bulb temp
             EvapCond(EvapCoolNum).OuletWetBulbTemp =
                 PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).InletHumRat, state.dataEnvrn->OutBaroPress);
@@ -2850,7 +2839,7 @@ namespace EvaporativeCoolers {
         }
     }
 
-    int IndirectResearchSpecialEvapCoolerOperatingMode(int const EvapCoolNum,
+    OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(int const EvapCoolNum,
                                                        Real64 const InletDryBulbTempSec,
                                                        Real64 const InletWetBulbTempSec,
                                                        Real64 const TdbOutSysWetMin,
@@ -2866,9 +2855,9 @@ namespace EvaporativeCoolers {
         // compares various temperatures to determine the operating mode
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 InletDryBulbTempPri; // entering air dry bulb temperature of primary air
-        Real64 SysTempSetPoint;     // evaporative cooler outlet setpoint temperature, drybulb
-        int OperatingMode;          // current operating mode of indrect evaporative cooler
+        Real64 InletDryBulbTempPri;  // entering air dry bulb temperature of primary air
+        Real64 SysTempSetPoint;      // evaporative cooler outlet setpoint temperature, drybulb
+        OperatingMode OperatingMode; // current operating mode of indrect evaporative cooler
 
         InletDryBulbTempPri = EvapCond(EvapCoolNum).InletTemp;
         SysTempSetPoint = EvapCond(EvapCoolNum).DesiredOutletTemp;
@@ -2877,25 +2866,25 @@ namespace EvaporativeCoolers {
         if ((InletDryBulbTempPri <= SysTempSetPoint) ||
             (InletDryBulbTempPri > EvapCond(EvapCoolNum).MaxOATDBEvapCooler && InletWetBulbTempSec > EvapCond(EvapCoolNum).MaxOATWBEvapCooler) ||
             (InletDryBulbTempPri < InletDryBulbTempSec)) {
-            OperatingMode = None;
+            OperatingMode = OperatingMode::None;
         } else if ((InletDryBulbTempSec < EvapCond(EvapCoolNum).MinOATDBEvapCooler && TdbOutSysDryMin < SysTempSetPoint)) {
-            OperatingMode = DryModulated; // dry mode capacity modulated
+            OperatingMode = OperatingMode::DryModulated; // dry mode capacity modulated
         } else if ((InletDryBulbTempSec < EvapCond(EvapCoolNum).MinOATDBEvapCooler && SysTempSetPoint <= TdbOutSysDryMin)) {
-            OperatingMode = DryFull; // dry mode in full capacity
+            OperatingMode = OperatingMode::DryFull; // dry mode in full capacity
         } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
                     InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler && SysTempSetPoint <= TdbOutSysWetMin)) {
-            OperatingMode = WetFull; // wet mode in full capacity
+            OperatingMode = OperatingMode::WetFull; // wet mode in full capacity
         } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
                     InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler &&
                     TdbOutSysWetMin < SysTempSetPoint)) { // && SysTempSetPoint < TdbOutSysDryMin
-            OperatingMode = WetModulated;                 // wet mode capacity modulated
+            OperatingMode = OperatingMode::WetModulated;  // wet mode capacity modulated
         } else if ((InletDryBulbTempSec >= EvapCond(EvapCoolNum).MinOATDBEvapCooler &&
                     InletDryBulbTempSec < EvapCond(EvapCoolNum).MaxOATDBEvapCooler &&
                     InletWetBulbTempSec < EvapCond(EvapCoolNum).MaxOATWBEvapCooler && SysTempSetPoint < TdbOutSysDryMin &&
                     TdbOutSysWetMin < SysTempSetPoint)) {
-            OperatingMode = DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
+            OperatingMode = OperatingMode::DryWetModulated; // modulated in dry and wet mode, and the lower total power will be used
         } else {
-            OperatingMode = None; // this condition should not happen unless the bounds do not cover all combinations possible
+            OperatingMode = OperatingMode::None; // this condition should not happen unless the bounds do not cover all combinations possible
         }
         return OperatingMode;
     }
@@ -2921,7 +2910,7 @@ namespace EvaporativeCoolers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EvapCoolIndex;         // evaporative cooler index
-        int DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
+        OperatingMode DryOrWetOperatingMode; // provides index for dry mode and wet mode operation
         Real64 EDBTSecAirSide;     // current entering dry bulb temperature of the secondary side
         Real64 EWBTSecAirSide;     // current entering wet bulb temperature of the secondary side
         Real64 EHumRatSecAirSide;  // current entering humidity ratio of the secondary side
@@ -2945,7 +2934,7 @@ namespace EvaporativeCoolers {
 
     void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
                                              int const EvapCoolNum,
-                                             int const DryOrWetOperatingMode,
+                                             OperatingMode DryOrWetOperatingMode,
                                              Real64 const AirMassFlowSec,
                                              Real64 const EDBTSec,
                                              Real64 const EWBTSec,
@@ -3012,7 +3001,7 @@ namespace EvaporativeCoolers {
         if (AirMassFlowSec > 0.0) {
             RhoAirSec = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EDBTSec, EHumRatSec);
             RhoAirSys = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
-            if (DryOrWetOperatingMode == DryModulated || DryOrWetOperatingMode == DryFull) {
+            if (DryOrWetOperatingMode == OperatingMode::DryModulated || DryOrWetOperatingMode == OperatingMode::DryFull) {
                 if (EvapCond(EvapCoolNum).DrybulbEffecCurveIndex > 0) {
                     EffModDryMode = CurveValue(state, EvapCond(EvapCoolNum).DrybulbEffecCurveIndex, FlowRatio);
                 } else {
@@ -3036,7 +3025,7 @@ namespace EvaporativeCoolers {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp - QHXRate / CapFlowSys;
                 }
                 EvapCond(EvapCoolNum).SecOutletTemp = OutletTempSec;
-            } else if (DryOrWetOperatingMode == WetModulated || DryOrWetOperatingMode == WetFull) {
+            } else if (DryOrWetOperatingMode == OperatingMode::WetModulated || DryOrWetOperatingMode == OperatingMode::WetFull) {
                 if (EvapCond(EvapCoolNum).WetbulbEffecCurveIndex > 0) {
                     EffModWetMode = CurveValue(state, EvapCond(EvapCoolNum).WetbulbEffecCurveIndex, FlowRatio);
                 } else {
@@ -3071,7 +3060,7 @@ namespace EvaporativeCoolers {
 
     void CalcSecondaryAirOutletCondition(EnergyPlusData &state,
                                          int const EvapCoolNum,
-                                         int const OperatingMode,
+                                         OperatingMode OperatingMode,
                                          Real64 const AirMassFlowSec,
                                          Real64 const EDBTSec,
                                          Real64 const EWBTSec,
@@ -3122,13 +3111,13 @@ namespace EvaporativeCoolers {
 
         QHXLatent = 0.0;
         if (AirMassFlowSec > 0.0) {
-            if ((OperatingMode == DryModulated || OperatingMode == DryFull)) {
+            if ((OperatingMode == OperatingMode::DryModulated || OperatingMode == OperatingMode::DryFull)) {
                 EvapCond(EvapCoolNum).SecOutletHumRat = EHumRatSec;
                 CpAirSec = PsyCpAirFnW(EHumRatSec);
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec + QHXTotal / AirMassFlowSec / CpAirSec;
                 EvapCond(EvapCoolNum).SecOutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec);
                 EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(state, EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec, state.dataEnvrn->OutBaroPress);
-            } else if ((OperatingMode == WetModulated || OperatingMode == WetFull)) {
+            } else if ((OperatingMode == OperatingMode::WetModulated || OperatingMode == OperatingMode::WetFull)) {
                 SecOutletEnthalpy = EvapCond(EvapCoolNum).SecInletEnthalpy + QHXTotal / AirMassFlowSec;
                 SecOutletAirHumRat = PsyWFnTdbH(state, EDBTSec, SecOutletEnthalpy); // assumes a constant temperature moisture addition
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec;
@@ -3154,7 +3143,7 @@ namespace EvaporativeCoolers {
 
     Real64 IndEvapCoolerPower(EnergyPlusData &state,
                               int const EvapCoolIndex, // Unit index
-                              int const DryWetMode,    // dry or wet operating mode of evaporator cooler
+                              OperatingMode DryWetMode, // dry or wet operating mode of evaporator cooler
                               Real64 const FlowRatio   // secondary air flow fraction
     )
     {
@@ -3203,7 +3192,7 @@ namespace EvaporativeCoolers {
                 FanPowerModCurveValue = EvapCond(EvapCoolIndex).PartLoadFract * FlowRatio;
             }
             EvapCoolertotalPower += EvapCond(EvapCoolIndex).IndirectFanPower * FanPowerModCurveValue;
-            if (DryWetMode == WetModulated || DryWetMode == WetFull) {
+            if (DryWetMode == OperatingMode::WetModulated || DryWetMode == OperatingMode::WetFull) {
                 // Add the pump power to the total Evap Cooler power for wet operating mode
                 if (EvapCond(EvapCoolIndex).PumpPowerModifierCurveIndex > 0) {
                     PumpPowerModCurveValue = CurveValue(state, EvapCond(EvapCoolIndex).PumpPowerModifierCurveIndex, FlowRatio);
@@ -3447,13 +3436,13 @@ namespace EvaporativeCoolers {
         Node(OutletNode).Quality = Node(InletNode).Quality;
 
         // Set the demand request for supply water from water storage tank (if needed)
-        if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
             state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID).VdotRequestDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID) =
                 EvapCond(EvapCoolNum).EvapWaterConsumpRate;
         }
 
         // check if should be starved by restricted flow from tank
-        if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupplyFromTank) {
+        if (EvapCond(EvapCoolNum).EvapWaterSupplyMode == WaterSupply::FromTank) {
             AvailWaterRate = state.dataWaterData->WaterStorage(EvapCond(EvapCoolNum).EvapWaterSupTankID).VdotAvailDemand(EvapCond(EvapCoolNum).EvapWaterTankDemandARRID);
             if (AvailWaterRate < EvapCond(EvapCoolNum).EvapWaterConsumpRate) {
                 EvapCond(EvapCoolNum).EvapWaterStarvMakupRate = EvapCond(EvapCoolNum).EvapWaterConsumpRate - AvailWaterRate;
@@ -3762,9 +3751,9 @@ namespace EvaporativeCoolers {
                 {
                     auto const SELECT_CASE_var(Alphas(9));
                     if (SELECT_CASE_var == "BLOWTHROUGH") {
-                        ZoneEvapUnit(UnitLoop).FanLocation = BlowThruFan;
+                        ZoneEvapUnit(UnitLoop).FanLocation = FanPlacement::BlowThruFan;
                     } else if (SELECT_CASE_var == "DRAWTHROUGH") {
-                        ZoneEvapUnit(UnitLoop).FanLocation = DrawThruFan;
+                        ZoneEvapUnit(UnitLoop).FanLocation = FanPlacement::DrawThruFan;
                     } else {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError(state, "invalid choice found " + cAlphaFields(9) + "=\"" + Alphas(9) + "\".");
@@ -3786,11 +3775,11 @@ namespace EvaporativeCoolers {
                 {
                     auto const SELECT_CASE_var(Alphas(10));
                     if (SELECT_CASE_var == "ZONETEMPERATUREDEADBANDONOFFCYCLING") {
-                        ZoneEvapUnit(UnitLoop).ControlSchemeType = ZoneTemperatureDeadBandOnOffCycling;
+                        ZoneEvapUnit(UnitLoop).ControlSchemeType = ControlType::ZoneTemperatureDeadBandOnOffCycling;
                     } else if (SELECT_CASE_var == "ZONECOOLINGLOADONOFFCYCLING") {
-                        ZoneEvapUnit(UnitLoop).ControlSchemeType = ZoneCoolingLoadOnOffCycling;
+                        ZoneEvapUnit(UnitLoop).ControlSchemeType = ControlType::ZoneCoolingLoadOnOffCycling;
                     } else if (SELECT_CASE_var == "ZONECOOLINGLOADVARIABLESPEEDFAN") {
-                        ZoneEvapUnit(UnitLoop).ControlSchemeType = ZoneCoolingLoadVariableSpeedFan;
+                        ZoneEvapUnit(UnitLoop).ControlSchemeType = ControlType::ZoneCoolingLoadVariableSpeedFan;
                     } else {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError(state, "invalid choice found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
@@ -3915,7 +3904,7 @@ namespace EvaporativeCoolers {
                 }
 
                 // check that fan type is consistent with control method
-                if (ZoneEvapUnit(UnitLoop).ControlSchemeType == ZoneCoolingLoadVariableSpeedFan) { // must have a VS fan type
+                if (ZoneEvapUnit(UnitLoop).ControlSchemeType == ControlType::ZoneCoolingLoadVariableSpeedFan) { // must have a VS fan type
                     if (ZoneEvapUnit(UnitLoop).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                         ShowSevereError(state, CurrentModuleObject + "=\"" + ZoneEvapUnit(UnitLoop).Name + "\" invalid data.");
                         ShowContinueError(state, "Fan:ConstantVolume is not consistent with control method ZoneCoolingLoadVariableSpeedFan.");
@@ -4014,7 +4003,7 @@ namespace EvaporativeCoolers {
                                 "System",
                                 "Average",
                                 ZoneEvapUnit(UnitLoop).Name);
-            if (ZoneEvapUnit(UnitLoop).ControlSchemeType != ZoneCoolingLoadVariableSpeedFan) {
+            if (ZoneEvapUnit(UnitLoop).ControlSchemeType != ControlType::ZoneCoolingLoadVariableSpeedFan) {
                 SetupOutputVariable(state, "Zone Evaporative Cooler Unit Part Load Ratio",
                                     OutputProcessor::Unit::None,
                                     ZoneEvapUnit(UnitLoop).UnitPartLoadRatio,
@@ -4369,7 +4358,7 @@ namespace EvaporativeCoolers {
         {
             auto const SELECT_CASE_var(ZoneEvapUnit(UnitNum).ControlSchemeType);
 
-            if (SELECT_CASE_var == ZoneTemperatureDeadBandOnOffCycling) {
+            if (SELECT_CASE_var == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
                 ZoneTemp = Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp;
                 CoolSetLowThrottle = ZoneThermostatSetPointHi(ZoneNum) - (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
                 CoolSetHiThrottle = ZoneThermostatSetPointHi(ZoneNum) + (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
@@ -4407,7 +4396,7 @@ namespace EvaporativeCoolers {
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
-            } else if (SELECT_CASE_var == ZoneCoolingLoadOnOffCycling) {
+            } else if (SELECT_CASE_var == ControlType::ZoneCoolingLoadOnOffCycling) {
 
                 // get zone loads
                 ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
@@ -4433,7 +4422,7 @@ namespace EvaporativeCoolers {
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
                 }
 
-            } else if (SELECT_CASE_var == ZoneCoolingLoadVariableSpeedFan) {
+            } else if (SELECT_CASE_var == ControlType::ZoneCoolingLoadVariableSpeedFan) {
                 // get zone loads
                 ZoneCoolingLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
                 CoolingLoadThreashold = -1.0 * ZoneEvapUnit(UnitNum).ThresholdCoolingLoad;
@@ -4505,7 +4494,7 @@ namespace EvaporativeCoolers {
             Node(ReliefNodeNum).MassFlowRate = Node(OAInletNodeNum).MassFlowRate;
             Node(ReliefNodeNum).MassFlowRateMaxAvail = Node(OAInletNodeNum).MassFlowRate;
         }
-        if (ZoneEvapUnit(UnitNum).FanLocation == BlowThruFan) {
+        if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
             Node(FanOutletNodeNum).MassFlowRate = Node(OAInletNodeNum).MassFlowRate;
             Node(FanOutletNodeNum).MassFlowRateMaxAvail = Node(OAInletNodeNum).MassFlowRate;
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4529,7 +4518,7 @@ namespace EvaporativeCoolers {
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
             SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, PartLoadRatio);
         }
-        if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
+        if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state,
                                             ZoneEvapUnit(UnitNum).FanName,
@@ -4697,7 +4686,7 @@ namespace EvaporativeCoolers {
             Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
         }
-        if (ZoneEvapUnit(UnitNum).FanLocation == BlowThruFan) {
+        if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
             Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4715,7 +4704,7 @@ namespace EvaporativeCoolers {
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
             SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
         }
-        if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
+        if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(
                     state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
@@ -4833,7 +4822,7 @@ namespace EvaporativeCoolers {
             Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             Node(ZoneEvapUnit(UnitNum).UnitReliefNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
         }
-        if (ZoneEvapUnit(UnitNum).FanLocation == BlowThruFan) {
+        if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::BlowThruFan) {
             Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRate = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             Node(ZoneEvapUnit(UnitNum).FanOutletNodeNum).MassFlowRateMaxAvail = Node(ZoneEvapUnit(UnitNum).OAInletNodeNum).MassFlowRate;
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4851,7 +4840,7 @@ namespace EvaporativeCoolers {
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
             SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, FanSpeedRatio);
         }
-        if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
+        if (ZoneEvapUnit(UnitNum).FanLocation == FanPlacement::DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(
                     state, ZoneEvapUnit(UnitNum).FanName, false, ZoneEvapUnit(UnitNum).FanIndex, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
