@@ -103,14 +103,10 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    bool GetUCSDDVDataFlag(true); // UCSD
-    bool GetAirModelData(true);   // Used to "get" all air model data
     bool MyOneTimeFlag(true);
 
     void clear_state()
     {
-        GetUCSDDVDataFlag = true;
-        GetAirModelData = true;
         MyOneTimeFlag = true;
     }
 
@@ -136,9 +132,9 @@ namespace RoomAirModelManager {
         using UFADManager::ManageUCSDUFModels;
 
 
-        if (GetAirModelData) {
+        if (state.dataRoomAirModelMgr->GetAirModelData) {
             GetAirModelDatas(state);
-            GetAirModelData = false;
+            state.dataRoomAirModelMgr->GetAirModelData = false;
         }
 
         if (state.dataRoomAirMod->UCSDModelUsed) {
@@ -2691,9 +2687,9 @@ namespace RoomAirModelManager {
         int I; // Zone index
 
         // Obtains and Allocates RoomAirSettings : AirflowNetwork
-        if (GetAirModelData) {
+        if (state.dataRoomAirModelMgr->GetAirModelData) {
             GetAirModelDatas(state);
-            GetAirModelData = false;
+            state.dataRoomAirModelMgr->GetAirModelData = false;
         }
 
         Errorfound = false;
