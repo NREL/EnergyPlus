@@ -2632,11 +2632,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // Determine flow rate and temperature of supply air based on type of damper
 
-        //bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
-
-        bool AdjustZoneMixingFlowFlag(true); // holds zone mixing air flow calc status
-        bool AdjustZoneInfiltrationFlowFlag(true); // holds zone infiltration air flow calc status
-
         FirstCall = true;
         ErrorFlag = false;
 
@@ -2685,9 +2680,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // and controllers
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::NoAdjustReturnAndMixing) AdjustZoneMixingFlowFlag = false;
-            if (ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::NoInfiltrationFlow) AdjustZoneInfiltrationFlowFlag = false;
-            CalcAirFlowSimple(state, 0, AdjustZoneMixingFlowFlag, AdjustZoneInfiltrationFlowFlag);
+            CalcAirFlowSimple(state, 0, ZoneAirMassFlow.AdjustZoneMixingFlow, ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {

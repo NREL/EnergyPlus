@@ -2822,6 +2822,10 @@ namespace HeatBalanceAirManager {
                         MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop) = ZoneMixingNum(Loop);
                     }
                 }
+                // flag zones used as both source and receiving zone
+                if (MassConservation(ZoneNum).NumSourceZonesMixingObject > 0 && MassConservation(ZoneNum).NumReceivingZonesMixingObject > 0) {
+                    MassConservation(ZoneNum).IsSourceAndReceivingZone = true;
+                }
             }
             if (allocated(ZoneMixingNum)) ZoneMixingNum.deallocate();
         }
@@ -2830,7 +2834,13 @@ namespace HeatBalanceAirManager {
         // and then proceeds to source zones
         Loop = 0;
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (!MassConservation(ZoneNum).IsOnlySourceZone) {
+            if (!MassConservation(ZoneNum).IsOnlySourceZone && !MassConservation(ZoneNum).IsSourceAndReceivingZone) {
+                Loop += 1;
+                ZoneReOrder(Loop) = ZoneNum;
+            }
+        }
+        for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (MassConservation(ZoneNum).IsSourceAndReceivingZone) {
                 Loop += 1;
                 ZoneReOrder(Loop) = ZoneNum;
             }

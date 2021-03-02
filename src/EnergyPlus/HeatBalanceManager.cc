@@ -1309,6 +1309,7 @@ namespace HeatBalanceManager {
                         ShowWarningError(state, CurrentModuleObject + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = None");
                     }
                 }
+                if (ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) ZoneAirMassFlow.AdjustZoneMixingFlow = true;
             }
             if (NumAlpha > 1) {
                 {
@@ -1366,6 +1367,7 @@ namespace HeatBalanceManager {
         } else {
             ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
+        if (ZoneAirMassFlow.InfiltrationTreatment != DataHeatBalance::NoInfiltrationFlow) ZoneAirMassFlow.AdjustZoneInfiltrationFlow = true;
 
         static constexpr auto Format_732(
             "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing | None}}, Adjust Zone Infiltration "
