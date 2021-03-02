@@ -10236,8 +10236,8 @@ namespace Furnaces {
         Array1D<Real64> Par(10);   // Parameters passed to RegulaFalsi
         Real64 QCoilActual;        // coil load actually delivered returned to calling component
         int i;                     // Speed index
-        static int ErrCountCyc(0); // Counter used to minimize the occurrence of output warnings
-        static int ErrCountVar(0); // Counter used to minimize the occurrence of output warnings
+        int ErrCountCyc(0); // Counter used to minimize the occurrence of output warnings
+        int ErrCountVar(0); // Counter used to minimize the occurrence of output warnings
         IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
 
 
