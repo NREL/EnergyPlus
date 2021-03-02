@@ -2680,7 +2680,11 @@ namespace EnergyPlus::ZoneEquipmentManager {
         // and controllers
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            CalcAirFlowSimple(state, 0, ZoneAirMassFlow.AdjustZoneMixingFlow, ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
+            if (FirstHVACIteration) {
+                CalcAirFlowSimple(state, 0);
+            } else {
+                CalcAirFlowSimple(state, 0, ZoneAirMassFlow.AdjustZoneMixingFlow, ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
+            }
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= state.dataGlobal->NumOfZones; ++ControlledZoneNum) {
@@ -4002,9 +4006,14 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 Node(ZoneNode).MassFlowRateMin = TotInletAirMassFlowRateMin;
                 Node(ZoneNode).MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
 
-                // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
-                StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
-                                         (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneExhBalanced);
+                if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+                    // do not include adjusted for "balanced" exhaust flow
+                    StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate - TotExhaustAirMassFlowRate;
+                } else {
+                    // Calculate standard return air flow rate using default method of inlets minus exhausts adjusted for "balanced" exhaust flow
+                    StdTotalReturnMassFlow = TotInletAirMassFlowRate + ZoneMixingNetAirMassFlowRate -
+                        (TotExhaustAirMassFlowRate - state.dataZoneEquip->ZoneEquipConfig( ZoneNum ).ZoneExhBalanced);
+                }
                 if (!ZoneAirMassFlow.EnforceZoneMassBalance) {
                     if (StdTotalReturnMassFlow < 0.0) {
                         state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExcessZoneExh = -StdTotalReturnMassFlow;
