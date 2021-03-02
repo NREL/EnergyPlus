@@ -4224,3 +4224,180 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wSourceAndReceivingZone)
     EXPECT_FALSE(DataHeatBalance::MassConservation(3).IsOnlySourceZone);
     EXPECT_FALSE(DataHeatBalance::MassConservation(3).IsSourceAndReceivingZone);
 }
+
+TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_ZoneMixingInfiltrationFlowsFlags)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "ZoneAirMassFlowConservation,",
+        "  AdjustMixingOnly,            !- Adjust Zone Mixing and Return For Air Mass Flow Balance",
+        "  None,                        !- Infiltration Balancing Method",
+        "  AllZones;                    !- Infiltration Balancing Zones",
+
+        "Zone,",
+        "  SZone;                       !- Name",
+
+        "Zone,",
+        "  RSZone;                      !- Name",
+
+        "Zone,",
+        "  RZone;                       !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        " SZone,                        !- Zone Name",
+        " SZone Equipment,              !- Zone Conditioning Equipment List Name",
+        " SZone In Node,                !- Zone Air Inlet Node or NodeList Name",
+        " SZone Exh Nodes,              !- Zone Air Exhaust Node or NodeList Name",
+        " SZone Node,                   !- Zone Air Node Name",
+        " SZone Ret Node;               !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        " RSZone,                       !- Zone Name",
+        " RSZone Equipment,             !- Zone Conditioning Equipment List Name",
+        " RSZone In Node,               !- Zone Air Inlet Node or NodeList Name",
+        " RSZone Exh Nodes,             !- Zone Air Exhaust Node or NodeList Name",
+        " RSZone Node,                  !- Zone Air Node Name",
+        " RSZone Ret Node;              !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        " RZone,                        !- Zone Name",
+        " RZone Equipment,              !- Zone Conditioning Equipment List Name",
+        " RZone In Node,                !- Zone Air Inlet Node or NodeList Name",
+        " RZone Exh Nodes,              !- Zone Air Exhaust Node or NodeList Name",
+        " RZone Node,                   !- Zone Air Node Name",
+        " RZone Ret Node;               !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentList,",
+        " SZone Equipment,              !- Name",
+        " SequentialLoad,               !- Load Distribution Scheme",
+        " Fan:ZoneExhaust,              !- Zone Equipment 1 Object Type",
+        " SZone ExhaustFan,             !- Zone Equipment 1 Name",
+        " 1,                            !- Zone Equipment 1 Cooling Sequence",
+        " 1,                            !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                             !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                             !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+
+        "ZoneHVAC:EquipmentList,",
+        " RSZone Equipment,             !- Name",
+        " SequentialLoad,               !- Load Distribution Scheme",
+        " Fan:ZoneExhaust,              !- Zone Equipment 1 Object Type",
+        " RSZone ExhaustFan,            !- Zone Equipment 1 Name",
+        " 1,                            !- Zone Equipment 1 Cooling Sequence",
+        " 1,                            !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                             !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                             !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+
+        "ZoneHVAC:EquipmentList,",
+        " RZone Equipment,              !- Name",
+        " SequentialLoad,               !- Load Distribution Scheme",
+        " Fan:ZoneExhaust,              !- Zone Equipment 1 Object Type",
+        " RZone ExhaustFan,             !- Zone Equipment 1 Name",
+        " 1,                            !- Zone Equipment 1 Cooling Sequence",
+        " 1,                            !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                             !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                             !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+
+        "Fan:ZoneExhaust,",
+        "  SZone ExhaustFan,            !- Name",
+        "  ,                            !- Availability Schedule Name",
+        "  0.30,                        !- Fan Total Efficiency",
+        "  0.0,                         !- Pressure Rise{Pa}",
+        "  0.0,                         !- Maximum Flow Rate{m3/s}",
+        "  SZoneExhaustFan Inlet Node,  !- Air Inlet Node Name",
+        "  SZoneExhaustFan Outlet Node, !- Air Outlet Node Name",
+        "  Zones Exhaust Fans;          !- End - Use Subcategory",
+
+        "Fan:ZoneExhaust,",
+        "  RSZone ExhaustFan,           !- Name",
+        "  ,                            !- Availability Schedule Name",
+        "  0.30,                        !- Fan Total Efficiency",
+        "  100.0,                       !- Pressure Rise{Pa}",
+        "  0.0,                         !- Maximum Flow Rate{m3/s}",
+        "  RSZoneExhaustFan Inlet Node, !- Air Inlet Node Name",
+        "  RSZoneExhaustFan Outlet Node,!- Air Outlet Node Name",
+        "  Zones Exhaust Fans;          !- End - Use Subcategory",
+
+        "Fan:ZoneExhaust,",
+        "  RZone ExhaustFan,            !- Name",
+        "  ,                            !- Availability Schedule Name",
+        "  0.30,                        !- Fan Total Efficiency",
+        "  100.0,                       !- Pressure Rise{Pa}",
+        "  0.0,                         !- Maximum Flow Rate{m3/s}",
+        "  RZoneExhaustFan Inlet Node,  !- Air Inlet Node Name",
+        "  RZoneExhaustFan Outlet Node, !- Air Outlet Node Name",
+        "  Zones Exhaust Fans;          !- End - Use Subcategory",
+
+        "NodeList,",
+        "  SZone Exh Nodes,             !- Name",
+        "  SZone ZoneHVAC Exh Node,     !- Node 1 Name",
+        "  SZoneExhaustFan Inlet Node;  !- Node 1 Name",
+
+        "NodeList,",
+        "  RSZone Exh Nodes,            !- Name",
+        "  RSZone ZoneHVAC Exh Node,    !- Node 1 Name",
+        "  RSZoneExhaustFan Inlet Node; !- Node 1 Name",
+
+        "NodeList,",
+        "  RZone Exh Nodes,             !- Name",
+        "  RZone ZoneHVAC Exh Node,     !- Node 1 Name",
+        "  RZoneExhaustFan Inlet Node;  !- Node 1 Name",
+
+        "ZoneMixing,",
+        "  RSZone ZoneMixing,           !- Name",
+        "  RSZone,                      !- Zone Name",
+        "  AlwaysOn,                    !- Schedule Name",
+        "  Flow/Zone,                   !- Design Flow Rate Calculation Method",
+        "  0.852323,                    !- Design Flow Rate{m3/s}",
+        "  ,                            !- Flow Rate per Zone Floor Area{m3/s-m2}",
+        "  ,                            !- Flow Rate per Person{m3/s-person}",
+        "  ,                            !- Air Changes per Hour{1/hr}",
+        "  SZone,                       !- Source Zone Name",
+        "  0.0;                         !- Delta Temperature{deltaC}",
+
+        "ZoneMixing,",
+        "  RZone ZoneMixing,            !- Name",
+        "  RZone,                       !- Zone Name",
+        "  AlwaysOn,                    !- Schedule Name",
+        "  Flow/Zone,                   !- Design Flow Rate Calculation Method",
+        "  0.852323,                    !- Design Flow Rate{m3/s}",
+        "  ,                            !- Flow Rate per Zone Floor Area{m3/s-m2}",
+        "  ,                            !- Flow Rate per Person{m3/s-person}",
+        "  ,                            !- Air Changes per Hour{1/hr}",
+        "  RSZone,                      !- Source Zone Name",
+        "  0.0;                         !- Delta Temperature{deltaC}",
+
+        "Schedule:Constant,",
+        "AlwaysOn,",
+        "Fraction,",
+        "1.0;",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    int ZoneNum;
+    int NodeNum;
+    bool ErrorsFound = false;
+    ScheduleManager::ProcessScheduleInput(*state);
+    GetZoneData(*state, ErrorsFound);
+    AllocateHeatBalArrays(*state);
+    GetZoneEquipmentData(*state);
+    state->dataZoneEquip->ZoneEquipInputsFilled = true;
+    ErrorsFound = false;
+    GetProjectControlData(*state, ErrorsFound);
+    GetSimpleAirModelInputs(*state, ErrorsFound);
+    SetZoneMassConservationFlag();
+    // ckeck zone mixing and infiltration flags
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingOnly);
+    EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.AdjustZoneMixingFlow);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::NoInfiltrationFlow);
+    EXPECT_FALSE(DataHeatBalance::ZoneAirMassFlow.AdjustZoneInfiltrationFlow);
+    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, 0);
+    // ckeck zone re-order,
+    EXPECT_EQ(DataHeatBalFanSys::ZoneReOrder(1), 3); // receving only zone
+    EXPECT_EQ(DataHeatBalFanSys::ZoneReOrder(2), 2); // source and receiving zone,
+    EXPECT_EQ(DataHeatBalFanSys::ZoneReOrder(3), 1); // source only zone
+}
