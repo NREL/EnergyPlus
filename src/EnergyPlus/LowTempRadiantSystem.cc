@@ -5745,8 +5745,6 @@ namespace LowTempRadiantSystem {
         Real64 sumHATsurf(0.0);
 
         for (int surfNum = Zone(ZoneNum).HTSurfaceFirst; surfNum <= Zone(ZoneNum).HTSurfaceLast; ++surfNum) {
-            if (!Surface(surfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass::Window) {

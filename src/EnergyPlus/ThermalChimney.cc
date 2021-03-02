@@ -672,11 +672,7 @@ namespace ThermalChimney {
             }
 
             for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-
-                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
                 if (Surface(SurfNum).Class == SurfaceClass::Window) {
-
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = HConvIn(SurfNum);

@@ -252,8 +252,6 @@ namespace ConvectionCoefficients {
 
             for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
                 if (present(ZoneToResimulate)) {
                     if ((ZoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone
@@ -2741,8 +2739,6 @@ namespace ConvectionCoefficients {
         Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
 
         for (auto SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                     return CalcCeilingDiffuserIntConvCoeff(
@@ -2827,8 +2823,6 @@ namespace ConvectionCoefficients {
         }
 
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
             if (ACH <= 3.0) { // Use the other convection algorithm
                 if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                     CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
@@ -2978,8 +2972,6 @@ namespace ConvectionCoefficients {
 
         // Assign convection coefficients
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
             // Use ASHRAESimple correlation to give values for all the minor surfaces
             CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
 

@@ -1029,7 +1029,6 @@ namespace RoomAirModelAirflowNetwork {
 
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNodeNum) {
                 Found = false;
                 for (Loop = 1; Loop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
@@ -1181,7 +1180,6 @@ namespace RoomAirModelAirflowNetwork {
         SumHmARaW = 0.0;
 
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
             if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
 
             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNode) {

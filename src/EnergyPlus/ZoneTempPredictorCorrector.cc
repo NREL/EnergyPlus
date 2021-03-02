@@ -2723,8 +2723,6 @@ namespace ZoneTempPredictorCorrector {
                 FirstSurfFlag = true;
                 if (Zone(Loop).HTSurfaceFirst > 0) {
                     for (SurfNum = Zone(Loop).HTSurfaceFirst; SurfNum <= Zone(Loop).HTSurfaceLast; ++SurfNum) {
-                        if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
                         if (FirstSurfFlag) {
                             TRefFlag = Surface(SurfNum).TAirRef;
                             FirstSurfFlag = false;
@@ -6247,9 +6245,6 @@ namespace ZoneTempPredictorCorrector {
         }
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
             HA = 0.0;
             Area = Surface(SurfNum).Area; // For windows, this is the glazing area
 
@@ -6543,8 +6538,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area; // For windows, this is the glazing area
             // determine reference air temperature for this surface's convective heat transfer model

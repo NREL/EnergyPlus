@@ -1380,7 +1380,6 @@ namespace HeatBalanceSurfaceManager {
         TempSurfIn.dimension(TotSurfaces, 0.0);
         TempInsOld.dimension(TotSurfaces, 0.0);
         TempSurfInTmp.dimension(TotSurfaces, 0.0);
-        TempSurfInTmp.dimension(TotSurfaces, 0.0);
         RefAirTemp.dimension(TotSurfaces, 0.0);
         SurfQRadLWOutSrdSurfs.dimension(TotSurfaces, 0.0);
 

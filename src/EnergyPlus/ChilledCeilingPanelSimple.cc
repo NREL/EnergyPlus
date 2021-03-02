@@ -1720,8 +1720,6 @@ namespace CoolingPanelSimple {
 
             auto &ThisSurf(Surface(SurfNum));
 
-            if (!ThisSurf.HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
             Area = ThisSurf.Area;
 
             if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {

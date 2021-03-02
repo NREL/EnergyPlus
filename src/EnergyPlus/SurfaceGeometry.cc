@@ -1437,36 +1437,12 @@ namespace SurfaceGeometry {
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
-            // Non-window) subsurfaces are next (anything left in this zone that's not a window or a glass door)
-            // includes SurfaceClass::TDD_Dome which transmits light but is not a window for heat balance purposes
+            // Opaque door goes next
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond > 0) continue; // Exterior
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::Window) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::GlassDoor) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::TDD_Diffuser) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::TDD_Dome) continue;
-
-                ++MovedSurfs;
-                Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
-                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
-                // Reset BaseSurf to it's positive value (set to negative earlier)
-                Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
-                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
-                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
-            }
-            for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
-
-                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond <= 0) continue; // Interior
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::Window) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::GlassDoor) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::TDD_Diffuser) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::TDD_Dome) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Door) continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
@@ -1478,7 +1454,7 @@ namespace SurfaceGeometry {
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
-            // The window subsurfaces (includes SurfaceClass::TDD_Diffuser)
+            // The exterior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmpClassMoved(SubSurfNum)) continue;
@@ -1496,6 +1472,8 @@ namespace SurfaceGeometry {
                 // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
+
+            // The interior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmpClassMoved(SubSurfNum)) continue;
@@ -1514,6 +1492,7 @@ namespace SurfaceGeometry {
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
+            // The SurfaceClass::TDD_Diffuser (OriginalClass = Window) goes next
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmpClassMoved(SubSurfNum)) continue;
@@ -1530,6 +1509,7 @@ namespace SurfaceGeometry {
                 // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
+
             // Last but not least, SurfaceClass::TDD_Dome
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
