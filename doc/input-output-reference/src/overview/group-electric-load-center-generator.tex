@@ -3238,6 +3238,10 @@ Using the FC model with DisplayAdvancedReportVariables (see Diagnostics object o
   HVAC,Sum, Generator Fuel Cell Model Iteration Count {[]}
 \item
   HVAC,Sum,Generator Root Solver Iteration Count {[]}
+\item
+  HVAC,Average,Generator Number of Cycles {[]}
+\item
+  HVAC,Average,Generator Power Module Skin Heat Loss Rate {[}W{]}
 \end{itemize}
 
 \paragraph{Generator Air Inlet Temperature {[}C{]}}\label{generator-air-inlet-temperature-c}
@@ -3411,6 +3415,16 @@ This is the water vapor fraction in the exit gas.
 \paragraph{Generator Heat Recovery Water Condensate Molar Flow Rate {[}kmol/s{]}}\label{generator-heat-recovery-water-condensate-molar-flow-rate-kmols}
 
 This is the flow of condensed water in kmol/s.
+
+\paragraph{Generator Number of Cycles {[]}}\label{generator-number-of-cycles}
+
+This is the number of start-stop cycles that the fuel cell power module has experienced so far.
+It is initialized to the value of \hyperref[field-number-of-stops-at-start-of-simulation]{Number of Stops at Start of Simulation} provided in the \hyperref[generatorfuelcellpowermodule]{Generator:FuelCell:PowerModule} object.
+
+\paragraph{Generator Power Module Skin Heat Loss Rate {[}W{]}}\label{generator-power-module-skin-heat-loss-rate-w}
+
+This is the which is the rate of energy lost to the surroundings via the skin of the fuel cell power module.
+
 
 \subsection{Generator:FuelCell:PowerModule}\label{generatorfuelcellpowermodule}
 
