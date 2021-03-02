@@ -101,7 +101,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
 {
 
     // ZoneTempPredictorCorrector variable initialization
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     HybridModelZone.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(1);
     ZTM1.allocate(1);
@@ -164,21 +164,21 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTC(1) = 0.0;
     SurfaceWindow.allocate(1);
     Surface.allocate(2);
-    HConvIn.allocate(1);
-    SNLoadHeatRate.allocate(1);
-    SNLoadCoolRate.allocate(1);
-    SNLoadHeatEnergy.allocate(1);
-    SNLoadCoolEnergy.allocate(1);
+    state->dataHeatBal->HConvIn.allocate(1);
+    state->dataHeatBal->SNLoadHeatRate.allocate(1);
+    state->dataHeatBal->SNLoadCoolRate.allocate(1);
+    state->dataHeatBal->SNLoadHeatEnergy.allocate(1);
+    state->dataHeatBal->SNLoadCoolEnergy.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
     state->dataRoomAirMod->IsZoneDV.dimension(1, false);
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
     state->dataRoomAirMod->IsZoneUI.dimension(1, false);
     state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
-    ZnAirRpt.allocate(1);
+    state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneIntGain.allocate(1);
-    ZoneIntGain(1).NumberOfDevices = 0;
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
     ZoneEqSizing.allocate(1);
 
     // CorrectZoneHumRat variable initialization
@@ -241,13 +241,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
-    Zone(1).IsControlled = true;
-    Zone(1).ZoneEqNum = 1;
-    Zone(1).Multiplier = 1;
-    Zone(1).SystemZoneNodeNumber = 1;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 2;
-    Zone(1).Volume = 1061.88;
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 2;
+    state->dataHeatBal->Zone(1).Volume = 1061.88;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;
     Real64 ZoneTempChange;
@@ -273,14 +273,14 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredZT1(1) = 0.1;
     PreviousMeasuredZT2(1) = 0.2;
     PreviousMeasuredZT3(1) = 0.3;
-    Zone(1).OutDryBulbTemp = -5.21;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -5.21;
     ZoneAirHumRat(1) = 0.002083;
     MCPV(1) = 1414.60;   // Assign TempDepCoef
     MCPTV(1) = -3335.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99166.67;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
-    EXPECT_NEAR(15.13, Zone(1).ZoneVolCapMultpSensHM, 0.01);
+    EXPECT_NEAR(15.13, state->dataHeatBal->Zone(1).ZoneVolCapMultpSensHM, 0.01);
 
     // Case 2: Hybrid model infiltration with measured temperature (free-floating)
 
@@ -297,15 +297,15 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredZT1(1) = 0.02;
     PreviousMeasuredZT2(1) = 0.04;
     PreviousMeasuredZT3(1) = 0.06;
-    Zone(1).ZoneVolCapMultpSens = 8.0;
-    Zone(1).OutDryBulbTemp = -6.71;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 8.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
     ZoneAirHumRat(1) = 0.002083;
     MCPV(1) = 539.49;  // Assign TempDepCoef
     MCPTV(1) = 270.10; // Assign TempIndCoef
     state->dataEnvrn->OutBaroPress = 99250;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
-    EXPECT_NEAR(0.2444, Zone(1).InfilOAAirChangeRateHM, 0.01);
+    EXPECT_NEAR(0.2444, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 3: Hybrid model infiltration with measured humidity ratio (free-floating)
 
@@ -318,9 +318,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).PeopleCountCalc_C = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).Volume = 4000;
-    Zone(1).OutDryBulbTemp = -10.62;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 4000;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     ZoneAirHumRat(1) = 0.001120003;
     ZT(1) = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
@@ -334,7 +334,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
+    EXPECT_NEAR(0.5, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured temperature (free-floating)
 
@@ -352,8 +352,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredZT1(1) = -2.887415174;
     PreviousMeasuredZT2(1) = -2.897557416;
     PreviousMeasuredZT3(1) = -2.909294101;
-    Zone(1).ZoneVolCapMultpSens = 1.0;
-    Zone(1).OutDryBulbTemp = -6.71;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
     ZoneAirHumRat(1) = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
     MCPV(1) = 5163.5;    // Assign TempDepCoef
@@ -362,7 +362,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
-    EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
+    EXPECT_NEAR(0, state->dataHeatBal->Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 5: Hybrid model people count with measured humidity ratio (free-floating)
 
@@ -375,9 +375,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).PeopleCountCalc_C = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).Volume = 4000;
-    Zone(1).OutDryBulbTemp = -10.62;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 4000;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     ZoneAirHumRat(1) = 0.0024964;
     ZT(1) = -2.92;
     state->dataEnvrn->OutHumRat = 0.0025365002784602363;
@@ -392,7 +392,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
+    EXPECT_NEAR(4, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
 
     // Case 6: Hybrid model infiltration with measured temperature (with HVAC)
 
@@ -410,8 +410,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredZT1(1) = 15.56;
     PreviousMeasuredZT2(1) = 15.56;
     PreviousMeasuredZT3(1) = 15.56;
-    Zone(1).ZoneVolCapMultpSens = 1.0;
-    Zone(1).OutDryBulbTemp = -10.62;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
     ZoneAirHumRat(1) = 0.0077647;
     MCPV(1) = 4456;   // Assign TempDepCoef
     MCPTV(1) = 60650; // Assign TempIndCoef
@@ -425,7 +425,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.7974274;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
-    EXPECT_NEAR(0.49, Zone(1).InfilOAAirChangeRateHM, 0.01);
+    EXPECT_NEAR(0.49, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 7: Hybrid model infiltration with measured humidity ratio (with HVAC)
 
@@ -439,9 +439,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).IncludeSystemSupplyParameters = true;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).Volume = 4000;
-    Zone(1).OutDryBulbTemp = -10.62;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 4000;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     ZoneAirHumRat(1) = 0.001120003;
     ZT(1) = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
+    EXPECT_NEAR(0.5, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 8: Hybrid model people count with measured temperature (with HVAC)
 
@@ -475,8 +475,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     PreviousMeasuredZT1(1) = 21.11;
     PreviousMeasuredZT2(1) = 21.11;
     PreviousMeasuredZT3(1) = 21.11;
-    Zone(1).ZoneVolCapMultpSens = 1.0;
-    Zone(1).OutDryBulbTemp = -6.71;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpSens = 1.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -6.71;
     ZoneAirHumRat(1) = 0.0024964;
     state->dataEnvrn->OutBaroPress = 98916.7;
     MCPV(1) = 6616;      // Assign TempDepCoef
@@ -495,7 +495,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
 
     CorrectZoneAirTemp(*state, ZoneTempChange, false, true, 10 / 60);
-    EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
+    EXPECT_NEAR(0, state->dataHeatBal->Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 9: Hybrid model people count with measured humidity ratio (with HVAC)
     HybridModelZone(1).InternalThermalMassCalc_T = false;
@@ -508,9 +508,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).IncludeSystemSupplyParameters = true;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).Volume = 4000;
-    Zone(1).OutDryBulbTemp = -10.62;
-    Zone(1).ZoneVolCapMultpMoist = 1.0;
+    state->dataHeatBal->Zone(1).Volume = 4000;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.62;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
     ZoneAirHumRat(1) = 0.001120003;
     ZT(1) = -6.08;
     state->dataEnvrn->OutHumRat = 0.0011366887816818931;
@@ -532,11 +532,11 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataEnvrn->OutBaroPress = 99500;
 
     CorrectZoneHumRat(*state, 1);
-    EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
+    EXPECT_NEAR(4, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
     HybridModel::clear_state();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     state->dataRoomAirMod->AirModel.deallocate();
     ZTM1.deallocate();
     ZTM2.deallocate();
@@ -583,19 +583,15 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTC.deallocate();
     SurfaceWindow.deallocate();
     Surface.deallocate();
-    HConvIn.deallocate();
-    SNLoadHeatRate.deallocate();
-    SNLoadCoolRate.deallocate();
-    SNLoadHeatEnergy.deallocate();
-    SNLoadCoolEnergy.deallocate();
+    state->dataHeatBal->HConvIn.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataRoomAirMod->IsZoneCV.deallocate();
     state->dataRoomAirMod->IsZoneUI.deallocate();
     state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
-    ZnAirRpt.deallocate();
+    state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    ZoneIntGain.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
     ZoneEqSizing.deallocate();
     ZoneLatentGain.deallocate();
     SumLatentHTRadSys.deallocate();
@@ -622,7 +618,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 {
 
     // ZoneContaminantPredictorCorrector variable initialization
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     HybridModelZone.allocate(1);
     state->dataRoomAirMod->AirModel.allocate(1);
     state->dataRoomAirMod->ZTOC.allocate(1);
@@ -674,13 +670,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     MCPTC(1) = 0.0;
     SurfaceWindow.allocate(1);
     Surface.allocate(2);
-    HConvIn.allocate(1);
+    state->dataHeatBal->HConvIn.allocate(1);
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.allocate(1);
     state->dataRoomAirMod->IsZoneDV.dimension(1, false);
     state->dataRoomAirMod->IsZoneCV.dimension(1, false);
     state->dataRoomAirMod->IsZoneUI.dimension(1, false);
     state->dataRoomAirMod->ZoneDVMixedFlag.allocate(1);
-    ZnAirRpt.allocate(1);
+    state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     ZoneEqSizing.allocate(1);
@@ -735,13 +731,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
-    Zone(1).IsControlled = true;
-    Zone(1).ZoneEqNum = 1;
-    Zone(1).Multiplier = 1;
-    Zone(1).SystemZoneNodeNumber = 1;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 2;
-    Zone(1).Volume = 4000;
+    state->dataHeatBal->Zone(1).IsControlled = true;
+    state->dataHeatBal->Zone(1).ZoneEqNum = 1;
+    state->dataHeatBal->Zone(1).Multiplier = 1;
+    state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 2;
+    state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;
 
@@ -763,7 +759,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).PeopleCountCalc_C = false;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).ZoneVolCapMultpCO2 = 1.0;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     ZoneAirHumRat(1) = 0.001120003;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
     state->dataEnvrn->OutHumRat = 0.001147;
@@ -775,7 +771,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
 
     CorrectZoneContaminants(*state, false, true, 10 / 60);
-    EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
+    EXPECT_NEAR(0.5, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 2: Hybrid model people count with measured CO2 concentration (free-floating)
 
@@ -789,9 +785,9 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).PeopleCountCalc_C = true;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).Volume = 4000;
-    Zone(1).ZoneVolCapMultpCO2 = 1.0;
-    Zone(1).OutDryBulbTemp = -1.0394166434012677;
+    state->dataHeatBal->Zone(1).Volume = 4000;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -1.0394166434012677;
     ZT(1) = -2.92;
     ZoneAirHumRat(1) = 0.00112;
     state->dataContaminantBalance->OutdoorCO2 = 387.6064554;
@@ -804,7 +800,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
     CorrectZoneContaminants(*state, false, true, 10 / 60);
-    EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
+    EXPECT_NEAR(4, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
 
     // Case 3: Hybrid model infiltration with measured CO2 concentration (with HVAC)
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;
@@ -818,10 +814,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).IncludeSystemSupplyParameters = true;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).ZoneVolCapMultpCO2 = 1.0;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     ZT(1) = 15.56;
     ZoneAirHumRat(1) = 0.00809;
-    Zone(1).OutDryBulbTemp = -10.7;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = -10.7;
     state->dataEnvrn->OutBaroPress = 99500;
     state->dataContaminantBalance->ZoneCO2Gain(1) = 0.0;
     state->dataContaminantBalance->CO2ZoneTimeMinus1(1) = 388.54049;
@@ -835,7 +831,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.898375186;
 
     CorrectZoneContaminants(*state, false, true, 10 / 60);
-    EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
+    EXPECT_NEAR(0.5, state->dataHeatBal->Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured CO2 concentration (with HVAC)
 
@@ -850,7 +846,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).IncludeSystemSupplyParameters = true;
     HybridModelZone(1).HybridStartDayOfYear = 1;
     HybridModelZone(1).HybridEndDayOfYear = 2;
-    Zone(1).ZoneVolCapMultpCO2 = 1.0;
+    state->dataHeatBal->Zone(1).ZoneVolCapMultpCO2 = 1.0;
     ZT(1) = 21.1;
     ZoneAirHumRat(1) = 0.01102;
     state->dataEnvrn->OutBaroPress = 98933.3;
@@ -875,10 +871,10 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZonePeopleCO2GenRateSchedulePtr).CurrentValue = 0.0000000382;
 
     CorrectZoneContaminants(*state, false, true, 10 / 60);
-    EXPECT_NEAR(7.27, Zone(1).NumOccHM, 0.1);
+    EXPECT_NEAR(7.27, state->dataHeatBal->Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     HybridModelZone.deallocate();
     state->dataRoomAirMod->AirModel.deallocate();
     state->dataRoomAirMod->ZTOC.deallocate();
@@ -915,13 +911,13 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     MCPTC.deallocate();
     SurfaceWindow.deallocate();
     Surface.deallocate();
-    HConvIn.deallocate();
+    state->dataHeatBal->HConvIn.deallocate();
     state->dataZoneTempPredictorCorrector->ZoneAirRelHum.deallocate();
     state->dataRoomAirMod->IsZoneDV.deallocate();
     state->dataRoomAirMod->IsZoneCV.deallocate();
     state->dataRoomAirMod->IsZoneUI.deallocate();
     state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
-    ZnAirRpt.deallocate();
+    state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     ZoneEqSizing.deallocate();
     MixingMassFlowZone.deallocate();

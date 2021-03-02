@@ -148,7 +148,7 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(int const t_SampleDataPtr)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -160,7 +160,7 @@ namespace WindowManager {
         // Reads spectral data value
         assert(t_SampleDataPtr != 0); // It must not be called for zero value
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
-        auto spectralData = SpectralData(t_SampleDataPtr);
+        auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr);
         int numOfWl = spectralData.NumOfWavelengths;
         for (auto i = 1; i <= numOfWl; ++i) {
             Real64 wl = spectralData.WaveLength(i);

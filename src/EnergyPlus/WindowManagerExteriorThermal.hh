@@ -132,7 +132,8 @@ namespace WindowManager {
 
         int getNumOfLayers(EnergyPlusData &state) const;
 
-        std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(DataSurfaces::SurfaceData const &surface,
+        std::shared_ptr<Tarcog::CBaseIGULayer> getSolidLayer(EnergyPlusData &state,
+                                                             DataSurfaces::SurfaceData const &surface,
                                                              Material::MaterialProperties const &material,
                                                              int const t_Index,
                                                              int const t_SurfNum);

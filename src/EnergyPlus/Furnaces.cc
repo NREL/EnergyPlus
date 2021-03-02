@@ -827,7 +827,6 @@ namespace Furnaces {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using DataHeatBalance::Zone;
         using DataLoopNode::NodeID;
         using NodeInputManager::GetOnlySingleNode;
         auto &GetWtoAHPSimpleCoilCapacity(WaterToAirHeatPumpSimple::GetCoilCapacity);
@@ -971,7 +970,6 @@ namespace Furnaces {
         std::string IHPCoilName;        // IHP cooling coil name
         int IHPCoilIndex(0);            // IHP cooling coil id
 
-        // Flow
         GetFurnaceInputFlag = false;
         MaxNumbers = 0;
         MaxAlphas = 0;
@@ -1102,7 +1100,7 @@ namespace Furnaces {
             }
 
             // Get the Controlling Zone or Location of the Furnace Thermostat
-            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(6), Zone);
+            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(6), state.dataHeatBal->Zone);
             if (Furnace(FurnaceNum).ControlZoneNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, "Illegal " + cAlphaFields(6) + " = " + Alphas(6));
@@ -1648,7 +1646,7 @@ namespace Furnaces {
             }
 
             // Get the Controlling Zone or Location of the Furnace Thermostat
-            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(6), Zone);
+            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(6), state.dataHeatBal->Zone);
             if (Furnace(FurnaceNum).ControlZoneNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, "Illegal " + cAlphaFields(6) + " = " + Alphas(6));
@@ -2847,7 +2845,7 @@ namespace Furnaces {
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Get the Controlling Zone or Location of the Furnace Thermostat
-            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), Zone);
+            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), state.dataHeatBal->Zone);
             if (Furnace(FurnaceNum).ControlZoneNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + Alphas(5));
@@ -3769,7 +3767,7 @@ namespace Furnaces {
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Get the Controlling Zone or Location of the Furnace Thermostat
-            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), Zone);
+            Furnace(FurnaceNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), state.dataHeatBal->Zone);
             if (Furnace(FurnaceNum).ControlZoneNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, "Illegal " + cAlphaFields(5) + " = " + Alphas(5));
@@ -4792,7 +4790,6 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
@@ -5241,7 +5238,7 @@ namespace Furnaces {
         }
 
         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && MyCheckFlag(FurnaceNum)) {
-            int zoneNum = Zone(Furnace(FurnaceNum).ControlZoneNum).ZoneEqNum;
+            int zoneNum = state.dataHeatBal->Zone(Furnace(FurnaceNum).ControlZoneNum).ZoneEqNum;
             int zoneInlet = Furnace(FurnaceNum).ZoneInletNode;
             int coolingPriority = 0;
             int heatingPriority = 0;
@@ -5253,11 +5250,14 @@ namespace Furnaces {
             }
             MyCheckFlag(FurnaceNum) = false;
             if (Furnace(FurnaceNum).ZoneSequenceCoolingNum == 0 || Furnace(FurnaceNum).ZoneSequenceHeatingNum == 0) {
-                ShowSevereError(state, cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
-                                "\": Airloop air terminal in the zone equipment list for zone = " + Zone(Furnace(FurnaceNum).ControlZoneNum).Name +
-                                " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
-                ShowFatalError(state, "Subroutine InitFurnace: Errors found in getting " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) +
-                               " input.  Preceding condition(s) causes termination.");
+                ShowSevereError(state,
+                                cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " \"" + Furnace(FurnaceNum).Name +
+                                    "\": Airloop air terminal in the zone equipment list for zone = " +
+                                    state.dataHeatBal->Zone(Furnace(FurnaceNum).ControlZoneNum).Name +
+                                    " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
+                ShowFatalError(state,
+                               "Subroutine InitFurnace: Errors found in getting " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) +
+                                   " input.  Preceding condition(s) causes termination.");
             }
         }
 

@@ -87,12 +87,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 
     int numOfdd_airterminals = 2;
 
-    DataHeatBalance::Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     DataSizing::OARequirements.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    DataHeatBalance::Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
 
     dd_airterminal.allocate(numOfdd_airterminals);
     dd_airterminal(1).CtrlZoneNum = 1;
@@ -119,7 +119,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
     DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
     DualDuct::dd_airterminal(1).CalcOAMassFlow(*state, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
@@ -129,10 +129,10 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     EXPECT_NEAR(0.004884, OAMassFlow, 0.00001);
 
     // Cleanup
-    DataHeatBalance::Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     DataSizing::OARequirements.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 
     dd_airterminal.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();

@@ -163,19 +163,6 @@ namespace DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    // Parameters to indicate heat transfer model to use for surface
-    int const HeatTransferModel_NotSet(-1);
-    int const HeatTransferModel_None(0); // shading surfaces
-    int const HeatTransferModel_CTF(1);
-    int const HeatTransferModel_EMPD(2);
-    int const HeatTransferModel_CondFD(5);
-    int const HeatTransferModel_HAMT(6);
-    int const HeatTransferModel_Window5(7);             // original detailed layer-by-layer based on window 4 and window 5
-    int const HeatTransferModel_ComplexFenestration(8); // BSDF
-    int const HeatTransferModel_TDD(9);                 // tubular daylighting device
-    int const HeatTransferModel_Kiva(10);               // Kiva ground calculations
-    int const HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
-
     // Parameters for classification of outside face of surfaces
     int const OutConvClass_WindwardVertWall(101);
     int const OutConvClass_LeewardVertWall(102);
@@ -786,15 +773,15 @@ namespace DataSurfaces {
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 RefAirTemp = MAT(Zone);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = DataHeatBalance::TempEffBulkAir(t_SurfNum);
+                RefAirTemp = state.dataHeatBal->TempEffBulkAir(t_SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // determine ZoneEquipConfigNum for this zone
                 //            ControlledZoneAirFlag = .FALSE.
                 // ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
-                if (!DataHeatBalance::Zone(Zone).IsControlled) {
+                if (!state.dataHeatBal->Zone(Zone).IsControlled) {
                     ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                   DataHeatBalance::Zone(Zone).Name);
+                                   state.dataHeatBal->Zone(Zone).Name);
                     // return;
                 }
                 // determine supply air conditions
@@ -887,7 +874,7 @@ namespace DataSurfaces {
         return value;
     }
 
-    Real64 SurfaceData::getSWIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -898,10 +885,10 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
-    Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWBeamIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -912,10 +899,10 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident from outside beam
 
-        return  SurfQRadSWOutIncidentBeam(t_SurfNum);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentBeam(t_SurfNum);
     }
 
-    Real64 SurfaceData::getSWDiffuseIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWDiffuseIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -926,7 +913,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return  SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers(EnergyPlusData &state) const

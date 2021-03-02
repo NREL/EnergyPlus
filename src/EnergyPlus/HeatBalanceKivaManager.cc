@@ -299,7 +299,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                     Tin = 0.0;
                     ShowSevereError(state,
                                     format("Illegal control type for Zone={}, Found value={}, in Schedule={}",
-                                           DataHeatBalance::Zone(zoneNum).Name,
+                                           state.dataHeatBal->Zone(zoneNum).Name,
                                            controlType,
                                            state.dataZoneCtrls->TempControlledZone(zoneControlNum).ControlTypeSchedName));
                 }
@@ -370,12 +370,12 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         bcs->skyEmissivity = pow4(state.dataEnvrn->SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
         bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
-                               DataHeatBalance::SurfQRadThermInAbs(floorSurface) + // internal gains
+                               state.dataHeatBal->SurfQRadThermInAbs(floorSurface) + // internal gains
                                DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
                                DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
                                DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
 
-        bcs->slabConvectiveTemp = DataHeatBalance::TempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
+        bcs->slabConvectiveTemp = state.dataHeatBal->TempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
         bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
         bcs->gradeForcedTerm = kmPtr->surfaceConvMap[floorSurface].f;
         bcs->gradeConvectionAlgorithm = kmPtr->surfaceConvMap[floorSurface].out;
@@ -389,7 +389,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         Real64 TAConvTotal = 0.0;
         for (auto &wl : wallSurfaces) {
             Real64 Q = DataHeatBalSurface::SurfOpaqQRadSWInAbs(wl) + // solar
-                       DataHeatBalance::SurfQRadThermInAbs(wl) + // internal gains
+                       state.dataHeatBal->SurfQRadThermInAbs(wl) + // internal gains
                        DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
                        DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
                        DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC
@@ -397,7 +397,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
             Real64 &A = DataSurfaces::Surface(wl).Area;
 
             Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, wl);
-            Real64 Tconv = DataHeatBalance::TempEffBulkAir(wl);
+            Real64 Tconv = state.dataHeatBal->TempEffBulkAir(wl);
 
             QAtotal += Q * A;
             TARadTotal += Trad * A;
@@ -1039,7 +1039,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                     ShowContinueError(state, "  referencing Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\".");
                     if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Wall) {
                         ShowContinueError(state, "  You must also reference Foundation:Kiva=\"" + foundationInputs[Surfaces(surfNum).OSCPtr].name + "\"");
-                        ShowContinueError(state, "  in a floor surface within the same Zone=\"" + DataHeatBalance::Zone(Surfaces(surfNum).Zone).Name +
+                        ShowContinueError(state, "  in a floor surface within the same Zone=\"" + state.dataHeatBal->Zone(Surfaces(surfNum).Zone).Name +
                                           "\".");
                     } else if (Surfaces(surfNum).Class == DataSurfaces::SurfaceClass::Floor) {
                         ShowContinueError(state, "  However, this floor was never assigned to a Kiva instance.");
@@ -1204,7 +1204,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                 std::string contextStr = "Surface=\"" + DataSurfaces::Surface(surfNum).Name + "\"";
                 Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
                 surfaceMap[surfNum].calc_weighted_results();
-                DataHeatBalance::HConvIn(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
+                state.dataHeatBal->HConvIn(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;
             }
         }
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);

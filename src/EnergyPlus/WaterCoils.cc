@@ -295,7 +295,6 @@ namespace WaterCoils {
         //  certain object in the input file
         static bool ErrorsFound(false); // If errors detected in input
 
-        // Flow
         NumSimpHeat = inputProcessor->getNumObjectsFound(state, "Coil:Heating:Water");
         NumFlatFin = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water:DetailedGeometry");
         NumCooling = inputProcessor->getNumObjectsFound(state, "Coil:Cooling:Water");
