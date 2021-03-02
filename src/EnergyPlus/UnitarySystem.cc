@@ -6098,6 +6098,11 @@ namespace UnitarySystems {
                     thisSys.m_HeatingSAFMethod = state.dataUnitarySystems->None;
                     if (thisSys.m_HeatCoilExists && thisSys.m_MaxHeatAirVolFlow == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
+                        if (loc_m_HeatingSAFMethod == "") {
+                            ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method is blank.");
+                        } else {
+                            ShowContinueError(state, "Input for Heating Supply Air Flow Rate Method = None.");
+                        }
                         if (thisSys.m_CoolCoilExists) {
                             ShowContinueError(state, "Blank field not allowed for this coil type when cooling coil air flow rate is not AutoSized.");
                         } else {
@@ -6281,6 +6286,24 @@ namespace UnitarySystems {
                     }
                 } else if (UtilityRoutines::SameString(loc_m_NoCoolHeatSAFMethod, "None") || loc_m_NoCoolHeatSAFMethod == "") {
                     thisSys.m_NoCoolHeatSAFMethod = state.dataUnitarySystems->None;
+                    if (thisSys.m_ControlType == ControlType::CCMASHRAE) {
+                        if (loc_m_NoCoolHeatSAFMethod_SAFlow == -99999.0) { // no load air flow is autosized
+                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
+                            thisSys.m_RequestAutoSize = true;
+                        } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == -999.0) { // no load air flow is blank
+                            thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
+                            thisSys.m_RequestAutoSize = true;
+                            ShowWarningError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                            ShowContinueError(state, "Control Type = " + loc_m_ControlType);
+                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be blank.");
+                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate has been set to AutoSize and the simulation continues.");
+                        } else if (loc_m_NoCoolHeatSAFMethod_SAFlow == 0.0) { // no load air flow for SZVAV cannot be 0
+                            ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                            ShowContinueError(state, "Control Type = " + loc_m_ControlType);
+                            ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
+                            errorsFound = true;
+                        }
+                    }
                 } else {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisObjectName);
                     ShowContinueError(state, "Illegal No Load Supply Air Flow Rate Method = " + loc_m_NoCoolHeatSAFMethod);
@@ -7001,6 +7024,12 @@ namespace UnitarySystems {
                         thisSys.m_RunOnSensibleLoad = true;
                         thisSys.m_RunOnLatentLoad = false;
                         thisSys.m_RunOnLatentOnlyWithSensible = false;
+                    }
+                    if (thisSys.m_MaxNoCoolHeatAirVolFlow == 0.0) { // 0 min air flow not allowed for SZVAV
+                        ShowSevereError(state, "Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                        ShowContinueError(state, "Control Type = " + loc_m_ControlType);
+                        ShowContinueError(state, "Input for No Load Supply Air Flow Rate cannot be 0.");
+                        errorsFound = true;
                     }
                 }
 
