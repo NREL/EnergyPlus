@@ -98,24 +98,6 @@ namespace EvaporativeCoolers {
         WetFull                 // the evaporative cooler Research Special is run in full capacity in Wet Mode
     };
 
-    //// Indirect Evaporative Coolers Research Special Operating Modes
-    //extern int const None;            
-    //extern int const DryModulated;    
-    //extern int const DryFull;         
-    //extern int const DryWetModulated; 
-    //extern int const WetModulated;    
-    //extern int const WetFull;         
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
-    extern int NumEvapCool;                 // The Number of Evap Coolers found in the Input
-    extern Array1D_bool CheckEquipName;
-
-    extern int NumZoneEvapUnits;
-    extern Array1D_bool CheckZoneEvapUnitName;
-    extern bool GetInputZoneEvapUnit;
-
-
     enum class EvapCoolerType {
         Unassigned,
         DirectCELDEKPAD,
@@ -358,11 +340,6 @@ namespace EvaporativeCoolers {
         ZoneEvapCoolerUnitFieldData() = default;
     };
 
-    // Object Data
-    extern Array1D<EvapConditions> EvapCond;
-    extern Array1D<ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
-    extern Array1D<ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
-
     // Functions
 
     void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 PartLoadRatio = 1.0);
@@ -527,9 +504,29 @@ namespace EvaporativeCoolers {
 
 struct EvaporativeCoolersData :  BaseGlobalStruct {
 
+    bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
+    int NumEvapCool;                 // The Number of Evap Coolers found in the Input
+    Array1D_bool CheckEquipName;
+    int NumZoneEvapUnits;
+    Array1D_bool CheckZoneEvapUnitName;
+    bool GetInputZoneEvapUnit;
+    Array1D<EvaporativeCoolers::EvapConditions> EvapCond;
+    Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
+    Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
+    std::unordered_map<std::string, std::string> UniqueEvapCondNames;
+
     void clear_state() override
     {
-
+        this->NumEvapCool = 0;
+        this->EvapCond.clear();
+        this->NumZoneEvapUnits = 0;
+        this->ZoneEvapUnit.clear();
+        this->ZoneEvapCoolerUnitFields.clear();
+        this->GetInputEvapComponentsFlag = true;
+        this->GetInputZoneEvapUnit = true;
+        this->UniqueEvapCondNames.clear();
+        this->CheckEquipName.clear();
+        this->CheckZoneEvapUnitName.clear();
     }
 };
 

@@ -110,10 +110,6 @@ namespace EvaporativeCoolers {
     // various evaporative component models in this module
     //   different models share common module level data structure.
 
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
@@ -131,34 +127,6 @@ namespace EvaporativeCoolers {
         bool MySetPointCheckFlag(true);
         bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
     }                                         // namespace
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    bool GetInputEvapComponentsFlag(true); // Flag set to make sure you get input once
-    int NumEvapCool(0);                    // The Number of Evap Coolers found in the Input
-    Array1D_bool CheckEquipName;
-
-    int NumZoneEvapUnits(0);
-    Array1D_bool CheckZoneEvapUnitName;
-    bool GetInputZoneEvapUnit(true);
-
-    //// Indirect Evaporative Coolers Research Special Operating Modes
-    //int const None(0);            // the indirect evaporative cooler Research Special is scheduled off or turned off
-    //int const DryModulated(1);    // the indirect evaporative cooler Research Special is modulated in Dry Mode
-    //int const DryFull(2);         // the indirect evaporative cooler Research Special is run in full capacity in Dry Mode
-    //int const DryWetModulated(3); // the indirect evaporative cooler Research Special is modulated in Dry Mode or wet Mode
-    //int const WetModulated(4);    // the indirect evaporative cooler Research Special is modulated in wet Mode
-    //int const WetFull(5);         // the indirect evaporative cooler Research Special is run in full capacity in Wet Mode
-
-    // Object Data
-    Array1D<EvapConditions> EvapCond;
-    std::unordered_map<std::string, std::string> UniqueEvapCondNames;
-    Array1D<ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
-    Array1D<ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     // Functions
 
@@ -4923,16 +4891,6 @@ namespace EvaporativeCoolers {
 
     void clear_state()
     {
-        NumEvapCool = 0;
-        EvapCond.clear();
-        NumZoneEvapUnits = 0;
-        ZoneEvapUnit.clear();
-        ZoneEvapCoolerUnitFields.clear();
-        GetInputEvapComponentsFlag = true;
-        GetInputZoneEvapUnit = true;
-        UniqueEvapCondNames.clear();
-        CheckEquipName.clear();
-        CheckZoneEvapUnitName.clear();
         MySetPointCheckFlag = true;
         ZoneEquipmentListChecked = false;
     }
