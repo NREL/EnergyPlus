@@ -189,11 +189,6 @@ namespace Furnaces {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    // starting add variables for variable speed water source heat pump
-    Real64 SaveCompressorPLR(0.0);   // holds compressor PLR from active DX coil
-    std::string CurrentModuleObject; // Object type for getting and error messages
-    // ending varibles for variable speed water source heat pump
-
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
 
@@ -5464,7 +5459,7 @@ namespace Furnaces {
             NumOfSpeedHeating = state.dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating;
             // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
             if (state.dataFurnaces->Furnace(FurnaceNum).CheckFanFlow) {
-                CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
+                state.dataFurnaces->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
                 GetFanVolFlow(state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow);
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
@@ -5478,12 +5473,12 @@ namespace Furnaces {
                         ShowWarningError(state,
                                          format("{} - air flow rate = {:.7T} in fan object is less than the MSHP system air flow rate when cooling "
                                                 "is required ({:.7T}).",
-                                                CurrentModuleObject,
+                                                state.dataFurnaces->CurrentModuleObject,
                                                 state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow,
                                                 state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(NumOfSpeedCooling)));
                         ShowContinueError(state,
                             " The MSHP system flow rate when cooling is required is reset to the fan flow rate and the simulation continues.");
-                        ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        ShowContinueError(state, " Occurs in " + state.dataFurnaces->CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                         state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(NumOfSpeedCooling) = state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow;
 
                         if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
@@ -5499,7 +5494,7 @@ namespace Furnaces {
                                                   format(" The MSHP system flow rate when cooling is required is reset to the flow rate at higher "
                                                          "speed and the simulation continues at Speed{}.",
                                                          i));
-                                ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                                ShowContinueError(state, " Occurs in " + state.dataFurnaces->CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                                 state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(i) = state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(i + 1);
                             }
                         }
@@ -5509,12 +5504,12 @@ namespace Furnaces {
                             ShowWarningError(state,
                                              format("{} - air flow rate = {:.7T} in fan object is less than the MSHP system air flow rate when "
                                                     "heating is required ({:.7T}).",
-                                                    CurrentModuleObject,
+                                                    state.dataFurnaces->CurrentModuleObject,
                                                     state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow,
                                                     state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(NumOfSpeedHeating)));
                             ShowContinueError(state,
                                 " The MSHP system flow rate when heating is required is reset to the fan flow rate and the simulation continues.");
-                            ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                            ShowContinueError(state, " Occurs in " + state.dataFurnaces->CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                             state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(NumOfSpeedHeating) = state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow;
 
                             if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
@@ -5530,7 +5525,7 @@ namespace Furnaces {
                                                       format(" The MSHP system flow rate when heating is required is reset to the flow rate at "
                                                              "higher speed and the simulation continues at Speed{}.",
                                                              i));
-                                    ShowContinueError(state, " Occurs in " + CurrentModuleObject + " system = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                                    ShowContinueError(state, " Occurs in " + state.dataFurnaces->CurrentModuleObject + " system = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                                     state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(i) = state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(i + 1);
                                 }
                             }
@@ -5540,12 +5535,12 @@ namespace Furnaces {
                         ShowWarningError(state,
                                          format("{} - air flow rate = {:.7T} in fan object is less than the MSHP system air flow rate when no "
                                                 "heating or cooling is needed ({:.7T}).",
-                                                CurrentModuleObject,
+                                                state.dataFurnaces->CurrentModuleObject,
                                                 state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow,
                                                 state.dataFurnaces->Furnace(FurnaceNum).IdleVolumeAirRate));
                         ShowContinueError(state, " The MSHP system flow rate when no heating or cooling is needed is reset to the fan flow rate and the "
                                           "simulation continues.");
-                        ShowContinueError(state, " Occurs in " + CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
+                        ShowContinueError(state, " Occurs in " + state.dataFurnaces->CurrentModuleObject + " = " + state.dataFurnaces->Furnace(FurnaceNum).Name);
                         state.dataFurnaces->Furnace(FurnaceNum).IdleVolumeAirRate = state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow;
                     }
                     RhoAir = state.dataEnvrn->StdRhoAir;
@@ -9916,7 +9911,7 @@ namespace Furnaces {
         // zero DX coils, and supplemental electric heater electricity consumption
         DXElecHeatingPower = 0.0;
         DXElecCoolingPower = 0.0;
-        SaveCompressorPLR = 0.0;
+        state.dataFurnaces->SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
 
         SystemSensibleLoad = QZnReq;
@@ -10030,14 +10025,14 @@ namespace Furnaces {
         }
 
         if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool) {
-            SaveCompressorPLR = PartLoadFrac;
+            state.dataFurnaces->SaveCompressorPLR = PartLoadFrac;
         } else {
             if (SpeedNum > 1) {
-                SaveCompressorPLR = 1.0;
+                state.dataFurnaces->SaveCompressorPLR = 1.0;
             }
 
-            if (PartLoadFrac == 1.0 && SaveCompressorPLR < 1.0) {
-                PartLoadFrac = SaveCompressorPLR;
+            if (PartLoadFrac == 1.0 && state.dataFurnaces->SaveCompressorPLR < 1.0) {
+                PartLoadFrac = state.dataFurnaces->SaveCompressorPLR;
             }
         }
 
@@ -10167,7 +10162,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilSensDemand = 0.0;
         }
 
-        state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = SaveCompressorPLR;
+        state.dataFurnaces->Furnace(FurnaceNum).CompPartLoadRatio = state.dataFurnaces->SaveCompressorPLR;
         if (state.dataFurnaces->Furnace(FurnaceNum).OpMode == CycFanCycCoil) {
             if (SupHeaterLoad > 0.0) {
                 state.dataFurnaces->Furnace(FurnaceNum).FanPartLoadRatio = 1.0;
@@ -10668,7 +10663,7 @@ namespace Furnaces {
         OutletNode = state.dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum;
 
         HeatCoilLoad = 0.0;
-        SaveCompressorPLR = 0.0;
+        state.dataFurnaces->SaveCompressorPLR = 0.0;
         SavePartloadRatio = 0.0;
         ErrorToler = 0.001;
 
@@ -10740,7 +10735,7 @@ namespace Furnaces {
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
 
-                SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -10816,7 +10811,7 @@ namespace Furnaces {
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
 
-                    SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
@@ -10907,7 +10902,7 @@ namespace Furnaces {
 
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
-                SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
@@ -10983,7 +10978,7 @@ namespace Furnaces {
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
-                    SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
@@ -11080,7 +11075,7 @@ namespace Furnaces {
                 SavePartloadRatio = PartLoadFrac;
                 SaveSpeedRatio = SpeedRatio;
 
-                SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
+                state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).PartLoadRatio;
             } else {
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                     SimIHP(state,
@@ -11156,7 +11151,7 @@ namespace Furnaces {
 
                     SavePartloadRatio = PartLoadFrac;
                     SaveSpeedRatio = SpeedRatio;
-                    SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
+                    state.dataFurnaces->SaveCompressorPLR = state.dataVariableSpeedCoils->VarSpeedCoil(state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex).PartLoadRatio;
                 } else {
                     if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,

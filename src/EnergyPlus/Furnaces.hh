@@ -99,11 +99,6 @@ namespace Furnaces {
 
     // used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
 
-    // starting add variables for variable speed water source heat pump
-    extern Real64 SaveCompressorPLR;        // holds compressor PLR from active DX coil
-    extern std::string CurrentModuleObject; // Object type for getting and error messages
-    // ending varibles for variable speed water source heat pump
-
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
 
