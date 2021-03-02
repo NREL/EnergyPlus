@@ -4796,20 +4796,20 @@ namespace Furnaces {
         std::string FanType; // used in warning messages
         std::string FanName; // used in warning messages
 
-        static int ZoneInSysIndex(0);                            // number of zone inlet nodes counter in an airloop
-        static int NumAirLoopZones(0);                           // number of zone inlet nodes in an air loop
-        static int ZoneInletNodeNum(0);                          // zone inlet nodes node number
-        static Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
-        static Real64 CntrlZoneTerminalUnitMassFlowRateMax(0.0); // Maximum mass flow rate through controlled zone terminal unit
+        int ZoneInSysIndex(0);                            // number of zone inlet nodes counter in an airloop
+        int NumAirLoopZones(0);                           // number of zone inlet nodes in an air loop
+        int ZoneInletNodeNum(0);                          // zone inlet nodes node number
+        Real64 SumOfMassFlowRateMax(0.0);                 // the sum of mass flow rates at inlet to zones in an airloop
+        Real64 CntrlZoneTerminalUnitMassFlowRateMax(0.0); // Maximum mass flow rate through controlled zone terminal unit
 
-        static bool ErrorsFound(false);        // flag returned from mining call
-        static Real64 mdot(0.0);               // local temporary for mass flow rate (kg/s)
-        static Real64 rho(0.0);                // local for fluid density
-        static int SteamIndex(0);              // index of steam quality for steam heating coil
-        static Real64 SteamDensity(0.0);       // density of steam at 100C, used for steam heating coils
-        static Real64 CoilMaxVolFlowRate(0.0); // coil fluid maximum volume flow rate
-        static Real64 QActual(0.0);            // coil actual capacity
-        static Real64 SUPHEATERLOAD(0.0);      // SUPPLEMENTAL HEATER LOAD
+        bool ErrorsFound(false);        // flag returned from mining call
+        Real64 mdot(0.0);               // local temporary for mass flow rate (kg/s)
+        Real64 rho(0.0);                // local for fluid density
+        int SteamIndex(0);              // index of steam quality for steam heating coil
+        Real64 SteamDensity(0.0);       // density of steam at 100C, used for steam heating coils
+        Real64 CoilMaxVolFlowRate(0.0); // coil fluid maximum volume flow rate
+        Real64 QActual(0.0);            // coil actual capacity
+        Real64 SUPHEATERLOAD(0.0);      // SUPPLEMENTAL HEATER LOAD
         int NumOfSpeedCooling;                 // Number of speeds for cooling
         int NumOfSpeedHeating;                 // Number of speeds for heating
         int InNode;                            // Inlet node number in MSHP loop
