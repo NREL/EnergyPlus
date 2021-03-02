@@ -188,15 +188,27 @@ namespace CommandLineInterface {
 
         state.dataGlobal->outputEpJSONConversionOnly = opt.isSet("--convert-only");
 
+        bool eplusRunningViaAPI = state.dataGlobal->eplusRunningViaAPI;
+
         // Process standard arguments
         if (opt.isSet("-h")) {
             DisplayString(state, usage);
-            exit(EXIT_SUCCESS);
+            if (eplusRunningViaAPI) {
+                // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
+                return static_cast<int>(ReturnCodes::SuccessButHelper);
+            } else {
+                exit(EXIT_SUCCESS);
+            }
         }
 
         if (opt.isSet("-v")) {
             DisplayString(state, VerString);
-            exit(EXIT_SUCCESS);
+            if (eplusRunningViaAPI) {
+                // we need another return code to let runEnergyPlusAsLibrary know it should not try to run anything
+                return static_cast<int>(ReturnCodes::SuccessButHelper);
+            } else {
+                exit(EXIT_SUCCESS);
+            }
         }
 
         if (opt.lastArgs.size() == 1) {
@@ -225,7 +237,11 @@ namespace CommandLineInterface {
             }
             if (invalidOptionFound) {
                 DisplayString(state, errorFollowUp);
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             } else {
                 DisplayString(state, "ERROR: Multiple input files specified:");
                 for (size_type i = 0; i < opt.lastArgs.size(); ++i) {
@@ -233,7 +249,11 @@ namespace CommandLineInterface {
                     DisplayString(state, format("  Input file #{}: {}", i + 1, arg));
                 }
                 DisplayString(state, errorFollowUp);
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
@@ -266,7 +286,11 @@ namespace CommandLineInterface {
             DisplayString(state, "BSON input format is experimental and unsupported.");
         } else {
             DisplayString(state, "ERROR: Input file must have IDF, IMF, or epJSON extension.");
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         std::string weatherFilePathWithoutExtension = FileSystem::removeFileExtension(state.files.inputWeatherFileName.fileName);
@@ -363,7 +387,11 @@ namespace CommandLineInterface {
         } else {
             DisplayString(state, "ERROR: Unrecognized argument for output suffix style: " + suffixType);
             DisplayString(state, errorFollowUp);
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         // EnergyPlus files
@@ -465,7 +493,11 @@ namespace CommandLineInterface {
                 DisplayString(state, "ERROR: Unexpected number of arguments for option " + badOptions[i]);
             }
             DisplayString(state, errorFollowUp);
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         // This is a place holder in case there are required options in the future
@@ -474,7 +506,11 @@ namespace CommandLineInterface {
                 DisplayString(state, "ERROR: Missing required option " + badOptions[i]);
             }
             DisplayString(state, errorFollowUp);
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         if (opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0) {
@@ -487,14 +523,22 @@ namespace CommandLineInterface {
                 DisplayString(state, "ERROR: Invalid option: " + arg);
             }
             DisplayString(state, errorFollowUp);
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         // Error for cases where both design-day and annual simulation switches are set
         if (state.dataGlobal->DDOnlySimulation && state.dataGlobal->AnnualSimulation) {
             DisplayString(state, "ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(state, errorFollowUp);
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         // Read path from INI file if it exists
@@ -504,7 +548,11 @@ namespace CommandLineInterface {
             auto iniFile = state.files.iniFile.try_open();
             if (!iniFile.good()) {
                 DisplayString(state, "ERROR: Could not open file " + iniFile.fileName + " for input (read).");
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
             CurrentWorkingFolder = iniFile.fileName;
             // Relying on compiler to supply full path name here
@@ -524,14 +572,22 @@ namespace CommandLineInterface {
         if (!FileSystem::fileExists(inputFileName)) {
             DisplayString(state, "ERROR: Could not find input data file: " + FileSystem::getAbsolutePath(inputFileName) + ".");
             DisplayString(state, errorFollowUp);
-            exit(EXIT_FAILURE);
+            if (eplusRunningViaAPI) {
+                return static_cast<int>(ReturnCodes::Failure);
+            } else {
+                exit(EXIT_FAILURE);
+            }
         }
 
         if (opt.isSet("-w") && !state.dataGlobal->DDOnlySimulation) {
             if (!FileSystem::fileExists(state.files.inputWeatherFileName.fileName)) {
                 DisplayString(state, "ERROR: Could not find weather file: " + FileSystem::getAbsolutePath(state.files.inputWeatherFileName.fileName) + ".");
                 DisplayString(state, errorFollowUp);
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
         }
 
@@ -542,7 +598,11 @@ namespace CommandLineInterface {
             std::string epMacroPath = exeDirectory + "EPMacro" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(epMacroPath)) {
                 DisplayString(state, "ERROR: Could not find EPMacro executable: " + FileSystem::getAbsolutePath(epMacroPath) + ".");
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
             std::string epMacroCommand = "\"" + epMacroPath + "\"";
             bool inputFileNamedIn = (FileSystem::getAbsolutePath(inputFileName) == FileSystem::getAbsolutePath("in.imf"));
@@ -560,7 +620,11 @@ namespace CommandLineInterface {
             std::string expandObjectsPath = exeDirectory + "ExpandObjects" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(expandObjectsPath)) {
                 DisplayString(state, "ERROR: Could not find ExpandObjects executable: " + FileSystem::getAbsolutePath(expandObjectsPath) + ".");
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
             std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
             bool inputFileNamedIn = (FileSystem::getAbsolutePath(inputFileName) == FileSystem::getAbsolutePath("in.idf"));
@@ -569,7 +633,11 @@ namespace CommandLineInterface {
             if (!FileSystem::fileExists(inputIddFileName)) {
                 DisplayString(state, "ERROR: Could not find input data dictionary: " + FileSystem::getAbsolutePath(inputIddFileName) + ".");
                 DisplayString(state, errorFollowUp);
-                exit(EXIT_FAILURE);
+                if (eplusRunningViaAPI) {
+                    return static_cast<int>(ReturnCodes::Failure);
+                } else {
+                    exit(EXIT_FAILURE);
+                }
             }
 
             bool iddFileNamedEnergy = (FileSystem::getAbsolutePath(inputIddFileName) == FileSystem::getAbsolutePath("Energy+.idd"));
@@ -586,7 +654,7 @@ namespace CommandLineInterface {
             }
         }
 
-        return 0;
+        return static_cast<int>(ReturnCodes::Success);
     }
 
     // Fix This is Fortranic code that needs to be brought up to C++ style
@@ -735,7 +803,7 @@ namespace CommandLineInterface {
             readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + FileSystem::exeExtension;
             if (!FileSystem::fileExists(readVarsPath)) {
                 DisplayString(state, "ERROR: Could not find ReadVarsESO executable: " + FileSystem::getAbsolutePath(readVarsPath) + ".");
-                return EXIT_FAILURE;
+                return static_cast<int>(ReturnCodes::Failure);
             }
         }
 
@@ -778,7 +846,7 @@ namespace CommandLineInterface {
         if (!mviFileExists) FileSystem::removeFile(MVIfile.c_str());
 
         FileSystem::moveFile("readvars.audit", outputRvauditFileName);
-        return EXIT_SUCCESS;
+        return static_cast<int>(ReturnCodes::Success);
     }
 
 } // namespace CommandLineInterface
