@@ -83,7 +83,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     EvapCond(EvapCoolNum).SecInletEnthalpy = 42000.0;
 
     // set up arguments
-    int OperatingMode(EvaporativeCoolers::None);
+    OperatingMode OperatingMode(EvaporativeCoolers::OperatingMode::None);
     Real64 AirMassFlowSec(0.0);
     Real64 const EDBTSec(20.0);
     Real64 const EWBTSec(15.0);
@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // dry operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::DryFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::DryFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
@@ -113,7 +113,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::WetFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
     EvapCond(EvapCoolNum).DryCoilMaxEfficiency = 0.8;
 
     // set up arguments
-    int DryOrWetOperatingMode(EvaporativeCoolers::DryFull);
+    OperatingMode DryOrWetOperatingMode(EvaporativeCoolers::OperatingMode::DryFull);
     Real64 const AirMassFlowSec(1.0);
     Real64 const EDBTSec(14.0);
     Real64 const EWBTSec(11.0);
@@ -153,7 +153,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
     EXPECT_DOUBLE_EQ(16.0, EvapCond(EvapCoolNum).OutletTemp);
 
     // testing full capacity in wet operating mode
-    DryOrWetOperatingMode = EvaporativeCoolers::WetFull;
+    DryOrWetOperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     EvapCond(EvapCoolNum).WetCoilMaxEfficiency = 0.75;
 
     CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
@@ -329,7 +329,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
     EvaporativeCoolers::EvapCond(EvapCoolNum).SecInletEnthalpy = 42000.0;
 
     // set up arguments
-    int OperatingMode(EvaporativeCoolers::None);
+    OperatingMode OperatingMode(EvaporativeCoolers::OperatingMode::None);
     Real64 AirMassFlowSec(0.0);
     Real64 const EDBTSec(20.0);
     Real64 const EWBTSec(15.0);
@@ -346,7 +346,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // dry operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::DryFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::DryFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
@@ -361,7 +361,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
-    OperatingMode = EvaporativeCoolers::WetFull;
+    OperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     AirMassFlowSec = 2.0;
     QHXTotal = 10206.410750000941;
 
@@ -389,7 +389,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp
     EvaporativeCoolers::EvapCond(EvapCoolNum).DryCoilMaxEfficiency = 0.8;
 
     // set up arguments
-    int DryOrWetOperatingMode(EvaporativeCoolers::DryFull);
+    OperatingMode DryOrWetOperatingMode(EvaporativeCoolers::OperatingMode::DryFull);
     Real64 const AirMassFlowSec(1.0);
     Real64 const EDBTSec(14.0);
     Real64 const EWBTSec(11.0);
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp
     EXPECT_DOUBLE_EQ(16.0, EvaporativeCoolers::EvapCond(EvapCoolNum).OutletTemp);
 
     // testing full capacity in wet operating mode
-    DryOrWetOperatingMode = EvaporativeCoolers::WetFull;
+    DryOrWetOperatingMode = EvaporativeCoolers::OperatingMode::WetFull;
     EvaporativeCoolers::EvapCond(EvapCoolNum).WetCoilMaxEfficiency = 0.75;
 
     EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum, DryOrWetOperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec);
@@ -421,7 +421,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     EvaporativeCoolers::EvapCond(EvapCoolNum).IndirectRecircPumpPower = 100.0;
 
     // set up arguments
-    int DryWetMode(EvaporativeCoolers::DryFull);
+    OperatingMode DryWetMode(EvaporativeCoolers::OperatingMode::DryFull);
     Real64 FlowRatio(1.0);
 
     CurveNum = 1;
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     EXPECT_EQ(200.0, EvaporativeCoolers::EvapCond(EvapCoolNum).EvapCoolerPower);
 
     // set up arguments for wet modulated operating condition
-    DryWetMode = EvaporativeCoolers::WetModulated;
+    DryWetMode = EvaporativeCoolers::OperatingMode::WetModulated;
     FlowRatio = 0.8;
     EvaporativeCoolers::EvapCond(EvapCoolNum).PartLoadFract = 0.5;
 
@@ -787,10 +787,10 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     thisEvapCooler.DesiredOutletTemp = 21.0;
 
     // determine operating mode
-    int Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
+    OperatingMode Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
         EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
     // check operating mode
-    EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::WetFull);
+    EXPECT_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull);
     // get outlet temperature in full wet operating mode
     EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state, EvapCoolNum,
                                                             Result_WetFullOperatingMode,

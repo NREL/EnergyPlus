@@ -403,7 +403,7 @@ namespace EvaporativeCoolers {
                                                        Real64 InletDewPointTempSec,
                                                        Real64 InletHumRatioSec);
 
-    int IndirectResearchSpecialEvapCoolerOperatingMode(int EvapCoolNum,
+    OperatingMode IndirectResearchSpecialEvapCoolerOperatingMode(int EvapCoolNum,
                                                        Real64 InletDryBulbTempSec,
                                                        Real64 InletWetBulbTempSec,
                                                        Real64 TdbOutSysWetMin,

@@ -2501,7 +2501,7 @@ namespace EvaporativeCoolers {
         {
             if (EvapCond(EvapCoolNum).EvapCoolerRDDOperatingMode == OperatingMode::DryModulated) {
                 Par(1) = double(EvapCoolNum);
-                Par(2) = OperatingMode::DryModulated;
+                Par(2) = double(OperatingMode::DryModulated);
                 Par(3) = SysTempSetPoint;
                 Par(4) = InletDryBulbTempSec;
                 Par(5) = InletWetBulbTempSec;
@@ -2919,7 +2919,7 @@ namespace EvaporativeCoolers {
         Real64 Residuum;           // Residual to be minimized to zero
 
         EvapCoolIndex = int(Par(1));
-        DryOrWetOperatingMode = int(Par(2));
+        DryOrWetOperatingMode = OperatingMode(Par(2));
         SysTempSetPoint = Par(3);
         EDBTSecAirSide = Par(4);
         EWBTSecAirSide = Par(5);
