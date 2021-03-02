@@ -1023,12 +1023,6 @@ namespace HWBaseboardRadiator {
         static std::string const RoutineName("SizeHWBaseboard");
         static std::string const RoutineNameFull("BaseboardRadiatorWater:SizeHWBaseboard");
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizNum;     // do loop index for plant sizing
         int PltSizHeatNum; // index of plant sizing object for 1st heating loop
@@ -1071,6 +1065,8 @@ namespace HWBaseboardRadiator {
         WaterVolFlowRateMaxUser = 0.0;
         RatedCapacityDes = 0.0;
         state.dataSize->DataScalableCapSizingON = false;
+
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         if (state.dataSize->CurZoneEqNum > 0) {
 

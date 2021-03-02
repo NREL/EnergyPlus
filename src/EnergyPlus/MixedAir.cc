@@ -915,7 +915,7 @@ namespace EnergyPlus::MixedAir {
         state.dataAirLoop->NumOASystems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataAirLoop->OutsideAirSys.allocate(state.dataAirLoop->NumOASystems);
-        OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
+        state.dataSize->OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
         state.dataMixedAir->ControllerListUniqueNames.reserve(static_cast<unsigned>(state.dataAirLoop->NumOASystems));
         state.dataMixedAir->MyOneTimeErrorFlag.dimension(state.dataAirLoop->NumOASystems, true);
         state.dataMixedAir->MyOneTimeCheckUnitarySysFlag.dimension(state.dataAirLoop->NumOASystems, true);

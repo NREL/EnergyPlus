@@ -92,7 +92,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(HPNum);
     state->dataSize->FinalZoneSizing.allocate(state->dataSize->CurZoneEqNum);
-    ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
     DesDayWeath.allocate(1);
     DesDayWeath(1).Temp.allocate(24);
 
@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.0045;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 25.5;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0045;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
 
     state->dataCurveManager->NumCurves = 2;
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);

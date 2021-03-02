@@ -117,10 +117,10 @@ protected:
         HydrRadSys.allocate(1);
         CFloRadSys.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
-        ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing.allocate(1);
         state->dataHeatBal->Zone.allocate(1);
         state->dataSize->CurZoneEqNum = 1;
-        ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
         state->dataSize->ZoneSizingRunDone = true;
 
         state->dataSize->CurSysNum = 0;
@@ -1184,11 +1184,11 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->FinalZoneSizing.allocate(state->dataSize->CurZoneEqNum);
-    ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
 
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) = DataSizing::FractionOfAutosizedHeatingCapacity;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing) = DataSizing::FractionOfAutosizedCoolingCapacity;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) = DataSizing::FractionOfAutosizedHeatingCapacity;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing) = DataSizing::FractionOfAutosizedCoolingCapacity;
     // heating capacity sizing calculation
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 10000.0;
     HeatingCapacity = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad * HydrRadSys(RadSysNum).ScaledHeatingCapacity;

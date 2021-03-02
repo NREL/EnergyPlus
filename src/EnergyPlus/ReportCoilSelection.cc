@@ -1159,6 +1159,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
 )
 {
+    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+    auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     // no this is adjusted back to ratings    c->coilTotCapAtPeak = TotalCoolingCap;
@@ -1175,34 +1178,34 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     c->oASysNum = curOASysNum;
 
-    if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(state.dataSize->FinalSysSizing) && allocated(DataSizing::SysSizPeakDDNum)) {
+    if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(state.dataSize->FinalSysSizing) && allocated(SysSizPeakDDNum)) {
 
         // These next blocks does not always work with SizingPeriod:WeatherFileDays or SizingPeriod:WeatherFileConditionType, protect against hard
         // crash
-        if (DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
+        if (SysSizPeakDDNum(curSysNum).SensCoolPeakDD > 0 &&
+            SysSizPeakDDNum(curSysNum).SensCoolPeakDD <= state.dataEnvrn->TotDesDays) {
+            c->desDayNameAtSensPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).SensCoolPeakDD).Title;
             c->coilSensePeakHrMin =
                 PeakHrMinString(state,
-                                DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD,
-                                DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
+                                SysSizPeakDDNum(curSysNum).SensCoolPeakDD,
+                                SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD));
         }
-        if (DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
+        if (SysSizPeakDDNum(curSysNum).TotCoolPeakDD > 0 &&
+            SysSizPeakDDNum(curSysNum).TotCoolPeakDD <= state.dataEnvrn->TotDesDays) {
+            c->desDayNameAtTotalPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).TotCoolPeakDD).Title;
             c->coilTotalPeakHrMin =
                 PeakHrMinString(state,
-                                DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD,
-                                DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
+                                SysSizPeakDDNum(curSysNum).TotCoolPeakDD,
+                                SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD));
         }
 
-        if (DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 &&
-            DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
-            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
+        if (SysSizPeakDDNum(curSysNum).CoolFlowPeakDD > 0 &&
+            SysSizPeakDDNum(curSysNum).CoolFlowPeakDD <= state.dataEnvrn->TotDesDays) {
+            c->desDayNameAtAirFlowPeak = state.dataWeatherManager->DesDayInput(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD).Title;
             c->airPeakHrMin =
                 PeakHrMinString(state,
-                                DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD,
-                                DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(DataSizing::SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
+                                SysSizPeakDDNum(curSysNum).CoolFlowPeakDD,
+                                SysSizPeakDDNum(curSysNum).TimeStepAtCoolFlowPk(SysSizPeakDDNum(curSysNum).CoolFlowPeakDD));
         }
 
         if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
@@ -1232,15 +1235,15 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         int SysPeakDDnum(0);
         int SysPeakTimeStepInDay(0);
         if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::TotalCoolingLoad) {
-            SysPeakDDnum = DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD;
+            SysPeakDDnum = SysSizPeakDDNum(curSysNum).TotCoolPeakDD;
             if (SysPeakDDnum > 0)
                 SysPeakTimeStepInDay =
-                    DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).TotCoolPeakDD);
+                    SysSizPeakDDNum(curSysNum).TimeStepAtTotCoolPk(SysSizPeakDDNum(curSysNum).TotCoolPeakDD);
         } else if (state.dataSize->FinalSysSizing(curSysNum).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
-            SysPeakDDnum = DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD;
+            SysPeakDDnum = SysSizPeakDDNum(curSysNum).SensCoolPeakDD;
             if (SysPeakDDnum > 0)
                 SysPeakTimeStepInDay =
-                    DataSizing::SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(DataSizing::SysSizPeakDDNum(curSysNum).SensCoolPeakDD);
+                    SysSizPeakDDNum(curSysNum).TimeStepAtSensCoolPk(SysSizPeakDDNum(curSysNum).SensCoolPeakDD);
         }
 
         if (SysPeakDDnum > 0 && SysPeakTimeStepInDay > 0) {
@@ -1352,8 +1355,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 
         c->rmSensibleAtPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolLoad;
 
-        if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
-            c->oaPeakVolFlow = DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow;
+        if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+            c->oaPeakVolFlow = ZoneEqSizing(curZoneEqNum).OAVolFlow;
         } else {
             c->oaPeakVolFlow = 0.0;
         }
@@ -1374,7 +1377,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             // DataSizing::FinalZoneSizing( curZoneEqNum ).OutHumRatAtCoolPeak + ( 1.0 - c->oaPeakVolFrac ) * DataSizing::FinalZoneSizing(
             // curZoneEqNum ).ZoneHumRatAtCoolPeak;
         } else if (state.dataSize->ZoneEqDXCoil) {
-            if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+            if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).DesCoolCoilInTemp;
                 }
@@ -1430,6 +1433,11 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
 )
 {
+    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+    auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+    auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+    auto &UnitarySysEqSizing(state.dataSize->UnitarySysEqSizing);
+
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->capIsAutosized = isAutoSize;
@@ -1577,10 +1585,10 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
         c->rmSensibleAtPeak = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatLoad;
 
-        if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
-            c->oaPeakVolFlow = DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow;
-        } else if (DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {
-            c->oaPeakVolFlow = DataSizing::ZoneEqSizing(curZoneEqNum).ATMixerVolFlow;
+        if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+            c->oaPeakVolFlow = ZoneEqSizing(curZoneEqNum).OAVolFlow;
+        } else if (ZoneEqSizing(curZoneEqNum).ATMixerVolFlow > 0.0) {
+            c->oaPeakVolFlow = ZoneEqSizing(curZoneEqNum).ATMixerVolFlow;
         } else {
             c->oaPeakVolFlow = 0.0;
         }
@@ -1597,8 +1605,8 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 c->coilDesEntHumRat = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU;
             }
         } else if (state.dataSize->TermUnitPIU) {
-            Real64 MinPriFlowFrac = DataSizing::TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MinFlowFrac;
-            if (DataSizing::TermUnitSizing(state.dataSize->CurTermUnitSizingNum).InducesPlenumAir) {
+            Real64 MinPriFlowFrac = TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MinFlowFrac;
+            if (TermUnitSizing(state.dataSize->CurTermUnitSizingNum).InducesPlenumAir) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     c->coilDesEntTemp =
                         (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU * MinPriFlowFrac) +
@@ -1626,7 +1634,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                                       (1.0 - desOAFlowFrac) * state.dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak;
             }
         } else if (state.dataSize->ZoneEqDXCoil) {
-            if (DataSizing::ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
+            if (ZoneEqSizing(curZoneEqNum).OAVolFlow > 0.0) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     c->coilDesEntTemp = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatCoilInTemp;
                 }
@@ -1681,21 +1689,21 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->coilDesMassFlow = state.dataSize->FinalZoneSizing(curZoneEqNum).DesHeatMassFlow;
             c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
         } else if (curSysNum > 0 && allocated(state.dataSize->FinalSysSizing)) {
-            if (curOASysNum > 0 && allocated(DataSizing::OASysEqSizing)) {
-                if (DataSizing::OASysEqSizing(curOASysNum).AirFlow) {
-                    c->coilDesVolFlow = DataSizing::OASysEqSizing(curOASysNum).AirVolFlow;
-                } else if (DataSizing::OASysEqSizing(curOASysNum).HeatingAirFlow) {
-                    c->coilDesVolFlow = DataSizing::OASysEqSizing(curOASysNum).HeatingAirVolFlow;
+            if (curOASysNum > 0 && allocated(OASysEqSizing)) {
+                if (OASysEqSizing(curOASysNum).AirFlow) {
+                    c->coilDesVolFlow = OASysEqSizing(curOASysNum).AirVolFlow;
+                } else if (OASysEqSizing(curOASysNum).HeatingAirFlow) {
+                    c->coilDesVolFlow = OASysEqSizing(curOASysNum).HeatingAirVolFlow;
                 } else {
                     c->coilDesVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 }
             } else {
                 if (state.dataSize->DataFlowUsedForSizing > 0.0) {
                     c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
-                } else if (DataSizing::UnitarySysEqSizing(curSysNum).AirFlow) {
-                    c->coilDesVolFlow = DataSizing::UnitarySysEqSizing(curSysNum).AirVolFlow;
-                } else if (DataSizing::UnitarySysEqSizing(curSysNum).HeatingAirFlow) {
-                    c->coilDesVolFlow = DataSizing::UnitarySysEqSizing(curSysNum).HeatingAirVolFlow;
+                } else if (UnitarySysEqSizing(curSysNum).AirFlow) {
+                    c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).AirVolFlow;
+                } else if (UnitarySysEqSizing(curSysNum).HeatingAirFlow) {
+                    c->coilDesVolFlow = UnitarySysEqSizing(curSysNum).HeatingAirVolFlow;
                 } else {
                     if (state.dataSize->CurDuctType == DataHVACGlobals::Main) {
                         if (state.dataSize->FinalSysSizing(curSysNum).SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {

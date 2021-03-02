@@ -503,7 +503,7 @@ namespace ZoneAirLoopEquipmentManager {
 
                 // Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
                 {
-                    auto &thisTermUnitSizingData(DataSizing::TermUnitSizing(thisADU.TermUnitSizingNum));
+                    auto &thisTermUnitSizingData(state.dataSize->TermUnitSizing(thisADU.TermUnitSizingNum));
                     thisTermUnitSizingData.ADUName = thisADU.Name;
                     if (thisADU.AirTerminalSizingSpecIndex > 0) {
                         {

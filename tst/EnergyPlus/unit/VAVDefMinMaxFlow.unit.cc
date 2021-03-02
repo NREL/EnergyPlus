@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     state->dataSize->NumAirTerminalSizingSpec = 1;
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
     GetOARequirements(*state);      // get the OA requirements object
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     state->dataSize->FinalZoneSizing.deallocate();
     state->dataSize->TermUnitFinalZoneSizing.deallocate();
     state->dataSize->CalcFinalZoneSizing.deallocate();
-    TermUnitSizing.deallocate();
+    state->dataSize->TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
 
@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->NumAirTerminalSizingSpec = 1;
     state->dataSize->CalcFinalZoneSizing.allocate(1);
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
     GetOARequirements(*state);      // get the OA requirements object
@@ -473,7 +473,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     state->dataSize->FinalZoneSizing.deallocate();
     state->dataSize->TermUnitFinalZoneSizing.deallocate();
     state->dataSize->CalcFinalZoneSizing.deallocate();
-    TermUnitSizing.deallocate();
+    state->dataSize->TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
 
@@ -596,7 +596,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
     GetOARequirements(*state);      // get the OA requirements object
@@ -653,7 +653,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     state->dataSize->FinalZoneSizing.deallocate();
     state->dataSize->TermUnitFinalZoneSizing.deallocate();
     state->dataSize->CalcFinalZoneSizing.deallocate();
-    TermUnitSizing.deallocate();
+    state->dataSize->TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
 
@@ -777,7 +777,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
     // GetOARequirements(*state); // get the OA requirements object
@@ -802,7 +802,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     state->dataSize->FinalZoneSizing.deallocate();
     state->dataSize->TermUnitFinalZoneSizing.deallocate();
     state->dataSize->CalcFinalZoneSizing.deallocate();
-    TermUnitSizing.deallocate();
+    state->dataSize->TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
 
@@ -927,7 +927,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     state->dataSize->NumAirTerminalSizingSpec = 1;
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->CalcFinalZoneSizing.allocate(1);
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     GetZoneData(*state, ErrorsFound);
     EXPECT_EQ("SPACE3-1", state->dataHeatBal->Zone(1).Name);
     GetOARequirements(*state);      // get the OA requirements object
@@ -983,7 +983,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     state->dataSize->FinalZoneSizing.deallocate();
     state->dataSize->TermUnitFinalZoneSizing.deallocate();
     state->dataSize->CalcFinalZoneSizing.deallocate();
-    TermUnitSizing.deallocate();
+    state->dataSize->TermUnitSizing.deallocate();
     state->dataSingleDuct->sd_airterminal.deallocate();
 }
 

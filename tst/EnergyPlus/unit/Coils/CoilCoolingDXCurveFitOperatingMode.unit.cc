@@ -123,8 +123,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
 
 
     state->dataSize->FinalZoneSizing.allocate(1);
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::SysSizPeakDDNum.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->SysSizPeakDDNum.allocate(1);
 
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
@@ -133,9 +133,9 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     state->dataEnvrn->StdBaroPress = 101325.0;
 
     state->dataSize->ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     Real64 ratedEvapAirFlowRate = 1.005;
 

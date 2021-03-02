@@ -7198,15 +7198,17 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
         // sweep specific data into one pointer to avoid if statements throughout this subroutine
         if (state.dataSize->CurOASysNum > 0) {
-            select_EqSizing = &DataSizing::OASysEqSizing(state.dataSize->CurOASysNum);
+            select_EqSizing = &state.dataSize->OASysEqSizing(state.dataSize->CurOASysNum);
         } else if (state.dataSize->CurSysNum > 0) {
-            select_EqSizing = &DataSizing::UnitarySysEqSizing(state.dataSize->CurSysNum);
+            select_EqSizing = &state.dataSize->UnitarySysEqSizing(state.dataSize->CurSysNum);
         } else if (state.dataSize->CurZoneEqNum > 0) {
-            select_EqSizing = &DataSizing::ZoneEqSizing(state.dataSize->CurZoneEqNum);
+            select_EqSizing = &ZoneEqSizing(state.dataSize->CurZoneEqNum);
             state.dataSize->ZoneEqUnitarySys = true;
         } else {
             assert(false);
@@ -7214,7 +7216,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Object Data, points to specific array
         DataSizing::ZoneEqSizingData &EqSizing(*select_EqSizing);
 
-        // can't hurt to initialize these going in, problably redundant
+        // can't hurt to initialize these going in, probably redundant
         EqSizing.AirFlow = false;
         EqSizing.CoolingAirFlow = false;
         EqSizing.HeatingAirFlow = false;

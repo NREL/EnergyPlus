@@ -243,6 +243,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         int ZoneCompNum;   // Number/index of zone equipment component
         int ZoneEquipCount;
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         if (state.dataZoneEquipmentManager->InitZoneEquipmentOneTimeFlag) {
             state.dataZoneEquipmentManager->InitZoneEquipmentOneTimeFlag = false;
             ZoneEqSizing.allocate(state.dataGlobal->NumOfZones);
@@ -2570,6 +2572,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
         //     balance point is determined will be different depending on
         //     the type of system being simulated.
         // 3.  Calculate zone energy requirements
+
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         // Using/Aliasing
         using namespace DataHVACGlobals;

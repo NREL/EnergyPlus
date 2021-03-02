@@ -170,8 +170,8 @@ protected:
         DataSizing::DesDayWeath(1).Temp.allocate(1);
         DataSizing::DesDayWeath(1).Temp(1) = 35.0;
 
-        DataSizing::ZoneEqSizing.allocate(1);
-        DataSizing::ZoneEqSizing(state->dataSize->CurSysNum).SizingMethod.allocate(25);
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurSysNum).SizingMethod.allocate(25);
         state->dataSize->ZoneSizingRunDone = true;
 
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -240,7 +240,7 @@ protected:
         HeatingCoils::NumHeatingCoils = 1;
         HeatingCoils::ValidSourceType.dimension(HeatingCoils::NumHeatingCoils, false);
         HeatingCoils::GetCoilsInputFlag = false;
-        DataSizing::UnitarySysEqSizing.allocate(1);
+        state->dataSize->UnitarySysEqSizing.allocate(1);
         cbvav.HeatCoilName = "MyHeatingCoil";
         cbvav.DXCoolCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
         cbvav.HeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;

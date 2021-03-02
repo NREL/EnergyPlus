@@ -288,7 +288,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     state->dataSize->CurSysNum = 1;
     state->dataDXCoils->NumDXCoils = 2;
     DXCoilNum = 2;
-    UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
     state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilDX_HeatingEmpirical;
@@ -381,7 +381,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     // HSPF {Btu/W-h}, Region Number", " DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"
 
     // Clean up
-    UnitarySysEqSizing.deallocate();
+    state->dataSize->UnitarySysEqSizing.deallocate();
     state->dataSize->FinalSysSizing.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
@@ -1453,12 +1453,12 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.1;
     state->dataSize->DataFlowUsedForSizing = 0.1;
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = true;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = state->dataDXCoils->DXCoil(1).RatedTotCap(1);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = state->dataDXCoils->DXCoil(1).RatedTotCap(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     state->dataSize->NumZoneSizingInput = 1;
@@ -2203,8 +2203,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
 
     // Fake having a parent coil setting the size
     // UnitarySysEqSizing(DXCoilNum).CoolingCapacity = true;
@@ -2429,8 +2429,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
 
     // Get into a block so that it sets the RatedTotCap
     state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
@@ -3107,9 +3107,9 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", state->dataDXCoils->DXCoil(1).DXCoilType);
     // coils are in an airloop
     state->dataSize->CurSysNum = 1;
-    UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
-    UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
-    UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
+    state->dataSize->UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
     // coil sizing
     SizeDXCoil(*state, 1);
     EXPECT_EQ(14067.4113682534, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2));
@@ -3535,7 +3535,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
 
     SizeDXCoil(*state, 1);
     // Design flow rate at speed 2 and speed 1
@@ -3787,7 +3787,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
     state->dataSize->NumSysSizInput = 1;
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
 
     // test SHR design size when all autosized
     SizeDXCoil(*state, 1);

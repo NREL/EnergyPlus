@@ -2470,7 +2470,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
 
     state->dataEnvrn->StdRhoAir = 1.2027389349552706;
     Real64 CoilInTemp = state->dataSize->TermUnitFinalZoneSizing(1).DesHeatCoilInTempTU;
-    Real64 DesMassFlow = state->dataEnvrn->StdRhoAir * TermUnitSizing(1).AirVolFlow;
+    Real64 DesMassFlow = state->dataEnvrn->StdRhoAir * state->dataSize->TermUnitSizing(1).AirVolFlow;
     Real64 DesZoneHeatLoad = state->dataSize->FinalZoneSizing(1).DesHeatLoad * state->dataSize->FinalZoneSizing(1).HeatSizingFactor;
     Real64 ZoneDesTemp = state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak;
     Real64 ZoneDesHumRat = state->dataSize->FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
@@ -2691,7 +2691,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
-    DataSizing::TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     state->dataSize->FinalZoneSizing.allocate(1);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
@@ -2755,7 +2755,7 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 1;
 
-    ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
 
     int ATMixerIndex = 1;
     int ControlledZoneNum = 1;
@@ -2763,30 +2763,30 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     // set ATMixer properties used for sizing
     SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerVolFlow, state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).CoolSupTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatSupTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatSupHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerVolFlow, state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).CoolSupTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).CoolSupHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatSupTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatSupHumRat);
 
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = false;
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralHeatCoilExists = false;
     // set ATMixer properties used for sizing
     SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).PrecoolTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).PrecoolHumRat);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).PreheatTemp);
-    EXPECT_DOUBLE_EQ(ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).PreheatHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).PrecoolTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).PrecoolHumRat);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).PreheatTemp);
+    EXPECT_DOUBLE_EQ(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).PreheatHumRat);
 
     // set ATMixer properties used for sizing
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate /= 2.0;
     SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).PrecoolTemp, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).PrecoolHumRat, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).PreheatTemp, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).PreheatHumRat, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).PrecoolTemp, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).PrecoolHumRat, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).PreheatTemp, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).PreheatHumRat, 0.0000001);
 
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOAHeatCoils = 0;
     state->dataAirSystemsData->PrimaryAirSystems(1).NumOACoolCoils = 0;
@@ -2794,8 +2794,8 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
 
     SingleDuct::setATMixerSizingProperties(*state, ATMixerIndex, ControlledZoneNum, state->dataSize->CurZoneEqNum);
 
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatOutTemp, 0.0000001);
-    EXPECT_NEAR(ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatOutHumRat, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriDryBulb, state->dataSize->FinalSysSizing(1).OutTempAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerCoolPriHumRat, state->dataSize->FinalSysSizing(1).OutHumRatAtCoolPeak, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriDryBulb, state->dataSize->FinalSysSizing(1).HeatOutTemp, 0.0000001);
+    EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat, state->dataSize->FinalSysSizing(1).HeatOutHumRat, 0.0000001);
 }

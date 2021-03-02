@@ -1622,6 +1622,8 @@ namespace HeatRecovery {
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         state.dataSize->HRFlowSizingFlag = true;
         PrintFlag = true;
         FieldNum = 0;

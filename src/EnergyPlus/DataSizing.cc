@@ -84,12 +84,6 @@ namespace EnergyPlus::DataSizing {
     //  before applying user input sys flow rates.
 
     // Object Data
-    Array1D<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
-    Array1D<SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
-    Array1D<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines (indexed per terminal unit)
-    Array1D<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
-    Array1D<ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
-    Array1D<ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
     Array1D<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
     Array1D<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
     Array1D<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
@@ -146,12 +140,6 @@ namespace EnergyPlus::DataSizing {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        CalcSysSizing.deallocate();
-        SysSizPeakDDNum.deallocate();
-        TermUnitSizing.deallocate();
-        ZoneEqSizing.deallocate();
-        UnitarySysEqSizing.deallocate();
-        OASysEqSizing.deallocate();
         PlantSizData.deallocate();
         DesDayWeath.deallocate();
         CompDesWaterFlow.deallocate();
@@ -448,6 +436,8 @@ namespace EnergyPlus::DataSizing {
 
         // These zone specific sizing variables are set in zone equipment to use for sizing.
         // Reset to avoid chance that second zone equipment will size using these variables set by first zone equipment to be sized
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &UnitarySysEqSizing(state.dataSize->UnitarySysEqSizing);
         if (curZoneEqNum > 0) {
 
             if (ZoneEqSizing.size() == 0) {
@@ -513,9 +503,6 @@ namespace EnergyPlus::DataSizing {
         // METHODOLOGY EMPLOYED:
         // energy and mass flow balance
 
-        // REFERENCES:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int DDAtSensPeak(0);
         int TimeStepAtSensPeak(0);
@@ -532,8 +519,13 @@ namespace EnergyPlus::DataSizing {
         Real64 TotFlow(0.0);       // total flow for bypass control [m3/s]
         Real64 MixTemp(0.0);       // mixed air temperature at the peak [C]
 
-        CoolCapCtrl = state.dataSize->SysSizInput(SysNum).CoolCapControl;
-        PeakLoadType = state.dataSize->SysSizInput(SysNum).CoolingPeakLoadType;
+        auto &SysSizInput(state.dataSize->SysSizInput);
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
+        auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+        auto &CalcSysSizing(state.dataSize->CalcSysSizing);
+
+        CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
+        PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
         DDAtSensPeak = SysSizPeakDDNum(SysNum).SensCoolPeakDD;
         if (DDAtSensPeak > 0) {
             TimeStepAtSensPeak = SysSizPeakDDNum(SysNum).TimeStepAtSensCoolPk(DDAtSensPeak);
@@ -549,7 +541,7 @@ namespace EnergyPlus::DataSizing {
             }
         } else {
             if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
-                ShowWarningError(state, "GetCoilDesFlow: AirLoopHVAC=" + state.dataSize->SysSizInput(SysNum).AirPriLoopName +
+                ShowWarningError(state, "GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
                                  "has no time of peak cooling load for sizing.");
                 ShowContinueError(state, "Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
                 CoolCapCtrl = VAV;
@@ -557,37 +549,37 @@ namespace EnergyPlus::DataSizing {
         }
 
         if (CoolCapCtrl == VAV) {
-            DesExitTemp = state.dataSize->FinalSysSizing(SysNum).CoolSupTemp;
-            DesFlow = state.dataSize->FinalSysSizing(SysNum).MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
-            DesExitHumRat = state.dataSize->FinalSysSizing(SysNum).CoolSupHumRat;
+            DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+            DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / state.dataEnvrn->StdRhoAir;
+            DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
         } else if (CoolCapCtrl == OnOff) {
-            DesExitTemp = state.dataSize->FinalSysSizing(SysNum).CoolSupTemp;
+            DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
             DesFlow = state.dataSize->DataAirFlowUsedForSizing;
-            DesExitHumRat = state.dataSize->FinalSysSizing(SysNum).CoolSupHumRat;
+            DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
         } else if (CoolCapCtrl == VT) {
-            if (state.dataSize->FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+            if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-            } else if (state.dataSize->FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
+            } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
             }
-            DesExitTemp = max(state.dataSize->FinalSysSizing(SysNum).CoolSupTemp,
-                              AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * state.dataSize->FinalSysSizing(SysNum).DesCoolVolFlow));
-            DesFlow = state.dataSize->FinalSysSizing(SysNum).DesCoolVolFlow;
+            DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
+                              AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
+            DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
             DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
         } else if (CoolCapCtrl == Bypass) {
-            if (state.dataSize->FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+            if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
-            } else if (state.dataSize->FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
+            } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
                 ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
                 AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
             }
-            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * state.dataSize->FinalSysSizing(SysNum).DesCoolVolFlow);
-            TotFlow = state.dataSize->FinalSysSizing(SysNum).DesCoolVolFlow;
+            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (state.dataEnvrn->StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
+            TotFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
             MixTemp = CalcSysSizing(SysNum).MixTempAtCoolPeak;
-            DesExitTemp = state.dataSize->FinalSysSizing(SysNum).CoolSupTemp;
+            DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
             if (MixTemp > DesExitTemp) {
                 DesFlow = TotFlow * max(0.0, min(1.0, ((MixTemp - AvgSupTemp) / (MixTemp - DesExitTemp))));
             } else {

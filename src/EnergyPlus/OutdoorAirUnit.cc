@@ -1418,12 +1418,14 @@ namespace OutdoorAirUnit {
         MaxVolWaterFlowDes = 0.0;
         MaxVolWaterFlowUser = 0.0;
 
-        auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
+        auto &OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &DataFanEnumType(state.dataSize->DataFanEnumType);
 
         if (OutAirUnit(OAUnitNum).SFanType == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
         } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {

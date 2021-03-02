@@ -124,8 +124,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     state->dataSize->TermUnitSingDuct = false;
     state->dataSize->TermUnitPIU = true;
     state->dataSize->CurTermUnitSizingNum = 1;
-    DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitSizing(1).ReheatLoadMult = 0.5;
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing(1).ReheatLoadMult = 0.5;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -141,8 +141,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     state->dataSize->DataWaterFlowUsedForSizing = 0.00025;
     state->dataSize->TermUnitSingDuct = false;
     state->dataSize->TermUnitPIU = true;
-    DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitSizing(1).ReheatLoadMult = 0.5;
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing(1).ReheatLoadMult = 0.5;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -164,7 +164,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
     state->dataSize->NumZoneSizingInput = 0;
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -211,7 +211,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test 7 - Outdoor Air System Equipment, no DOAS air loop
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
     state->dataAirLoop->OutsideAirSys.allocate(1);
     state->dataSize->CurOASysNum = 1;
     // start with an auto-sized value as the user input

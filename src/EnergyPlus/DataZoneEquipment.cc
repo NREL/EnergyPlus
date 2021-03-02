@@ -159,6 +159,8 @@ namespace EnergyPlus::DataZoneEquipment {
         int Loop1;
         int Loop2;
 
+        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+
         struct EquipListAudit
         {
             // Members
@@ -806,12 +808,12 @@ namespace EnergyPlus::DataZoneEquipment {
         // Allocate TermUnitSizing array and set zone number
         if (locTermUnitSizingCounter > 0) {
             state.dataSize->NumAirTerminalUnits = locTermUnitSizingCounter;
-            DataSizing::TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
+            TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
             for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
                 {
                     auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(loopZoneNum));
                     for (int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum) {
-                        DataSizing::TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
+                        TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
                     }
                 }
             }

@@ -4731,22 +4731,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         Real64 MaxSATSupHeatDes;            // Autosized supply air temperature of supplemental heater for reporting
         Real64 MaxSATSupHeatUser;           // Hardsized supply air temperature of supplemental heater for reporting
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound;
         bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
-
         std::string CompName;     // component name
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -4761,6 +4751,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         int CapSizingMethod(0);  // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                  // FractionOfAutosizedHeatingCapacity )
         Real64 minNoLoadFlow(0); // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
+
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         ErrorsFound = false;
         IsAutoSize = false;

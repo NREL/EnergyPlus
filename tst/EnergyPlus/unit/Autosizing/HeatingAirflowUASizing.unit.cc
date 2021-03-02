@@ -83,7 +83,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     state->dataEnvrn->StdRhoAir = 1.2;
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     static std::string const routineName("HeatingAirflowUASizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -134,10 +134,10 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     has_eio_output(true);
 
     // now allocate sizing arrays for testing autosized field
-    DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitSizing(1).AirVolFlow = 0.0008;
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing(1).AirVolFlow = 0.0008;
     state->dataSize->FinalZoneSizing.allocate(1);
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
 
     state->dataSize->ZoneSizingRunDone = true;
 
@@ -153,7 +153,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0, sizedValue, 0.01);
-    EXPECT_NEAR(0.0008, DataSizing::TermUnitSizing(1).AirVolFlow, 0.0001);
+    EXPECT_NEAR(0.0008, state->dataSize->TermUnitSizing(1).AirVolFlow, 0.0001);
     EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
 
     eiooutput = std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Heating Coil Airflow For UA, 0.00000\n");
@@ -161,7 +161,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 3 - Zone Equipment, Single Duct TU
-    DataSizing::TermUnitSizing(1).AirVolFlow = 5;
+    state->dataSize->TermUnitSizing(1).AirVolFlow = 5;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -170,7 +170,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(6.0, sizedValue, 0.01);
-    EXPECT_NEAR(5.0, DataSizing::TermUnitSizing(1).AirVolFlow, 0.01);
+    EXPECT_NEAR(5.0, state->dataSize->TermUnitSizing(1).AirVolFlow, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 4 - Zone Equipment, Powered Induction TU
@@ -204,7 +204,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 6 - Zone Equipment, Zone Eq Fan Coil
     state->dataSize->TermUnitIU = false;
     state->dataSize->ZoneEqFanCoil = true;
-    DataSizing::TermUnitSizing(1).AirVolFlow = 0.0;
+    state->dataSize->TermUnitSizing(1).AirVolFlow = 0.0;
     state->dataSize->FinalZoneSizing(1).DesHeatVolFlow = 5.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -221,8 +221,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     state->dataSize->ZoneEqFanCoil = false;
     // baseFlags.otherEqType = true; set in initialize function based on other flags
     state->dataSize->FinalZoneSizing(1).DesHeatVolFlow = 0.0;
-    DataSizing::ZoneEqSizing(1).AirVolFlow = 5.0;
-    DataSizing::ZoneEqSizing(1).SystemAirFlow = true;
+    state->dataSize->ZoneEqSizing(1).AirVolFlow = 5.0;
+    state->dataSize->ZoneEqSizing(1).SystemAirFlow = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -235,10 +235,10 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 8 - Zone Equipment, Other Equipment
-    DataSizing::ZoneEqSizing(1).AirVolFlow = 0.0;
-    DataSizing::ZoneEqSizing(1).HeatingAirVolFlow = 5.0;
-    DataSizing::ZoneEqSizing(1).SystemAirFlow = false;
-    DataSizing::ZoneEqSizing(1).HeatingAirFlow = true;
+    state->dataSize->ZoneEqSizing(1).AirVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow = 5.0;
+    state->dataSize->ZoneEqSizing(1).SystemAirFlow = false;
+    state->dataSize->ZoneEqSizing(1).HeatingAirFlow = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -251,8 +251,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 9 - Zone Equipment, Other Equipment
-    DataSizing::ZoneEqSizing(1).HeatingAirVolFlow = 0.0;
-    DataSizing::ZoneEqSizing(1).HeatingAirFlow = false;
+    state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(1).HeatingAirFlow = false;
     state->dataSize->FinalZoneSizing(1).DesHeatMassFlow = 5.0;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -275,7 +275,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
@@ -406,7 +406,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 17 - Outdoor Air System Equipment, no DOAS air loop
     state->dataSize->FinalSysSizing(1).DesHeatVolFlow = 0.0;
     state->dataSize->FinalSysSizing(1).DesOutAirVolFlow = 5.0;
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
     state->dataAirLoop->OutsideAirSys.allocate(1);
     state->dataSize->CurOASysNum = 1;
     // start with an auto-sized value as the user input

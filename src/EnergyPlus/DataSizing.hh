@@ -1018,15 +1018,9 @@ namespace DataSizing {
     };
 
     // Object Data
-    extern Array1D<SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
-    extern Array1D<TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines
-    extern Array1D<ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
-    extern Array1D<ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
-    extern Array1D<ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
     extern Array1D<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
     extern Array1D<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
     extern Array1D<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
-    extern Array1D<SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
     extern Array1D<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
     extern Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for air terminal sizing
     // used only for Facility Load Component Summary
@@ -1221,6 +1215,12 @@ struct SizingData : BaseGlobalStruct
     Array1D<DataSizing::SystemSizingInputData> SysSizInput;               // Input data array for system sizing object
     Array2D<DataSizing::SystemSizingData> SysSizing;                      // Data array for system sizing (all data)
     Array1D<DataSizing::SystemSizingData> FinalSysSizing;                 // Data array for system sizing (max heat/cool)
+    Array1D<DataSizing::SystemSizingData> CalcSysSizing;                  // Data array for system sizing (max heat/cool)
+    Array1D<DataSizing::SysSizPeakDDNumData> SysSizPeakDDNum;             // data array for peak des day indices
+    Array1D<DataSizing::TermUnitSizingData> TermUnitSizing;               // Data added in sizing routines (indexed per terminal unit)
+    Array1D<DataSizing::ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
+    Array1D<DataSizing::ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
+    Array1D<DataSizing::ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
 
     void clear_state() override
     {
@@ -1342,6 +1342,12 @@ struct SizingData : BaseGlobalStruct
         this->SysSizInput.deallocate();
         this->SysSizing.deallocate();
         this->FinalSysSizing.deallocate();
+        this->CalcSysSizing.deallocate();
+        this->SysSizPeakDDNum.deallocate();
+        this->TermUnitSizing.deallocate();
+        this->ZoneEqSizing.deallocate();
+        this->UnitarySysEqSizing.deallocate();
+        this->OASysEqSizing.deallocate();
     }
 };
 

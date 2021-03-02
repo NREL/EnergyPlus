@@ -61,7 +61,7 @@ using namespace ObjexxFCL;
 
 TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
 {
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     bool FirstPass = true;
 
@@ -112,29 +112,29 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     state->dataSize->DataWaterCoilSizHeatDeltaT = 1.0;
     state->dataSize->DataNomCapInpMeth = true;
 
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirFlow = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).Capacity = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingCapacity = true;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxHWVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxCWVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirFlow = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).Capacity = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingCapacity = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxHWVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxCWVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirVolFlow = 1.0;
 
     // test a few to ensure not equal to initial state
     EXPECT_NE(state->dataSize->DataTotCapCurveIndex, 0);
     EXPECT_NE(state->dataSize->DataDesInletWaterTemp, 0.0);
     EXPECT_NE(state->dataSize->DataHeatSizeRatio, 1.0);
     EXPECT_NE(state->dataSize->DataFanEnumType, -1);
-    EXPECT_TRUE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow);
+    EXPECT_TRUE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow);
     EXPECT_FALSE(state->dataSize->DataAutosizable);
 
     // function argument initialized to true at beginning of simulation
@@ -193,23 +193,23 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     EXPECT_EQ(state->dataSize->DataWaterCoilSizHeatDeltaT, 0.0);
     EXPECT_FALSE(state->dataSize->DataNomCapInpMeth);
 
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow);
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirFlow);
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow);
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow);
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).Capacity);
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity);
-    EXPECT_FALSE(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingCapacity);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirFlow);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirFlow);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).Capacity);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity);
+    EXPECT_FALSE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingCapacity);
 
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxHWVolFlow, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxCWVolFlow, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow, 0.0);
-    EXPECT_EQ(DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxHWVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxCWVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesHeatingLoad, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow, 0.0);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirVolFlow, 0.0);
 
     // Test clean return if CurZoneEqNum = 0
     FirstPass = true;
@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     EXPECT_FALSE(FirstPass);
 
     // Test clean return if ZoneEqSizing is not allocated
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->CurZoneEqNum = 1;
     FirstPass = true;
     // call reset function

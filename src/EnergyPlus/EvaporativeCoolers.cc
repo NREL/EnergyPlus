@@ -4232,6 +4232,8 @@ namespace EvaporativeCoolers {
         PrintFlag = true;
         bool errorsFound = false;
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         if (state.dataSize->CurZoneEqNum > 0) {
 
             if (ZoneEvapUnit(UnitNum).HVACSizingIndex > 0) {

@@ -59,7 +59,7 @@ namespace EnergyPlus {
 TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataEnvrn->StdRhoAir = 1.2;
     static std::string const routineName("HeatingWaterDesAirInletHumRatSizingGauntlet");
 
@@ -114,8 +114,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // now allocate sizing arrays for testing autosized field
     state->dataSize->FinalZoneSizing.allocate(1);
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::TermUnitSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
 
     // Sizing Type Prerequisites:
@@ -133,9 +133,9 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;
     // set by parent
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.021;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 0.015;
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.003;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.021;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 0.015;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.003;
 
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurTermUnitSizingNum = 1;
@@ -159,7 +159,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     // Test 4 - Zone Equipment, Powered Induction TU
     state->dataSize->TermUnitSingDuct = false;
     state->dataSize->TermUnitPIU = true;
-    DataSizing::TermUnitSizing(1).MinFlowFrac = 0.0; // all zone air
+    state->dataSize->TermUnitSizing(1).MinFlowFrac = 0.0; // all zone air
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -172,7 +172,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Zone Equipment, Powered Induction TU with MinFlowFrac at 0.3
-    DataSizing::TermUnitSizing(1).MinFlowFrac = 0.3; // mix zone air and DesHeatCoilInHumRatTU
+    state->dataSize->TermUnitSizing(1).MinFlowFrac = 0.3; // mix zone air and DesHeatCoilInHumRatTU
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -217,7 +217,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 8 - Zone Equipment, Zone Eq Fan Coil, parent set system flow
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -229,10 +229,10 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(0.00657, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SystemAirFlow = false;
 
     // Test 9 - Zone Equipment, Zone Eq Fan Coil, parent set heating flow
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = true;
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -244,10 +244,10 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     EXPECT_NEAR(0.00592, sizedValue, 0.00001);
     sizer.autoSizedValue = 0.0; // reset for next test
 
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = false;
 
     // Test 10 - Zone Equipment w/ 10% OA
-    DataSizing::ZoneEqSizing(1).OAVolFlow =
+    state->dataSize->ZoneEqSizing(1).OAVolFlow =
         state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatMassFlow / (10.0 * state->dataEnvrn->StdRhoAir);
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -263,8 +263,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 11 - Zone Equipment w/ AT Mixer at 20% of design flow
-    DataSizing::ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.001;
-    DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.002 / state->dataEnvrn->StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
+    state->dataSize->ZoneEqSizing(1).ATMixerHeatPriHumRat = 0.001;
+    state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.002 / state->dataEnvrn->StdRhoAir; // AT mass flow smaller than DesCoolMassFlow by factor of 5
     Real64 mixedHumRat2 = 0.8 * 0.007 + 0.2 * 0.001;                                 // 80% of ZoneHumRatAtCoolPeak, 20% of AT Mixer mass flow
 
     // start with an auto-sized value as the user input
@@ -279,8 +279,8 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 12 - Zone Equipment w/o AT Mixer or OA flow set by parent, yields zone hum rat
-    DataSizing::ZoneEqSizing(1).ATMixerVolFlow = 0.0;
-    DataSizing::ZoneEqSizing(1).OAVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(1).ATMixerVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(1).OAVolFlow = 0.0;
 
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
@@ -303,7 +303,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     // delete zone sizing info
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->NumZoneSizingInput = 0;
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
@@ -390,7 +390,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
 
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test 17 - Outdoor Air System Equipment, no DOAS air loop
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
     state->dataAirLoop->OutsideAirSys.allocate(1);
     state->dataSize->CurOASysNum = 1;
     // start with an auto-sized value as the user input

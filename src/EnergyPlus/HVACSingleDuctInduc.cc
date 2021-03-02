@@ -594,7 +594,7 @@ namespace HVACSingleDuctInduc {
         if (MyAirDistInitFlag(IUNum)) {
             // save the induction ratio in the term unit sizing array for use in the system sizing calculation
             if (state.dataSize->CurTermUnitSizingNum > 0) {
-                DataSizing::TermUnitSizing(state.dataSize->CurTermUnitSizingNum).InducRat = IndUnit(IUNum).InducRatio;
+                state.dataSize->TermUnitSizing(state.dataSize->CurTermUnitSizingNum).InducRat = IndUnit(IUNum).InducRatio;
             }
             if (IndUnit(IUNum).AirLoopNum == 0) {
                 if ((IndUnit(IUNum).CtrlZoneNum > 0) && (IndUnit(IUNum).CtrlZoneInNodeIndex > 0)) {
@@ -796,6 +796,8 @@ namespace HVACSingleDuctInduc {
         MaxVolHotWaterFlowUser = 0.0;
         MaxVolColdWaterFlowDes = 0.0;
         MaxVolColdWaterFlowUser = 0.0;
+
+        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
 
         if (IndUnit(IUNum).MaxTotAirVolFlow == AutoSize) {
             IsAutoSize = true;

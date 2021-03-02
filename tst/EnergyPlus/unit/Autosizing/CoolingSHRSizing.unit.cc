@@ -57,7 +57,7 @@ namespace EnergyPlus {
 TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     static std::string const routineName("CoolingSHRSizingGauntlet");
@@ -240,7 +240,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // Test #10 - Airloop Equipment
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->NumZoneSizingInput = 0;
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
     DataHVACGlobals::NumPrimaryAirSys = 1;
@@ -322,7 +322,7 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test #14 - Outdoor Air System Equipment, no DOAS air loop
     state->dataSize->CurOASysNum = 1;
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
     // start with an auto-sized value as the user input
     inputValue = 0.52;
     printFlag = true;

@@ -106,10 +106,10 @@ protected:
         DataHeatBalFanSys::ZoneThermostatSetPointLo(1) = 23.0; // 73.4F
 
         state->dataSize->FinalZoneSizing.allocate(1);
-        ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing.allocate(1);
         state->dataSize->CurZoneEqNum = 1;
         state->dataSize->CurSysNum = 0;
-        ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
         state->dataSize->ZoneSizingRunDone = true;
 
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
@@ -147,10 +147,10 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test1)
 {
 
     int PurchAirNum = 1;
-    ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(24);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(24);
     state->dataSize->CurSysNum = 0;
 
     state->dataSize->FinalZoneSizing.allocate(1);
@@ -201,10 +201,10 @@ TEST_F(EnergyPlusFixture, SizePurchasedAirTest_Test2)
 {
 
     int PurchAirNum = 1;
-    ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
     state->dataEnvrn->StdRhoAir = 1.0; // Prevent divide by zero in Sizer
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(24);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(24);
     state->dataSize->CurSysNum = 0;
 
     state->dataSize->FinalZoneSizing.allocate(1);

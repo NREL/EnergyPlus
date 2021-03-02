@@ -1443,6 +1443,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     Real64 HeatingAirVolFlowDes(0.0); // heating supply air flow rate
 
     auto &PurchAir(state.dataPurchasedAirMgr->PurchAir);
+    auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
     IsAutoSize = false;
     MaxHeatVolFlowRateDes = 0.0;

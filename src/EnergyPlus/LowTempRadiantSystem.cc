@@ -2625,12 +2625,7 @@ namespace LowTempRadiantSystem {
         Real64 WaterVolFlowMaxDes;  // Design water volume flow rate for reproting
         Real64 WaterVolFlowMaxUser; // User hard-sized water volume flow rate for reproting
 
-//        Real64 ScaledHeatingCapacity(-9999999999);
-//        int HeatingCapMethod(99999999999999);
-//        Real64 ScaledCoolingCapacity(-9999999999);
-//        int CoolingCapMethod(9999999999999);
-
-
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         DesCoilLoad = 0.0;
         state.dataSize->DataScalableCapSizingON = false;

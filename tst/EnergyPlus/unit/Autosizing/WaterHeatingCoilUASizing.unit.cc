@@ -61,7 +61,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
 {
     // this global state is what would be set up by E+ currently
     state->dataEnvrn->StdRhoAir = 1.2;
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     static std::string const routineName("WaterHeatingCoilUASizingGauntlet");
 
     // create the sizer and set up the flags to specify the sizing configuration
@@ -125,13 +125,13 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     ScheduleManager::Schedule.allocate(1);
 
     // now allocate sizing arrays for testing autosized field
-    DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitSizing(1).AirVolFlow = 0.0008;
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing(1).AirVolFlow = 0.0008;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(1).HeatDesTemp = 30.0;
     state->dataSize->FinalZoneSizing(1).HeatDesHumRat = 0.007;
     state->dataSize->FinalZoneSizing(1).ZoneName = "MyZone";
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     DataSizing::PlantSizData.allocate(1);
     DataSizing::PlantSizData(1).ExitTemp = 60.0;
     state->dataPlnt->PlantLoop.allocate(1);
@@ -194,7 +194,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     state->dataSize->NumZoneSizingInput = 0;
     state->dataSize->CurTermUnitSizingNum = 0;
     // baseFlags.otherEqType = false; set in initialize function based on other flags
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
 
     state->dataSize->CurSysNum = 1;
@@ -280,7 +280,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     // OUTDOOR AIR SYSTEM EQUIPMENT TESTING
     // Test 6 - Outdoor Air System Equipment, no DOAS air loop
     state->dataSize->CurOASysNum = 1;
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
 

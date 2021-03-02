@@ -389,7 +389,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     BaseboardRadiator::GetBaseboardInput(*state);
 
     state->dataSize->FinalZoneSizing.allocate(3);
-    DataSizing::ZoneEqSizing.allocate(3);
+    state->dataSize->ZoneEqSizing.allocate(3);
     state->dataSize->ZoneSizingRunDone = true;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(3);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(3);
@@ -398,8 +398,8 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     CntrlZoneNum = 1;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CntrlZoneNum).RemainingOutputReqToHeatSP = 2000.0;
@@ -425,8 +425,8 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     CntrlZoneNum = 2;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;
@@ -452,8 +452,8 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     CntrlZoneNum = 3;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    DataSizing::ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
         state->dataBaseboardRadiator->Baseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(CntrlZoneNum) = false;

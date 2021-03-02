@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 {
 
     Node.allocate(10);
-    ZoneEqSizing.allocate(2);
+    state->dataSize->ZoneEqSizing.allocate(2);
     state->dataHeatBal->Zone.allocate(2);
     state->dataSize->CalcZoneSizing.allocate(1, 2);
     state->dataSize->CalcFinalZoneSizing.allocate(2);
@@ -316,7 +316,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     EXPECT_NEAR(.127528, state->dataSize->CalcZoneSizing(1, 2).CoolMassFlow, .000001);
 
     Node.deallocate();
-    ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->CalcZoneSizing.deallocate();
     NonAirSystemResponse.deallocate();

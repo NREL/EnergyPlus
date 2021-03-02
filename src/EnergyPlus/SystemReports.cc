@@ -4605,7 +4605,7 @@ namespace EnergyPlus::SystemReports {
                     if (ADUNum > 0) {
                         int termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(ADUNum).TermUnitSizingNum;
                         if (termUnitSizingNum > 0) {
-                            termUnitOAFrac = DataSizing::TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
+                            termUnitOAFrac = state.dataSize->TermUnitSizing(termUnitSizingNum).SpecMinOAFrac;
                         }
                     }
                     state.dataSysRpts->SysTargetVentilationFlowVoz(AirLoopNum) +=

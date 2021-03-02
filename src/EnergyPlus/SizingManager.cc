@@ -121,6 +121,9 @@ namespace EnergyPlus::SizingManager {
         // Design day simulations are run again with central air systems supplied by
         // purchased hot and cold water, yielding central heating and cooling capacities.
 
+        auto &CalcSysSizing(state.dataSize->CalcSysSizing);
+        auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+
         // Using/Aliasing
         using SimAirServingZones::ManageAirLoops;
         using SimAirServingZones::UpdateSysSizing;
@@ -4951,7 +4954,7 @@ namespace EnergyPlus::SizingManager {
 
         for (int termUnitSizingIndex = 1; termUnitSizingIndex <= state.dataSize->NumAirTerminalUnits; ++termUnitSizingIndex) {
             auto &thisTUFZSizing(state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex));
-            auto &thisTUSizing(TermUnitSizing(termUnitSizingIndex));
+            auto &thisTUSizing(state.dataSize->TermUnitSizing(termUnitSizingIndex));
             int ctrlZoneNum = thisTUSizing.CtrlZoneNum;
             auto const &thisFZSizing(state.dataSize->FinalZoneSizing(ctrlZoneNum));
 

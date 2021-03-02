@@ -1409,13 +1409,15 @@ namespace UnitarySystems {
         // References
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
+        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+
         // sweep specific data into one pointer to avoid if statements throughout this subroutine
         if (state.dataSize->CurOASysNum > 0) {
-            select_EqSizing = &DataSizing::OASysEqSizing(state.dataSize->CurOASysNum);
+            select_EqSizing = &OASysEqSizing(state.dataSize->CurOASysNum);
         } else if (state.dataSize->CurSysNum > 0) {
-            select_EqSizing = &DataSizing::UnitarySysEqSizing(state.dataSize->CurSysNum);
+            select_EqSizing = &state.dataSize->UnitarySysEqSizing(state.dataSize->CurSysNum);
         } else if (state.dataSize->CurZoneEqNum > 0) {
-            select_EqSizing = &DataSizing::ZoneEqSizing(state.dataSize->CurZoneEqNum);
+            select_EqSizing = &state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
             state.dataSize->ZoneEqUnitarySys = true;
         } else {
             assert(false);
@@ -13855,6 +13857,9 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
 
+        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+        auto &CurOASysNum(state.dataSize->CurOASysNum);
+
         Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         Real64 SensibleOutput = 0.0; // sensible output rate, {W}
@@ -14064,13 +14069,13 @@ namespace UnitarySystems {
 
             if (!state.dataGlobal->SysSizingCalc) {
 
-                if (state.dataSize->CurOASysNum > 0) {
-                    DataSizing::OASysEqSizing(state.dataSize->CurOASysNum).AirFlow = false;
-                    DataSizing::OASysEqSizing(state.dataSize->CurOASysNum).CoolingAirFlow = false;
-                    DataSizing::OASysEqSizing(state.dataSize->CurOASysNum).HeatingAirFlow = false;
-                    DataSizing::OASysEqSizing(state.dataSize->CurOASysNum).Capacity = false;
-                    DataSizing::OASysEqSizing(state.dataSize->CurOASysNum).CoolingCapacity = false;
-                    DataSizing::OASysEqSizing(state.dataSize->CurOASysNum).HeatingCapacity = false;
+                if (CurOASysNum > 0) {
+                    OASysEqSizing(CurOASysNum).AirFlow = false;
+                    OASysEqSizing(CurOASysNum).CoolingAirFlow = false;
+                    OASysEqSizing(CurOASysNum).HeatingAirFlow = false;
+                    OASysEqSizing(CurOASysNum).Capacity = false;
+                    OASysEqSizing(CurOASysNum).CoolingCapacity = false;
+                    OASysEqSizing(CurOASysNum).HeatingCapacity = false;
                     this->m_FirstPass = false;
                 } else if (state.dataSize->CurSysNum > 0) {
                     state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;

@@ -1317,7 +1317,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         // Obtains flow rates from the zone or system sizing arrays.
 
         // Using/Aliasing
-        using DataSizing::ZoneEqSizing;
         using Fans::SetFanData;
         using Fans::SimulateFanComponents;
         using HeatRecovery::SetHeatExchangerData;
@@ -1354,6 +1353,8 @@ namespace EnergyPlus::HVACStandAloneERV {
         std::string CompName(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name);
         bool PrintFlag = true;
         bool ErrorsFound = false;
+
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == DataSizing::AutoSize) {
             IsAutoSize = true;

@@ -2034,6 +2034,8 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         Real64 deltaT;
         Real64 Cp;
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate == AutoSize) {
 
             if (state.dataSize->CurSysNum > 0) {

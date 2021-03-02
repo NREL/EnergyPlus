@@ -916,6 +916,8 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone or system sizing arrays
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         // Using/Aliasing
         using namespace DataSizing;
         using DataHVACGlobals::CoolingCapacitySizing;

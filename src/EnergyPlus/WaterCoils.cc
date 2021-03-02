@@ -2030,24 +2030,13 @@ namespace WaterCoils {
         // Obtains flow rates from the zone or system sizing arrays and plant sizing data. UAs are
         // calculated by numerically inverting the individual coil calculation routines.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const InitWaterCoil("InitWaterCoil");
         static std::string const RoutineName("SizeWaterCoil");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 rho;
@@ -2070,6 +2059,9 @@ namespace WaterCoils {
         Real64 DesCoilExitTemp = 0.0;
         Real64 CpAirStd = PsyCpAirFnW(0.0);
         std::string CompName = state.dataWaterCoils->WaterCoil(CoilNum).Name;
+
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
 
         // cooling coils
         if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Cooling && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {

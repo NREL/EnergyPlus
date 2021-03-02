@@ -99,13 +99,13 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->zoneEqUnitVent = state.dataSize->ZoneEqUnitVent;
     this->zoneEqVentedSlab = state.dataSize->ZoneEqVentedSlab;
     this->zoneSizingInput = state.dataSize->ZoneSizingInput;
-    this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
-    this->oaSysEqSizing = DataSizing::OASysEqSizing;
+    this->unitarySysEqSizing = state.dataSize->UnitarySysEqSizing;
+    this->oaSysEqSizing = state.dataSize->OASysEqSizing;
     this->outsideAirSys = state.dataAirLoop->OutsideAirSys;
-    this->termUnitSizing = DataSizing::TermUnitSizing;
+    this->termUnitSizing = state.dataSize->TermUnitSizing;
     this->finalZoneSizing = state.dataSize->FinalZoneSizing;
     this->termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing;
-    this->zoneEqSizing = DataSizing::ZoneEqSizing;
+    this->zoneEqSizing = state.dataSize->ZoneEqSizing;
     this->sysSizingInputData = state.dataSize->SysSizInput;
     this->finalSysSizing = state.dataSize->FinalSysSizing;
     this->plantSizData = DataSizing::PlantSizData;

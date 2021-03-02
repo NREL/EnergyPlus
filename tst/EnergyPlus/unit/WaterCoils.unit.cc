@@ -140,18 +140,18 @@ public:
         state->dataPlnt->TotNumLoops = 1;
         state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
         PlantSizData.allocate(1);
-        ZoneEqSizing.allocate(1);
-        UnitarySysEqSizing.allocate(1);
-        OASysEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->UnitarySysEqSizing.allocate(1);
+        state->dataSize->OASysEqSizing.allocate(1);
         state->dataSize->SysSizInput.allocate(1);
         state->dataSize->ZoneSizingInput.allocate(1);
-        SysSizPeakDDNum.allocate(1);
-        SysSizPeakDDNum(1).TimeStepAtSensCoolPk.allocate(1);
-        SysSizPeakDDNum(1).TimeStepAtCoolFlowPk.allocate(1);
-        SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(1);
-        SysSizPeakDDNum(1).SensCoolPeakDD = 1;
-        SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
-        SysSizPeakDDNum(1).TotCoolPeakDD = 1;
+        state->dataSize->SysSizPeakDDNum.allocate(1);
+        state->dataSize->SysSizPeakDDNum(1).TimeStepAtSensCoolPk.allocate(1);
+        state->dataSize->SysSizPeakDDNum(1).TimeStepAtCoolFlowPk.allocate(1);
+        state->dataSize->SysSizPeakDDNum(1).TimeStepAtTotCoolPk.allocate(1);
+        state->dataSize->SysSizPeakDDNum(1).SensCoolPeakDD = 1;
+        state->dataSize->SysSizPeakDDNum(1).CoolFlowPeakDD = 1;
+        state->dataSize->SysSizPeakDDNum(1).TotCoolPeakDD = 1;
         state->dataSize->FinalSysSizing.allocate(1);
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -164,11 +164,6 @@ public:
         EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
 
         PlantSizData.clear();
-        ZoneEqSizing.clear();
-        UnitarySysEqSizing.clear();
-        OASysEqSizing.clear();
-        SysSizPeakDDNum.clear();
-        SysSizPeakDDNum.clear();
         cached_Twb.clear();
         cached_Psat.clear();
     }
@@ -362,18 +357,18 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->NumZoneSizingInput = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneSizingInput(1).ZoneNum = state->dataSize->CurZoneEqNum;
-    ZoneEqSizing(1).SizingMethod.allocate(25);
-    ZoneEqSizing(1).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(1).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(1).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing(1).ZoneTempAtHeatPeak = 20.0;
     state->dataSize->FinalZoneSizing(1).OutTempAtHeatPeak = -20.0;
     state->dataSize->FinalZoneSizing(1).DesHeatCoilInTemp = -20.0; // simulates zone heating air flow rate <= zone OA flow rate
     state->dataSize->FinalZoneSizing(1).DesHeatCoilInHumRat = 0.005;
     state->dataSize->FinalZoneSizing(1).HeatDesTemp = 30.0;
     state->dataSize->FinalZoneSizing(1).HeatDesHumRat = 0.005;
-    ZoneEqSizing(1).OAVolFlow = 0.01;
-    ZoneEqSizing(1).HeatingAirFlow = true;
-    ZoneEqSizing(1).HeatingAirVolFlow = 0.1;
-    state->dataSize->FinalZoneSizing(1).DesHeatMassFlow = state->dataEnvrn->StdRhoAir * ZoneEqSizing(1).HeatingAirVolFlow;
+    state->dataSize->ZoneEqSizing(1).OAVolFlow = 0.01;
+    state->dataSize->ZoneEqSizing(1).HeatingAirFlow = true;
+    state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow = 0.1;
+    state->dataSize->FinalZoneSizing(1).DesHeatMassFlow = state->dataEnvrn->StdRhoAir * state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow;
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MySizeFlag(CoilNum) = true;
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
@@ -516,11 +511,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurTermUnitSizingNum = 1;
     state->dataSize->CurSysNum = 0;
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
-    TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
-    TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate / 3.0;
-    TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate / 3.0; // DesAirVolFlowRate = 1.0
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate / 3.0;
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
     state->dataSize->TermUnitSingDuct = true;
 
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
@@ -538,11 +533,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     state->dataSize->NumZoneSizingInput = 1;
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(20);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingAirflowSizing) = DataHVACGlobals::HeatingAirflowSizing;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 0.0;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(20);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingAirflowSizing) = DataHVACGlobals::HeatingAirflowSizing;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
@@ -668,12 +663,12 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurTermUnitSizingNum = 1;
-    TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
-    TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow =
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow =
         state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate / 1500.0; // DesAirVolFlowRate = 1.0 so TU air flow = 0.00067 (lower than 0.001)
-    TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate / 1500.0;
-    TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MaxHWVolFlow = state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate / 1500.0;
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
     state->dataSize->TermUnitSingDuct = true;
 
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
@@ -691,11 +686,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     state->dataSize->NumZoneSizingInput = 1;
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(20);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingAirflowSizing) = DataHVACGlobals::HeatingAirflowSizing;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 0.0;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(20);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingAirflowSizing) = DataHVACGlobals::HeatingAirflowSizing;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingAirVolFlow = 0.0;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow = 1.0;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.00095;
@@ -1746,18 +1741,18 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
 
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->ZoneSizingRunDone = true;
-    DataSizing::ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(25) = 0;
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(25) = 0;
     state->dataSize->ZoneEqFanCoil = true;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
 
     // User-specified air volume flow rate from the ZoneHVAC:FourPipeFanCoil object
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.5;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 0.5;
     // User-specified water flow rate from the ZoneHVAC:FourPipeFanCoil object
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxCWVolFlow = 0.0002;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxCWVolFlow = 0.0002;
     // User-specified water flow rate from the ZoneHVAC:FourPipeFanCoil object
-    DataSizing::ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxHWVolFlow = 0.0002;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).MaxHWVolFlow = 0.0002;
 
     // Initial design air volume flow rate based on the design conditions
     state->dataWaterCoils->WaterCoil(2).DesAirVolFlowRate = DataSizing::AutoSize;

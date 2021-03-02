@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     int CtrlZoneNum;          // index of zones
 
     // Allocate
-    CalcSysSizing.allocate(NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(NumPrimaryAirSys);
     state->dataSize->FinalSysSizing.allocate(NumPrimaryAirSys);
     state->dataSize->FinalZoneSizing.allocate(NumPrimaryAirSys);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(NumPrimaryAirSys);
@@ -122,12 +122,12 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
         state->dataSize->FinalSysSizing(AirLoopNum).PreheatTemp = 7;
         state->dataSize->FinalSysSizing(AirLoopNum).HeatRetTemp = 22;
         state->dataSize->FinalSysSizing(AirLoopNum).HeatMixTemp = 10;
-        CalcSysSizing(AirLoopNum).HeatSupTemp = 17;
+        state->dataSize->CalcSysSizing(AirLoopNum).HeatSupTemp = 17;
 
         state->dataSize->FinalSysSizing(AirLoopNum).PreheatHumRat = 0.003;
         state->dataSize->FinalSysSizing(AirLoopNum).HeatRetHumRat = 0.008;
         state->dataSize->FinalSysSizing(AirLoopNum).HeatMixHumRat = 0.004;
-        CalcSysSizing(AirLoopNum).HeatSupHumRat = 0.006;
+        state->dataSize->CalcSysSizing(AirLoopNum).HeatSupHumRat = 0.006;
     }
 
     // Run
@@ -149,7 +149,7 @@ TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
     EXPECT_EQ(0.004, state->dataSize->FinalZoneSizing(4).DesHeatCoilInHumRatTU);
 
     // Clean up
-    CalcSysSizing.deallocate();
+    state->dataSize->CalcSysSizing.deallocate();
     state->dataSize->FinalSysSizing.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest1)
     Real64 ScaledHeatDesignFlowRate(0.0); // system heating design flow rate
 
     AirLoopNum = 1;
-    CalcSysSizing.allocate(AirLoopNum);
+    state->dataSize->CalcSysSizing.allocate(AirLoopNum);
     state->dataSize->FinalSysSizing.allocate(AirLoopNum);
 
     // set system flow sizing method for cooling
@@ -269,7 +269,7 @@ TEST_F(EnergyPlusFixture, SizingSystem_FlowPerCapacityMethodTest2)
     Real64 ScaledHeatDesignCapacity(0.0); // system heating design capacity
 
     AirLoopNum = 1;
-    CalcSysSizing.allocate(AirLoopNum);
+    state->dataSize->CalcSysSizing.allocate(AirLoopNum);
     state->dataSize->FinalSysSizing.allocate(AirLoopNum);
 
     // set system flow sizing method for cooling

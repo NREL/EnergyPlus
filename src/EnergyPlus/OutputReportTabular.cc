@@ -12942,7 +12942,9 @@ namespace EnergyPlus::OutputReportTabular {
 
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSizing::CalcFinalFacilitySizing;
-        using DataSizing::SysSizPeakDDNum;
+
+        auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
+        auto &FinalSysSizing(state.dataSize->FinalSysSizing);
         auto &ort(state.dataOutRptTab);
 
         if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
@@ -13209,14 +13211,14 @@ namespace EnergyPlus::OutputReportTabular {
                 for (int iAirLoop = 1; iAirLoop <= NumPrimaryAirSys; ++iAirLoop) {
                     zoneToAirLoopCool = 0;
                     zoneToAirLoopHeat = 0;
-                    if (state.dataSize->FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
+                    if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::SensibleCoolingLoad) {
                         coolDesSelected = SysSizPeakDDNum(iAirLoop).SensCoolPeakDD;
                         if (coolDesSelected != 0) {
                             timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtSensCoolPk(coolDesSelected);
                         } else {
                             timeCoolMax = 0;
                         }
-                    } else if (state.dataSize->FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
+                    } else if (FinalSysSizing(iAirLoop).CoolingPeakLoadType == DataSizing::Ventilation) {
                         coolDesSelected = SysSizPeakDDNum(iAirLoop).CoolFlowPeakDD;
                         if (coolDesSelected != 0) {
                             timeCoolMax = SysSizPeakDDNum(iAirLoop).TimeStepAtCoolFlowPk(coolDesSelected);

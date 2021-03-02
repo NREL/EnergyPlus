@@ -1473,6 +1473,8 @@ namespace FanCoilUnits {
         // fan coil unit is always blow thru
         state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         if (state.dataSize->CurZoneEqNum > 0) {
 
             if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {

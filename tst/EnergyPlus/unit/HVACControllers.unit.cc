@@ -991,10 +991,10 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
     state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::UnitarySysEqSizing(1).CoolingCapacity = false;
-    DataSizing::UnitarySysEqSizing(1).HeatingCapacity = false;
-    DataSizing::UnitarySysEqSizing.deallocate();
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing(1).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(1).HeatingCapacity = false;
+    state->dataSize->UnitarySysEqSizing.deallocate();
 
     bool SimZoneEquipment(false);
     // compare_err_stream("", true); // reset error stream

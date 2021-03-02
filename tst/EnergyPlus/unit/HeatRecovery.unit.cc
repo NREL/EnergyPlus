@@ -3870,9 +3870,9 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
 
     // initialize UnitarySysEqSizing capacity flag to false; not unitary system
-    UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
-    UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
-    UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
+    state->dataSize->UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
 
     // calc heat recovery sizing
     SizeHeatRecovery(*state, ExchNum);
@@ -3929,9 +3929,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     state->dataSize->CurOASysNum = 0;
 
     // the HR HX is in Zone Equipment ERV
-    ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 1.0;
 
     // size the HX nominal supply air volume flow rate
     SizeHeatRecovery(*state, ExchNum);

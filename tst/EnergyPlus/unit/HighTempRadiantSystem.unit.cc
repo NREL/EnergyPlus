@@ -143,12 +143,12 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     HighTempRadSys(RadSysNum).ZonePtr = 1;
     HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
     HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).FloorArea = 10.0;
     SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
     if (SizingTypesNum < 1) SizingTypesNum = 1;
-    ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
     SizeHighTempRadiantSystem(*state, RadSysNum);
     EXPECT_FALSE(state->dataSize->DataScalableSizingON);
