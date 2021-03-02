@@ -266,7 +266,8 @@ namespace FuelCellElectricGenerator {
 
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NomEff = NumArray(1);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NomPel = NumArray(2);
-                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCycles = NumArray(3);
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCyclesAtStart = NumArray(3);
+                state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCycles = state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumCyclesAtStart;
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.CyclingDegradRat = NumArray(4);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.NumRunHours = NumArray(5);
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).FCPM.OperateDegradRat = NumArray(6);
@@ -1329,6 +1330,20 @@ namespace FuelCellElectricGenerator {
                                 this->Report.RegulaFalsiIterations,
                                 "System",
                                 "Sum",
+                                this->Name);
+
+            SetupOutputVariable(state, "Generator Number of Cycles",
+                                OutputProcessor::Unit::None,
+                                this->Report.NumCycles,
+                                "System",
+                                "Average",
+                                this->Name);
+
+            SetupOutputVariable(state, "Generator Power Module Skin Heat Loss Rate",
+                                OutputProcessor::Unit::W,
+                                this->Report.FCPMSkinLoss,
+                                "System",
+                                "Average",
                                 this->Name);
         }
     }
@@ -3194,7 +3209,7 @@ namespace FuelCellElectricGenerator {
             this->AirSup.TairIntoBlower = 0.0;
             this->AirSup.QskinLoss = 0.0;
             this->AirSup.QintakeRecovery = 0.0;
-            this->FCPM.NumCycles = 0;
+            this->FCPM.NumCycles = this->FCPM.NumCyclesAtStart;
             this->FCPM.Pel = 0.0;
             this->FCPM.PelLastTimeStep = 0.0;
             this->FCPM.Eel = 0.0;
@@ -3340,7 +3355,10 @@ namespace FuelCellElectricGenerator {
                 cell.AirSup.QskinLoss = 0.0;
                 cell.WaterSup.QskinLoss = 0.0;
                 cell.AuxilHeat.QskinLoss = 0.0;
-                cell.FCPM.QdotSkin = 0.0;
+                if (cell.FCPM.SkinLossMode != DataGenerators::SkinLoss::ConstantRate) {
+                    // If Constant Skin Loss Rate, then do not zero out
+                    cell.FCPM.QdotSkin = 0.0;
+                }
                 cell.Report.SkinLossConvect = 0.0;
                 cell.Report.SkinLossRadiat = 0.0;
                 cell.AuxilHeat.QairIntake = 0.0;
@@ -3484,6 +3502,8 @@ namespace FuelCellElectricGenerator {
 
         this->Report.SeqSubstIterations = this->FCPM.SeqSubstitIter;     // number of iterations in FuelCell loop
         this->Report.RegulaFalsiIterations = this->FCPM.RegulaFalsiIter; // number of iterations in Tproduct gas solving
+        this->Report.NumCycles = this->FCPM.NumCycles;                   // number of start-stop cycles
+        this->Report.FCPMSkinLoss = this->FCPM.QdotSkin;                 // Skin loss of power module
 
         this->Report.ACancillariesPower = this->FCPM.PelancillariesAC;
         this->Report.ACancillariesEnergy = this->FCPM.PelancillariesAC * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
