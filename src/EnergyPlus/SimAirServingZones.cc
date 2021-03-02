@@ -4715,7 +4715,7 @@ namespace EnergyPlus::SimAirServingZones {
                     int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
                     if (TermUnitSizingIndex == 0) {
                         ShowSevereError(state, "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName +
-                                        ", Zone =" + DataHeatBalance::Zone(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum)).Name);
+                                        ", Zone =" + state.dataHeatBal->Zone(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledNum)).Name);
                         ShowFatalError(state, "This is a defect. Please report this issue.");
                     }
                     if (SysSizNum > 0) {
@@ -4881,7 +4881,7 @@ namespace EnergyPlus::SimAirServingZones {
                         int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(ZonesHeatedNum);
                         if (TermUnitSizingIndex == 0) {
                             ShowSevereError(state, "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName +
-                                            ", Zone =" + DataHeatBalance::Zone(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedNum)).Name);
+                                            ", Zone =" + state.dataHeatBal->Zone(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedNum)).Name);
                             ShowFatalError(state, "This is a defect. Please report this issue.");
                         }
                         int MatchingCooledZoneNum =
@@ -5038,7 +5038,7 @@ namespace EnergyPlus::SimAirServingZones {
                         int TermUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                         if (TermUnitSizingIndex == 0) {
                             ShowSevereError(state, "SetUpSysSizingArray: TermUnitSizingIndex = 0 for AirLoop=" + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName +
-                                            ", Zone =" + DataHeatBalance::Zone(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedNum)).Name);
+                                            ", Zone =" + state.dataHeatBal->Zone(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedNum)).Name);
                             ShowFatalError(state, "This is a defect. Please report this issue.");
                         }
 
@@ -5163,7 +5163,6 @@ namespace EnergyPlus::SimAirServingZones {
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace OutputReportPredefined;
-        using DataHeatBalance::Zone;
         using namespace DataSizing;
 
         // Locals

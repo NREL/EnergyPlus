@@ -298,7 +298,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
 
                 if (!DataIPShortCuts::lAlphaFieldBlanks(3)) {
                     state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneName = AlphArray(3); //  A3 Zone Name
-                    state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID = UtilityRoutines::FindItemInList(state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneName, DataHeatBalance::Zone);
+                    state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID = UtilityRoutines::FindItemInList(state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneName, state.dataHeatBal->Zone);
                     if (state.dataCHPElectGen->MicroCHP(GeneratorNum).ZoneID == 0) {
                         ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + AlphArray(3));
                         ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
