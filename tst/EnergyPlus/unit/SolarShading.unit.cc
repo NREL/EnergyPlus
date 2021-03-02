@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2612,4 +2612,23 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
     curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(*state, curSurface);
     activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
     EXPECT_EQ(activeWindowShadingControl, 1);
+}
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_ShadingFlagTest)
+{
+    WinShadingType ShadingFlag = WinShadingType::IntShade;
+    EXPECT_TRUE(IS_SHADED(ShadingFlag));
+    EXPECT_TRUE(ANY_SHADE(ShadingFlag));
+    EXPECT_TRUE(ANY_SHADE_SCREEN(ShadingFlag));
+    EXPECT_TRUE(ANY_INTERIOR_SHADE_BLIND(ShadingFlag));
+    EXPECT_FALSE(ANY_BLIND(ShadingFlag));
+    EXPECT_FALSE(ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadingFlag));
+    EXPECT_FALSE(ANY_BETWEENGLASS_SHADE_BLIND(ShadingFlag));
+
+    ShadingFlag = WinShadingType::ExtBlind;
+    EXPECT_TRUE(ANY_BLIND(ShadingFlag));
+    EXPECT_TRUE(ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadingFlag));
+
+    ShadingFlag = WinShadingType::GlassConditionallyLightened;
+    IS_SHADED_NO_GLARE_CTRL(ANY_BETWEENGLASS_SHADE_BLIND(ShadingFlag));
 }

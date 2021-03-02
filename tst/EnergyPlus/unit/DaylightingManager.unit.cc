@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1380,12 +1380,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
     SurfWinWindowModelType(IWin) = Window5DetailedModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
+    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
+    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 5.0, 0.001);
@@ -1393,12 +1393,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
     SurfWinWindowModelType(IWin) = WindowBSDFModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
+    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
+    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);

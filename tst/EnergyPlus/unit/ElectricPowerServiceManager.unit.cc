@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1021,5 +1021,149 @@ TEST_F(EnergyPlusFixture, ElectricLoadCenter_WarnAvailabilitySchedule_PVWatts)
       "   ** Warning ** GeneratorController constructor ElectricLoadCenter:Generators, Availability Schedule for Generator:PVWatts 'PVWATTS1' will be be ignored (runs all the time).",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+}
+
+TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Constructor)
+{
+    std::string const idf_objects = delimited_string({
+        "ElectricLoadCenter:Storage:LiIonNMCBattery,",
+        "  Battery1,       !- Name",
+        "  ,               !- Availability Schedule Name",
+        "  ,               !- Zone Name",
+        "  ,               !- Radiative Fraction",
+        "  KandlerSmith,   !- Lifetime Model",
+        "  139,            !- Number of Cells in Series",
+        "  8,              !- Number of Strings in Parallel",
+        "  0.95,           !- Initial Fractional State of Charge",
+        "  ,               !- DC to DC Charging Efficiency",
+        "  100,            !- Battery Mass",
+        "  0.75,           !- Battery Surface Area",
+        "  1500,           !- Battery Specific Heat Capacity",
+        "  8.1;            !- Heat Transfer Coefficient Between Battery and Ambient",
+
+        "ElectricLoadCenter:Storage:LiIonNMCBattery,",
+        "  Battery2,       !- Name",
+        "  ,               !- Availability Schedule Name",
+        "  ,               !- Zone Name",
+        "  ,               !- Radiative Fraction",
+        "  None,           !- Lifetime Model",
+        "  139,            !- Number of Cells in Series",
+        "  10,             !- Number of Strings in Parallel",
+        "  0.5,            !- Initial Fractional State of Charge",
+        "  ,               !- DC to DC Charging Efficiency",
+        "  100,            !- Battery Mass",
+        "  0.75,           !- Battery Surface Area",
+        "  ,               !- Battery Specific Heat Capacity",
+        "  ,               !- Heat Transfer Coefficient Between Battery and Ambient",
+        "  1,              !- Fully Charged Cell Voltage",
+        "  2,              !- Cell Voltage at End of Exponential Zone",
+        "  3,              !- Cell Voltage at End of Nominal Zone",
+        "  ,               !- Default Nominal Cell Voltage",
+        "  ,               !- Fully Charged Cell Capacity",
+        "  0.9,            !- Fraction of Cell Capacity Removed at the End of Exponential Zone",
+        "  0.8;            !- Fraction of Cell Capacity Removed at the End of Nominal Zone",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    ElectricStorage battery1{*state, "Battery1"};
+    ASSERT_TRUE(UtilityRoutines::SameString(battery1.name(), "Battery1"));
+
+    ASSERT_THROW(ElectricStorage battery2(*state, "Battery2"), EnergyPlus::FatalError);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry.",
+        "   **   ~~~   ** Fully Charged Cell Voltage must be greater than Cell Voltage at End of Exponential Zone,",
+        "   **   ~~~   ** which must be greater than Cell Voltage at End of Nominal Zone.",
+        "   **   ~~~   ** Fully Charged Cell Voltage = 1.000",
+        "   **   ~~~   ** Cell Voltage at End of Exponential Zone = 2.000",
+        "   **   ~~~   ** Cell Voltage at End of Nominal Zone = 3.000",
+        "   ** Severe  ** ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry.",
+        "   **   ~~~   ** Fraction of Cell Capacity Removed at the End of Nominal Zone must be greater than Fraction of Cell Capacity Removed at the End of Exponential Zone.",
+        "   **   ~~~   ** Fraction of Cell Capacity Removed at the End of Exponential Zone = 0.900",
+        "   **   ~~~   ** Fraction of Cell Capacity Removed at the End of Nominal Zone = 0.800",
+        "   **  Fatal  ** ElectricStorage constructor Preceding errors terminate program.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ElectricStorage constructor ElectricLoadCenter:Storage:LiIonNMCBattery=\"BATTERY2\", invalid entry."
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Battery_LiIonNmc_Simulate)
+{
+    std::string const idf_objects = delimited_string({
+        "ElectricLoadCenter:Storage:LiIonNMCBattery,",
+        "  Battery1,       !- Name",
+        "  ,               !- Availability Schedule Name",
+        "  ,               !- Zone Name",
+        "  ,               !- Radiative Fraction",
+        "  KandlerSmith,   !- Lifetime Model",
+        "  139,            !- Number of Cells in Series",
+        "  8,              !- Number of Strings in Parallel",
+        "  0.95,           !- Initial Fractional State of Charge",
+        "  ,               !- DC to DC Charging Efficiency",
+        "  100,            !- Battery Mass",
+        "  0.75,           !- Battery Surface Area",
+        "  ,               !- Battery Specific Heat Capacity",
+        "  ;               !- Heat Transfer Coefficient Between Battery and Ambient",
+    });
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ElectricStorage battery{*state, "Battery1"};
+
+    DataHVACGlobals::TimeStepSys = 0.25;
+    state->dataEnvrn->OutDryBulbTemp = 23.0;
+    Real64 socMin = 0.1;
+    Real64 socMax = 0.95;
+
+    Real64 powerCharge = 0.0;
+    Real64 powerDischarge = 3000.0;
+    bool charging = false;
+    bool discharging = true;
+
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
+
+    ASSERT_NEAR(battery.storedPower(), 0.0, 0.1);
+    ASSERT_NEAR(battery.storedEnergy(), 0.0, 0.1);
+    ASSERT_NEAR(battery.drawnPower(), powerDischarge, 0.1);
+    ASSERT_NEAR(battery.drawnEnergy(), powerDischarge * 15 * 60, 0.1);
+    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.929, 0.01);
+    ASSERT_NEAR(battery.batteryTemperature(), 20.1, 0.1);
+
+    DataHVACGlobals::SysTimeElapsed += DataHVACGlobals::TimeStepSys;
+    powerDischarge = 0.0;
+    powerCharge = 5000.0;
+    charging = true;
+    discharging = false;
+
+    battery.timeCheckAndUpdate(*state);
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
+
+    // Doesn't accept all the power, because the battery will be at capacity.
+    ASSERT_NEAR(battery.storedPower(), 1330.35, 0.1);
+    ASSERT_NEAR(battery.storedEnergy(), 1197315.3, 0.1);
+    ASSERT_NEAR(battery.drawnPower(), 0.0, 0.1);
+    ASSERT_NEAR(battery.drawnEnergy(), 0.0, 0.1);
+    ASSERT_NEAR(battery.stateOfChargeFraction(), socMax, 0.01);
+
+    // Discharge the battery some more (redo of last timestep)
+    powerDischarge = 5000.0;
+    powerCharge = 0.0;
+    charging = false;
+    discharging = true;
+    battery.timeCheckAndUpdate(*state);
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
+    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.837, 0.01);
+
+    // See that the battery state is reset at the beginning of a new environment (and also at the end of warmup)
+    DataHVACGlobals::SysTimeElapsed = 0.0;
+    battery.reinitAtBeginEnvironment();
+    battery.timeCheckAndUpdate(*state);
+    powerDischarge = 0.0;
+    powerCharge = 0.0;
+    charging = false;
+    discharging = false;
+    battery.simulate(*state, powerCharge, powerDischarge, charging, discharging, socMax, socMin);
+    ASSERT_NEAR(battery.stateOfChargeFraction(), 0.95, 0.1);
 
 }

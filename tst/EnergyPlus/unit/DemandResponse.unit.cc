@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,9 +74,9 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    NumOAControllers = 1;
-    OAController.allocate(NumOAControllers);
-    OAController(1).Name = "OA CONTROLLER 1";
+    state->dataMixedAir->NumOAControllers = 1;
+    state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
+    state->dataMixedAir->OAController(1).Name = "OA CONTROLLER 1";
 
     GetDemandManagerInput(*state);
     auto & DemandMgr(state->dataDemandManager->DemandMgr);

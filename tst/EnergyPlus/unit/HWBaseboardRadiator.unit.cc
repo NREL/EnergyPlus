@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,16 +80,18 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 
     Node.allocate(1);
     HWBaseboard.allocate(1);
-    ZoneSysEnergyDemand.allocate(1);
-    CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     QBBRadSource.allocate(1);
+    HWBaseboardDesignObject.allocate(1);
 
     Node(1).MassFlowRate = 0.40;
-    CurDeadBandOrSetback(1) = false;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 12000.;
     BBNum = 1;
     LoadMet = 0.0;
+    HWBaseboard(1).DesignObjectPtr = 1;
     HWBaseboard(1).ZonePtr = 1;
     HWBaseboard(1).AirInletTemp = 21.;
     HWBaseboard(1).WaterInletTemp = 82.;
@@ -113,8 +115,8 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
 
     Node.deallocate();
     HWBaseboard.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    CurDeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
     QBBRadSource.deallocate();
 }
@@ -129,14 +131,17 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
 
     Node.allocate(2);
     HWBaseboard.allocate(1);
-    ZoneSysEnergyDemand.allocate(1);
-    CurDeadBandOrSetback.allocate(1);
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
     QBBRadSource.allocate(1);
+    HWBaseboardDesignObject.allocate(1);
 
-    CurDeadBandOrSetback(1) = false;
-    ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0; // zero load test
 
+
+    HWBaseboard(1).DesignObjectPtr = 1;
     HWBaseboard(1).EquipID = "HWRadiativeConvectiveBB";
     HWBaseboard(1).EquipType = TypeOf_Baseboard_Rad_Conv_Water;
     HWBaseboard(1).ZonePtr = 1;
@@ -195,8 +200,8 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     // clear
     Node.deallocate();
     HWBaseboard.deallocate();
-    ZoneSysEnergyDemand.deallocate();
-    CurDeadBandOrSetback.deallocate();
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
+    state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
     QBBRadSource.deallocate();
 }

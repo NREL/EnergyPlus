@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -212,7 +212,7 @@ namespace UFADManager {
             if (SurfNum == 0) continue;
             if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
                 Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     ++NumShadesDown;
                 }
             }
@@ -905,7 +905,6 @@ namespace UFADManager {
         // The model is described in the EnergyPlus Engineering Reference in Anna Liu's UCSD PhD thesis.
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalFanSys;
@@ -972,7 +971,7 @@ namespace UFADManager {
         Real64 HeightOccupiedSubzoneAve; // Height of center of occupied air subzone
         Real64 ZoneMult;                 // total zone multiplier
         int ZoneNodeNum;                 // node number of the HVAC zone node
-        Array1D_int IntGainTypesOccupied(29,
+        Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -992,6 +991,7 @@ namespace UFADManager {
                                                  IntGainTypeOf_ElectricLoadCenterInverterSimple,
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_PipeIndoor,
@@ -1065,9 +1065,9 @@ namespace UFADManager {
         ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + SysDepZoneLoadsLagged(ZoneNum);
         ZoneEquipConfigNum = state.dataRoomAirMod->ZoneUCSDUI(UINum).ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
-            for (InNodeIndex = 1; InNodeIndex <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
+            for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1377,7 +1377,6 @@ namespace UFADManager {
         // The model is described in the EnergyPlus Engineering Reference in Anna Liu's UCSD PhD thesis.
 
         // Using/Aliasing
-        using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalFanSys;
@@ -1447,7 +1446,7 @@ namespace UFADManager {
         int ZoneNodeNum;                 // node number of the HVAC zone node
         static Real64 TempDepCoef(0.0);  // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0);  // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29,
+        static Array1D_int IntGainTypesOccupied(30,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -1468,6 +1467,7 @@ namespace UFADManager {
                                                  IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower,
                                                  IntGainTypeOf_ElectricLoadCenterInverterLookUpTable,
                                                  IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                                 IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                                  IntGainTypeOf_ElectricLoadCenterStorageSimple,
                                                  IntGainTypeOf_PipeIndoor,
                                                  IntGainTypeOf_RefrigerationCase,
@@ -1543,9 +1543,9 @@ namespace UFADManager {
         ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + SysDepZoneLoadsLagged(ZoneNum);
         ZoneEquipConfigNum = state.dataRoomAirMod->ZoneUCSDUE(UINum).ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
-            for (InNodeIndex = 1; InNodeIndex <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
-                NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
-                MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
+            for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
+                NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
+                MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,9 +56,11 @@
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -943,6 +945,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                 } else {
                     PVWatts::PVWattsGenerator &pvwGen = PVWatts::GetOrCreatePVWattsGenerator(state, generatorController->name);
                     totalDCCapacity += pvwGen.getDCSystemCapacity();
+
+                    // Pass the inverter properties to the PVWatts generator class
+                    pvwGen.setDCtoACRatio(inverterObj->pvWattsDCtoACSizeRatio());
+                    pvwGen.setInverterEfficiency(inverterObj->pvWattsInverterEfficiency());
                 }
             }
             if (!errorsFound) {
@@ -2503,6 +2509,16 @@ Real64 DCtoACInverter::pvWattsDCCapacity()
     return ratedPower_ * pvWattsDCtoACSizeRatio_;
 }
 
+Real64 DCtoACInverter::pvWattsInverterEfficiency()
+{
+    return pvWattsInverterEfficiency_;
+}
+
+Real64 DCtoACInverter::pvWattsDCtoACSizeRatio()
+{
+    return pvWattsDCtoACSizeRatio_;
+}
+
 Real64 DCtoACInverter::thermLossRate() const
 {
     return thermLossRate_;
@@ -2601,6 +2617,9 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
         break;
     }
     case InverterModelType::pvWatts: {
+        // This code is lifted from ssc cmod_pvwatts5.cpp:powerout() method.
+        // It was easier to do this calculation here because we have a many to one relationship between inverter
+        // and generator whereas theirs is one to one.
         Real64 const etaref = 0.9637;
         Real64 const A = -0.0162;
         Real64 const B = -0.0059;
@@ -2617,6 +2636,8 @@ void DCtoACInverter::calcEfficiency(EnergyPlusData &state)
                 // clipping
                 ac = ratedPower_;
             }
+            // make sure no negative AC values (no parasitic nighttime losses calculated)
+            if (ac < 0) ac = 0;
             efficiency_ = ac / dCPowerIn_;
         } else {
             efficiency_ = 0.0;
@@ -2924,11 +2945,14 @@ ElectricStorage::ElectricStorage( // main constructor
       energeticEfficCharge_(0.0), energeticEfficDischarge_(0.0), maxPowerDraw_(0.0), maxPowerStore_(0.0), maxEnergyCapacity_(0.0), parallelNum_(0),
       seriesNum_(0), numBattery_(0), chargeCurveNum_(0), dischargeCurveNum_(0), cycleBinNum_(0), startingSOC_(0.0), maxAhCapacity_(0.0),
       availableFrac_(0.0), chargeConversionRate_(0.0), chargedOCV_(0.0), dischargedOCV_(0.0), internalR_(0.0), maxDischargeI_(0.0), cutoffV_(0.0),
-      maxChargeRate_(0.0), lifeCalculation_(BatteyDegredationModelType::degredationNotSet), lifeCurveNum_(0), thisTimeStepStateOfCharge_(0.0),
-      lastTimeStepStateOfCharge_(0.0), pelNeedFromStorage_(0.0), pelFromStorage_(0.0), pelIntoStorage_(0.0), qdotConvZone_(0.0), qdotRadZone_(0.0),
-      timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0), lastTimeStepBound_(0.0),
-      lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0), thermLossRate_(0.0), thermLossEnergy_(0.0),
-      storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0), batteryDamage_(0.0)
+      maxChargeRate_(0.0), lifeCalculation_(BatteryDegradationModelType::degredationNotSet), lifeCurveNum_(0),
+      liIon_dcToDcChargingEff_(0.0), liIon_mass_(0.0), liIon_surfaceArea_(0.0), liIon_Cp_(0.0), liIon_heatTransferCoef_(0.0), liIon_Vfull_(0.0),
+      liIon_Vexp_(0.0), liIon_Vnom_(0.0), liIon_Vnom_default_(0.0), liIon_Qfull_(0.0), liIon_Qexp_(0.0), liIon_Qnom_(0.0), liIon_C_rate_(0.0),
+      thisTimeStepStateOfCharge_(0.0), lastTimeStepStateOfCharge_(0.0), pelNeedFromStorage_(0.0), pelFromStorage_(0.0), pelIntoStorage_(0.0),
+      qdotConvZone_(0.0), qdotRadZone_(0.0), timeElapsed_(0.0), thisTimeStepAvailable_(0.0), thisTimeStepBound_(0.0), lastTimeStepAvailable_(0.0),
+      lastTimeStepBound_(0.0), lastTwoTimeStepAvailable_(0.0), lastTwoTimeStepBound_(0.0), count0_(0), electEnergyinStorage_(0.0),
+      thermLossRate_(0.0), thermLossEnergy_(0.0), storageMode_(0), absoluteSOC_(0.0), fractionSOC_(0.0), batteryCurrent_(0.0), batteryVoltage_(0.0),
+      batteryDamage_(0.0), batteryTemperature_(0.0)
 {
 
     std::string const routineName = "ElectricStorage constructor ";
@@ -2941,20 +2965,21 @@ ElectricStorage::ElectricStorage( // main constructor
     int testStorageIndex = 0;
     int storageIDFObjectNum = 0;
 
-    testStorageIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Simple", objectName);
-    if (testStorageIndex > 0) {
-        foundStorage = true;
-        storageIDFObjectNum = testStorageIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Simple";
-        storageModelMode_ = StorageModelType::simpleBucketStorage;
-    }
+    const std::array<std::pair<std::string, StorageModelType>, 3> storageTypes{{
+        {"ElectricLoadCenter:Storage:Simple", StorageModelType::simpleBucketStorage},
+        {"ElectricLoadCenter:Storage:Battery", StorageModelType::kiBaMBattery},
+        {"ElectricLoadCenter:Storage:LiIonNMCBattery", StorageModelType::liIonNmcBattery}
+    }};
 
-    testStorageIndex = inputProcessor->getObjectItemNum(state, "ElectricLoadCenter:Storage:Battery", objectName);
-    if (testStorageIndex > 0) {
-        foundStorage = true;
-        storageIDFObjectNum = testStorageIndex;
-        DataIPShortCuts::cCurrentModuleObject = "ElectricLoadCenter:Storage:Battery";
-        storageModelMode_ = StorageModelType::kiBaMBattery;
+    for (auto &item : storageTypes) {
+        testStorageIndex = inputProcessor->getObjectItemNum(state, item.first, objectName);
+        if (testStorageIndex > 0) {
+            foundStorage = true;
+            storageIDFObjectNum = testStorageIndex;
+            DataIPShortCuts::cCurrentModuleObject = item.first;
+            storageModelMode_ = item.second;
+            break;
+        }
     }
 
     if (foundStorage) {
@@ -3057,17 +3082,17 @@ ElectricStorage::ElectricStorage( // main constructor
             }
 
             if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "Yes")) {
-                lifeCalculation_ = BatteyDegredationModelType::lifeCalculationYes;
+                lifeCalculation_ = BatteryDegradationModelType::lifeCalculationYes;
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(6), "No")) {
-                lifeCalculation_ = BatteyDegredationModelType::lifeCalculationNo;
+                lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
             } else {
                 ShowWarningError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
                 ShowContinueError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + " = " + DataIPShortCuts::cAlphaArgs(6));
                 ShowContinueError(state, "Yes or No should be selected. Default value No is used to continue simulation");
-                lifeCalculation_ = BatteyDegredationModelType::lifeCalculationNo;
+                lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
             }
 
-            if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
+            if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
                 lifeCurveNum_ = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7)); // Battery life calculation
                 if (lifeCurveNum_ == 0 && !DataIPShortCuts::lAlphaFieldBlanks(7)) {
                     ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) +
@@ -3115,6 +3140,119 @@ ElectricStorage::ElectricStorage( // main constructor
             cutoffV_ = DataIPShortCuts::rNumericArgs(12);
             maxChargeRate_ = DataIPShortCuts::rNumericArgs(13);
 
+            break;
+        }
+        case StorageModelType::liIonNmcBattery: {
+            if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "KandlerSmith") or DataIPShortCuts::lAlphaFieldBlanks(4)) {
+                lifeCalculation_ = BatteryDegradationModelType::lifeCalculationYes;
+            } else {
+                lifeCalculation_ = BatteryDegradationModelType::lifeCalculationNo;
+            }
+            seriesNum_ = static_cast<int>(DataIPShortCuts::rNumericArgs(2));
+            parallelNum_ = static_cast<int>(DataIPShortCuts::rNumericArgs(3));
+            startingSOC_ = DataIPShortCuts::lNumericFieldBlanks(4) ? 0.5 : DataIPShortCuts::rNumericArgs(4);
+            liIon_dcToDcChargingEff_ = DataIPShortCuts::lNumericFieldBlanks(5) ? 0.95 : DataIPShortCuts::rNumericArgs(5);
+            liIon_mass_ = DataIPShortCuts::rNumericArgs(6);
+            liIon_surfaceArea_ = DataIPShortCuts::rNumericArgs(7);
+            liIon_Cp_ = DataIPShortCuts::lNumericFieldBlanks(8) ? 1500.0 : DataIPShortCuts::rNumericArgs(8);
+            liIon_heatTransferCoef_ = DataIPShortCuts::lNumericFieldBlanks(9) ? 7.5 : DataIPShortCuts::rNumericArgs(9);
+            liIon_Vfull_ = DataIPShortCuts::lNumericFieldBlanks(10) ? 4.2 : DataIPShortCuts::rNumericArgs(10);
+            liIon_Vexp_ = DataIPShortCuts::lNumericFieldBlanks(11) ? 3.53 : DataIPShortCuts::rNumericArgs(11);
+            liIon_Vnom_ = DataIPShortCuts::lNumericFieldBlanks(12) ? 3.342 : DataIPShortCuts::rNumericArgs(12);
+            if (liIon_Vfull_ < liIon_Vexp_ or liIon_Vexp_ < liIon_Vnom_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(10) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(11) + ",");
+                ShowContinueError(state, "which must be greater than " + DataIPShortCuts::cNumericFieldNames(12) + ".");
+                for (int i = 10; i <= 12; ++i) {
+                    ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(i), DataIPShortCuts::rNumericArgs(i)));
+                }
+                errorsFound = true;
+            }
+            liIon_Vnom_default_ = DataIPShortCuts::lNumericFieldBlanks(13) ? 3.342 : DataIPShortCuts::rNumericArgs(13);
+            liIon_Qfull_ = DataIPShortCuts::lNumericFieldBlanks(14) ? 3.2 : DataIPShortCuts::rNumericArgs(14);
+            liIon_Qexp_ = DataIPShortCuts::lNumericFieldBlanks(15) ? 0.8075 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(15) * liIon_Qfull_;
+            liIon_Qnom_ = DataIPShortCuts::lNumericFieldBlanks(16) ? 0.976875 * liIon_Qfull_ : DataIPShortCuts::rNumericArgs(16) * liIon_Qfull_;
+            if (liIon_Qexp_ >= liIon_Qnom_) {
+                ShowSevereError(state, routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\", invalid entry.");
+                ShowContinueError(state, DataIPShortCuts::cNumericFieldNames(16) + " must be greater than " + DataIPShortCuts::cNumericFieldNames(15) + ".");
+                for (int i = 15; i <= 16; ++i) {
+                    ShowContinueError(state, format("{} = {:.3R}", DataIPShortCuts::cNumericFieldNames(i), DataIPShortCuts::rNumericArgs(i)));
+                }
+                errorsFound = true;
+            }
+            liIon_C_rate_ = DataIPShortCuts::lNumericFieldBlanks(17) ? 1.0 : DataIPShortCuts::rNumericArgs(17);
+            internalR_ = DataIPShortCuts::lNumericFieldBlanks(18) ? 0.09 : DataIPShortCuts::rNumericArgs(18);
+
+            maxAhCapacity_ = liIon_Qfull_ * parallelNum_;
+
+            if (!errorsFound) {
+                // Set the Lifetime model in SSC
+                // I'm using a raw pointer here because the the battery_t constructor expects it.
+                // The pointer is then passed into the battery_t where it is converted into a unique_ptr and persists along with that object.
+                // Therefore I am not deleting this pointer here because that will be handled by the battery_t class.
+                lifetime_t* battLifetime;
+                if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
+                    battLifetime = new lifetime_nmc_t(DataHVACGlobals::TimeStepSys);
+                } else {
+                    // This sets a lifetime model where the capacity is always 100%.
+                    std::vector<double> tblVals{{20, 0, 100, 20, 5000, 100, 20, 10000, 100, 80, 0, 100, 80, 1000, 100, 80, 2000, 100}};
+                    util::matrix_t<double> battLifetimeMatrix(6, 3, &tblVals);
+                    battLifetime = new lifetime_calendar_cycle_t(battLifetimeMatrix, DataHVACGlobals::TimeStepSys);
+                }
+
+                // Create the SSC battery object
+                ssc_battery_ = std::unique_ptr<battery_t>(
+                    new battery_t(
+                        DataHVACGlobals::TimeStepSys,
+                        battery_params::CHEM::LITHIUM_ION,
+                        new capacity_lithium_ion_t(
+                            maxAhCapacity_,  // Capacity of the whole battery
+                            startingSOC_ * 100.0,
+                            100.0,  // Reset later
+                            0.0,  // Reset later
+                            DataHVACGlobals::TimeStepSys
+                        ),
+                        new voltage_dynamic_t(
+                            seriesNum_,
+                            parallelNum_,
+                            liIon_Vnom_default_,
+                            liIon_Vfull_,
+                            liIon_Vexp_,
+                            liIon_Vnom_,
+                            liIon_Qfull_,  // Capacity of one cell
+                            liIon_Qexp_,
+                            liIon_Qnom_,
+                            liIon_C_rate_,
+                            internalR_,
+                            DataHVACGlobals::TimeStepSys
+                        ),
+                        battLifetime,
+                        new thermal_t(
+                            DataHVACGlobals::TimeStepSys,
+                            liIon_mass_,
+                            liIon_surfaceArea_,
+                            internalR_ * seriesNum_ / parallelNum_,  // Electric resistance of the whole battery
+                            liIon_Cp_,
+                            liIon_heatTransferCoef_,
+                            20.0  // Picking a temperature for now, will reset before each run.
+                        ),
+                        nullptr
+                    )
+                );
+                ssc_lastBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+                ssc_initBatteryState_ = std::unique_ptr<battery_state>(new battery_state(ssc_battery_->get_state()));
+            }
+
+            break;
+        }
+        case StorageModelType::storageTypeNotSet: {
+            // do nothing
+            break;
+        }
+
+        } // switch storage model type
+
+        if (storageModelMode_ == StorageModelType::kiBaMBattery or storageModelMode_ == StorageModelType::liIonNmcBattery) {
             SetupOutputVariable(state, "Electric Storage Operating Mode Index", OutputProcessor::Unit::None, storageMode_, "System", "Average", name_);
             SetupOutputVariable(state, "Electric Storage Battery Charge State",
                                 OutputProcessor::Unit::Ah,
@@ -3126,17 +3264,10 @@ ElectricStorage::ElectricStorage( // main constructor
             SetupOutputVariable(state, "Electric Storage Total Current", OutputProcessor::Unit::A, batteryCurrent_, "System", "Average", name_);
             SetupOutputVariable(state, "Electric Storage Total Voltage", OutputProcessor::Unit::V, batteryVoltage_, "System", "Average", name_);
 
-            if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
+            if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
                 SetupOutputVariable(state, "Electric Storage Degradation Fraction", OutputProcessor::Unit::None, batteryDamage_, "System", "Average", name_);
             }
-            break;
         }
-        case StorageModelType::storageTypeNotSet: {
-            // do nothing
-            break;
-        }
-
-        } // switch storage model type
 
         SetupOutputVariable(state, "Electric Storage Charge Power", OutputProcessor::Unit::W, storedPower_, "System", "Average", name_);
         SetupOutputVariable(state, "Electric Storage Charge Energy", OutputProcessor::Unit::J, storedEnergy_, "System", "Sum", name_);
@@ -3172,6 +3303,9 @@ ElectricStorage::ElectricStorage( // main constructor
                 SetupEMSInternalVariable(state, "Electrical Storage Battery Maximum Capacity", name_, "[Ah]", maxAhCapacity_);
             }
         }
+        if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+            SetupOutputVariable(state, "Electric Storage Battery Temperature", OutputProcessor::Unit::C, batteryTemperature_, "System", "Average", name_);
+        }
 
         if (zoneNum_ > 0) {
             switch (storageModelMode_) {
@@ -3190,6 +3324,16 @@ ElectricStorage::ElectricStorage( // main constructor
                                       "ElectricLoadCenter:Storage:Battery",
                                       name_,
                                       DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageBattery,
+                                      &qdotConvZone_,
+                                      nullptr,
+                                      &qdotRadZone_);
+                break;
+            }
+            case StorageModelType::liIonNmcBattery: {
+                SetupZoneInternalGain(state, zoneNum_,
+                                      "ElectricLoadCenter:Storage:LiIonNMCBattery",
+                                      name_,
+                                      DataHeatBalance::IntGainTypeOf_ElectricLoadCenterStorageLiIonNmcBattery,
                                       &qdotConvZone_,
                                       nullptr,
                                       &qdotRadZone_);
@@ -3238,7 +3382,7 @@ void ElectricStorage::reinitAtBeginEnvironment()
         lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
         thisTimeStepAvailable_ = initialCharge * availableFrac_;
         thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
-        if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
+        if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
             x0_[0] = 0.0;
@@ -3252,6 +3396,10 @@ void ElectricStorage::reinitAtBeginEnvironment()
             }
             batteryDamage_ = 0.0;
         }
+    } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        // Copy the initial battery state to the last battery state
+        *ssc_lastBatteryState_ = *ssc_initBatteryState_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_);
     }
     myWarmUpFlag_ = true;
 }
@@ -3275,7 +3423,7 @@ void ElectricStorage::reinitAtEndWarmup()
         lastTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
         thisTimeStepAvailable_ = initialCharge * availableFrac_;
         thisTimeStepBound_ = initialCharge * (1.0 - availableFrac_);
-        if (lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
+        if (lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
             count0_ = 1;            // Index 0 is for initial SOC, so new input starts from index 1.
             b10_[0] = startingSOC_; // the initial fractional SOC is stored as the reference
             x0_[0] = 0.0;
@@ -3289,6 +3437,10 @@ void ElectricStorage::reinitAtEndWarmup()
             }
             batteryDamage_ = 0.0;
         }
+    } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        // Copy the initial battery state to the last battery state
+        *ssc_lastBatteryState_ = *ssc_initBatteryState_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_);
     }
     myWarmUpFlag_ = false;
 }
@@ -3302,7 +3454,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
 
     Real64 timeElapsedLoc = state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + DataHVACGlobals::SysTimeElapsed;
     if (timeElapsed_ != timeElapsedLoc) { // time changed, update last with "current" result from previous time
-        if (storageModelMode_ == StorageModelType::kiBaMBattery && lifeCalculation_ == BatteyDegredationModelType::lifeCalculationYes) {
+        if (storageModelMode_ == StorageModelType::kiBaMBattery && lifeCalculation_ == BatteryDegradationModelType::lifeCalculationYes) {
             //    At this point, the current values, last time step values and last two time step values have not been updated, hence:
             //    "ThisTimeStep*" actually points to the previous one time step
             //    "LastTimeStep*" actually points to the previous two time steps
@@ -3342,6 +3494,8 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
                     batteryDamage_ += oneNmb0_[binNum] / CurveManager::CurveValue(state, lifeCurveNum_, (double(binNum) / double(cycleBinNum_)));
                 }
             }
+        } else if ( storageModelMode_ == StorageModelType::liIonNmcBattery ) {
+            *ssc_lastBatteryState_ = ssc_battery_->get_state();
         }
 
         lastTimeStepStateOfCharge_ = thisTimeStepStateOfCharge_;
@@ -3373,7 +3527,9 @@ void ElectricStorage::simulate(EnergyPlusData &state,
     if (storageModelMode_ == StorageModelType::simpleBucketStorage) {
         simulateSimpleBucketModel(powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
     } else if (storageModelMode_ == StorageModelType::kiBaMBattery) {
-        simulateKineticBatteryModel(state,powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+        simulateKineticBatteryModel(state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
+    } else if (storageModelMode_ == StorageModelType::liIonNmcBattery) {
+        simulateLiIonNmcBatteryModel(state, powerCharge, powerDischarge, charging, discharging, controlSOCMaxFracLimit, controlSOCMinFracLimit);
     }
 }
 
@@ -3686,6 +3842,88 @@ void ElectricStorage::simulateKineticBatteryModel(EnergyPlusData &state,
     powerDischarge = drawnPower_;
 }
 
+void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
+                                                   Real64 &powerCharge,
+                                                   Real64 &powerDischarge,
+                                                   bool &charging,
+                                                   bool &discharging,
+                                                   Real64 const controlSOCMaxFracLimit,
+                                                   Real64 const controlSOCMinFracLimit)
+{
+
+    // Copy the battery state from the end of last timestep
+    battery_state battState = *ssc_lastBatteryState_;
+
+    // Set the temperature the battery sees
+    if (zoneNum_ > 0) {
+        // If in a zone, use the zone temperature
+        battState.thermal->T_room = DataHeatBalFanSys::ZT(zoneNum_);
+    } else {
+        // If outside, use outdoor temperature
+        battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;
+    }
+    ssc_battery_->set_state(battState);
+
+    // Set the SOC limits
+    ssc_battery_->changeSOCLimits(controlSOCMinFracLimit * 100.0, controlSOCMaxFracLimit * 100.0);
+
+    // Set the current timestep length
+    ssc_battery_->ChangeTimestep(DataHVACGlobals::TimeStepSys);
+
+    // Run the battery
+    // SAM uses negative values for charging, positive for discharging
+    // E+ power/energy outputs are positive
+    double power{0.0};  // Using double instead of Real64 because SSC is expecting a double
+    if (charging) {
+        power = - powerCharge;
+    } else if (discharging) {
+        power = powerDischarge;
+    }
+    power *= 0.001;  // Convert to kW
+    ssc_battery_->runPower(power);
+
+    // Store outputs
+    const battery_state& battState2{ssc_battery_->get_state()};
+    if (battState2.P < 0.0) { // negative for charging
+        storageMode_ = 2;
+        powerCharge = fabs(battState2.P) * 1000.0;  // kW -> W
+        powerDischarge = 0.0;
+        charging = true;
+        discharging = false;
+    } else if (battState2.P > 0.0) { // positive for discharging
+        storageMode_ = 1;
+        powerCharge = 0.0;
+        powerDischarge = fabs(battState2.P) * 1000.0;  // kW -> W
+        charging = false;
+        discharging = true;
+    } else {
+        storageMode_ = 0;
+        powerCharge = 0.0;
+        powerDischarge = 0.0;
+        charging = false;
+        discharging = false;
+    }
+    absoluteSOC_ = ssc_battery_->charge_total();
+    fractionSOC_ = ssc_battery_->SOC() * 0.01;  // % -> fraction
+    batteryCurrent_ = ssc_battery_->I();
+    batteryVoltage_ = ssc_battery_->V();
+    batteryDamage_ = 1.0 - (ssc_battery_->charge_maximum_lifetime() / maxAhCapacity_);
+    storedPower_ = powerCharge;
+    storedEnergy_ = storedPower_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    drawnPower_ = powerDischarge;
+    drawnEnergy_ = drawnPower_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    decrementedEnergyStored_ = - storedEnergy_;
+    thermLossRate_ = battState2.thermal->heat_dissipated * 1000.0;  // kW -> W
+    thermLossEnergy_ = thermLossRate_ * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
+    batteryTemperature_ = battState2.thermal->T_batt;
+
+    // Zone Heat Gains
+    if (zoneNum_ > 0) { // set values for zone heat gains
+        qdotConvZone_ = (1.0 - zoneRadFract_) * thermLossRate_;
+        qdotRadZone_ = (zoneRadFract_) * thermLossRate_;
+    }
+}
+
 Real64 ElectricStorage::drawnPower() const
 {
     return drawnPower_;
@@ -3704,6 +3942,17 @@ Real64 ElectricStorage::drawnEnergy() const
 Real64 ElectricStorage::storedEnergy() const
 {
     return storedEnergy_;
+}
+
+Real64 ElectricStorage::stateOfChargeFraction() const
+{
+    return fractionSOC_;
+}
+
+Real64 ElectricStorage::batteryTemperature() const
+{
+    assert(storageModelMode_ == StorageModelType::liIonNmcBattery);
+    return batteryTemperature_;
 }
 
 bool ElectricStorage::determineCurrentForBatteryDischarge(EnergyPlusData &state,

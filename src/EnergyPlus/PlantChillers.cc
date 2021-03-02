@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -174,7 +174,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric";
         state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -863,7 +863,7 @@ namespace PlantChillers {
             // init maximum available condenser flow rate
             if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
 
-                DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn; // DSU? old behavior, still want?
+                DataLoopNode::Node(this->CondInletNodeNum).Temp = this->TempDesCondIn; // old behavior, still want?
 
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
@@ -2090,7 +2090,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:EngineDriven";
         state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -2222,9 +2222,6 @@ namespace PlantChillers {
                                                                                     DataLoopNode::NodeConnectionType_Outlet,
                                                                                     2,
                                                                                     DataLoopNode::ObjectIsNotParent);
-                // CALL
-                // TestCompSet(state, TRIM(DataIPShortCuts::cCurrentModuleObject),DataIPShortCuts::cAlphaArgs(1),DataIPShortCuts::cAlphaArgs(5),DataIPShortCuts::cAlphaArgs(6),'Condenser
-                // (Air) Nodes')
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
@@ -4025,7 +4022,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:CombustionTurbine";
         state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 

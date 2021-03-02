@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,6 +50,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -58,27 +60,12 @@ namespace DataSizing {
     // MODULE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   December 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This data-only module contains type definitions and variables
     // associated with HVAC system design flow rates, temperatures and
     // capacities. This data is available to the HVAC component modules
     // for their self sizing calculations.
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
 
     // parameters for outside air flow method
     int const NumOAFlowMethods(9);
@@ -99,7 +86,7 @@ namespace DataSizing {
                                              "Sum",
                                              "Maximum",
                                              "IndoorAirQualityProcedure",
-                                             "ProportionalControlBasedonOccupancySchedule",
+                                             "ProportionalControlBasedOnOccupancySchedule",
                                              "ProportionalControlBasedOnDesignOccupancy"});
 
     // parameters for outside air
@@ -197,13 +184,6 @@ namespace DataSizing {
     int const GlobalHeatingSizingFactorMode(102);
     int const GlobalCoolingSizingFactorMode(103);
     int const LoopComponentSizingFactorMode(104);
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
 
     //  days; includes effects of user multiplier
     //  and user set flows)
@@ -963,6 +943,31 @@ namespace DataSizing {
             }
             DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(state, DesExitTemp, 0.9, state.dataEnvrn->StdBaroPress, "GetCoilDesFlowT");
         }
+    }
+
+    Real64 ZoneAirDistributionData::calculateEz(EnergyPlusData &state, int const ZoneNum) // Zone index
+    {
+        Real64 zoneEz = 1.0;
+        // Calc the zone supplied OA flow rate counting the zone air distribution effectiveness
+        //  First check whether the zone air distribution effectiveness schedule exists, if yes uses it;
+        //   otherwise uses the inputs of zone distribution effectiveness in cooling mode or heating mode
+        if (this->ZoneADEffSchPtr > 0) {
+            // Get schedule value for the zone air distribution effectiveness
+            zoneEz = ScheduleManager::GetCurrentScheduleValue(state, this->ZoneADEffSchPtr);
+        } else {
+            Real64 zoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
+
+            // Zone in cooling mode
+            if (zoneLoad < 0.0) zoneEz = this->ZoneADEffCooling;
+
+            // Zone in heating mode
+            if (zoneLoad > 0.0) zoneEz = this->ZoneADEffHeating;
+        }
+        if (zoneEz <= 0.0) {
+            // Enforce defaults
+            zoneEz = 1.0;
+        }
+        return zoneEz;
     }
 
 } // namespace DataSizing

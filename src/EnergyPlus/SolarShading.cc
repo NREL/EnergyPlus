@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -758,7 +758,7 @@ namespace SolarShading {
         int I;
         int NumOfLayers;
 
-        // FLOW:
+
 
         state.dataSolarShading->CTHETA.dimension(TotSurfaces, 0.0);
         state.dataSolarShading->SAREA.dimension(TotSurfaces, 0.0);
@@ -1347,8 +1347,8 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
-                            // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
+                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WinShadingType::SwitchableGlazing) {
+                            // IF (SurfaceWindow(SurfLoop)%ShadingFlag == WinShadingType::SwitchableGlazing) THEN  !ShadingFlag is not set to WinShadingType::SwitchableGlazing yet!
                             SetupOutputVariable(state, "Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
                                                 SurfWinSwitchingFactor(SurfLoop),
@@ -2285,7 +2285,7 @@ namespace SolarShading {
         Real64 ViewFactorSkyGeom;      // Geometrical sky view factor
         Real64 const cosine_tolerance(0.0001);
 
-        // FLOW:
+
 #ifdef EP_Count_Calls
         ++NumAnisoSky_Calls;
 #endif
@@ -6068,7 +6068,7 @@ namespace SolarShading {
                 }
                 int BlNum = SurfWinBlindNumber(SurfNum);
                 int ScNum = SurfWinScreenNumber(SurfNum);
-                int ShadeFlag = SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
+                WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum); // Set in subr. WindowShadingManager
 
                 Real64 ProfAng = 0.0; // Window solar profile angle (radians)
 
@@ -6111,8 +6111,8 @@ namespace SolarShading {
                             AbWin(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).AbsBeamCoef({1, 6}, Lay)) *
                                          CosInc * SunLitFract * SurfaceWindow(SurfNum).OutProjSLFracMult(state.dataGlobal->HourOfDay);
                         }
-                        if (ShadeFlag <= 0 || ShadeFlag >= 10) {
-                            // Bare window (ShadeFlag = -1 or 0 or shading device of off)
+                        if (!IS_SHADED_NO_GLARE_CTRL(ShadeFlag)) {
+                            // (ShadeFlag <= 0 || ShadeFlag >= 10) - Bare window (ShadeFlag = -1 or 0 or shading device of off)
                             for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                 // Add contribution of beam reflected from outside and inside reveal
                                 SurfWinA(Lay, SurfNum) = AbWin(Lay) + SurfWinOutsRevealDiffOntoGlazing(SurfNum) * state.dataConstruction->Construct(ConstrNum).AbsDiff(Lay) +
@@ -6124,30 +6124,30 @@ namespace SolarShading {
                             Real64 InOutProjSLFracMult = SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);
                             Array1D<Real64> AbWinSh(NGlass); // Like AbWin, but for shaded window
                             Array1D<Real64> ADiffWinSh(NGlass);     // Diffuse solar absorptance of glass layer, window with shading device
-                            if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn) FracSunLit = SunLitFract;
+                            if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) FracSunLit = SunLitFract;
 
-                            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == SwitchableGlazing) {
+                            if (ANY_SHADE(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
                                 // Shade or switchable glazing on
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                     AbWinSh(Lay) = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamCoef({1, 6}, Lay)) * CosInc * FracSunLit;
                                     ADiffWinSh(Lay) = state.dataConstruction->Construct(ConstrNumSh).AbsDiff(Lay);
                                 }
-                                if (ShadeFlag == IntShadeOn) { // Exterior beam absorbed by INTERIOR SHADE
+                                if (ShadeFlag == WinShadingType::IntShade) { // Exterior beam absorbed by INTERIOR SHADE
                                     // Note that AbsBeamShadeCoef includes effect of shade/glazing inter-reflection
                                     Real64 AbsShade = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamShadeCoef); // Interior shade or blind beam solar absorptance
                                     ExtBeamAbsByShadFac(SurfNum) = (AbsShade * CosInc * SunLitFract * InOutProjSLFracMult + SurfWinOutsRevealDiffOntoGlazing(SurfNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffShade) * SurfWinGlazedFrac(SurfNum);
                                     // In the above, GlazedFrac corrects for shadowing of divider onto interior shade
-                                } else if (ShadeFlag == ExtShadeOn) { // Exterior beam absorbed by EXTERIOR SHADE
+                                } else if (ShadeFlag == WinShadingType::ExtShade) { // Exterior beam absorbed by EXTERIOR SHADE
                                     ExtBeamAbsByShadFac(SurfNum) = state.dataConstruction->Construct(ConstrNumSh).AbsDiffShade * CosInc * SunLitFract;
-                                } else if (ShadeFlag == BGShadeOn) { // Exterior beam absorbed by BETWEEN-GLASS SHADE
+                                } else if (ShadeFlag == WinShadingType::BGShade) { // Exterior beam absorbed by BETWEEN-GLASS SHADE
                                     Real64 AbsShade = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).AbsBeamShadeCoef);
                                     ExtBeamAbsByShadFac(SurfNum) = AbsShade * CosInc * SunLitFract + SurfWinOutsRevealDiffOntoGlazing(SurfNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffShade;
                                 }
 
                             } else {
                                 // Blind or screen on
-                                if (ShadeFlag != ExtScreenOn) ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
-                                if (ShadeFlag == IntBlindOn) {
+                                if (ShadeFlag != WinShadingType::ExtScreen) ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                                if (ShadeFlag == WinShadingType::IntBlind) {
                                     // Interior blind on
                                     Real64 TGlBm = POLYF(CosInc,state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef); // Glazing system front solar beam transmittance
                                     Real64 RGlDiffBack = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack; // Glazing system back diffuse solar reflectance
@@ -6171,7 +6171,7 @@ namespace SolarShading {
                                                                     SurfWinOutsRevealDiffOntoGlazing(SurfNum) * AbsShadeDiff) *
                                                                    SurfWinGlazedFrac(SurfNum);
                                     // In the above, GlazedFrac corrects for shadowing of divider onto interior blind
-                                } else if (ShadeFlag == ExtBlindOn) {
+                                } else if (ShadeFlag == WinShadingType::ExtBlind) {
                                     // Exterior blind on
                                     Real64 TBlBmBm = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness); // Blind solar front beam-beam transmittance
                                     Real64 TBlDifDif = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffTrans); // Diffuse-diffuse solar transmittance of blind
@@ -6196,7 +6196,7 @@ namespace SolarShading {
                                     Real64 AbsBlDiffBack = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffAbs); // Blind solar back diffuse absorptance
                                     Real64 AbsShade = AbsBlFront + AbsBlBack * RGlFront * TBlBmBm + (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) * (RGlFront * TBlBmBm * RhoBlBack + TBlBmDiff);
                                     ExtBeamAbsByShadFac(SurfNum) = AbsShade * CosInc * SunLitFract * InOutProjSLFracMult;
-                                } else if (ShadeFlag == ExtScreenOn) {
+                                } else if (ShadeFlag == WinShadingType::ExtScreen) {
                                     // Exterior screen on
                                     Real64 TScBmBm = SurfaceScreens(ScNum).BmBmTrans; // Screen solar front beam-beam transmittance
                                     Real64 TScBmDiff = SurfaceScreens(ScNum).BmDifTrans; // Screen solar front beam-diffuse transmittance
@@ -6218,7 +6218,7 @@ namespace SolarShading {
                                     Real64 AbsScDiffBack = SurfaceScreens(ScNum).DifScreenAbsorp; // Screen solar back diffuse absorptance
                                     Real64 AbsScreen = AbsScBeam * (1.0 + TScBmBm * RGlFront) +  (AbsScDiffBack * TScBmBm * RGlFront * RGlDiffFront * RScBack / (1.0 - RScDifBack * RGlDiffFront)); // Exterior screen beam solar absorptance
                                     ExtBeamAbsByShadFac(SurfNum) = AbsScreen * CosInc * SunLitFract * InOutProjSLFracMult;
-                                } else if (ShadeFlag == BGBlindOn) {
+                                } else if (ShadeFlag == WinShadingType::BGBlind) {
                                     // Between-glass blind o
                                     // Isolated glass and blind properties at current incidence angle, profile angle and slat angle
                                     Real64 t1 = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).tBareSolCoef({1, 6}, 1)); // Bare-glass beam solar transmittance for glass layers 1,2 and 3
@@ -6281,12 +6281,12 @@ namespace SolarShading {
                                 } // End of check if blind is interior, exterior or between-glass
                             } // End of check if a blind is on
 
-                            if (ShadeFlag != SwitchableGlazing) {
+                            if (ShadeFlag != WinShadingType::SwitchableGlazing) {
                                 // Interior or between glass shade or blind on
                                 for (int Lay = 1; Lay <= NGlass; ++Lay) {
                                     SurfWinA(Lay, SurfNum) = AbWinSh(Lay);
                                     // Add contribution of diffuse from beam on outside reveal
-                                    if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn)
+                                    if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag) || ANY_BETWEENGLASS_SHADE_BLIND(ShadeFlag))
                                         SurfWinA(Lay, SurfNum) += ADiffWinSh(Lay) * SurfWinOutsRevealDiffOntoGlazing(SurfNum);
                                 }
                             } else {
@@ -6401,10 +6401,10 @@ namespace SolarShading {
                 }
 
                 if (SurfWinWindowModelType(SurfNum) == Window5DetailedModel) {
-                    if (ShadeFlag > 0 && ShadeFlag < 10) {
-                        if (ShadeFlag != SwitchableGlazing) {
+                    if (IS_SHADED_NO_GLARE_CTRL(SurfWinShadingFlag(SurfNum))) {
+                        if (ShadeFlag != WinShadingType::SwitchableGlazing) {
                             // Shade or blind
-                            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
+                            if (ANY_SHADE_SCREEN(ShadeFlag)) {
                                 // Shade or screen
                                 DiffTrans = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
                             } else {
@@ -6451,7 +6451,7 @@ namespace SolarShading {
                         // Need to check what effect, if any, defining these here has
                         TBmBm = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                 .WinDirSpecTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep);
-                        TBmDif = SurfaceWindow(SurfNum) .ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
+                        TBmDif = SurfaceWindow(SurfNum).ComplexFen.State(SurfaceWindow(SurfNum).ComplexFen.CurrentState)
                                          .WinDirHemiTrans(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep) - TBmBm;
                     } else if (SurfWinWindowModelType(SurfNum) == WindowEQLModel) {
                         // get ASHWAT fenestration model beam-beam and beam-diffuse properties
@@ -6489,10 +6489,10 @@ namespace SolarShading {
                     } else {
                         DiffTrans = state.dataConstruction->Construct(ConstrNum).TransDiff;
                     }
-                    if (ShadeFlag > 0 && ShadeFlag < 10) {
-                        if (ShadeFlag != SwitchableGlazing) {
+                    if (IS_SHADED_NO_GLARE_CTRL(ShadeFlag)) {
+                        if (ShadeFlag != WinShadingType::SwitchableGlazing) {
                             // Shade or blind
-                            if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
+                            if (ANY_SHADE_SCREEN(ShadeFlag)) {
                                 // Shade or screen
                                 DiffTrans = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
                             } else {
@@ -6546,10 +6546,10 @@ namespace SolarShading {
                 if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
                     SurfWinBlGlSysTsolDifDif(SurfNum) = DiffTrans;
                     SurfWinScGlSysTsolDifDif(SurfNum) = DiffTrans;
-                    if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
+                    if (ANY_BLIND(ShadeFlag)|| ShadeFlag == WinShadingType::ExtScreen) {
                         SurfWinBlGlSysTsolDifDif(SurfNum) = DiffTrans;
                         SurfWinScGlSysTsolDifDif(SurfNum) = DiffTrans;
-                        if (ShadeFlag == ExtScreenOn) {
+                        if (ShadeFlag == WinShadingType::ExtScreen) {
                             SurfWinScTsolDifDif(SurfNum) = SurfaceScreens(ScNum).DifDifTrans;
                         } else {
                             SurfWinBlTsolDifDif(SurfNum) = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffTrans);
@@ -6562,10 +6562,10 @@ namespace SolarShading {
                 //-----------------------------------------------------------------
                 if (ConstrNumSh != 0 && SunLitFract > 0.0) {
                     if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
-                        if (ShadeFlag > 0 && ShadeFlag < 10) {
+                        if (IS_SHADED_NO_GLARE_CTRL(ShadeFlag)) {
                             // Shade or screen or blind on, or switchable glazing
                             // (note in the following that diffusing glass is not allowed in a window with shade, blind or switchable glazing)
-                            if (ShadeFlag != IntBlindOn && ShadeFlag != ExtBlindOn && ShadeFlag != BGBlindOn && ShadeFlag != ExtScreenOn) {
+                            if (ANY_SHADE(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
                                 // Shade on or switchable glazing
                                 TBmAllShBlSc = POLYF(CosInc, state.dataConstruction->Construct(ConstrNumSh).TransSolBeamCoef);
                             } else {
@@ -6575,7 +6575,7 @@ namespace SolarShading {
                                 Real64 TBlDifDif; // Diffuse-diffuse solar transmittance of blind
                                 Real64 TScBmBm;
                                 Real64 TBlBmBm;
-                                if (ShadeFlag == ExtScreenOn) {// Exterior screen
+                                if (ShadeFlag == WinShadingType::ExtScreen) {// Exterior screen
                                     Real64 RScBack = SurfaceScreens(ScNum).ReflectSolBeamFront;
                                     Real64 RScDifDifBk = SurfaceScreens(ScNum).DifReflect; // Diffuse-diffuse back refectance of screen
                                     Real64 RGlBmFr = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef); // Beam front reflectance of glass
@@ -6595,7 +6595,7 @@ namespace SolarShading {
                                 } else {
                                     TBlBmBm = BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
                                     TBlBmDif = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffTrans);
-                                    if (ShadeFlag == IntBlindOn) {
+                                    if (ShadeFlag == WinShadingType::IntBlind) {
                                         Real64 RhoBlBmDifFr = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolFrontBeamDiffRefl); // Beam-diffuse front reflectance of blind
                                         Real64 RGlDifBk = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack; // Diffuse front reflectance of glass
                                         Real64 RhoBlDifDifFr = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolFrontDiffDiffRefl); // Diffuse-diffuse front refectance of blind
@@ -6606,7 +6606,7 @@ namespace SolarShading {
                                         TBmBmShBlSc = TBmBmBl; // TBmBm * TBlBmBm
                                         TBmDifShBlSc = TBmAllShBlSc - TBmBmShBlSc;
                                         if (TBmDifShBlSc < 0.0) TBmDifShBlSc = 0.0;
-                                    } else if (ShadeFlag == ExtBlindOn) {
+                                    } else if (ShadeFlag == WinShadingType::ExtBlind) {
                                         Real64 RhoBlBmDifBk = InterpProfSlatAng(ProfAng, SlatAng, VarSlats, Blind(BlNum).SolBackBeamDiffRefl); // Beam-diffuse back reflectance of blind
                                         Real64 RhoBlDifDifBk = InterpSlatAng(SlatAng, VarSlats, Blind(BlNum).SolBackDiffDiffRefl); // Diffuse-diffuse back refectance of blind
                                         Real64 RGlBmFr = POLYF(CosInc, state.dataConstruction->Construct(ConstrNum).ReflSolBeamFrontCoef);
@@ -6659,8 +6659,7 @@ namespace SolarShading {
                     } // end of checking if not eql window model
                 } // end of checking if sunlitfract > 0
 
-                // TODO: Why this is updated after reporting
-                if (ShadeFlag == SwitchableGlazing) {
+                if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                     // Switchable glazing
                     Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum);
                     if (!SurfWinSolarDiffusing(SurfNum)) {
@@ -6690,7 +6689,7 @@ namespace SolarShading {
                 Real64 InOutProjSLFracMult = SurfaceWindow(SurfNum).InOutProjSLFracMult(state.dataGlobal->HourOfDay);
                 if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
                     WinTransDifSolar(SurfNum) = DiffTrans * Surface(SurfNum).Area;
-                    if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
+                    if (ANY_BLIND(ShadeFlag)) {
                         if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                             WinTransDifSolarGnd(SurfNum) = DiffTransGnd * Surface(SurfNum).Area;
                             WinTransDifSolarSky(SurfNum) = DiffTransSky * Surface(SurfNum).Area;
@@ -6705,7 +6704,8 @@ namespace SolarShading {
                     WinTransDifSolarSky(SurfNum) = DiffTrans * Surface(SurfNum).Area;
                 }
 
-                if (ShadeFlag < 1 || ShadeFlag == SwitchableGlazing || ShadeFlag >= 10) { // Unshaded or switchable glazing
+                if (!IS_SHADED_NO_GLARE_CTRL(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
+                    // Unshaded or switchable glazing
                     // Note: with previous defs of TBmBm & TBmDif, these come out right for Complex Fenestration
                     // WinTransBmSolar uses the directional-hemispherical transmittance
                     WinTransBmSolar(SurfNum) = (TBmBm + TBmDif) * SunLitFract * CosInc * Surface(SurfNum).Area * InOutProjSLFracMult;
@@ -6744,9 +6744,7 @@ namespace SolarShading {
                     // Window is schedule surface gained. Do not make addition to what enters into zone since that information is not available
                     if (FenSolAbsPtr == 0) {
                         Real64 TBmAll; // Window beam-to-(beam+diffuse) transmittance
-                        if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
-                            (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
-                             ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn)) {
+                        if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel && (ANY_BLIND(ShadeFlag) || ANY_SHADE_SCREEN(ShadeFlag))) {
                             TBmAll = TBmAllShBlSc;
                         } else {
                             TBmAll = TBmBm + TBmDif;
@@ -6787,9 +6785,10 @@ namespace SolarShading {
                 // from this exterior window since the beam-beam transmittance of shades and diffusing glass
                 // is assumed to be zero. The beam-beam transmittance of tubular daylighting devices is also
                 // assumed to be zero.
+
                 if (SunLitFract > 0.0) {
                     if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel)
-                        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || SurfWinSolarDiffusing(SurfNum) ||
+                        if (ANY_SHADE(ShadeFlag) || SurfWinSolarDiffusing(SurfNum) ||
                             SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser || Surface(SurfNum).Class == SurfaceClass::TDD_Dome)
                             continue;
 
@@ -6812,9 +6811,9 @@ namespace SolarShading {
                     if (ShelfNum > 0) { // Daylighting shelf
                         InShelfSurf = state.dataDaylightingDevicesData->Shelf(ShelfNum).InSurf;
                     }
-                    if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
+                    if (ANY_BLIND(ShadeFlag)) {
                         TBm = TBmBmBl; // Interior, exterior or between-glass blind on
-                    } else if (ShadeFlag == ExtScreenOn) {
+                    } else if (ShadeFlag == WinShadingType::ExtScreen) {
                         TBm = TBmBmSc; // Exterior screen on
                     } else {
                         TBm = TBmBm; // Bare glass or switchable glazing
@@ -6882,7 +6881,7 @@ namespace SolarShading {
                                     // are assumed to be bare, i.e., they have no shading device and are non-switchable.
                                     // The layer order for interior windows is "outside" to "inside," where "outside" refers to
                                     // the adjacent zone and "inside" refers to the current zone.
-                                    int ShadeFlagBack = SurfWinShadingFlag(BackSurfNum);
+                                    WinShadingType ShadeFlagBack = SurfWinShadingFlag(BackSurfNum);
                                     bool VarSlatsBack = SurfWinMovableSlats(BackSurfNum);
                                     Real64 SlatAngBack = SurfWinSlatAngThisTS(BackSurfNum);
                                     Real64 CosIncBack = std::abs(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, BackSurfNum));
@@ -6902,7 +6901,7 @@ namespace SolarShading {
 
                                     // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                     // or interior window WITHOUT SHADING this timestep
-                                    if (ShadeFlagBack <= 0) {
+                                    if (NOT_SHADED(ShadeFlagBack)) {
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef({1, 6}, Lay));
                                         }
@@ -6911,7 +6910,7 @@ namespace SolarShading {
 
                                     // Interior beam absorptance of glass layers and beam transmittance
                                     // of back exterior window with SHADE
-                                    if (ShadeFlagBack == IntShadeOn || ShadeFlagBack == ExtShadeOn || ShadeFlagBack == BGShadeOn) {
+                                    if (ANY_SHADE(ShadeFlagBack)) {
                                         for (int Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNumBackSh).TotGlassLayers; ++Lay) {
                                             AbsBeamWin(Lay) = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBackSh).AbsBeamBackCoef({1, 6}, Lay));
                                         }
@@ -6920,15 +6919,11 @@ namespace SolarShading {
 
                                     // Interior beam absorbed by INTERIOR SHADE of back exterior window
 
-                                    if (ShadeFlagBack == IntShadeOn) {
+                                    if (ShadeFlagBack == WinShadingType::IntShade) {
                                         IntBeamAbsByShadFac(BackSurfNum) = BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade /
                                                                            (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum));
                                         BABSZone += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
-                                    }
-
-                                    // Interior beam absorbed by EXTERIOR SHADE of back exterior window
-
-                                    if (ShadeFlagBack == ExtShadeOn) {
+                                    } else if (ShadeFlagBack == WinShadingType::ExtShade) { // Interior beam absorbed by EXTERIOR SHADE of back exterior window
                                         Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
                                         Real64 AbsSh = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)).AbsorpSolar;
                                         Real64 RhoSh = 1.0 - AbsSh - state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNumBackSh).LayerPoint(1)).Trans;
@@ -6936,11 +6931,7 @@ namespace SolarShading {
                                         BABSZone += BOverlap * AShBack;
                                         IntBeamAbsByShadFac(BackSurfNum) =
                                                 BOverlap * AShBack / (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum));
-                                    }
-
-                                    // Interior beam absorbed by BETWEEN-GLASS SHADE of back exterior window
-
-                                    if (ShadeFlagBack == BGShadeOn) {
+                                    } else if (ShadeFlagBack == WinShadingType::BGShade) {  // Interior beam absorbed by BETWEEN-GLASS SHADE of back exterior window
                                         Real64 rbd1k = state.dataConstruction->Construct(ConstrNumBack).rbBareSolDiff(1);
                                         Real64 rfd2k = state.dataConstruction->Construct(ConstrNumBack).rfBareSolDiff(2);
                                         Real64 AShBack; // System shade absorptance for interior beam solar
@@ -6966,7 +6957,7 @@ namespace SolarShading {
 
                                     // Interior beam absorptance of glass layers and beam absorbed in blind
                                     // of back exterior window with BLIND
-                                    if (ShadeFlagBack == IntBlindOn || ShadeFlagBack == ExtBlindOn || ShadeFlagBack == BGBlindOn) {
+                                    if (ANY_BLIND(ShadeFlagBack)) {
                                         int BlNumBack = SurfWinBlindNumber(BackSurfNum); // Back surface blind number
                                         Real64 ProfAngBack; // Back window solar profile angle (radians)
                                         ProfileAngle(BackSurfNum, state.dataEnvrn->SOLCOS, Blind(BlNumBack).SlatOrientation, ProfAngBack);
@@ -6979,7 +6970,7 @@ namespace SolarShading {
                                         Real64 TBlBmDiffBack = InterpProfSlatAng(ProfAngBack, SlatAngBack, VarSlatsBack,
                                                 Blind(BlNumBack).SolBackBeamDiffTrans); // Blind solar back beam-diffuse transmittance
 
-                                        if (ShadeFlagBack == IntBlindOn) {
+                                        if (ShadeFlagBack == WinShadingType::IntBlind) {
 
                                             // Interior beam absorptance of GLASS LAYERS of exterior back window with INTERIOR BLIND
                                             // Blind solar front beam reflectance
@@ -7021,9 +7012,7 @@ namespace SolarShading {
                                             IntBeamAbsByShadFac(BackSurfNum) =
                                                     BOverlap * ABlBack / (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum));
                                             BABSZone += BOverlap * ABlBack;
-                                        }
-
-                                        if (ShadeFlagBack == ExtBlindOn) {
+                                        } else if (ShadeFlagBack == WinShadingType::ExtBlind) {
 
                                             // Interior beam absorptance of GLASS LAYERS of exterior back window with EXTERIOR BLIND
                                             // Glazing system front diffuse solar reflectance
@@ -7058,10 +7047,8 @@ namespace SolarShading {
                                             BABSZone += BOverlap * ABlBack;
                                             IntBeamAbsByShadFac(BackSurfNum) =
                                                     BOverlap * ABlBack / (Surface(BackSurfNum).Area + SurfWinDividerArea(BackSurfNum));
-                                        } // End of check if exterior blind on back window
-
-                                        if (ShadeFlagBack == BGBlindOn) {
-
+                                        } else {
+                                            // ShadeFlagBack == BGBlindOn
                                             Real64 t1k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef({1, 6}, 1));
                                             Real64 t2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).tBareSolCoef({1, 6}, 2));
                                             Real64 af2k = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).afBareSolCoef({1, 6}, 2));
@@ -7122,10 +7109,8 @@ namespace SolarShading {
                                             IntBeamAbsByShadFac(BackSurfNum) = BOverlap * ABlBack / Surface(BackSurfNum).Area;
 
                                         } // End of check if between-glass blind is on back window
-
-                                    } // End of check if blind is on back window
-
-                                    if (ShadeFlagBack == ExtScreenOn) {
+                                    // End of check if blind is on back window
+                                    } else if (ShadeFlagBack == WinShadingType::ExtScreen) {
 
                                         // Interior beam absorptance of GLASS LAYERS of exterior back window with EXTERIOR SCREEN
                                         int ScNumBack = SurfWinScreenNumber(BackSurfNum); // Back surface screen number
@@ -7161,7 +7146,7 @@ namespace SolarShading {
 
                                     // Interior beam absorptance of glass layers of back exterior window with SWITCHABLE GLAZING
 
-                                    if (ShadeFlagBack == SwitchableGlazing && Surface(BackSurfNum).ExtBoundCond == 0) {
+                                    if (ShadeFlagBack == WinShadingType::SwitchableGlazing && Surface(BackSurfNum).ExtBoundCond == 0) {
                                         Real64 SwitchFac = SurfWinSwitchingFactor(SurfNum); // Switching factor for a window
                                         Real64 AbsBeamWinSh;  // Glass layer beam solar absorptance of a shaded window
                                         for (int Lay = 1; Lay <= NBackGlass; ++Lay) {
@@ -7564,7 +7549,7 @@ namespace SolarShading {
 
                     if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
 
-                        int ShadeFlag = SurfWinShadingFlag(SurfNum);
+                        WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum);
                         int ShelfNum = Surface(SurfNum).Shelf;
                         int OutShelfSurf = 0;
                         if (ShelfNum > 0) { // Outside daylighting shelf
@@ -7627,7 +7612,7 @@ namespace SolarShading {
                             SurfWinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
                             SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                             SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                            if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
+                            if (ANY_BLIND(ShadeFlag)) {
                                 if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
                                     SurfWinDifSolar(SurfNum) = SkySolarInc * WinTransDifSolarSky(SurfNum) + GndSolarInc * WinTransDifSolarGnd(SurfNum);
                                     SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * state.dataGlobal->TimeStepZoneSec;
@@ -8175,7 +8160,7 @@ namespace SolarShading {
         // Certain operations performed only if reveal status not yet set.
         int RevealStatus; // Status of the reveal, takes the parameter values above
 
-        // FLOW:
+
         RevealStatus = None;
         RevealStatusSet = false;
 
@@ -8672,7 +8657,7 @@ namespace SolarShading {
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
                 SurfWinExtIntShadePrevTS(ISurf) = SurfWinShadingFlag(ISurf);
 
-                SurfWinShadingFlag(ISurf) = NoShade;
+                SurfWinShadingFlag(ISurf) = WinShadingType::NoShade;
                 SurfWinFracTimeShadingDeviceOn(ISurf) = 0.0;
                 if (SurfWinWindowModelType(ISurf) == WindowEQLModel) {
                     int EQLNum = state.dataConstruction->Construct(Surface(ISurf).Construction).EQLConsPtr;
@@ -8694,10 +8679,14 @@ namespace SolarShading {
                         const int LayPtr = construction.LayerPoint(Lay);
                         auto &material(state.dataMaterial->Material(LayPtr));
                         const bool isShading = material.Group == ComplexWindowShade;
-                        if (isShading && Lay == 1) SurfWinShadingFlag(ISurf) = ExtShadeOn;
-                        if (isShading && Lay == TotLayers) SurfWinShadingFlag(ISurf) = IntShadeOn;
+                        if (isShading && Lay == 1) {
+                            SurfWinShadingFlag(ISurf) = WinShadingType::ExtShade;
+                        }
+                        if (isShading && Lay == TotLayers) {
+                            SurfWinShadingFlag(ISurf) = WinShadingType::IntShade;
+                        }
                     }
-                    if (SurfWinShadingFlag(ISurf) == IntShadeOn) {
+                    if (SurfWinShadingFlag(ISurf) == WinShadingType::IntShade) {
                         auto &construction(state.dataConstruction->Construct(Surface(ISurf).Construction));
                         const int TotLay = construction.TotLayers;
                         int ShadingLayerPtr = construction.LayerPoint(TotLay);
@@ -8745,36 +8734,10 @@ namespace SolarShading {
                     Surface(ISurf).activeStormWinShadedConstruction = Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
                 }
                 int IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
-
-                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
-                SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
-
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
                 Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
                 Real64 SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2; // Second control setpoint
-
-
-                // ShType = NoShade           ! =-1 (see DataHeatBalance)
-                // ShType = ShadeOff          ! =0
-                int ShType;
-                // 1 = interior shade is on,
-                // 2 = glass is switched to dark state,
-                // 3 = exterior shade is on,
-                // 4 = exterior screen is on,
-                // 6 = interior blind is on,
-                // 7 = exterior blind is on,
-                // 8 = between-glass shade is on,
-                // 9 = between-glass blind is on.
-                //  CHARACTER(len=32)  :: ShadingType     ! Type of shading (interior shade, interior blind, etc.)
-                if (ShadingType == WSC_ST_InteriorShade) ShType = IntShadeOn;            // =1
-                if (ShadingType == WSC_ST_SwitchableGlazing) ShType = SwitchableGlazing; // =2
-                if (ShadingType == WSC_ST_ExteriorShade) ShType = ExtShadeOn;            // =3
-                if (ShadingType == WSC_ST_ExteriorScreen) ShType = ExtScreenOn;          // =4
-                if (ShadingType == WSC_ST_InteriorBlind) ShType = IntBlindOn;            // =6
-                if (ShadingType == WSC_ST_ExteriorBlind) ShType = ExtBlindOn;            // =7
-                if (ShadingType == WSC_ST_BetweenGlassShade) ShType = BGShadeOn;         // =8
-                if (ShadingType == WSC_ST_BetweenGlassBlind) ShType = BGBlindOn;         // =9
 
                 bool SchedAllowsControl = true; // True if control schedule is not specified or is specified and schedule value = 1
                 int SchedulePtr = WindowShadingControl(IShadingCtrl).Schedule;
@@ -8802,195 +8765,226 @@ namespace SolarShading {
                 // Determine whether to deploy shading depending on type of control
 
 
-                auto const SELECT_CASE_var(WindowShadingControl(IShadingCtrl).ShadingControlType);
-
-                if (SELECT_CASE_var == WSCT_AlwaysOn) { // 'ALWAYSON'
-                    SurfWinShadingFlag(ISurf) = ShType;
-
-                } else if (SELECT_CASE_var == WSCT_AlwaysOff) { // 'ALWAYSOFF'
-                    SurfWinShadingFlag(ISurf) = ShadeOff;
-
-                } else if (SELECT_CASE_var == WSCT_OnIfScheduled) { // 'ONIFSCHEDULEALLOWS'
-                    if (SchedAllowsControl) SurfWinShadingFlag(ISurf) = ShType;
-
-                } else if (SELECT_CASE_var == WSCT_HiSolar) {
-                    // 'ONIFHIGHSOLARONWINDOW'  ! Direct plus diffuse solar intensity on window
-                    if (state.dataEnvrn->SunIsUp) {
-                        if (SolarOnWindow > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_HiHorzSolar) {
-                    // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
-                    if (state.dataEnvrn->SunIsUp) {
-                        if (HorizSolar > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_HiOutAirTemp) { // 'OnIfHighOutdoorAirTemperature'
-                    if (Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_HiZoneAirTemp) {
-                    // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
-                    if (MAT(IZone) > SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnHiOutTemp_HiSolarWindow) {
-                    // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
-                    if (state.dataEnvrn->SunIsUp) {
-                        if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 &&
-                            SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnHiOutTemp_HiHorzSolar) {
-                    // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
-                    if (state.dataEnvrn->SunIsUp) {
-                        if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 &&
-                            SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnHiZoneTemp_HiSolarWindow) {
-                    // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
-                    if (state.dataEnvrn->SunIsUp) {
-                        if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var ==  WSCT_OnHiZoneTemp_HiHorzSolar) {
-                    // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
-                    if (state.dataEnvrn->SunIsUp) {
-                        if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_HiZoneCooling) {
-                    // 'ONIFHIGHZONECOOLING'  ! Previous time step zone sensible cooling rate [W]
-                    // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
-                    // used in other CASEs) are not allocated at this point for the first time step of the simulation.
-                    if (!state.dataGlobal->BeginSimFlag) {
-                        if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_HiGlare) {
-                    // 'ONIFHIGHGLARE'  ! Daylight glare index at first reference point in the zone.
-                    // This type of shading control is done in DayltgInteriorIllum. Glare control is not affected
-                    // by control schedule.
-                    if (state.dataEnvrn->SunIsUp) SurfWinShadingFlag(ISurf) = 10 * ShType;
-
-                } else if (SELECT_CASE_var == WSCT_MeetDaylIlumSetp) {
-                    // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
-                    // Only switchable glazing does daylight illuminance control
-                    if (state.dataEnvrn->SunIsUp && SchedAllowsControl) SurfWinShadingFlag(ISurf) = GlassConditionallyLightened;
-
-                } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OffDay) { // 'OnNightIfLowOutdoorTempAndOffDay'
-                    if (!state.dataEnvrn->SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnNightLoInTemp_OffDay) { // 'OnNightIfLowInsideTempAndOffDay')
-                    if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
-                        SurfWinShadingFlag(ISurf) = ShType;
-                    } else if (GlareControlIsActive) {
-                        SurfWinShadingFlag(ISurf) = 10 * ShType;
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnNightIfHeating_OffDay) { // 'OnNightIfHeatingAndOffDay'
-                    if (!state.dataGlobal->BeginSimFlag) {
-                        if (!state.dataEnvrn->SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
-                        }
-                    }
-
-                } else if (SELECT_CASE_var == WSCT_OnNightLoOutTemp_OnDayCooling) {
-                    // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
-                    if (!state.dataGlobal->BeginSimFlag) {
-                        if (!state.dataEnvrn->SunIsUp) { // Night
-                            if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
-                                SurfWinShadingFlag(ISurf) = ShType;
-                        } else { // Day
-                            if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                                SurfWinShadingFlag(ISurf) = ShType;
+                bool shadingOn = false;
+                bool shadingOffButGlareControlOn = false;
+                switch (WindowShadingControl(IShadingCtrl).ShadingControlType) {
+                    case WindowShadingControlType::AlwaysOn: // 'ALWAYSON'
+                        shadingOn = true;
+                        break;
+                    case WindowShadingControlType::AlwaysOff: // 'ALWAYSOFF'
+                        break;
+                    case WindowShadingControlType::OnIfScheduled: // 'ONIFSCHEDULEALLOWS'
+                        if (SchedAllowsControl) shadingOn = true;
+                        break;
+                    case WindowShadingControlType::HiSolar: // 'ONIFHIGHSOLARONWINDOW'
+                        // ! Direct plus diffuse solar intensity on window
+                        if (state.dataEnvrn->SunIsUp) {
+                            if (SolarOnWindow > SetPoint && SchedAllowsControl) {
+                                shadingOn = true;
                             } else if (GlareControlIsActive) {
-                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                                shadingOffButGlareControlOn = true;
                             }
                         }
-                    }
+                        break;
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OnNightIfHeating_OnDayCooling) { // 'OnNightIfHeatingAndOnDayIfCooling'
-                    if (!state.dataGlobal->BeginSimFlag) {
-                        if (!state.dataEnvrn->SunIsUp) { // Night
-                            if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
-                                SurfWinShadingFlag(ISurf) = ShType;
-                        } else { // Day
-                            if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                                SurfWinShadingFlag(ISurf) = ShType;
+                    case WindowShadingControlType::HiHorzSolar: // 'ONIFHIGHHORIZONTALSOLAR'  ! Direct plus diffuse exterior horizontal solar intensity
+                        if (state.dataEnvrn->SunIsUp) {
+                            if (HorizSolar > SetPoint && SchedAllowsControl) {
+                                shadingOn = true;
                             } else if (GlareControlIsActive) {
-                                SurfWinShadingFlag(ISurf) = 10 * ShType;
+                                shadingOffButGlareControlOn = true;
                             }
                         }
-                    }
+                        break;
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OffNight_OnDay_HiSolarWindow) { // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
-                    if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                            if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
+                    case WindowShadingControlType::HiOutAirTemp: // 'OnIfHighOutdoorAirTemperature'
+                        if (Surface(ISurf).OutDryBulbTemp > SetPoint && SchedAllowsControl) {
+                            shadingOn = true;
                         } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            shadingOffButGlareControlOn = true;
                         }
-                    }
+                        break;
 
-                } else if (SELECT_CASE_var ==
-                           WSCT_OnNight_OnDay_HiSolarWindow) { // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
-                    if (!state.dataGlobal->BeginSimFlag) {
-                        if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
-                            if (SolarOnWindow > SetPoint) SurfWinShadingFlag(ISurf) = ShType;
-                        } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
-                            SurfWinShadingFlag(ISurf) = ShType;
+                    case WindowShadingControlType::HiZoneAirTemp: // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
+                        if (MAT(IZone) > SetPoint && SchedAllowsControl) {
+                            shadingOn = true;
                         } else if (GlareControlIsActive) {
-                            SurfWinShadingFlag(ISurf) = 10 * ShType;
+                            shadingOffButGlareControlOn = true;
                         }
+                        break;
+
+                    case WindowShadingControlType::OnHiOutTemp_HiSolarWindow: // 'OnIfHighOutdoorAirTempAndHighSolarOnWindow'  ! Outside air temp and solar on window
+                        if (state.dataEnvrn->SunIsUp) {
+                            if (Surface(ISurf).OutDryBulbTemp > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnHiOutTemp_HiHorzSolar: // 'OnIfHighOutdoorAirTempAndHighHorizontalSolar'  ! Outside air temp and horizontal solar
+                        if (state.dataEnvrn->SunIsUp) {
+                            if (Surface(ISurf).OutDryBulbTemp > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnHiZoneTemp_HiSolarWindow: // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
+                        if (state.dataEnvrn->SunIsUp) {
+                            if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnHiZoneTemp_HiHorzSolar: // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
+                        if (state.dataEnvrn->SunIsUp) {
+                            if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::HiZoneCooling:
+                        // 'ONIFHIGHZONECOOLING'  ! Previous time step zone sensible cooling rate [W]
+                        // In the following, the check on BeginSimFlag is needed since SNLoadCoolRate (and SNLoadHeatRate,
+                        // used in other CASEs) are not allocated at this point for the first time step of the simulation.
+                        if (!state.dataGlobal->BeginSimFlag) {
+                            if (SNLoadCoolRate(IZone) > SetPoint && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::HiGlare:
+                        // 'ONIFHIGHGLARE'  ! Daylight glare index at first reference point in the zone.
+                        // This type of shading control is done in DayltgInteriorIllum. Glare control is not affected
+                        // by control schedule.
+                        if (state.dataEnvrn->SunIsUp) {
+                            shadingOffButGlareControlOn = true;
+                        }
+                        break;
+
+                    case WindowShadingControlType::MeetDaylIlumSetp:
+                        // 'MEETDAYLIGHTILLUMINANCESETPOINT')  !  Daylight illuminance test is done in DayltgInteriorIllum
+                        // Only switchable glazing does daylight illuminance control
+                        if (state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                            shadingOffButGlareControlOn = true;
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnNightLoOutTemp_OffDay: // 'OnNightIfLowOutdoorTempAndOffDay'
+                        if (!state.dataEnvrn->SunIsUp && Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl) {
+                            shadingOn = true;
+                        } else if (GlareControlIsActive) {
+                            shadingOffButGlareControlOn = true;
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnNightLoInTemp_OffDay: // 'OnNightIfLowInsideTempAndOffDay')
+                        if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
+                            shadingOn = true;
+                        } else if (GlareControlIsActive) {
+                            shadingOffButGlareControlOn = true;
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnNightIfHeating_OffDay: // 'OnNightIfHeatingAndOffDay'
+                        if (!state.dataGlobal->BeginSimFlag) {
+                            if (!state.dataEnvrn->SunIsUp && SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnNightLoOutTemp_OnDayCooling: // 'OnNightIfLowOutdoorTempAndOnDayIfCooling'
+                        if (!state.dataGlobal->BeginSimFlag) {
+                            if (!state.dataEnvrn->SunIsUp) { // Night
+                                if (Surface(ISurf).OutDryBulbTemp < SetPoint && SchedAllowsControl)
+                                    shadingOn = true;
+                            } else { // Day
+                                if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                    shadingOn = true;
+                                } else if (GlareControlIsActive) {
+                                    shadingOffButGlareControlOn = true;
+                                }
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnNightIfHeating_OnDayCooling: // 'OnNightIfHeatingAndOnDayIfCooling'
+                        if (!state.dataGlobal->BeginSimFlag) {
+                            if (!state.dataEnvrn->SunIsUp) { // Night
+                                if (SNLoadHeatRate(IZone) > SetPoint && SchedAllowsControl)
+                                    shadingOn = true;
+                            } else { // Day
+                                if (SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                    shadingOn = true;
+                                } else if (GlareControlIsActive) {
+                                    shadingOffButGlareControlOn = true;
+                                }
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OffNight_OnDay_HiSolarWindow: // 'OffNightAndOnDayIfCoolingAndHighSolarOnWindow'
+                        if (!state.dataGlobal->BeginSimFlag) {
+                            if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                if (SolarOnWindow > SetPoint) shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+
+                    case WindowShadingControlType::OnNight_OnDay_HiSolarWindow: // 'OnNightAndOnDayIfCoolingAndHighSolarOnWindow'
+                        if (!state.dataGlobal->BeginSimFlag) {
+                            if (state.dataEnvrn->SunIsUp && SNLoadCoolRate(IZone) > 0.0 && SchedAllowsControl) {
+                                if (SolarOnWindow > SetPoint) shadingOn = true;
+                            } else if (!state.dataEnvrn->SunIsUp && SchedAllowsControl) {
+                                shadingOn = true;
+                            } else if (GlareControlIsActive) {
+                                shadingOffButGlareControlOn = true;
+                            }
+                        }
+                        break;
+                    default:
+                        ShowWarningError(state, "Invalid Selection of Window Shading Control Type for Surface " +
+                                                Surface(ISurf).Name);
+                }
+
+                WinShadingType ShType = WindowShadingControl(IShadingCtrl).ShadingType;
+
+                SurfWinShadingFlag(ISurf) = WinShadingType::ShadeOff; // Initialize shading flag to off
+
+                if (IS_SHADED(ShType)) {
+                    if (shadingOn) {
+                        SurfWinShadingFlag(ISurf) = ShType;
+                    } else if (shadingOffButGlareControlOn) {
+                        if (ShType == WinShadingType::SwitchableGlazing) SurfWinShadingFlag(ISurf) = WinShadingType::GlassConditionallyLightened;
+                        else if (ShType == WinShadingType::IntShade) SurfWinShadingFlag(ISurf) = WinShadingType::IntShadeConditionallyOff;
+                        else if (ShType == WinShadingType::ExtShade) SurfWinShadingFlag(ISurf) = WinShadingType::ExtShadeConditionallyOff;
+                        else if (ShType == WinShadingType::IntBlind) SurfWinShadingFlag(ISurf) = WinShadingType::IntBlindConditionallyOff;
+                        else if (ShType == WinShadingType::ExtBlind) SurfWinShadingFlag(ISurf) = WinShadingType::ExtBlindConditionallyOff;
+                        else if (ShType == WinShadingType::BGShade) SurfWinShadingFlag(ISurf) = WinShadingType::BGShadeConditionallyOff;
+                        else if (ShType == WinShadingType::BGBlind) SurfWinShadingFlag(ISurf) = WinShadingType::BGBlindConditionallyOff;
                     }
                 }
 
                 // Set switching factor to fully switched if ShadingFlag = 2
-                if (SurfWinShadingFlag(ISurf) == SwitchableGlazing) {
+                if (SurfWinShadingFlag(ISurf) == WinShadingType::SwitchableGlazing) {
                     SurfWinSwitchingFactor(ISurf) = 1.0;
 
                     // Added TH 1/20/2010
@@ -9005,9 +8999,10 @@ namespace SolarShading {
                 SurfWinSlatAngThisTS(ISurf) = 0.0;
                 SurfWinSlatAngThisTSDeg(ISurf) = 0.0;
                 SurfWinSlatsBlockBeam(ISurf) = false;
-                if (SurfWinShadingFlag(ISurf) == IntBlindOn || SurfWinShadingFlag(ISurf) == 10 * IntBlindOn ||
-                    SurfWinShadingFlag(ISurf) == ExtBlindOn || SurfWinShadingFlag(ISurf) == 10 * ExtBlindOn ||
-                    SurfWinShadingFlag(ISurf) == BGBlindOn || SurfWinShadingFlag(ISurf) == 10 * BGBlindOn) {
+                if (ANY_BLIND(SurfWinShadingFlag(ISurf)) ||
+                    SurfWinShadingFlag(ISurf) == WinShadingType::IntBlindConditionallyOff ||
+                    SurfWinShadingFlag(ISurf) == WinShadingType::ExtBlindConditionallyOff ||
+                    SurfWinShadingFlag(ISurf) == WinShadingType::BGBlindConditionallyOff) {
                     // Blind in place or may be in place due to glare control
                     int BlNum = SurfWinBlindNumber(ISurf);
                     if (BlNum > 0) {
@@ -9138,17 +9133,66 @@ namespace SolarShading {
                 } // End of check if interior or exterior blind in place
 
                 //   CALL CalcScreenTransmittance to intialized all screens prior to HB calc's
-                if (SurfWinShadingFlag(ISurf) == ExtScreenOn && state.dataEnvrn->SunIsUp) {
+                if (SurfWinShadingFlag(ISurf) == WinShadingType::ExtScreen && state.dataEnvrn->SunIsUp) {
                     CalcScreenTransmittance(state, ISurf);
                 }
 
                 // EMS Actuator Point: override setting if ems flag on
                 if (SurfWinShadingFlagEMSOn(ISurf)) {
-                    SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMSValue(ISurf);
+                    WinShadingType SurfWinShadingFlagEMS = findValueInEnumeration(SurfWinShadingFlagEMSValue(ISurf));
+                    if (SurfWinShadingFlagEMS != WinShadingType::INVALID) {
+                        SurfWinShadingFlag(ISurf) = SurfWinShadingFlagEMS;
+                    } else {
+                        ShowWarningError(state, "Invalid EMS value of Window Shading Control Type for Surface " +
+                                                Surface(ISurf).Name);
+                    }
                 }
-
             } // End of surface loop
         }
+    }
+
+    DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue) {
+        // This is a workaround to translate EMS Shading control numerical values
+        // EMS control of window shading devices involves setting the control values for shading control actuators with
+        // one of these values.  The variable names can be used or replaced, it is the whole number values that trigger
+        // changes in the modeling.
+        // Shades and Blinds are either fully on or fully off, partial positions require multiple windows.
+        // the window shading control flag values follow
+        // -1: if window has no shading device
+        // 0: if shading device is off
+        // 1: if interior shade is on
+        // 2: if glazing is switched to darker state
+        // 3: if exterior shade is on
+        // 4: if exterior screen is on
+        // 6: if interior blind is on
+        // 7: if exterior blind is on
+        // 8: if between-glass shade is on
+        // 9: if between-glass blind is on
+        // 10: window has interior shade that is off but may be triggered on later to control daylight glare
+        // 20: window has switchable glazing that is unswitched but may be switched later to control daylight glare or daylight illuminance
+        // 30: window has exterior shade that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 60: window has interior blind that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 70: window has exterior blind that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 80: window has between-glass shade that is off but may be triggered on later to control daylight glare or daylight illuminance
+        // 90: window has between-glass blind that is off but may be triggered on later to control daylight glare or daylight illuminance
+        if (controlValue == -1.0) return WinShadingType::NoShade;
+        if (controlValue == 0.0) return WinShadingType::ShadeOff;
+        if (controlValue == 1.0) return WinShadingType::IntShade;
+        if (controlValue == 2.0) return WinShadingType::SwitchableGlazing;
+        if (controlValue == 3.0) return WinShadingType::ExtShade;
+        if (controlValue == 4.0) return WinShadingType::ExtScreen;
+        if (controlValue == 6.0) return WinShadingType::IntBlind;
+        if (controlValue == 7.0) return WinShadingType::ExtBlind;
+        if (controlValue == 8.0) return WinShadingType::BGShade;
+        if (controlValue == 9.0) return WinShadingType::BGBlind;
+        if (controlValue == 10.0) return WinShadingType::IntShadeConditionallyOff;
+        if (controlValue == 20.0) return WinShadingType::GlassConditionallyLightened;
+        if (controlValue == 30.0) return WinShadingType::ExtShadeConditionallyOff;
+        if (controlValue == 60.0) return WinShadingType::IntBlindConditionallyOff;
+        if (controlValue == 70.0) return WinShadingType::ExtBlindConditionallyOff;
+        if (controlValue == 80.0) return WinShadingType::BGShadeConditionallyOff;
+        if (controlValue == 90.0) return WinShadingType::BGBlindConditionallyOff;
+        return WinShadingType::INVALID;
     }
 
     int selectActiveWindowShadingControlIndex(EnergyPlusData &state, int curSurface)
@@ -9289,7 +9333,7 @@ namespace SolarShading {
         //                                                           ! sky on surface, without shading
         // INTEGER iHour,iTS
 
-        // FLOW:
+
 
         // Initialize Surfaces Arrays
         state.dataSolarShading->SAREA = 0.0;
@@ -9868,7 +9912,7 @@ namespace SolarShading {
         //  outside reveal surface (m2)
         Real64 BmSolRefldInsReveal; // Multiplied by beam solar gives beam solar reflected by horiz or vertical
         //  inside reveal surface (m2)
-        int ShadeFlag;     // Shading flag
+        WinShadingType ShadeFlag;     // Shading flag
         int FrameDivNum;   // Frame/Divider number
         Real64 FrameWidth; // Frame width (m)
         Real64 P1;         // Frame outside/inside projection plus half of glazing thickness (m)
@@ -9922,7 +9966,7 @@ namespace SolarShading {
                 if (SurfWinInsideSillDepth(SurfNum) < SurfWinInsideReveal(SurfNum)) continue;
 
                 ShadeFlag = SurfWinShadingFlag(SurfNum);
-                if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn) continue;
+                if (BITF_TEST_ANY(BITF(ShadeFlag), BITF(WinShadingType::ExtShade) | BITF(WinShadingType::ExtBlind))) continue;
 
                 if (CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) continue;
 
@@ -10177,12 +10221,12 @@ namespace SolarShading {
                     // Quantities related to inside reveal; inside reveal reflection/absorption is assumed
                     // to occur only if an interior shade or blind is not in place.
 
-                    if (ShadeFlag <= 0 || ShadeFlag == SwitchableGlazing) {
+                    if (NOT_SHADED(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
 
                         if (A2ill > 1.0e-6) {
 
                             DiffReflGlass = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
-                            if (ShadeFlag == SwitchableGlazing) {
+                            if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                                 SolTransGlassSh = POLYF(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum),
                                                         state.dataConstruction->Construct(ConstrNumSh).TransSolBeamCoef);
                                 SolTransGlass = InterpSw(SurfWinSwitchingFactor(SurfNum), SolTransGlass,
@@ -10517,18 +10561,16 @@ namespace SolarShading {
                     Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
                     //  of incident radiation remaining after reflected portion is
                     //  removed that is absorbed
-                    if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
-                        WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                    if (ANY_SHADE(WindowShadingControl(WinShadeCtrlNum).ShadingType)) {
                         int ConstrNumSh = Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
                         int TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 
 
-                        if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade) {
+                        if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::IntShade) {
                             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(TotLay); // Interior shade
-                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade) {
+                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::ExtShade) {
                             MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(1); // Exterior shade
-                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
+                        } else if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WinShadingType::BGShade) {
                             if (state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers == 2) {
                                 // Double pane with between-glass shade
                                 MatNumSh = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(3);
@@ -10765,10 +10807,10 @@ namespace SolarShading {
                             ConstrNumSh = Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
                         }
                         int TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
-                        int ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);
+                        WinShadingType ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);
 
                         if (SurfWinWindowModelType(HeatTransSurfNum) != WindowEQLModel) {
-                            if (ShadeFlag <= 0) { // No window shading
+                            if (NOT_SHADED(ShadeFlag)) { // No window shading
                                 // Init accumulator for transmittance calc below
                                 DifSolarAbsW = 0.0;
 
@@ -10859,93 +10901,7 @@ namespace SolarShading {
                                 // Accumulate transmitted diffuse solar for reporting
                                 SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
 
-                            } else if (ConstrNumSh != 0 && (ShadeFlag == IntShadeOn || ShadeFlag >= 3)) {
-                                // Interior, exterior or between-glass shade, screen or blind in place
-
-                                // Init accumulator for transmittance calc below
-                                DifSolarAbsW = 0.0;
-                                WinDifSolLayAbsW = 0.0;
-
-                                // First calc diffuse solar absorbed by each glass layer in this window with shade/blind in place
-                                auto const &construct_sh(state.dataConstruction->Construct(ConstrNumSh));
-                                auto const &construct_sh_AbsDiffBack(construct_sh.AbsDiffBack);
-                                auto const &construct_sh_BlAbsDiffBack(construct_sh.BlAbsDiffBack);
-                                for (int IGlass = 1; IGlass <= construct_sh.TotGlassLayers; ++IGlass) {
-                                    if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
-                                        // Calc diffuse solar absorbed in each window glass layer and shade
-                                        WinDifSolLayAbsW = WinDifSolarTrans_Factor * construct_sh_AbsDiffBack(IGlass);
-                                    }
-
-                                    if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                                        BlAbsDiffBk = InterpSlatAng(HTsurf_slat_ang, HTsurf_movable_slats, construct_sh_BlAbsDiffBack(_, IGlass));
-                                        // Calc diffuse solar absorbed in each window glass layer and shade
-                                        WinDifSolLayAbsW = WinDifSolarTrans_Factor * BlAbsDiffBk;
-                                    }
-
-                                    // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
-                                    DifSolarAbsW += WinDifSolLayAbsW;
-
-                                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-//                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
-//                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
-
-                                    // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                                    SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
-                                }
-
-                                // Next calc diffuse solar reflected back to zone from window with shade or blind on
-                                // Diffuse back solar reflectance, bare glass or shade on
-                                InsideDifReflectance = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
-                                if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn) {
-                                    // Diffuse back solar reflectance, blind present, vs. slat angle
-                                    InsideDifReflectance =
-                                            InterpSlatAng(HTsurf_slat_ang, HTsurf_movable_slats, state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack);
-                                }
-                                DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
-
-                                // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                                InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
-
-                                // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-//                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
-//                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
-
-                                // Now calc diffuse solar absorbed by shade/blind itself
-                                BlNum = SurfWinBlindNumber(HeatTransSurfNum);
-                                if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
-                                    // Calc diffuse solar absorbed by shade or screen [W]
-                                    ShBlDifSolarAbsW = WinDifSolarTrans_Factor * construct_sh.AbsDiffBackShade;
-                                }
-                                if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                                    // Calc diffuse solar absorbed by blind [W]
-                                    AbsDiffBkBl = InterpSlatAng(HTsurf_slat_ang, HTsurf_movable_slats, construct_sh.AbsDiffBackBlind);
-                                    ShBlDifSolarAbsW = WinDifSolarTrans_Factor * AbsDiffBkBl;
-                                }
-                                // Correct for divider shadowing
-                                if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn)
-                                    ShBlDifSolarAbsW *= SurfWinGlazedFrac(HeatTransSurfNum);
-
-                                // Accumulate diffuse solar absorbed  by shade or screen [W/m2] for heat balance calcs
-                                SurfWinInitialDifSolAbsByShade(HeatTransSurfNum) += ShBlDifSolarAbsW * per_HTSurfaceArea;
-
-                                // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
-                                DifSolarAbsW += ShBlDifSolarAbsW;
-
-                                // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-//                                WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW;  // debug
-//                                ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
-
-                                // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
-                                // This is not very effective since it assigns whatever distributed diffuse solar has not been
-                                // absorbed or reflected to transmitted.
-                                DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
-//                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
-//                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
-
-                                // Accumulate transmitted diffuse solar for reporting
-                                SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
-
-                            } else if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
+                            } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                                 // Init accumulator for transmittance calc below
                                 DifSolarAbsW = 0.0;
 
@@ -10990,6 +10946,89 @@ namespace SolarShading {
                                 // Accumulate transmitted diffuse solar for reporting
                                 SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
 
+                            } else if (ConstrNumSh != 0) {
+                                // Interior, exterior or between-glass shade, screen or blind in place
+
+                                // Init accumulator for transmittance calc below
+                                DifSolarAbsW = 0.0;
+                                WinDifSolLayAbsW = 0.0;
+
+                                // First calc diffuse solar absorbed by each glass layer in this window with shade/blind in place
+                                auto const &construct_sh(state.dataConstruction->Construct(ConstrNumSh));
+                                auto const &construct_sh_AbsDiffBack(construct_sh.AbsDiffBack);
+                                auto const &construct_sh_BlAbsDiffBack(construct_sh.BlAbsDiffBack);
+                                for (int IGlass = 1; IGlass <= construct_sh.TotGlassLayers; ++IGlass) {
+                                    if (ANY_SHADE_SCREEN(ShadeFlag)) {
+                                        // Calc diffuse solar absorbed in each window glass layer and shade
+                                        WinDifSolLayAbsW = WinDifSolarTrans_Factor * construct_sh_AbsDiffBack(IGlass);
+                                    } else if (ANY_BLIND(ShadeFlag)) {
+                                        BlAbsDiffBk = InterpSlatAng(HTsurf_slat_ang, HTsurf_movable_slats, construct_sh_BlAbsDiffBack(_, IGlass));
+                                        // Calc diffuse solar absorbed in each window glass layer and shade
+                                        WinDifSolLayAbsW = WinDifSolarTrans_Factor * BlAbsDiffBk;
+                                    }
+
+                                    // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
+                                    DifSolarAbsW += WinDifSolLayAbsW;
+
+                                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+//                                    WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW;  // debug
+//                                    ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
+
+                                    // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
+                                    SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += WinDifSolLayAbsW * per_HTSurfaceArea;
+                                }
+
+                                // Next calc diffuse solar reflected back to zone from window with shade or blind on
+                                // Diffuse back solar reflectance, bare glass or shade on
+                                InsideDifReflectance = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
+                                if (BITF_TEST_ANY(BITF(ShadeFlag), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind))) {
+                                    // Diffuse back solar reflectance, blind present, vs. slat angle
+                                    InsideDifReflectance =
+                                            InterpSlatAng(HTsurf_slat_ang, HTsurf_movable_slats, state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack);
+                                }
+                                DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
+
+                                // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
+                                InitialZoneDifSolReflW(enclosureNum) += DifSolarReflW; // [W]
+
+                                // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+//                                WinDifSolarDistReflectedTotl += DifSolarReflW;  // debug
+//                                ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+
+                                // Now calc diffuse solar absorbed by shade/blind itself
+                                BlNum = SurfWinBlindNumber(HeatTransSurfNum);
+                                if (ANY_SHADE_SCREEN(ShadeFlag)) {
+                                    // Calc diffuse solar absorbed by shade or screen [W]
+                                    ShBlDifSolarAbsW = WinDifSolarTrans_Factor * construct_sh.AbsDiffBackShade;
+                                } else if (ANY_BLIND(ShadeFlag)) {
+                                    // Calc diffuse solar absorbed by blind [W]
+                                    AbsDiffBkBl = InterpSlatAng(HTsurf_slat_ang, HTsurf_movable_slats, construct_sh.AbsDiffBackBlind);
+                                    ShBlDifSolarAbsW = WinDifSolarTrans_Factor * AbsDiffBkBl;
+                                }
+                                // Correct for divider shadowing
+                                if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
+                                    ShBlDifSolarAbsW *= SurfWinGlazedFrac(HeatTransSurfNum);
+                                }
+
+                                // Accumulate diffuse solar absorbed  by shade or screen [W/m2] for heat balance calcs
+                                SurfWinInitialDifSolAbsByShade(HeatTransSurfNum) += ShBlDifSolarAbsW * per_HTSurfaceArea;
+
+                                // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
+                                DifSolarAbsW += ShBlDifSolarAbsW;
+
+                                // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+//                                WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW;  // debug
+//                                ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
+
+                                // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
+                                // This is not very effective since it assigns whatever distributed diffuse solar has not been
+                                // absorbed or reflected to transmitted.
+                                DifSolarTransW = WinDifSolarTrans_Factor - DifSolarAbsW - DifSolarReflW;
+//                                WinDifSolarDistTransmittedTotl += DifSolarTransW;  // debug [W]
+//                                ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+
+                                // Accumulate transmitted diffuse solar for reporting
+                                SurfWinInitialDifSolInTrans(HeatTransSurfNum) += DifSolarTransW * per_HTSurfaceArea;
                             } // End of shading flag check
 
                         } else {
@@ -11098,7 +11137,7 @@ namespace SolarShading {
                         //            IF(ShadeFlag == IntShadeOn) THEN
                         //              MatNumSh = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
                         //              DividerSolAbs = DividerSolAbs * dataMaterial.Material(MatNumSh)%Trans
-                        //            ELSE IF(ShadeFlag == IntBlindOn) THEN
+                        //            ELSE IF(ShadeFlag == WinShadingType::IntBlind) THEN
                         //              DividerSolAbs = DividerSolAbs * InterpSlatAng(SurfaceWindow(HeatTransSurfNum)%SlatAngThisTS, &
                         //                  SurfaceWindow(HeatTransSurfNum)%MovableSlats,Blind(BlNum)%SolBackDiffDiffTrans)
                         //            END IF
@@ -11177,7 +11216,7 @@ namespace SolarShading {
         int ConstrNumSh;             // Shaded construction number
         int IGlass;                  // Glass layer counter
         int TotGlassLayers;          // Number of glass layers in a window construction
-        int ShadeFlag;               // Shading flag
+        WinShadingType ShadeFlag;               // Shading flag
         Real64 AbsInt;               // Tmp var for Inside surface short-wave absorptance
         Real64 MovInsulSchedVal;     // Value of the movable insulation schedule for current time
         Real64 HMovInsul;            // Conductance of movable insulation
@@ -11309,7 +11348,7 @@ namespace SolarShading {
                 TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
                 ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);
 
-                if (ShadeFlag <= 0) { // No window shading
+                if (NOT_SHADED(ShadeFlag)) { // No window shading
                     // Init accumulator for transmittance calc below
                     DifSolarAbsW = 0.0;
 
@@ -11379,94 +11418,7 @@ namespace SolarShading {
                         InitialZoneDifSolReflW(Surface(AdjSurfNum).SolarEnclIndex) += DifSolarTransW; // [W]
                     }
 
-                } else if (ShadeFlag == IntShadeOn || ShadeFlag >= 3) {
-                    // Interior, exterior or between-glass shade, screen or blind in place
-
-                    // Init accumulator for transmittance calc below
-                    DifSolarAbsW = 0.0;
-                    WinDifSolLayAbsW = 0.0;
-
-                    // First calc diffuse solar absorbed by each glass layer in this window with shade/blind in place
-                    for (IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
-                        if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
-                            // Calc diffuse solar absorbed in each window glass layer and shade
-                            WinDifSolLayAbsW = SolarTrans_ViewFactor * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass);
-                        }
-
-                        if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                            BlAbsDiffBk = InterpSlatAng(SurfWinSlatAngThisTS(HeatTransSurfNum),
-                                                        SurfWinMovableSlats(HeatTransSurfNum),
-                                                        state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(_, IGlass));
-                            // Calc diffuse solar absorbed in each window glass layer and shade
-                            WinDifSolLayAbsW = SolarTrans_ViewFactor * BlAbsDiffBk;
-                        }
-
-                        // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
-                        DifSolarAbsW += WinDifSolLayAbsW;
-
-                        // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
-                        SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += (WinDifSolLayAbsW / Surface(HeatTransSurfNum).Area);
-                    }
-                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                    //					WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
-                    //					ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
-
-                    // Next calc diffuse solar reflected back to zone from window with shade or blind on
-                    // Diffuse back solar reflectance, bare glass or shade on
-                    InsideDifReflectance = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
-                    if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn) {
-                        // Diffuse back solar reflectance, blind present, vs. slat angle
-                        InsideDifReflectance = InterpSlatAng(SurfWinSlatAngThisTS(HeatTransSurfNum),
-                                                             SurfWinMovableSlats(HeatTransSurfNum),
-                                                             state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack);
-                    }
-                    DifSolarReflW = SolarTrans_ViewFactor * InsideDifReflectance;
-
-                    // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-                    InitialZoneDifSolReflW_zone += DifSolarReflW; // [W]
-
-                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                    //					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
-                    //					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
-
-                    // Now calc diffuse solar absorbed by shade/blind itself
-                    BlNum = SurfWinBlindNumber(HeatTransSurfNum);
-                    if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) {
-                        // Calc diffuse solar absorbed by shade or screen [W]
-                        ShBlDifSolarAbsW = SolarTrans_ViewFactor * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
-                    }
-                    if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                        // Calc diffuse solar absorbed by blind [W]
-                        AbsDiffBkBl = InterpSlatAng(SurfWinSlatAngThisTS(HeatTransSurfNum),
-                                                    SurfWinMovableSlats(HeatTransSurfNum),
-                                                    state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind);
-                        ShBlDifSolarAbsW = SolarTrans_ViewFactor * AbsDiffBkBl;
-                    }
-                    // Correct for divider shadowing
-                    if (ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn)
-                        ShBlDifSolarAbsW *= SurfWinGlazedFrac(HeatTransSurfNum);
-
-                    // Accumulate diffuse solar absorbed  by shade or screen [W/m2] for heat balance calcs
-                    SurfWinInitialDifSolAbsByShade(HeatTransSurfNum) += (ShBlDifSolarAbsW / Surface(HeatTransSurfNum).Area);
-
-                    // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
-                    DifSolarAbsW += ShBlDifSolarAbsW;
-
-                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-                    //					WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
-                    //					ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
-
-                    // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
-                    // This is not very effective since it assigns whatever distributed diffuse solar has not been
-                    // absorbed or reflected to transmitted.
-                    DifSolarTransW = SolarTrans_ViewFactor - DifSolarAbsW - DifSolarReflW;
-                    //					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
-                    //					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
-
-                    // Accumulate transmitted diffuse solar for reporting
-                    SurfWinInitialDifSolInTrans(HeatTransSurfNum) += (DifSolarTransW / Surface(HeatTransSurfNum).Area);
-
-                } else if (ShadeFlag == SwitchableGlazing) { // Switchable glazing
+                } else if (ShadeFlag == WinShadingType::SwitchableGlazing) { // Switchable glazing
                     // Init accumulator for transmittance calc below
                     DifSolarAbsW = 0.0;
 
@@ -11508,6 +11460,91 @@ namespace SolarShading {
                     // Accumulate transmitted diffuse solar for reporting
                     SurfWinInitialDifSolInTrans(HeatTransSurfNum) += (DifSolarTransW / Surface(HeatTransSurfNum).Area);
 
+                } else {
+                    // Interior, exterior or between-glass shade, screen or blind in place
+
+                    // Init accumulator for transmittance calc below
+                    DifSolarAbsW = 0.0;
+                    WinDifSolLayAbsW = 0.0;
+
+                    // First calc diffuse solar absorbed by each glass layer in this window with shade/blind in place
+                    for (IGlass = 1; IGlass <= state.dataConstruction->Construct(ConstrNumSh).TotGlassLayers; ++IGlass) {
+                        if (ANY_SHADE_SCREEN(ShadeFlag)) {
+                            // Calc diffuse solar absorbed in each window glass layer and shade
+                            WinDifSolLayAbsW = SolarTrans_ViewFactor * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(IGlass);
+                        } else if (ANY_BLIND(ShadeFlag)) {
+                            BlAbsDiffBk = InterpSlatAng(SurfWinSlatAngThisTS(HeatTransSurfNum),
+                                                        SurfWinMovableSlats(HeatTransSurfNum),
+                                                        state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(_, IGlass));
+                            // Calc diffuse solar absorbed in each window glass layer and shade
+                            WinDifSolLayAbsW = SolarTrans_ViewFactor * BlAbsDiffBk;
+                        }
+
+                        // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
+                        DifSolarAbsW += WinDifSolLayAbsW;
+
+                        // Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
+                        SurfWinInitialDifSolwinAbs(IGlass, HeatTransSurfNum) += (WinDifSolLayAbsW / Surface(HeatTransSurfNum).Area);
+                    }
+                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+                    //					WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
+                    //					ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
+
+                    // Next calc diffuse solar reflected back to zone from window with shade or blind on
+                    // Diffuse back solar reflectance, bare glass or shade on
+                    InsideDifReflectance = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
+                    if (BITF_TEST_ANY(BITF(ShadeFlag), BITF(WinShadingType::IntBlind) | BITF(WinShadingType::ExtBlind))) {
+                        // Diffuse back solar reflectance, blind present, vs. slat angle
+                        InsideDifReflectance = InterpSlatAng(SurfWinSlatAngThisTS(HeatTransSurfNum),
+                                                             SurfWinMovableSlats(HeatTransSurfNum),
+                                                             state.dataConstruction->Construct(ConstrNum).BlReflectSolDiffBack);
+                    }
+                    DifSolarReflW = SolarTrans_ViewFactor * InsideDifReflectance;
+
+                    // Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
+                    InitialZoneDifSolReflW_zone += DifSolarReflW; // [W]
+
+                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+                    //					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
+                    //					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+
+                    // Now calc diffuse solar absorbed by shade/blind itself
+                    BlNum = SurfWinBlindNumber(HeatTransSurfNum);
+                    if (ANY_SHADE_SCREEN(ShadeFlag)) {
+                        // Calc diffuse solar absorbed by shade or screen [W]
+                        ShBlDifSolarAbsW = SolarTrans_ViewFactor * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
+                    } else if (ANY_BLIND(ShadeFlag)) {
+                        // Calc diffuse solar absorbed by blind [W]
+                        AbsDiffBkBl = InterpSlatAng(SurfWinSlatAngThisTS(HeatTransSurfNum),
+                                                    SurfWinMovableSlats(HeatTransSurfNum),
+                                                    state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind);
+                        ShBlDifSolarAbsW = SolarTrans_ViewFactor * AbsDiffBkBl;
+                    }
+                    // Correct for divider shadowing
+                    if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(ShadeFlag)) {
+                        ShBlDifSolarAbsW *= SurfWinGlazedFrac(HeatTransSurfNum);
+                    }
+
+                    // Accumulate diffuse solar absorbed  by shade or screen [W/m2] for heat balance calcs
+                    SurfWinInitialDifSolAbsByShade(HeatTransSurfNum) += (ShBlDifSolarAbsW / Surface(HeatTransSurfNum).Area);
+
+                    // Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
+                    DifSolarAbsW += ShBlDifSolarAbsW;
+
+                    // Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+                    //					WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
+                    //					ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
+
+                    // Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
+                    // This is not very effective since it assigns whatever distributed diffuse solar has not been
+                    // absorbed or reflected to transmitted.
+                    DifSolarTransW = SolarTrans_ViewFactor - DifSolarAbsW - DifSolarReflW;
+                    //					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+                    //					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+
+                    // Accumulate transmitted diffuse solar for reporting
+                    SurfWinInitialDifSolInTrans(HeatTransSurfNum) += (DifSolarTransW / Surface(HeatTransSurfNum).Area);
+
                 } // End of shading flag check
 
                 // HERE 8/14/07 Ignore absorptance and reflectance of Frames and Dividers for now.
@@ -11532,7 +11569,7 @@ namespace SolarShading {
                 //            IF(ShadeFlag == IntShadeOn) THEN
                 //              MatNumSh = Construct(ConstrNumSh)%LayerPoint(Construct(ConstrNumSh)%TotLayers)
                 //              DividerSolAbs = DividerSolAbs * dataMaterial.Material(MatNumSh)%Trans
-                //            ELSE IF(ShadeFlag == IntBlindOn) THEN
+                //            ELSE IF(ShadeFlag == WinShadingType::IntBlind) THEN
                 //              DividerSolAbs = DividerSolAbs * InterpSlatAng(SurfaceWindow(HeatTransSurfNum)%SlatAngThisTS, &
                 //                  SurfaceWindow(HeatTransSurfNum)%MovableSlats,Blind(BlNum)%SolBackDiffDiffTrans)
                 //            END IF
@@ -11624,9 +11661,7 @@ namespace SolarShading {
         }
 
         // This calculates the area stored in XVS and YVS
-        // CALL HTRANS(1,LOCHCA,NVT)
         HTRANS1(state, state.dataSolarShading->LOCHCA, NVT);
-        // HCAREA(LOCHCA) = -HCAREA(LOCHCA)
 
         // Calculation of overlap areas for each outgoing basis direction
         for (IRay = 1; IRay <= Geom.Trn.NBasis; ++IRay) { // basis directions loop (on back surface)
@@ -11670,9 +11705,7 @@ namespace SolarShading {
                 // Transform to the homogeneous coordinate system.
 
                 NS3 = state.dataSolarShading->LOCHCA + 1;
-                // NS3      = LOCHCA
                 state.dataSolarShading->HCT(NS3) = 0.0;
-                // CALL HTRANS(1,NS3,NVT)
                 HTRANS1(state, NS3, NVT);
 
                 // Determine area of overlap of projected back surface and receiving surface.

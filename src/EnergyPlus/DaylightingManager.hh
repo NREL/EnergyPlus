@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,7 +110,7 @@ namespace DaylightingManager {
                                                   int &LSHCAL,      // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
                                                   int &InShelfSurf, // Inside daylighting shelf surface number
                                                   int &ICtrl,       // Window control counter
-                                                  int &ShType,      // Window shading type
+                                                  DataSurfaces::WinShadingType &ShType,      // Window shading type
                                                   int &BlNum,       // Window blind number
                                                   Vector3<Real64> &WNORM2, // Unit vector normal to window
                                                   DataDaylighting::iExtWinType &ExtWinType,         // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
@@ -257,7 +257,7 @@ namespace DaylightingManager {
         Real64 const TVISB,   // Visible transmittance of window for COSB angle of incidence (times light well efficiency, if appropriate)
         Real64 const DOMEGA,  // Solid angle subtended by window element wrt reference point (steradians)
         int const ICtrl,      // Window control counter
-        int const ShType,     // Window shading type
+        DataSurfaces::WinShadingType const ShType,     // Window shading type
         int const BlNum,      // Window blind number
         Real64 const THRAY,   // Azimuth of ray from reference point to window element (radians)
         Vector3<Real64> const &WNORM2, // Unit vector normal to window
@@ -316,6 +316,8 @@ namespace DaylightingManager {
     void AssociateWindowShadingControlWithDaylighting(EnergyPlusData &state);
 
     void GetLightWellData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
+
+    int findWinShadingStatus(int const IWin);
 
     void DayltgGlare(EnergyPlusData &state,
                      int &IL,        // Reference point index: 1=first ref pt, 2=second ref pt

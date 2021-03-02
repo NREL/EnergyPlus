@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,19 +64,6 @@ struct EnergyPlusData;
 
 namespace PlantManager {
 
-    // MODULE PARAMETER DEFINITIONS
-    extern int const TempSetPt;
-    extern int const FlowSetPt;
-
-    extern bool InitLoopEquip;
-    extern bool GetCompSizFac;
-
-    extern Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
-    extern Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
-    extern Array1D_int DemandSideInletNode;  // Inlet node on the demand side
-
-    void clear_state();
-
     void ManagePlantLoops(EnergyPlusData &state, bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
@@ -122,9 +109,13 @@ namespace PlantManager {
 
 struct PlantMgrData : BaseGlobalStruct {
 
+    bool InitLoopEquip = true;
+    bool GetCompSizFac = true;
+
     void clear_state() override
     {
-
+        this->InitLoopEquip = true;
+        this->GetCompSizFac = true;
     }
 };
 

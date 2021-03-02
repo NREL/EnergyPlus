@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -658,7 +658,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchULnotMetHeatOcc = 0;
     int pdchULnotMetCoolOcc = 0;
 
-    // Outside Air Report
+    // Outdoor Air Report
     int pdrOutsideAir = 0;
     int pdstOAavgOcc = 0;
     int pdchOaoAvgNumOcc1 = 0;
@@ -678,6 +678,82 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int pdchOaoMinAFNInfil = 0;
     int pdchOaoMinSimpVent = 0;
     int pdchOaoMinTotVent = 0;
+
+    // Outdoor Air Details Report
+    int pdrOutsideAirDetails = 0;
+
+    int pdstOAmechVentParByZone = 0;
+    int pdchOaMvAirLpNm = 0;
+    int pdchOaMvAvgNumOcc = 0;
+    int pdchOaMvNomNumOcc = 0;
+    int pdchOaMvZoneVol = 0;
+    int pdchOaMvZoneArea = 0;
+    int pdchOaMvDesZnOa = 0;
+    int pdchOaMvMinDynTrgVent = 0;
+
+    int pdstOAtotAirByZone = 0;
+    int pdchOaTaBzMechVent = 0;
+    int pdchOaTaBzNatVent = 0;
+    int pdchOaTaBzTotVent = 0;
+    int pdchOaTaBzInfil = 0;
+    int pdchOaTaBzTotVentInfil = 0;
+    int pdchOaTaBzDynTrgVent = 0;
+    int pdchOaTaBzTmBelow = 0;
+    int pdchOaTaBzTmAt = 0;
+    int pdchOaTaBzTmAbove = 0;
+    int pdchOaTaBzTmAboveUnocc = 0;
+
+    int pdstOAavgOccByZone = 0;
+    int pdchOaOccBzMechVent = 0;
+    int pdchOaOccBzNatVent = 0;
+    int pdchOaOccBzTotVent = 0;
+    int pdchOaOccBzInfil = 0;
+    int pdchOaOccBzTotVentInfil = 0;
+    int pdchOaOccBzDynTrgVent = 0;
+    int pdchOaOccBzTmBelow = 0;
+    int pdchOaOccBzTmAt = 0;
+    int pdchOaOccBzTmAbove = 0;
+
+    int pdstOAtotAirByLoop = 0;
+    int pdchOaTaAlMechVent = 0;
+    int pdchOaTaAlNatVent = 0;
+    int pdchOaTaAlTotVent = 0;
+    int pdchOaTaAlSumDynTrgVent = 0;
+    int pdchOaTaAlTmBelow = 0;
+    int pdchOaTaAlTmAt = 0;
+    int pdchOaTaAlTmAbove = 0;
+    int pdchOaTaAlTmAboveUnocc = 0;
+
+    int pdstOAavgOccByLoop = 0;
+    int pdchOaOccAlMechVent = 0;
+    int pdchOaOccAlNatVent = 0;
+    int pdchOaOccAlTotVent = 0;
+    int pdchOaOccAlSumDynTrgVent = 0;
+    int pdchOaOccAlTmBelow = 0;
+    int pdchOaOccAlTmAt = 0;
+    int pdchOaOccAlTmAbove = 0;
+
+    int pdstOAtimeFactorsDurOcc = 0;
+    int pdchOaTmFctNoLimit = 0;
+    int pdchOaTmFctHiHumid = 0;
+    int pdchOaTmFctNiteVent = 0;
+    int pdchOaTmFctEcono = 0;
+    int pdchOaTmFctDCV = 0;
+    int pdchOaTmFctExhaust = 0;
+    int pdchOaTmFctLimit = 0;
+    int pdchOaTmFctDemand = 0;
+    int pdchOaTmFctEMS = 0;
+
+    int pdstOAavgFactorsDurOcc = 0;
+    int pdchOaAvFctNoLimit = 0;
+    int pdchOaAvFctHiHumid = 0;
+    int pdchOaAvFctNiteVent = 0;
+    int pdchOaAvFctEcono = 0;
+    int pdchOaAvFctDCV = 0;
+    int pdchOaAvFctExhaust = 0;
+    int pdchOaAvFctLimit = 0;
+    int pdchOaAvFctDemand = 0;
+    int pdchOaAvFctEMS = 0;
 
     // Object Count Report
     int pdrObjCnt = 0;
@@ -1080,10 +1156,29 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
     int sizeShadowRelate = 0;
     int numShadowRelate = 0;
 
+    // Totals for ABUPS report
     Real64 TotalNotMetHeatingOccupiedForABUPS = 0.0;
     Real64 TotalNotMetCoolingOccupiedForABUPS = 0.0;
     Real64 TotalNotMetOccupiedForABUPS = 0.0;
     Real64 TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+
+    // Totals for OA details report
+    Real64 TotalVozMax = 0.0; // total Voz (max of heating and cooling)
+    Real64 TotalAnyZoneBelowVozDynForOA = 0.0; // total time any zone below target Voz-Dyn
+    Real64 TotalAllZonesAtVozDynForOA = 0.0; // total time all zones at target Voz-Dyn
+    Real64 TotalAnyZoneAboveVozDynForOA = 0.0; // total time any zone above target Voz-Dyn
+    Real64 TotalAnyZoneBelowVozDynOccForOA = 0.0; // total time any zone below target Voz-Dyn
+    Real64 TotalAllZonesAtVozDynOccForOA = 0.0; // total time all zones at target Voz-Dyn
+    Real64 TotalAnyZoneAboveVozDynOccForOA = 0.0; // total time any zone above target Voz-Dyn
+    Real64 TotalAnyZoneVentUnoccForOA = 0.0; // total time any zone has ventilation when unoccupied
+
+    Real64 TotalAnyAirLoopBelowVozDynForOA = 0.0; // total time any air loop below target Voz-Dyn
+    Real64 TotalAllAirLoopsAtVozDynForOA = 0.0; // total time all air loops at target Voz-Dyn
+    Real64 TotalAnyAirLoopAboveVozDynForOA = 0.0; // total time any air loop above target Voz-Dyn
+    Real64 TotalAnyAirLoopBelowVozDynOccForOA = 0.0; // total time any air loop below target Voz-Dyn
+    Real64 TotalAllAirLoopsAtVozDynOccForOA = 0.0; // total time all air loops at target Voz-Dyn
+    Real64 TotalAnyAirLoopAboveVozDynOccForOA = 0.0; // total time any air loop above target Voz-Dyn
+    Real64 TotalAnyAirLoopVentUnoccForOA = 0.0; // total time any air loop has ventilation when unoccupied
 
     Array1D<OutputReportPredefined::reportNameType> reportName;
     Array1D<OutputReportPredefined::SubTableType> subTable;
@@ -1503,6 +1598,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->pdchULnotMetCool = 0;
         this->pdchULnotMetHeatOcc = 0;
         this->pdchULnotMetCoolOcc = 0;
+
         this->pdrOutsideAir = 0;
         this->pdstOAavgOcc = 0;
         this->pdchOaoAvgNumOcc1 = 0;
@@ -1522,6 +1618,81 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->pdchOaoMinAFNInfil = 0;
         this->pdchOaoMinSimpVent = 0;
         this->pdchOaoMinTotVent = 0;
+
+        this->pdrOutsideAirDetails = 0;
+        this->pdstOAmechVentParByZone = 0;
+        this->pdchOaMvAirLpNm = 0;
+        this->pdchOaMvAvgNumOcc = 0;
+        this->pdchOaMvNomNumOcc = 0;
+        this->pdchOaMvZoneVol = 0;
+        this->pdchOaMvZoneArea = 0;
+        this->pdchOaMvDesZnOa = 0;
+        this->pdchOaMvMinDynTrgVent = 0;
+
+        this->pdstOAtotAirByZone = 0;
+        this->pdchOaTaBzMechVent = 0;
+        this->pdchOaTaBzNatVent = 0;
+        this->pdchOaTaBzTotVent = 0;
+        this->pdchOaTaBzInfil = 0;
+        this->pdchOaTaBzTotVentInfil = 0;
+        this->pdchOaTaBzDynTrgVent = 0;
+        this->pdchOaTaBzTmBelow = 0;
+        this->pdchOaTaBzTmAt = 0;
+        this->pdchOaTaBzTmAbove = 0;
+        this->pdchOaTaBzTmAboveUnocc = 0;
+
+        this->pdstOAavgOccByZone = 0;
+        this->pdchOaOccBzMechVent = 0;
+        this->pdchOaOccBzNatVent = 0;
+        this->pdchOaOccBzTotVent = 0;
+        this->pdchOaOccBzInfil = 0;
+        this->pdchOaOccBzTotVentInfil = 0;
+        this->pdchOaOccBzDynTrgVent = 0;
+        this->pdchOaOccBzTmBelow = 0;
+        this->pdchOaOccBzTmAt = 0;
+        this->pdchOaOccBzTmAbove = 0;
+
+        this->pdstOAtotAirByLoop = 0;
+        this->pdchOaTaAlMechVent = 0;
+        this->pdchOaTaAlNatVent = 0;
+        this->pdchOaTaAlTotVent = 0;
+        this->pdchOaTaAlSumDynTrgVent = 0;
+        this->pdchOaTaAlTmBelow = 0;
+        this->pdchOaTaAlTmAt = 0;
+        this->pdchOaTaAlTmAbove = 0;
+        this->pdchOaTaAlTmAboveUnocc = 0;
+
+        this->pdstOAavgOccByLoop = 0;
+        this->pdchOaOccAlMechVent = 0;
+        this->pdchOaOccAlNatVent = 0;
+        this->pdchOaOccAlTotVent = 0;
+        this->pdchOaOccAlSumDynTrgVent = 0;
+        this->pdchOaOccAlTmBelow = 0;
+        this->pdchOaOccAlTmAt = 0;
+        this->pdchOaOccAlTmAbove = 0;
+
+        this->pdstOAtimeFactorsDurOcc = 0;
+        this->pdchOaTmFctNoLimit = 0;
+        this->pdchOaTmFctHiHumid = 0;
+        this->pdchOaTmFctNiteVent = 0;
+        this->pdchOaTmFctEcono = 0;
+        this->pdchOaTmFctDCV = 0;
+        this->pdchOaTmFctExhaust = 0;
+        this->pdchOaTmFctLimit = 0;
+        this->pdchOaTmFctDemand = 0;
+        this->pdchOaTmFctEMS = 0;
+
+        this->pdstOAavgFactorsDurOcc = 0;
+        this->pdchOaAvFctNoLimit = 0;
+        this->pdchOaAvFctHiHumid = 0;
+        this->pdchOaAvFctNiteVent = 0;
+        this->pdchOaAvFctEcono = 0;
+        this->pdchOaAvFctDCV = 0;
+        this->pdchOaAvFctExhaust = 0;
+        this->pdchOaAvFctLimit = 0;
+        this->pdchOaAvFctDemand = 0;
+        this->pdchOaAvFctEMS = 0;
+
         this->pdrObjCnt = 0;
         this->pdstSurfCnt = 0;
         this->pdchSurfCntTot = 0;
@@ -1879,6 +2050,21 @@ struct OutputReportPredefinedData : BaseGlobalStruct {
         this->TotalNotMetCoolingOccupiedForABUPS = 0.0;
         this->TotalNotMetOccupiedForABUPS = 0.0;
         this->TotalTimeNotSimpleASH55EitherForABUPS = 0.0;
+        this->TotalVozMax = 0.0;
+        this->TotalAnyZoneBelowVozDynForOA = 0.0;
+        this->TotalAllZonesAtVozDynForOA = 0.0;
+        this->TotalAnyZoneAboveVozDynForOA = 0.0;
+        this->TotalAnyZoneBelowVozDynOccForOA = 0.0;
+        this->TotalAllZonesAtVozDynOccForOA = 0.0;
+        this->TotalAnyZoneAboveVozDynOccForOA = 0.0;
+        this->TotalAnyZoneVentUnoccForOA = 0.0;
+        this->TotalAnyAirLoopBelowVozDynForOA = 0.0;
+        this->TotalAllAirLoopsAtVozDynForOA = 0.0;
+        this->TotalAnyAirLoopAboveVozDynForOA = 0.0;
+        this->TotalAnyAirLoopBelowVozDynOccForOA = 0.0;
+        this->TotalAllAirLoopsAtVozDynOccForOA = 0.0;
+        this->TotalAnyAirLoopAboveVozDynOccForOA = 0.0;
+        this->TotalAnyAirLoopVentUnoccForOA = 0.0;
         this->reportName.deallocate();
         this->subTable.deallocate();
         this->columnTag.deallocate();

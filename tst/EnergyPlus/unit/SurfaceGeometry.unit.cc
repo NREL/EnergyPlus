@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3474,9 +3474,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     WindowShadingControl(1).Name = "TheShadingControl";
     WindowShadingControl(1).ZoneIndex = 57;
     WindowShadingControl(1).SequenceNumber = 3;
-    WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+    WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     WindowShadingControl(1).ShadingDevice = 17;
-    WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
+    WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
     WindowShadingControl(1).Schedule = 83;
     WindowShadingControl(1).SetPoint = 200;
     WindowShadingControl(1).SetPoint2 = 170;
@@ -3546,11 +3546,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_isWindowShadingControlSimilar_Test)
     EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
     WindowShadingControl(2) = WindowShadingControl(1);
 
-    WindowShadingControl(2).ShadingType = WSC_ST_BetweenGlassBlind;
+    WindowShadingControl(2).ShadingType = WinShadingType::BGBlind;
     EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
     WindowShadingControl(2) = WindowShadingControl(1);
 
-    WindowShadingControl(2).ShadingControlType = WSCT_OffNight_OnDay_HiSolarWindow;
+    WindowShadingControl(2).ShadingControlType = WindowShadingControlType::OffNight_OnDay_HiSolarWindow;
     EXPECT_FALSE(isWindowShadingControlSimilar(1, 2));
     WindowShadingControl(2) = WindowShadingControl(1);
 
@@ -3601,9 +3601,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
     WindowShadingControl(1).Name = "TheShadingControl";
     WindowShadingControl(1).ZoneIndex = 57;
     WindowShadingControl(1).SequenceNumber = 3;
-    WindowShadingControl(1).ShadingType = WSC_ST_ExteriorShade;
+    WindowShadingControl(1).ShadingType = WinShadingType::ExtShade;
     WindowShadingControl(1).ShadingDevice = 17;
-    WindowShadingControl(1).ShadingControlType = WSCT_OnIfScheduled;
+    WindowShadingControl(1).ShadingControlType = WindowShadingControlType::OnIfScheduled;
     WindowShadingControl(1).Schedule = 83;
     WindowShadingControl(1).SetPoint = 200;
     WindowShadingControl(1).SetPoint2 = 170;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,6 +61,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -101,12 +102,34 @@ std::unique_ptr<SQLite> CreateSQLiteDatabase(EnergyPlusData &state)
             int numNumbers;
             int status;
 
+            auto &sql_ort(state.dataOutRptTab);
+
             inputProcessor->getObjectItem(state, "Output:SQLite", 1, alphas, numAlphas, numbers, numNumbers, status);
             if (numAlphas > 0) {
                 std::string option = alphas(1);
                 if (UtilityRoutines::SameString(option, "SimpleAndTabular")) {
                     writeTabularDataToSQLite = true;
                     writeOutputToSQLite = true;
+
+                    if (numAlphas > 1) {
+                        std::string option2 = alphas(2);
+                        if (UtilityRoutines::SameString(option2, "None")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::None;
+                        } else if (UtilityRoutines::SameString(option2, "JtoKWH")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoKWH;
+                        } else if (UtilityRoutines::SameString(option2, "JtoMJ")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoMJ;
+                        } else if (UtilityRoutines::SameString(option2, "JtoGJ")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::JtoGJ;
+                        } else if (UtilityRoutines::SameString(option2, "InchPound")) {
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
+                        } else { // (UtilityRoutines::SameString(option2, "UseOutputControlTableStyles")) {
+                            // Jan 2021 Note: Since here we do not know weather sql_ort->unitsStyle has been processed or not,
+                            // the value "NotFound" is used for the option "UseOutputControlTableStyles" at this point; 
+                            // This will be updated again and got concretely assigned first thing in OutputReportTabular::WriteTabularReports().
+                            sql_ort->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::NotFound;  // sql_ort->unitsStyle;
+                        } 
+                    }
                 } else if (UtilityRoutines::SameString(option, "Simple")) {
                     writeOutputToSQLite = true;
                 }

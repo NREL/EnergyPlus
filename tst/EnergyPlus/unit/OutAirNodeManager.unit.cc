@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,8 +64,8 @@ using namespace EnergyPlus::OutAirNodeManager;
 
 TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
 {
-    NumOutsideAirNodes = 3;
-    OutsideAirNodeList.allocate(3);
+    state->dataOutAirNodeMgr->NumOutsideAirNodes = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList.allocate(3);
     DataLoopNode::Node.allocate(3);
     ScheduleManager::Schedule.allocate(2);
 
@@ -77,9 +77,9 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
     ScheduleManager::Schedule(1).CurrentValue = 24.0;
-    OutsideAirNodeList(1) = 1;
-    OutsideAirNodeList(2) = 2;
-    OutsideAirNodeList(3) = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(2) = 2;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(3) = 3;
     // Scheduled value
     DataLoopNode::Node(1).IsLocalNode = true;
     DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;

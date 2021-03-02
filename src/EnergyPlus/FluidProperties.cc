@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -531,7 +531,7 @@ namespace FluidProperties {
         Array1D<PressureSequence> PressurePtr;
         Array1D<FluidData> FluidNames;
 
-        // FLOW:
+
         MaxAlphas = 0;
         MaxNumbers = 0;
         if (inputProcessor->getNumObjectsFound(state, "FluidProperties:Name") > 0) {
@@ -4904,7 +4904,7 @@ CurrentModuleObject,
         int LoopC;         // loop counter for concentration
         int LoopT;         // loop counter for temperature
 
-        // FLOW:
+
         // First, find where the actual concentration falls between the concentration data.
         // Then, interpolate if necessary.
         if (Concentration < RawConcData(1)) { // Concentration too low
@@ -5009,7 +5009,7 @@ CurrentModuleObject,
         int LoopC;         // loop counter for concentration
         int LoopT;         // loop counter for temperature
 
-        // FLOW:
+
         // First, find where the actual concentration falls between the concentration data.
         // Then, interpolate if necessary.
         if (Concentration < RawConcData(1)) { // Concentration too low
@@ -6034,7 +6034,7 @@ CurrentModuleObject,
         // error counters and dummy string
         bool ErrorFlag; // error flag for current call
 
-        // FLOW:
+
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6158,7 +6158,7 @@ CurrentModuleObject,
         // error counters and dummy string
         bool ErrorFlag; // error flag for current call
 
-        // FLOW:
+
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6278,7 +6278,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int RefrigNum; // index for refrigerant under consideration
 
-        // FLOW:
+
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6371,7 +6371,7 @@ CurrentModuleObject,
 
         // error counters and dummy string
 
-        // FLOW:
+
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6520,7 +6520,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int RefrigNum; // index for refrigerant under consideration
 
-        // FLOW:
+
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -6902,7 +6902,7 @@ CurrentModuleObject,
         int CurTempRangeErrCount;     // error counter for current call
         int CurEnthalpyRangeErrCount; // error counter for current call
         int CurSatErrCount;           // error counter for current call
-        // FLOW:
+
 
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -7771,7 +7771,7 @@ CurrentModuleObject,
         bool LowErrorThisTime;
         bool HighErrorThisTime;
 
-        // FLOW:
+
         LowErrorThisTime = false;
         HighErrorThisTime = false;
 
@@ -7941,7 +7941,7 @@ CurrentModuleObject,
         bool LowErrorThisTime;
         bool HighErrorThisTime;
 
-        // FLOW:
+
         LowErrorThisTime = false;
         HighErrorThisTime = false;
 
@@ -8112,7 +8112,7 @@ CurrentModuleObject,
         bool LowErrorThisTime;
         bool HighErrorThisTime;
 
-        // FLOW:
+
         LowErrorThisTime = false;
         HighErrorThisTime = false;
 
@@ -8288,7 +8288,7 @@ CurrentModuleObject,
         static int TempLoRangeErrIndex(0);
         static int TempHiRangeErrIndex(0);
 
-        // FLOW:
+
         if (GetInput) {
             GetFluidPropertiesData(state);
             GetInput = false;
@@ -8393,7 +8393,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found; // Indicator for found item
 
-        // FLOW:
+
         // Make sure we have already read in the input
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -8440,7 +8440,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Found; // Indicator for found item
 
-        // FLOW:
+
         // Make sure we have already read in the input
         if (GetInput) {
             GetFluidPropertiesData(state);
@@ -8508,7 +8508,7 @@ CurrentModuleObject,
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Check to see if this glycol shows up in the glycol data
         //  ArrayLength = SIZE(GlycolData)

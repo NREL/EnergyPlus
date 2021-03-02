@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -236,7 +236,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Load assumed action for underlying function F(X)
         if (SlopeType != iSlopeIncreasing && SlopeType != iSlopeDecreasing) {
@@ -320,7 +320,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Reset min point
         RootFinderData.MinPoint.X = XMin;
@@ -407,7 +407,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SavedXCandidate;
         Real64 XMinReset;
-        // FLOW:
+
 
         XMinReset = XMin;
         if (XMin > XMax) {
@@ -519,7 +519,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Reset status flag
         RootFinderData.StatusFlag = iStatusNone;
@@ -722,7 +722,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Default initialization
         CheckInternalConsistency = iStatusNone;
@@ -870,7 +870,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         if (CheckMinMaxRange(RootFinderData, X) && CheckLowerUpperBracket(RootFinderData, X)) {
             CheckRootFinderCandidate = true;
@@ -924,15 +924,15 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
-        if (RootFinderData.MinPoint.DefinedFlag) { // DSU3 testing
+
+        if (RootFinderData.MinPoint.DefinedFlag) {
             if (X < RootFinderData.MinPoint.X) {
                 CheckMinMaxRange = false;
                 return CheckMinMaxRange;
             }
         }
 
-        if (RootFinderData.MaxPoint.DefinedFlag) { // DSU3 testing
+        if (RootFinderData.MaxPoint.DefinedFlag) {
             if (X > RootFinderData.MaxPoint.X) {
                 CheckMinMaxRange = false;
                 return CheckMinMaxRange;
@@ -988,17 +988,17 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         if (RootFinderData.LowerPoint.DefinedFlag) {
-            if (X < RootFinderData.LowerPoint.X) { // DSU3 test with < instead of <=
+            if (X < RootFinderData.LowerPoint.X) {
                 CheckLowerUpperBracket = false;
                 return CheckLowerUpperBracket;
             }
         }
 
         if (RootFinderData.UpperPoint.DefinedFlag) {
-            if (X > RootFinderData.UpperPoint.X) { // DSU3 test with > instead of >=
+            if (X > RootFinderData.UpperPoint.X) {
                 CheckLowerUpperBracket = false;
                 return CheckLowerUpperBracket;
             }
@@ -1054,7 +1054,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Check that the slope requirement is respected at the min and max points
         // Note that the singularity check takes care of RootFinderData%MinPoint%Y == RootFinderData%MaxPoint%Y
@@ -1139,7 +1139,7 @@ namespace RootFinder {
         Real64 DeltaY; // Difference between min and max Y-values
         Real64 ATolY;  // Absolute tolerance used to detected equal min and max Y-values
 
-        // FLOW:
+
 
         // Added this check based on an absolute tolerance test for y values to avoid incorrectly detecting
         // functions with bad slope due to numerical noise.
@@ -1201,7 +1201,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
@@ -1274,7 +1274,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Check for max constrained convergence with respect to the new iterate (X,Y)
         {
@@ -1346,7 +1346,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Check for unconstrained convergence
         if (std::abs(Y) <= RootFinderData.Controls.ATolY) {
@@ -1399,7 +1399,7 @@ namespace RootFinder {
         Real64 DeltaUL; // Distance between lower and upper points
         Real64 TypUL;   // Typical value for values lying within lower/upper interval
         Real64 TolUL;   // Tolerance to satisfy for lower-upper distance
-        // FLOW:
+
 
         // Check for round-off error in Lower/Upper interval
         if (RootFinderData.LowerPoint.DefinedFlag && RootFinderData.UpperPoint.DefinedFlag) {
@@ -1461,7 +1461,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Update min support point
         if (X == RootFinderData.MinPoint.X) {
@@ -1524,7 +1524,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         {
             auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
@@ -1694,7 +1694,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumHistory;
 
-        // FLOW:
+
 
         // Update history with best iterates so that:
         //   ABS(History(1)%Y) <= ABS(History(2)%Y) <= ABS(History(3)%Y)
@@ -1783,7 +1783,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Update history with best iterates so that:
         //   ABS(History(1)%Y) <= ABS(History(2)%Y) <= ABS(History(3)%Y)
@@ -1856,7 +1856,7 @@ namespace RootFinder {
         int J;
         Real64 XTemp;
         Real64 YTemp;
-        // FLOW:
+
 
         // Nothing to do if only one point stored in history
         if (N <= 1) {
@@ -1923,7 +1923,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Real64 XNext(0.0);
 
-        // FLOW:
+
 
         //----------------------------------------------------------------------------
         // First attempt to bracket root between a lower point and an upper point.
@@ -2063,7 +2063,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         // Cannot use Secant method unless there are at least 2 points
         // Also do not use Secant method more than once, i.e. NumHistory==3, in order to avoid
@@ -2139,7 +2139,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
         RootFinderData.CurrentMethodType = iMethodBisection;
         BisectionMethod = (RootFinderData.LowerPoint.X + RootFinderData.UpperPoint.X) / 2.0;
 
@@ -2194,7 +2194,7 @@ namespace RootFinder {
         Real64 Num;
         Real64 Den;
 
-        // FLOW:
+
 
         Num = RootFinderData.UpperPoint.X - RootFinderData.LowerPoint.X;
         Den = RootFinderData.UpperPoint.Y - RootFinderData.LowerPoint.Y;
@@ -2265,7 +2265,7 @@ namespace RootFinder {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 XCandidate;
 
-        // FLOW:
+
 
         // Recover with false position
         if (SecantFormula(RootFinderData, XCandidate)) {
@@ -2334,7 +2334,7 @@ namespace RootFinder {
         Real64 Num;
         Real64 Den;
 
-        // FLOW:
+
 
         Num = RootFinderData.Increment.X;
         Den = RootFinderData.Increment.Y;
@@ -2409,7 +2409,7 @@ namespace RootFinder {
         Real64 T;
         Real64 P;
         Real64 Q;
-        // FLOW:
+
 
         // Only attempt Brent's method if enough history points are available
         // and if the root finder is converging (not diverging) since the previous
@@ -2505,7 +2505,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         //'MinPoint%DefinedFlag', ',', &
         //'LowerPoint%DefinedFlag', ',', &
@@ -2575,7 +2575,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         print(TraceFile, "{},{},", RootFinderData.StatusFlag,RootFinderData.CurrentMethodType);
 
@@ -2634,7 +2634,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         if (PointData.DefinedFlag) {
             print(TraceFile, "{:20.10F},{:20.10F},", PointData.X, PointData.Y);
@@ -2685,7 +2685,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
         print(DebugFile, "Current = ");
         WritePoint(DebugFile, RootFinderData.CurrentPoint, true);
@@ -2743,7 +2743,7 @@ namespace RootFinder {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
 
             auto const SELECT_CASE_var(RootFinderData.StatusFlag);
             if (SELECT_CASE_var == iStatusOK) {

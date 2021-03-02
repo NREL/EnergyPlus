@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,6 +91,8 @@ namespace Pipes {
 
         static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string const &objectName);
         void simulate([[maybe_unused]] EnergyPlusData &states, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void oneTimeInit(EnergyPlusData &state) override;
+        void initEachEnvironment(EnergyPlusData &state) const;
     };
 
     void GetPipeInput(EnergyPlusData &state);
@@ -98,13 +100,11 @@ namespace Pipes {
 } // namespace Pipes
 
     struct PipesData : BaseGlobalStruct {
-        int NumLocalPipes = 0;
         bool GetPipeInputFlag = true;
         Array1D<Pipes::LocalPipeData> LocalPipe;
         std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
         void clear_state() override {
-            this->NumLocalPipes = 0;
             this->GetPipeInputFlag = true;
             this->LocalPipe.deallocate();
             this->LocalPipeUniqueNames.clear();

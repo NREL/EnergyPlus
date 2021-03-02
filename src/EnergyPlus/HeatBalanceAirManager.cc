@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -245,7 +245,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);
 
-        // FLOW:
+
 
         GetAirFlowFlag(state, ErrorsFound);
 
@@ -316,7 +316,7 @@ namespace HeatBalanceAirManager {
 
         // flow
 
-        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.BalanceMixing) {
+        if (ZoneAirMassFlow.EnforceZoneMassBalance && ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
             for (Loop = 1; Loop <= TotMixing; ++Loop) {
                 ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
                 ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
@@ -3860,7 +3860,7 @@ namespace HeatBalanceAirManager {
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
             // Check for infiltration in zone which are only a mixing source zone
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if ((ZoneAirMassFlow.BalanceMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
+                if ((ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing && MassConservation(ZoneNum).IsOnlySourceZone) &&
                     (ZoneAirMassFlow.InfiltrationTreatment != NoInfiltrationFlow)) {
                     if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
                         ShowSevereError(state, RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
@@ -3888,7 +3888,7 @@ namespace HeatBalanceAirManager {
                                     "System",
                                     "Average",
                                     Zone(ZoneNum).Name);
-                if (ZoneAirMassFlow.BalanceMixing &&
+                if ((ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) &&
                     ((MassConservation(ZoneNum).NumSourceZonesMixingObject + MassConservation(ZoneNum).NumReceivingZonesMixingObject) > 0)) {
                     SetupOutputVariable(state, "Zone Air Mass Balance Mixing Receiving Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
@@ -3964,7 +3964,7 @@ namespace HeatBalanceAirManager {
         bool ErrorsFound;
         bool IsNotOK;
 
-        // FLOW:
+
 
         // Initialize default values for air model parameters
         state.dataRoomAirMod->AirModel.allocate(state.dataGlobal->NumOfZones);
@@ -4351,9 +4351,9 @@ namespace HeatBalanceAirManager {
         // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
         // to allow an external hvac manager to play nice with E+
         EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
-        if (!EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled) {
+        if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
             EnergyPlus::DataZoneEquipment::GetZoneEquipmentData(state);
-            EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled = true;
+            state.dataZoneEquip->ZoneEquipInputsFilled = true;
         }
     }
 
@@ -4368,31 +4368,10 @@ namespace HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the AirHeatBalance.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHeatBalance::MRT;
-        using DataZoneControls::AnyOpTempControl;
-        using DataZoneControls::TempControlledZone;
         using Psychrometrics::PsyTdpFnWPb;
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneLoop;             // Counter for the # of zones (nz)
@@ -4410,16 +4389,16 @@ namespace HeatBalanceAirManager {
 
             // if operative temperature control is being used, then radiative fraction/weighting
             //  might be defined by user to be something different than 0.5, even scheduled over simulation period
-            if (AnyOpTempControl) { // dig further...
+            if (state.dataZoneCtrls->AnyOpTempControl) { // dig further...
                 // find TempControlledZoneID from ZoneLoop index
                 TempControlledZoneID = Zone(ZoneLoop).TempControlledZoneIndex;
                 if (Zone(ZoneLoop).IsControlled) {
-                    if ((TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
+                    if ((state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OperativeTempControl)) {
                         // is operative temp radiative fraction scheduled or fixed?
-                        if (TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
-                            thisMRTFraction = GetCurrentScheduleValue(state, TempControlledZone(TempControlledZoneID).OpTempRadiativeFractionSched);
+                        if (state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempCntrlModeScheduled) {
+                            thisMRTFraction = GetCurrentScheduleValue(state, state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).OpTempRadiativeFractionSched);
                         } else {
-                            thisMRTFraction = TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
+                            thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
                         ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * MRT(ZoneLoop);
                     }

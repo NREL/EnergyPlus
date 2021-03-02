@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,44 +51,18 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
-namespace EnergyPlus {
+namespace EnergyPlus::TARCOGParams {
 
-namespace TARCOGParams {
+    Real64 constexpr e(2.718281828459);
+    Real64 constexpr DeflectionRelaxation(0.005); // Deflection relaxation parameter
+    int constexpr DeflectionMaxIterations(400);   // maximum number of deflection iterations
+    Real64 constexpr DeflectionErrorMargin(0.01); // maximum temperature difference on layers for deflection iterations
 
-    // Data
-    // REAL(r64), parameter :: StefanBoltzmannConst    = 5.6697d-8     ! Stefan-Boltzman constant (5.6697e-8 [W/m^2K^4])
-    // REAL(r64), parameter :: GravityConstant = 9.807d0
-    extern Real64 const e;
-    // REAL(r64), parameter :: MaxHr = 100  ! used in iterations in case temperatures on surfaces reaches identical values
-    extern Real64 const DeflectionRelaxation;  // Deflection relaxation parameter
-    extern int const DeflectionMaxIterations;  // maximum number of deflection iterations
-    extern Real64 const DeflectionErrorMargin; // maximum temperature difference on layers for deflection iterations
-    // pi is moved to gasses since it is used there now
-    // REAL(r64), parameter :: pi       = 3.14159265358979323846d0
-
-    extern int const maxpan; // maximum number of monolithic glazing layers (100)
-    // integer, parameter :: maxlay   = 1000         ! maximum number of layers (including laminates) (1000)
-    extern int const maxlay;   // maximum number of layers (including laminates) (100)
-    extern int const MaxGap;   // maximum number of gaps (between layers)
-    extern int const maxlay1;  // maximum number of 'gaps', including in and out (maxlay+1)
-    extern int const maxlay2;  // maximum number of glass surfaces (maxlay*2)
-    extern int const maxlay3;  // maximum number of ? (maxlay2+1)
-    extern int const maxlay4;  // maximum number of ? (maxlay*4)
-    extern int const maxslice; // maximum nuber of slices (100)
-
-    // integer, parameter :: MaxThetaArray = 200     ! maximum number for theta array
-
-    // Debug flags
-    extern int const noDebug;
-    extern int const appendResultsToFile;
-    extern int const resultsToNewFile;
-    extern int const saveIntermediateResults; // this will create new file
-
-    extern int const minDebugFlag;
-    extern int const maxDebugFlag;
-
-    // to keep info that certain file is not open for writing
-    extern int const statusClosed;
+    int constexpr maxlay(100);          // maximum number of layers (including laminates) (100)
+    int constexpr MaxGap(maxlay - 1);   // maximum number of gaps (between layers)
+    int constexpr maxlay1(maxlay + 1);  // maximum number of 'gaps', including in and out (maxlay+1)
+    int constexpr maxlay2(maxlay * 2);  // maximum number of glass surfaces (maxlay*2)
+    int constexpr maxlay3(maxlay2 + 1); // maximum number of ? (maxlay2+1)
 
     //  Layer types:
     extern int const SPECULAR;
@@ -107,10 +81,6 @@ namespace TARCOGParams {
     extern int const THERM_MOD_SCW;
     extern int const THERM_MOD_CSM;
 
-    extern int const MinThermalMode;
-    extern int const MaxThermalMode;
-
-    extern int const NO_SupportPillar;
     extern int const YES_SupportPillar;
 
     // Deflection parameters
@@ -130,47 +100,47 @@ namespace TARCOGParams {
     extern int const CalcForcedVentilation;
 
     //  Calculation outcome
-    extern int const CALC_UNKNOWN;
-    extern int const CALC_OK;
-    extern int const CALC_DIVERGE;
-    extern int const CALC_OSC_OK;
+    enum class CalculationOutcome { Unknown, OK };
 
-    extern int const NumOfIterations;
+    int constexpr NumOfIterations(100);
 
     // Program will examine convergence parameter in each iteration.  That convergence parameter should decrease each time.
     // In case that is not happening program will tolerate certain number of tries before declare convergence
     // (or decrease relaxation parameter)
-    extern int const NumOfTries;
+    int constexpr NumOfTries(5);
     // integer, parameter :: NewtonIterations = 75 ! shows when to swith to Newton
-    extern Real64 const RelaxationStart;    // Has to be between 0 and 1
-    extern Real64 const RelaxationDecrease; // Step for which relaxation parameter will decrease
+    Real64 constexpr RelaxationStart(0.6);    // Has to be between 0 and 1
+    Real64 constexpr RelaxationDecrease(0.1); // Step for which relaxation parameter will decrease
 
     // Convergence parameters
-    extern Real64 const tempCorrection;       // used in case outside or inside temperature approaches tamb or troom
-    extern Real64 const ConvergenceTolerance; // tolerance used within iterations
+    Real64 constexpr ConvergenceTolerance(1e-2); // tolerance used within iterations
 
     // Airflow iterations
-    extern Real64 const AirflowConvergenceTolerance;
-    extern Real64 const AirflowRelaxationParameter;
+    Real64 constexpr AirflowConvergenceTolerance(1e-2);
+    Real64 constexpr AirflowRelaxationParameter(0.9);
 
-    extern Real64 const TemperatureQuessDiff; // in case outside and inside temperatures are identical
+    Real64 constexpr TemperatureQuessDiff(1.0); // in case outside and inside temperatures are identical
 
-    extern Real64 const C1_VENET_HORIZONTAL;
-    extern Real64 const C2_VENET_HORIZONTAL;
-    extern Real64 const C3_VENET_HORIZONTAL;
-    extern Real64 const C4_VENET_HORIZONTAL;
+    // Coefficients for new airflow algorithm.
+    // Robert Hart, Howdy Goudey & D. Charlie Curcija (2017): Experimental
+    // validation and model development for thermal transmittances of porous window screens
+    // and horizontal louvred blind systems, Journal of Building Performance Simulation, DOI:
+    // 10.1080/19401493.2017.1323010
 
-    extern Real64 const C1_VENET_VERTICAL;
-    extern Real64 const C2_VENET_VERTICAL;
-    extern Real64 const C3_VENET_VERTICAL;
-    extern Real64 const C4_VENET_VERTICAL;
+    Real64 constexpr C1_VENET_HORIZONTAL(0.016);
+    Real64 constexpr C2_VENET_HORIZONTAL(-0.63);
+    Real64 constexpr C3_VENET_HORIZONTAL(0.53);
+    Real64 constexpr C4_VENET_HORIZONTAL(0.043);
 
-    extern Real64 const C1_SHADE;
-    extern Real64 const C2_SHADE;
-    extern Real64 const C3_SHADE;
-    extern Real64 const C4_SHADE;
+    Real64 constexpr C1_VENET_VERTICAL(0.041);
+    Real64 constexpr C2_VENET_VERTICAL(0.000);
+    Real64 constexpr C3_VENET_VERTICAL(0.270);
+    Real64 constexpr C4_VENET_VERTICAL(0.012);
 
-} // namespace TARCOGParams
+    Real64 constexpr C1_SHADE(0.05);
+    Real64 constexpr C2_SHADE(1.08);
+    Real64 constexpr C3_SHADE(0.79);
+    Real64 constexpr C4_SHADE(0.50);
 
 } // namespace EnergyPlus
 

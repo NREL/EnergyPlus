@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -702,10 +702,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         ShowMessage(state, "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -731,7 +731,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
-        ResultsFramework::resultsFramework->writeOutputs(state);
+        state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
@@ -741,6 +741,11 @@ namespace UtilityRoutines {
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
+
+        if (state.dataGlobal->eplusRunningViaAPI) {
+            state.files.flushAll();
+        }
+
         return EXIT_FAILURE;
     }
 
@@ -853,10 +858,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        state.dataResultsFramework->resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (state.dataGlobal->createPerfLog) {
             UtilityRoutines::appendPerfLog(state, "Run Time [string]", Elapsed);
@@ -881,7 +886,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state, state.files.json);
 
-        ResultsFramework::resultsFramework->writeOutputs(state);
+        state.dataResultsFramework->resultsFramework->writeOutputs(state);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
@@ -890,6 +895,11 @@ namespace UtilityRoutines {
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
+
+        if (state.dataGlobal->eplusRunningViaAPI) {
+            state.files.flushAll();
+        }
+
         return EXIT_SUCCESS;
     }
 

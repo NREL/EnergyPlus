@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -209,8 +209,6 @@ namespace OutdoorAirUnit {
 
         CalcOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
-        // CALL UpdateOutdoorAirUnit(OAUnitNum, FirstHVACIteration)
-
         ReportOutdoorAirUnit(state, OAUnitNum);
 
         ZoneEqOutdoorAirUnit = false;
@@ -307,7 +305,7 @@ namespace OutdoorAirUnit {
         Array1D_string AlphArray;
         static bool errFlag(false);
 
-        // FLOW:
+
         // Figure out how many outdoor air units there are in the input file
 
         if (!state.dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag) return;
@@ -1058,7 +1056,6 @@ namespace OutdoorAirUnit {
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::OutdoorAirUnit_Num;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1099,7 +1096,7 @@ namespace OutdoorAirUnit {
         Real64 rho;
         bool errFlag;
 
-        // FLOW:
+
         // Do the one time initializations
 
         auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
@@ -1159,7 +1156,7 @@ namespace OutdoorAirUnit {
         }
 
         // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
-        if (!state.dataOutdoorAirUnit->ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+        if (!state.dataOutdoorAirUnit->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
             state.dataOutdoorAirUnit->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataOutdoorAirUnit->NumOfOAUnits; ++Loop) {
                 if (CheckZoneEquipmentList(state, CurrentModuleObject, OutAirUnit(Loop).Name)) continue;

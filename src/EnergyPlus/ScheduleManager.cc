@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -930,13 +930,6 @@ namespace ScheduleManager {
             }
 
             SchedTypePtr = DaySchedule(Count).ScheduleTypePtr;
-            if (ScheduleType(SchedTypePtr).Limited) {
-                if (any_lt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Minimum) ||
-                    any_gt(DaySchedule(Count).TSValue, ScheduleType(SchedTypePtr).Maximum)) {
-                    ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", Values are outside of range for " +
-                                     cAlphaFields(2) + '=' + Alphas(2));
-                }
-            }
             if (!ScheduleType(SchedTypePtr).IsReal) {
                 // Make sure each is integer
                 NumErrorFlag = false; // only show error message once
@@ -3795,11 +3788,11 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+        MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
 
         CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -3907,14 +3900,14 @@ namespace ScheduleManager {
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         if (MaxString == "<") {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
         } else {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+            MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         }
 
         CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -4006,11 +3999,11 @@ namespace ScheduleManager {
         }
 
         //  Min/max for schedule has been set.  Test.
-        MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+        MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
 
         CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -4109,14 +4102,14 @@ namespace ScheduleManager {
         if (MinString == ">") {
             MinValueOk = (Schedule(ScheduleIndex).MinValue > Minimum);
         } else {
-            MinValueOk = (Schedule(ScheduleIndex).MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - Schedule(ScheduleIndex).MinValue);
         }
 
-        MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+        MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         if (MaxString == "<") {
             MaxValueOk = (Schedule(ScheduleIndex).MaxValue < Maximum);
         } else {
-            MaxValueOk = (Schedule(ScheduleIndex).MaxValue <= Maximum);
+            MaxValueOk = (Schedule(ScheduleIndex).MaxValue - Maximum <= FLT_EPSILON);
         }
 
         CheckScheduleValueMinMax = (MinValueOk && MaxValueOk);
@@ -4340,7 +4333,7 @@ namespace ScheduleManager {
         if (MinString == ">") {
             MinValueOk = (MinValue > Minimum);
         } else {
-            MinValueOk = (MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
         if (present(Maximum)) {
@@ -4348,10 +4341,10 @@ namespace ScheduleManager {
                 if (MaxString() == "<") {
                     MaxValueOk = (MaxValue < Maximum);
                 } else {
-                    MaxValueOk = (MaxValue <= Maximum);
+                    MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
                 }
             } else {
-                MaxValueOk = (MaxValue <= Maximum);
+                MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
             }
         }
 
@@ -4431,7 +4424,7 @@ namespace ScheduleManager {
         if (MinString == ">") {
             MinValueOk = (MinValue > Minimum);
         } else {
-            MinValueOk = (MinValue >= Minimum);
+            MinValueOk = (FLT_EPSILON >= Minimum - MinValue);
         }
 
         if (present(Maximum)) {
@@ -4439,10 +4432,10 @@ namespace ScheduleManager {
                 if (MaxString() == "<") {
                     MaxValueOk = (MaxValue < Maximum);
                 } else {
-                    MaxValueOk = (MaxValue <= Maximum);
+                    MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
                 }
             } else {
-                MaxValueOk = (MaxValue <= Maximum);
+                MaxValueOk = (MaxValue - Maximum <= FLT_EPSILON);
             }
         }
 

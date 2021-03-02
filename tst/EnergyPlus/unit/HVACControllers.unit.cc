@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -523,9 +523,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_SimpleHeat;
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
 
-    OAMixer.allocate(1);
-    OAMixer(1).Name = "OAMixer";
-    OAMixer(1).InletNode = 2;
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
@@ -655,9 +655,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(1) = SimAirServingZones::WaterCoil_CoolingHXAsst;
     state->dataAirLoop->OutsideAirSys(1).ComponentType_Num(2) = SimAirServingZones::OAMixer_Num;
 
-    OAMixer.allocate(1);
-    OAMixer(1).Name = "OAMixer";
-    OAMixer(1).InletNode = 2;
+    state->dataMixedAir->OAMixer.allocate(1);
+    state->dataMixedAir->OAMixer(1).Name = "OAMixer";
+    state->dataMixedAir->OAMixer(1).InletNode = 2;
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);

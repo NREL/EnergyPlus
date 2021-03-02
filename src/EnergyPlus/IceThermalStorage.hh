@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,15 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace IceThermalStorage {
-
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cIceStorageSimple;
-    extern std::string const cIceStorageDetailed;
-
-    // ITS numbers and FoundOrNot
-    extern int NumSimpleIceStorage;
-    extern int NumDetailedIceStorage;
-    extern int TotalNumIceStorage;
 
     enum class IceStorageType
     {
@@ -268,13 +259,6 @@ namespace IceThermalStorage {
         void setupOutputVars(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
-
-    // Static Functions
-    void clear_state();
-
     void GetIceStorageInput(EnergyPlusData &state);
 
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
@@ -294,15 +278,27 @@ namespace IceThermalStorage {
 
     Real64 TempIPtoSI(Real64 Temp);
 
-    void UpdateIceFractions();
+    void UpdateIceFractions(EnergyPlusData &state);
 
 } // namespace IceThermalStorage
 
 struct IceThermalStorageData : BaseGlobalStruct {
 
+    bool getITSInput = true;
+    int NumSimpleIceStorage = 0;
+    int NumDetailedIceStorage = 0;
+    int TotalNumIceStorage = 0;
+    Array1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    Array1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
+
     void clear_state() override
     {
-
+        this->getITSInput = true;
+        this->NumSimpleIceStorage = 0;
+        this->NumDetailedIceStorage = 0;
+        this->TotalNumIceStorage = 0;
+        this->SimpleIceStorage.deallocate();
+        this->DetailedIceStorage.deallocate();
     }
 };
 
