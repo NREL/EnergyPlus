@@ -867,7 +867,7 @@ namespace Furnaces {
         std::string CompSetCoolInlet;
         std::string CompSetHeatInlet;
         std::string CompSetHeatOutlet;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         bool IsNotOK;                   // Flag to verify name
         int NumHeatOnly;                // Number of heat only furnaces
         int NumHeatCool;                // Number of heat/cool furnaces
