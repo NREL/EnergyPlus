@@ -430,7 +430,13 @@ int runEnergyPlusAsLibrary(EnergyPlus::EnergyPlusData &state, int argc, const ch
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
 
-    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
+    int return_code = EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
+    if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::Failure)) {
+        return return_code;
+    } else if (return_code == static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::SuccessButHelper)) {
+        // If it was "--version" or "--help", you do not want to continue trying to run the simulation, but do not want to indicate failure either
+        return static_cast<int>(EnergyPlus::CommandLineInterface::ReturnCodes::Success);
+    }
 
     int status = initializeAsLibrary(state);
     if (status || state.dataGlobal->outputEpJSONConversionOnly) return status;

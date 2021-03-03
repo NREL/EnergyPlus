@@ -98,8 +98,8 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE1";
     Surface.allocate(1);
     Surface(1).Name = "WALL1";
     Surface(1).Zone = 1;
@@ -144,8 +144,8 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_SizeHighTempRadiantSystemSca
     HighTempRadSys(RadSysNum).HeatingCapMethod = DataSizing::CapacityPerFloorArea;
     HighTempRadSys(RadSysNum).ScaledHeatingCapacity = 100.0;
     DataSizing::ZoneEqSizing.allocate(1);
-    DataHeatBalance::Zone.allocate(1);
-    Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
     SizingTypesNum = DataHVACGlobals::NumOfSizingTypes;
     if (SizingTypesNum < 1) SizingTypesNum = 1;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);

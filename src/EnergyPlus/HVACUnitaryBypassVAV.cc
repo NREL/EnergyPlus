@@ -4063,7 +4063,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 HeatCoilLoad,
                                                                 CBVAV(CBVAVNum).HeatCoilIndex,
                                                                 QCoilActual,
-                                                                true,
+                                                                false,
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     // simulate the heating coil at maximum hot water flow rate
@@ -4153,7 +4153,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 HeatCoilLoad,
                                                                 CBVAV(CBVAVNum).HeatCoilIndex,
                                                                 QCoilActual,
-                                                                true,
+                                                                false,
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     mdot = 0.0;

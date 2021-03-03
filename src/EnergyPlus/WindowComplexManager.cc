@@ -183,7 +183,7 @@ namespace WindowComplexManager {
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
             SurfWinWindowModelType(ISurf) = WindowBSDFModel;
-            DataHeatBalance::AnyBSDF = true;
+            state.dataHeatBal->AnyBSDF = true;
             ++state.dataWindowComplexManager->NumComplexWind;
             NumStates = 1;
             state.dataWindowComplexManager->WindowList(state.dataWindowComplexManager->NumComplexWind).NumStates = 1; // Having found the construction reference in
@@ -920,11 +920,11 @@ namespace WindowComplexManager {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ComplexFenInZone = false;
-            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
             }
             if (ComplexFenInZone) {
-                NumSurfInZone = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
+                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1;
                 if (state.dataBSDFWindow->MaxBkSurf < NumSurfInZone) state.dataBSDFWindow->MaxBkSurf = NumSurfInZone;
             }
         }
@@ -2418,7 +2418,6 @@ namespace WindowComplexManager {
 
         using namespace DataBSDFWindow;
         using DataHeatBalance::GasCoeffsAir;
-        using DataHeatBalance::SupportPillar;
         using DataLoopNode::Node;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
@@ -2727,13 +2726,13 @@ namespace WindowComplexManager {
         Pa = state.dataEnvrn->OutBaroPress;
 
         ThermalModelNum = state.dataConstruction->Construct(ConstrNum).BSDFInput.ThermalModel;
-        standard = WindowThermalModel(ThermalModelNum).CalculationStandard;
-        ThermalMod = WindowThermalModel(ThermalModelNum).ThermalModel;
-        CalcDeflection = WindowThermalModel(ThermalModelNum).DeflectionModel;
-        SDScalar = WindowThermalModel(ThermalModelNum).SDScalar;
-        VacuumPressure = WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
-        Tini = WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
-        Pini = WindowThermalModel(ThermalModelNum).InitialPressure;
+        standard = state.dataHeatBal->WindowThermalModel(ThermalModelNum).CalculationStandard;
+        ThermalMod = state.dataHeatBal->WindowThermalModel(ThermalModelNum).ThermalModel;
+        CalcDeflection = state.dataHeatBal->WindowThermalModel(ThermalModelNum).DeflectionModel;
+        SDScalar = state.dataHeatBal->WindowThermalModel(ThermalModelNum).SDScalar;
+        VacuumPressure = state.dataHeatBal->WindowThermalModel(ThermalModelNum).VacuumPressureLimit;
+        Tini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialTemperature - DataGlobalConstants::KelvinConv;
+        Pini = state.dataHeatBal->WindowThermalModel(ThermalModelNum).InitialPressure;
 
         nlayer = state.dataConstruction->Construct(ConstrNum).TotSolidLayers;
         isky = 3; // IR radiation is provided from external source
@@ -2748,7 +2747,7 @@ namespace WindowComplexManager {
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     // determine ZoneEquipConfigNum for this zone
                     //            ControlledZoneAirFlag = .FALSE.
@@ -2759,8 +2758,8 @@ namespace WindowComplexManager {
                     //                EXIT
                     //            END DO ! ZoneEquipConfigNum
                     // check whether this zone is a controlled zone or not
-                    if (!Zone(ZoneNum).IsControlled) {
-                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + Zone(ZoneNum).Name);
+                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(ZoneNum).Name);
                         return;
                     }
                     // determine supply air conditions
@@ -2798,14 +2797,14 @@ namespace WindowComplexManager {
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
-                        if (!Zone(ZoneNum).IsControlled) {
+                        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           Zone(ZoneNum).Name);
+                                           state.dataHeatBal->Zone(ZoneNum).Name);
                             return;
                         }
                         // determine supply air conditions
@@ -2832,7 +2831,7 @@ namespace WindowComplexManager {
 
                 tout = RefAirTemp + DataGlobalConstants::KelvinConv; // outside air temperature
 
-                tsky = MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = state.dataHeatBal->MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 //  ! Add long-wave radiation from adjacent zone absorbed by glass layer closest to the adjacent zone.
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)
@@ -2877,7 +2876,7 @@ namespace WindowComplexManager {
                         Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
-            hin = HConvIn(SurfNum); // Room-side surface convective film conductance
+            hin = state.dataHeatBal->HConvIn(SurfNum); // Room-side surface convective film conductance
             ibc(2) = 0;             // convective coefficient on indoor side will be recalculated (like in Winkelmann routines)
 
             // hcout=HextConvCoeff  ! Exterior convection coefficient is passed in from outer routine
@@ -2953,28 +2952,28 @@ namespace WindowComplexManager {
             } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowShade) {
                 ++IGlass;
                 TempInt = state.dataMaterial->Material(LayPtr).ComplexShadePtr;
-                LayerType(IGlass) = ComplexShade(TempInt).LayerType;
+                LayerType(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LayerType;
 
-                thick(IGlass) = ComplexShade(TempInt).Thickness;
-                scon(IGlass) = ComplexShade(TempInt).Conductivity;
-                emis(2 * IGlass - 1) = ComplexShade(TempInt).FrontEmissivity;
-                emis(2 * IGlass) = ComplexShade(TempInt).BackEmissivity;
-                tir(2 * IGlass - 1) = ComplexShade(TempInt).IRTransmittance;
-                tir(2 * IGlass) = ComplexShade(TempInt).IRTransmittance;
+                thick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Thickness;
+                scon(IGlass) = state.dataHeatBal->ComplexShade(TempInt).Conductivity;
+                emis(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).FrontEmissivity;
+                emis(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).BackEmissivity;
+                tir(2 * IGlass - 1) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
+                tir(2 * IGlass) = state.dataHeatBal->ComplexShade(TempInt).IRTransmittance;
 
                 // This needs to be converted into correct areas. That can be done only after loading complete window data
-                Atop(IGlass) = ComplexShade(TempInt).TopOpeningMultiplier;
-                Abot(IGlass) = ComplexShade(TempInt).BottomOpeningMultiplier;
-                Al(IGlass) = ComplexShade(TempInt).LeftOpeningMultiplier;
-                Ar(IGlass) = ComplexShade(TempInt).RightOpeningMultiplier;
-                Ah(IGlass) = ComplexShade(TempInt).FrontOpeningMultiplier;
+                Atop(IGlass) = state.dataHeatBal->ComplexShade(TempInt).TopOpeningMultiplier;
+                Abot(IGlass) = state.dataHeatBal->ComplexShade(TempInt).BottomOpeningMultiplier;
+                Al(IGlass) = state.dataHeatBal->ComplexShade(TempInt).LeftOpeningMultiplier;
+                Ar(IGlass) = state.dataHeatBal->ComplexShade(TempInt).RightOpeningMultiplier;
+                Ah(IGlass) = state.dataHeatBal->ComplexShade(TempInt).FrontOpeningMultiplier;
 
-                SlatThick(IGlass) = ComplexShade(TempInt).SlatThickness;
-                SlatWidth(IGlass) = ComplexShade(TempInt).SlatWidth;
-                SlatAngle(IGlass) = ComplexShade(TempInt).SlatAngle;
-                SlatCond(IGlass) = ComplexShade(TempInt).SlatConductivity;
-                SlatSpacing(IGlass) = ComplexShade(TempInt).SlatSpacing;
-                SlatCurve(IGlass) = ComplexShade(TempInt).SlatCurve;
+                SlatThick(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatThickness;
+                SlatWidth(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatWidth;
+                SlatAngle(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatAngle;
+                SlatCond(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatConductivity;
+                SlatSpacing(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatSpacing;
+                SlatCurve(IGlass) = state.dataHeatBal->ComplexShade(TempInt).SlatCurve;
             } else if (state.dataMaterial->Material(LayPtr).Group == ComplexWindowGap) {
                 ++IGap;
                 gap(IGap) = state.dataMaterial->Material(LayPtr).Thickness;
@@ -2982,7 +2981,7 @@ namespace WindowComplexManager {
 
                 DeflectionPtr = state.dataMaterial->Material(LayPtr).DeflectionStatePtr;
                 if (DeflectionPtr != 0) {
-                    GapDefMax(IGap) = DeflectionState(DeflectionPtr).DeflectedThickness;
+                    GapDefMax(IGap) = state.dataHeatBal->DeflectionState(DeflectionPtr).DeflectedThickness;
                 } else {
                     GapDefMax(IGap) = gap(IGap);
                 }
@@ -2991,8 +2990,8 @@ namespace WindowComplexManager {
 
                 if (PillarPtr != 0) {
                     SupportPlr(IGap) = 1;
-                    PillarSpacing(IGap) = SupportPillar(PillarPtr).Spacing;
-                    PillarRadius(IGap) = SupportPillar(PillarPtr).Radius;
+                    PillarSpacing(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Spacing;
+                    PillarRadius(IGap) = state.dataHeatBal->SupportPillar(PillarPtr).Radius;
                 }
 
                 GasPointer = state.dataMaterial->Material(LayPtr).GasPointer;
@@ -3061,13 +3060,13 @@ namespace WindowComplexManager {
         // direct solar radiation
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ShadeFlag = SurfWinShadingFlag(SurfNum);
-            dir = SurfQRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
+            dir = state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) + state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
             // if (dir.ne.0.0d0) then
             for (IGlass = 1; IGlass <= nlayer; ++IGlass) {
                 // IF (dir > 0.0D0 ) THEN
-                asol(IGlass) = SurfWinQRadSWwinAbs(IGlass, SurfNum);
+                asol(IGlass) = state.dataHeatBal->SurfWinQRadSWwinAbs(IGlass, SurfNum);
                 // ELSE
                 //  asol(IGLASS) = 0.0D0
                 // ENDIF
@@ -3076,7 +3075,7 @@ namespace WindowComplexManager {
 
             // Add contribution of IR from zone internal gains (lights, equipment and people). This is absorbed in zone-side layer and it
             // is assumed that nothing is transmitted through
-            asol(nlayer) += SurfQRadThermInAbs(SurfNum);
+            asol(nlayer) += state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
 
             presure = state.dataEnvrn->OutBaroPress;
 
@@ -3254,7 +3253,7 @@ namespace WindowComplexManager {
             ShowContinueError(state, "construction name = " + state.dataConstruction->Construct(ConstrNum).Name);
             ShowFatalError(state, "halting because of error in tarcog");
         } else if (CalcCondition == DataBSDFWindow::winterCondition) {
-            NominalU(ConstrNum) = ufactor;
+            state.dataHeatBal->NominalU(ConstrNum) = ufactor;
         } else if (CalcCondition == DataBSDFWindow::summerCondition) {
             // tempInt = SurfaceWindow(SurfNum)%ComplexFen%CurrentState
             // tempReal = SurfaceWindow(SurfNum)%ComplexFen%State(tempInt)%WinDiffTrans
@@ -3282,7 +3281,7 @@ namespace WindowComplexManager {
             // Window heat balance solution has converged.
 
             SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
-            HConvIn(SurfNum) = hcin;
+            state.dataHeatBal->HConvIn(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
             // For all cases, get total window heat gain for reporting. See CalcWinFrameAndDividerTemps for
@@ -3293,7 +3292,7 @@ namespace WindowComplexManager {
             SurfOutsideTemp = theta(1) - DataGlobalConstants::KelvinConv;
             SurfOutsideEmiss = emis(1);
 
-            IncidentSolar = Surface(SurfNum).Area * SurfQRadSWOutIncident(SurfNum);
+            IncidentSolar = Surface(SurfNum).Area * state.dataHeatBal->SurfQRadSWOutIncident(SurfNum);
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 // Interior shade or blind
                 ConvHeatFlowNatural = -qv(nlayer) * height * width;
@@ -3409,9 +3408,9 @@ namespace WindowComplexManager {
             //  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
-            SurfWinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatGain(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatTransfer(SurfNum) -= state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
@@ -3420,9 +3419,9 @@ namespace WindowComplexManager {
             }
             if (state.dataEnvrn->SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
-                        SurfWinTransSolar(SurfNum) / (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
-                                                (SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                        SurfWinTransSolar(SurfNum) / (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                SurfWinSysSolAbsorptance(SurfNum) = (state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
+                                                (state.dataHeatBal->SurfQRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
                 SurfWinSysSolTransmittance(SurfNum) = 0.0;
@@ -3452,8 +3451,8 @@ namespace WindowComplexManager {
                 SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
-                SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - DataGlobalConstants::KelvinConv;
+                state.dataHeatBal->SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - DataGlobalConstants::KelvinConv;
                 // thetas(k) = theta(k)
             }
         }

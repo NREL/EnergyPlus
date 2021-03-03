@@ -144,7 +144,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 
     Node.allocate(10);
     ZoneEqSizing.allocate(2);
-    Zone.allocate(2);
+    state->dataHeatBal->Zone.allocate(2);
     CalcZoneSizing.allocate(1, 2);
     CalcFinalZoneSizing.allocate(2);
     NonAirSystemResponse.allocate(2);
@@ -164,7 +164,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode.allocate(1);
     ZoneMassBalanceFlag.allocate(2);
     state->dataGlobal->NumOfZones = 2;
-    MassConservation.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     AirflowNetwork::AirflowNetworkNumOfExhFan = 0;
     TempControlType(1) = 4;
@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     CalcZoneSizing(CurOverallSimDay, 2).HeatDesTempDiff = 30.0;
     CalcZoneSizing(CurOverallSimDay, 1).SupplyAirAdjustFactor = 1.0;
     CalcZoneSizing(CurOverallSimDay, 2).SupplyAirAdjustFactor = 1.0;
-    ZoneAirMassFlow.EnforceZoneMassBalance = false;
+    state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
     ZoneMassBalanceFlag(1) = false;
     ZoneMassBalanceFlag(2) = false;
     Node(1).MassFlowRateMin = 0.0;
@@ -281,12 +281,12 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneExh = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(2).ZoneExhBalanced = 0.0;
     state->dataZoneEquip->ZoneEquipConfig(2).PlenumMassFlow = 0.0;
-    MassConservation(1).MixingMassFlowRate = 0.0;
-    MassConservation(2).MixingMassFlowRate = 0.0;
-    Zone(1).Multiplier = 1.0;
-    Zone(2).Multiplier = 1.0;
-    Zone(1).ListMultiplier = 1;
-    Zone(2).ListMultiplier = 1;
+    state->dataHeatBal->MassConservation(1).MixingMassFlowRate = 0.0;
+    state->dataHeatBal->MassConservation(2).MixingMassFlowRate = 0.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1;
 
     state->dataZoneEquipmentManager->SizeZoneEquipmentOneTimeFlag = false;
     SizeZoneEquipment(*state);
@@ -317,7 +317,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
 
     Node.deallocate();
     ZoneEqSizing.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     CalcZoneSizing.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoads.deallocate();
@@ -335,7 +335,7 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     state->dataZoneEnergyDemand->DeadBandOrSetback.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
     ZoneMassBalanceFlag.deallocate();
-    MassConservation.deallocate();
+    state->dataHeatBal->MassConservation.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)

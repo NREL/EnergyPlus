@@ -82,20 +82,20 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
     // unit test for issue #6222, test to make sure zone index in surface on which PV is placed is not zero so zone multiplier is applied properly
 
     EnergyPlus::DataPhotovoltaics::PVarray.deallocate();
-    DataHeatBalance::Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     DataSurfaces::Surface.deallocate();
 
     EnergyPlus::DataPhotovoltaics::PVarray.allocate(3);
-    DataHeatBalance::Zone.allocate(2);
+    state->dataHeatBal->Zone.allocate(2);
     DataSurfaces::Surface.allocate(3);
 
     state->dataGlobal->NumOfZones = 2;
-    DataHeatBalance::Zone(1).Name = "Zone1";
-    DataHeatBalance::Zone(1).ListMultiplier = 1.0;
-    DataHeatBalance::Zone(1).Multiplier = 5.0;
-    DataHeatBalance::Zone(2).Name = "Zone2";
-    DataHeatBalance::Zone(2).ListMultiplier = 10.0;
-    DataHeatBalance::Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Name = "Zone1";
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 5.0;
+    state->dataHeatBal->Zone(2).Name = "Zone2";
+    state->dataHeatBal->Zone(2).ListMultiplier = 10.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
 
     EnergyPlus::DataPhotovoltaics::NumPVs = 3;
     EnergyPlus::DataPhotovoltaics::PVarray(1).SurfacePtr = 1;

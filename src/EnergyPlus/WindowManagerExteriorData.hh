@@ -125,7 +125,7 @@ namespace WindowManager {
     class CWCESpecturmProperties
     {
     public:
-        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
         getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
         static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(EnergyPlusData &state);

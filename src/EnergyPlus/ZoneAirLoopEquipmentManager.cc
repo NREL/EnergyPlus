@@ -518,7 +518,7 @@ namespace ZoneAirLoopEquipmentManager {
                 }
             }
 
-            if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).ZoneNum != 0 && DataHeatBalance::Zone(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).ZoneNum).HasAdjustedReturnTempByITE) {
+            if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).ZoneNum != 0 && state.dataHeatBal->Zone(state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).ZoneNum).HasAdjustedReturnTempByITE) {
                 for (int AirDistCompNum = 1; AirDistCompNum <= state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).NumComponents; ++AirDistCompNum) {
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum) != DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVReheat &&
                         state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum) != DataDefineEquip::iZnAirLoopEquipType::SingleDuctVAVNoReheat) {
