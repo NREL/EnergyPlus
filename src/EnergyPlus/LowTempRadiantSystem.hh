@@ -190,44 +190,44 @@ namespace LowTempRadiantSystem {
     struct HydronicSystemBaseData : RadiantSystemBaseData
     {
         // Members
-        Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
-        Real64 TubeLength = 0.0;               // tube length embedded in radiant surface (meters)
-        bool HeatingSystem = false;              // .TRUE. when the system is able to heat (parameters are valid)
-        int HotWaterInNode = 0;              // hot water inlet node
-        int HotWaterOutNode = 0;             // hot water outlet node
+        Array1D<Real64> NumCircuits; // Number of fluid circuits in the surface
+        Real64 TubeLength = 0.0;     // tube length embedded in radiant surface (meters)
+        bool HeatingSystem = false;  // .TRUE. when the system is able to heat (parameters are valid)
+        int HotWaterInNode = 0;      // hot water inlet node
+        int HotWaterOutNode = 0;     // hot water outlet node
         int HWLoopNum = 0;
         int HWLoopSide = 0;
         int HWBranchNum = 0;
         int HWCompNum = 0;
-        bool CoolingSystem = false;         // .TRUE. when the system is able to cool (parameters are valid)
-        int ColdWaterInNode = 0;        // cold water inlet node
-        int ColdWaterOutNode = 0;       // cold water outlet node
+        bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
+        int ColdWaterInNode = 0;    // cold water inlet node
+        int ColdWaterOutNode = 0;   // cold water outlet node
         int CWLoopNum = 0;
         int CWLoopSide = 0;
         int CWBranchNum = 0;
         int CWCompNum = 0;
-        int GlycolIndex = 0;          // Index to Glycol (Water) Properties
-        int CondErrIndex = 0;         // Error index for recurring warning messages
-        Real64 CondCausedTimeOff = 0.0; // Amount of time condensation did or could have turned system off
-        bool CondCausedShutDown = false;  // .TRUE. when condensation predicted at surface
-        int NumCircCalcMethod = 0;    // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
-        Real64 CircLength = 0.0;        // Circuit length {m}
-        std::string schedNameChangeoverDelay;   // changeover delay schedule
-        int schedPtrChangeoverDelay = 0;    // Pointer to the schedule for the changeover delay in hours
+        int GlycolIndex = 0;                  // Index to Glycol (Water) Properties
+        int CondErrIndex = 0;                 // Error index for recurring warning messages
+        Real64 CondCausedTimeOff = 0.0;       // Amount of time condensation did or could have turned system off
+        bool CondCausedShutDown = false;      // .TRUE. when condensation predicted at surface
+        int NumCircCalcMethod = 0;            // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
+        Real64 CircLength = 0.0;              // Circuit length {m}
+        std::string schedNameChangeoverDelay; // changeover delay schedule
+        int schedPtrChangeoverDelay = 0;      // Pointer to the schedule for the changeover delay in hours
         int lastOperatingMode = NotOperating; // Last mode of operation (heating or cooling)
-        int lastDayOfSim = 1;   // Last day of simulation radiant system operated in lastOperatingMode
-        int lastHourOfDay = 1;  // Last hour of the day radiant system operated in lastOperatingMode
-        int lastTimeStep = 1;   // Last time step radiant system operated in lastOperatingMode
+        int lastDayOfSim = 1;                 // Last day of simulation radiant system operated in lastOperatingMode
+        int lastHourOfDay = 1;                // Last hour of the day radiant system operated in lastOperatingMode
+        int lastTimeStep = 1;                 // Last time step radiant system operated in lastOperatingMode
         // Other parameters
         bool EMSOverrideOnWaterMdot = false;
         Real64 EMSWaterMdotOverrideValue = 0.0;
         // Report data
-        Real64 WaterInletTemp = 0.0;        // water inlet temperature
-        Real64 WaterOutletTemp = 0.0;       // water outlet temperature
-        Real64 CoolPower = 0.0;             // cooling sent to panel in Watts
-        Real64 CoolEnergy = 0.0;            // cooling sent to panel in Joules
-        int OutRangeHiErrorCount = 0;     // recurring errors for crazy results too high fluid temperature
-        int OutRangeLoErrorCount = 0;     // recurring errors for crazy results too low fluid temperature
+        Real64 WaterInletTemp = 0.0;  // water inlet temperature
+        Real64 WaterOutletTemp = 0.0; // water outlet temperature
+        Real64 CoolPower = 0.0;       // cooling sent to panel in Watts
+        Real64 CoolEnergy = 0.0;      // cooling sent to panel in Joules
+        int OutRangeHiErrorCount = 0; // recurring errors for crazy results too high fluid temperature
+        int OutRangeLoErrorCount = 0; // recurring errors for crazy results too low fluid temperature
 
         void updateOperatingModeHistory(EnergyPlusData &state);
 
