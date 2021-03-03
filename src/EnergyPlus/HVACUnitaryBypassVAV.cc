@@ -128,21 +128,6 @@ namespace HVACUnitaryBypassVAV {
     // "Ventilation for Changeover-Bypass VAV Systems," D. Stanke, ASHRAE Journal Vol. 46, No. 11, November 2004.
     //  Lawrence Berkeley Laboratory. Nov. 1993. DOE-2 Supplement Version 2.1E, Winklemann et.al.
 
-    // Dehumidification control modes (DehumidControlMode) for Multimode units only
-    int const DehumidControl_None(0);
-    int const DehumidControl_Multimode(1);
-    int const DehumidControl_CoolReheat(2);
-
-    // Mode of operation
-    int const CoolingMode(1); // System operating mode is cooling
-    int const HeatingMode(2); // System operating mode is heating
-
-    // Priority control mode (prioritized thermostat signal)
-    int const CoolingPriority(1); // Controls CBVAV system based on cooling priority
-    int const HeatingPriority(2); // Controls CBVAV system based on heating priority
-    int const ZonePriority(3);    // Controls CBVAV system based on number of zones priority
-    int const LoadPriority(4);    // Controls CBVAV system based on total load priority
-
     // Airflow control for contant fan mode
     int const UseCompressorOnFlow(1);  // Set compressor OFF air flow rate equal to compressor ON air flow rate
     int const UseCompressorOffFlow(2); // Set compressor OFF air flow rate equal to user defined value
@@ -1064,13 +1049,13 @@ namespace HVACUnitaryBypassVAV {
             }
 
             if (UtilityRoutines::SameString(Alphas(18), "CoolingPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = CoolingPriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::CoolingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "HeatingPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = HeatingPriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::HeatingPriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "ZonePriority")) {
-                CBVAV(CBVAVNum).PriorityControl = ZonePriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::ZonePriority;
             } else if (UtilityRoutines::SameString(Alphas(18), "LoadPriority")) {
-                CBVAV(CBVAVNum).PriorityControl = LoadPriority;
+                CBVAV(CBVAVNum).PriorityControl = PriorityCtrlMode::LoadPriority;
             } else {
                 ShowSevereError(state, CurrentModuleObject + " illegal " + cAlphaFields(18) + " = " + Alphas(18));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + CBVAV(CBVAVNum).Name);
@@ -1099,28 +1084,28 @@ namespace HVACUnitaryBypassVAV {
 
             // Dehumidification control mode
             if (UtilityRoutines::SameString(Alphas(19), "None")) {
-                CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(19), "")) {
-                CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
             } else if (UtilityRoutines::SameString(Alphas(19), "Multimode")) {
                 if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_Multimode;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::Multimode;
                 } else {
                     ShowWarningError(state, "Invalid " + cAlphaFields(19) + " = " + Alphas(19));
                     ShowContinueError(state, "In " + CurrentModuleObject + " \"" + CBVAV(CBVAVNum).Name + "\".");
                     ShowContinueError(state, "Valid only with " + cAlphaFields(14) + " = Coil:Cooling:DX:TwoStageWithHumidityControlMode.");
                     ShowContinueError(state, "Setting " + cAlphaFields(19) + " to \"None\" and the simulation continues.");
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                 }
             } else if (UtilityRoutines::SameString(Alphas(19), "CoolReheat")) {
                 if (CBVAV(CBVAVNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_CoolReheat;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::CoolReheat;
                 } else {
                     ShowWarningError(state, "Invalid " + cAlphaFields(19) + " = " + Alphas(19));
                     ShowContinueError(state, "In " + CurrentModuleObject + " \"" + CBVAV(CBVAVNum).Name + "\".");
                     ShowContinueError(state, "Valid only with " + cAlphaFields(14) + " = Coil:Cooling:DX:TwoStageWithHumidityControlMode.");
                     ShowContinueError(state, "Setting " + cAlphaFields(19) + " to \"None\" and the simulation continues.");
-                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl_None;
+                    CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                 }
             } else {
                 ShowSevereError(state, "Invalid " + cAlphaFields(19) + " =" + Alphas(19));
@@ -1838,14 +1823,14 @@ namespace HVACUnitaryBypassVAV {
 
         // Check for correct control node at outlet of unit
         if (CBVAV(CBVAVNum).HumRatMaxCheck) {
-            if (CBVAV(CBVAVNum).DehumidControlType > 0) {
+            if (CBVAV(CBVAVNum).DehumidControlType != DehumidControl::None) {
                 if (DataLoopNode::Node(OutNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowWarningError(state, "Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
                         ShowContinueError(state, "Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node of "
                                           "the unitary system.");
                         ShowContinueError(state, "Setting Dehumidification Control Type to None and simulation continues.");
-                        CBVAV(CBVAVNum).DehumidControlType = 0;
+                        CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                     } else {
                         // need call to EMS to check node
                         EMSSetPointCheck = false;
@@ -1859,7 +1844,7 @@ namespace HVACUnitaryBypassVAV {
                             ShowContinueError(state,
                                 "Or use an EMS Actuator to place a maximum humidity setpoint at the air outlet node of the unitary system.");
                             ShowContinueError(state, "Setting Dehumidification Control Type to None and simulation continues.");
-                            CBVAV(CBVAVNum).DehumidControlType = 0;
+                            CBVAV(CBVAVNum).DehumidControlType = DehumidControl::None;
                         } else if (!foundControl) {
                             // Couldn't find a control, but no error? There are some plugins, so adjust warning message accordingly
                             ShowWarningError(state, "Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
@@ -2801,7 +2786,7 @@ namespace HVACUnitaryBypassVAV {
 
                         if ((DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
                             (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
-                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl_Multimode) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0) {
+                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::Multimode) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0) {
 
                             // Determine required part load for enhanced dehumidification mode 1
 
@@ -2875,7 +2860,7 @@ namespace HVACUnitaryBypassVAV {
 
                         if ((DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilOutletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
                             (DataLoopNode::Node(CBVAV(CBVAVNum).DXCoilInletNode).HumRat > DataLoopNode::Node(OutletNode).HumRatMax) &&
-                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl_CoolReheat) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0) {
+                            (CBVAV(CBVAVNum).DehumidControlType == DehumidControl::CoolReheat) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0) {
 
                             // Determine revised desired outlet temperature  - use approach temperature control strategy
                             // based on CONTROLLER:SIMPLE TEMPANDHUMRAT control type.
@@ -3580,19 +3565,19 @@ namespace HVACUnitaryBypassVAV {
 
         {
             auto const SELECT_CASE_var(CBVAV(CBVAVNum).PriorityControl);
-            if (SELECT_CASE_var == CoolingPriority) {
+            if (SELECT_CASE_var == PriorityCtrlMode::CoolingPriority) {
                 if (QZoneReqCool < 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (QZoneReqHeat > 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 }
-            } else if (SELECT_CASE_var == HeatingPriority) {
+            } else if (SELECT_CASE_var == PriorityCtrlMode::HeatingPriority) {
                 if (QZoneReqHeat > 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
                 } else if (QZoneReqCool < 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 }
-            } else if (SELECT_CASE_var == ZonePriority) {
+            } else if (SELECT_CASE_var == PriorityCtrlMode::ZonePriority) {
                 if (CBVAV(CBVAVNum).NumZonesHeated > CBVAV(CBVAVNum).NumZonesCooled) {
                     if (QZoneReqHeat > 0.0) {
                         CBVAV(CBVAVNum).HeatCoolMode = HeatingMode;
@@ -3614,7 +3599,7 @@ namespace HVACUnitaryBypassVAV {
                         CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                     }
                 }
-            } else if (SELECT_CASE_var == LoadPriority) {
+            } else if (SELECT_CASE_var == PriorityCtrlMode::LoadPriority) {
                 if (std::abs(QZoneReqCool) > std::abs(QZoneReqHeat) && QZoneReqCool != 0.0) {
                     CBVAV(CBVAVNum).HeatCoolMode = CoolingMode;
                 } else if (std::abs(QZoneReqCool) < std::abs(QZoneReqHeat) && QZoneReqHeat != 0.0) {
