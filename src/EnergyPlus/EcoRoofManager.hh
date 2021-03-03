@@ -100,10 +100,12 @@ struct EcoRoofManagerData : BaseGlobalStruct {
     Real64 Tfold; // leaf temperature from the previous time step
     Real64 Tgold; // ground temperature from the previous time step
     bool EcoRoofbeginFlag;
+    bool CalcEcoRoofMyEnvrnFlag = true;
 
     void clear_state() override
     {
-        EcoRoofbeginFlag = true;
+        this->EcoRoofbeginFlag = true;
+        this->CalcEcoRoofMyEnvrnFlag = true;
     }
 };
 

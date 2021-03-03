@@ -95,16 +95,6 @@ namespace EcoRoofManager {
     using namespace DataSurfaces;
     using namespace DataHeatBalance;
 
-    bool CalcEcoRoofMyEnvrnFlag(true);
-
-    void clear_state() {
-        CalcEcoRoofMyEnvrnFlag = true;
-    }
-
-    // MODULE SUBROUTINES:
-
-    //*************************************************************************
-
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
@@ -425,7 +415,7 @@ namespace EcoRoofManager {
         }
         // DJS July 2007
 
-        if (state.dataGlobal->BeginEnvrnFlag && CalcEcoRoofMyEnvrnFlag) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag) {
             state.dataEcoRoofMgr->Tgold = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             state.dataEcoRoofMgr->Tfold = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tg = 10.0;
@@ -440,11 +430,11 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->CurrentET = 0.0;
             state.dataEcoRoofMgr->CurrentPrecipitation = 0.0;
             state.dataEcoRoofMgr->CurrentIrrigation = 0.0;
-            CalcEcoRoofMyEnvrnFlag = false;
+            state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            CalcEcoRoofMyEnvrnFlag = true;
+            state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag = true;
         }
 
         // If current surface is = FirstEcoSurf then for this time step we need to update the soil moisture

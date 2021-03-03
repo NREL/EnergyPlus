@@ -103,13 +103,6 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    bool MyOneTimeFlag(true);
-
-    void clear_state()
-    {
-        MyOneTimeFlag = true;
-    }
-
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
     {
 
@@ -1863,7 +1856,7 @@ namespace RoomAirModelManager {
         static int NodeNum2(0); // The Second node number in an AirflowNetwork linkage data
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataRoomAirModelMgr->MyOneTimeFlag) {
 
             MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
 
@@ -2532,7 +2525,7 @@ namespace RoomAirModelManager {
 
             MyEnvrnFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataRoomAirModelMgr->MyOneTimeFlag = false;
         }
 
         // Do the Begin Environment initializations
