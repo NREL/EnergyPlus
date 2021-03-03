@@ -179,12 +179,6 @@ namespace ScheduleManager {
         }
     };
 
-    // Object Data
-    extern Array1D<ScheduleTypeData> ScheduleType; // Allowed Schedule Types
-    extern Array1D<DayScheduleData> DaySchedule;   // Day Schedule Storage
-    extern Array1D<WeekScheduleData> WeekSchedule; // Week Schedule Storage
-    extern Array1D<ScheduleData> Schedule;         // Schedule Storage
-
     // Functions
 
     // Clears the global data in ScheduleManager.
@@ -356,12 +350,23 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumWeekSchedules = 0;
     int NumSchedules = 0;
 
+    // Object Data
+    Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types
+    Array1D<ScheduleManager::DayScheduleData> DaySchedule;   // Day Schedule Storage
+    Array1D<ScheduleManager::WeekScheduleData> WeekSchedule; // Week Schedule Storage
+    Array1D<ScheduleManager::ScheduleData> Schedule;         // Schedule Storage
+
     void clear_state() override
     {
         NumScheduleTypes = 0;
         NumDaySchedules = 0;
         NumWeekSchedules = 0;
         NumSchedules = 0;
+
+        ScheduleType.clear(); // Allowed Schedule Types
+        DaySchedule.clear();  // Day Schedule Storage
+        WeekSchedule.clear(); // Week Schedule Storage
+        Schedule.clear();     // Schedule Storage
     }
 };
 
