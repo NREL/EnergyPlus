@@ -2721,17 +2721,15 @@ namespace ZoneTempPredictorCorrector {
 
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 FirstSurfFlag = true;
-                if (state.dataHeatBal->Zone(Loop).HTSurfaceFirst > 0) {
-                    for (SurfNum = state.dataHeatBal->Zone(Loop).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(Loop).HTSurfaceLast; ++SurfNum) {
-                        if (FirstSurfFlag) {
-                            TRefFlag = Surface(SurfNum).TAirRef;
-                            FirstSurfFlag = false;
-                        }
-                        // for each particular zone, the reference air temperature(s) should be the same
-                        // (either mean air, bulk air, or supply air temp).
-                        if (Surface(SurfNum).TAirRef != TRefFlag) {
-                            ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + state.dataHeatBal->Zone(Loop).Name);
-                        }
+                for (SurfNum = state.dataHeatBal->Zone(Loop).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(Loop).HTSurfaceLast; ++SurfNum) {
+                    if (FirstSurfFlag) {
+                        TRefFlag = Surface(SurfNum).TAirRef;
+                        FirstSurfFlag = false;
+                    }
+                    // for each particular zone, the reference air temperature(s) should be the same
+                    // (either mean air, bulk air, or supply air temp).
+                    if (Surface(SurfNum).TAirRef != TRefFlag) {
+                        ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + state.dataHeatBal->Zone(Loop).Name);
                     }
                 }
             }
