@@ -72,8 +72,8 @@ namespace HVACUnitaryBypassVAV {
     constexpr int Off(0); // Signal DXCoil that compressor should not run
 
     // Mode of operation
-    int constexpr CoolingMode;      // System operating mode is cooling
-    int constexpr HeatingMode;      // System operating mode is heating
+    int constexpr CoolingMode(1);      // System operating mode is cooling
+    int constexpr HeatingMode(2);      // System operating mode is heating
 
     enum class DehumidControl       // Dehumidification control modes (DehumidControlMode) for Multimode units only
     {
@@ -378,18 +378,18 @@ namespace HVACUnitaryBypassVAV {
 
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct {
 
-    int NumCBVAV;                  // Number of CBVAV systems in input file
-    Real64 CompOnMassFlow;         // System air mass flow rate w/ compressor ON
-    Real64 OACompOnMassFlow;       // OA mass flow rate w/ compressor ON
-    Real64 CompOffMassFlow;        // System air mass flow rate w/ compressor OFF
-    Real64 OACompOffMassFlow;      // OA mass flow rate w/ compressor OFF
-    Real64 CompOnFlowRatio;        // fan flow ratio when coil on
-    Real64 CompOffFlowRatio;       // fan flow ratio when coil off
-    Real64 FanSpeedRatio;          // ratio of air flow ratio passed to fan object
-    Real64 BypassDuctFlowFraction; // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
-    Real64 PartLoadFrac;           // Compressor part-load fraction
-    Real64 SaveCompressorPLR;      // Holds DX compressor PLR from active DX coil
-    Real64 TempSteamIn;            // steam coil steam inlet temperature
+    int NumCBVAV = 0;                       // Number of CBVAV systems in input file
+    Real64 CompOnMassFlow = 0.0;            // System air mass flow rate w/ compressor ON
+    Real64 OACompOnMassFlow = 0.0;          // OA mass flow rate w/ compressor ON
+    Real64 CompOffMassFlow = 0.0;           // System air mass flow rate w/ compressor OFF
+    Real64 OACompOffMassFlow = 0.0;         // OA mass flow rate w/ compressor OFF
+    Real64 CompOnFlowRatio = 0.0;           // fan flow ratio when coil on
+    Real64 CompOffFlowRatio = 0.0;          // fan flow ratio when coil off
+    Real64 FanSpeedRatio = 0.0;             // ratio of air flow ratio passed to fan object
+    Real64 BypassDuctFlowFraction = 0.0;    // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
+    Real64 PartLoadFrac = 0.0;              // Compressor part-load fraction
+    Real64 SaveCompressorPLR = 0.0;         // Holds DX compressor PLR from active DX coil
+    Real64 TempSteamIn = 100.0;               // steam coil steam inlet temperature
     Array1D_bool CheckEquipName;
 
     Array1D<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
