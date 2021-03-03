@@ -154,10 +154,6 @@ namespace LowTempRadiantSystem {
     std::string const cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
     std::string const cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
     std::string const cElectricSystem("ZoneHVAC:LowTemperatureRadiant:Electric");
-
-    // Number of Circuits per Surface Calculation Method
-    int const OneCircuit(1);          // there is 1 circuit per surface
-    int const CalculateFromLength(2); // The number of circuits is TubeLength*SurfaceFrac / CircuitLength
     std::string const OnePerSurf("OnePerSurface");
     std::string const CalcFromLength("CalculateFromCircuitLength");
 

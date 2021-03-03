@@ -79,10 +79,11 @@ namespace LowTempRadiantSystem {
     extern std::string const cHydronicSystem;
     extern std::string const cConstantFlowSystem;
     extern std::string const cElectricSystem;
+
     // Operating modes:
     int constexpr NotOperating = 0; // Parameter for use with OperatingMode variable, set for heating
     int constexpr HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
-    int constexpr CoolingMode = -1;  // Parameter for use with OperatingMode variable, set for cooling
+    int constexpr CoolingMode = -1; // Parameter for use with OperatingMode variable, set for cooling
 
     // Control types:
     enum class LowTempRadiantControlTypes {
@@ -112,14 +113,9 @@ namespace LowTempRadiantSystem {
         CondCtrlVariedOff  // Condensation control--variable off, system modulates to keep running if possible
     };
 
-//    // Condensation control types:
-//    extern int const CondCtrlNone;      // Condensation control--none, so system never shuts down
-//    extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
-//    extern int const CondCtrlVariedOff; // Condensation control--variable off, system modulates to keep running if possible
-
     // Number of Circuits per Surface Calculation Method
-    extern int const OneCircuit;          // there is 1 circuit per surface
-    extern int const CalculateFromLength; // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
+    int constexpr OneCircuit = 1;          // there is 1 circuit per surface
+    int constexpr CalculateFromLength = 2; // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
 
     extern std::string const OnePerSurf;
     extern std::string const CalcFromLength;
@@ -131,29 +127,31 @@ namespace LowTempRadiantSystem {
     struct RadiantSystemBaseData
     {
         // Members
-        std::string Name;                // name of hydronic radiant system
-        std::string SchedName;           // availability schedule
-        int SchedPtr = 0;                    // index to schedule
-        std::string ZoneName;            // Name of zone the system is serving
-        int ZonePtr = 0;                     // Point to this zone in the Zone derived type
-        std::string SurfListName;        // Name of surface/surface list that is the radiant system
-        int NumOfSurfaces = 0;               // Number of surfaces included in this radiant system (coordinated control)
-        Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
-        Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
-        Array1D<Real64> SurfaceFrac;     // Fraction of flow/pipe length or electric power for a particular surface
-        Real64 TotalSurfaceArea = 0.0;         // Total surface area for all surfaces that are part of this radiant system
+        std::string Name;              // name of hydronic radiant system
+        std::string SchedName;         // availability schedule
+        int SchedPtr = 0;              // index to schedule
+        std::string ZoneName;          // Name of zone the system is serving
+        int ZonePtr = 0;               // Point to this zone in the Zone derived type
+        std::string SurfListName;      // Name of surface/surface list that is the radiant system
+        int NumOfSurfaces = 0;         // Number of surfaces included in this radiant system (coordinated control)
+        Array1D_int SurfacePtr;        // Pointer to the surface(s) in the Surface derived type
+        Array1D_string SurfaceName;    // Name of surfaces that are the radiant system (can be one or more)
+        Array1D<Real64> SurfaceFrac;   // Fraction of flow/pipe length or electric power for a particular surface
+        Real64 TotalSurfaceArea = 0.0; // Total surface area for all surfaces that are part of this radiant system
         LowTempRadiantControlTypes ControlType = LowTempRadiantControlTypes::MATControl; // Control type for the system (MAT, MRT, Op temp, ODB, OWB,
-                                                // Surface Face Temp, Surface Interior Temp, Running Mean Temp
-                                                // for Constant Flow systems only)
-        LowTempRadiantSetpointTypes SetpointType = LowTempRadiantSetpointTypes::halfFlowPower;   // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+                                                                                         // Surface Face Temp, Surface Interior Temp, Running Mean
+                                                                                         // Temp for Constant Flow systems only)
+        LowTempRadiantSetpointTypes SetpointType =
+            LowTempRadiantSetpointTypes::halfFlowPower; // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
         int OperatingMode = NotOperating;               // Operating mode currently being used (NotOperating, Heating, Cooling)
-        Real64 HeatPower;             // heating sent to panel in Watts
-        Real64 HeatEnergy;            // heating sent to panel in Joules
-        Real64 runningMeanOutdoorAirTemperatureWeightingFactor = 0.0; // Weighting factor for running mean outdoor air temperature equation (user input)
-        Real64 todayRunningMeanOutdoorDryBulbTemperature = 0.0;        // Current running mean outdoor air dry-bulb temperature
-        Real64 yesterdayRunningMeanOutdoorDryBulbTemperature = 0.0;    // Running mean outdoor air dry-bulb temperature from yesterday
-        Real64 todayAverageOutdoorDryBulbTemperature = 0.0;            // Average outdoor dry-bulb temperature for today
-        Real64 yesterdayAverageOutdoorDryBulbTemperature = 0.0;        // Average outdoor dry-bulb temperature for yesterday
+        Real64 HeatPower;                               // heating sent to panel in Watts
+        Real64 HeatEnergy;                              // heating sent to panel in Joules
+        Real64 runningMeanOutdoorAirTemperatureWeightingFactor =
+            0.0;                                                    // Weighting factor for running mean outdoor air temperature equation (user input)
+        Real64 todayRunningMeanOutdoorDryBulbTemperature = 0.0;     // Current running mean outdoor air dry-bulb temperature
+        Real64 yesterdayRunningMeanOutdoorDryBulbTemperature = 0.0; // Running mean outdoor air dry-bulb temperature from yesterday
+        Real64 todayAverageOutdoorDryBulbTemperature = 0.0;         // Average outdoor dry-bulb temperature for today
+        Real64 yesterdayAverageOutdoorDryBulbTemperature = 0.0;     // Average outdoor dry-bulb temperature for yesterday
 
         LowTempRadiantControlTypes processRadiantSystemControlInput(EnergyPlusData &state,
                                                                     std::string const& controlInput,
