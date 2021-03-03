@@ -657,8 +657,6 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataHeatBal->Zone(1).HTSurfaceLast = -1;
-    state->dataHeatBal->Zone(2).HTSurfaceLast = -1;
     ZoneTempPredictorCorrector::InitZoneAirSetPoints(*state);
     bool simZone = false;
     bool simAir = false;
