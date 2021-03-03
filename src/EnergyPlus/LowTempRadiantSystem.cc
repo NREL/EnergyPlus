@@ -5130,7 +5130,6 @@ namespace LowTempRadiantSystem {
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        auto constexpr RoutineName("UpdateLowTempRadiantSystem");
 
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
 
