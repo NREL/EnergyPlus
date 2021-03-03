@@ -76,10 +76,6 @@ namespace LowTempRadiantSystem {
         ElectricSystem,                 // Electric resistance radiant heating system
     };
 
-    extern std::string const cHydronicSystem;
-    extern std::string const cConstantFlowSystem;
-    extern std::string const cElectricSystem;
-
     // Operating modes:
     int constexpr NotOperating = 0; // Parameter for use with OperatingMode variable, set for heating
     int constexpr HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
@@ -116,9 +112,6 @@ namespace LowTempRadiantSystem {
     // Number of Circuits per Surface Calculation Method
     int constexpr OneCircuit = 1;          // there is 1 circuit per surface
     int constexpr CalculateFromLength = 2; // The number of circuits is TubeLength*SurfaceFlowFrac / CircuitLength
-
-    extern std::string const OnePerSurf;
-    extern std::string const CalcFromLength;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 

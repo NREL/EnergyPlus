@@ -151,13 +151,13 @@ namespace LowTempRadiantSystem {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // System types:
-    std::string const cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
-    std::string const cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
-    std::string const cElectricSystem("ZoneHVAC:LowTemperatureRadiant:Electric");
-    std::string const OnePerSurf("OnePerSurface");
-    std::string const CalcFromLength("CalculateFromCircuitLength");
+    auto constexpr cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
+    auto constexpr cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
+    auto constexpr cElectricSystem("ZoneHVAC:LowTemperatureRadiant:Electric");
+    auto constexpr OnePerSurf("OnePerSurface");
+    auto constexpr CalcFromLength("CalculateFromCircuitLength");
 
-    static std::string const fluidNameWater("WATER");
+    auto constexpr fluidNameWater("WATER");
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -321,10 +321,10 @@ namespace LowTempRadiantSystem {
         using namespace DataSurfaceLists;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
-        static std::string const Off("Off");
-        static std::string const SimpleOff("SimpleOff");
-        static std::string const VariableOff("VariableOff");
+        auto constexpr RoutineName("GetLowTempRadiantSystem: "); // include trailing blank space
+        auto constexpr Off("Off");
+        auto constexpr SimpleOff("SimpleOff");
+        auto constexpr VariableOff("VariableOff");
         int const iHeatCAPMAlphaNum(5);             // get input index to Low Temperature Radiant system heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1); // get input index to Low Temperature Radiant system electric heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(
@@ -675,7 +675,7 @@ namespace LowTempRadiantSystem {
             thisRadSys.ZoneName = Alphas(4);
             thisRadSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
             if (thisRadSys.ZonePtr == 0) {
-                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(4));
+                ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(3), Alphas(4)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
@@ -709,7 +709,7 @@ namespace LowTempRadiantSystem {
                 thisRadSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (thisRadSys.SurfacePtr(1) == 0) {
-                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(5) + " = " + Alphas(5));
+                    ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(5), Alphas(5)));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(thisRadSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
@@ -946,7 +946,7 @@ namespace LowTempRadiantSystem {
             thisCFloSys.ZoneName = Alphas(4);
             thisCFloSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(4), Zone);
             if (thisCFloSys.ZonePtr == 0) {
-                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
@@ -983,7 +983,7 @@ namespace LowTempRadiantSystem {
                 thisCFloSys.NumCircuits(1) = 0.0;
                 // Error checking for single surfaces
                 if (thisCFloSys.SurfacePtr(1) == 0) {
-                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(thisCFloSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
@@ -1162,7 +1162,7 @@ namespace LowTempRadiantSystem {
             thisElecSys.ZoneName = Alphas(3);
             thisElecSys.ZonePtr = UtilityRoutines::FindItemInList(Alphas(3), Zone);
             if (thisElecSys.ZonePtr == 0) {
-                ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(3) + " = " + Alphas(3));
+                ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(3), Alphas(3)));
                 ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                 ErrorsFound = true;
             }
@@ -1190,7 +1190,7 @@ namespace LowTempRadiantSystem {
                 thisElecSys.SurfaceFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (thisElecSys.SurfacePtr(1) == 0) {
-                    ShowSevereError(state, RoutineName + "Invalid " + cAlphaFields(4) + " = " + Alphas(4));
+                    ShowSevereError(state, format("{}Invalid {} = {}", RoutineName, cAlphaFields(4), Alphas(4)));
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else if (Surface(thisElecSys.SurfacePtr(1)).IsRadSurfOrVentSlabOrPool) {
@@ -1381,7 +1381,7 @@ namespace LowTempRadiantSystem {
         lNumericBlanks.deallocate();
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input. Preceding conditions cause termination.");
+            ShowFatalError(state, format("{}Errors found in input. Preceding conditions cause termination.", RoutineName));
         }
 
         // Set up the output variables for low temperature radiant systems
@@ -1795,7 +1795,7 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const ZeroTol(0.0000001); // Smallest non-zero value allowed
-        static std::string const RoutineName("InitLowTempRadiantSystem");
+        auto constexpr RoutineName("InitLowTempRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CurrentFlowSchedule; // Schedule value for flow fraction in a constant flow radiant system
@@ -2520,7 +2520,7 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeLowTempRadiantSystem");
+        auto constexpr RoutineName("SizeLowTempRadiantSystem");
         static int const OFF = 0;
         static int const ClgHtg = 1;
         static int const ClgOnly = 2;
@@ -2603,7 +2603,7 @@ namespace LowTempRadiantSystem {
                         DataScalableCapSizingON = false;
                         state.dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower = TempSize;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                        ShowSevereError(state, RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + state.dataLowTempRadSys->ElecRadSys(RadSysNum).Name + "\".");
+                        ShowSevereError(state, format("{}: auto-sizing cannot be done for {} = {}\".", RoutineName, CompType, state.dataLowTempRadSys->ElecRadSys(RadSysNum).Name));
                         ShowContinueError(state, "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when the "
                                           "Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\".");
                         ErrorsFound = true;
@@ -2690,8 +2690,7 @@ namespace LowTempRadiantSystem {
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat == AutoSize) {
-                            ShowSevereError(state, RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name +
-                                            "\".");
+                            ShowSevereError(state, format("{}: auto-sizing cannot be done for {} = {}\".", RoutineName, CompType, state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                             ShowContinueError(state, "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when "
                                               "the Heating Design Capacity Method = \"FractionOfAutosizedHeatingCapacity\".");
                             ErrorsFound = true;
@@ -2850,8 +2849,7 @@ namespace LowTempRadiantSystem {
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         if (state.dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool == AutoSize) {
-                            ShowSevereError(state, RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name +
-                                            "\".");
+                            ShowSevereError(state, format("{}: auto-sizing cannot be done for {} = {}\".", RoutineName, CompType, state.dataLowTempRadSys->HydrRadSys(RadSysNum).Name));
                             ShowContinueError(state, "The \"SimulationControl\" object must have the field \"Do Zone Sizing Calculation\" set to Yes when "
                                               "the Cooling Design Capacity Method = \"FractionOfAutosizedCoolingCapacity\".");
                             ErrorsFound = true;
@@ -3745,7 +3743,7 @@ namespace LowTempRadiantSystem {
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                ShowWarningMessage(state, cHydronicSystem + " [" + this->Name + ']');
+                                ShowWarningMessage(state, format("{} [{}]", cHydronicSystem, this->Name));
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
@@ -3759,13 +3757,13 @@ namespace LowTempRadiantSystem {
                                     format("Note that a {:.4R} C safety was chosen in the input for the shut-off criteria", variableFlowDesignDataObject.CondDewPtDeltaT));
                                 ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(state, cHydronicSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
-                                                           this->CondErrIndex,
-                                                           DewPointTemp,
-                                                           DewPointTemp,
-                                                           _,
-                                                           "C",
-                                                           "C");
+                            ShowRecurringWarningErrorAtEnd(state, format("{} [{}] condensation shut-off occurrence continues.", cHydronicSystem, this->Name),
+                                               this->CondErrIndex,
+                                               DewPointTemp,
+                                               DewPointTemp,
+                                               _,
+                                               "C",
+                                               "C");
                         }
                         break; // outer do loop
                     }
@@ -3916,7 +3914,7 @@ namespace LowTempRadiantSystem {
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                ShowWarningMessage(state, cHydronicSystem + " [" + this->Name + ']');
+                                ShowWarningMessage(state, format("{} [{}]", cHydronicSystem, this->Name));
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(CondSurfNum)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
@@ -3930,7 +3928,7 @@ namespace LowTempRadiantSystem {
                                     format("Note that a {:.4R} C safety was chosen in the input for the shut-off criteria", variableFlowDesignDataObject.CondDewPtDeltaT));
                                 ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(state, cHydronicSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
+                            ShowRecurringWarningErrorAtEnd(state, format("{} [{}] condensation shut-off occurrence continues.", cHydronicSystem, this->Name),
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
@@ -3998,7 +3996,7 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const LowCpFluidValue(100.0); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
-        static std::string const RoutineName("CalcLowTempCFloRadiantSystem");
+        auto constexpr RoutineName("CalcLowTempCFloRadiantSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CpFluid;         // Specific heat of the fluid in the radiant system
@@ -4512,7 +4510,7 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const TempCheckLimit(0.1); // Maximum allowed temperature difference between outlet temperature calculations
         Real64 const ZeroSystemResp(0.1); // Response below which the system response is really zero
-        static std::string const RoutineName("CalcLowTempCFloRadSysComps");
+        auto constexpr RoutineName("CalcLowTempCFloRadSysComps");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ConstrNum;                // Index for construction number in Construct derived type
@@ -4850,7 +4848,7 @@ namespace LowTempRadiantSystem {
                         // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                         if (!state.dataGlobal->WarmupFlag) {
                             if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                ShowWarningMessage(state, cConstantFlowSystem + " [" + this->Name + ']');
+                                ShowWarningMessage(state, format("{} [{}]", cConstantFlowSystem, this->Name));
                                 ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                   "] temperature below dew-point temperature--potential for condensation exists");
                                 ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
@@ -4864,7 +4862,7 @@ namespace LowTempRadiantSystem {
                                     format("Note that a {:.4R} C safety was chosen in the input for the shut-off criteria", ConstantFlowDesignDataObject.CondDewPtDeltaT));
                                 ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                             }
-                            ShowRecurringWarningErrorAtEnd(state, cConstantFlowSystem + " [" + this->Name + "] condensation shut-off occurrence continues.",
+                            ShowRecurringWarningErrorAtEnd(state, format("{} [{}] condensation shut-off occurrence continues.", cConstantFlowSystem, this->Name),
                                                            this->CondErrIndex,
                                                            DewPointTemp,
                                                            DewPointTemp,
@@ -4912,7 +4910,7 @@ namespace LowTempRadiantSystem {
                             // Produce a warning message so that user knows the system was shut-off due to potential for condensation
                             if (!state.dataGlobal->WarmupFlag) {
                                 if (this->CondErrIndex == 0) { // allow errors up to number of radiant systems
-                                    ShowWarningMessage(state, cConstantFlowSystem + " [" + this->Name + ']');
+                                    ShowWarningMessage(state, format("{} [{}]", cConstantFlowSystem, this->Name));
                                     ShowContinueError(state, "Surface [" + Surface(this->SurfacePtr(RadSurfNum2)).Name +
                                                       "] temperature below dew-point temperature--potential for condensation exists");
                                     ShowContinueError(state, "Flow to the radiant system will be shut-off to avoid condensation");
@@ -4927,8 +4925,7 @@ namespace LowTempRadiantSystem {
                                                              ConstantFlowDesignDataObject.CondDewPtDeltaT));
                                     ShowContinueError(state, "Note also that this affects all surfaces that are part of this radiant system");
                                 }
-                                ShowRecurringWarningErrorAtEnd(state, cConstantFlowSystem + " [" + this->Name +
-                                                                   "] condensation shut-off occurrence continues.",
+                                ShowRecurringWarningErrorAtEnd(state, format("{} [{}] condensation shut-off occurrence continues.", cConstantFlowSystem, this->Name),
                                                                this->CondErrIndex,
                                                                DewPointTemp,
                                                                DewPointTemp,
@@ -5133,7 +5130,7 @@ namespace LowTempRadiantSystem {
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateLowTempRadiantSystem");
+        auto constexpr RoutineName("UpdateLowTempRadiantSystem");
 
         for (int radSurfNum = 1; radSurfNum <= this->NumOfSurfaces; ++radSurfNum) {
 
@@ -5165,7 +5162,7 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateVariableFlowSystem");
+        auto constexpr RoutineName("UpdateVariableFlowSystem");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 cpWater;       // Specific heat of water
@@ -5491,7 +5488,7 @@ namespace LowTempRadiantSystem {
             NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
         static Array1D<Real64> const Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
-        static std::string const RoutineName("calculateHXEffectivenessTerm");
+        auto constexpr RoutineName("calculateHXEffectivenessTerm");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Index;
@@ -5818,7 +5815,7 @@ namespace LowTempRadiantSystem {
         using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        static std::string const routineName("ReportConstantFlowSystem");
+        auto constexpr routineName("ReportConstantFlowSystem");
         Real64 cpFluid;               // Specific heat of the fluid in the radiant system
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
 
