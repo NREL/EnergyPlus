@@ -110,7 +110,6 @@
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -193,7 +192,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
-    InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();

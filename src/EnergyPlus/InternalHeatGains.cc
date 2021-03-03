@@ -140,17 +140,7 @@ namespace InternalHeatGains {
     int const ITEInletZoneAirNode(1);
     int const ITEInletRoomAirModel(2);
 
-    bool GetInternalHeatGainsInputFlag(true); // Controls the GET routine calling (limited to first time)
-    bool ErrorsFound(false);                  // if errors were found in the input
-
     static std::string const BlankString;
-
-    // Functions
-    void clear_state()
-    {
-        GetInternalHeatGainsInputFlag = true;
-        ErrorsFound = false;
-    }
 
     void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
@@ -165,9 +155,9 @@ namespace InternalHeatGains {
         // This is the main driver subroutine for the internal heat gains.
 
 
-        if (GetInternalHeatGainsInputFlag) {
+        if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
             GetInternalHeatGainsInput(state);
-            GetInternalHeatGainsInputFlag = false;
+            state.dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
         }
 
         if (present(InitOnly)) {
@@ -279,6 +269,7 @@ namespace InternalHeatGains {
             }
         };
 
+        auto &ErrorsFound(state.dataInternalHeatGains->ErrorsFound);
 
         state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
@@ -6419,7 +6410,7 @@ namespace InternalHeatGains {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
-        if (GetInternalHeatGainsInputFlag) {
+        if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
             ShowFatalError(state, "GetDesignLightingLevelForZone: Function called prior to Getting Lights Input.");
         }
 
@@ -6473,7 +6464,7 @@ namespace InternalHeatGains {
         Real64 LightsRepMax; // Maximum Lighting replacement fraction for any lights statement for this zone
         int NumLights;       // Number of Lights statement for that zone.
 
-        if (GetInternalHeatGainsInputFlag) {
+        if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
             ShowFatalError(state, "CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input.");
         }
 
