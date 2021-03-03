@@ -5470,9 +5470,9 @@ namespace LowTempRadiantSystem {
         Real64 const MaxLaminarRe(2300.0); // Maximum Reynolds number for laminar flow
         int const NumOfPropDivisions(13);
         Real64 const MaxExpPower(50.0); // Maximum power after which EXP argument would be zero for DP variables
-        static Array1D<Real64> const Temps(
+        Array1D<Real64> Temps(
             NumOfPropDivisions, {1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85}); // Temperature, in C
-        static Array1D<Real64> const Mu(NumOfPropDivisions,
+        Array1D<Real64> Mu(NumOfPropDivisions,
                                         {0.001652,
                                          0.001422,
                                          0.001225,
@@ -5486,9 +5486,9 @@ namespace LowTempRadiantSystem {
                                          0.000528,
                                          0.000489,
                                          0.000453}); // Viscosity, in Ns/m2
-        static Array1D<Real64> const Conductivity(
+        Array1D<Real64> Conductivity(
             NumOfPropDivisions, {0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656}); // Conductivity, in W/mK
-        static Array1D<Real64> const Pr(
+        Array1D<Real64> Pr(
             NumOfPropDivisions, {12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88}); // Prandtl number (dimensionless)
         auto constexpr RoutineName("calculateHXEffectivenessTerm");
 
