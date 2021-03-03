@@ -545,34 +545,39 @@ void CoilCoolingDXCurveFitPerformance::setOperMode(EnergyPlusData &state, CoilCo
         if (mode == 2) {
             if (currentMode.speeds[speedNum].indexSHRFT == 0) {
                 ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
-                    "SubcoolReheat mode. Please input");
+                ShowContinueError(state,
+                                  "The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
             if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
                 ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
-                    "SubcoolReheat mode. Please input");
+                ShowContinueError(state,
+                                  "The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
         }
         if (mode == 3) {
             if (currentMode.speeds[speedNum].indexSHRFT == 0) {
                 ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
-                    "SubcoolReheat mode. Please input");
+                ShowContinueError(state,
+                                  "The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
             if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
                 ShowSevereError(state, currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
-                ShowContinueError(state, "The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
-                    "SubcoolReheat mode. Please input");
+                ShowContinueError(state,
+                                  "The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                                  "SubcoolReheat mode. Please input");
                 errorsFound = true;
             }
         }
     }
     if (errorsFound) {
-        ShowFatalError(state, "CoilCoolingDXCurveFitPerformance: Errors found in getting " + this->object_name +
-            " input. Preceding condition(s) causes termination.");
+        ShowFatalError(state,
+                       "CoilCoolingDXCurveFitPerformance: Errors found in getting " + this->object_name +
+                           " input. Preceding condition(s) causes termination.");
     }
 }

@@ -219,7 +219,6 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
     DataSizing::DataFractionUsedForSizing = 0.000114;
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
-    int thisSpeedNum = 0;
 
     AutoCalculateSizer sizerCondAirFlow;
     stringOverride = "Rated Condenser Air Flow Rate [m3/s]";
@@ -241,6 +240,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
         this->nominalEvaporativePumpPower = sizerCondEvapPumpPower.size(state, TempSize, errorsFound);
     }
 
+    int thisSpeedNum = 0;
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentName = this->parentName;
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
