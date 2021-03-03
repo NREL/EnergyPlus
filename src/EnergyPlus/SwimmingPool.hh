@@ -192,7 +192,7 @@ namespace SwimmingPool {
 
     void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
-    Real64 SumHATsurf(int ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
     void ReportSwimmingPool(EnergyPlusData &state);
 

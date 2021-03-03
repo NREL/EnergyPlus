@@ -657,7 +657,7 @@ namespace SolarReflectionManager {
                         if (Surface(HitPtSurfNum).Class == SurfaceClass::Window || Surface(HitPtSurfNum).Class == SurfaceClass::GlassDoor) continue;
 
                         // Skip rays that hit non-sunlit surface. Assume first time step of the hour.
-                        SunLitFract = SunlitFrac(1, iHour, HitPtSurfNum);
+                        SunLitFract = state.dataHeatBal->SunlitFrac(1, iHour, HitPtSurfNum);
 
                         // If hit point's surface is not sunlit go to next ray
                         // TH 3/25/2010. why limit to HeatTransSurf? shading surfaces should also apply
@@ -920,7 +920,7 @@ namespace SolarReflectionManager {
                     if ((Surface(ReflSurfNum).Class == SurfaceClass::Window && Surface(ReflSurfNum).ExtSolar) ||
                         (Surface(ReflSurfNum).ShadowSurfGlazingFrac > 0.0 && Surface(ReflSurfNum).ShadowingSurf)) {
                         // Skip if window and not sunlit
-                        if (Surface(ReflSurfNum).Class == SurfaceClass::Window && SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
+                        if (Surface(ReflSurfNum).Class == SurfaceClass::Window && state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
                         // Check if sun is in front of this reflecting surface.
                         ReflNorm = Surface(ReflSurfNum).OutNormVec;
                         CosIncAngRefl = dot(SunVec, ReflNorm);
@@ -1133,11 +1133,11 @@ namespace SolarReflectionManager {
                             }
                         }
 
-                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
-                            SkyReflSolRadiance = Surface(HitPtSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(HitPtSurfNumX) *
+                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                            SkyReflSolRadiance = Surface(HitPtSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(HitPtSurfNumX) *
                                                  state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum);
                         } else {
-                            SkyReflSolRadiance = Surface(HitPtSurfNumX).ViewFactorSky * DifShdgRatioIsoSkyHRTS(1, 1, HitPtSurfNumX) *
+                            SkyReflSolRadiance = Surface(HitPtSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSkyHRTS(1, 1, HitPtSurfNumX) *
                                                  state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum);
                         }
                         dReflSkySol =

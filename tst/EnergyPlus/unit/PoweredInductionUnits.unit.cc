@@ -78,7 +78,6 @@
 using namespace EnergyPlus;
 using namespace SimulationManager;
 using namespace DataSizing;
-using DataHeatBalance::Zone;
 
 TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 {

@@ -883,7 +883,7 @@ namespace EnergyPlus {
                 if (thisDomain.SlabInGradeFlag) {
                     thisDomain.SlabMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
                                                                                  state.dataMaterial->Material,
-                                                                                 DataHeatBalance::TotMaterials);
+                                                                                 state.dataHeatBal->TotMaterials);
                     if (thisDomain.SlabMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
                                         DataIPShortCuts::cAlphaArgs(6));
@@ -918,7 +918,7 @@ namespace EnergyPlus {
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(8),
                                                                                      state.dataMaterial->Material,
-                                                                                     DataHeatBalance::TotMaterials);
+                                                                                     state.dataHeatBal->TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(8) + "=" +
                                         DataIPShortCuts::cAlphaArgs(8));
@@ -975,7 +975,7 @@ namespace EnergyPlus {
                 if (thisDomain.VertInsPresentFlag) {
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(11),
                                                                                     state.dataMaterial->Material,
-                                                                                    DataHeatBalance::TotMaterials);
+                                                                                    state.dataHeatBal->TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(11) + "=" +
                                         DataIPShortCuts::cAlphaArgs(11));
@@ -1315,7 +1315,7 @@ namespace EnergyPlus {
                 if (thisDomain.HorizInsPresentFlag) {
                     thisDomain.HorizInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(6),
                                                                                      state.dataMaterial->Material,
-                                                                                     DataHeatBalance::TotMaterials);
+                                                                                     state.dataHeatBal->TotMaterials);
                     if (thisDomain.HorizInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + "=" +
                                         DataIPShortCuts::cAlphaArgs(6));
@@ -1377,7 +1377,7 @@ namespace EnergyPlus {
                     }
                     thisDomain.VertInsMaterialNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(10),
                                                                                     state.dataMaterial->Material,
-                                                                                    DataHeatBalance::TotMaterials);
+                                                                                    state.dataHeatBal->TotMaterials);
                     if (thisDomain.VertInsMaterialNum == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(10) + "=" +
                                         DataIPShortCuts::cAlphaArgs(10));

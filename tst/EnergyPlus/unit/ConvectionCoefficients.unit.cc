@@ -596,16 +596,16 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
     state->dataGlobal->NumOfZones = 1;
     DataSurfaces::Surface.allocate( 1 );
     state->dataConstruction->Construct.allocate( 1 );
-    DataHeatBalance::Zone.allocate( 1 );
+    state->dataHeatBal->Zone.allocate( 1 );
     DataLoopNode::Node.allocate( 1 );
 
     DataSurfaces::Surface( SurfNum ).Zone = 1;
     DataSurfaces::Surface( SurfNum ).Construction = 1;
     DataSurfaces::Surface(SurfNum).TAirRef = 0;
     state->dataConstruction->Construct( 1 ).TypeIsWindow = false;
-    DataHeatBalance::Zone( 1 ).SystemZoneNodeNumber = 1;
-    DataHeatBalance::Zone( 1 ).Multiplier = 1.0;
-    DataHeatBalance::Zone( 1 ).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone( 1 ).SystemZoneNodeNumber = 1;
+    state->dataHeatBal->Zone( 1 ).Multiplier = 1.0;
+    state->dataHeatBal->Zone( 1 ).ListMultiplier = 1.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataLoopNode::Node( 1 ).Temp = 20.0;
     HeatBalanceManager::AllocateHeatBalArrays(*state);
@@ -621,8 +621,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     // Case 1 - Low ACH (should default to CalcASHRAETARPNatural)
     Real64 ACH = 0.25;
-    DataHeatBalance::Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+    state->dataHeatBal->Zone( 1 ).Volume = 125.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
 
 
     // Test 1: Floor Diffuser Model
@@ -661,8 +661,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     // Case 2 - High ACH
     ACH = 3.1;
-    DataHeatBalance::Zone( 1 ).Volume = 125.0;
-    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * DataHeatBalance::Zone( 1 ).Volume * ACH;
+    state->dataHeatBal->Zone( 1 ).Volume = 125.0;
+    DataLoopNode::Node( 1 ).MassFlowRate = 1.17653/3600.0 * state->dataHeatBal->Zone( 1 ).Volume * ACH;
 
     // Test 1: Floor Diffuser Model
     ConvModelEquationNum = HcInt_FisherPedersenCeilDiffuserFloor;
@@ -713,8 +713,8 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     DataSurfaces::Surface.allocate(SurfNum);
     DataSurfaces::Surface(SurfNum).Zone = 1;
     state->dataRoomAirMod->AirModel.allocate(1);
-    EnergyPlus::DataHeatBalance::TempEffBulkAir.allocate(1);
-    EnergyPlus::DataHeatBalance::TempEffBulkAir(1) = 1.0;
+    state->dataHeatBal->TempEffBulkAir.allocate(1);
+    state->dataHeatBal->TempEffBulkAir(1) = 1.0;
     SurfTemp.allocate(1);
     HcIn.allocate(1);
     Vhc.allocate(1);
@@ -760,25 +760,25 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcZoneSystemACH)
     Real64 ACHAnswer;
     Real64 ACHExpected;
 
-    if (!allocated(DataHeatBalance::Zone)) DataHeatBalance::Zone.allocate(TotalNumberofZones);
-    DataHeatBalance::Zone(ZoneNum).Volume = 100.0;
-    DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber = 1;
+    if (!allocated(state->dataHeatBal->Zone)) state->dataHeatBal->Zone.allocate(TotalNumberofZones);
+    state->dataHeatBal->Zone(ZoneNum).Volume = 100.0;
+    state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber = 1;
     state->dataGlobal->BeginEnvrnFlag = false;
-    DataHeatBalance::Zone(ZoneNum).Multiplier = 1.0;
-    DataHeatBalance::Zone(ZoneNum).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(ZoneNum).Multiplier = 1.0;
+    state->dataHeatBal->Zone(ZoneNum).ListMultiplier = 1.0;
     state->dataEnvrn->OutBaroPress = 101400.0;
-    Real64 ZoneNode = DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber;
+    Real64 ZoneNode = state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
 
     // Test 1: Node not allocated, returns a zero ACH
-    if (allocated(EnergyPlus::DataLoopNode::Node)) EnergyPlus::DataLoopNode::Node.deallocate();
+    if (allocated(DataLoopNode::Node)) DataLoopNode::Node.deallocate();
     ACHExpected = 0.0;
     ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
 
     // Test 2: Node now allocated, needs to return a proper ACH
-    EnergyPlus::DataLoopNode::Node.allocate(DataHeatBalance::Zone(ZoneNum).SystemZoneNodeNumber);
-    EnergyPlus::DataLoopNode::Node(ZoneNode).Temp = 20.0;
-    EnergyPlus::DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
+    DataLoopNode::Node.allocate(state->dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber);
+    DataLoopNode::Node(ZoneNode).Temp = 20.0;
+    DataLoopNode::Node(ZoneNode).MassFlowRate = 0.2;
     ACHExpected = 6.11506;
     ACHAnswer = CalcZoneSystemACH(*state, ZoneNum);
     EXPECT_NEAR(ACHExpected, ACHAnswer, 0.0001);
@@ -1437,11 +1437,11 @@ TEST_F(ConvectionCoefficientsFixture, ConvectionCoefficientsTest_HConvInDependen
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).CosTilt = 0;
 
-    DataHeatBalance::HConvIn.allocate(1);
+    state->dataHeatBal->HConvIn.allocate(1);
 
     CalcASHRAESimpleIntConvCoeff(*state, 1, 20.0, 30.0);
 
-    ConvectionCoefficient = DataHeatBalance::HConvIn(1);
+    ConvectionCoefficient = state->dataHeatBal->HConvIn(1);
 
     EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
 }
@@ -1960,11 +1960,11 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     Real64 Hin;
 
     DataSurfaces::Surface.allocate(3);
-    DataHeatBalance::Zone.allocate(3);
+    state->dataHeatBal->Zone.allocate(3);
 
     // Horizontal Roof, heat flow down
     DataSurfaces::Surface(1).Zone = 1;
-    DataHeatBalance::Zone(1).Volume = 1000;
+    state->dataHeatBal->Zone(1).Volume = 1000;
     DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Roof;
     DataSurfaces::Surface(1).Tilt = 0;
     DataSurfaces::Surface(1).Area = 100;
@@ -1982,7 +1982,7 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
 
     //Pitched Roof, heat flow up
     DataSurfaces::Surface(2).Zone = 2;
-    DataHeatBalance::Zone(2).Volume = 1000;
+    state->dataHeatBal->Zone(2).Volume = 1000;
     DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Roof;
     DataSurfaces::Surface(2).Tilt = 20;
     DataSurfaces::Surface(2).Area = 100;
@@ -1998,10 +1998,10 @@ TEST_F(ConvectionCoefficientsFixture, TestASTMC1340)
     Hin = ConvectionCoefficients::CalcASTMC1340ConvCoeff(2, Tsurf, Tair, AirStreamV, Tilt);
 
     EXPECT_NEAR(Hin, 2.666, 0.001);
-    
+
     // Vertical Wall
     DataSurfaces::Surface(3).Zone = 3;
-    DataHeatBalance::Zone(3).Volume = 1000;
+    state->dataHeatBal->Zone(3).Volume = 1000;
     DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Wall;
     DataSurfaces::Surface(3).Tilt = 90;
     DataSurfaces::Surface(3).Area = 100;
