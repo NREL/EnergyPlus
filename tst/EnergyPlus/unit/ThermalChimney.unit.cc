@@ -1115,11 +1115,11 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     ScheduleManager::ProcessScheduleInput(*state);
     ScheduleManager::ScheduleInputProcessed = true;
 
-    DataHeatBalance::Zone(2).HasWindow = true;
-    DataHeatBalance::Zone(4).HasWindow = true;
+    state->dataHeatBal->Zone(2).HasWindow = true;
+    state->dataHeatBal->Zone(4).HasWindow = true;
     EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn.allocate(TotSurfaces);
-    DataHeatBalance::HConvIn = 0.1;
+    state->dataHeatBal->HConvIn.allocate(TotSurfaces);
+    state->dataHeatBal->HConvIn = 0.1;
     DataHeatBalSurface::TempSurfIn = 25.00;
     int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
@@ -1140,7 +1140,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalFanSys::ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS
     ThermalChimney::GetThermalChimney(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);

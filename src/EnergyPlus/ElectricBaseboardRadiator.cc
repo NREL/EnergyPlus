@@ -651,7 +651,7 @@ namespace ElectricBaseboardRadiator {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             QBBElecRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBElecRadSrc(BaseboardNum) = 0.0;
             LastSysTimeElapsed(BaseboardNum) = 0.0;
@@ -695,7 +695,6 @@ namespace ElectricBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -744,7 +743,7 @@ namespace ElectricBaseboardRadiator {
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
-                    TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
@@ -849,7 +848,7 @@ namespace ElectricBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
+                LoadMet = (SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
                           (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
 
                 if (LoadMet < 0.0) {
@@ -866,14 +865,14 @@ namespace ElectricBaseboardRadiator {
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
-                    TempZeroSourceSumHATsurf = SumHATsurf(ZoneNum);
+                    TempZeroSourceSumHATsurf = SumHATsurf(state, ZoneNum);
                     // Now, turn it back on:
                     QBBElecRadSource(BaseboardNum) = RadHeat;
                     DistributeBBElecRadGains(state);
                     HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Recalculate LoadMet with new ZeroSource... term and see if it is positive now.  If not, shut it down.
-                    LoadMet = (SumHATsurf(ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
+                    LoadMet = (SumHATsurf(state, ZoneNum) - TempZeroSourceSumHATsurf) + (QBBCap * ElecBaseboard(BaseboardNum).FracConvect) +
                               (RadHeat * ElecBaseboard(BaseboardNum).FracDistribPerson);
                     if (LoadMet < 0.0) {
                         // LoadMet is still less than zero so shut everything down
@@ -1115,7 +1114,7 @@ namespace ElectricBaseboardRadiator {
         ElecBaseboard(BaseboardNum).RadEnergy = ElecBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1141,7 +1140,7 @@ namespace ElectricBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;
@@ -1154,18 +1153,18 @@ namespace ElectricBaseboardRadiator {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

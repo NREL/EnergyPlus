@@ -164,10 +164,10 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     state->dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 2;
     state->dataAirLoop->AirToZoneNodeInfo(1).HeatCtrlZoneNums(2) = 3;
     state->dataGlobal->NumOfZones = 3;
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "Zone 1";
-    DataHeatBalance::Zone(2).Name = "Zone 2";
-    DataHeatBalance::Zone(3).Name = "Zone 3";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    state->dataHeatBal->Zone(3).Name = "Zone 3";
 
     // This triggers doAirLoopSetUp
     coilSelectionReportObj->setCoilUA(*state, coil2Name, coil2Type, uA, sizingCap, isAutoSized, curSysNum, curZoneEqNum);
@@ -297,10 +297,10 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     std::string coil1Type("Coil:Heating:Fuel"); // idf input object class name of coil
 
     state->dataGlobal->NumOfZones = 3;
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalance::Zone(1).Name = "Zone 1";
-    DataHeatBalance::Zone(2).Name = "Zone 2";
-    DataHeatBalance::Zone(3).Name = "Zone 3";
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+    state->dataHeatBal->Zone(2).Name = "Zone 2";
+    state->dataHeatBal->Zone(3).Name = "Zone 3";
 
     int curSysNum = 0;
     int curZoneEqNum = 2;
@@ -456,7 +456,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
-    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = DataHeatBalance::Zone(1).Name;
+    state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = state->dataHeatBal->Zone(1).Name;
     DataSizing::FinalZoneSizing.allocate(1);
     DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
     DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;

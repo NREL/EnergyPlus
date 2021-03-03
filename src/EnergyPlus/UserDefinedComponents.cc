@@ -828,7 +828,7 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(31)) {
 
-                    state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(31), DataHeatBalance::Zone);
+                    state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(31), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(31));
                         ErrorsFound = true;
@@ -1156,7 +1156,7 @@ namespace UserDefinedComponents {
 
                     if (!lAlphaFieldBlanks(13)) {
 
-                        state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13), DataHeatBalance::Zone);
+                        state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13), state.dataHeatBal->Zone);
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum == 0) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(13));
                             ErrorsFound = true;
@@ -1565,7 +1565,7 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(16)) {
 
-                    state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(16), DataHeatBalance::Zone);
+                    state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(16), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(16));
                         ErrorsFound = true;
@@ -1992,7 +1992,7 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(14)) {
 
-                    state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(14), DataHeatBalance::Zone);
+                    state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(14), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Ambient Zone Name not found = " + cAlphaArgs(14));
                         ErrorsFound = true;

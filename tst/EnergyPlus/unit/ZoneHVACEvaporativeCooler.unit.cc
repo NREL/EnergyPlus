@@ -94,7 +94,7 @@ protected:
             Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
 
         state->dataGlobal->NumOfZones = 1;
-        DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+        state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
         DataLoopNode::Node.allocate(NumOfNodes);
@@ -115,13 +115,13 @@ protected:
         state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 10;
         state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-        DataHeatBalance::Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-        DataHeatBalance::Zone(1).ZoneEqNum = 1;
-        DataHeatBalance::Zone(1).Multiplier = 1.0;
-        DataHeatBalance::Zone(1).Volume = 1000.0;
-        DataHeatBalance::Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
+        state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
+        state->dataHeatBal->Zone(1).ZoneEqNum = 1;
+        state->dataHeatBal->Zone(1).Multiplier = 1.0;
+        state->dataHeatBal->Zone(1).Volume = 1000.0;
+        state->dataHeatBal->Zone(state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum).SystemZoneNodeNumber =
             state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
-        DataHeatBalance::Zone(1).ZoneVolCapMultpMoist = 1.0;
+        state->dataHeatBal->Zone(1).ZoneVolCapMultpMoist = 1.0;
 
         state->dataZoneEquip->ZoneEquipList(1).Name = "ZONEHVACEVAPEQUIPMENT";
         state->dataZoneEquip->ZoneEquipList(1).NumOfEquipTypes = 1;

@@ -961,7 +961,7 @@ namespace HWBaseboardRadiator {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) {
             ZoneNum = HWBaseboard(BaseboardNum).ZonePtr;
-            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum);
+            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum);
             QBBRadSrcAvg(BaseboardNum) = 0.0;
             LastQBBRadSrc(BaseboardNum) = 0.0;
             LastSysTimeElapsed(BaseboardNum) = 0.0;
@@ -1009,7 +1009,6 @@ namespace HWBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using DataLoopNode::Node;
 
@@ -1100,7 +1099,7 @@ namespace HWBaseboardRadiator {
 
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HWBaseboard(BaseboardNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HWBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -1451,7 +1450,7 @@ namespace HWBaseboardRadiator {
                 // that all energy radiated to people is converted to convective energy is
                 // not very precise, but at least it conserves energy. The system impact to heat balance
                 // should include this.
-                LoadMet = (SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (BBHeat * HWBaseboard(BaseboardNum).FracConvect) +
+                LoadMet = (SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + (BBHeat * HWBaseboard(BaseboardNum).FracConvect) +
                           (RadHeat * HWBaseboardDesignDataObject.FracDistribPerson);
             }
             HWBaseboard(BaseboardNum).WaterOutletEnthalpy = HWBaseboard(BaseboardNum).WaterInletEnthalpy - BBHeat / WaterMassFlowRate;
@@ -1646,7 +1645,6 @@ namespace HWBaseboardRadiator {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHWBaseboardSurf;
         using DataHeatBalFanSys::QHWBaseboardToPerson;
@@ -1753,7 +1751,7 @@ namespace HWBaseboardRadiator {
         HWBaseboard(BaseboardNum).RadEnergy = HWBaseboard(BaseboardNum).RadPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1791,7 +1789,7 @@ namespace HWBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;
@@ -1804,18 +1802,18 @@ namespace HWBaseboardRadiator {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

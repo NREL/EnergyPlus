@@ -109,7 +109,7 @@ if(BUILD_FORTRAN)
 endif()
 
 # Need to install the ssc lib...
-install(TARGETS ssc DESTINATION ./)
+# install(TARGETS ssc DESTINATION ./)
 
 set(CPACK_PACKAGE_VENDOR "US Department of Energy")
 set(CPACK_IFW_PACKAGE_PUBLISHER "${CPACK_PACKAGE_VENDOR}")

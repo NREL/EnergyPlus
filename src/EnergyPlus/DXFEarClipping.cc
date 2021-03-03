@@ -77,22 +77,9 @@ namespace DXFEarClipping {
     // Methodology employed:
     // Ear clipping has turned out to be the simplest, most robust technique.
 
-    // References:
-    // na
-
-    // Other notes:
-    // na
-
-    // Use statements:
     // Using/Aliasing
     using namespace DataVectorTypes;
-    // Data
 
-    // Derived type definitions:
-    // na
-
-    // Module variable declarations:
-    // na
     bool trackit(false);
     // Subroutine specifications for module <module_name>:
 
@@ -196,13 +183,6 @@ namespace DXFEarClipping {
         // of 3D vertices, nsides, to a returned set (as possible) of triangles -- noted
         // by vertex numbers.
 
-        // Methodology employed:
-        // <Description>
-
-        // References:
-        // na
-
-        // Use statements:
         // Using/Aliasing
         using DataSurfaces::cSurfaceClass;
         using DataSurfaces::SurfaceClass;
@@ -213,17 +193,8 @@ namespace DXFEarClipping {
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
 
-        // Locals
-        // Subroutine argument definitions:
-
-        // Subroutine parameter definitions:
+       // Subroutine parameter definitions:
         Real64 const point_tolerance(0.00001);
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Subroutine local variable declarations:
         bool errFlag;
@@ -233,27 +204,20 @@ namespace DXFEarClipping {
         Array1D_int c_vertices(nsides);
         Array2D_int earvert(nsides, 3);
         Array1D_bool removed(nsides);
-        // unused  type(Vector_2d), dimension(3) :: testtri
-        // unused  type(Vector_2d) :: point
         Array1D_int earverts(3);
         Array1D<Real64> xvt(nsides);
         Array1D<Real64> yvt(nsides);
         Array1D<Real64> zvt(nsides);
 
-        // unused  integer k
         int ntri;
-        // unused  logical inpoly
         int nvertcur;
         int ncount;
         int svert;
         int mvert;
         int evert;
-        // unused  integer tvert
         int nears;
         int nrangles;
         int ncverts;
-        // unused  double precision :: ang
-        // unused  double precision :: val
         std::string line;
         static int errcount(0);
 
@@ -387,14 +351,8 @@ namespace DXFEarClipping {
         // (XA,YA) to (XB,YB) to (XC,YC).  The interior is to the
         // left of the two directed edges.
 
-        // Methodology employed:
-        // <Description>
-
         // References:
         // Geometry Tools for Computer Graphics
-
-        // Use statements:
-        // na
 
         // Return value
         Real64 angle; // the angle, between 0 and 2*PI.
@@ -405,12 +363,6 @@ namespace DXFEarClipping {
 
         // Function parameter definitions:
         Real64 const epsilon(0.0000001);
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Function local variable declarations:
         Real64 t;
@@ -465,25 +417,11 @@ namespace DXFEarClipping {
         // M Shimrat, Position of Point Relative to Polygon, ACM Algorithm 112,
         // Communications of the ACM, Volume 5, Number 8, page 434, August 1962.
 
-        // Use statements:
-        // na
-
         // Return value
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
-
-        // Locals
-        // Function argument definitions:
-
-        // Function parameter definitions:
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Function local variable declarations:
         int i;
@@ -541,9 +479,6 @@ namespace DXFEarClipping {
         // clipping for triangulation is described in Chapter 13 on Polygon Partitioning.  Also
         // described in a small article "Triangulation by Ear Clipping", David Eberly, http://www.geometrictools.com
 
-        // Use statements:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(vertex, nvert);
         EP_SIZE_CHECK(ears, nvert);
@@ -552,17 +487,6 @@ namespace DXFEarClipping {
         EP_SIZE_CHECK(removed, nvert);
         EP_SIZE_CHECK(earvert, 3);
         EP_SIZE_CHECK(rangles, nvert);
-
-        // Locals
-        // Subroutine argument definitions:
-
-        // Subroutine parameter definitions:
-
-        // Interface block specifications:
-        // na
-
-        // Derived type definitions:
-        // na
 
         // Subroutine local variable declarations:
         int svert;   // starting vertex
@@ -683,29 +607,11 @@ namespace DXFEarClipping {
         // Methodology employed:
         // Standard angle rotation
 
-        // References:
-        // na
-
-        // Use statements:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
         EP_SIZE_CHECK(xvt, nsides);
         EP_SIZE_CHECK(yvt, nsides);
         EP_SIZE_CHECK(zvt, nsides);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Subroutine parameter definitions:
-        // na
-
-        // Interface block specifications
-        // na
-
-        // Derived type definitions
-        // na
 
         // Subroutine local variable declarations:
 
@@ -747,29 +653,11 @@ namespace DXFEarClipping {
         // Methodology employed:
         // Standard angle rotation
 
-        // References:
-        // na
-
-        // Use statements:
-        // na
-
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
         EP_SIZE_CHECK(xvt, nsides);
         EP_SIZE_CHECK(yvt, nsides);
         EP_SIZE_CHECK(zvt, nsides);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // Subroutine parameter definitions:
-        // na
-
-        // Interface block specifications
-        // na
-
-        // Derived type definitions
-        // na
 
         // Subroutine local variable declarations:
 

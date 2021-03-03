@@ -65,13 +65,10 @@ using namespace EnergyPlus::AirflowNetworkBalanceManager;
 using namespace ObjexxFCL;
 using namespace EnergyPlus::DataEnvironment;
 using DataHeatBalFanSys::MAT;
-using DataHeatBalance::MRT;
-using DataHeatBalance::Zone;
 using namespace CurveManager;
 using DataHeatBalFanSys::TempControlType;
 using DataHeatBalFanSys::ZoneThermostatSetPointHi;
 using DataHeatBalFanSys::ZoneThermostatSetPointLo;
-using DataHeatBalance::ZoneIntGain;
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 {
@@ -110,11 +107,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(0, OpenStatus);
 
     state->dataEnvrn->OutDryBulbTemp = 15.0;
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     MAT.allocate(1);
-    MRT.allocate(1);
+    state->dataHeatBal->MRT.allocate(1);
     MAT(1) = 22.0;
-    MRT(1) = 22.0;
+    state->dataHeatBal->MRT(1) = 22.0;
 
     TimeOpenElapsed = 5.0;
     TimeCloseElapsed = 0.0;
@@ -161,15 +158,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     EXPECT_EQ(1, CloseProbStatus);
 
     MAT(1) = 26.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     state->dataAirflowNetworkBalanceManager->OccupantVentilationControl(1).calc(*state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 5.0;
-    ZoneIntGain.allocate(1);
-    ZoneIntGain(1).NOFOCC = 0.5;
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.5;
     TempControlType.allocate(1);
     TempControlType(1) = 0;
     ZoneThermostatSetPointLo.allocate(1);

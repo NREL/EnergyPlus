@@ -64,7 +64,7 @@ namespace DataHeatBalFanSys {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    extern int const UseSimpleAirFlow;
+    constexpr bool UseSimpleAirFlow = true;
     extern Real64 const MaxRadHeatFlux; // [W/m2] max limit for radiant heat flux at a surface due to HVAC equipment
 
     // Controls for PredictorCorrector
@@ -89,7 +89,7 @@ namespace DataHeatBalFanSys {
     extern Array1D<Real64> QCoolingPanelToPerson;   // Sum of radiant losses to people from cooling panels
     // Zone air drybulb conditions variables
     extern Array1D<Real64> ZTAV;         // Zone Air Temperature Averaged over the Zone Time step
-    extern Array1D<Real64> MAT;          // MEAN AIR TEMPARATURE (C)
+    extern Array1D<Real64> MAT;          // MEAN AIR TEMPERATURE (C)
     extern Array1D<Real64> TempTstatAir; // temperature of air near the thermo stat
     extern Array1D<Real64> ZT;           // Zone Air Temperature Averaged over the System Time Increment
     extern Array1D<Real64> XMAT;         // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE

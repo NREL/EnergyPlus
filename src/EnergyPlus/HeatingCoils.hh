@@ -290,7 +290,7 @@ namespace HeatingCoils {
     // Beginning of Reporting subroutines for the HeatingCoil Module
     // *****************************************************************************
 
-    void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum);
+    void ReportHeatingCoil(EnergyPlusData &state, int const CoilNum, bool const coilIsSuppHeater);
 
     //        End of Reporting subroutines for the HeatingCoil Module
 

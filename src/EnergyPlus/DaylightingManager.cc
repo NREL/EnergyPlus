@@ -83,7 +83,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PierceSurface.hh>
@@ -172,6 +171,8 @@ namespace EnergyPlus::DaylightingManager {
 
         // REFERENCES:
         // Based on DOE-2.1E subroutine DAVREF
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         SurfaceClass IType;                  // Surface type/class
         Real64 AREA;                // Inside surface area (m2)
@@ -388,18 +389,6 @@ namespace EnergyPlus::DaylightingManager {
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;     // Zone number
         int IHR;         // Hour of day counter
@@ -417,6 +406,7 @@ namespace EnergyPlus::DaylightingManager {
         int ISA;
         int ISlatAngle;
 
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (state.dataDaylightingManager->CalcDayltghCoefficients_firstTime) {
             GetDaylightingParametersInput(state);
@@ -724,28 +714,10 @@ namespace EnergyPlus::DaylightingManager {
         // This subroutine does the daylighting coefficient calculation for the
         // daylighting and illuminance map reference points.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-
         using General::SafeDivide;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IWin;    // Window counter
@@ -754,6 +726,8 @@ namespace EnergyPlus::DaylightingManager {
         int TZoneNum;
         bool ErrorsFound;
         int MapNum;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (state.dataDaylightingManager->VeryFirstTime) {
             // make sure all necessary surfaces match to pipes
@@ -809,33 +783,13 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Provides calculations for Daylighting Coefficients for daylighting reference points
 
-        // METHODOLOGY EMPLOYED:
-        // April 2012 change: Was previously part of CalcDayltgCoeffsRefMapPoints -- broken out to allow multiple
-        // maps per zone
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
-
         using General::SafeDivide;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static Vector3<Real64> W2;     // Second vertex of window
         static Vector3<Real64> W3;     // Third vertex of window
         static Vector3<Real64> W21;    // Vector from window vertex 2 to window vertex 1
@@ -851,7 +805,6 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> U21;    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
         static Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
                                        //		static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
-
         static Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
         int IHR;                        // Hour of day counter
         int NRF;                        // Number of daylighting reference points in a zone
@@ -909,7 +862,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Azimuth of view vector in absolute coord sys
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
         // View vector components in absolute coord sys
         VIEWVC(1) = std::sin(AZVIEW);
         VIEWVC(2) = std::cos(AZVIEW);
@@ -1210,9 +1163,6 @@ namespace EnergyPlus::DaylightingManager {
         // Was previously part of CalcDayltgCoeffsRefMapPoints -- broken out to all multiple
         // maps per zone
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
@@ -1220,21 +1170,7 @@ namespace EnergyPlus::DaylightingManager {
         using General::SafeDivide;
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // the daylighting and glare factors
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         static Vector3<Real64> W2;      // Second vertex of window
         static Vector3<Real64> W3;      // Third vertex of window
         static Vector3<Real64> U2;      // Second vertex of window for TDD:DOME (if exists)
@@ -1312,7 +1248,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Azimuth of view vector in absolute coord sys
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
         // View vector components in absolute coord sys
         VIEWVC(1) = std::sin(AZVIEW);
         VIEWVC(2) = std::cos(AZVIEW);
@@ -1643,27 +1579,11 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // switch as need to serve both reference points and map points based on calledFrom
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSystemVariables::DetailedSolarTimestepIntegration;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
-
         using General::SafeDivide;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ShelfNum;       // Daylighting shelf object number
@@ -1697,18 +1617,12 @@ namespace EnergyPlus::DaylightingManager {
         Real64 SinCornerAng;           // For triangle, sine of corner angle of window element
 
         // Complex fenestration variables
-        //		int CplxFenState; // Current complex fenestration state //Unused Set but never used
-        //		int NReflSurf; // Number of blocked beams for complex fenestration //Unused Set but never used
         int NRefPts; // number of reference points
-                     //		int WinEl; // Current window element //Unused Set but never used
         static Vector3<Real64> RayVector;
-        //		Real64 TransBeam; // Obstructions transmittance for incoming BSDF rays (temporary variable) //Unused Set but never used
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         // Complex fenestration variables
-        //		CplxFenState = 0; //Unused Set but never used
-        //		NReflSurf = 0; //Unused Set but never used
-        //		WinEl = 0; //Unused Set but never used
-        //		TransBeam = 0.0; //Unused Set but never used
         NRefPts = 0;
 
         IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loopwin);
@@ -1729,7 +1643,6 @@ namespace EnergyPlus::DaylightingManager {
         IConst = Surface(IWin).Construction;
         if (SurfWinStormWinFlag(IWin) == 1) IConst = Surface(IWin).StormWinConstruction;
 
-        // TH Added 6/29/2009.
         // For thermochromic windows, the daylight and glare factors are calculated for a base window cosntruction
         //  at base TC layer temperature. During each time step calculations at DayltgInteriorIllum,
         //  DayltgInteriorMapIllum, and DayltgGlare, the daylight and glare factors are adjusted by the visible
@@ -2103,9 +2016,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // collect code to do calculations for each window element for daylighting coefficients
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
         // REFERENCES:
         // switch as need to serve both reference points and map points based on calledFrom
 
@@ -2117,15 +2027,6 @@ namespace EnergyPlus::DaylightingManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // from reference point through a window element
         //   efficiency, if appropriate)
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 DIS;    // Distance between reference point and center of window element (m)
@@ -2241,7 +2142,7 @@ namespace EnergyPlus::DaylightingManager {
                 }
                 if (ExtWinType == DataDaylighting::iExtWinType::AdjZoneExtWin) {
                     // Does ray pass through an interior window in zone (ZoneNum) containing the ref point?
-                    for (IntWin = Zone(ZoneNum).SurfaceFirst; IntWin <= Zone(ZoneNum).SurfaceLast; ++IntWin) {
+                    for (IntWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IntWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IntWin) {
                         if (Surface(IntWin).Class == SurfaceClass::Window && Surface(IntWin).ExtBoundCond >= 1) {
                             if (Surface(Surface(IntWin).ExtBoundCond).Zone == Surface(IWin).Zone) {
                                 PierceSurface(IntWin, RREF, Ray, HitPtIntWin, hitIntWin);
@@ -2393,17 +2294,6 @@ namespace EnergyPlus::DaylightingManager {
         // For incoming BSDF window direction calculates whether bin is coming from sky, ground or reflected surface.
         // Routine also calculates intersection points with ground and exterior reflection surfaces.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         int NumOfWinEl;  // Number of window elements
         int CurFenState; // Current fenestration state
 
@@ -2417,25 +2307,12 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> W3;
         static Vector3<Real64> W21;
         static Vector3<Real64> W23;
-
-        // window elements counters
-        // integer :: IX ! horizontal elements
-        // integer :: IY ! vertical elements
-
-        // TYPE(Vector) :: HitPt ! surface hit point
-        // REAL(r64), dimension(3) :: RWin ! window element center point (same as centroid)
         static Vector3<Real64> WNorm; // unit vector from window (point towards outside)
 
-        // REAL(r64) :: DotProd     !Temporary variable for manipulating dot product .dot.
-        // REAL(r64) :: LeastHitDsq  ! dist^2 from window element center to hit point
-        // REAL(r64) :: HitDsq
-        // REAL(r64), dimension(3)  ::  V    !vector array
-        // REAL(r64), dimension(3) :: GroundHitPt    ! Coordinates of point that ray hits ground (m)
         int NBasis;    // number of incident basis directions for current state
         int NTrnBasis; // number of outgoing basis directions for current state
 
         // reference point variables
-        // REAL(r64), dimension(3) :: RefPoint ! reference point
         static Vector3<Real64> Ray;        // vector along ray from window to reference point
         static Vector3<Real64> RayNorm;    // unit vector along ray from window to reference point
         static Vector3<Real64> InterPoint; // Intersection point
@@ -2452,7 +2329,7 @@ namespace EnergyPlus::DaylightingManager {
         DWX = Surface(IWin).Width / NWX;
         DWY = Surface(IWin).Height / NWY;
 
-        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + Zone(ZoneNum).RelNorth + BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
+        AZVIEW = (state.dataDaylightingData->ZoneDaylight(ZoneNum).ViewAzimuthForGlare + state.dataHeatBal->Zone(ZoneNum).RelNorth + state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians;
 
         // Perform necessary calculations for window coordinates and vectors.  This will be used to calculate centroids for
         // each window element
@@ -2606,18 +2483,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Initialize daylight state data for current
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // integer, intent(in) :: NRefPt
 
         // SUBROUTINE LOCAL VARIABLES
         int curWinEl;
@@ -2832,19 +2697,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Memory allocation for complex fenestration systems reference points geometry
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLES
-
         if (!allocated(StateRefPoint.NSky)) {
             StateRefPoint.NSky.allocate(NumOfWinEl);
             StateRefPoint.NSky = 0;
@@ -2983,18 +2835,6 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate position factor for given reference point.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // integer, intent(in) :: iRefPoint
-
         // SUBROUTINE LOCAL VARIABLES
         static Vector3<Real64> Ray;
         static Vector3<Real64> RayNorm;
@@ -3039,18 +2879,8 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate position factor for given reference point.
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using WindowComplexManager::DaylghtAltAndAzimuth;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // integer, intent(in) :: iRefPoint
 
         // SUBROUTINE LOCAL VARIABLES
         int iTrnRay;
@@ -3100,9 +2930,6 @@ namespace EnergyPlus::DaylightingManager {
         // Divide hemisphere centered at ground hit point into elements of altitude Phi and
         // azimuth Theta and create upward-going ground ray unit vector at each Phi,Theta pair.
         // Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
-
-        // REFERENCES:
-        // <>
 
         // USE STATEMENTS:
         using DataSurfaces::AzimAngStepsForSolReflCalc;
@@ -3360,6 +3187,8 @@ namespace EnergyPlus::DaylightingManager {
         Real64 TVisIntWinDiskMult; // Interior window vis trans solar disk multiplier for ext win in adj zone
         Real64 WindowSolidAngleDaylightPoint;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         ++ISunPos;
 
         // Altitude of sun (degrees)
@@ -3462,11 +3291,11 @@ namespace EnergyPlus::DaylightingManager {
                 if (Surface(NearestHitSurfNum).ShadowingSurf) {
                     if (dot(Ray, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                 }
-                if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
-                    SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                    SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 } else {
                     SkyReflVisLum =
-                        ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                        ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSkyHRTS(1, iHour, NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 }
                 assert(equal_dimensions(state.dataDaylightingManager->AVWLSK, state.dataDaylightingManager->EDIRSK));
                 auto l2(state.dataDaylightingManager->GILSK.index(iHour, 1));
@@ -3676,17 +3505,17 @@ namespace EnergyPlus::DaylightingManager {
 
                         TransBmBmMult = 0.0;
                         if (ANY_BLIND(ShType)) {
-                            ProfileAngle(IWin, RAYCOS, Blind(BlNum).SlatOrientation, ProfAng);
+                            ProfileAngle(IWin, RAYCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
                             // Contribution of beam passing through slats and reaching reference point
                             for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                                 // IF (.NOT.SurfaceWindow(IWin)%MovableSlats .AND. JB > 1) EXIT
                                 if (SurfWinMovableSlats(IWin)) {
                                     SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                                 } else {
-                                    SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                    SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                 }
                                 TransBmBmMult(JB) = BlindBeamBeamTrans(
-                                    ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                    ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                 state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) = RAYCOS(3) * TVISS * TransBmBmMult(JB) * ObTransDisk;
 
                                 // do this only once for fixed slat blinds
@@ -3697,7 +3526,7 @@ namespace EnergyPlus::DaylightingManager {
                             //                          SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                             //                          SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
                             CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - SurfWinTheta(IWin)));
-                            TransBmBmMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
+                            TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
                             state.dataDaylightingManager->EDIRSUdisk(iHour, 2) = RAYCOS(3) * TVISS * TransBmBmMult(1) * ObTransDisk;
                         }
 
@@ -3766,7 +3595,7 @@ namespace EnergyPlus::DaylightingManager {
                                 // Vector to sun that is mirrored in obstruction
                                 SunVecMir = RAYCOS - 2.0 * dot(RAYCOS, ReflNorm) * ReflNorm;
                                 // Skip if reflecting surface is not sunlit
-                                if (SunlitFrac(1, iHour, ReflSurfNumX) < 0.01) continue;
+                                if (state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNumX) < 0.01) continue;
                                 // Skip if altitude angle of mirrored sun is negative since reflected sun cannot
                                 // reach reference point in this case
                                 if (SunVecMir(3) <= 0.0) continue;
@@ -3843,7 +3672,7 @@ namespace EnergyPlus::DaylightingManager {
 
                                 TransBmBmMultRefl = 0.0;
                                 if (ANY_BLIND(ShType)) {
-                                    ProfileAngle(IWin, SunVecMir, Blind(BlNum).SlatOrientation, ProfAng);
+                                    ProfileAngle(IWin, SunVecMir, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
                                     // Contribution of reflected beam passing through slats and reaching reference point
                                     Real64 const Pi_SlatAng_fac(DataGlobalConstants::Pi / (MaxSlatAngs - 1));
                                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
@@ -3851,10 +3680,10 @@ namespace EnergyPlus::DaylightingManager {
                                         if (SurfWinMovableSlats(IWin)) {
                                             SlatAng = double(JB - 1) * Pi_SlatAng_fac;
                                         } else {
-                                            SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                            SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                                         }
                                         TransBmBmMultRefl(JB) = BlindBeamBeamTrans(
-                                            ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                            ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                                         state.dataDaylightingManager->EDIRSUdisk(iHour, JB + 1) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(JB);
 
                                         if (!SurfWinMovableSlats(IWin)) break;
@@ -3864,7 +3693,7 @@ namespace EnergyPlus::DaylightingManager {
                                     //                             surface angles SunAltitudeToWindowNormalAngle = PHSUN - SurfaceWindow(IWin)%Phi
                                     //                             SunAzimuthToWindowNormalAngle = THSUN - SurfaceWindow(IWin)%Theta
                                     CalcScreenTransmittance(state, IWin, (state.dataDaylightingManager->PHSUN - SurfWinPhi(IWin)), (state.dataDaylightingManager->THSUN - SurfWinTheta(IWin)));
-                                    TransBmBmMultRefl(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
+                                    TransBmBmMultRefl(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTrans;
                                     state.dataDaylightingManager->EDIRSUdisk(iHour, 2) += SunVecMir(3) * SpecReflectance * TVisRefl * TransBmBmMultRefl(1);
                                 } // End of check if window has a blind or screen
 
@@ -3954,29 +3783,13 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // this version is just for reference points.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
-        // the daylighting and glare factors
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
+        Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating the daylighting and glare factors
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ISky;   // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
         int JSH;    // Shading index: J=1 is unshaded window, J=2 is shaded window
-        Real64 VTR; // For switchable glazing, ratio of visible transmittance of
-        //  fully-switched state to that of the unswitched state
+        Real64 VTR; // For switchable glazing, ratio of visible transmittance of fully-switched state to that of the unswitched state
 
         if (SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return;
 
@@ -4101,24 +3914,9 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // this version is just for map points.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const tmpDFCalc(0.05); // cut off illuminance (lux) for exterior horizontal in calculating
         // the daylighting and glare factors
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ISky;   // Sky type index: 1=clear, 2=clear turbid, 3=intermediate, 4=overcast
@@ -4243,11 +4041,12 @@ namespace EnergyPlus::DaylightingManager {
         std::string cErrorMsg;  // Each DElight Error Message can be up to 200 characters long
         bool bEndofErrFile;     // End of Error File flag
         bool bRecordsOnErrFile; // true if there are records on the error file
-
         int NumReports;
         int NumNames;
         int NumNumbers;
         int IOStat;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         ErrorsFound = false;
         cCurrentModuleObject = "Daylighting:Controls";
@@ -4388,7 +4187,7 @@ namespace EnergyPlus::DaylightingManager {
             }
         }
 
-        if (!DataHeatBalance::AnyAirBoundary) {
+        if (!state.dataHeatBal->AnyAirBoundary) {
             for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
                 if (Surface(SurfLoop).Class == SurfaceClass::Window && Surface(SurfLoop).ExtSolar) {
                     int const zoneOfSurf = Surface(SurfLoop).Zone;
@@ -4571,11 +4370,13 @@ namespace EnergyPlus::DaylightingManager {
         Real64 NewAspectRatio;
         Array1D_bool ZoneMsgDone;
 
-        CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        auto &Zone(state.dataHeatBal->Zone);
+
+        CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
         // these are only for Building Rotation for Appendix G when using world coordinate system
-        CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
-        SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
 
         doTransform = false;
         OldAspectRatio = 1.0;
@@ -4976,7 +4777,7 @@ namespace EnergyPlus::DaylightingManager {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            int const ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            int const ZoneFound = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
             if (ZoneFound == 0) {
                 ShowSevereError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
@@ -5208,11 +5009,11 @@ namespace EnergyPlus::DaylightingManager {
         Real64 rLightLevel;
 
         // Calc cos and sin of Building Relative North values for later use in transforming Reference Point coordinates
-        CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-        SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        CosBldgRelNorth = std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+        SinBldgRelNorth = std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
         // these are only for Building Rotation for Appendix G when using world coordinate system
-        CosBldgRotAppGonly = std::cos(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
-        SinBldgRotAppGonly = std::sin(-BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        CosBldgRotAppGonly = std::cos(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
+        SinBldgRotAppGonly = std::sin(-state.dataHeatBal->BuildingRotationAppendixG * DataGlobalConstants::DegToRadians);
 
         doTransform = false;
         OldAspectRatio = 1.0;
@@ -5223,7 +5024,7 @@ namespace EnergyPlus::DaylightingManager {
         for (auto &daylCntrl : state.dataDaylightingData->ZoneDaylight) {
             zoneIndex++;
             if (daylCntrl.TotalDaylRefPoints > 0) {
-                auto &zone(Zone(zoneIndex));
+                auto &zone(state.dataHeatBal->Zone(zoneIndex));
 
                 // Calc cos and sin of Zone Relative North values for later use in transforming Reference Point coordinates
                 CosZoneRelNorth = std::cos(-zone.RelNorth * DataGlobalConstants::DegToRadians);
@@ -5370,7 +5171,7 @@ namespace EnergyPlus::DaylightingManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             pt.Name = cAlphaArgs(1);
-            pt.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            pt.ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
             if (pt.ZoneNum == 0) {
                 ShowSevereError(state, cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
                 ErrorsFound = true;
@@ -5409,23 +5210,6 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // loop thru daylighting devices and check that their zones have daylight controls
 
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using DataHeatBalance::Zone;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;  // TDD pipe object number
         int ShelfNum; // light shelf object number
@@ -5438,7 +5222,7 @@ namespace EnergyPlus::DaylightingManager {
             SurfNum = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             if (SurfNum > 0) {
                 bool daylightControlFound = false;
-                int const pipeEnclNum = Zone(Surface(SurfNum).Zone).SolarEnclosureNum;
+                int const pipeEnclNum = state.dataHeatBal->Zone(Surface(SurfNum).Zone).SolarEnclosureNum;
                 for (int const zoneNum : DataViewFactorInformation::ZoneSolarInfo(pipeEnclNum).ZoneNums) {
                     if (state.dataDaylightingData->ZoneDaylight(zoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::NoDaylighting) {
                         daylightControlFound = true;
@@ -5505,8 +5289,6 @@ namespace EnergyPlus::DaylightingManager {
         // Based on fit to Fig. 8-21, "Efficiency factors for various depths of light wells
         // based on well-interreflectance values," Lighting Handbook, 8th Edition, Illuminating
         // Engineering Society of North America, 1993.
-
-        // REFERENCES: see above.
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
@@ -5629,21 +5411,6 @@ namespace EnergyPlus::DaylightingManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DGLARE.
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 GTOT  = 0.0;  // Glare constant
 
@@ -5688,16 +5455,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // REFERENCES:
         // Based on subroutine DayltgGlare.
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS
-
-        // SUBROUTINE PARAMETER DEFINITIONS: na
-        // INTERFACE BLOCK SPECIFICATIONS: na
-        // DERIVED TYPE DEFINITIONS: na
 
         Real64 GTOT = 0.0;;   // Glare constant
 
@@ -5752,28 +5509,14 @@ namespace EnergyPlus::DaylightingManager {
         // REFERENCES:
         // Based on DOE-2.1E subroutine DHILL.
 
-        // USE STATEMENTS:
-        // na
-
         // Argument array dimensioning
         HISK.dim(4);
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  and overcast sky (lux)
-        //   illuminance (lux)
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NTH(18);                          // Number of azimuth steps for sky integration
         int const NPH(8);                           // Number of altitude steps for sky integration
         Real64 const DTH((2.0 * DataGlobalConstants::Pi) / double(NTH)); // Sky integration azimuth stepsize (radians)
         Real64 const DPH(DataGlobalConstants::PiOvr2 / double(NPH));     // Sky integration altitude stepsize (radians)
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IPH;                            // Altitude index for sky integration
@@ -5782,7 +5525,6 @@ namespace EnergyPlus::DaylightingManager {
         static Array1D<Real64> TH(NTH);     // Azimuth of sky element (radians)
         int ISky;                           // Sky type index
         static Array1D<Real64> SPHCPH(NPH); // Sine times cosine of altitude of sky element
-
 
         // Integrate to obtain illuminance from sky.
         // The contribution in lumens/m2 from a patch of sky at altitude PH and azimuth TH
@@ -6136,8 +5878,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Called by InitSurfaceHeatBalance.
 
-        // METHODOLOGY EMPLOYED:na
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DINTIL.
 
@@ -6145,17 +5885,8 @@ namespace EnergyPlus::DaylightingManager {
         using General::InterpSlatAng;
         using General::POLYF;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const tmpSWIterStep(0.05); // step of switching factor, assuming maximum of 20 switching states
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NREFPT; // Number of daylighting reference points
@@ -6221,7 +5952,7 @@ namespace EnergyPlus::DaylightingManager {
         // Three arrays to save original clear and dark (fully switched) states'
         //  zone/window daylighting properties.
         if (state.dataDaylightingManager->DayltgInteriorIllum_firstTime) {
-            int const d1(max(maxval(Zone, &ZoneData::NumSubSurfaces), maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::NumOfDayltgExtWins)));
+            int const d1(max(maxval(state.dataHeatBal->Zone, &ZoneData::NumSubSurfaces), maxval(state.dataDaylightingData->ZoneDaylight, &DataDaylighting::ZoneDaylightCalc::NumOfDayltgExtWins)));
             tmpIllumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyZone);
             tmpBackLumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyZone);
             tmpSourceLumFromWinAtRefPt.allocate(d1, 2, state.dataDaylightingManager->maxNumRefPtInAnyZone);
@@ -6236,8 +5967,6 @@ namespace EnergyPlus::DaylightingManager {
         tmpIllumFromWinAtRefPt = 0.0;
         tmpBackLumFromWinAtRefPt = 0.0;
         tmpSourceLumFromWinAtRefPt = 0.0;
-
-
 
         // Initialize reference point illuminance and window background luminance
         for (int IL = 1; IL <= NREFPT; ++IL) {
@@ -7043,7 +6772,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Loop again over windows and reset remaining shading flags that
         // are 10 or higher (i.e., conditionally off) to off
-        for (int IWin = Zone(ZoneNum).SurfaceFirst; IWin <= Zone(ZoneNum).SurfaceLast; ++IWin) {
+        for (int IWin = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; IWin <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++IWin) {
             if (Surface(IWin).Class != SurfaceClass::Window) continue;
             if (Surface(IWin).ExtBoundCond != ExternalEnvironment) continue;
             bool anyGlareControl = BITF_TEST_ANY(BITF(SurfWinShadingFlag(IWin)), BITF(WinShadingType::IntShadeConditionallyOff) | BITF(WinShadingType::GlassConditionallyLightened) |\
@@ -7074,14 +6803,14 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // The following report variables are valid only for daylit zones without interior windows
-        if (!Zone(ZoneNum).HasInterZoneWindow) {
+        if (!state.dataHeatBal->Zone(ZoneNum).HasInterZoneWindow) {
             for (loop = 1; loop <= state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
                 int IWin = state.dataDaylightingData->ZoneDaylight(ZoneNum).DayltgExtWinSurfNums(loop);
                 int IS = 1;
                 if (SurfWinWindowModelType(IWin) != WindowBSDFModel && (IS_SHADED(SurfWinShadingFlag(IWin)) || SurfWinSolarDiffusing(IWin))) IS = 2;
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) {
                     int refPtCount = 0;
-                    for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
+                    for (int const enclZoneNum : DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).ZoneNums) {
                         for (int refPtNum = 1; refPtNum <= state.dataDaylightingData->ZoneDaylight(enclZoneNum).TotalDaylRefPoints; ++refPtNum) {
                             ++refPtCount; // Count reference points across each zone in the same enclosure
                             SurfaceWindow(IWin).IllumFromWinAtRefPtRep(refPtCount) = state.dataDaylightingData->ZoneDaylight(enclZoneNum).IllumFromWinAtRefPt(loop, IS, refPtNum);
@@ -7104,28 +6833,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate the TDD Pipe illuminance values
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;                            // TDD pipe object number
@@ -7195,25 +6902,11 @@ namespace EnergyPlus::DaylightingManager {
 
         // Called by InitSurfaceHeatBalance.
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DLTSYS.
 
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TotReduction; // Electric lighting power reduction factor for a zone
@@ -7230,8 +6923,6 @@ namespace EnergyPlus::DaylightingManager {
         int MapNum;   // Illuminance map number
         int ILM;
         bool ScheduledAvailable;
-
-
 
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod != DataDaylighting::iDaylightingMethod::SplitFluxDaylighting) return;
 
@@ -7358,30 +7049,11 @@ namespace EnergyPlus::DaylightingManager {
         // the position factor for X = 0, 0.5, 1.0, 1.5, 2.0, 2.5,
         // and 3.0 and Y = 0, 0.5, 1.0, 1.5, 2.0. Called by CalcDayltgCoefficients.
 
-        // METHODOLOGY EMPLOYED:
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DPFAC.
 
-        // USE STATEMENTS:
-        // na
-
         // Return value
         Real64 DayltgGlarePositionFactor; // Position factor
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-        //  horizontal line of vision, divided by horizontal distance from
-        //  eye of observer
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int IX; // Lateral and vertical displacement indices
@@ -7481,19 +7153,9 @@ namespace EnergyPlus::DaylightingManager {
         using General::InterpProfAng;
         using General::POLYF;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  quantities that do not depend on sun position.
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NPHMAX(10); // Number of sky/ground integration steps in altitude
         int const NTHMAX(16); // Number of sky/ground integration steps in azimuth
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // In the following I,J arrays:
@@ -7580,7 +7242,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 rfshB;  // Beam-diffuse front vis reflectance of bare blind
         Real64 tfshd;  // Diffuse-diffuse front vis trans of bare blind
         Real64 rbshd;  // Diffuse-diffuse back vis reflectance of bare blind
-        // unused  REAL(r64)         :: A                         ! Intermediate value for azimuth limits calculation
         Real64 ZSUObsRefl; // Illuminance on window from beam solar reflected by an
         //  obstruction (for unit beam normal illuminance)
         int NearestHitSurfNum;               // Surface number of nearest obstruction
@@ -7624,7 +7285,7 @@ namespace EnergyPlus::DaylightingManager {
         ZoneNumThisWin = Surface(Surface(IWin).BaseSurf).Zone;
         // The inside surface area, ZoneDaylight(ZoneNum)%TotInsSurfArea was calculated in subr DayltgAveInteriorReflectance
 
-        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == Zone(ZoneNum).SolarEnclosureNum) {
+        if (Surface(Surface(IWin).BaseSurf).SolarEnclIndex == state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum) {
             ExtWinType = DataDaylighting::iExtWinType::InZoneExtWin;
             ZoneInsideSurfArea = state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea;
             IntWinAdjZoneExtWinNum = 0;
@@ -7837,11 +7498,11 @@ namespace EnergyPlus::DaylightingManager {
                         if (Surface(NearestHitSurfNum).ShadowingSurf) {
                             if (dot(U, Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                         }
-                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
-                            SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                            SkyReflVisLum = ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         } else {
                             SkyReflVisLum =
-                                ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * DifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / DataGlobalConstants::Pi;
+                                ObsVisRefl * Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSkyHRTS(1, IHR, NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         }
                         dReflObsSky = SkyReflVisLum * COSB * DA;
                         for (ISky = 1; ISky <= 4; ++ISky) {
@@ -7989,34 +7650,34 @@ namespace EnergyPlus::DaylightingManager {
                     } else if (ScreenOn) { // Screen: get beam-beam, beam-diffuse and diffuse-diffuse vis trans/ref of screen and glazing system
                         CalcScreenTransmittance(state, IWin, (PH - SurfWinPhi(IWin)), (TH - SurfWinTheta(IWin)));
                         ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                        ReflScDiffDiffBack = SurfaceScreens(SurfWinScreenNumber(IWin)).DifReflectVis;
-                        TransScBmDiffFront = SurfaceScreens(SurfWinScreenNumber(IWin)).BmDifTransVis;
+                        ReflScDiffDiffBack = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).DifReflectVis;
+                        TransScBmDiffFront = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmDifTransVis;
                         TransMult(1) = TransScBmDiffFront * SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
                                        (1 - ReflGlDiffDiffFront * ReflScDiffDiffBack) * SurfWinLightWellEff(IWin);
-                        TransBmBmMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis;
+                        TransBmBmMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis;
 
                     } else if (BlindOn) { // Blind: get beam-diffuse and beam-beam vis trans of blind+glazing system
                         // PETER:  As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                         //         for TDDs because it is based on TVISBR which is correctly calculated for TDDs above.
 
-                        ProfileAngle(IWin, U, Blind(BlNum).SlatOrientation, ProfAng);
+                        ProfileAngle(IWin, U, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                             if (!SurfWinMovableSlats(IWin) && JB > 1) break;
 
-                            TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                             if (ShType == WinShadingType::IntBlind) { // Interior blind
                                 ReflGlDiffDiffBack = state.dataConstruction->Construct(IConst).ReflectVisDiffBack;
-                                ReflBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                                ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                                TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                ReflBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                                 TransMult(JB) = TVISBR * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                    (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
 
                             } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                                 ReflGlDiffDiffFront = state.dataConstruction->Construct(IConst).ReflectVisDiffFront;
-                                ReflBlDiffDiffBack = Blind(BlNum).VisBackDiffDiffRefl(JB);
+                                ReflBlDiffDiffBack = state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB);
                                 TransMult(JB) = TransBlBmDiffFront * SurfWinGlazedFrac(IWin) * state.dataConstruction->Construct(IConst).TransDiffVis /
                                                 (1.0 - ReflGlDiffDiffFront * ReflBlDiffDiffBack) * SurfWinLightWellEff(IWin);
 
@@ -8025,10 +7686,10 @@ namespace EnergyPlus::DaylightingManager {
                                 td2 = state.dataConstruction->Construct(IConst).tBareVisDiff(2);
                                 rbd1 = state.dataConstruction->Construct(IConst).rbBareVisDiff(1);
                                 rfd2 = state.dataConstruction->Construct(IConst).rfBareVisDiff(2);
-                                tfshBd = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                                tfshd = Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                                rfshB = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
-                                rbshd = Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                                tfshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                rbshd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
@@ -8045,11 +7706,11 @@ namespace EnergyPlus::DaylightingManager {
                             if (SurfWinMovableSlats(IWin)) {
                                 SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                             } else {
-                                SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                             }
                             TransBmBmMult(JB) =
                                 TVISBR *
-                                BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // End of loop over slat angles
 
                     } else { // Diffusing glass
@@ -8109,7 +7770,7 @@ namespace EnergyPlus::DaylightingManager {
                 FLCWSK(1, ISky) += ZSK(ISky) * TVISBR * SurfWinFractionUpgoing(IWin);
 
                 if (ISky == 1) {
-                    ZSU = state.dataDaylightingManager->GILSU(IHR) * SunlitFracHR(IHR, OutShelfSurf) * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
+                    ZSU = state.dataDaylightingManager->GILSU(IHR) * state.dataHeatBal->SunlitFracHR(IHR, OutShelfSurf) * state.dataDaylightingDevicesData->Shelf(ShelfNum).OutReflectVis * state.dataDaylightingDevicesData->Shelf(ShelfNum).ViewFactor;
                     FLCWSU(1) += ZSU * TVISBR * SurfWinFractionUpgoing(IWin);
                 }
             } // ISKY
@@ -8134,7 +7795,7 @@ namespace EnergyPlus::DaylightingManager {
 
         // Beam reaching window directly (without specular reflection from exterior obstructions)
 
-        if (SunlitFracHR(IHR, IWin) > 0.0) {
+        if (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0) {
             // Cos of angle of incidence
             COSBSun =
                 state.dataDaylightingManager->SPHSUN * std::sin(SurfWinPhi(IWin)) + state.dataDaylightingManager->CPHSUN * std::cos(SurfWinPhi(IWin)) * std::cos(state.dataDaylightingManager->THSUN - SurfWinTheta(IWin));
@@ -8145,7 +7806,7 @@ namespace EnergyPlus::DaylightingManager {
                 // Note that in the following SunlitFracHR accounts for possibly non-zero transmittance of
                 // shading surfaces.
 
-                ZSU1 = COSBSun * SunlitFracHR(IHR, IWin);
+                ZSU1 = COSBSun * state.dataHeatBal->SunlitFracHR(IHR, IWin);
 
                 // Contribution to window luminance and downgoing flux
 
@@ -8184,7 +7845,7 @@ namespace EnergyPlus::DaylightingManager {
                     TransMult = 0.0;
 
                     // TH 7/7/2010 moved from inside the loop: DO JB = 1,MaxSlatAngs
-                    if (BlindOn) ProfileAngle(IWin, SUNCOSHR(IHR, {1, 3}), Blind(BlNum).SlatOrientation, ProfAng);
+                    if (BlindOn) ProfileAngle(IWin, SUNCOSHR(IHR, {1, 3}), state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
 
                     for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                         if (!SurfWinMovableSlats(IWin) && JB > 1) break;
@@ -8195,7 +7856,7 @@ namespace EnergyPlus::DaylightingManager {
                                 TransMult(1) = TransTDD(state, PipeNum, COSBSun, DataDaylightingDevices::iRadType::VisibleBeam) * SurfWinGlazedFrac(IWin);
                             } else {
                                 if (ScreenOn) {
-                                    TransMult(1) = SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis * SurfWinGlazedFrac(IWin) *
+                                    TransMult(1) = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).BmBmTransVis * SurfWinGlazedFrac(IWin) *
                                                    SurfWinLightWellEff(IWin);
                                 } else {
                                     TransMult(1) = POLYF(COSBSun, state.dataConstruction->Construct(IConstShaded).TransVisBeamCoef) * SurfWinGlazedFrac(IWin) *
@@ -8208,16 +7869,16 @@ namespace EnergyPlus::DaylightingManager {
                             // As long as only interior blinds are allowed for TDDs, no need to change TransMult calculation
                             // for TDDs because it is based on TVISBSun which is correctly calculated for TDDs above.
 
-                            TransBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                            TransBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
 
                             if (ShType == WinShadingType::IntBlind) { // Interior blind
                                 // TH CR 8121, 7/7/2010
                                 // ReflBlBmDiffFront = InterpProfAng(ProfAng,Blind(BlNum)%VisFrontBeamDiffRefl)
-                                ReflBlBmDiffFront = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                ReflBlBmDiffFront = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
 
                                 // TH added 7/12/2010 for CR 8121
-                                ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
-                                TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
 
                                 TransMult(JB) = TVISBSun * (TransBlBmDiffFront + ReflBlBmDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                                      (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
@@ -8225,13 +7886,13 @@ namespace EnergyPlus::DaylightingManager {
                             } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                                 TransMult(JB) =
                                     TransBlBmDiffFront *
-                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
                                     SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = POLYF(COSBSun, state.dataConstruction->Construct(IConst).tBareVisCoef({1, 6}, 1));
-                                tfshBd = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
-                                rfshB = InterpProfAng(ProfAng, Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
+                                tfshBd = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffTrans(JB, {1, 37}));
+                                rfshB = InterpProfAng(ProfAng, state.dataHeatBal->Blind(BlNum).VisFrontBeamDiffRefl(JB, {1, 37}));
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
@@ -8244,11 +7905,11 @@ namespace EnergyPlus::DaylightingManager {
                             if (SurfWinMovableSlats(IWin)) {
                                 SlatAng = (JB - 1) * DataGlobalConstants::Pi / (MaxSlatAngs - 1);
                             } else {
-                                SlatAng = Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
+                                SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;
                             }
                             TransBmBmMult(JB) =
                                 TVISBSun *
-                                BlindBeamBeamTrans(ProfAng, SlatAng, Blind(BlNum).SlatWidth, Blind(BlNum).SlatSeparation, Blind(BlNum).SlatThickness);
+                                BlindBeamBeamTrans(ProfAng, SlatAng, state.dataHeatBal->Blind(BlNum).SlatWidth, state.dataHeatBal->Blind(BlNum).SlatSeparation, state.dataHeatBal->Blind(BlNum).SlatThickness);
                         } // ShadeOn/ScreenOn/BlindOn/Diffusing glass
 
                         if (SurfWinOriginalClass(IWin) == SurfaceClass::TDD_Dome) {
@@ -8305,15 +7966,15 @@ namespace EnergyPlus::DaylightingManager {
                             TransMult(1) = state.dataConstruction->Construct(IConstShaded).TransDiffVis * SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                         } else if (ScreenOn) { // Exterior screen on
-                            TransScDiffDiffFront = SurfaceScreens(SurfWinScreenNumber(IWin)).DifDifTransVis;
+                            TransScDiffDiffFront = state.dataHeatBal->SurfaceScreens(SurfWinScreenNumber(IWin)).DifDifTransVis;
                             TransMult(1) = TransScDiffDiffFront *
                                            (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * ReflScDiffDiffBack)) *
                                            SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                         } else { // Blind on
-                            TransBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                            TransBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
                             if (ShType == WinShadingType::IntBlind) { // Interior blind
-                                ReflBlDiffDiffFront = Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                ReflBlDiffDiffFront = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 TransMult(JB) =
                                     TVisSunRefl * (TransBlDiffDiffFront + ReflBlDiffDiffFront * ReflGlDiffDiffBack * TransBlDiffDiffFront /
                                                                               (1.0 - ReflBlDiffDiffFront * ReflGlDiffDiffBack));
@@ -8321,13 +7982,13 @@ namespace EnergyPlus::DaylightingManager {
                             } else if (ShType == WinShadingType::ExtBlind) { // Exterior blind
                                 TransMult(JB) =
                                     TransBlDiffDiffFront *
-                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * Blind(BlNum).VisBackDiffDiffRefl(JB))) *
+                                    (state.dataConstruction->Construct(IConst).TransDiffVis / (1.0 - ReflGlDiffDiffFront * state.dataHeatBal->Blind(BlNum).VisBackDiffDiffRefl(JB))) *
                                     SurfWinGlazedFrac(IWin) * SurfWinLightWellEff(IWin);
 
                             } else { // Between-glass blind
                                 t1 = state.dataConstruction->Construct(IConst).tBareVisDiff(1);
-                                tfshBd = Blind(BlNum).VisFrontDiffDiffTrans(JB);
-                                rfshB = Blind(BlNum).VisFrontDiffDiffRefl(JB);
+                                tfshBd = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffTrans(JB);
+                                rfshB = state.dataHeatBal->Blind(BlNum).VisFrontDiffDiffRefl(JB);
                                 if (state.dataConstruction->Construct(IConst).TotGlassLayers == 2) { // 2 glass layers
                                     TransMult(JB) =
                                         t1 * (tfshBd * (1.0 + rfd2 * rbshd) + rfshB * rbd1 * tfshd) * td2 * SurfWinLightWellEff(IWin);
@@ -8384,26 +8045,12 @@ namespace EnergyPlus::DaylightingManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // exluding beam
-        // due to sun beam
-
         int iIncElem;
         int iSky;
         int SolBmIndex;
         Real64 LambdaInc;
         Real64 Altitude;
         Real64 Azimuth;
-        //  REAL(r64) :: CurCplxFenState
         int CurCplxFenState;
         Real64 SunObstrMultiplier; // sun obstruction multiplier used to determine if sun hit the ground point
         Real64 ObstrTrans;         // product of all surface transmittances intersecting incoming beam
@@ -8454,7 +8101,7 @@ namespace EnergyPlus::DaylightingManager {
                 ElementLuminanceSun(iIncElem) = 0.5 * state.dataDaylightingManager->GILSU(IHR) * state.dataEnvrn->GndReflectanceForDayltg / DataGlobalConstants::Pi * LambdaInc;
             }
             // Sun beam calculations
-            if ((SolBmIndex == iIncElem) && (SunlitFracHR(IHR, IWin) > 0.0)) {
+            if ((SolBmIndex == iIncElem) && (state.dataHeatBal->SunlitFracHR(IHR, IWin) > 0.0)) {
                 ElementLuminanceSunDisk(iIncElem) = 1.0;
             }
         }
@@ -8554,15 +8201,6 @@ namespace EnergyPlus::DaylightingManager {
         // the center of the window and then reflecting this
         // light from the inside surfaces of the space.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         Array2D<Real64> FLSK;     // Sky related luminous flux
         Array1D<Real64> FLSU;     // Sun related luminous flux, excluding entering beam
         Array1D<Real64> FLSUdisk; // Sun related luminous flux, due to entering beam
@@ -8574,8 +8212,6 @@ namespace EnergyPlus::DaylightingManager {
         Array2D<Real64> ElementLuminanceSky;     // sky related luminance at window element (exterior side)
         Array1D<Real64> ElementLuminanceSun;     // sun related luminance at window element (exterior side), exluding beam
         Array1D<Real64> ElementLuminanceSunDisk; // sun related luminance at window element (exterior side), due to sun beam
-        // Total transmitted flux
-        //		static Vector4< Real64 > FLSKTot; //Unused
         Real64 FLSUTot;
         Real64 FLSUdiskTot;
 
@@ -8635,7 +8271,7 @@ namespace EnergyPlus::DaylightingManager {
         } else {
             COSIncSun = 0.0;
         }
-        ElementLuminanceSunDisk *= SunlitFracHR(IHR, IWin) * COSIncSun;
+        ElementLuminanceSunDisk *= state.dataHeatBal->SunlitFracHR(IHR, IWin) * COSIncSun;
 
         //		FLSKTot = 0.0;
         FLSUTot = 0.0;
@@ -8710,20 +8346,6 @@ namespace EnergyPlus::DaylightingManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  quantities that do not depend on sun position.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // Luminances from different sources to the window
         Array2D<Real64> ElementLuminanceSky; // sky related luminance at window element (exterior side)
         Array1D<Real64> ElementLuminanceSun; // sun related luminance at window element (exterior side),
@@ -8733,12 +8355,8 @@ namespace EnergyPlus::DaylightingManager {
 
         static Vector4<Real64> WinLumSK; // Sky related window luminance
         Real64 WinLumSU;                 // Sun related window luminance, excluding entering beam
-        // REAL(r64) :: WinLumSUdisk  ! Sun related window luminance, due to entering beam
-
         static Vector4<Real64> EDirSky; // Sky related direct illuminance
         Real64 EDirSun;                 // Sun related direct illuminance, excluding entering beam
-                                        //		Real64 EDirSunDisk; // Sun related direct illuminance, due to entering beam //Unused Set but never used
-
         int CurCplxFenState;
         int NIncBasis;
         int RefPointIndex; // reference point patch number
@@ -8746,9 +8364,7 @@ namespace EnergyPlus::DaylightingManager {
         int iConst;
         int iSky;
 
-        // REAL(r64) :: LambdaInc ! lambda for incident direation
         Real64 dirTrans; // directional BSDF transmittance
-
         Real64 dOmega;      // solid view angle of current element
         Real64 zProjection; // z-axe projection of solid view angle (used to calculate amount of light at horizontal surface
         // laying at reference point)
@@ -8834,18 +8450,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculate illuminance from sun disk for complex fenestration systems
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-
-        // Argument array dimensioning
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        //  glare calculation (radians)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurCplxFenState;
@@ -8982,18 +8586,6 @@ namespace EnergyPlus::DaylightingManager {
         // Return value
         Real64 DayltgSkyLuminance(0.0); // Luminance of sky element divided by zenith luminance
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 SPHSKY;    // Sine of PHSKY
         Real64 G(0.0);    // Angle between sun and element of sky (radians)
@@ -9003,9 +8595,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 Z2;
         Real64 Z3;
         Real64 Z4;
-
-        // Autodesk:Return ISky in {1,2,3,4} should be checked or asserted or a default case should be added to SELECT block to set return value
-
 
         SPHSKY = max(std::sin(PHSKY), 0.01); // Prevent floating point underflows
         Z = DataGlobalConstants::PiOvr2 - state.dataDaylightingManager->PHSUN;
@@ -9056,9 +8645,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates profile angle for a surface.
-
-        // REFERENCES: na
-        // USE STATEMENTS:
 
         // Using/Aliasing
         using namespace DataSurfaces;
@@ -9139,31 +8725,13 @@ namespace EnergyPlus::DaylightingManager {
         // Determines surface number and hit point of closest exterior obstruction hit
         // by a ray from a window. If no obstruction is hit, NearestHitSurfNum = 0.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //  = 0 if no obstruction is hit.
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         static Vector3<Real64> HitPt; // Hit point on an obstruction (m)
         bool hit;                     // True iff obstruction is hit
-
-
 
         NearestHitSurfNum = 0;
         Real64 NearestHitDistance_sq(
@@ -9255,24 +8823,9 @@ namespace EnergyPlus::DaylightingManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates exterior surface luminance due to beam solar diffuse reflection.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // USE STATEMENTS: na
-
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         //  beam normal illuminance (cd/m2)
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> ReflNorm; // Unit normal to reflecting surface (m)
@@ -9281,8 +8834,6 @@ namespace EnergyPlus::DaylightingManager {
         static Vector3<Real64> ObsHitPt; // Hit point on obstruction (m)
         Real64 CosIncAngAtHitPt;         // Cosine of angle of incidence of sun at HitPt
         Real64 DiffVisRefl;              // Diffuse visible reflectance of ReflSurfNum
-
-
 
         LumAtReflHitPtFrSun = 0.0;
         // Skip daylighting shelves since reflection from these is separately calculated
@@ -9355,8 +8906,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Called by InitSurfaceHeatBalance.
 
-        // METHODOLOGY EMPLOYED:na
-
         // REFERENCES:
         // Based on DOE-2.1E subroutine DINTIL.
 
@@ -9366,17 +8915,6 @@ namespace EnergyPlus::DaylightingManager {
 
         // Locals
         static Array1D<Real64> daylight_illum;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NREFPT; // Number of daylighting map reference points
@@ -9413,7 +8951,6 @@ namespace EnergyPlus::DaylightingManager {
         static Array1D<Real64> BACLUM;
         static Array1D<Real64> GLRNDX;
         int ILB;
-
         int IConst;
         Real64 VTRatio;
         Real64 VTNow;
@@ -9816,27 +9353,10 @@ namespace EnergyPlus::DaylightingManager {
         // is placed on a temporary file and later (see CloseReportIllumMaps) coallesced into a single
         // output file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string String;
@@ -9844,7 +9364,6 @@ namespace EnergyPlus::DaylightingManager {
         int X;
         int Y;
         int R;
-        //  REAL(r64)           :: NumOut
         int IllumOut;
 
         static Array1D_bool FirstTimeMaps;
@@ -10024,28 +9543,10 @@ namespace EnergyPlus::DaylightingManager {
         // This subroutine "closes" out the created daylight illuminance maps by merging them
         // into the "eplusout.map" file.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataStringGlobals::CharComma;
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         if (state.dataDaylightingData->TotIllumMaps > 0) {
@@ -10097,30 +9598,6 @@ namespace EnergyPlus::DaylightingManager {
         // Make sure DFSFile is closed at exit time.  Do not rely on operating system to
         // take care of it.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         state.files.dfs.close();
     }
 
@@ -10146,6 +9623,7 @@ namespace EnergyPlus::DaylightingManager {
         int RefSize;
         int MapNum;
 
+        auto &Zone(state.dataHeatBal->Zone);
 
         // Count number of exterior Windows (use to allocate arrays)
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -10504,6 +9982,9 @@ namespace EnergyPlus::DaylightingManager {
         // J. Glazer - 2018
         // Allow a way to map back to the original "loop" index that is used in many other places in the
         // ZoneDayLight data structure when traversing the list in the order of the window shaded deployment
+
+        auto &Zone(state.dataHeatBal->Zone);
+
         if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotalDaylRefPoints > 0 && state.dataDaylightingData->ZoneDaylight(ZoneNum).NumOfDayltgExtWins > 0 &&
             state.dataDaylightingData->ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size() > 0) {
             int count = 0;
@@ -10556,13 +10037,13 @@ namespace EnergyPlus::DaylightingManager {
 
         state.dataDaylightingData->ZoneDaylight(ZoneNum).InterReflIllFrIntWins = 0.0;
 
-        auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
+        auto &thisEnclSurfaces(DataViewFactorInformation::ZoneSolarInfo(state.dataHeatBal->Zone(ZoneNum).SolarEnclosureNum).SurfacePtr);
         for (int const IWin : thisEnclSurfaces) {
             if (Surface(IWin).Class == SurfaceClass::Window && Surface(IWin).ExtBoundCond >= 1) {
                 // This is an interior window in ZoneNum
                 int const ConstrNum = Surface(IWin).Construction;
                 int const adjEnclNum = Surface(Surface(IWin).ExtBoundCond).SolarEnclIndex;
-                QDifTrans = QSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * state.dataEnvrn->PDIFLW;
+                QDifTrans = state.dataHeatBal->QSDifSol(adjEnclNum) * state.dataConstruction->Construct(ConstrNum).TransDiffVis * Surface(IWin).Area * state.dataEnvrn->PDIFLW;
                 QDifTransUp = QDifTrans * SurfWinFractionUpgoing(IWin);
                 QDifTransDn = QDifTrans * (1.0 - SurfWinFractionUpgoing(IWin));
                 if (state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea * (1.0 - state.dataDaylightingData->ZoneDaylight(ZoneNum).AveVisDiffReflect) != 0.0) {
@@ -10639,7 +10120,7 @@ namespace EnergyPlus::DaylightingManager {
         Real64 COSB;                  // Cosine of angle between ray from ref pt to center of window
         //  and window outward normal
 
-
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             state.dataDaylightingData->ZoneDaylight(ZoneNum).MinIntWinSolidAng = 2.0 * DataGlobalConstants::Pi;
@@ -10805,7 +10286,7 @@ namespace EnergyPlus::DaylightingManager {
         // The purpose of the routine is to allow the daylighting map data to be written in various formats
 
         // must add correct number of commas at end
-        const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", Zone(ZoneNum).Name, environmentName, mapName);
+        const auto fullmapName = fmt::format("{}:{}:{} Illuminance [lux] (Hourly)", state.dataHeatBal->Zone(ZoneNum).Name, environmentName, mapName);
         print(mapFile,
               "Date/Time{Sep}{FullMapName}{Sep}{RefPt1}{Sep}{RefPt2}{Sep}{Sep}\n",
               fmt::arg("Sep", state.dataDaylightingData->MapColSep),

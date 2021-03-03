@@ -268,25 +268,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // METHODOLOGY EMPLOYED:
         // Calls ControlPTUnitOutput to obtain the desired unit output
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadFrac;      // compressor part load fraction
@@ -309,6 +292,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         DXElecCoolingPower = 0.0;
         DXElecHeatingPower = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
         state.dataPTHP->SaveCompressorPLR = 0.0;
         QLatReq = 0.0;
 
@@ -419,21 +403,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         } else {
             locFanElecPower = HVACFan::fanObjs[state.dataPTHP->PTUnit(PTUnitNum).FanIndex]->fanPower();
         }
-
-        if (state.dataPTHP->PTUnit(PTUnitNum).UnitType_Num == iPTHPType::PTACUnit) {
-            {
-                auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType_Num);
-                if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                    state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
-
-                } else if ((SELECT_CASE_var == Coil_HeatingWater) || (SELECT_CASE_var == Coil_HeatingSteam)) {
-                    state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower;
-                } else {
-                }
-            }
-        } else {
-            state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower;
-        }
+        state.dataPTHP->PTUnit(PTUnitNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + SuppHeatingCoilPower;
     }
 
     void GetPTUnit(EnergyPlusData &state)
@@ -471,7 +441,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         auto &GetHXDXCoilInletNode(HVACHXAssistedCoolingCoil::GetCoilInletNode);
         auto &GetHXDXCoilOutletNode(HVACHXAssistedCoolingCoil::GetCoilOutletNode);
         auto &GetHeatingCoilIndex(HeatingCoils::GetCoilIndex);
-        using HeatingCoils::SimulateHeatingCoilComponents;
         auto &GetHeatingCoilInletNode(HeatingCoils::GetCoilInletNode);
         auto &GetHeatingCoilOutletNode(HeatingCoils::GetCoilOutletNode);
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
@@ -4703,7 +4672,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
@@ -4834,7 +4802,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -4894,7 +4862,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
@@ -4953,7 +4921,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
                         ZoneEqSizing(CurZoneEqNum).AirVolFlow =
-                            ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                            ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -4989,7 +4957,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesCoolingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * Zone(DataZoneNumber).FloorArea;
+                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
@@ -5011,7 +4979,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                            ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
@@ -6547,9 +6515,10 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         PTUnitNum = int(Par(1));
         // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
         FirstHVACIteration = (Par(2) == 1.0);
+        auto & thisUnit = state.dataPTHP->PTUnit(PTUnitNum);
         SimulateHeatingCoilComponents(
-            state, state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, TempSupHeater, state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex);
-        SupSATResidual = Node(state.dataPTHP->PTUnit(PTUnitNum).AirOutNode).Temp - state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat;
+            state, thisUnit.SuppHeatCoilName, FirstHVACIteration, TempSupHeater, thisUnit.SuppHeatCoilIndex, _, true);
+        SupSATResidual = Node(thisUnit.AirOutNode).Temp - thisUnit.MaxSATSupHeat;
 
         return SupSATResidual;
     }
@@ -7161,6 +7130,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         DXElecCoolingPower = 0.0;
         state.dataPTHP->SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
 
         // initialize local variables
         UnitOn = true;
@@ -7658,7 +7628,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     auto const SELECT_CASE_var(state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
                         SimulateHeatingCoilComponents(
-                            state, state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                            state, state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, state.dataPTHP->PTUnit(PTUnitNum).SuppHeatCoilIndex, _, true);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
                         SetComponentFlowRate(state, mdot,
