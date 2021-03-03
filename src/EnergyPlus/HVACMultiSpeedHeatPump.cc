@@ -320,9 +320,6 @@ namespace HVACMultiSpeedHeatPump {
         // METHODOLOGY EMPLOYED:
         // Calls ControlMSHPOutput to obtain the desired unit output
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using DataHVACGlobals::SmallLoad;
@@ -330,17 +327,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Locals
         Real64 SupHeaterLoad;
-
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 PartLoadFrac; // compressor part load fraction
@@ -361,6 +347,7 @@ namespace HVACMultiSpeedHeatPump {
         DXElecCoolingPower = 0.0;
         SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
+        DataHVACGlobals::SuppHeatingCoilPower = 0.0;
 
         // initialize local variables
         UnitOn = true;
@@ -509,20 +496,8 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHeatPumpNum).AuxOnCyclePower * SaveCompressorPLR + MSHeatPump(MSHeatPumpNum).AuxOffCyclePower * (1.0 - SaveCompressorPLR);
         Real64 locFanElecPower = 0.0;
         locFanElecPower = Fans::GetFanPower(MSHeatPump(MSHeatPumpNum).FanNum);
-        if (MSHeatPump(MSHeatPumpNum).HeatCoilType != MultiSpeedHeatingCoil) {
-            {
-                auto const SELECT_CASE_var(MSHeatPump(MSHeatPumpNum).HeatCoilType);
-                if ((SELECT_CASE_var == Coil_HeatingGas_MultiStage) || (SELECT_CASE_var == Coil_HeatingElectric_MultiStage)) {
-                    MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
-                } else if ((SELECT_CASE_var == Coil_HeatingWater) || (SELECT_CASE_var == Coil_HeatingSteam)) {
-                    MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + DXElecCoolingPower;
-                } else {
-                }
-            }
-        } else {
-            MSHeatPump(MSHeatPumpNum).ElecPower =
-                locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower + MSHeatPump(MSHeatPumpNum).AuxElecPower;
-        }
+        MSHeatPump(MSHeatPumpNum).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower +
+                                              DataHVACGlobals::SuppHeatingCoilPower + MSHeatPump(MSHeatPumpNum).AuxElecPower;
     }
 
     //******************************************************************************
@@ -540,7 +515,6 @@ namespace HVACMultiSpeedHeatPump {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
         using DataSizing::AutoSize;
@@ -696,7 +670,7 @@ namespace HVACMultiSpeedHeatPump {
             TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
             // Get the Controlling Zone or Location of the engine driven heat pump Thermostat
-            MSHeatPump(MSHPNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), Zone);
+            MSHeatPump(MSHPNum).ControlZoneNum = UtilityRoutines::FindItemInList(Alphas(5), state.dataHeatBal->Zone);
             MSHeatPump(MSHPNum).ControlZoneName = Alphas(5);
             if (MSHeatPump(MSHPNum).ControlZoneNum == 0) {
                 ShowSevereError(state, CurrentModuleObject + ", \"" + MSHeatPump(MSHPNum).Name + "\" " + cAlphaFields(5) +
@@ -2020,7 +1994,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && MSHeatPump(MSHeatPumpNum).MyCheckFlag) {
-            int zoneNum = DataHeatBalance::Zone(MSHeatPump(MSHeatPumpNum).ControlZoneNum).ZoneEqNum;
+            int zoneNum = state.dataHeatBal->Zone(MSHeatPump(MSHeatPumpNum).ControlZoneNum).ZoneEqNum;
             int zoneInlet = MSHeatPump(MSHeatPumpNum).ZoneInletNode;
             int coolingPriority = 0;
             int heatingPriority = 0;
@@ -2878,8 +2852,6 @@ namespace HVACMultiSpeedHeatPump {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         using General::SolveRoot;
-
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using Psychrometrics::PsyCpAirFnW;
         using TempSolveRoot::SolveRoot;
 

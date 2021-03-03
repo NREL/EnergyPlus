@@ -122,7 +122,6 @@ namespace EnergyPlus::DataSurfaceLists {
 
         // Using/Aliasing
         using namespace DataSurfaces;
-        using DataHeatBalance::Zone;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject1("ZoneHVAC:LowTemperatureRadiant:SurfaceGroup");
@@ -316,7 +315,7 @@ namespace EnergyPlus::DataSurfaceLists {
                 NumArray = 1;
                 for (SurfNum = 1; SurfNum <= SlabList(Item).NumOfSurfaces; ++SurfNum) {
                     SlabList(Item).ZoneName(SurfNum) = Alphas(AlphaArray);
-                    SlabList(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(AlphaArray), Zone);
+                    SlabList(Item).ZonePtr = UtilityRoutines::FindItemInList(Alphas(AlphaArray), state.dataHeatBal->Zone);
                     if (SlabList(Item).ZonePtr(SurfNum) == 0) {
                         ShowSevereError(state, cAlphaFields(AlphaArray + 1) + " in " + CurrentModuleObject2 +
                                         " Zone not found = " + SlabList(Item).SurfName(SurfNum));

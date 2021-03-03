@@ -85,7 +85,7 @@ namespace HeatBalanceAirManager {
 
     void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors found
 
-    void SetZoneMassConservationFlag(); // sets the zone air mass flow variables
+    void SetZoneMassConservationFlag(EnergyPlusData &state); // sets the zone air mass flow variables
 
     void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound); // IF errors found in input
 

@@ -521,7 +521,7 @@ namespace HVACFan {
         }
         m_nightVentPressureDelta = numericArgs(10);
         m_nightVentFlowFraction = numericArgs(11); // not used
-        m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), DataHeatBalance::Zone);
+        m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), state.dataHeatBal->Zone);
         if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::zoneGains;
         if (m_zoneNum == 0) {
             if (isAlphaFieldBlank(8)) {

@@ -117,14 +117,14 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
     ExtVentedCavity(NumOfSurf).SurfPtrs(NumOfSurf) = 1;
     // allocate zone variable data
-    Zone.allocate(ZoneNum);
-    Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
+    state->dataHeatBal->Zone.allocate(ZoneNum);
+    state->dataHeatBal->Zone(ZoneNum).OutsideConvectionAlgo = ASHRAESimple;
     // allocate surface temperature variable data
     TH.allocate(NumOfSurf, 1, 2);
     TH(SurfNum, 1, 1) = 22.0;
     // allocate solar incident radiation variable data
-    SurfQRadSWOutIncident.allocate(1);
-    SurfQRadSWOutIncident(1) = 0.0;
+    state->dataHeatBal->SurfQRadSWOutIncident.allocate(1);
+    state->dataHeatBal->SurfQRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
     state->dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
@@ -166,7 +166,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     state->dataMaterial->Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     TH.deallocate();
-    SurfQRadSWOutIncident.deallocate();
+    state->dataHeatBal->SurfQRadSWOutIncident.deallocate();
 }

@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     MSHPMassFlowRateHigh = 0.2924 * state->dataEnvrn->StdRhoAir;
 
     int CoilIndex = 1;
-    DataHeatBalance::HeatReclaimDXCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
     state->dataDXCoils->DXCoil(CoilIndex).InletAirMassFlowRate = MSHPMassFlowRateLow;
     state->dataDXCoils->DXCoil(CoilIndex).MSRatedAirMassFlowRate(1) = MSHPMassFlowRateLow;
     state->dataDXCoils->DXCoil(CoilIndex).MSRatedAirMassFlowRate(2) = MSHPMassFlowRateHigh;
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
@@ -3970,7 +3970,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(state->dataDXCoils->NumDXCoils).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(state->dataDXCoils->NumDXCoils).PerfMode(1).FieldNames.allocate(20);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilFullLoadOutAirTemp.allocate(state->dataDXCoils->NumDXCoils);
@@ -4109,7 +4109,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);

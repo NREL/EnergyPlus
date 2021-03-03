@@ -200,7 +200,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
-        using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
@@ -904,7 +903,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             //   High humidity control option is YES, read in additional data
             if (UtilityRoutines::SameString(Alphas(6), "Yes")) {
 
-                HStatZoneNum = UtilityRoutines::FindItemInList(Alphas(7), Zone);
+                HStatZoneNum = UtilityRoutines::FindItemInList(Alphas(7), state.dataHeatBal->Zone);
                 thisOAController.HumidistatZoneNum = HStatZoneNum;
 
                 // Get the node number for the zone with the humidistat
@@ -1318,10 +1317,6 @@ namespace EnergyPlus::HVACStandAloneERV {
         // Obtains flow rates from the zone or system sizing arrays.
 
         // Using/Aliasing
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-        using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
         using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CurZoneEqNum;
         using DataSizing::ZoneEqSizing;
@@ -1363,7 +1358,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         bool PrintFlag = true;
         bool ErrorsFound = false;
 
-        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize) {
+        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == DataSizing::AutoSize) {
             IsAutoSize = true;
         }
 
@@ -1373,24 +1368,24 @@ namespace EnergyPlus::HVACStandAloneERV {
             //      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
             ZoneName = state.dataZoneEquip->ZoneEquipConfig(CurZoneEqNum).ZoneName;
             ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CurZoneEqNum).ActualZoneNum;
-            ZoneMult = Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier;
+            ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
             FloorArea = 0.0;
-            if (UtilityRoutines::SameString(ZoneName, Zone(ActualZoneNum).Name)) {
-                FloorArea = Zone(ActualZoneNum).FloorArea;
+            if (UtilityRoutines::SameString(ZoneName, state.dataHeatBal->Zone(ActualZoneNum).Name)) {
+                FloorArea = state.dataHeatBal->Zone(ActualZoneNum).FloorArea;
             } else {
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                    if (!UtilityRoutines::SameString(ZoneName, Zone(ZoneNum).Name)) continue;
-                    FloorArea = Zone(ZoneNum).FloorArea;
+                    if (!UtilityRoutines::SameString(ZoneName, state.dataHeatBal->Zone(ZoneNum).Name)) continue;
+                    FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
                     break;
                 }
             }
             NumberOfPeople = 0.0;
             MaxPeopleSch = 0.0;
-            for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
-                if (ActualZoneNum != People(PeopleNum).ZonePtr) continue;
-                PeopleSchPtr = People(PeopleNum).NumberOfPeoplePtr;
+            for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                if (ActualZoneNum != state.dataHeatBal->People(PeopleNum).ZonePtr) continue;
+                PeopleSchPtr = state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr;
                 MaxPeopleSch = GetScheduleMaxValue(state, PeopleSchPtr);
-                NumberOfPeople = NumberOfPeople + (People(PeopleNum).NumberOfPeople * MaxPeopleSch);
+                NumberOfPeople = NumberOfPeople + (state.dataHeatBal->People(PeopleNum).NumberOfPeople * MaxPeopleSch);
             }
             SupplyAirVolFlowDes = FloorArea * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerFloorArea +
                                   NumberOfPeople * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerOccupant;
@@ -1428,7 +1423,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         // Size ERV exhaust flow rate
         DataSizing::DataFractionUsedForSizing = 1.0;
         IsAutoSize = false;
-        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == AutoSize) {
+        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == DataSizing::AutoSize) {
             IsAutoSize = true;
         }
 
@@ -1471,7 +1466,7 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         // Check supply fan flow rate or set flow rate if autosized in fan object
         IsAutoSize = false;
-        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate == AutoSize) {
+        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate == DataSizing::AutoSize) {
             IsAutoSize = true;
         }
         DesignSAFanVolFlowRateDes = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
@@ -1533,13 +1528,8 @@ namespace EnergyPlus::HVACStandAloneERV {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::ZoneAirMassFlow;
         using Fans::SimulateFanComponents;
-
         using HeatRecovery::SimHeatRecovery;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1687,7 +1677,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             //      END DO
             TotalExhaustMassFlow = Node(ExhaustInletNode).MassFlowRate;
             TotalSupplyMassFlow = Node(SupInletNode).MassFlowRate;
-            if (TotalExhaustMassFlow > TotalSupplyMassFlow && !ZoneAirMassFlow.EnforceZoneMassBalance) {
+            if (TotalExhaustMassFlow > TotalSupplyMassFlow && !state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                 ShowWarningError(state, "For " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name +
                                  "\" there is unbalanced exhaust air flow.");
                 ShowContinueError(state, format("... The exhaust air mass flow rate = {:.6R}", Node(ExhaustInletNode).MassFlowRate));

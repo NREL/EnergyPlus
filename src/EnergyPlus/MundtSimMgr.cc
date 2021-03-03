@@ -184,7 +184,6 @@ namespace MundtSimMgr {
         //     initialize Mundt-model variables
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataRoomAirModel::FloorAirNode;
         using DataRoomAirModel::MundtRoomAirNode;
         using DataSurfaces::Surface;
@@ -209,7 +208,7 @@ namespace MundtSimMgr {
         bool AirNodeFoundFlag;  // flag used for error check
         bool ErrorsFound;       // true if errors found in init
 
-
+        auto &Zone(state.dataHeatBal->Zone);
 
         // allocate and initialize zone data
         ZoneData.allocate(state.dataGlobal->NumOfZones);
@@ -368,8 +367,6 @@ namespace MundtSimMgr {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::HConvIn;
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::MCPI;
         using DataHeatBalFanSys::NonAirSystemResponse;
@@ -413,7 +410,7 @@ namespace MundtSimMgr {
         Real64 ZoneMult;         // total zone multiplier
         Real64 RetAirConvGain;
 
-
+        auto &Zone(state.dataHeatBal->Zone);
 
         // determine ZoneEquipConfigNum for this zone
         ZoneEquipConfigNum = ZoneNum;
@@ -459,13 +456,13 @@ namespace MundtSimMgr {
             QsysCoolTot = -(SumSysMCpT - ZoneMassFlowRate * CpAir * MAT(ZoneNum));
         }
         // determine heat gains
-        SumAllInternalConvectionGains(ZoneNum, ConvIntGain);
+        SumAllInternalConvectionGains(state, ZoneNum, ConvIntGain);
         ConvIntGain += SumConvHTRadSys(ZoneNum) + SumConvPool(ZoneNum) + SysDepZoneLoadsLagged(ZoneNum) + NonAirSystemResponse(ZoneNum) / ZoneMult;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (Zone(ZoneNum).NoHeatToReturnAir) {
-            SumAllReturnAirConvectionGains(ZoneNum, RetAirConvGain, 0);
+            SumAllReturnAirConvectionGains(state, ZoneNum, RetAirConvGain, 0);
             ConvIntGain += RetAirConvGain;
         }
 
@@ -474,7 +471,7 @@ namespace MundtSimMgr {
         // get surface data
         for (SurfNum = 1; SurfNum <= ZoneData(ZoneNum).NumOfSurfs; ++SurfNum) {
             MundtAirSurf(SurfNum, MundtZoneNum).Temp = TempSurfIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
-            MundtAirSurf(SurfNum, MundtZoneNum).Hc = HConvIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
+            MundtAirSurf(SurfNum, MundtZoneNum).Hc = state.dataHeatBal->HConvIn(ZoneData(ZoneNum).SurfFirst + SurfNum - 1);
         }
     }
 
@@ -505,7 +502,6 @@ namespace MundtSimMgr {
 
         // Using/Aliasing
         using namespace DataRoomAirModel;
-        using DataHeatBalance::Zone;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -567,7 +563,7 @@ namespace MundtSimMgr {
                 FloorSurf(SurfNum).Area = MundtAirSurf(FloorSurfSetIDs(SurfNum), MundtZoneNum).Area;
             }
         } else {
-            ShowSevereError(state, "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + Zone(ZoneNum).Name);
+            ShowSevereError(state, "SetupMundtModel: Mundt model has no FloorAirNode, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
             ErrorsFound = true;
         }
     }
@@ -761,8 +757,6 @@ namespace MundtSimMgr {
         //     map data from air domain back to surface domain for each particular zone
 
         // Using/Aliasing
-        using DataHeatBalance::TempEffBulkAir;
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::TempTstatAir;
         using DataHeatBalFanSys::TempZoneThermostatSetPoint;
@@ -789,7 +783,7 @@ namespace MundtSimMgr {
                 // Use direct coupling scheme to report air temperatures back to surface/system domains
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
                 for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                    TempEffBulkAir(SurfFirst + SurfNum - 1) = MundtAirSurf(SurfNum, MundtZoneNum).TMeanAir;
+                    state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = MundtAirSurf(SurfNum, MundtZoneNum).TMeanAir;
                     // set flag for reference air temperature
                     Surface(SurfFirst + SurfNum - 1).TAirRef = AdjacentAirTemp;
                 }
@@ -798,7 +792,7 @@ namespace MundtSimMgr {
                 // TRoomAverage = ( LineNode( MundtCeilAirID, MundtZoneNum ).Temp + LineNode( MundtFootAirID, MundtZoneNum ).Temp ) / 2;
                 // ZT(ZoneNum) = TRoomAverage
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
-                ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
+                ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 Node(ZoneNodeNum).Temp = LineNode(ReturnNodeID, MundtZoneNum).Temp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
                 TempTstatAir(ZoneNum) = LineNode(TstatNodeID, MundtZoneNum).Temp;
@@ -807,7 +801,7 @@ namespace MundtSimMgr {
                 // a) Bulk air temperatures -> TempEffBulkAir(SurfNum)
                 for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
                     DeltaTemp = MundtAirSurf(SurfNum, MundtZoneNum).TMeanAir - LineNode(TstatNodeID, MundtZoneNum).Temp;
-                    TempEffBulkAir(SurfFirst + SurfNum - 1) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
+                    state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                     // set flag for reference air temperature
                     Surface(SurfFirst + SurfNum - 1).TAirRef = AdjacentAirTemp;
                 }
@@ -817,7 +811,7 @@ namespace MundtSimMgr {
                 // DeltaTemp = TRoomAverage - LineNode( TstatNodeID, MundtZoneNum ).Temp;
                 // ZT(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp
                 // c) Leaving-zone air temperature -> Node(ZoneNode)%Temp
-                ZoneNodeNum = Zone(ZoneNum).SystemZoneNodeNumber;
+                ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
                 DeltaTemp = LineNode(ReturnNodeID, MundtZoneNum).Temp - LineNode(TstatNodeID, MundtZoneNum).Temp;
                 Node(ZoneNodeNum).Temp = TempZoneThermostatSetPoint(ZoneNum) + DeltaTemp;
                 // d) Thermostat air temperature -> TempTstatAir(ZoneNum)
@@ -828,7 +822,7 @@ namespace MundtSimMgr {
         } else { // Controlled zone when the system is off --> Use the mixing model instead of the Mundt model
             // Bulk air temperatures -> TempEffBulkAir(SurfNum)
             for (SurfNum = 1; SurfNum <= NumOfSurfs; ++SurfNum) {
-                TempEffBulkAir(SurfFirst + SurfNum - 1) = MAT(ZoneNum);
+                state.dataHeatBal->TempEffBulkAir(SurfFirst + SurfNum - 1) = MAT(ZoneNum);
                 // set flag for reference air temperature
                 Surface(SurfFirst + SurfNum - 1).TAirRef = ZoneMeanAirTemp;
             }

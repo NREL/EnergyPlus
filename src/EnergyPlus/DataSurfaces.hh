@@ -237,21 +237,21 @@ namespace DataSurfaces {
     // TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
-    // why aren't these sequential (LKL - 13 Aug 2007)
+    // why aren't these sequential
 
     // Parameters to indicate heat transfer model to use for surface
     extern Array1D_string const HeatTransferModelNames;
-    extern int const HeatTransferModel_NotSet;
-    extern int const HeatTransferModel_None; // shading surfaces for example
-    extern int const HeatTransferModel_CTF;
-    extern int const HeatTransferModel_EMPD;
-    extern int const HeatTransferModel_CondFD;
-    extern int const HeatTransferModel_HAMT;
-    extern int const HeatTransferModel_Window5;             // original detailed layer-by-layer based on window 4 and window 5
-    extern int const HeatTransferModel_ComplexFenestration; // BSDF
-    extern int const HeatTransferModel_TDD;                 // tubular daylighting device
-    extern int const HeatTransferModel_Kiva;                // Kiva ground calculations
-    extern int const HeatTransferModel_AirBoundaryNoHT;     // Construction:AirBoundary - not IRT or interior window
+    constexpr int HeatTransferModel_NotSet(-1);
+    constexpr int HeatTransferModel_None(0); // shading surfaces
+    constexpr int HeatTransferModel_CTF(1);
+    constexpr int HeatTransferModel_EMPD(2);
+    constexpr int HeatTransferModel_CondFD(5);
+    constexpr int HeatTransferModel_HAMT(6);
+    constexpr int HeatTransferModel_Window5(7);             // original detailed layer-by-layer based on window 4 and window 5
+    constexpr int HeatTransferModel_ComplexFenestration(8); // BSDF
+    constexpr int HeatTransferModel_TDD(9);                 // tubular daylighting device
+    constexpr int HeatTransferModel_Kiva(10);               // Kiva ground calculations
+    constexpr int HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
 
     // Parameters for classification of outside face of surfaces
     extern int const OutConvClass_WindwardVertWall;
@@ -916,7 +916,7 @@ namespace DataSurfaces {
         Real64 WindSpeedEMSOverrideValue;
         bool ViewFactorGroundEMSOverrideOn; // if true, EMS is calling to override the surface's view factor to ground
         Real64 ViewFactorGroundEMSOverrideValue; // value to use for EMS override of the surface's view factor to ground
-        
+
         Real64 WindDir;                    // Surface outside wind direction, for surface heat balance and ventilation(degree)
         bool WindDirEMSOverrideOn;         // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue;    // value to use for EMS override of the surface's outside wind speed
@@ -1021,15 +1021,15 @@ namespace DataSurfaces {
 
         static Real64 getInsideIR(const int t_SurfNum);
 
-        Real64 getOutsideAirTemperature(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getOutsideAirTemperature(EnergyPlusData &state, int t_SurfNum) const;
 
-        Real64 getOutsideIR(EnergyPlusData &state, const int t_SurfNum) const;
+        Real64 getOutsideIR(EnergyPlusData &state, int t_SurfNum) const;
 
-        static Real64 getSWIncident(const int t_SurfNum);
+        static Real64 getSWIncident(EnergyPlusData &state, int t_SurfNum);
 
-        static Real64 getSWBeamIncident(const int t_SurfNum);
+        static Real64 getSWBeamIncident(EnergyPlusData &state, int t_SurfNum);
 
-        static Real64 getSWDiffuseIncident(const int t_SurfNum);
+        static Real64 getSWDiffuseIncident(EnergyPlusData &state, int t_SurfNum);
 
         int getTotLayers(EnergyPlusData &state) const;
 

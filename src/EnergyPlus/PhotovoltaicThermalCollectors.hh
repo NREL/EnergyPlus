@@ -174,7 +174,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void size(EnergyPlusData &state);
 
-        void control();
+        void control(EnergyPlusData &state);
 
         void calculate(EnergyPlusData &state);
 

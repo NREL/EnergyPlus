@@ -194,7 +194,7 @@ namespace CoolingPanelSimple {
 
     void DistributeCoolingPanelRadGains(EnergyPlusData &state);
 
-    Real64 SumHATsurf(int ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
 } // namespace CoolingPanelSimple
 

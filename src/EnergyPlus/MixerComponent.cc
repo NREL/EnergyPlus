@@ -181,7 +181,6 @@ namespace EnergyPlus::MixerComponent {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
-        // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
         state.dataMixerComponent->NumMixers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 

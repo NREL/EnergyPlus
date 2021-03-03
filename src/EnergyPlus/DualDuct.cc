@@ -288,7 +288,6 @@ namespace DualDuct {
         int ADUNum;                                  // loop control to search Air Distribution Units
         static Real64 DummyOAFlow(0.0);
 
-        // Flow
         NumDualDuctConstVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDConstantVolume);
         NumDualDuctVarVolDampers = inputProcessor->getNumObjectsFound(state, cCMO_DDVariableVolume);
         NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(state, cCMO_DDVarVolOA);
@@ -847,8 +846,6 @@ namespace DualDuct {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -952,11 +949,11 @@ namespace DualDuct {
                 Node(OAInNode).MassFlowRateMin = 0.0;
                 // figure per person by design level for the OA duct.
                 PeopleFlow = 0.0;
-                for (Loop = 1; Loop <= TotPeople; ++Loop) {
-                    if (People(Loop).ZonePtr != this->ActualZoneNum) continue;
+                for (Loop = 1; Loop <= state.dataHeatBal->TotPeople; ++Loop) {
+                    if (state.dataHeatBal->People(Loop).ZonePtr != this->ActualZoneNum) continue;
                     int damperOAFlowMethod = OARequirements(this->OARequirementsPtr).OAFlowMethod;
                     if (damperOAFlowMethod == OAFlowPPer || damperOAFlowMethod == OAFlowSum || damperOAFlowMethod == OAFlowMax) {
-                        PeopleFlow += People(Loop).NumberOfPeople * OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
+                        PeopleFlow += state.dataHeatBal->People(Loop).NumberOfPeople * OARequirements(this->OARequirementsPtr).OAFlowPerPerson;
                     }
                 }
                 this->OAPerPersonByDesignLevel = PeopleFlow;

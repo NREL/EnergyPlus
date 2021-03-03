@@ -59,13 +59,6 @@ namespace EnergyPlus {
 
 namespace DataReportingFlags {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
     extern int NumOfWarmupDays; // reinitialized for each environment.
     extern std::string cWarmupDay;

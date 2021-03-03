@@ -149,7 +149,7 @@ namespace WindowEquivalentLayer {
         state.dataWindowEquivalentLayer->EQLDiffPropFlag = true;
         state.dataWindowEquivalentLayer->CFSDiffAbsTrans = 0.0;
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (!state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             if (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
 
@@ -190,7 +190,6 @@ namespace WindowEquivalentLayer {
         int NumGLayers;                           // number of gap layers
         int NumSLayers;                           // number of glazing and shade layers (non-gas layers)
         Array2D<Real64> SysAbs1(2, CFSMAXNL + 1); // layers absorptance and system transmittance
-        // Flow
 
         if (!allocated(CFSLayers)) CFSLayers.allocate(state.dataConstruction->Construct(ConstrNum).TotLayers);
 
@@ -722,7 +721,7 @@ namespace WindowEquivalentLayer {
         ConvHeatFlowNatural = 0.0;
 
         EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
-        HcIn = HConvIn(SurfNum); // windows inside surface convective film conductance
+        HcIn = state.dataHeatBal->HConvIn(SurfNum); // windows inside surface convective film conductance
 
         if (CalcCondition == DataBSDFWindow::noCondition) {
             ZoneNum = Surface(SurfNum).Zone;
@@ -734,11 +733,11 @@ namespace WindowEquivalentLayer {
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     RefAirTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                    RefAirTemp = TempEffBulkAir(SurfNum);
+                    RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                     ZoneEquipConfigNum = ZoneNum;
                     // check whether this zone is a controlled zone or not
-                    if (!Zone(ZoneNum).IsControlled) {
+                    if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                         return;
                     }
                     // determine supply air conditions
@@ -777,12 +776,12 @@ namespace WindowEquivalentLayer {
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
                         RefAirTemp = MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp = TempEffBulkAir(SurfNumAdj);
+                        RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                         // determine ZoneEquipConfigNum for this zone
                         ZoneEquipConfigNum = ZoneNum;
                         // check whether this zone is a controlled zone or not
-                        if (!Zone(ZoneNum).IsControlled) {
+                        if (!state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             return;
                         }
                         // determine supply air conditions
@@ -808,12 +807,12 @@ namespace WindowEquivalentLayer {
                 }
 
                 Tout = RefAirTemp + DataGlobalConstants::KelvinConv;      // outside air temperature
-                tsky = MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
+                tsky = state.dataHeatBal->MRT(ZoneNumAdj) + DataGlobalConstants::KelvinConv; // TODO this misses IR from sources such as high temp radiant and baseboards
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
                 outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
-                        QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + SurfQRadThermInAbs(SurfNumAdj);
+                        QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
                      // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -861,11 +860,11 @@ namespace WindowEquivalentLayer {
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
         rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
-               QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + SurfQRadThermInAbs(SurfNum);
+               QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
         NL = CFS(EQLNum).NL;
-        QAllSWwinAbs({1, NL + 1}) = SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
+        QAllSWwinAbs({1, NL + 1}) = state.dataHeatBal->SurfWinQRadSWwinAbs({1, NL + 1}, SurfNum);
         //  Solve energy balance(s) for temperature at each node/layer and
         //  heat flux, including components, between each pair of nodes/layers
         ASHWAT_ThermalCalc(state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, QAllSWwinAbs({1, NL + 1}), TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
@@ -1118,7 +1117,6 @@ namespace WindowEquivalentLayer {
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
-        // Flow
 
         RB_BEAM(state, THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
@@ -1257,7 +1255,6 @@ namespace WindowEquivalentLayer {
         Real64 RHO_BD;
         Real64 TAU_BB;
         Real64 TAU_BD;
-        // Flow
 
         IS_BEAM(state, THETA, P(state.dataWindowEquivalentLayer->hipRHO_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BT0), P(state.dataWindowEquivalentLayer->hipTAU_BB0), RHO_BD, TAU_BB, TAU_BD);
 
@@ -3691,7 +3688,6 @@ namespace WindowEquivalentLayer {
         Real64 K3;
         Real64 K4;
         Real64 DEN;
-        // flow
 
         Real64 const W_cos_PHI_2(pow_2(W * std::cos(PHI)));
         Real64 const W_sin_PHI(W * std::sin(PHI));
@@ -4480,7 +4476,6 @@ namespace WindowEquivalentLayer {
         Real64 HC_GS;                        // convection - glass to shade (one side)
         Array1D<Real64> SOURCEdv(FS.NL + 1); // indices of merit
         Real64 QGAIN;                        // total gain to conditioned space [[W/m2]
-                                             // Flow
 
         NL = FS.NL; // working copy
         if (NL < 1) return;
@@ -4957,7 +4952,6 @@ namespace WindowEquivalentLayer {
         Real64 SaveHCNLm;                    // place to save HC[NL-1] - two resistance networks differ
         Real64 SaveHCNL;                     // place to save HC[NL]   - two resistance networks differ
                                              // in their definitions of these heat transfer coefficients
-                                             // Flow
 
         ASHWAT_ThermalRatings = false; // init to failure
         NL = FS.NL;                    // working copy
@@ -8137,7 +8131,7 @@ namespace WindowEquivalentLayer {
         ConstrNum = Surface(SurfNum).Construction;
         EQLNum = state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
-            if (CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
+            if (state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
 
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
@@ -8149,7 +8143,7 @@ namespace WindowEquivalentLayer {
                 }
             }
             // Incident angle
-            IncAng = std::acos(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
+            IncAng = std::acos(state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
             CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
             CFSAbs(1, {1, CFSMAXNL + 1}) = Abs1(1, {1, CFSMAXNL + 1});
             CFSAbs(2, {1, CFSMAXNL + 1}) = Abs1(2, {1, CFSMAXNL + 1});
@@ -8164,7 +8158,7 @@ namespace WindowEquivalentLayer {
                         }
                     }
                 }
-                IncAng = std::acos(CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
+                IncAng = std::acos(state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum));
                 CalcEQLWindowOpticalProperty(state, CFS(EQLNum), BeamDIffFlag, Abs1, IncAng, ProfAngVer, ProfAngHor);
                 CFSAbs(_, {1, CFSMAXNL + 1}) = Abs1(_, {1, CFSMAXNL + 1});
                 state.dataWindowEquivalentLayer->CFSDiffAbsTrans(_, {1, CFSMAXNL + 1}, EQLNum) = Abs1(_, {1, CFSMAXNL + 1});
@@ -8215,7 +8209,7 @@ namespace WindowEquivalentLayer {
 
         // calculate fenestration air-to-air U-value
         CalcEQLWindowUvalue(state, CFS(EQLNum), UValue);
-        NominalU(ConstrNum) = UValue;
+        state.dataHeatBal->NominalU(ConstrNum) = UValue;
 
         // calculate the SHGC and Normal Transmittance
         CalcEQLWindowSHGCAndTransNormal(state, CFS(EQLNum), SHGCSummer, TransNormal);
