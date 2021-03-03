@@ -252,7 +252,6 @@ namespace Furnaces {
         // performed here (i.e. the supplemental and reheat coil loads are passed as 0 to CalcFurnaceOutput).
 
         // Using/Aliasing
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using namespace DataZoneEnergyDemands;
         using DataHeatBalFanSys::TempControlType;
@@ -6371,7 +6370,6 @@ namespace Furnaces {
         // na
 
         // Using/Aliasing
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using namespace ScheduleManager;
         using DataHeatBalFanSys::MAT;
 
@@ -6669,7 +6667,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using namespace ScheduleManager;
         using namespace DataZoneEnergyDemands;
         using DataHeatBalFanSys::ZT;
@@ -7999,8 +7996,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
-
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using TempSolveRoot::SolveRoot;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -8591,7 +8586,6 @@ namespace Furnaces {
         // na
 
         // Using/Aliasing
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using WaterToAirHeatPump::SimWatertoAirHP;
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
@@ -8872,7 +8866,7 @@ namespace Furnaces {
                 SimulateFanComponents(state, BlankString, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).FanIndex, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the supplemental heating coil
-            SimulateHeatingCoilComponents(
+            HeatingCoils::SimulateHeatingCoilComponents(
                 state, BlankString, FirstHVACIteration, HeatCoilLoad, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, _, true, FanOpMode);
 
         } else { // ELSE it's not a heat pump
@@ -9618,8 +9612,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using DataHVACGlobals::SmallLoad;
-
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
         using TempSolveRoot::SolveRoot;
@@ -9681,7 +9673,7 @@ namespace Furnaces {
             auto const SELECT_CASE_var(CoilTypeNum);
             if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric) ||
                 (SELECT_CASE_var == Coil_HeatingDesuperheater)) {
-                SimulateHeatingCoilComponents(
+                HeatingCoils::SimulateHeatingCoilComponents(
                     state, HeatingCoilName, FirstHVACIteration, QCoilLoad, HeatingCoilIndex, QActual, SuppHeatingCoilFlag, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingWater) {
                 if (QCoilLoad > SmallLoad) {
@@ -9905,6 +9897,7 @@ namespace Furnaces {
         DXElecCoolingPower = 0.0;
         state.dataFurnaces->SaveCompressorPLR = 0.0;
         ElecHeatingCoilPower = 0.0;
+        SuppHeatingCoilPower = 0.0;
 
         SystemSensibleLoad = QZnReq;
         TotalZoneSensibleLoad = QZnReq;
@@ -10207,7 +10200,6 @@ namespace Furnaces {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         // Using/Aliasing
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using IntegratedHeatPump::GetCurWorkMode;
         using IntegratedHeatPump::GetMaxSpeedNumIHP;
         using IntegratedHeatPump::IHPOperationMode;
