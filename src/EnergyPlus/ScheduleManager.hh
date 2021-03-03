@@ -73,10 +73,7 @@ namespace ScheduleManager {
     // Data
     // MODULE PARAMETER DEFINITIONS
     extern int const MaxDayTypes;
-    extern Array1D_string const ValidDayTypes;
-
     extern int const NumScheduleTypeLimitUnitTypes;
-    extern Array1D_string const ScheduleTypeLimitUnitTypes;
 
     enum class SchedType :int {
         Unassigned = 0,
@@ -349,6 +346,9 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumDaySchedules = 0;
     int NumWeekSchedules = 0;
     int NumSchedules = 0;
+
+//    Array1D_string const ValidDayTypes;
+//    Array1D_string const ScheduleTypeLimitUnitTypes;
 
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types

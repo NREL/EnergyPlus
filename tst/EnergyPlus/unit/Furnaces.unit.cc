@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     Real64 PartLoadRatio(1.0);
     Node.allocate(10);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
-    Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
     MSHPMassFlowRateLow = 0.0;
     MSHPMassFlowRateHigh = 0.0;

@@ -122,7 +122,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     state->dataWaterCoils->WaterCoil(1).SchedPtr = -1;
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataWaterCoils->MySizeFlag.allocate(1);
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
     // now allocate sizing arrays for testing autosized field
     EnergyPlus::DataSizing::TermUnitSizing.allocate(1);

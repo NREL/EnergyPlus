@@ -6454,7 +6454,7 @@ namespace EnergyPlus::OutputReportTabular {
         }
         // LEED schedule sub table
         for (long iSch = 1; iSch <= state.dataScheduleMgr->NumSchedules; ++iSch) {
-            std::string curSchName = ScheduleManager::Schedule(iSch).Name;
+            std::string curSchName = state.dataScheduleMgr->Schedule(iSch).Name;
             std::string curSchType = ScheduleManager::GetScheduleType(state, iSch);
             if (UtilityRoutines::SameString(curSchType, "FRACTION")) {
                 PreDefTableEntry(state,

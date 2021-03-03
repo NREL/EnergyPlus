@@ -1139,7 +1139,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     DataHeatBalFanSys::MCPThermChim.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ThermChimAMFL.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::MCPTThermChim.allocate(state->dataGlobal->NumOfZones);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     // No EMS
     ThermalChimney::GetThermalChimney(*state, localErrorsFound);

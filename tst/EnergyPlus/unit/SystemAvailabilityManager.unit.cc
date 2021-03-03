@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataContaminantBalance->ZoneCO2SetPoint.allocate(1);
     state->dataAirLoop->PriAirSysAvailMgr.allocate(1);
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData.allocate(1);
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
     DataHVACGlobals::ZoneComp.allocate(DataZoneEquipment::NumValidSysAvailZoneComponents);
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempZoneThermostatSetPoint.allocate(1);
@@ -514,10 +514,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerName(1) = "Avail 1";
     state->dataAirLoop->PriAirSysAvailMgr(1).AvailManagerNum(1) = 1;
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData(1).SchedPtr = 1;
-    ScheduleManager::Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // System operation
-    ScheduleManager::Schedule(1).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentSysAvailMgrData(1).VentilationCtrl); // Vent open
 
@@ -571,7 +571,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     state->dataContaminantBalance->ZoneCO2SetPoint.deallocate();
     state->dataAirLoop->PriAirSysAvailMgr.deallocate();
     state->dataSystemAvailabilityManager->SchedSysAvailMgrData.deallocate();
-    ScheduleManager::Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
     DataHVACGlobals::ZoneComp.deallocate();
     DataHeatBalFanSys::TempControlType.deallocate();
     DataHeatBalFanSys::TempZoneThermostatSetPoint.deallocate();
@@ -679,9 +679,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCoolingZones = NumZones;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZonePtrs = NumZones;
-    ScheduleManager::Schedule.allocate(2);
-    ScheduleManager::Schedule(1).CurrentValue = 1;
-    ScheduleManager::Schedule(2).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule.allocate(2);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
 
     // Cycling Run Time Control Type = FixedRunTime
     // and current time is within the run time period, starting time is less than stopping time
@@ -810,9 +810,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZoneListName = state->dataHeatBal->Zone(1).Name;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).NumOfCoolingZones = NumZones;
     state->dataSystemAvailabilityManager->NCycSysAvailMgrData(1).CoolingZonePtrs = NumZones;
-    ScheduleManager::Schedule.allocate(2);
-    ScheduleManager::Schedule(1).CurrentValue = 1;
-    ScheduleManager::Schedule(2).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule.allocate(2);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
 
     // Cycling Run Time Control Type = FixedRunTime
     // and current time is within the run time period, starting time is less than stopping time
