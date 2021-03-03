@@ -97,9 +97,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlus::En
     }
 
     if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
-        this->condenserType = AIRCOOLED;
+        this->condenserType = CondenserType::AIRCOOLED;
     } else if (UtilityRoutines::SameString(input_data.condenser_type, "EvaporativelyCooled")) {
-        this->condenserType = EVAPCOOLED;
+        this->condenserType = CondenserType::EVAPCOOLED;
     } else {
         ShowSevereError(state, routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Condenser Type=\"" + input_data.condenser_type + "\":");
@@ -219,7 +219,6 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
     DataSizing::DataFractionUsedForSizing = 0.000114;
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
-    int numSpeeds = this->speeds.size();
     int thisSpeedNum = 0;
 
     AutoCalculateSizer sizerCondAirFlow;
@@ -230,7 +229,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     this->ratedCondAirFlowRate = sizerCondAirFlow.size(state, TempSize, errorsFound);
 
 
-    if (this->condenserType != AIRCOOLED) {
+    if (this->condenserType != CondenserType::AIRCOOLED) {
         // Auto size Nominal Evaporative Condenser Pump Power to Total Capacity * 0.004266 w/w (15 W/ton)
         AutoCalculateSizer sizerCondEvapPumpPower;
         DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
