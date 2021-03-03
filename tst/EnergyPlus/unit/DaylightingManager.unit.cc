@@ -854,7 +854,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput(*state);
     compare_err_stream("");
@@ -1340,7 +1340,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(*state);
     state->dataDaylightingManager->GILSK = 100.0;
@@ -2128,7 +2128,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput(*state);
     compare_err_stream("");
