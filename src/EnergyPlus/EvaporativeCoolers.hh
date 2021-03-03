@@ -487,8 +487,6 @@ namespace EvaporativeCoolers {
     // *****************************************************************************
 
     // Used to clear global data between Unit Tests, should not be normally called
-    void clear_state();
-
     int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName,
         bool &ErrorsFound
     );
@@ -510,6 +508,9 @@ struct EvaporativeCoolersData :  BaseGlobalStruct {
     Array1D<EvaporativeCoolers::EvapConditions> EvapCond;
     Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitStruct> ZoneEvapUnit;
     Array1D<EvaporativeCoolers::ZoneEvapCoolerUnitFieldData> ZoneEvapCoolerUnitFields;
+    std::unordered_map<std::string, std::string> UniqueEvapCondNames;
+    bool MySetPointCheckFlag = true;
+    bool ZoneEquipmentListChecked = false;
 
     void clear_state() override
     {
@@ -522,6 +523,9 @@ struct EvaporativeCoolersData :  BaseGlobalStruct {
         this->GetInputZoneEvapUnit = true;
         this->CheckEquipName.clear();
         this->CheckZoneEvapUnitName.clear();
+        this->UniqueEvapCondNames.clear();
+        this->MySetPointCheckFlag = true;
+        this->ZoneEquipmentListChecked = false;
     }
 };
 

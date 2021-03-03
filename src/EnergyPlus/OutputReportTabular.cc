@@ -4458,7 +4458,7 @@ namespace EnergyPlus::OutputReportTabular {
 
         // Evaporative coolers
         for (int iCooler = 1; iCooler <= state.dataEvapCoolers->NumEvapCool; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += state.dataEvapCoolers->EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC +
+            state.dataHeatBal->SysTotalHVACRejectHeatLoss += state.dataEvapCoolers->EvapCond(iCooler).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC +
                                           state.dataEvapCoolers->EvapCond(iCooler).EvapCoolerEnergy;
         }
     }

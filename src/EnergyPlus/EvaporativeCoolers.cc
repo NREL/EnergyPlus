@@ -117,20 +117,7 @@ namespace EvaporativeCoolers {
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace DataGlobalConstants;
-
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool MySetPointCheckFlag(true);
-        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-    }                                         // namespace
-
-    // Object Data
-    std::unordered_map<std::string, std::string> UniqueEvapCondNames;
-        
+      
     void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
     {
 
@@ -255,6 +242,7 @@ namespace EvaporativeCoolers {
         bool ErrorsFound(false);
 
         auto &EvapCond(state.dataEvapCoolers->EvapCond);
+        auto &UniqueEvapCondNames(state.dataEvapCoolers->UniqueEvapCondNames);
 
         state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
         // Start getting the input data
@@ -905,7 +893,7 @@ namespace EvaporativeCoolers {
         auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         // Check that setpoint is active
-        if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataEvapCoolers->MySetPointCheckFlag && DoSetPointTest) {
             for (EvapUnitNum = 1; EvapUnitNum <= state.dataEvapCoolers->NumEvapCool; ++EvapUnitNum) {
 
                 // only check evap coolers that are supposed to have a control node
@@ -933,7 +921,7 @@ namespace EvaporativeCoolers {
                     }
                 }
             }
-            MySetPointCheckFlag = false;
+            state.dataEvapCoolers->MySetPointCheckFlag = false;
         }
 
         if (!state.dataGlobal->SysSizingCalc && EvapCond(EvapCoolNum).MySizeFlag) {
@@ -3378,7 +3366,6 @@ namespace EvaporativeCoolers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CompNum;
 
-        auto &EvapCond(state.dataEvapCoolers->EvapCond);
         auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         if (state.dataEvapCoolers->GetInputZoneEvapUnit) {
@@ -3896,8 +3883,8 @@ namespace EvaporativeCoolers {
             ZoneEvapUnit(UnitNum).FanAvailStatus = ZoneComp(ZoneEvaporativeCoolerUnit_Num).ZoneCompAvailMgrs(UnitNum).AvailStatus;
         }
 
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            state.dataEvapCoolers->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataEvapCoolers->NumZoneEvapUnits; ++Loop) {
                 if (CheckZoneEquipmentList(state, "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit(Loop).Name)) {
                     ZoneEvapUnit(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
@@ -4471,8 +4458,6 @@ namespace EvaporativeCoolers {
         Real64 QSensOutputProvided; // sensible output at a given PLR
         Real64 QLatOutputProvided;  // latent output at a given PLR
 
-        auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
-
         UnitNum = int(Par(1));
         LoadToBeMet = Par(2);
 
@@ -4645,7 +4630,6 @@ namespace EvaporativeCoolers {
         Real64 MinHumRat;
         Real64 SensibleOutputProvided;
 
-        auto &EvapCond(state.dataEvapCoolers->EvapCond);
         auto &ZoneEvapUnit(state.dataEvapCoolers->ZoneEvapUnit);
 
         UnitNum = int(Par(1));
@@ -4745,13 +4729,6 @@ namespace EvaporativeCoolers {
 
     //        End of Reporting subroutines for the EvaporativeCoolers Module
     // *****************************************************************************
-
-    void clear_state()
-    {
-        UniqueEvapCondNames.clear();
-        MySetPointCheckFlag = true;
-        ZoneEquipmentListChecked = false;
-    }
 
     int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound)
     {
