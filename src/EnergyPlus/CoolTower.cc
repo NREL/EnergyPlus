@@ -170,6 +170,8 @@ namespace CoolTower {
         lAlphaBlanks.dimension(NumAlphas, true);
         lNumericBlanks.dimension(NumNumbers, true);
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         state.dataCoolTower->NumCoolTowers = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataCoolTower->CoolTowerSys.allocate(state.dataCoolTower->NumCoolTowers);
@@ -555,6 +557,8 @@ namespace CoolTower {
         MCPTC = 0.0;
         MCPC = 0.0;
         CTMFL = 0.0;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (CoolTowerNum = 1; CoolTowerNum <= state.dataCoolTower->NumCoolTowers; ++CoolTowerNum) {
             ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ZonePtr;

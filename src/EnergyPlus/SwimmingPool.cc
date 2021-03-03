@@ -517,7 +517,7 @@ namespace EnergyPlus::SwimmingPool {
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
 
             int ZoneNum = this->ZonePtr;
-            this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+            this->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
             int SurfNum = this->SurfacePtr;
             this->QPoolSrcAvg(SurfNum) = 0.0;        // Initialize this variable to zero (pool parameters "off")
             this->HeatTransCoefsAvg(SurfNum) = 0.0;  // Initialize this variable to zero (pool parameters "off")
@@ -804,7 +804,7 @@ namespace EnergyPlus::SwimmingPool {
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
         Real64 LWsum =
-            (DataHeatBalance::SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
+            (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
              DataHeatBalFanSys::QHWBaseboardSurf(SurfNum) + DataHeatBalFanSys::QSteamBaseboardSurf(SurfNum) +
              DataHeatBalFanSys::QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
         Real64 LWtotal = this->CurCoverLWRadFac * LWsum;      // total flux from long-wavelength radiation to surface
@@ -989,7 +989,7 @@ namespace EnergyPlus::SwimmingPool {
         }
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Peter Graham Ellis
@@ -1001,7 +1001,7 @@ namespace EnergyPlus::SwimmingPool {
 
         Real64 SumHATsurf = 0.0; // Return value
 
-        for (int SurfNum = DataHeatBalance::Zone(ZoneNum).SurfaceFirst; SurfNum <= DataHeatBalance::Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!DataSurfaces::Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Real64 Area = DataSurfaces::Surface(SurfNum).Area; // Effective surface area
@@ -1015,7 +1015,7 @@ namespace EnergyPlus::SwimmingPool {
 
                 if (DataSurfaces::SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * DataSurfaces::SurfWinFrameArea(SurfNum) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * DataSurfaces::SurfWinFrameArea(SurfNum) *
                                   (1.0 + DataSurfaces::SurfWinProjCorrFrIn(SurfNum)) * DataSurfaces::SurfWinFrameTempSurfIn(SurfNum);
                 }
 
@@ -1023,13 +1023,13 @@ namespace EnergyPlus::SwimmingPool {
                     DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntShade &&
                     DataSurfaces::SurfWinShadingFlag(SurfNum) != DataSurfaces::WinShadingType::IntBlind) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * DataSurfaces::SurfWinDividerArea(SurfNum) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * DataSurfaces::SurfWinDividerArea(SurfNum) *
                                   (1.0 + 2.0 * DataSurfaces::SurfWinProjCorrDivIn(SurfNum)) *
                                   DataSurfaces::SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += DataHeatBalance::HConvIn(SurfNum) * Area * DataHeatBalSurface::TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * DataHeatBalSurface::TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

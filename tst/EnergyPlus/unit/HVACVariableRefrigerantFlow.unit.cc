@@ -154,7 +154,7 @@ protected:
         DataLoopNode::Node.allocate(50);
         DataLoopNode::NodeID.allocate(50);
 
-        DataHeatBalance::Zone.allocate(numZones);
+        state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
         state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
@@ -185,7 +185,7 @@ protected:
 
         state->dataDXCoils->CheckEquipName.allocate(10);
         state->dataDXCoils->DXCoilNumericFields.allocate(10);
-        DataHeatBalance::HeatReclaimDXCoil.allocate(10);
+        state->dataHeatBal->HeatReclaimDXCoil.allocate(10);
         state->dataDXCoils->NumDXCoils = 10;
         state->dataMixedAir->OAMixer.allocate(5);
         DataSizing::NumSysSizInput = 1;
@@ -247,7 +247,7 @@ protected:
         thisZoneEqConfig.EquipListIndex = zoneNum;
         thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobalConstants::ScheduleAlwaysOn;
 
-        auto &thisZone(DataHeatBalance::Zone(zoneNum));
+        auto &thisZone(state->dataHeatBal->Zone(zoneNum));
         thisZone.Name = "ZONE1";
         thisZone.IsControlled = true;
         thisZone.SystemZoneNodeNumber = zoneNode;

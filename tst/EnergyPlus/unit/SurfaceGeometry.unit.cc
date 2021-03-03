@@ -482,8 +482,8 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
 
@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetMaterialData(*state, FoundError);
     GetConstructData(*state, FoundError);
     GetZoneData(*state, FoundError); // Read Zone data from input file
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
@@ -934,8 +934,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     EXPECT_FALSE(ErrorsFound);
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     GetSurfaceData(*state, ErrorsFound); // setup zone geometry and get zone data
@@ -2494,11 +2494,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    Zone.dimension(state->dataGlobal->NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).AllSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 6;
+    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 6;
 
     Surface.dimension(6);
 
@@ -2557,7 +2557,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
     Surface(6).Vertex(4) = Vector(10., 8., 3.);
 
     CalculateZoneVolume(*state, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
@@ -2565,11 +2565,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    Zone.dimension(state->dataGlobal->NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).AllSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 5;
+    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 5;
 
     Surface.dimension(5);
 
@@ -2618,11 +2618,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
     Surface(5).Vertex(3) = Vector(10., 0., 3.);
     Surface(5).Vertex(4) = Vector(10., 8., 3.);
 
-    Zone(1).FloorArea = 80.;
-    Zone(1).CeilingHeight = 3.;
+    state->dataHeatBal->Zone(1).FloorArea = 80.;
+    state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
     CalculateZoneVolume(*state, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
@@ -2630,11 +2630,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    Zone.dimension(state->dataGlobal->NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).AllSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 5;
+    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 5;
 
     Surface.dimension(5);
 
@@ -2683,11 +2683,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
     Surface(5).Vertex(3) = Vector(10., 8, 0.);
     Surface(5).Vertex(4) = Vector(10., 0, 0.);
 
-    Zone(1).FloorArea = 80.;
-    Zone(1).CeilingHeight = 3.;
+    state->dataHeatBal->Zone(1).FloorArea = 80.;
+    state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
     CalculateZoneVolume(*state, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
@@ -2695,11 +2695,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    Zone.dimension(state->dataGlobal->NumOfZones);
-    Zone(1).HasFloor = true;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).AllSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 5;
+    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).HasFloor = true;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 5;
 
     Surface.dimension(5);
 
@@ -2748,11 +2748,11 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
     Surface(5).Vertex(3) = Vector(10., 0., 3.);
     Surface(5).Vertex(4) = Vector(10., 8., 3.);
 
-    Zone(1).CeilingArea = 80.;
-    Zone(1).CeilingHeight = 3.;
+    state->dataHeatBal->Zone(1).CeilingArea = 80.;
+    state->dataHeatBal->Zone(1).CeilingHeight = 3.;
 
     CalculateZoneVolume(*state, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
@@ -2760,10 +2760,10 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Array1D_bool enteredCeilingHeight;
     state->dataGlobal->NumOfZones = 1;
     enteredCeilingHeight.dimension(state->dataGlobal->NumOfZones, false);
-    Zone.dimension(state->dataGlobal->NumOfZones);
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).AllSurfaceFirst = 1;
-    Zone(1).SurfaceLast = 4;
+    state->dataHeatBal->Zone.dimension(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).AllSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 4;
 
     Surface.dimension(4);
 
@@ -2812,7 +2812,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
     Surface(4).Vertex(4) = Vector(10., 8., 3.);
 
     CalculateZoneVolume(*state, enteredCeilingHeight);
-    EXPECT_EQ(240., Zone(1).Volume);
+    EXPECT_EQ(240., state->dataHeatBal->Zone(1).Volume);
 }
 
 TEST_F(EnergyPlusFixture, MakeRectangularVertices)
@@ -2828,13 +2828,13 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
     state->dataSurfaceGeometry->SurfaceTmp(surfNum).Sides = 4;
     state->dataSurfaceGeometry->SurfaceTmp(surfNum).Vertex.allocate(4);
 
-    Zone.allocate(zoneNum);
-    Zone(zoneNum).RelNorth = 0.;
+    state->dataHeatBal->Zone.allocate(zoneNum);
+    state->dataHeatBal->Zone(zoneNum).RelNorth = 0.;
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(zoneNum);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(zoneNum);
-    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(zoneNum) = std::cos(-state->dataHeatBal->Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(zoneNum) = std::sin(-state->dataHeatBal->Zone(zoneNum).RelNorth * DataGlobalConstants::DegToRadians);
 
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
@@ -2983,9 +2983,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     state->dataGlobal->NumOfZones = 2;
-    Zone.allocate(2);
-    Zone(1).Name = "ZONE 1";
-    Zone(2).Name = "ZONE 2";
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
     state->dataSurfaceGeometry->SurfaceTmp.allocate(2);
     int SurfNum = 0;
     int TotHTSurfs = 2;
@@ -3641,47 +3641,47 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CheckWindowShadingControlSimilarForWin
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createAirMaterialFromDistance_Test)
 {
-    TotMaterials = 0;
+    state->dataHeatBal->TotMaterials = 0;
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(TotMaterials, 1);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_8MM");
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.008);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(1, 1), 2.873e-3);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).GasCon(2, 1), 7.760e-5);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 1);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_8MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.008);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(1, 1), 2.873e-3);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).GasCon(2, 1), 7.760e-5);
 
     createAirMaterialFromDistance(*state, 0.012, "test_air_");
-    EXPECT_EQ(TotMaterials, 2);
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Name, "test_air_12MM");
-    EXPECT_EQ(state->dataMaterial->Material(TotMaterials).Thickness, 0.012);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Name, "test_air_12MM");
+    EXPECT_EQ(state->dataMaterial->Material(state->dataHeatBal->TotMaterials).Thickness, 0.012);
 
     createAirMaterialFromDistance(*state, 0.008, "test_air_");
-    EXPECT_EQ(TotMaterials, 2);
+    EXPECT_EQ(state->dataHeatBal->TotMaterials, 2);
 }
 
 
 TEST_F(EnergyPlusFixture, SurfaceGeometry_createConstructionWithStorm_Test)
 {
-    TotConstructs = 1;
-    state->dataConstruction->Construct.allocate(TotConstructs);
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
 
     state->dataMaterial->Material.allocate(60);
     state->dataMaterial->Material(47).AbsorpThermalFront = 0.11;
 
     // Case 1a: Constructs with regular materials are a reverse of each other--material layers match in reverse (should get a "false" answer)
-    state->dataConstruction->Construct(TotConstructs).TotLayers = 3;
-    state->dataConstruction->Construct(TotConstructs).LayerPoint(1) = 11;
-    state->dataConstruction->Construct(TotConstructs).LayerPoint(2) = 22;
-    state->dataConstruction->Construct(TotConstructs).LayerPoint(3) = 33;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).TotLayers = 3;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1) = 11;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2) = 22;
+    state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3) = 33;
 
     createConstructionWithStorm(*state, 1, "construction_A", 47, 59);
-    EXPECT_EQ(TotConstructs, 2);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).Name, "construction_A");
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(1), 47);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(2), 59);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(3), 11);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(4), 22);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).LayerPoint(5), 33);
-    EXPECT_EQ(state->dataConstruction->Construct(TotConstructs).OutsideAbsorpThermal, 0.11);
+    EXPECT_EQ(state->dataHeatBal->TotConstructs, 2);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).Name, "construction_A");
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(1), 47);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(2), 59);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(3), 11);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(4), 22);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).LayerPoint(5), 33);
+    EXPECT_EQ(state->dataConstruction->Construct(state->dataHeatBal->TotConstructs).OutsideAbsorpThermal, 0.11);
 }
 
 
@@ -3888,8 +3888,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
 
-    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
-    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * DataGlobalConstants::DegToRadians);
     state->dataSurfaceGeometry->CosZoneRelNorth(2) = state->dataSurfaceGeometry->CosZoneRelNorth(1);
     state->dataSurfaceGeometry->SinZoneRelNorth(2) = state->dataSurfaceGeometry->SinZoneRelNorth(1);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
@@ -3900,19 +3900,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyCondFD);
+    EXPECT_TRUE(state->dataHeatBal->AnyCondFD);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_10000", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_CondFD, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
+    EXPECT_TRUE(state->dataHeatBal->AnyEMPD); // input as EMPD but then later overriden to CondFD - see error message below
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_20000", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_HAMT, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyHAMT);
+    EXPECT_TRUE(state->dataHeatBal->AnyHAMT);
 
     surfNum = UtilityRoutines::FindItemInList("ZONE1_FLOOR_4_0_30000", DataSurfaces::Surface);
     EXPECT_EQ(DataSurfaces::HeatTransferModel_CTF, DataSurfaces::Surface(surfNum).HeatTransferAlgorithm);
-    EXPECT_TRUE(DataHeatBalance::AnyCTF);
+    EXPECT_TRUE(state->dataHeatBal->AnyCTF);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetSurfaceData: Entered Zone Floor Areas differ from calculated Zone Floor Area(s).",
@@ -3936,13 +3936,13 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     EXPECT_EQ(DataSurfaces::AllHTSurfaceList.size(), 4u);
     EXPECT_EQ(DataSurfaces::AllIZSurfaceList.size(), 2u);
 
-    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", DataHeatBalance::Zone);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+    int zoneNum = UtilityRoutines::FindItemInList("DATATELCOM", state->dataHeatBal->Zone);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 2u);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 
-    zoneNum = UtilityRoutines::FindItemInList("ZONE1", DataHeatBalance::Zone);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
-    EXPECT_EQ(DataHeatBalance::Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
+    zoneNum = UtilityRoutines::FindItemInList("ZONE1", state->dataHeatBal->Zone);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneHTSurfaceList.size(), 4u);
+    EXPECT_EQ(state->dataHeatBal->Zone(zoneNum).ZoneIZSurfaceList.size(), 2u);
 }
 
 // Test for #7071: if a Surface references an outside boundary surface that cannot be found, we handle it gracefully with an error message
@@ -3995,9 +3995,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     EXPECT_FALSE(ErrorsFound);
 
     state->dataGlobal->NumOfZones = 2;
-    Zone.allocate(2);
-    Zone(1).Name = "ZONE 1";
-    Zone(2).Name = "ZONE 2";
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(2).Name = "ZONE 2";
     state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
     int TotHTSurfs = 1;
@@ -4721,15 +4721,15 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     // check unique internal surface name created created from a combination
     // of zone name and internal mass object name represented in the zone
     // first zone in the ground floor ZoneList
-    EXPECT_EQ("G SW APARTMENT", Zone(1).Name);
+    EXPECT_EQ("G SW APARTMENT", state->dataHeatBal->Zone(1).Name);
     EXPECT_EQ("GFLOORZONESINTMASS", DataSurfaces::IntMassObjects(1).Name);
     EXPECT_EQ("G SW APARTMENT GFLOORZONESINTMASS", state->dataSurfaceGeometry->SurfaceTmp(1).Name);
     // first zone in the middle floor ZoneList
-    EXPECT_EQ("M SW APARTMENT", Zone(9).Name);
+    EXPECT_EQ("M SW APARTMENT", state->dataHeatBal->Zone(9).Name);
     EXPECT_EQ("MFLOORZONESINTMASS", DataSurfaces::IntMassObjects(2).Name);
     EXPECT_EQ("M SW APARTMENT MFLOORZONESINTMASS", state->dataSurfaceGeometry->SurfaceTmp(9).Name);
     // first zone in the top floor ZoneList
-    EXPECT_EQ("T SW APARTMENT", Zone(17).Name);
+    EXPECT_EQ("T SW APARTMENT", state->dataHeatBal->Zone(17).Name);
     EXPECT_EQ("TFLOORZONESINTMASS", DataSurfaces::IntMassObjects(3).Name);
     EXPECT_EQ("T SW APARTMENT TFLOORZONESINTMASS", state->dataSurfaceGeometry->SurfaceTmp(17).Name);
 }
@@ -4754,11 +4754,11 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
     bool ErrorsFound(false);
 
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 0;
-    Zone(1).OriginY = 0;
-    Zone(1).OriginZ = 0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 0;
+    state->dataHeatBal->Zone(1).OriginY = 0;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
     GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
@@ -4784,11 +4784,11 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
     bool ErrorsFound(false);
 
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 0;
-    Zone(1).OriginY = 0;
-    Zone(1).OriginZ = 0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 0;
+    state->dataHeatBal->Zone(1).OriginY = 0;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
     GetGeometryParameters(*state, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
@@ -4814,11 +4814,11 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
     bool ErrorsFound(false);
 
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 6;
-    Zone(1).OriginY = 6;
-    Zone(1).OriginZ = 0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 6;
+    state->dataHeatBal->Zone(1).OriginY = 6;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
     GetGeometryParameters(*state, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
@@ -4849,11 +4849,11 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
     bool ErrorsFound(false);
 
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
-    Zone(1).OriginX = 6;
-    Zone(1).OriginY = 6;
-    Zone(1).OriginZ = 0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone(1).OriginX = 6;
+    state->dataHeatBal->Zone(1).OriginY = 6;
+    state->dataHeatBal->Zone(1).OriginZ = 0;
 
     GetGeometryParameters(*state, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
@@ -5138,9 +5138,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 3);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 3);
 
     EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 3);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Zone 1"));
@@ -5149,9 +5149,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(3).ZoneNames[0], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 3);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 3);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries1)
@@ -5320,18 +5320,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[0], "Zone 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
 
     EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[0], "Zone 1"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 3"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBoundaries2)
@@ -5512,9 +5512,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[1], "Zone 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
 
     EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 2);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
@@ -5522,9 +5522,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[1], "Zone 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Zone 2"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(2).ZoneNames[0], "Zone 2"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 2);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 2);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
 
     // Check surface order
     int Zone1Surface1 =
@@ -5542,16 +5542,16 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     int Zone3Floor =
         UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Zone3-Floor"), DataSurfaces::Surface);
 
-    EXPECT_EQ(DataHeatBalance::Zone(1).AllSurfaceFirst, Zone1Surface2); // air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(2).AllSurfaceFirst, Zone2Surface1); // no air boundary surfaces in Zone 2
-    EXPECT_EQ(DataHeatBalance::Zone(3).AllSurfaceFirst, Zone3Surface1); // air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(1).SurfaceFirst, Zone1Surface1); // first non-air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(2).SurfaceFirst, Zone2Surface1); // first non-air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(3).SurfaceFirst, Zone3Floor); // first non-air boundary surface
-    EXPECT_EQ(DataHeatBalance::Zone(1).SurfaceLast, Zone1Floor);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SurfaceLast, Zone2Floor);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SurfaceLast, Zone3Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst, Zone1Surface2); // air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(1).AllSurfaceFirst + 1, Zone1Surface1); // air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(2).AllSurfaceFirst, Zone2Surface1); // no air boundary surfaces in Zone 2
+    EXPECT_EQ(state->dataHeatBal->Zone(3).AllSurfaceFirst, Zone3Surface1); // air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SurfaceFirst, Zone1Surface1); // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SurfaceFirst, Zone2Surface1); // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SurfaceFirst, Zone3Floor); // first non-air boundary surface
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SurfaceLast, Zone1Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SurfaceLast, Zone2Floor);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SurfaceLast, Zone3Floor);
 
 }
 
@@ -5865,11 +5865,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[2], "Zone 5"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[3], "Zone 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNames[4], "Zone 4"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(4).RadiantEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(5).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(4).RadiantEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(5).RadiantEnclosureNum, 1);
 
     EXPECT_EQ(DataViewFactorInformation::NumOfSolarEnclosures, 1);
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Solar Enclosure 1"));
@@ -5878,11 +5878,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[2], "Zone 5"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[3], "Zone 3"));
     EXPECT_TRUE(UtilityRoutines::SameString(DataViewFactorInformation::ZoneSolarInfo(1).ZoneNames[4], "Zone 4"));
-    EXPECT_EQ(DataHeatBalance::Zone(1).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(2).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(3).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(4).SolarEnclosureNum, 1);
-    EXPECT_EQ(DataHeatBalance::Zone(5).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(4).SolarEnclosureNum, 1);
+    EXPECT_EQ(state->dataHeatBal->Zone(5).SolarEnclosureNum, 1);
 }
 
 TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
@@ -6906,12 +6906,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(windowEastWindow, 17);
     EXPECT_EQ(windowSouthWindow, 18);
     EXPECT_EQ(windowWestWindow, 19);
-    EXPECT_EQ(Zone(1).SurfaceFirst, 7);
-    EXPECT_EQ(Zone(1).SurfaceLast, 19);
-    EXPECT_EQ(Zone(1).NonWindowSurfaceFirst, 7);
-    EXPECT_EQ(Zone(1).NonWindowSurfaceLast, 14);
-    EXPECT_EQ(Zone(1).WindowSurfaceFirst, 15);
-    EXPECT_EQ(Zone(1).WindowSurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).SurfaceLast, 19);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).NonWindowSurfaceFirst, 7);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).NonWindowSurfaceLast, 14);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceFirst, 15);
+    EXPECT_EQ(state->dataHeatBal->Zone(1).WindowSurfaceLast, 19);
 
     //  GARAGE ZONE:
     int wallGarageInterior = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("Garage:Interior"), DataSurfaces::Surface);
@@ -6929,12 +6929,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(floorGarageFloor, 24);
     EXPECT_EQ(ceilingGarageInterior, 25);
     EXPECT_EQ(intmassEVChargingStation, 26);
-    EXPECT_EQ(Zone(2).SurfaceFirst, 20);
-    EXPECT_EQ(Zone(2).SurfaceLast, 26);
-    EXPECT_EQ(Zone(2).NonWindowSurfaceFirst, 20);
-    EXPECT_EQ(Zone(2).NonWindowSurfaceLast, 26);
-    EXPECT_EQ(Zone(2).WindowSurfaceFirst, 0);
-    EXPECT_EQ(Zone(2).WindowSurfaceLast, -1);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).SurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).NonWindowSurfaceFirst, 20);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).NonWindowSurfaceLast, 26);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceFirst, 0);
+    EXPECT_EQ(state->dataHeatBal->Zone(2).WindowSurfaceLast, -1);
 
     //  ATTIC ZONE:
     int wallEastGable = UtilityRoutines::FindItemInList(UtilityRoutines::MakeUPPERCase("EastGable"), DataSurfaces::Surface);
@@ -6967,12 +6967,12 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     EXPECT_EQ(roofWestRoof, 38);
     EXPECT_EQ(nonwindowTubularDaylightingDome1, 39);
     EXPECT_EQ(windowAtticSkylight, 40);
-    EXPECT_EQ(Zone(3).SurfaceFirst, 27);
-    EXPECT_EQ(Zone(3).SurfaceLast, 40);
-    EXPECT_EQ(Zone(3).NonWindowSurfaceFirst, 27);
-    EXPECT_EQ(Zone(3).NonWindowSurfaceLast, 39);
-    EXPECT_EQ(Zone(3).WindowSurfaceFirst, 40);
-    EXPECT_EQ(Zone(3).WindowSurfaceLast, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SurfaceFirst, 27);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).SurfaceLast, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).NonWindowSurfaceFirst, 27);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).NonWindowSurfaceLast, 39);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceFirst, 40);
+    EXPECT_EQ(state->dataHeatBal->Zone(3).WindowSurfaceLast, 40);
 
     // Reporting (legacy) Order (zero-based)
     //  SHADING SURFACES:

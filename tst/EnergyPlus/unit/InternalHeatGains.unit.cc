@@ -124,10 +124,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
+    ASSERT_EQ(state->dataHeatBal->ZoneOtherEq.size(), 2u);
 
-    for (unsigned long i = 1; i <= DataHeatBalance::ZoneOtherEq.size(); ++i) {
-        const DataHeatBalance::ZoneEquipData &equip = DataHeatBalance::ZoneOtherEq(i);
+    for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
+        const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
             ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::ExteriorFuelUsage::Unknown);
         } else if (equip.Name == "OTHEREQ2") {
@@ -480,16 +480,16 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    Real64 InitialPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    Real64 NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    Real64 NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_NE(InitialPower, NewPower);
     HVACManager::ResetNodeData();
 
     InternalHeatGains::CalcZoneITEq(*state);
-    NewPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
+    NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_EQ(InitialPower, NewPower);
 }
 
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     InternalHeatGains::UpdateInternalGainValues(*state);
 
     // Check total of all convective gains
-    InternalHeatGains::SumAllInternalConvectionGains(zoneNum, totConvGains);
+    InternalHeatGains::SumAllInternalConvectionGains(*state, zoneNum, totConvGains);
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // Check subtotals used in zone component loads
@@ -886,7 +886,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     ASSERT_FALSE(ErrorsFound);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalance::ZnRpt.allocate(1);
+    state->dataHeatBal->ZnRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
     DataHeatBalFanSys::MAT(1) = 24.0;
@@ -896,9 +896,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq(*state);
-    ASSERT_DOUBLE_EQ(DataHeatBalance::ZoneITEq(1).AirOutletDryBulbT + DataHeatBalance::ZoneITEq(1).ReturnApproachTemp,
-                     DataHeatBalance::Zone(1).AdjustedReturnTempByITE);
-    ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + DataHeatBalance::ZoneITEq(1).SupplyApproachTemp, DataHeatBalance::ZoneITEq(1).AirInletDryBulbT);
+    ASSERT_DOUBLE_EQ(state->dataHeatBal->ZoneITEq(1).AirOutletDryBulbT + state->dataHeatBal->ZoneITEq(1).ReturnApproachTemp,
+                     state->dataHeatBal->Zone(1).AdjustedReturnTempByITE);
+    ASSERT_DOUBLE_EQ(DataLoopNode::Node(1).Temp + state->dataHeatBal->ZoneITEq(1).SupplyApproachTemp, state->dataHeatBal->ZoneITEq(1).AirInletDryBulbT);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
@@ -1049,10 +1049,10 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     InternalHeatGains::CalcZoneITEq(*state);
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such
-    Real64 DefaultUPSPower = (DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower) *
-                             max((1.0 - DataHeatBalance::ZoneITEq(1).DesignUPSEfficiency), 0.0);
+    Real64 DefaultUPSPower = (state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower) *
+                             max((1.0 - state->dataHeatBal->ZoneITEq(1).DesignUPSEfficiency), 0.0);
 
-    ASSERT_EQ(DefaultUPSPower, DataHeatBalance::ZoneITEq(1).UPSPower);
+    ASSERT_EQ(DefaultUPSPower, state->dataHeatBal->ZoneITEq(1).UPSPower);
 
 }
 
@@ -1312,40 +1312,40 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_EQ(DataHeatBalance::TotPeople, 1);
-    EXPECT_EQ(DataHeatBalance::TotLights, 1);
-    EXPECT_EQ(DataHeatBalance::TotElecEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotGasEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotHWEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotStmEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotOthEquip, 1);
-    EXPECT_EQ(DataHeatBalance::TotBBHeat, 1);
+    EXPECT_EQ(state->dataHeatBal->TotPeople, 1);
+    EXPECT_EQ(state->dataHeatBal->TotLights, 1);
+    EXPECT_EQ(state->dataHeatBal->TotElecEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotGasEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotHWEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotStmEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotOthEquip, 1);
+    EXPECT_EQ(state->dataHeatBal->TotBBHeat, 1);
 
     EnergyPlus::createFacilityElectricPowerServiceObject(); // Needs to happen before InitInternalHeatGains
 
-    // First time should be all good, because ZnRpt values intialize to zero
+    // First time should be all good, because ZnRpt values initialize to zero
     InternalHeatGains::InitInternalHeatGains(*state);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).CO2Rate, 0.0001125);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ITEqSHI, 0);
 
     // Second time should should give the same answers, because everything should reset before accumulating
     InternalHeatGains::InitInternalHeatGains(*state);
 
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).LtsPower, 100.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ElecPower, 150.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).GasPower, 200.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).HWPower, 250.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).SteamPower, 300.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).BaseHeatPower, 1500.0);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).CO2Rate, 0.0001125);
-    EXPECT_EQ(DataHeatBalance::ZnRpt(1).ITEqSHI, 0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).LtsPower, 100.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ElecPower, 150.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).GasPower, 200.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).HWPower, 250.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).SteamPower, 300.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).BaseHeatPower, 1500.0);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).CO2Rate, 0.0001125);
+    EXPECT_EQ(state->dataHeatBal->ZnRpt(1).ITEqSHI, 0);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)

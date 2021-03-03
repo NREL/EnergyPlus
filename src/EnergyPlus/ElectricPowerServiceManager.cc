@@ -2334,7 +2334,7 @@ DCtoACInverter::DCtoACInverter(EnergyPlusData &state, std::string const &objectN
                 }
             }
 
-            zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), DataHeatBalance::Zone);
+            zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), state.dataHeatBal->Zone);
             if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
             if (zoneNum_ == 0) {
                 if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
@@ -2770,7 +2770,7 @@ ACtoDCConverter::ACtoDCConverter(EnergyPlusData &state, std::string const &objec
 
         standbyPower_ = DataIPShortCuts::rNumericArgs(3);
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), DataHeatBalance::Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(5), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
             if (DataIPShortCuts::lAlphaFieldBlanks(5)) {
@@ -3010,7 +3010,7 @@ ElectricStorage::ElectricStorage( // main constructor
             }
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), DataHeatBalance::Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(3), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
             if (DataIPShortCuts::lAlphaFieldBlanks(3)) {
@@ -4214,7 +4214,7 @@ ElectricTransformer::ElectricTransformer(EnergyPlusData &state, std::string cons
             errorsFound = true;
         }
 
-        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), DataHeatBalance::Zone);
+        zoneNum_ = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(4), state.dataHeatBal->Zone);
         if (zoneNum_ > 0) heatLossesDestination_ = ThermalLossDestination::zoneGains;
         if (zoneNum_ == 0) {
             if (DataIPShortCuts::lAlphaFieldBlanks(4)) {
@@ -4494,7 +4494,7 @@ void ElectricTransformer::manageTransformers(EnergyPlusData &state, Real64 const
         Real64 ambTemp = 20.0;
         if (heatLossesDestination_ == ThermalLossDestination::zoneGains) {
 
-            ambTemp = DataHeatBalance::ZnAirRpt(zoneNum_).MeanAirTemp;
+            ambTemp = state.dataHeatBal->ZnAirRpt(zoneNum_).MeanAirTemp;
         } else {
             ambTemp = 20.0;
         }

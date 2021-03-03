@@ -320,7 +320,7 @@ namespace Fans {
         int MaxNumbers;
 
         state.dataFans->GetFanInputFlag = false;
-        // Flow
+
         MaxAlphas = 0;
         MaxNumbers = 0;
         NumSimpFan = inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
