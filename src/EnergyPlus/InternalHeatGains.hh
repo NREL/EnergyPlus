@@ -190,8 +190,8 @@ namespace InternalHeatGains {
 
 struct InternalHeatGainsData : BaseGlobalStruct {
 
-    bool GetInternalHeatGainsInputFlag; // Controls the GET routine calling (limited to first time)
-    bool ErrorsFound;                   // if errors were found in the input
+    bool GetInternalHeatGainsInputFlag = true; // Controls the GET routine calling (limited to first time)
+    bool ErrorsFound = false;                   // if errors were found in the input
 
     void clear_state() override {
 

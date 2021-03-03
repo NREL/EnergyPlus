@@ -95,8 +95,8 @@ namespace RoomAirModelManager {
 
 struct RoomAirModelManagerData : BaseGlobalStruct {
 
-    bool GetUCSDDVDataFlag; // UCSD
-    bool GetAirModelData;   // Used to "get" all air model data
+    bool GetUCSDDVDataFlag = true; // UCSD
+    bool GetAirModelData = true; // Used to "get" all air model data
     bool MyOneTimeFlag = true;
 
     void clear_state() override
