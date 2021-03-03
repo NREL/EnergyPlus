@@ -1224,7 +1224,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    //Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -1345,7 +1345,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     Real64 MultiSpeedTotalCoolingRate1 = Coil.TotalCoolingEnergyRate;
     Real64 MultiSpeedSensCoolingRate1 = Coil.SensCoolingEnergyRate;
     Real64 MultiSpeedLatCoolingRate1 = Coil.LatCoolingEnergyRate;
-    Real64 MultiSpeedOutletHumRat1 = AirOutletNode.HumRat;
+    //Real64 MultiSpeedOutletHumRat1 = AirOutletNode.HumRat;
     Real64 MultiSpeedOutletTemp1 = AirOutletNode.Temp;
     Real64 MultiSpeedElecPower1 = Coil.ElecCoolingPower;
 
@@ -1456,7 +1456,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     Real64 ratedInletAirTemp = 26.6667;
     Real64 ratedInletAirHumRat = 0.0111847;
     std::string routineName = "MultiSpeedDXCoolingCoilOutputTestvsCoilDXCooling";
-    Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
+    //Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
     Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
@@ -1577,7 +1577,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     Real64 MultiSpeedTotalCoolingRate1 = Coil.TotalCoolingEnergyRate;
     Real64 MultiSpeedSensCoolingRate1 = Coil.SensCoolingEnergyRate;
     Real64 MultiSpeedLatCoolingRate1 = Coil.LatCoolingEnergyRate;
-    Real64 MultiSpeedOutletHumRat1 = AirOutletNode.HumRat;
+    //Real64 MultiSpeedOutletHumRat1 = AirOutletNode.HumRat;
     Real64 MultiSpeedOutletTemp1 = AirOutletNode.Temp;
     Real64 MultiSpeedElecPower1 = Coil.ElecCoolingPower;
 

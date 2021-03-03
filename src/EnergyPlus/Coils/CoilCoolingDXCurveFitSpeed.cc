@@ -323,7 +323,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state, int const speedNum, int const maxSpeeds)
+void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeSpeed";
