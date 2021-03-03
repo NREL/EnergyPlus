@@ -6389,7 +6389,7 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 Error(1.0);
+        Real64 Error(1.0);
         Real64 SystemSensibleLoad;   // Sensible load to be met by furnace (W)
         Real64 FullSensibleOutput;   // Full sensible output of furnace (W)
         Real64 FullLatentOutput;     // Full latent output of furnace = 0 (W)
@@ -6403,7 +6403,6 @@ namespace Furnaces {
         Real64 deltaT;               // Heater outlet temp minus design heater outlet temp
         //  CHARACTER(len=20) :: ErrNum = ' '         ! For displaying error message in cooling
         //  INTEGER,SAVE      :: ErrCount = 0
-        static int Iter(0);    // Iteration counter
         int FurnaceInletNode;  // Node number of furnace inlet
         int FurnaceOutletNode; // Node number of furnace outlet
         int OpMode;            // Mode of Operation (fan cycling or fan continuous)
@@ -6502,9 +6501,9 @@ namespace Furnaces {
                     // Calculate the part load ratio through iteration
                     HeatErrorToler = state.dataFurnaces->Furnace(FurnaceNum).HeatingConvergenceTolerance; // Error tolerance for convergence from input deck
                     Error = 1.0;                                                      // initialize error value for comparison against tolerance
-                    Iter = 0;                                                         // initialize iteration counter
+                    state.dataFurnaces->Iter = 0;                                                         // initialize iteration counter
                     IterRelax = 0.9;                                                  // relaxation factor for iterations
-                    while (Iter <= MaxIter) {
+                    while (state.dataFurnaces->Iter <= MaxIter) {
 
                         if (OpMode == CycFanCycCoil) Node(FurnaceInletNode).MassFlowRate = state.dataFurnaces->Furnace(FurnaceNum).MdotFurnace * PartLoadRatio;
                         CalcFurnaceOutput(state,
@@ -6558,12 +6557,12 @@ namespace Furnaces {
 
                         if (PartLoadRatio == MinPLR) break;
                         if (PartLoadRatio == 1.0) break;
-                        ++Iter;
-                        if (Iter == 7) IterRelax = 0.7;
-                        if (Iter == 15) IterRelax = 0.4;
+                        ++state.dataFurnaces->Iter;
+                        if (state.dataFurnaces->Iter == 7) IterRelax = 0.7;
+                        if (state.dataFurnaces->Iter == 15) IterRelax = 0.4;
                     }
 
-                    if (Iter > MaxIter) {
+                    if (state.dataFurnaces->Iter > MaxIter) {
                         if (state.dataFurnaces->Furnace(FurnaceNum).HeatingMaxIterIndex2 == 0) {
                             ShowWarningMessage(state,
                                                format("{} \"{}\" -- Exceeded max heating iterations ({}) while adjusting furnace runtime.",

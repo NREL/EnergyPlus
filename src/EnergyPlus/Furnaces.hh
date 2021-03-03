@@ -561,6 +561,9 @@ struct FurnacesData : BaseGlobalStruct {
     Real64 SaveCompressorPLR = 0.0;  // holds compressor PLR from active DX coil
     std::string CurrentModuleObject; // Object type for getting and error messages
 
+
+    int Iter = 0;    // Iteration counter for CalcNewZoneHeatOnlyFlowRates
+
     // Object Data
     Array1D<Furnaces::FurnaceEquipConditions> Furnace;
 
