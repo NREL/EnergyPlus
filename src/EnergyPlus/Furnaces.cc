@@ -182,7 +182,7 @@ namespace Furnaces {
     // MODULE PARAMETER DEFINITIONS
     static std::string const BlankString;
 
-    static std::string const fluidNameSteam("STEAM");
+    auto constexpr fluidNameSteam("STEAM");
     bool GetFurnaceInputFlag(true); // Logical to allow "GetInput" only once per simulation
 
     // DERIVED TYPE DEFINITIONS
@@ -843,8 +843,8 @@ namespace Furnaces {
         std::string CurrentModuleObject; // Object type for getting and error messages
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const getUnitaryHeatOnly("GetUnitaryHeatOnly");
-        static std::string const getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
+        auto constexpr getUnitaryHeatOnly("GetUnitaryHeatOnly");
+        auto constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceNum;                // The Furnace that you are currently loading input into
@@ -4763,7 +4763,7 @@ namespace Furnaces {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Small5WLoad(5.0);
-        static std::string const RoutineName("InitFurnace");
+        auto constexpr RoutineName("InitFurnace");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
