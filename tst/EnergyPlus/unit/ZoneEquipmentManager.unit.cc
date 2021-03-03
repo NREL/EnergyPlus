@@ -409,7 +409,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
-    DataHeatBalance::AirFlowFlag = 1;
+    state->dataHeatBal->AirFlowFlag = true;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
     ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;
@@ -3061,14 +3061,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingOnly);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
+    EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingOnly);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
-    SetZoneMassConservationFlag();
+    SetZoneMassConservationFlag(*state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::AirFlowFlag = 1;
+    state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataEnvrn->OutBaroPress = 100000.0;
@@ -3099,20 +3099,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
     // zone 1, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);                            // zone supply air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);                           // zone exhaust air mass flow rate
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.421039, 0.000001);          // zone return air mass flow rate
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 0.578961, 0.000001); // source zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);                        // receiving zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);                  // zone infiltration mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);                            // zone supply air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);                           // zone exhaust air mass flow rate
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.421039, 0.000001);          // zone return air mass flow rate
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 0.578961, 0.000001); // source zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);                        // receiving zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);                  // zone infiltration mass flow rate
     ;
     // zone 2, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);                      // zone supply air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 1.0);                     // zone exhaust air mass flow rate
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.578961, 0.000001);    // zone return air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);            // source zone mixing mass flow rate
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 0.578961, 0.000001); // receiving zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);            // zone infiltration mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);                      // zone supply air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 1.0);                     // zone exhaust air mass flow rate
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.578961, 0.000001);    // zone return air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);            // source zone mixing mass flow rate
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.578961, 0.000001); // receiving zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);            // zone infiltration mass flow rate
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set zone exhaust nodes to zero and exhaust fan node flow to 2.0 for receiving zone
@@ -3123,20 +3123,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
     // zone 1, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);           // zone supply air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);          // zone exhaust air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);          // zone return air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 1.0); // source zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);       // receiving zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);           // zone supply air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);          // zone exhaust air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);          // zone return air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 1.0); // source zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);       // receiving zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
     ;
     // zone 2, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);           // zone supply air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 2.0);          // zone exhaust air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0);          // zone return air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0); // source zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 1.0);       // receiving zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);           // zone supply air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 2.0);          // zone exhaust air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0);          // zone return air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0); // source zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0);       // receiving zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
     ;
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set zone exhaust nodes to zero and exhaust fan node flow to 3.0 for receiving zone
@@ -3147,20 +3147,20 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
     // zone 1, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);           // zone supply air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);          // zone exhaust air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);          // zone return air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 2.0); // source zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);       // receiving zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 1.0); // zone infiltration mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);           // zone supply air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);          // zone exhaust air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);          // zone return air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 2.0); // source zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);       // receiving zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 1.0); // zone infiltration mass flow rate
     ;
     // zone 2, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);           // zone supply air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 3.0);          // zone exhaust air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0);          // zone return air mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0); // source zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 2.0);       // receiving zone mixing mass flow rate
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);           // zone supply air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 3.0);          // zone exhaust air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0);          // zone return air mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0); // source zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0);       // receiving zone mixing mass flow rate
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0); // zone infiltration mass flow rate
 }
 
 TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
@@ -3305,14 +3305,14 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustReturnOnly);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
+    EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustReturnOnly);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
-    SetZoneMassConservationFlag();
+    SetZoneMassConservationFlag(*state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::AirFlowFlag = 1;
+    state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -3335,7 +3335,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     ;
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone (RZone) exhaust fan flow to zero
-    // set supply air flow rates for source (SZone) and receiving (RZone) zones 
+    // set supply air flow rates for source (SZone) and receiving (RZone) zones
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
             Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
@@ -3353,21 +3353,21 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 1.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 1.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
@@ -3379,21 +3379,21 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 2.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 2.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.413368, 0.000001);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.413368, 0.000001);
     ;
     ;
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
@@ -3401,28 +3401,28 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
     Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
-    DataHeatBalance::Mixing(1).DesiredAirFlowRate = 1.0;
-    DataHeatBalance::Mixing(1).DesiredAirFlowRateSaved = 1.0;
+    state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
+    state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
     ;
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 1.173265, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.173265, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 1.173265, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.173265, 0.000001);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 3.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 1.173265, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 3.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.173265, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 1.173265, 0.000001);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.826735, 0.000001);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.826735, 0.000001);
 }
 
 TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
@@ -3567,14 +3567,14 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustReturnThenMixing);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
+    EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustReturnThenMixing);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
-    SetZoneMassConservationFlag();
+    SetZoneMassConservationFlag(*state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::AirFlowFlag = 1;
+    state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -3597,7 +3597,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     ;
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone (RZone) exhaust fan flow to zero
-    // set supply air flow rates for source (SZone) and receiving (RZone) zones 
+    // set supply air flow rates for source (SZone) and receiving (RZone) zones
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
             Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
@@ -3616,21 +3616,21 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     CalcAirFlowSimple(*state, 0, true, true);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 1.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 1.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
@@ -3643,21 +3643,21 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     CalcAirFlowSimple(*state, 0, true, true);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 1.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 1.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 2.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 2.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object flow is modified
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 1.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
@@ -3665,29 +3665,29 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
     Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
-    DataHeatBalance::Mixing(1).DesiredAirFlowRate = 1.0;
-    DataHeatBalance::Mixing(1).DesiredAirFlowRateSaved = 1.0;
+    state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
+    state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
     ;
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
     CalcAirFlowSimple(*state, 0, true, true);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 2.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 1.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 2.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 1.0, 0.000001);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 3.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 3.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
     // zone mixing object flow is modified
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 2.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 }
 
 TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
@@ -3832,14 +3832,14 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     ErrorsFound = false;
     GetProjectControlData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_TRUE(DataHeatBalance::ZoneAirMassFlow.EnforceZoneMassBalance);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingThenReturn);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
-    EXPECT_EQ(DataHeatBalance::ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
+    EXPECT_TRUE(state->dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment, DataHeatBalance::AdjustMixingThenReturn);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment, DataHeatBalance::AdjustInfiltrationFlow);
+    EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
-    SetZoneMassConservationFlag();
+    SetZoneMassConservationFlag(*state);
     ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    DataHeatBalance::AirFlowFlag = 1;
+    state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101325.0;
@@ -3862,7 +3862,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     ;
     // Test 1: set receiving zone exhaust fan flow to supply air flow rate
     // set source zone (RZone) exhaust fan flow to zero
-    // set supply air flow rates for source (SZone) and receiving (RZone) zones 
+    // set supply air flow rates for source (SZone) and receiving (RZone) zones
     for (ZoneNum = 1; ZoneNum <= state->dataGlobal->NumOfZones; ++ZoneNum) {
         for (NodeNum = 1; NodeNum <= state->dataZoneEquip->ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
             Node(state->dataZoneEquip->ZoneEquipConfig(ZoneNum).InletNode(NodeNum)).MassFlowRate = 1.0;
@@ -3881,21 +3881,21 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     CalcAirFlowSimple(*state, 0, true, true);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.413368, 0.000001);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 1.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 1.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.586632, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
@@ -3908,49 +3908,49 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     CalcAirFlowSimple(*state, 0, true, true);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 1.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 1.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 0.0);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 2.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 2.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object flow is modified
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 1.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
-    ;
-    ;
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
+
+
     // Test 3: set receiving zone exhaust fan flow 3 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 3.0
     // double zone mixing flow rate to trigger infiltration air flow in the source zone
     Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(1)).MassFlowRate = 0.0;
     Node(state->dataZoneEquip->ZoneEquipConfig(2).ExhaustNode(2)).MassFlowRate = 3.0;
-    DataHeatBalance::Mixing(1).DesiredAirFlowRate = 1.0;
-    DataHeatBalance::Mixing(1).DesiredAirFlowRateSaved = 1.0;
-    ;
+    state->dataHeatBal->Mixing(1).DesiredAirFlowRate = 1.0;
+    state->dataHeatBal->Mixing(1).DesiredAirFlowRateSaved = 1.0;
+
     CalcAirFlowSimple(*state);
     CalcZoneMassBalance(*state, false);
     CalcAirFlowSimple(*state, 0, true, true);
     EXPECT_FALSE(has_err_output());
     // SZone, source zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).ExhMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).RetMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).MixingSourceMassFlowRate, 2.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(1).MixingMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(1).InfiltrationMassFlowRate, 1.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).ExhMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).RetMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).MixingSourceMassFlowRate, 2.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(1).MixingMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(1).InfiltrationMassFlowRate, 1.0, 0.000001);
     // RZone, receiving zone mass conservation results
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InMassFlowRate, 1.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).ExhMassFlowRate, 3.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).RetMassFlowRate, 0.0);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).MixingSourceMassFlowRate, 0.0);
-    EXPECT_NEAR(DataHeatBalance::MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InMassFlowRate, 1.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).ExhMassFlowRate, 3.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).RetMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
+    EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
     // zone mixing object flow is modified
     EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 2.0, 0.000001);
-    EXPECT_EQ(DataHeatBalance::MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 }

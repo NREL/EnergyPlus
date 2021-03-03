@@ -147,6 +147,8 @@ namespace EnergyPlus::EarthTube {
         int Loop;
         Array1D_bool RepVarSet;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         RepVarSet.dimension(state.dataGlobal->NumOfZones, true);
 
         // Following used for reporting

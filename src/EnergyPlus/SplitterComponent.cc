@@ -187,7 +187,6 @@ namespace SplitterComponent {
         // RESET THE GETINPUT FLAG
         state.dataSplitterComponent->GetSplitterInputFlag = false;
 
-        // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneSplitter";
         state.dataSplitterComponent->NumSplitters = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 

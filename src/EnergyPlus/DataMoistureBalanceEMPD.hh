@@ -59,18 +59,7 @@ namespace EnergyPlus {
 
 namespace DataMoistureBalanceEMPD {
 
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS
-
-    // Parameters for the definition and limitation of arrays:
-
-    extern Real64 const Lam; // heat of adsorption for building materials
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
+    constexpr Real64 Lam(2500000.0); // heat of adsorption for building materials
 
     // MODULE VARIABLE DECLARATIONS:
     // Variables that are used in both the Surface Heat Balance and the Moisture Balance

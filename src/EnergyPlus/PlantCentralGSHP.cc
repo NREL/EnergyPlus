@@ -2156,7 +2156,6 @@ namespace EnergyPlus::PlantCentralGSHP {
         CondenserLoad = this->WrapperHeatingLoad;
         Real64 HWInletMassFlowRate = DataLoopNode::Node(this->HWInletNodeNum).MassFlowRate;
 
-        // Flow
         for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
 
             // Set module level inlet and outlet nodes and initialize other local variables
