@@ -4376,8 +4376,6 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_ZoneMixingInfiltrationFlowsFlag
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    int ZoneNum;
-    int NodeNum;
     bool ErrorsFound = false;
     ScheduleManager::ProcessScheduleInput(*state);
     GetZoneData(*state, ErrorsFound);
