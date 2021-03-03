@@ -146,7 +146,7 @@ namespace EvaporativeCoolers {
 
         // Find the correct EvapCoolNumber
         if (CompIndex == 0) {
-            EvapCoolNum = UtilityRoutines::FindItemInList(CompName, state.dataEvapCoolers->EvapCond, &EvapConditions::EvapCoolerName);
+            EvapCoolNum = UtilityRoutines::FindItemInList(CompName, EvapCond, &EvapConditions::EvapCoolerName);
             if (EvapCoolNum == 0) {
                 ShowFatalError(state, "SimEvapCooler: Unit not found=" + CompName);
             }
