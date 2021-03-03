@@ -376,7 +376,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
@@ -792,7 +792,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
@@ -1208,7 +1208,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
@@ -1440,7 +1440,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
-    DataHeatBalance::HeatReclaimDXCoil.allocate(2);
+    state->dataHeatBal->HeatReclaimDXCoil.allocate(2);
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
