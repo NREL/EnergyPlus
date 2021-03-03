@@ -99,7 +99,7 @@ namespace HVACManager {
 
     void ResetNodeData();
 
-    void UpdateZoneListAndGroupLoads();
+    void UpdateZoneListAndGroupLoads(EnergyPlusData &state);
 
     void ReportAirHeatBalance(EnergyPlusData &state);
 

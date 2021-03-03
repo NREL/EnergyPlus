@@ -252,7 +252,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -411,7 +411,7 @@ namespace EnergyPlus {
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        Zone.deallocate();
+        state->dataHeatBal->Zone.deallocate();
     }
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     {
@@ -564,7 +564,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -723,7 +723,7 @@ namespace EnergyPlus {
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        Zone.deallocate();
+        state->dataHeatBal->Zone.deallocate();
     }
     TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     {
@@ -874,7 +874,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -1252,7 +1252,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -1417,7 +1417,7 @@ namespace EnergyPlus {
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        Zone.deallocate();
+        state->dataHeatBal->Zone.deallocate();
     }
     TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     {
@@ -1570,7 +1570,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -1926,7 +1926,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -2170,7 +2170,7 @@ namespace EnergyPlus {
         Node.deallocate();
         state->dataWaterCoils->WaterCoil.deallocate();
         state->dataZoneEquip->ZoneEquipConfig.deallocate();
-        Zone.deallocate();
+        state->dataHeatBal->Zone.deallocate();
     }
 
     Real64 ResidualFancoil(EnergyPlusData &state, Real64 const mdot,
@@ -2635,7 +2635,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -3053,7 +3053,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
@@ -3456,7 +3456,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
@@ -3823,7 +3823,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
@@ -4190,7 +4190,7 @@ namespace EnergyPlus {
         ASSERT_TRUE(process_idf(idf_objects));
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("EAST ZONE", Zone(1).Name);
+        EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;
@@ -4512,7 +4512,7 @@ namespace EnergyPlus {
         InitializePsychRoutines();
 
         GetZoneData(*state, ErrorsFound);
-        EXPECT_EQ("WEST ZONE", Zone(1).Name);
+        EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
         ScheduleInputProcessed = true;

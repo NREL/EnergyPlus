@@ -297,7 +297,6 @@ namespace EnergyPlus::SingleDuct {
         std::string AirTermSysInletNodeName;  // air terminal single duct system inlet node name
         std::string AirTermSysOutletNodeName; // air terminal single duct system outlet node name
 
-        // Flow
         NumVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:Reheat");
         NumNoRHVAVSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:VAV:NoReheat");
         state.dataSingleDuct->NumConstVolSys = inputProcessor->getNumObjectsFound(state, "AirTerminal:SingleDuct:ConstantVolume:Reheat");
@@ -573,9 +572,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -851,9 +850,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -1079,9 +1078,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -1214,9 +1213,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -1430,9 +1429,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -1597,9 +1596,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -1886,9 +1885,9 @@ namespace EnergyPlus::SingleDuct {
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneNum = CtrlZone;
                             state.dataSingleDuct->sd_airterminal(SysNum).CtrlZoneInNodeIndex = SupAirIn;
                             state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ActualZoneNum;
-                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
-                                                                   Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
+                            state.dataSingleDuct->sd_airterminal(SysNum).ZoneFloorArea = state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).FloorArea *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).Multiplier *
+                                                                   state.dataHeatBal->Zone(state.dataSingleDuct->sd_airterminal(SysNum).ActualZoneNum).ListMultiplier;
                         }
                     }
                 }
@@ -2357,7 +2356,6 @@ namespace EnergyPlus::SingleDuct {
         // Obtains flow rates from the zone or system sizing arrays.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 
@@ -2566,7 +2564,7 @@ namespace EnergyPlus::SingleDuct {
                 // if no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
                 if (this->MaxAirVolFlowRate > 0.0) {
                     MinMinFlowRatio =
-                        (0.000762 * Zone(ZoneNum).FloorArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier) / this->MaxAirVolFlowRate;
+                        (0.000762 * state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier) / this->MaxAirVolFlowRate;
                     MinAirFlowFracDes = max(0.2, MinMinFlowRatio);
                 } else {
                     MinAirFlowFracDes = 0.0;
@@ -2627,7 +2625,7 @@ namespace EnergyPlus::SingleDuct {
                 // if no zone sizing values available; use max of min frac = 0.2 and 0.000762 [m3/s-m2]
                 if (this->MaxAirVolFlowRate > 0.0) {
                     FixedMinAirDes = max(0.2 * this->MaxAirVolFlowRate,
-                                         0.000762 * Zone(ZoneNum).FloorArea * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier);
+                                         0.000762 * state.dataHeatBal->Zone(ZoneNum).FloorArea * state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
                 } else {
                     MinAirFlowFracDes = 0.0;
                 }

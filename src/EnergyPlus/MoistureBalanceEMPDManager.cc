@@ -305,7 +305,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
             if (!EMPDzone(Loop)) {
-                ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + Zone(Loop).Name +
+                ShowSevereError(state, "GetMoistureBalanceEMPDInput: None of the constructions for zone = " + state.dataHeatBal->Zone(Loop).Name +
                                 " has an inside layer with EMPD properties");
                 ShowContinueError(state, "..For each zone, the inside layer of at least one construction must have EMPD properties");
                 ErrorsFound = true;
@@ -705,7 +705,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
               "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
               "Coating Thickness {m}\n");
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
             if (state.dataMaterial->Material(MatNum).EMPDMaterialProps) {

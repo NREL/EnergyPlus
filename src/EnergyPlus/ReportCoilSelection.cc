@@ -458,7 +458,7 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
                 c->zoneName.resize(zoneCount);
                 for (int loopZone = 1; loopZone <= state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
                     c->zoneNum[loopZone - 1] = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
-                    c->zoneName[loopZone - 1] = DataHeatBalance::Zone(c->zoneNum[loopZone - 1]).Name;
+                    c->zoneName[loopZone - 1] = state.dataHeatBal->Zone(c->zoneNum[loopZone - 1]).Name;
                 }
             }
 
@@ -476,7 +476,7 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
                     }
                     if (!found) { // add it
                         c->zoneNum.emplace_back(zoneIndex);
-                        c->zoneName.emplace_back(DataHeatBalance::Zone(zoneIndex).Name);
+                        c->zoneName.emplace_back(state.dataHeatBal->Zone(zoneIndex).Name);
                     }
                 }
             }
@@ -491,7 +491,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     c->zoneNum.resize(1);
     c->zoneNum[0] = state.dataZoneEquip->ZoneEquipConfig(c->zoneEqNum).ActualZoneNum;
     c->zoneName.resize(1);
-    c->zoneName[0] = DataHeatBalance::Zone(c->zoneNum[0]).Name;
+    c->zoneName[0] = state.dataHeatBal->Zone(c->zoneNum[0]).Name;
     c->typeHVACname = "Zone Equipment"; // init
 
     // find the system and get   c->oaControllerNum
@@ -1245,7 +1245,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 
         if (SysPeakDDnum > 0 && SysPeakTimeStepInDay > 0) {
             for (auto &z : c->zoneNum) {
-                Real64 mult = DataHeatBalance::Zone(z).Multiplier * DataHeatBalance::Zone(z).ListMultiplier;
+                Real64 mult = state.dataHeatBal->Zone(z).Multiplier * state.dataHeatBal->Zone(z).ListMultiplier;
                 Real64 Tz = DataSizing::CalcZoneSizing(SysPeakDDnum, z).CoolZoneTempSeq(SysPeakTimeStepInDay);
                 Real64 Vdot_z = DataSizing::CalcZoneSizing(SysPeakDDnum, z).CoolFlowSeq(SysPeakTimeStepInDay);
                 if (Vdot_z == 0.0) { // take value from final zone sizing
@@ -1473,7 +1473,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         SysPeakTimeStepInDay = DataSizing::FinalSysSizing(curSysNum).SysHeatCoilTimeStepPk;
         if (SysPeakDDnum > 0 && SysPeakTimeStepInDay > 0) { // may be zero if no peak found because of zero system load
             for (auto &z : c->zoneNum) {
-                Real64 mult = DataHeatBalance::Zone(z).Multiplier * DataHeatBalance::Zone(z).ListMultiplier;
+                Real64 mult = state.dataHeatBal->Zone(z).Multiplier * state.dataHeatBal->Zone(z).ListMultiplier;
                 Real64 Tz = DataSizing::CalcZoneSizing(SysPeakDDnum, z).HeatZoneTempSeq(SysPeakTimeStepInDay);
                 Real64 Vdot_z = DataSizing::CalcZoneSizing(SysPeakDDnum, z).HeatFlowSeq(SysPeakTimeStepInDay);
                 if (Vdot_z == 0.0) { // take value from final zone sizing

@@ -414,7 +414,6 @@ namespace SurfaceGroundHeatExchanger {
 
         // Using/Aliasing
         using namespace DataEnvironment;
-        using DataHeatBalance::TotConstructs;
         using DataLoopNode::Node;
         using DataPlant::TypeOf_GrndHtExchgSurface;
         using FluidProperties::GetDensityGlycol;
@@ -464,7 +463,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // get QTF data - only once
         if (this->InitQTF) {
-            for (Cons = 1; Cons <= TotConstructs; ++Cons) {
+            for (Cons = 1; Cons <= state.dataHeatBal->TotConstructs; ++Cons) {
                 if (UtilityRoutines::SameString(state.dataConstruction->Construct(Cons).Name, this->ConstructionName)) {
                     // some error checking ??
                     // CTF stuff

@@ -1314,7 +1314,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false); // If errors detected in input
 
-        // Flow
         GetVRFInputData(state, ErrorsFound);
 
         if (ErrorsFound) {
@@ -1356,7 +1355,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using ScheduleManager::GetScheduleIndex;
         auto &GetDXCoilInletNode(DXCoils::GetCoilInletNode);
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
-        using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::ZoneHVACSizing;
         using DXCoils::GetCoilCondenserInletNode;
@@ -1429,7 +1427,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 MaxCurvePLR; // used for testing PLF curve output
         Real64 CurveInput;  // index used for testing PLF curve output
 
-        // Flow
         MaxAlphas = 0;
         MaxNumbers = 0;
 
@@ -2006,7 +2003,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                 }
             }
 
-            state.dataHVACVarRefFlow->VRF(VRFNum).MasterZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(24), Zone);
+            state.dataHVACVarRefFlow->VRF(VRFNum).MasterZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(24), state.dataHeatBal->Zone);
 
             if (UtilityRoutines::SameString(cAlphaArgs(25), "LoadPriority")) {
                 state.dataHVACVarRefFlow->VRF(VRFNum).ThermostatPriority = iThermostatCtrlType::LoadPriority;
@@ -4334,7 +4331,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
             }
 
             if (!lAlphaFieldBlanks(19)) {
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(19), Zone);
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(19), state.dataHeatBal->Zone);
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum == 0) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1));
                     ShowContinueError(state, "Illegal " + cAlphaFieldNames(19) + " = " + cAlphaArgs(19));
@@ -7140,7 +7137,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         using namespace DataSizing;
         using CurveManager::CurveValue;
         auto &GetDXCoilCap(DXCoils::GetCoilCapacityByIndexType);
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
@@ -7346,7 +7342,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                     DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -7405,7 +7401,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                     DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
@@ -7460,7 +7456,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                     DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -7501,7 +7497,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 } else if (SAFMethod == FlowPerFloorArea) {
                     EqSizing.SystemAirFlow = true;
-                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                    EqSizing.AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                     DataScalableSizingON = true;
                 } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
@@ -7538,7 +7534,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     EqSizing.CoolingCapacity = true;
-                    EqSizing.DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * Zone(DataZoneNumber).FloorArea;
+                    EqSizing.DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
@@ -7559,7 +7555,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     EqSizing.HeatingCapacity = true;
-                    EqSizing.DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    EqSizing.DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
@@ -8761,7 +8757,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Simulates the unit components sequentially in the air flow direction.
 
         using DXCoils::SimDXCoil;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -11677,8 +11672,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // Use RegulaFalsi technique to iterate on part-load ratio until convergence is achieved.
 
         using General::SolveRoot;
-
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using ScheduleManager::GetCurrentScheduleValue;
         using TempSolveRoot::SolveRoot;
 
@@ -11941,7 +11934,6 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         // METHODOLOGY EMPLOYED:
         //		A new physics based VRF model applicable for Fluid Temperature Control.
         using DXCoils::SimDXCoil;
-        using HeatingCoils::SimulateHeatingCoilComponents;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;

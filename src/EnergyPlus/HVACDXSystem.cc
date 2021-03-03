@@ -438,8 +438,6 @@ namespace HVACDXSystem {
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
 
-        // Flow
-
         CurrentModuleObject = "CoilSystem:Cooling:DX";
         NumDXSystem = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 

@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfZones = 1;
 
-    DataHeatBalance::Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;

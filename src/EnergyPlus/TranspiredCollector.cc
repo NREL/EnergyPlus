@@ -112,7 +112,6 @@ namespace TranspiredCollector {
     //   See EngineeringReference for details
 
     // Using/Aliasing
-    using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
 
     void SimTranspiredCollector(EnergyPlusData &state,
@@ -1063,7 +1062,7 @@ namespace TranspiredCollector {
 
         //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
-        Isc = sum_product_sub(SurfQRadSWOutIncident, Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+        Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below

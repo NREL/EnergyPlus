@@ -99,12 +99,8 @@ namespace HeatBalFiniteDiffManager {
     // Using/Aliasing
     using namespace DataMoistureBalance;
     using DataHeatBalance::Air;
-    using DataHeatBalance::SurfQRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
-    using DataHeatBalance::TotConstructs;
-    using DataHeatBalance::TotMaterials;
-    using DataHeatBalance::Zone;
-    using DataHeatBalFanSys::MAT;
+        using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::QCoolingPanelSurf;
     using DataHeatBalFanSys::QElecBaseboardSurf;
     using DataHeatBalFanSys::QHTRadSysSurf;
@@ -229,9 +225,6 @@ namespace HeatBalFiniteDiffManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataHeatBalance::CondFDRelaxFactor;
-        using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::MaxAllowedDelTempCondFD;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;                         // IO Status when calling get input subroutine
@@ -242,7 +235,6 @@ namespace HeatBalFiniteDiffManager {
         int MaterialNumProp;                // Number of material properties being passed
         Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
         static bool ErrorsFound(false);     // If errors detected in input
-        //  INTEGER :: CondFDMat                ! Number of variable property CondFD materials in input
         int Loop;
         int NumAlphas;
         int NumNumbers;
@@ -290,11 +282,11 @@ namespace HeatBalFiniteDiffManager {
                 SpaceDescritConstant = rNumericArgs(1);
             }
             if (!lNumericFieldBlanks(2)) {
-                CondFDRelaxFactorInput = rNumericArgs(2);
-                CondFDRelaxFactor = CondFDRelaxFactorInput;
+                state.dataHeatBal->CondFDRelaxFactorInput = rNumericArgs(2);
+                state.dataHeatBal->CondFDRelaxFactor = state.dataHeatBal->CondFDRelaxFactorInput;
             }
             if (!lNumericFieldBlanks(3)) {
-                MaxAllowedDelTempCondFD = rNumericArgs(3);
+                state.dataHeatBal->MaxAllowedDelTempCondFD = rNumericArgs(3);
             }
 
         } // settings object
@@ -302,7 +294,7 @@ namespace HeatBalFiniteDiffManager {
         pcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange");
         vcMat = inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
 
-        MaterialFD.allocate(TotMaterials);
+        MaterialFD.allocate(state.dataHeatBal->TotMaterials);
 
         // Load the additional CondFD Material properties
         cCurrentModuleObject = "MaterialProperty:PhaseChange"; // Phase Change Information First
@@ -472,7 +464,7 @@ namespace HeatBalFiniteDiffManager {
             }
         }
 
-        for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
+        for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
             if (MaterialFD(MaterNum).numTempEnth == 0) {
                 MaterialFD(MaterNum).numTempEnth = 3;
                 MaterialFD(MaterNum).TempEnth.dimension(2, 3, -100.0);
@@ -643,9 +635,9 @@ namespace HeatBalFiniteDiffManager {
         Real64 DeltaTimestep;      // zone timestep in seconds, for local check of properties
         Real64 ThicknessThreshold; // min thickness consistent with other thermal properties, for local check
 
-        ConstructFD.allocate(TotConstructs);
-        SigmaR.allocate(TotConstructs);
-        SigmaC.allocate(TotConstructs);
+        ConstructFD.allocate(state.dataHeatBal->TotConstructs);
+        SigmaR.allocate(state.dataHeatBal->TotConstructs);
+        SigmaC.allocate(state.dataHeatBal->TotConstructs);
 
         SurfaceFD.allocate(TotSurfaces);
         QHeatInFlux.allocate(TotSurfaces);
@@ -668,7 +660,7 @@ namespace HeatBalFiniteDiffManager {
             if (Delt <= 200) break;
         }
 
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             // Need to skip window constructions and eventually window materials
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
 
@@ -834,7 +826,7 @@ namespace HeatBalFiniteDiffManager {
         } // End of Construction Loop.  TotNodes in each construction now set
 
         // now determine x location, or distance that nodes are from the outside face in meters
-        for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             if (ConstructFD(ConstrNum).TotNodes > 0) {
                 ConstructFD(ConstrNum).NodeXlocation.allocate(ConstructFD(ConstrNum).TotNodes + 1);
                 ConstructFD(ConstrNum).NodeXlocation = 0.0; // init them all
@@ -1113,9 +1105,6 @@ namespace HeatBalFiniteDiffManager {
         //      finite difference procedures for
         //      all building surface constructs.
 
-        // Using/Aliasing
-        using DataHeatBalance::CondFDRelaxFactor;
-
         static Real64 MaxDelTemp(0.0);
 
         int const ConstrNum(Surface(Surf).Construction);
@@ -1203,10 +1192,10 @@ namespace HeatBalFiniteDiffManager {
             } // End of Gauss Seidell iteration loop
 
             GSloopCounter = GSiter; // outputs GSloop iterations, useful for pinpointing stability issues with condFD
-            if (CondFDRelaxFactor != 1.0) {
+            if (state.dataHeatBal->CondFDRelaxFactor != 1.0) {
                 // Apply Relaxation factor for stability, use current (TDT) and previous (TDreport) temperature values
                 //   to obtain the actual temperature that is going to be exported/use
-                relax_array(TDT, TDreport, 1.0 - CondFDRelaxFactor);
+                relax_array(TDT, TDreport, 1.0 - state.dataHeatBal->CondFDRelaxFactor);
                 EnthOld = EnthNew;
             }
 
@@ -1270,13 +1259,7 @@ namespace HeatBalFiniteDiffManager {
         // the initializations for the Finite Difference calculations
         // of each construction.
 
-        // Using/Aliasing
-        using DataHeatBalance::CondFDRelaxFactorInput;
-        using DataHeatBalance::MaxAllowedDelTempCondFD;
-
         using General::ScanForReports;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool DoReport;
@@ -1296,8 +1279,8 @@ namespace HeatBalFiniteDiffManager {
               " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
               cCondFDSchemeType(CondFDSchemeType),
               SpaceDescritConstant,
-              CondFDRelaxFactorInput,
-              MaxAllowedDelTempCondFD);
+              state.dataHeatBal->CondFDRelaxFactorInput,
+              state.dataHeatBal->MaxAllowedDelTempCondFD);
 
         ScanForReports(state, "Constructions", DoReport, "Constructions");
 
@@ -1311,14 +1294,14 @@ namespace HeatBalFiniteDiffManager {
                   "Stability");
 
             // HT Algo issue
-            if (DataHeatBalance::AnyCondFD) {
+            if (state.dataHeatBal->AnyCondFD) {
                 print(state.files.eio,
                       "{}\n",
                       "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material "
                       "Name (or Face), Inward Material Name (or Face)");
             }
 
-            for (ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum) {
+            for (ThisNum = 1; ThisNum <= state.dataHeatBal->TotConstructs; ++ThisNum) {
 
                 if (state.dataConstruction->Construct(ThisNum).TypeIsWindow) continue;
                 if (state.dataConstruction->Construct(ThisNum).TypeIsIRT) continue;
@@ -2266,7 +2249,7 @@ namespace HeatBalFiniteDiffManager {
             QElecBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
         Real64 const QCoolingPanelSurfFD(
             QCoolingPanelSurf(Surf));                     // Current radiant heat flux at a surface due to the presence of simple cooling panels
-        Real64 const QRadThermInFD(SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
+        Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(HConvInFD(Surf));
@@ -2430,31 +2413,31 @@ namespace HeatBalFiniteDiffManager {
                     ShowSevereMessage(state,
                                       format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
-                                             Zone(ZoneNum).Name,
+                                             state.dataHeatBal->Zone(ZoneNum).Name,
                                              Surface(SurfNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
-                    if (!Zone(ZoneNum).TempOutOfBoundsReported) {
-                        ShowContinueError(state, "Zone=\"" + Zone(ZoneNum).Name + "\", Diagnostic Details:");
-                        if (Zone(ZoneNum).FloorArea > 0.0) {
+                    if (!state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported) {
+                        ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\", Diagnostic Details:");
+                        if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0) {
                             ShowContinueError(
-                                state, format("...Internal Heat Gain [{:.3R}] W/m2", Zone(ZoneNum).InternalHeatGains / Zone(ZoneNum).FloorArea));
+                                state, format("...Internal Heat Gain [{:.3R}] W/m2", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains / state.dataHeatBal->Zone(ZoneNum).FloorArea));
                         } else {
-                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", Zone(ZoneNum).InternalHeatGains));
+                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains));
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", Zone(ZoneNum).NominalInfilVent));
-                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", Zone(ZoneNum).NominalMixing));
+                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalInfilVent));
+                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalMixing));
                         } else {
                             ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
-                        if (Zone(ZoneNum).IsControlled) {
+                        if (state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                         } else {
                             ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                         }
-                        Zone(ZoneNum).TempOutOfBoundsReported = true;
+                        state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
@@ -2463,7 +2446,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C",
                                                   "C");
                 } else {
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
@@ -2477,31 +2460,31 @@ namespace HeatBalFiniteDiffManager {
                     ShowSevereMessage(state,
                                       format("Temperature (high) out of bounds ({:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
-                                             Zone(ZoneNum).Name,
+                                             state.dataHeatBal->Zone(ZoneNum).Name,
                                              Surface(SurfNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
-                    if (!Zone(ZoneNum).TempOutOfBoundsReported) {
-                        ShowContinueError(state, "Zone=\"" + Zone(ZoneNum).Name + "\", Diagnostic Details:");
-                        if (Zone(ZoneNum).FloorArea > 0.0) {
+                    if (!state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported) {
+                        ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\", Diagnostic Details:");
+                        if (state.dataHeatBal->Zone(ZoneNum).FloorArea > 0.0) {
                             ShowContinueError(
-                                state, format("...Internal Heat Gain [{:.3R}] W/m2", Zone(ZoneNum).InternalHeatGains / Zone(ZoneNum).FloorArea));
+                                state, format("...Internal Heat Gain [{:.3R}] W/m2", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains / state.dataHeatBal->Zone(ZoneNum).FloorArea));
                         } else {
-                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", Zone(ZoneNum).InternalHeatGains));
+                            ShowContinueError(state, format("...Internal Heat Gain (no floor) [{:.3R}] W", state.dataHeatBal->Zone(ZoneNum).InternalHeatGains));
                         }
                         if (AirflowNetwork::SimulateAirflowNetwork <= AirflowNetwork::AirflowNetworkControlSimple) {
-                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", Zone(ZoneNum).NominalInfilVent));
-                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", Zone(ZoneNum).NominalMixing));
+                            ShowContinueError(state, format("...Infiltration/Ventilation [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalInfilVent));
+                            ShowContinueError(state, format("...Mixing/Cross Mixing [{:.3R}] m3/s", state.dataHeatBal->Zone(ZoneNum).NominalMixing));
                         } else {
                             ShowContinueError(state, "...Airflow Network Simulation: Nominal Infiltration/Ventilation/Mixing not available.");
                         }
-                        if (Zone(ZoneNum).IsControlled) {
+                        if (state.dataHeatBal->Zone(ZoneNum).IsControlled) {
                             ShowContinueError(state, "...Zone is part of HVAC controlled system.");
                         } else {
                             ShowContinueError(state, "...Zone is not part of HVAC controlled system.");
                         }
-                        Zone(ZoneNum).TempOutOfBoundsReported = true;
+                        state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
@@ -2510,7 +2493,7 @@ namespace HeatBalFiniteDiffManager {
                                                   "C",
                                                   "C");
                 } else {
-                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + Zone(ZoneNum).Name +
+                    ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
                                                       " for surface=" + Surface(SurfNum).Name,
                                                   Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,

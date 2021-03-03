@@ -1133,37 +1133,16 @@ void InitPurchasedAir(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Initialize the PurchAir data structure.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-    using DataHeatBalance::Zone; // to access zone area, volume, and multipliers
     using DataLoopNode::NodeID;
     using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
     using DataZoneEquipment::CheckZoneEquipmentList;
     using General::FindNumberInList;
-
     using ZonePlenum::GetReturnPlenumIndex;
     using ZonePlenum::GetReturnPlenumName;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Loop;
-    //      LOGICAL :: ErrorsFound = .FALSE.   ! If errors detected in input
     bool UnitOn;        // simple checks for error
     bool CoolOn;        // simple checks for error
     bool HeatOn;        // simple checks for error
@@ -1333,7 +1312,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             if (PurchAir(PurchAirNum).CoolErrIndex == 0) {
                 ShowSevereError(state,
                                 "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name + " serving Zone " +
-                                    Zone(ActualZoneNum).Name);
+                                    state.dataHeatBal->Zone(ActualZoneNum).Name);
                 ShowContinueError(state,
                                   format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air "
                                          "temperature (MAT) setpoint [{:.2R}].",
@@ -1348,7 +1327,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + Zone(ActualZoneNum).Name +
+                                              " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name +
                                               ", the minimum supply air temperature for cooling error continues",
                                           PurchAir(PurchAirNum).CoolErrIndex,
                                           PurchAir(PurchAirNum).MinCoolSuppAirTemp,
@@ -1378,7 +1357,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             if (PurchAir(PurchAirNum).HeatErrIndex == 0) {
                 ShowSevereMessage(state,
                                   "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                      " serving Zone " + Zone(ActualZoneNum).Name);
+                                      " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name);
                 ShowContinueError(state,
                                   format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature "
                                          "heating setpoint [{:.2R}].",
@@ -1393,7 +1372,7 @@ void InitPurchasedAir(EnergyPlusData &state,
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "InitPurchasedAir: For " + PurchAir(PurchAirNum).cObjectName + " = " + PurchAir(PurchAirNum).Name +
-                                              " serving Zone " + Zone(ActualZoneNum).Name +
+                                              " serving Zone " + state.dataHeatBal->Zone(ActualZoneNum).Name +
                                               ", maximum supply air temperature for heating error continues",
                                           PurchAir(PurchAirNum).HeatErrIndex,
                                           PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
@@ -1427,11 +1406,9 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataHeatBalance::Zone;
     using DataHVACGlobals::CoolingCapacitySizing;
     using DataHVACGlobals::HeatingAirflowSizing;
     using DataHVACGlobals::HeatingCapacitySizing;
-
     using Psychrometrics::CPCW;
     using Psychrometrics::CPHW;
     using Psychrometrics::PsyCpAirFnW;
@@ -1520,7 +1497,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         }
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                         HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -1586,7 +1563,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                            ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         DataScalableSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
@@ -1675,7 +1652,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                         }
                     } else if (SAFMethod == FlowPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataScalableSizingON = true;
                         CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1749,7 +1726,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                         ZoneEqSizing(CurZoneEqNum).DesCoolingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * Zone(DataZoneNumber).FloorArea;
+                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                         DataScalableSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
@@ -2051,17 +2028,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     //                      July 2012, Chandan Sharma - FSEC: Added hybrid ventilation manager
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // Needs description.
-
-    // METHODOLOGY EMPLOYED:
-    // Needs description, as appropriate.
-
-    // REFERENCES:
-    // na
-
     // Using/Aliasing
-    using DataHeatBalance::Zone;
     using DataHeatBalFanSys::TempControlType;
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::SmallLoad;
@@ -2934,14 +2901,8 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // User input defines method used to calculate OA.
 
-    // REFERENCES:
-
     // Using/Aliasing
-    using DataHeatBalance::Zone;
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // FUNCTION PARAMETER DEFINITIONS:
     bool const UseMinOASchFlag(true); // Always use min OA schedule in calculations.
@@ -2996,25 +2957,11 @@ void CalcPurchAirMixedAir(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Calculates the mixed air conditions, accounting for heat recovery.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-
     // Using/Aliasing
     using DataLoopNode::Node;
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     static std::string const RoutineName("CalcPurchAirMixedAir");
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int RecircNodeNum;           // Zone return air node
