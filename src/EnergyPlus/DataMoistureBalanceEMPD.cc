@@ -48,9 +48,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 
-namespace EnergyPlus {
-
-namespace DataMoistureBalanceEMPD {
+namespace EnergyPlus::DataMoistureBalanceEMPD {
 
     // MODULE INFORMATION:
     //       AUTHOR         Muthusamy V. Swami and Lixing Gu
@@ -61,21 +59,6 @@ namespace DataMoistureBalanceEMPD {
     // PURPOSE OF THIS MODULE:
     // This module should contain the information that is needed to calculate
     // moisture level at interior surfaces
-
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS
-
-    // Parameters for the definition and limitation of arrays:
-
-    Real64 const Lam(2500000.0); // heat of adsorption for building materials
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     // Variables that are used in both the Surface Heat Balance and the Moisture Balance
@@ -100,7 +83,5 @@ namespace DataMoistureBalanceEMPD {
         RVDeepLayer.deallocate();
         RVwall.deallocate();
     }
-
-} // namespace DataMoistureBalanceEMPD
 
 } // namespace EnergyPlus

@@ -166,10 +166,7 @@ namespace DaylightingDevices {
 
     // Using/Aliasing
     using DataHeatBalance::MinimalShadowing;
-    using DataHeatBalance::SolarDistribution;
-    using DataHeatBalance::TotConstructs;
-    using DataHeatBalance::Zone;
-    using DataSurfaces::CalcSolRefl;
+        using DataSurfaces::CalcSolRefl;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::Surface;
@@ -228,7 +225,7 @@ namespace DaylightingDevices {
         // Object Data
         Array1D<TDDPipeStoredData> TDDPipeStored;
 
-        // FLOW:
+
         // Initialize tubular daylighting devices (TDDs)
         GetTDDInput(state);
 
@@ -466,7 +463,7 @@ namespace DaylightingDevices {
         std::string TZoneName; // Transition zone name
         Real64 PipeArea;
 
-        // FLOW:
+
         cCurrentModuleObject = "DaylightingDevice:Tubular";
         state.dataDaylightingDevicesData->NumOfTDDPipes = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -686,7 +683,7 @@ namespace DaylightingDevices {
 
                     for (TZoneNum = 1; TZoneNum <= state.dataDaylightingDevicesData->TDDPipe(PipeNum).NumOfTZones; ++TZoneNum) {
                         TZoneName = cAlphaArgs(TZoneNum + 4);
-                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) = UtilityRoutines::FindItemInList(TZoneName, Zone);
+                        state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) = UtilityRoutines::FindItemInList(TZoneName, state.dataHeatBal->Zone);
                         if (state.dataDaylightingDevicesData->TDDPipe(PipeNum).TZone(TZoneNum) == 0) {
                             ShowSevereError(state, cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Transition zone " + TZoneName + " not found.");
                             ErrorsFound = true;
@@ -734,7 +731,7 @@ namespace DaylightingDevices {
         int SurfNum;                    // Window, inside, or outside shelf surfaces
         int ConstrNum;                  // Outside shelf construction object number
 
-        // FLOW:
+
         cCurrentModuleObject = "DaylightingDevice:Shelf";
         state.dataDaylightingDevicesData->NumOfShelf = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
@@ -964,7 +961,7 @@ namespace DaylightingDevices {
         Real64 c2;
         Real64 xLimit; // Limiting x value to prevent floating point underflow
 
-        // FLOW:
+
         CalcPipeTransBeam = 0.0;
 
         T = 0.0;
@@ -1161,17 +1158,6 @@ namespace DaylightingDevices {
         // REFERENCES:
         // See AnisoSkyViewFactors in SolarShading.cc.
 
-        // USE STATEMENTS: na
-        // Using/Aliasing
-        using DataHeatBalance::AnisoSkyMult;
-        using DataHeatBalance::curDifShdgRatioIsoSky;
-        using DataHeatBalance::DifShdgRatioHoriz;
-        using DataHeatBalance::DifShdgRatioHorizHRTS;
-        using DataHeatBalance::DifShdgRatioIsoSky;
-        using DataHeatBalance::MultCircumSolar;
-        using DataHeatBalance::MultHorizonZenith;
-        using DataHeatBalance::MultIsoSky;
-        using DataHeatBalance::SunlitFrac;
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
         // Return value
@@ -1187,23 +1173,23 @@ namespace DaylightingDevices {
         Real64 HorizonRad;      // Horizon sky radiation component
         Real64 AnisoSkyTDDMult; // Anisotropic sky multiplier for TDD
 
-        // FLOW:
+
         DomeSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome;
 
-        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || SolarDistribution == MinimalShadowing) {
-            IsoSkyRad = MultIsoSky(DomeSurf) * DifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = MultHorizonZenith(DomeSurf) * DifShdgRatioHoriz(DomeSurf);
+        if (!DetailedSkyDiffuseAlgorithm || !ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->DifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHoriz(DomeSurf);
         } else {
-            IsoSkyRad = MultIsoSky(DomeSurf) * curDifShdgRatioIsoSky(DomeSurf);
-            HorizonRad = MultHorizonZenith(DomeSurf) * DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+            IsoSkyRad = state.dataHeatBal->MultIsoSky(DomeSurf) * state.dataHeatBal->curDifShdgRatioIsoSky(DomeSurf);
+            HorizonRad = state.dataHeatBal->MultHorizonZenith(DomeSurf) * state.dataHeatBal->DifShdgRatioHorizHRTS(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
         }
-        CircumSolarRad = MultCircumSolar(DomeSurf) * SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
+        CircumSolarRad = state.dataHeatBal->MultCircumSolar(DomeSurf) * state.dataHeatBal->SunlitFrac(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, DomeSurf);
 
         AnisoSkyTDDMult = state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso * IsoSkyRad + TransTDD(state, PipeNum, COSI, DataDaylightingDevices::iRadType::SolarBeam) * CircumSolarRad +
                           state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolHorizon * HorizonRad;
 
-        if (AnisoSkyMult(DomeSurf) > 0.0) {
-            CalcTDDTransSolAniso = AnisoSkyTDDMult / AnisoSkyMult(DomeSurf);
+        if (state.dataHeatBal->AnisoSkyMult(DomeSurf) > 0.0) {
+            CalcTDDTransSolAniso = AnisoSkyTDDMult / state.dataHeatBal->AnisoSkyMult(DomeSurf);
         } else {
             CalcTDDTransSolAniso = 0.0;
         }
@@ -1259,7 +1245,7 @@ namespace DaylightingDevices {
         Real64 transPipe;
         Real64 transDiff;
 
-        // FLOW:
+
         TransTDD = 0.0;
 
         // Get constructions of each TDD component
@@ -1331,7 +1317,7 @@ namespace DaylightingDevices {
         Real64 m;
         Real64 b;
 
-        // FLOW:
+
         InterpolatePipeTransBeam = 0.0;
 
         // Linearly interpolate transBeam/COSAngle table to get value at current cosine of the angle
@@ -1378,7 +1364,7 @@ namespace DaylightingDevices {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int PipeNum; // TDD pipe object number
 
-        // FLOW:
+
         FindTDDPipe = 0;
 
         if (state.dataDaylightingDevicesData->NumOfTDDPipes <= 0) {
@@ -1418,17 +1404,8 @@ namespace DaylightingDevices {
         //   3. Inward absorbed solar in dome and diffuser glass
         // This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.cc.
 
-        // REFERENCES: na
-
         // Using/Aliasing
-        using DataHeatBalance::SurfQRadSWOutIncident;
-        using DataHeatBalance::SurfWinQRadSWwinAbs;
-        using DataHeatBalance::SurfWinQRadSWwinAbsTot;
-        using DataHeatBalance::QS;
         using DataSurfaces::SurfWinTransSolar;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS: na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;  // TDD pipe object number
@@ -1439,22 +1416,22 @@ namespace DaylightingDevices {
         Real64 QRefl;          // Diffuse radiation reflected back up the pipe
         Real64 TotTDDPipeGain; // Total absorbed solar gain in the tubular daylighting device pipe
 
-        // FLOW:
+
         for (PipeNum = 1; PipeNum <= state.dataDaylightingDevicesData->NumOfTDDPipes; ++PipeNum) {
             DiffSurf = state.dataDaylightingDevicesData->TDDPipe(PipeNum).Diffuser;
             transDiff = state.dataConstruction->Construct(Surface(DiffSurf).Construction).TransDiff;
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
-            QRefl = (SurfQRadSWOutIncident(DiffSurf) - SurfWinQRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
+            QRefl = (state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) - state.dataHeatBal->SurfWinQRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
-            QRefl += QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
+            QRefl += state.dataHeatBal->QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
-            TotTDDPipeGain = SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) - SurfQRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
+            TotTDDPipeGain = SurfWinTransSolar(state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) - state.dataHeatBal->SurfQRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - state.dataDaylightingDevicesData->TDDPipe(PipeNum).TransSolIso / transDiff) +
-                             SurfWinQRadSWwinAbs(1, state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
-                             SurfWinQRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
+                             state.dataHeatBal->SurfWinQRadSWwinAbs(1, state.dataDaylightingDevicesData->TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
+                             state.dataHeatBal->SurfWinQRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to
                                                                                        // reflections on the way out | Inward absorbed solar from dome
                                                                                        // glass | Inward absorbed solar from diffuser glass
             state.dataDaylightingDevicesData->TDDPipe(PipeNum).PipeAbsorbedSolar = max(0.0, TotTDDPipeGain); // Report variable [W]
@@ -1506,7 +1483,7 @@ namespace DaylightingDevices {
         int VShelf;
         int NumMatch; // Number of vertices matched
 
-        // FLOW:
+
         W = Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Width;
         H = Surface(state.dataDaylightingDevicesData->Shelf(ShelfNum).Window).Height;
 

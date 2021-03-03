@@ -171,8 +171,8 @@ namespace HeatBalanceIntRadExchange {
 
         bool IntShadeOrBlindStatusChanged; // True if status of interior shade or blind on at least
         // one window in a zone has changed from previous time step
-        int ShadeFlag;     // Window shading status current time step
-        int ShadeFlagPrev; // Window shading status previous time step
+        WinShadingType ShadeFlag;     // Window shading status current time step
+        WinShadingType ShadeFlagPrev; // Window shading status previous time step
 
         // variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
         static Array1D<Real64> SurfaceTempRad;
@@ -180,7 +180,7 @@ namespace HeatBalanceIntRadExchange {
         static Array1D<Real64> SurfaceEmiss;
 
 
-        // FLOW:
+
 
 #ifdef EP_Detailed_Timings
         epStartTime("CalcInteriorRadExchange=");
@@ -219,7 +219,7 @@ namespace HeatBalanceIntRadExchange {
         int startEnclosure = 1;
         int endEnclosure = DataViewFactorInformation::NumOfRadiantEnclosures;
         if (PartialResimulate) {
-            startEnclosure = endEnclosure = Zone(ZoneToResimulate).RadiantEnclosureNum;
+            startEnclosure = endEnclosure = state.dataHeatBal->Zone(ZoneToResimulate).RadiantEnclosureNum;
             auto const &enclosure(ZoneRadiantInfo(startEnclosure));
             for (int i : enclosure.SurfacePtr) {
                 NetLWRadToSurf(i) = 0.0;
@@ -271,9 +271,7 @@ namespace HeatBalanceIntRadExchange {
                         if (state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                             ShadeFlag = SurfWinShadingFlag(SurfNum);
                             ShadeFlagPrev = SurfWinExtIntShadePrevTS(SurfNum);
-                            if ((ShadeFlagPrev != IntShadeOn && ShadeFlag == IntShadeOn) ||
-                                (ShadeFlagPrev != IntBlindOn && ShadeFlag == IntBlindOn) ||
-                                (ShadeFlagPrev == IntShadeOn && ShadeFlag != IntShadeOn) || (ShadeFlagPrev == IntBlindOn && ShadeFlag != IntBlindOn))
+                            if (ShadeFlagPrev != ShadeFlag && (ANY_INTERIOR_SHADE_BLIND(ShadeFlagPrev) || ANY_INTERIOR_SHADE_BLIND(ShadeFlag)))
                                 IntShadeOrBlindStatusChanged = true;
                             if (SurfWinWindowModelType(SurfNum) == WindowEQLModel &&
                                 DataWindowEquivalentLayer::CFS(state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr).ISControlled) {
@@ -291,8 +289,7 @@ namespace HeatBalanceIntRadExchange {
                         int const ConstrNum = Surface(SurfNum).Construction;
                         zone_info.Emissivity(ZoneSurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
                         auto const &surface_window(SurfaceWindow(SurfNum));
-                        if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow &&
-                            (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)) {
+                        if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow && ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                             zone_info.Emissivity(ZoneSurfNum) =
                                 InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
                                 InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
@@ -331,14 +328,14 @@ namespace HeatBalanceIntRadExchange {
                 if (construct.WindowTypeEQL) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = EQLWindowInsideEffectiveEmiss(state, ConstrNum);
-                } else if (construct.WindowTypeBSDF && SurfWinShadingFlag(SurfNum) == IntShadeOn) {
+                } else if (construct.WindowTypeBSDF && SurfWinShadingFlag(SurfNum) == WinShadingType::IntShade) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = surface_window.EffShBlindEmiss[0] + surface_window.EffGlassEmiss[0];
                 } else if (construct.WindowTypeBSDF) {
                     SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                     SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                 } else if (construct.TypeIsWindow && SurfWinOriginalClass(SurfNum) != SurfaceClass::TDD_Diffuser) {
-                    if (SurfIterations == 0 && SurfWinShadingFlag(SurfNum) <= 0) {
+                    if (SurfIterations == 0 && NOT_SHADED(SurfWinShadingFlag(SurfNum))) {
                         // If the window is bare this TS and it is the first time through we use the previous TS glass
                         // temperature whether or not the window was shaded in the previous TS. If the window was shaded
                         // the previous time step this temperature is a better starting value than the shade temperature.
@@ -346,7 +343,7 @@ namespace HeatBalanceIntRadExchange {
                         SurfaceEmiss[ZoneSurfNum] = construct.InsideAbsorpThermal;
                         // For windows with an interior shade or blind an effective inside surface temp
                         // and emiss is used here that is a weighted combination of shade/blind and glass temp and emiss.
-                    } else if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
+                    } else if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                         SurfaceTempRad[ZoneSurfNum] = SurfWinEffInsSurfTemp(SurfNum);
                         SurfaceEmiss[ZoneSurfNum] = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffShBlindEmiss) +
                             InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), surface_window.EffGlassEmiss);
@@ -521,7 +518,7 @@ namespace HeatBalanceIntRadExchange {
         int NumIterations;
         std::string Option1; // view factor report option
 
-        // FLOW:
+
 
         ScanForReports(state, "ViewFactorInfo", ViewFactorReport, _, Option1);
 
@@ -548,7 +545,7 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
                 }
             }
@@ -571,13 +568,13 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     if (!Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
+                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
                     if (!Surface(DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
                     for (int enclSNum = priorZoneTotEnclSurfs+1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]) {
@@ -850,7 +847,7 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Include only heat transfer surfaces
                     if (Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
                 }
@@ -870,7 +867,7 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces
                     if (!Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
@@ -880,7 +877,7 @@ namespace HeatBalanceIntRadExchange {
                     Surface(surfNum).SolarEnclIndex = enclosureNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = Zone(zoneNum).SurfaceFirst, surfNum_end = Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
+                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
                     if (!Surface(DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == DataSurfaces::AllSurfaceListReportOrder[allSurfNum - 1]) {
@@ -1192,10 +1189,10 @@ namespace HeatBalanceIntRadExchange {
             if (enclMatchFound) continue; // We're done with this instance
             // Find matching ZoneList name
             int zoneListNum = UtilityRoutines::FindItemInList(
-                UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), DataHeatBalance::ZoneList, DataHeatBalance::NumOfZoneLists);
+                UtilityRoutines::MakeUPPERCase(thisZoneOrZoneListName), state.dataHeatBal->ZoneList, state.dataHeatBal->NumOfZoneLists);
             if (zoneListNum > 0) {
                 // Look for radiant enclosure with same list of zones
-                auto &thisZoneList(DataHeatBalance::ZoneList(zoneListNum));
+                auto &thisZoneList(state.dataHeatBal->ZoneList(zoneListNum));
                 for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
                     auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
                     bool anyZoneNotFound = false;
@@ -1426,7 +1423,7 @@ namespace HeatBalanceIntRadExchange {
         int j;
         Array1D<Real64> ZoneArea; // Sum of the area of all zone surfaces seen
 
-        // FLOW:
+
         // Calculate the sum of the areas seen by all zone surfaces
         ZoneArea.dimension(N, 0.0);
         for (i = 1; i <= N; ++i) {
@@ -1450,7 +1447,7 @@ namespace HeatBalanceIntRadExchange {
             }
             if (ZoneArea(i) <= 0.0) {
                 ShowWarningError(state, "CalcApproximateViewFactors: Zero area for all other zone surfaces.");
-                ShowContinueError(state, "Happens for Surface=\"" + Surface(SPtr(i)).Name + "\" in Zone=" + Zone(Surface(SPtr(i)).Zone).Name);
+                ShowContinueError(state, "Happens for Surface=\"" + Surface(SPtr(i)).Name + "\" in Zone=" + state.dataHeatBal->Zone(Surface(SPtr(i)).Zone).Name);
             }
         }
 
@@ -1557,7 +1554,7 @@ namespace HeatBalanceIntRadExchange {
         int j;
         static int LargestSurf(0);
 
-        // FLOW:
+
         OriginalCheckValue = std::abs(sum(F) - N);
 
         //  Allocate and zero arrays
@@ -1643,7 +1640,7 @@ namespace HeatBalanceIntRadExchange {
             FinalCheckValue = FixedCheckValue = std::abs(RowSum - N);
             F = FixedF;
             for (int zoneNum : zoneNums) {
-                Zone(zoneNum).EnforcedReciprocity = true;
+                state.dataHeatBal->Zone(zoneNum).EnforcedReciprocity = true;
             }
             return; // Do not iterate, stop with reciprocity satisfied.
 
@@ -1784,7 +1781,7 @@ namespace HeatBalanceIntRadExchange {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        // FLOW:
+
 
 #ifdef EP_Count_Calls
         ++NumCalcScriptF_Calls;
@@ -2040,8 +2037,8 @@ namespace HeatBalanceIntRadExchange {
         }
 
         // Check if the surface and equipment are in the same zone or radiant enclosure
-        int const surfRadEnclNum = DataHeatBalance::Zone(DataSurfaces::Surface(surfNum).Zone).RadiantEnclosureNum;
-        int const radSysEnclNum = DataHeatBalance::Zone(RadSysZoneNum).RadiantEnclosureNum;
+        int const surfRadEnclNum = state.dataHeatBal->Zone(DataSurfaces::Surface(surfNum).Zone).RadiantEnclosureNum;
+        int const radSysEnclNum = state.dataHeatBal->Zone(RadSysZoneNum).RadiantEnclosureNum;
         if (radSysEnclNum == 0) {
             // This should never happen - but it does in some simple unit tests that are designed to throw errors
             ShowSevereError(state, routineName + "Somehow the radiant system enclosure number is zero for" + cCurrentModuleObject + " = " + RadSysName);

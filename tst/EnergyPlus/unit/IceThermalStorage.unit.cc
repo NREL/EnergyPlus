@@ -65,10 +65,6 @@ using namespace EnergyPlus::General;
 
 TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
 {
-
-    IceThermalStorage::clear_state();
-    state->dataCurveManager->clear_state();
-
     int TotDetailedIce = 4;
     int TotCurves = 4;
     enum CurveVars IceStorageCurveType;
@@ -77,7 +73,7 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     Real64 ExpectedValue = 0.0;
     Real64 Tolerance = 0.001;
 
-    IceThermalStorage::DetailedIceStorage.allocate(TotDetailedIce);
+    state->dataIceThermalStorage->DetailedIceStorage.allocate(TotDetailedIce);
     state->dataCurveManager->PerfCurve.allocate(TotCurves);
     state->dataCurveManager->NumCurves = TotCurves;
     state->dataGlobal->BeginEnvrnFlag = false;

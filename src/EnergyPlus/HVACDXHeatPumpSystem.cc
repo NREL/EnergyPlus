@@ -323,8 +323,6 @@ namespace HVACDXHeatPumpSystem {
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
 
-        // Flow
-
         CurrentModuleObject = "CoilSystem:Heating:DX";
         NumDXHeatPumpSystems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -506,7 +504,7 @@ namespace HVACDXHeatPumpSystem {
         static bool MySetPointCheckFlag(true);
         int OutdoorAirUnitNum;    // "ONLY" for ZoneHVAC:OutdoorAirUnit
         Real64 OAUCoilOutletTemp; // "ONLY" for zoneHVAC:OutdoorAirUnit
-        // FLOW:
+
 
         //  IF (MyOneTimeFlag) THEN
         //    MyOneTimeFlag = .FALSE.

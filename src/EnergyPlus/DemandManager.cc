@@ -103,7 +103,7 @@ namespace EnergyPlus::DemandManager {
         static bool BeginDemandSim; // TRUE in the first timestep after warmup of a new environment
         static bool ClearHistory;   // TRUE in the first timestep during warmup of a new environment
 
-        // FLOW:
+
         if (state.dataDemandManager->GetInput && !state.dataGlobal->DoingSizing) {
             GetDemandManagerInput(state);
             GetDemandManagerListInput(state);
@@ -213,7 +213,7 @@ namespace EnergyPlus::DemandManager {
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
 
@@ -331,7 +331,7 @@ namespace EnergyPlus::DemandManager {
         static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
 
-        // FLOW:
+
         CurrentModuleObject = "DemandManagerAssignmentList";
         inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, ListNum, NumAlphas, NumNums);
 
@@ -567,16 +567,8 @@ namespace EnergyPlus::DemandManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the DEMAND MANAGER input from the input file.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus methodology.
-
         // Using/Aliasing
         using namespace DataIPShortCuts; // Data for field names, blank numerics
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::LightsObjects;
-        using DataHeatBalance::ZoneElectric;
-        using DataHeatBalance::ZoneElectricObjects;
-
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
 
@@ -604,7 +596,7 @@ namespace EnergyPlus::DemandManager {
         int Item;
         int Item1;
 
-        // FLOW:
+
         MaxAlphas = 0;
         MaxNums = 0;
         CurrentModuleObject = "DemandManager:ExteriorLights";
@@ -860,11 +852,11 @@ namespace EnergyPlus::DemandManager {
                 // Count actual pointers to controlled zones
                 DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), LightsObjects);
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->LightsObjects);
                     if (LoadPtr > 0) {
-                        DemandMgr(MgrNum).NumOfLoads += LightsObjects(LoadPtr).NumOfZones;
+                        DemandMgr(MgrNum).NumOfLoads += state.dataHeatBal->LightsObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), Lights);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->Lights);
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
@@ -881,14 +873,14 @@ namespace EnergyPlus::DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                     LoadNum = 0;
                     for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), LightsObjects);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->LightsObjects);
                         if (LoadPtr > 0) {
-                            for (Item1 = 1; Item1 <= LightsObjects(LoadPtr).NumOfZones; ++Item1) {
+                            for (Item1 = 1; Item1 <= state.dataHeatBal->LightsObjects(LoadPtr).NumOfZones; ++Item1) {
                                 ++LoadNum;
-                                DemandMgr(MgrNum).Load(LoadNum) = LightsObjects(LoadPtr).StartPtr + Item1 - 1;
+                                DemandMgr(MgrNum).Load(LoadNum) = state.dataHeatBal->LightsObjects(LoadPtr).StartPtr + Item1 - 1;
                             }
                         } else {
-                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), Lights);
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->Lights);
                             if (LoadPtr > 0) {
                                 ++LoadNum;
                                 DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -995,11 +987,11 @@ namespace EnergyPlus::DemandManager {
                 // Count actual pointers to controlled zones
                 DemandMgr(MgrNum).NumOfLoads = 0;
                 for (LoadNum = 1; LoadNum <= NumAlphas - 4; ++LoadNum) {
-                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), ZoneElectricObjects);
+                    LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectricObjects);
                     if (LoadPtr > 0) {
-                        DemandMgr(MgrNum).NumOfLoads += ZoneElectricObjects(LoadPtr).NumOfZones;
+                        DemandMgr(MgrNum).NumOfLoads += state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones;
                     } else {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), ZoneElectric);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.dataHeatBal->ZoneElectric);
                         if (LoadPtr > 0) {
                             ++DemandMgr(MgrNum).NumOfLoads;
                         } else {
@@ -1016,14 +1008,14 @@ namespace EnergyPlus::DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
                     LoadNum = 0;
                     for (Item = 1; Item <= NumAlphas - 4; ++Item) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), ZoneElectricObjects);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectricObjects);
                         if (LoadPtr > 0) {
-                            for (Item1 = 1; Item1 <= ZoneElectricObjects(LoadPtr).NumOfZones; ++Item1) {
+                            for (Item1 = 1; Item1 <= state.dataHeatBal->ZoneElectricObjects(LoadPtr).NumOfZones; ++Item1) {
                                 ++LoadNum;
-                                DemandMgr(MgrNum).Load(LoadNum) = ZoneElectricObjects(LoadPtr).StartPtr + Item1 - 1;
+                                DemandMgr(MgrNum).Load(LoadNum) = state.dataHeatBal->ZoneElectricObjects(LoadPtr).StartPtr + Item1 - 1;
                             }
                         } else {
-                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), ZoneElectric);
+                            LoadPtr = UtilityRoutines::FindItemInList(AlphArray(Item + 4), state.dataHeatBal->ZoneElectric);
                             if (LoadPtr > 0) {
                                 ++LoadNum;
                                 DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -1335,7 +1327,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             DemandMgr(MgrNum).CanReduceDemand = false;
@@ -1388,7 +1380,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             if (DemandMgr(MgrNum).Activate) {
@@ -1471,14 +1463,9 @@ namespace EnergyPlus::DemandManager {
         // Expires limits and rotates loads after specified time duration.
         // It updates availability flags, expires managers that ended in the last timestep, etc.
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::ZoneElectric;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MgrNum;
         int LoadNum;
@@ -1489,7 +1476,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
 
-        // FLOW:
+
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             // Check availability
@@ -1624,7 +1611,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
 
-        // FLOW:
+
         if (DemandManagerList(ListNum).BillingSchedule == 0) {
             BillingPeriod = state.dataEnvrn->Month;
         } else {
@@ -1692,11 +1679,7 @@ namespace EnergyPlus::DemandManager {
         // Demand managers for new types of loads can be easily added with a new CASE statement in this subroutine
         // and new GetInput code.
 
-        // METHODOLOGY EMPLOYED:
-
         // Using/Aliasing
-        using DataHeatBalance::Lights;
-        using DataHeatBalance::ZoneElectric;
         using DataHeatBalFanSys::ComfortControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -1710,7 +1693,7 @@ namespace EnergyPlus::DemandManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 LowestPower;
 
-        // FLOW:
+
         CanReduceDemand = false;
 
         {
@@ -1728,25 +1711,25 @@ namespace EnergyPlus::DemandManager {
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeLights) {
-                LowestPower = Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.dataHeatBal->Lights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == DemandAction::CheckCanReduce) {
-                    if (Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.dataHeatBal->Lights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
-                    Lights(LoadPtr).ManageDemand = true;
-                    Lights(LoadPtr).DemandLimit = LowestPower;
+                    state.dataHeatBal->Lights(LoadPtr).ManageDemand = true;
+                    state.dataHeatBal->Lights(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == DemandAction::ClearLimit) {
-                    Lights(LoadPtr).ManageDemand = false;
+                    state.dataHeatBal->Lights(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeElecEquip) {
-                LowestPower = ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.dataHeatBal->ZoneElectric(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == DemandAction::CheckCanReduce) {
-                    if (ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.dataHeatBal->ZoneElectric(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == DemandAction::SetLimit) {
-                    ZoneElectric(LoadPtr).ManageDemand = true;
-                    ZoneElectric(LoadPtr).DemandLimit = LowestPower;
+                    state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = true;
+                    state.dataHeatBal->ZoneElectric(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == DemandAction::ClearLimit) {
-                    ZoneElectric(LoadPtr).ManageDemand = false;
+                    state.dataHeatBal->ZoneElectric(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerType::ManagerTypeThermostats) {

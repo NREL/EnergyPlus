@@ -48,7 +48,6 @@
 // EnergyPlus::AirflowNetworkBalanceManager unit tests
 
 // Google test headers
-#include <exception>
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
@@ -63,11 +62,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -77,6 +77,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -88,6 +89,9 @@ using namespace DataHeatBalance;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::ScheduleManager;
 using namespace OutAirNodeManager;
+using namespace EnergyPlus::Fans;
+using namespace EnergyPlus::HVACStandAloneERV;
+using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
 
@@ -129,8 +133,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
 
     // Unit test for #5021
 
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
     Surface.allocate(2);
     Surface(1).Name = "WINDOW AULA 1";
@@ -224,7 +228,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
 }
@@ -234,8 +238,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
 
     // Unit test for #5384
 
-    Zone.allocate(1);
-    Zone(1).Name = "WEST_ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "WEST_ZONE";
 
     Surface.allocate(3);
     Surface(1).Name = "SURFACE_1";
@@ -352,7 +356,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     AirflowNetwork::AirflowNetworkNodeData.deallocate();
     AirflowNetwork::AirflowNetworkCompData.deallocate();
     AirflowNetwork::MultizoneExternalNodeData.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
 }
@@ -2401,8 +2405,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     // Unit test for #5490
 
-    Zone.allocate(1);
-    Zone(1).Name = "SOFF";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SOFF";
 
     Surface.allocate(2);
     Surface(1).Name = "WINDOW 1";
@@ -2427,12 +2431,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
-    TotPeople = 1; // Total number of people statements
-    People.allocate(TotPeople);
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 100.0;
-    People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
-    People(1).AdaptiveCEN15251 = true;
+    state->dataHeatBal->TotPeople = 1; // Total number of people statements
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 100.0;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = 1; // From dataglobals, always returns a 1 for schedule value
+    state->dataHeatBal->People(1).AdaptiveCEN15251 = true;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant,OnSch,,1.0;",
@@ -2492,10 +2496,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
-    People.deallocate();
+    state->dataHeatBal->People.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
@@ -2503,8 +2507,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
 
     // Unit test for a new feature
 
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE 1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
 
     Surface.allocate(14);
     // Rectangular base surface
@@ -3055,7 +3059,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(9).Width, 0.0001);
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(9).Height, 0.0001);
 
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     Surface.deallocate();
     SurfaceWindow.deallocate();
 }
@@ -5700,7 +5704,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodes)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -6404,7 +6408,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithTables)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -7027,7 +7031,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -7716,7 +7720,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricTable)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -8350,7 +8354,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithSymmetricCurve)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -9084,7 +9088,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
     SurfaceGeometry::GetSurfaceData(*state, errors); // setup zone geometry and get zone data
@@ -9558,7 +9562,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSided)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -13189,11 +13193,11 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     DataHeatBalFanSys::MAT = 23.0;
     DataHeatBalFanSys::ZoneAirHumRat = 0.001;
     DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
-    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
-    Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(4).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(5).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(3).IsControlled = false;
@@ -13647,7 +13651,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_FALSE(errors);                    // expect no errors
 
     // Magic to get surfaces read in correctly
-    DataHeatBalance::AnyCTF = true;
+    state->dataHeatBal->AnyCTF = true;
     state->dataSurfaceGeometry->CosBldgRotAppGonly = 1.0;
     state->dataSurfaceGeometry->SinBldgRotAppGonly = 0.0;
 
@@ -13671,7 +13675,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     int iter = 1;
     bool resimu = false;
 
-    Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(*state);
     state->dataAirflowNetworkBalanceManager->AirflowNetworkGetInputFlag = false;
     state->dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
@@ -15650,8 +15654,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 {
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
 
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
@@ -15718,8 +15722,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 {
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ATTIC ZONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
 
     DataSurfaces::Surface.allocate(1);
     DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
@@ -20012,8 +20016,8 @@ std::string const idf_objects = delimited_string({
 
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
 {
-    Zone.allocate(1);
-    Zone(1).Name = "SALA DE AULA";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "SALA DE AULA";
 
     Surface.allocate(3);
     Surface(1).Name = "WINDOW AULA 1";
@@ -20137,5 +20141,736 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
     EXPECT_EQ(0, AirflowNetwork::MultizoneSurfaceData(2).VentingSchNum);
     EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(2).VentSurfCtrNum, AirflowNetwork::VentControlType::Const);
 }
-} // namespace EnergyPlus
 
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneERV)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    DataLoopNode::NumOfNodes = 5;
+    DataLoopNode::Node.allocate(5);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(2).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(3).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(4).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(5).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(5);
+    DataLoopNode::NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ZONE 1";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = false;
+
+    // Create Fans
+    Real64 supplyFlowRate = 0.005;
+    Real64  exhaustFlowRate = 0.005;
+    Fan.allocate(2);
+    Fan(1).InletNodeNum = 2;
+    Fan(1).OutletNodeNum = 3;
+    Fan(1).FanType_Num = FanType_SimpleOnOff;
+    Fan(1).FanName = "SupplyFan";
+    Fan(1).MaxAirFlowRate = supplyFlowRate;
+    DataLoopNode::NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 3, NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+    Fan(2).InletNodeNum = 4;
+    Fan(2).OutletNodeNum = 5;
+    Fan(2).FanType_Num = FanType_SimpleOnOff;
+    Fan(2).FanName = "ExhaustFan";
+    Fan(2).MaxAirFlowRate = exhaustFlowRate;
+    DataLoopNode::NodeID(4) = "SupplyExhaustInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 4, NodeID(4), "Fan:OnOff", Fan(2).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(5) = "SupplyExhaustOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 5, NodeID(5), "Fan:OnOff", Fan(2).FanName, "Outlet", 1, false, errFlag);
+
+    // Create ERV
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=4",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
+        "object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    DataLoopNode::NumOfNodes = 5;
+    DataLoopNode::Node.allocate(5);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(2).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(3).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(4).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(5).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(5);
+    DataLoopNode::NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ZONE 1";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fans
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.005;
+    Fan.allocate(2);
+    Fan(1).InletNodeNum = 2;
+    Fan(1).OutletNodeNum = 3;
+    Fan(1).FanType_Num = FanType_SimpleOnOff;
+    Fan(1).FanName = "SupplyFan";
+    Fan(1).MaxAirFlowRate = supplyFlowRate;
+    DataLoopNode::NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 3, NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+    Fan(2).InletNodeNum = 4;
+    Fan(2).OutletNodeNum = 5;
+    Fan(2).FanType_Num = FanType_SimpleOnOff;
+    Fan(2).FanName = "ExhaustFan";
+    Fan(2).MaxAirFlowRate = exhaustFlowRate;
+    DataLoopNode::NodeID(4) = "SupplyExhaustInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 4, NodeID(4), "Fan:OnOff", Fan(2).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(5) = "SupplyExhaustOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 5, NodeID(5), "Fan:OnOff", Fan(2).FanName, "Outlet", 1, false, errFlag);
+
+    // Create ERV
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+
+    // Check validation and expected warning
+    ValidateDistributionSystem(*state);
+
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: A ZoneHVAC:EnergyRecoveryVentilator is simulated along with an "
+                                   "AirflowNetwork but is not included in the AirflowNetwork.\n",
+                                   true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalancedZoneERV)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    DataLoopNode::NumOfNodes = 5;
+    DataLoopNode::Node.allocate(5);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(2).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(3).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(4).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(5).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(5);
+    DataLoopNode::NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ZONE 1";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fans
+    Real64 supplyFlowRate = 0.005;
+    Real64 exhaustFlowRate = 0.003;
+    Fan.allocate(2);
+    Fan(1).InletNodeNum = 2;
+    Fan(1).OutletNodeNum = 3;
+    Fan(1).FanType_Num = FanType_SimpleOnOff;
+    Fan(1).FanName = "SupplyFan";
+    Fan(1).MaxAirFlowRate = supplyFlowRate;
+    DataLoopNode::NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 3, NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+    Fan(2).InletNodeNum = 4;
+    Fan(2).OutletNodeNum = 5;
+    Fan(2).FanType_Num = FanType_SimpleOnOff;
+    Fan(2).FanName = "ExhaustFan";
+    Fan(2).MaxAirFlowRate = exhaustFlowRate;
+    DataLoopNode::NodeID(4) = "SupplyExhaustInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 4, NodeID(4), "Fan:OnOff", Fan(2).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(5) = "SupplyExhaustOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 5, NodeID(5), "Fan:OnOff", Fan(2).FanName, "Outlet", 1, false, errFlag);
+
+    // Create ERV
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = 0.005;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=4",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyExhaustOutletNode' is not defined as an AirflowNetwork:Distribution:Node "
+        "object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    DataLoopNode::NumOfNodes = 3;
+    DataLoopNode::Node.allocate(3);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(2).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(3).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(3);
+    DataLoopNode::NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ZONE 1";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = false;
+
+    // Create Fan
+    Fan.allocate(1);
+    Fan(1).InletNodeNum = 2;
+    Fan(1).OutletNodeNum = 3;
+    Fan(1).FanType_Num = FanType_SimpleOnOff;
+    Fan(1).FanName = "SupplyFan";
+    DataLoopNode::NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 3, NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+
+    // Create HPWH
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::TempZone;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    DataLoopNode::NumOfNodes = 3;
+    DataLoopNode::Node.allocate(3);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(2).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(3).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(3);
+    DataLoopNode::NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ZONE 1";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fan
+    Fan.allocate(1);
+    Fan(1).InletNodeNum = 2;
+    Fan(1).OutletNodeNum = 3;
+    Fan(1).FanType_Num = FanType_SimpleOnOff;
+    Fan(1).FanName = "SupplyFan";
+    DataLoopNode::NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 3, NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+
+    // Create HPWH
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::TempZone;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
+
+    // Check validation and expected warning
+    ValidateDistributionSystem(*state);
+    EXPECT_TRUE(compare_err_stream("   ** Warning ** ValidateDistributionSystem: Heat pump water heater is simulated along with an AirflowNetwork "
+                                   "but is not included in the AirflowNetwork.\n",
+                                   true));
+}
+
+TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZoneAndOA)
+{
+    // Create zone
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE 1";
+
+    // Create surfaces
+    DataSurfaces::Surface.allocate(1);
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF001";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+    DataSurfaces::Surface(1).Name = "ZN004:ROOF002";
+    DataSurfaces::Surface(1).Zone = 1;
+    DataSurfaces::Surface(1).ZoneName = "ZONE 1";
+    DataSurfaces::Surface(1).Azimuth = 0.0;
+    DataSurfaces::Surface(1).ExtBoundCond = 0;
+    DataSurfaces::Surface(1).HeatTransSurf = true;
+    DataSurfaces::Surface(1).Tilt = 180.0;
+    DataSurfaces::Surface(1).Sides = 4;
+
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+
+    // Create air system
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    // Create air nodes
+    DataLoopNode::NumOfNodes = 3;
+    DataLoopNode::Node.allocate(3);
+    DataLoopNode::Node(1).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(2).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::Node(3).FluidType = DataLoopNode::NodeType_Air;
+    DataLoopNode::NodeID.allocate(3);
+    DataLoopNode::NodeID(1) = "ZONE 1 AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state, 1, "ZONE 1 AIR NODE", "Type1", "Object1", "ZoneNode", 1, false, errFlag);
+    EXPECT_FALSE(errFlag);
+
+    // Connect zone to air node
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ZONE 1";
+    state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    AirflowNetwork::AirflowNetworkNumOfZones = 1;
+    AirflowNetwork::MultizoneZoneData.allocate(1);
+    AirflowNetwork::MultizoneZoneData(1).ZoneNum = 1;
+    AirflowNetwork::MultizoneZoneData(1).ZoneName = "ZONE 1";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    AirflowNetwork::AirflowNetworkNumOfNodes = 1;
+    AirflowNetwork::AirflowNetworkNodeData.allocate(1);
+    AirflowNetwork::AirflowNetworkNodeData(1).Name = "ZONE 1";
+    AirflowNetwork::AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers.allocate(2);
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(1) = 0;
+    state->dataAirflowNetworkBalanceManager->SplitterNodeNumbers(2) = 0;
+
+    // Set flag to support zone equipment
+    AirflowNetwork::AirflowNetworkSimu.AllowSupportZoneEqp = true;
+
+    // Create Fan
+    Fan.allocate(1);
+    Fan(1).InletNodeNum = 2;
+    Fan(1).OutletNodeNum = 3;
+    Fan(1).FanType_Num = FanType_SimpleOnOff;
+    Fan(1).FanName = "SupplyFan";
+    DataLoopNode::NodeID(2) = "SupplyFanInletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 2, NodeID(2), "Fan:OnOff", Fan(1).FanName, "Inlet", 1, false, errFlag);
+    DataLoopNode::NodeID(3) = "SupplyFanOutletNode";
+    BranchNodeConnections::RegisterNodeConnection(*state, 3, NodeID(3), "Fan:OnOff", Fan(1).FanName, "Outlet", 1, false, errFlag);
+
+    // Create HPWH
+    state->dataWaterThermalTanks->HPWaterHeater.allocate(1);
+    state->dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    state->dataWaterThermalTanks->numHeatPumpWaterHeater = 1;
+    state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::AmbientTempEnum::ZoneAndOA;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanName = Fan(1).FanName;
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
+
+    // Check validation and expected errors
+    ASSERT_THROW(ValidateDistributionSystem(*state), std::runtime_error);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanInletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   ** Severe  ** ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+        "   **  Fatal  ** ValidateDistributionSystem: Program terminates for preceding reason(s).",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=2",
+        "   ..... Last severe error=ValidateDistributionSystem: 'SupplyFanOutletNode' is not defined as an AirflowNetwork:Distribution:Node object.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+} // namespace EnergyPlus

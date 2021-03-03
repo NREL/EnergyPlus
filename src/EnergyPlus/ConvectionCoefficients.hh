@@ -863,6 +863,14 @@ namespace ConvectionCoefficients {
                          Real64 RoofArea,
                          Real64 RoofPerimeter);
 
+    void CalcASTMC1340ConvCoeff(EnergyPlusData &state,
+                                int const SurfNum,                  // surface number for which coefficients are being calculated
+                                Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
+                                Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
+    );
+
+    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt);
+
 } // namespace ConvectionCoefficients
 
     struct ConvectionCoefficientsData : BaseGlobalStruct {

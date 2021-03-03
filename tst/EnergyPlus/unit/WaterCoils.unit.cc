@@ -1458,7 +1458,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataWaterCoils->GetWaterCoilsInputFlag = true;
-    NumCoils = 0;
+    state->dataGlobalNames->NumCoils = 0;
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -1590,7 +1590,7 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     GetZoneData(*state, ErrorsFound);
-    EXPECT_EQ("EAST ZONE", Zone(1).Name);
+    EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);

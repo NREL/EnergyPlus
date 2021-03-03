@@ -2238,7 +2238,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 DesiredDewPoint;
         Real64 OutdoorDryBulbTemp; // Dry-bulb temperature at outdoor condenser
         Real64 OutdoorBaroPress;   // Barometric pressure at outdoor condenser
-        // FLOW
+
 
         int OutletNode = CBVAV(CBVAVNum).AirOutNode;
         int InletNode = CBVAV(CBVAVNum).AirInNode;
@@ -4063,7 +4063,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 HeatCoilLoad,
                                                                 CBVAV(CBVAVNum).HeatCoilIndex,
                                                                 QCoilActual,
-                                                                true,
+                                                                false,
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     // simulate the heating coil at maximum hot water flow rate
@@ -4153,7 +4153,7 @@ namespace HVACUnitaryBypassVAV {
                                                                 HeatCoilLoad,
                                                                 CBVAV(CBVAVNum).HeatCoilIndex,
                                                                 QCoilActual,
-                                                                true,
+                                                                false,
                                                                 FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) {
                     mdot = 0.0;

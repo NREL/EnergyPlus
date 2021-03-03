@@ -54,9 +54,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace Construction {
+namespace EnergyPlus::Construction {
 
     void ConstructionProps::calculateTransferFunction(EnergyPlusData &state, bool & ErrorsFound, bool & DoCTFErrorReport) {
 
@@ -1142,7 +1140,7 @@ namespace Construction {
         // the significant figure limit for REAL(r64)
         // variables reached)
 
-        // FLOW:
+
         AMat1.allocate(this->rcmax, this->rcmax);
         AMato.allocate(this->rcmax, this->rcmax);
         AMatN.allocate(this->rcmax, this->rcmax);
@@ -1346,29 +1344,13 @@ namespace Construction {
         // REFERENCES:
         // Any linear algebra test (this is a generic routine).
 
-        // USE STATEMENTS:
-        // none
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D<Real64> AMat1; // Intermediate calculation matrix equivalent at first to AMat
         int ic;                // Loop counter
         int ir;                // Loop counter
         int irr;               // Loop counter
 
-        // FLOW:
+
 
         // Subroutine initializations ...
         AMat1.allocate(this->rcmax, this->rcmax);
@@ -1489,21 +1471,6 @@ namespace Construction {
         // of Mechanical Engineering, University of Wisconsin-
         // Madison, 1987.
 
-        // USE STATEMENTS:
-        // none
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array2D<Real64> ATemp; // Intermediate variable equal to AExp - I
         int i;                 // Loop counter
@@ -1511,7 +1478,7 @@ namespace Construction {
         int j;                 // Loop counter
         int SurfNode;          // Loop counter
 
-        // FLOW:
+
 
         // Compute Gamma1 from equation (2.1.12) in Seem's dissertation which
         // states that:  Gamma1  =  [AInv] * ([AExp]-[I]) * [BMat]
@@ -2008,11 +1975,11 @@ namespace Construction {
     Real64 ConstructionProps::setUserTemperatureLocationPerpendicular(EnergyPlusData &state, Real64 userValue)
     {
         if (userValue < 0.0) {
-            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is less than zero.");
+            ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a perpendicular temperature location parameter that is less than zero.");
             ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 0.");
             return 0.0;
         } else if (userValue > 1.0) {
-            ShowWarningError(state, "Construction:InternalSource has a perpendicular temperature location parameter that is greater than one.");
+            ShowWarningError(state, "ConstructionProperty:InternalHeatSource has a perpendicular temperature location parameter that is greater than one.");
             ShowContinueError(state, "Construction=" + this->Name + " has this error.  The parameter has been reset to 1.");
             return 1.0;
         } else {    // Valid value between 0 and 1
@@ -2042,6 +2009,16 @@ namespace Construction {
 
     }
 
-}   // namespace Construction
+    void ConstructionProps::setArraysBasedOnMaxSolidWinLayers(EnergyPlusData &state)
+    {
+        this->AbsDiff.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiff.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiffGnd.dimension (DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiffSky.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsDiffBack.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->BlAbsDiffBack.dimension(DataSurfaces::MaxSlatAngs, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsBeamCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+        this->AbsBeamBackCoef.dimension(6, state.dataHeatBal->MaxSolidWinLayers, 0.0);
+    }
 
 }   // namespace EnergyPlus

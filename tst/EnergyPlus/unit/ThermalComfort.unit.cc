@@ -66,7 +66,8 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -78,6 +79,7 @@ using namespace EnergyPlus::DataRoomAirModel;
 using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
+//using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
@@ -95,7 +97,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
     state->dataGlobal->TimeStepZone = 0.25;
     state->dataThermalComforts->ThermalComfortInASH55.allocate(state->dataGlobal->NumOfZones);
     state->dataThermalComforts->ThermalComfortInASH55(1).ZoneIsOccupied = true;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     // SingleHeatingSetPoint thermostat
 
@@ -708,7 +710,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     //	compare_err_stream( "" );
 
     ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -717,7 +719,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
     ZTAVComf(1) = 26.0;
-    MRT(1) = 27.0;
+    state->dataHeatBal->MRT(1) = 27.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -726,7 +728,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
     ZTAVComf(1) = 27.0;
-    MRT(1) = 28.0;
+    state->dataHeatBal->MRT(1) = 28.0;
     ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -735,7 +737,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
     ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 26.0;
     ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
     CalcThermalComfortFanger(*state);
@@ -753,14 +755,14 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
 
     TH.deallocate();
     Surface.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     state->dataThermalComforts->AngleFactorList.allocate(1);
     TotSurfaces = 3;
     state->dataGlobal->NumOfZones = 1;
     TH.allocate(2, 2, TotSurfaces);
     Surface.allocate(TotSurfaces);
     state->dataConstruction->Construct.allocate(TotSurfaces);
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
 
     Surface(1).Area = 20.0;
     Surface(2).Area = 15.0;
@@ -777,8 +779,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Surface(1).Zone = 1;
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 3;
+    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).SurfaceLast = 3;
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
     TH(2, 1, 3) = 10.0;
@@ -898,7 +900,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
     state->dataThermalComforts->ThermalComfortInASH55.allocate(state->dataGlobal->NumOfZones);
     state->dataThermalComforts->ThermalComfortInASH55(1).ZoneIsOccupied = true;
     state->dataGlobal->TimeStepZone = 0.25;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
     TempControlType(1) = DualSetPointWithDeadBand;
@@ -940,17 +942,17 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
 
 }
 
-TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 {
 
     // Set the data for the test
-    TotPeople = 1;
-    People.allocate(TotPeople);
-    state->dataThermalComforts->ThermalComfortData.allocate(TotPeople);
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     state->dataGlobal->NumOfZones = 1;
-    Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
     ZTAVComf.allocate(state->dataGlobal->NumOfZones);
-    MRT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MRT.allocate(state->dataGlobal->NumOfZones);
     ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
     state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
@@ -960,39 +962,94 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
     QSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
     QElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeoplePtr = -1;
-    People(1).NumberOfPeople = 5.0;
-    People(1).NomMinNumberPeople = 5.0;
-    People(1).NomMaxNumberPeople = 5.0;
-    Zone(People(1).ZonePtr).TotOccupants = People(1).NumberOfPeople;
-    People(1).FractionRadiant = 0.3;
-    People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
-    People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
-    People(1).CO2RateFactor = 3.82e-8;
-    People(1).ActivityLevelPtr = -1;
-    People(1).Show55Warning = true;
-    People(1).Pierce = true;
-    People(1).MRTCalcType = ZoneAveraged;
-    People(1).WorkEffPtr = 0;
-    People(1).ClothingType = 1;
-    People(1).ClothingPtr = -1;
-    People(1).AirVelocityPtr = 0;
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
+    state->dataHeatBal->People(1).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(1).NomMinNumberPeople = 5.0;
+    state->dataHeatBal->People(1).NomMaxNumberPeople = 5.0;
+    state->dataHeatBal->Zone(state->dataHeatBal->People(1).ZonePtr).TotOccupants = state->dataHeatBal->People(1).NumberOfPeople;
+    state->dataHeatBal->People(1).FractionRadiant = 0.3;
+    state->dataHeatBal->People(1).FractionConvected = 1.0 - state->dataHeatBal->People(1).FractionRadiant;
+    state->dataHeatBal->People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+    state->dataHeatBal->People(1).CO2RateFactor = 3.82e-8;
+    state->dataHeatBal->People(1).Show55Warning = true;
+    state->dataHeatBal->People(1).Pierce = true;
+    state->dataHeatBal->People(1).MRTCalcType = ZoneAveraged;
+    state->dataHeatBal->People(1).WorkEffPtr = 0;
+    state->dataHeatBal->People(1).ClothingType = 1;
 
-    ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
-    state->dataEnvrn->OutBaroPress = 101217.;
     state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
     QHTRadSysToPerson(1) = 0.0;
     QCoolingPanelToPerson(1) = 0.0;
     QHWBaseboardToPerson(1) = 0.0;
     QSteamBaseboardToPerson(1) = 0.0;
     QElecBaseboardToPerson(1) = 0.0;
+    Real64 BodySurfaceArea = 1.8258;
+    state->dataEnvrn->OutBaroPress = 101325.;
+    Real64 WorkEff = 0.0;
+    state->dataHeatBal->People(1).ActivityLevelPtr = 1;
+    state->dataHeatBal->People(1).ClothingPtr = 2;
+    state->dataHeatBal->People(1).AirVelocityPtr = 3;
+    state->dataHeatBal->People(1).AnkleAirVelocityPtr = 4;
+    ScheduleManager::Schedule.allocate(4);
 
-    CalcThermalComfortPierce(*state);
+    // Part 1: Test SET calculations.
+    // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D - Table D3 Validation Table for SET Computer Model
+    const std::vector<double> TAir = {25, 0, 40, 25, 25, 25, 25, 25};
+    const std::vector<double> RH = {0.5, 0.5, 0.5, 0.9, 0.5, 0.5, 0.5, 0.5};
+    const std::vector<double> Vel = {0.15, 0.15, 0.15, 0.15, 3, 0.15, 0.15, 0.15};
+    const std::vector<double> TRad = {25, 25, 25, 25, 25, 40, 25, 25};
+    const std::vector<double> MET = {1, 1, 1, 1, 1, 1, 2, 1};
+    const std::vector<double> Clo = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2};
+    const std::vector<double> SET = {23.8, 12.3, 34.3, 24.9, 18.8, 31.8, 29.7, 32.5};
 
-    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
-    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).PierceSET, 23.62, 0.01);
+    for (unsigned i = 0; i < TAir.size(); i++) {
+        Real64 SETResult = CalcStandardEffectiveTemp(*state, TAir[i], TRad[i], RH[i], Vel[i], MET[i], Clo[i], WorkEff);
+        EXPECT_NEAR(SETResult, SET[i], 0.1);
+    }
 
+    // Part 2: Test cooling effect
+    state->dataHeatBal->People(1).CoolingEffectASH55 = true;
+    Real64 AirTemp = 25.0;
+    Real64 RadTemp = 25.0;
+    Real64 RelHum = 0.5;
+    Real64 ActMet = 1;
+    Real64 CloUnit = 0.5;
+
+    ZTAVComf(1) = AirTemp;
+    state->dataHeatBal->MRT(1) = RadTemp;
+    ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
+    ScheduleManager::Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    ScheduleManager::Schedule(2).CurrentValue = CloUnit;
+
+    // Test 1 - Air velocity = 0.15 m/s.
+    Real64 AirVel = 0.15;
+    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    CalcThermalComfortCoolingEffectASH(*state);
+    Real64 CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
+    Real64 StillAirVel = 0.1;
+    Real64 RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
+    Real64 InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
+    Real64 CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
+
+    // Test 2 - Air velocity = 1 m/s.
+    AirVel = 1;
+    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    CalcThermalComfortCoolingEffectASH(*state);
+    CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
+    CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+
+    RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
+    InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
+
+    // Part 3: Test ankle draft PPD.
+    state->dataHeatBal->People(1).AnkleDraftASH55 = true;
+    AirVel = 0.15;
+    Real64 AnkleAirVel = 0.3;
+    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    ScheduleManager::Schedule(4).CurrentValue = AnkleAirVel;
+    CalcThermalComfortAnkleDraftASH(*state);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).AnkleDraftPPDASH55, 25.0, 0.1);
 }

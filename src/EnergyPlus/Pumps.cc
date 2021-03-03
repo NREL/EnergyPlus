@@ -240,7 +240,6 @@ namespace EnergyPlus::Pumps {
         using DataHeatBalance::IntGainTypeOf_Pump_VarSpeed;
         using DataHeatBalance::IntGainTypeOf_PumpBank_ConSpeed;
         using DataHeatBalance::IntGainTypeOf_PumpBank_VarSpeed;
-        using DataHeatBalance::Zone;
         using DataIPShortCuts::cAlphaArgs;
         using DataIPShortCuts::cAlphaFieldNames;
         using DataIPShortCuts::cCurrentModuleObject;
@@ -465,7 +464,7 @@ namespace EnergyPlus::Pumps {
             }
 
             if (!lAlphaFieldBlanks(13)) { // zone named for pump skin losses
-                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13), Zone);
+                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(13), state.dataHeatBal->Zone);
                 if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
                     state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
                     if (!lNumericFieldBlanks(12)) {
@@ -611,7 +610,7 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).RotSpeed = state.dataPumps->PumpEquip(PumpNum).RotSpeed_RPM / 60.0; // convert input[rpm] to calculation units[rps]
 
             if (!lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), Zone);
+                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), state.dataHeatBal->Zone);
                 if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
                     state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
                     if (!lNumericFieldBlanks(8)) {
@@ -707,7 +706,7 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(4) = rNumericArgs(9);
 
             if (!lAlphaFieldBlanks(5)) { // zone named for pump skin losses
-                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), Zone);
+                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(5), state.dataHeatBal->Zone);
                 if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
                     state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
                     if (!lNumericFieldBlanks(10)) {
@@ -841,7 +840,7 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).MinVolFlowRate = state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate * state.dataPumps->PumpEquip(PumpNum).MinVolFlowRateFrac;
 
             if (!lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), Zone);
+                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), state.dataHeatBal->Zone);
                 if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
                     state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
                     if (!lNumericFieldBlanks(12)) {
@@ -958,7 +957,7 @@ namespace EnergyPlus::Pumps {
             state.dataPumps->PumpEquip(PumpNum).PartLoadCoef(4) = 0.0;
 
             if (!lAlphaFieldBlanks(7)) { // zone named for pump skin losses
-                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), Zone);
+                state.dataPumps->PumpEquip(PumpNum).ZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(7), state.dataHeatBal->Zone);
                 if (state.dataPumps->PumpEquip(PumpNum).ZoneNum > 0) {
                     state.dataPumps->PumpEquip(PumpNum).HeatLossesToZone = true;
                     if (!lNumericFieldBlanks(7)) {
@@ -2113,7 +2112,7 @@ namespace EnergyPlus::Pumps {
         int OutletNode; // pump outlet node number
         int PumpType;   // Current pump type
 
-        // FLOW:
+
         PumpType = state.dataPumps->PumpEquip(PumpNum).PumpType;
         InletNode = state.dataPumps->PumpEquip(PumpNum).InletNodeNum;
         OutletNode = state.dataPumps->PumpEquip(PumpNum).OutletNodeNum;

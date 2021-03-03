@@ -102,7 +102,7 @@ namespace HeatBalanceMovableInsulation {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
-        // FLOW:
+
         MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulExt);
 
         {
@@ -167,7 +167,7 @@ namespace HeatBalanceMovableInsulation {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MovInsulSchedVal; // Value of the movable insulation schedule for current time
 
-        // FLOW:
+
         MovInsulSchedVal = GetCurrentScheduleValue(state, Surface(SurfNum).SchedMovInsulInt);
 
         {

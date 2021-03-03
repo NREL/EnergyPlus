@@ -119,7 +119,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
     // Functions
 
-    PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string objectName)
+    PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (state.dataPipeHT->GetPipeInputFlag) {
@@ -197,7 +197,6 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         // Using/Aliasing
         using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-        using DataHeatBalance::Zone;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
 
@@ -303,8 +302,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
                 if (SELECT_CASE_var == "ZONE") {
                     state.dataPipeHT->PipeHT(Item).EnvironmentPtr = iEnvrnPtr::ZoneEnv;
-                    state.dataPipeHT->PipeHT(Item).EnvrZone = cAlphaArgs(6);
-                    state.dataPipeHT->PipeHT(Item).EnvrZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(6), Zone);
+                    state.dataPipeHT->PipeHT(Item).EnvrZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->Zone);
                     if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -705,18 +703,13 @@ namespace EnergyPlus::PipeHeatTransfer {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 Resistance;   // overall thermal resistance [m^2.C/W]
         Real64 Density;      // average density [kg/m^3]
-        Real64 TotThickness; // total thickness of all layers
         Real64 SpHeat;       // average specific heat [J/kg.K]
-        int LayerNum;
-        int TotalLayers; // total number of layers (pipe layer + insulation layers)
-
-        Resistance = 0.0;
-        TotThickness = 0.0;
+        Real64 Resistance = 0.0;
+        Real64 TotThickness = 0.0;
 
         // CTF stuff
-        TotalLayers = state.dataConstruction->Construct(ConstructionNum).TotLayers;
+        int TotalLayers = state.dataConstruction->Construct(ConstructionNum).TotLayers;
         // get pipe properties
         if (TotalLayers == 1) { // no insulation layer
 
@@ -730,7 +723,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         } else if (TotalLayers >= 2) { // first layers are insulation, last layer is pipe
 
-            for (LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
+            for (int LayerNum = 1; LayerNum <= TotalLayers - 1; ++LayerNum) {
                 Resistance += state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Thickness /
                               state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Conductivity;
                 Density = state.dataMaterial->Material(state.dataConstruction->Construct(ConstructionNum).LayerPoint(LayerNum)).Density *
@@ -764,7 +757,14 @@ namespace EnergyPlus::PipeHeatTransfer {
         }
     }
 
-    //==============================================================================
+    void PipeHTData::oneTimeInit(EnergyPlusData &state) {
+        bool errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+        if (errFlag) {
+            ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
+        }
+    }
 
     void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
     )
@@ -790,7 +790,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -807,7 +806,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         Real64 CurTemp;
         Real64 CurSimDay;
         bool PushArrays;
-        bool errFlag;
 
         // Assign variable
         CurSimDay = double(state.dataGlobal->DayOfSim);
@@ -820,13 +818,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         // get some data only once
         if (this->OneTimeInit) {
-            errFlag = false;
-            ScanPlantLoopsForObject(state,
-                this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
-            if (errFlag) {
-                ShowFatalError(state, "InitPipesHeatTransfer: Program terminated due to previous condition(s).");
-            }
-            // unset one-time flag
+            this->oneTimeInit(state);
             this->OneTimeInit = false;
         }
 

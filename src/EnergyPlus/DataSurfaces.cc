@@ -163,19 +163,6 @@ namespace DataSurfaces {
                                                  "Tubular daylighting device",
                                                  "KivaFoundation - TwoDimensionalFiniteDifference"});
 
-    // Parameters to indicate heat transfer model to use for surface
-    int const HeatTransferModel_NotSet(-1);
-    int const HeatTransferModel_None(0); // shading surfaces
-    int const HeatTransferModel_CTF(1);
-    int const HeatTransferModel_EMPD(2);
-    int const HeatTransferModel_CondFD(5);
-    int const HeatTransferModel_HAMT(6);
-    int const HeatTransferModel_Window5(7);             // original detailed layer-by-layer based on window 4 and window 5
-    int const HeatTransferModel_ComplexFenestration(8); // BSDF
-    int const HeatTransferModel_TDD(9);                 // tubular daylighting device
-    int const HeatTransferModel_Kiva(10);               // Kiva ground calculations
-    int const HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
-
     // Parameters for classification of outside face of surfaces
     int const OutConvClass_WindwardVertWall(101);
     int const OutConvClass_LeewardVertWall(102);
@@ -236,57 +223,6 @@ namespace DataSurfaces {
     int const InConvWinLoc_WindowAboveThis(3);         // this is a wall with window above it
     int const InConvWinLoc_WindowBelowThis(4);         // this is a wall with window below it
     int const InConvWinLoc_LargePartOfExteriorWall(5); // this is a big window taking up most of wall
-
-    // Parameters for window shade status
-    int const NoShade(-1);
-    int const ShadeOff(0);
-    int const IntShadeOn(1); // Interior shade on
-    int const SwitchableGlazing(2);
-    int const ExtShadeOn(3);  // Exterior shade on
-    int const ExtScreenOn(4); // Exterior screen on
-    int const IntBlindOn(6);  // Interior blind on
-    int const ExtBlindOn(7);  // Exterior blind on
-    int const BGShadeOn(8);   // Between-glass shade on
-    int const BGBlindOn(9);   // Between-glass blind on
-    int const IntShadeConditionallyOff(10);
-    int const GlassConditionallyLightened(20);
-    int const ExtShadeConditionallyOff(30);
-    int const IntBlindConditionallyOff(60);
-    int const ExtBlindConditionallyOff(70);
-
-    // WindowShadingControl Shading Types
-    int const WSC_ST_NoShade(0);
-    int const WSC_ST_InteriorShade(1);
-    int const WSC_ST_SwitchableGlazing(2);
-    int const WSC_ST_ExteriorShade(3);
-    int const WSC_ST_InteriorBlind(4);
-    int const WSC_ST_ExteriorBlind(5);
-    int const WSC_ST_BetweenGlassShade(6);
-    int const WSC_ST_BetweenGlassBlind(7);
-    int const WSC_ST_ExteriorScreen(8);
-
-    // WindowShadingControl Control Types
-    int const WSCT_AlwaysOn(1);                       // AlwaysOn
-    int const WSCT_AlwaysOff(2);                      // AlwaysOff
-    int const WSCT_OnIfScheduled(3);                  // OnIfScheduleAllows
-    int const WSCT_HiSolar(4);                        // OnIfHighSolarOnWindow
-    int const WSCT_HiHorzSolar(5);                    // OnIfHighHorizontalSolar
-    int const WSCT_HiOutAirTemp(6);                   // OnIfHighOutsideAirTemp
-    int const WSCT_HiZoneAirTemp(7);                  // OnIfHighZoneAirTemp
-    int const WSCT_HiZoneCooling(8);                  // OnIfHighZoneCooling
-    int const WSCT_HiGlare(9);                        // OnIfHighGlare
-    int const WSCT_MeetDaylIlumSetp(10);              // MeetDaylightIlluminanceSetpoint
-    int const WSCT_OnNightLoOutTemp_OffDay(11);       // OnNightIfLowOutsideTemp/OffDay
-    int const WSCT_OnNightLoInTemp_OffDay(12);        // OnNightIfLowInsideTemp/OffDay
-    int const WSCT_OnNightIfHeating_OffDay(13);       // OnNightIfHeating/OffDay
-    int const WSCT_OnNightLoOutTemp_OnDayCooling(14); // OnNightIfLowOutsideTemp/OnDayIfCooling
-    int const WSCT_OnNightIfHeating_OnDayCooling(15); // OnNightIfHeating/OnDayIfCooling
-    int const WSCT_OffNight_OnDay_HiSolarWindow(16);  // OffNight/OnDayIfCoolingAndHighSolarOnWindow
-    int const WSCT_OnNight_OnDay_HiSolarWindow(17);   // OnNight/OnDayIfCoolingAndHighSolarOnWindow
-    int const WSCT_OnHiOutTemp_HiSolarWindow(18);     // OnIfHighOutsideAirTempAndHighSolarOnWindow
-    int const WSCT_OnHiOutTemp_HiHorzSolar(19);       // OnIfHighOutsideAirTempAndHighHorizontalSolar
-    int const WSCT_OnHiZoneTemp_HiSolarWindow(20);    // OnIfHighZoneAirTempAndHighSolarOnWindow
-    int const WSCT_OnHiZoneTemp_HiHorzSolar(21);      // OnIfHighZoneAirTempAndHighHorizontalSolar
 
     // WindowShadingControl Slat Angle Control for Blinds
     int const WSC_SAC_FixedSlatAngle(1);
@@ -511,13 +447,13 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    Array1D<int> SurfWinShadingFlag;                        // -1: window has no shading device
+    Array1D<WinShadingType> SurfWinShadingFlag;             // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
-    Array1D<int> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
+    Array1D<Real64> SurfWinShadingFlagEMSValue;             // EMS control value for Shading Flag
     Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
     Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
-    Array1D<int> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
+    Array1D<WinShadingType> SurfWinExtIntShadePrevTS;       // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
     Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window
@@ -607,6 +543,7 @@ namespace DataSurfaces {
 
     bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
+
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
@@ -836,15 +773,15 @@ namespace DataSurfaces {
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
                 RefAirTemp = MAT(Zone);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                RefAirTemp = DataHeatBalance::TempEffBulkAir(t_SurfNum);
+                RefAirTemp = state.dataHeatBal->TempEffBulkAir(t_SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
                 // determine ZoneEquipConfigNum for this zone
                 //            ControlledZoneAirFlag = .FALSE.
                 // ZoneEquipConfigNum = ZoneNum;
                 // check whether this zone is a controlled zone or not
-                if (!DataHeatBalance::Zone(Zone).IsControlled) {
+                if (!state.dataHeatBal->Zone(Zone).IsControlled) {
                     ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                   DataHeatBalance::Zone(Zone).Name);
+                                   state.dataHeatBal->Zone(Zone).Name);
                     // return;
                 }
                 // determine supply air conditions
@@ -937,7 +874,7 @@ namespace DataSurfaces {
         return value;
     }
 
-    Real64 SurfaceData::getSWIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -948,10 +885,10 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return SurfQRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return state.dataHeatBal->SurfQRadSWOutIncident(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
-    Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWBeamIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -962,10 +899,10 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident from outside beam
 
-        return  SurfQRadSWOutIncidentBeam(t_SurfNum);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentBeam(t_SurfNum);
     }
 
-    Real64 SurfaceData::getSWDiffuseIncident(const int t_SurfNum)
+    Real64 SurfaceData::getSWDiffuseIncident(EnergyPlusData &state, const int t_SurfNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -976,7 +913,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return  SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
+        return  state.dataHeatBal->SurfQRadSWOutIncidentSkyDiffuse(t_SurfNum) + state.dataHeatBal->SurfQRadSWOutIncidentGndDiffuse(t_SurfNum) + state.dataHeatBal->QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers(EnergyPlusData &state) const

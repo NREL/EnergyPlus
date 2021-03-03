@@ -403,6 +403,83 @@ namespace EnergyPlus::Boilers {
         }
     }
 
+    void BoilerSpecs::oneTimeInit(EnergyPlusData &state) {
+        // Locate the boilers on the plant loops for later usage
+        bool errFlag = false;
+        PlantUtilities::ScanPlantLoopsForObject(state,
+                                                this->Name,
+                                                DataPlant::TypeOf_Boiler_Simple,
+                                                this->LoopNum,
+                                                this->LoopSideNum,
+                                                this->BranchNum,
+                                                this->CompNum,
+                                                errFlag,
+                                                _,
+                                                this->TempUpLimitBoilerOut,
+                                                _,
+                                                _,
+                                                _);
+        if (errFlag) {
+            ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
+        }
+
+        if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
+            // reset flow priority
+            state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
+                    DataPlant::LoopFlowStatus_NeedyIfLoopOn;
+        }
+    }
+
+    void BoilerSpecs::initEachEnvironment(EnergyPlusData &state) {
+        constexpr auto RoutineName("BoilerSpecs::initEachEnvironment");
+        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
+                                                             DataGlobalConstants::HWInitConvTemp,
+                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
+                                                             RoutineName);
+        this->DesMassFlowRate = this->VolFlowRate * rho;
+
+        PlantUtilities::InitComponentNodes(0.0,
+                                           this->DesMassFlowRate,
+                                           this->BoilerInletNodeNum,
+                                           this->BoilerOutletNodeNum,
+                                           this->LoopNum,
+                                           this->LoopSideNum,
+                                           this->BranchNum,
+                                           this->CompNum);
+
+        if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) { // check if setpoint on outlet node
+            if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
+                (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
+                if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                    if (!this->ModulatedFlowErrDone) {
+                        ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
+                        ShowContinueError(state,
+                                          "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager");
+                        ShowContinueError(state, "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... ");
+                        this->ModulatedFlowErrDone = true;
+                    }
+                } else {
+                    // need call to EMS to check node
+                    bool FatalError = false; // but not really fatal yet, but should be.
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
+                    DataLoopNode::NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
+                    if (FatalError) {
+                        if (!this->ModulatedFlowErrDone) {
+                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
+                            ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode");
+                            ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the boiler outlet node ");
+                            ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the boiler outlet node ");
+                            ShowContinueError(state, "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... ");
+                            this->ModulatedFlowErrDone = true;
+                        }
+                    }
+                }
+                this->ModulatedFlowSetToLoop = true; // this is for backward compatibility and could be removed
+            }
+        }
+    }
+
     void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boiler being simulated
     {
 
@@ -418,92 +495,15 @@ namespace EnergyPlus::Boilers {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr auto RoutineName("InitBoiler");
-
         // Init more variables
         if (this->MyFlag) {
-
-            // setup the output variable pointers
             this->SetupOutputVars(state);
-
-            // Locate the boilers on the plant loops for later usage
-            bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state,
-                                                    this->Name,
-                                                    DataPlant::TypeOf_Boiler_Simple,
-                                                    this->LoopNum,
-                                                    this->LoopSideNum,
-                                                    this->BranchNum,
-                                                    this->CompNum,
-                                                    errFlag,
-                                                    _,
-                                                    this->TempUpLimitBoilerOut,
-                                                    _,
-                                                    _,
-                                                    _);
-            if (errFlag) {
-                ShowFatalError(state, "InitBoiler: Program terminated due to previous condition(s).");
-            }
-
-            if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) || (this->FlowMode == DataPlant::FlowMode::Constant)) {
-                // reset flow priority
-                state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).FlowPriority =
-                    DataPlant::LoopFlowStatus_NeedyIfLoopOn;
-            }
-
+            this->oneTimeInit(state);
             this->MyFlag = false;
         }
 
         if (this->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
-            // if ( ! PlantFirstSizeCompleted ) SizeBoiler( BoilerNum );
-            Real64 const rho = FluidProperties::GetDensityGlycol(state,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
-                                                                 DataGlobalConstants::HWInitConvTemp,
-                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
-                                                                 RoutineName);
-            this->DesMassFlowRate = this->VolFlowRate * rho;
-
-            PlantUtilities::InitComponentNodes(0.0,
-                                               this->DesMassFlowRate,
-                                               this->BoilerInletNodeNum,
-                                               this->BoilerOutletNodeNum,
-                                               this->LoopNum,
-                                               this->LoopSideNum,
-                                               this->BranchNum,
-                                               this->CompNum);
-
-            if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) { // check if setpoint on outlet node
-                if ((DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                    (DataLoopNode::Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
-                    if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                        if (!this->ModulatedFlowErrDone) {
-                            ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
-                            ShowContinueError(state,
-                                "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode, use a SetpointManager");
-                            ShowContinueError(state, "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... ");
-                            this->ModulatedFlowErrDone = true;
-                        }
-                    } else {
-                        // need call to EMS to check node
-                        bool FatalError = false; // but not really fatal yet, but should be.
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->BoilerOutletNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, FatalError);
-                        DataLoopNode::NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
-                        if (FatalError) {
-                            if (!this->ModulatedFlowErrDone) {
-                                ShowWarningError(state, "Missing temperature setpoint for LeavingSetpointModulated mode Boiler named " + this->Name);
-                                ShowContinueError(state, "  A temperature setpoint is needed at the outlet node of a boiler in variable flow mode");
-                                ShowContinueError(state, "  use a Setpoint Manager to establish a setpoint at the boiler outlet node ");
-                                ShowContinueError(state, "  or use an EMS actuator to establish a setpoint at the boiler outlet node ");
-                                ShowContinueError(state, "  The overall loop setpoint will be assumed for Boiler. The simulation continues ... ");
-                                this->ModulatedFlowErrDone = true;
-                            }
-                        }
-                    }
-                    this->ModulatedFlowSetToLoop = true; // this is for backward compatibility and could be removed
-                }
-            }
-
+            this->initEachEnvironment(state);
             this->MyEnvrnFlag = false;
         }
 

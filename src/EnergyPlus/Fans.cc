@@ -189,7 +189,7 @@ namespace Fans {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
 
-        // FLOW:
+
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -320,7 +320,7 @@ namespace Fans {
         int MaxNumbers;
 
         state.dataFans->GetFanInputFlag = false;
-        // Flow
+
         MaxAlphas = 0;
         MaxNumbers = 0;
         NumSimpFan = inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
@@ -654,9 +654,6 @@ namespace Fans {
             } else {
                 Fan(FanNum).BalancedFractSchedNum = 0;
             }
-
-            // Component sets not setup yet for zone equipment
-            // CALL TestCompSet(TRIM(cCurrentModuleObject),cAlphaArgs(1),cAlphaArgs(3),cAlphaArgs(4),'Air Nodes')
 
         } // end of Zone Exhaust Fan loop
 
@@ -1028,7 +1025,7 @@ namespace Fans {
         int OutNode;
         int Loop;
 
-        // FLOW:
+
 
         if (MyOneTimeFlag) {
 
@@ -3112,7 +3109,7 @@ namespace Fans {
         Real64 FanCalDeltaPress;     // Calculated Fan Delta Pressure for temp use [Pa]
         Real64 FanCalDeltaPresstemp; // Calculated Fan Delta Pressure for temp use [Pa]
 
-        // FLOW
+
 
         // Check whether the fan curve covers the design operational point of the fan
         FanCalDeltaPress = CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
