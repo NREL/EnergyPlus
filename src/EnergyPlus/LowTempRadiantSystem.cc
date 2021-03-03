@@ -155,10 +155,6 @@ namespace LowTempRadiantSystem {
     std::string const cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
     std::string const cElectricSystem("ZoneHVAC:LowTemperatureRadiant:Electric");
 
-    // Operating modes:
-    int const NotOperating(0); // Parameter for use with OperatingMode variable, set for heating
-    int const HeatingMode(1);  // Parameter for use with OperatingMode variable, set for heating
-    int const CoolingMode(-1); // Parameter for use with OperatingMode variable, set for cooling
     // Number of Circuits per Surface Calculation Method
     int const OneCircuit(1);          // there is 1 circuit per surface
     int const CalculateFromLength(2); // The number of circuits is TubeLength*SurfaceFrac / CircuitLength

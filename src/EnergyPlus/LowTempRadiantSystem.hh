@@ -80,9 +80,9 @@ namespace LowTempRadiantSystem {
     extern std::string const cConstantFlowSystem;
     extern std::string const cElectricSystem;
     // Operating modes:
-    extern int const NotOperating; // Parameter for use with OperatingMode variable, set for heating
-    extern int const HeatingMode;  // Parameter for use with OperatingMode variable, set for heating
-    extern int const CoolingMode;  // Parameter for use with OperatingMode variable, set for cooling
+    int constexpr NotOperating = 0; // Parameter for use with OperatingMode variable, set for heating
+    int constexpr HeatingMode = 1;  // Parameter for use with OperatingMode variable, set for heating
+    int constexpr CoolingMode = -1;  // Parameter for use with OperatingMode variable, set for cooling
 
     // Control types:
     enum class LowTempRadiantControlTypes {
