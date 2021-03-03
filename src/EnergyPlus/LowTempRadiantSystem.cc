@@ -2521,10 +2521,13 @@ namespace LowTempRadiantSystem {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         auto constexpr RoutineName("SizeLowTempRadiantSystem");
-        static int const OFF = 0;
-        static int const ClgHtg = 1;
-        static int const ClgOnly = 2;
-        static int const HtgOnly = 3;
+
+        enum OperatingMode : int {
+            OFF = 0,
+            ClgHtg = 1,
+            ClgOnly = 2,
+            HtgOnly = 3
+        };
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PltSizHeatNum(0);    // index of plant sizing object for 1st heating loop
@@ -2550,7 +2553,7 @@ namespace LowTempRadiantSystem {
         int CapSizingMethod(0);     // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                     // FractionOfAutosizedHeatingCapacity )
         Real64 DesCoilLoad;         // design autosized or user specified capacity
-        int OpMode(1);              // System operating mode
+        OperatingMode OpMode(ClgHtg);              // System operating mode
         int HeatNode;               // Hot water inlet node to determine system operating mode
         int CoolNode;               // Chilled water inlet node to determine system operating mode
         Real64 WaterVolFlowMaxDes;  // Design water volume flow rate for reproting
