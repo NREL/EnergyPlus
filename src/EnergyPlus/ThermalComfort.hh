@@ -264,8 +264,10 @@ struct ThermalComfortsData : BaseGlobalStruct {
 
     bool FirstTimeFlag = true;                // Flag set to make sure you get input once
     bool FirstTimeSurfaceWeightedFlag = true; // Flag set to make sure certain calcs related to surface weighted option are only done once
-    bool FirstTimeCoolingEffectWarning = true; // Flag set to make sure certain warnings related to cooling effect calcs are only done once
-    bool FirstTimeAnkleDraftWarning = true; // Flag set to make sure certain warnings related to ankle draft calcs are only done once
+    int CoolingEffectWarningInd = 0; // Counter for ankle draft invalid air velocity warnings.
+    int AnkleDraftAirVelWarningInd = 0; // Counter for ankle draft invalid air velocity warnings.
+    int AnkleDraftCloUnitWarningInd = 0; // Counter for ankle draft invalid clothing unit warnings.
+    int AnkleDraftActMetWarningInd = 0; // Counter for ankle draft invalid activity level warnings.
 
     // MODULE PARAMETER DEFINITIONS
     Real64 const TAbsConv = DataGlobalConstants::KelvinConv; // Converter for absolute temperature

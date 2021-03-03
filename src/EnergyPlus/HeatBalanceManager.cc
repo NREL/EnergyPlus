@@ -7901,14 +7901,14 @@ namespace HeatBalanceManager {
         ZoneUnscheduled = false;
         ZoneScheduled = false;
 
-        for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
+        for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
             iConst = state.dataSurface->Surface(iSurf).Construction;
             if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
                 SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
             } else {
                 SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
             }
-            if (iSurf == state.dataHeatBal->Zone(ZoneNum).SurfaceFirst) {
+            if (iSurf == state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst) {
                 if (SchedPtr != 0) {
                     ZoneScheduled = true;
                     ZoneUnscheduled = false;
@@ -7935,7 +7935,7 @@ namespace HeatBalanceManager {
         }
 
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
+            for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
                 iConst = state.dataSurface->Surface(iSurf).Construction;
                 if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
                     SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);

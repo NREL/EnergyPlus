@@ -304,8 +304,8 @@ namespace DElightManagerF {
                     // Zone Surface Data Section
                     // Count the number of opaque surfaces bounding the current zone
                     iNumOpaqueSurfs = 0;
-                    iSurfaceFirst = zn.SurfaceFirst;
-                    int const iSurfaceLast = zn.SurfaceLast; // ending loop variable for surfaces
+                    iSurfaceFirst = zn.HTSurfaceFirst;
+                    int const iSurfaceLast = zn.HTSurfaceLast; // ending loop variable for surfaces
 
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
                         auto &surf(state.dataSurface->Surface(isurf));

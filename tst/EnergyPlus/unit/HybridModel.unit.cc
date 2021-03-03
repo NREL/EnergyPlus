@@ -245,8 +245,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 2;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 0; // No HT surface here.
+    state->dataHeatBal->Zone(1).HTSurfaceLast = -1;
     state->dataHeatBal->Zone(1).Volume = 1061.88;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;
@@ -735,8 +735,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 1;
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 2;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 0;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = -1;
     state->dataHeatBal->Zone(1).Volume = 4000;
     state->dataGlobal->TimeStepZone = 10.0 / 60.0; // Zone timestep in hours
     TimeStepSys = 10.0 / 60.0;
