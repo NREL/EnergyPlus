@@ -118,7 +118,7 @@ protected:
         state->dataLowTempRadSys->CFloRadSys.allocate(1);
         FinalZoneSizing.allocate(1);
         ZoneEqSizing.allocate(1);
-        Zone.allocate(1);
+        state->dataHeatBal->Zone.allocate(1);
         CurZoneEqNum = 1;
         ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
         ZoneSizingRunDone = true;
@@ -194,7 +194,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantElectric)
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower = AutoSize;
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
     state->dataLowTempRadSys->ElecRadSys(RadSysNum).ScaledHeatingCapacity = 1.5;
-    Zone(1).FloorArea = 500.0;
+    state->dataHeatBal->Zone(1).FloorArea = 500.0;
     SizeLowTempRadiantSystem(*state, RadSysNum, SystemType);
     EXPECT_NEAR(750.0, state->dataLowTempRadSys->ElecRadSys(RadSysNum).MaxElecPower, 0.1);
 
@@ -262,14 +262,14 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantVariableFlow)
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxHeat = AutoSize;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = 10.0;
-    Zone(1).FloorArea = 500.0;
-    ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity * Zone(1).FloorArea;
+    state->dataHeatBal->Zone(1).FloorArea = 500.0;
+    ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity * state->dataHeatBal->Zone(1).FloorArea;
     ExpectedResult1 = ExpectedResult1 / (PlantSizData(1).DeltaT * RhoWater * CpWater);
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).WaterVolFlowMaxCool = AutoSize;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = 20.0;
-    ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(1).FloorArea;
+    ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity * state->dataHeatBal->Zone(1).FloorArea;
     ExpectedResult2 = ExpectedResult2 / (PlantSizData(2).DeltaT * RhoWater * CpWater);
 
     SizeLowTempRadiantSystem(*state, RadSysNum, SystemType);
@@ -339,14 +339,14 @@ TEST_F(LowTempRadiantSystemTest, SizeCapacityLowTempRadiantVariableFlow)
     EXPECT_NEAR(ExpectedResult2, state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity, 0.1);
 
     // Hydronic - CapacityPerFloorArea Capacity Sizing Method
-    Zone(1).FloorArea = 50.0;
+    state->dataHeatBal->Zone(1).FloorArea = 50.0;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).HeatingCapMethod = CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity = 200.0;
-    ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity * Zone(1).FloorArea;
+    ExpectedResult1 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity * state->dataHeatBal->Zone(1).FloorArea;
 
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).CoolingCapMethod = CapacityPerFloorArea;
     state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity = 250.0;
-    ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(1).FloorArea;
+    ExpectedResult2 = state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledCoolingCapacity * state->dataHeatBal->Zone(1).FloorArea;
 
     SizeLowTempRadiantSystem(*state, RadSysNum, SystemType);
     EXPECT_NEAR(ExpectedResult1, state->dataLowTempRadSys->HydrRadSys(RadSysNum).ScaledHeatingCapacity, 0.1);
@@ -1119,7 +1119,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ("WEST ZONE", Zone(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
@@ -1994,7 +1994,7 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
 
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ("WEST ZONE", Zone(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
@@ -2312,9 +2312,9 @@ TEST_F(LowTempRadiantSystemTest, LowTempElecRadSurfaceGroupTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Zone.allocate(2);
-    Zone(1).Name = "WEST ZONE";
-    Zone(2).Name = "EAST ZONE";
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataHeatBal->Zone(1).Name = "WEST ZONE";
+    state->dataHeatBal->Zone(2).Name = "EAST ZONE";
 
     DataSurfaces::TotSurfaces = 4;
     Surface.allocate(4);
@@ -2851,8 +2851,8 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
     Real64 acceptibleError = 0.001;
 
     DataHeatBalFanSys::MAT.allocate(1);
-    MRT.allocate(1);
-    Zone.allocate(1);
+    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     DataHeatBalSurface::TempSurfIn.allocate(1);
     DataHeatBalSurface::TempUserLoc.allocate(1);
     state->dataLowTempRadSys->HydrRadSys.allocate(1);
@@ -2861,9 +2861,9 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test Data
     DataHeatBalFanSys::MAT(1) = 23.456;
-    MRT(1) = 12.345;
-    Zone(1).OutDryBulbTemp = 34.567;
-    Zone(1).OutWetBulbTemp = 1.234;
+    state->dataHeatBal->MRT(1) = 12.345;
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 34.567;
+    state->dataHeatBal->Zone(1).OutWetBulbTemp = 1.234;
     DataHeatBalSurface::TempSurfIn(1) = 5.678;
     DataHeatBalSurface::TempUserLoc(1) = 7.890;
     state->dataLowTempRadSys->HydrRadSys(1).ZonePtr = 1;
@@ -2895,68 +2895,68 @@ TEST_F(LowTempRadiantSystemTest, setRadiantSystemControlTemperatureTest)
 
     // Test 2: MRT Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = MRT(1);
+    expectedResult = state->dataHeatBal->MRT(1);
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = MRT(1);
+    expectedResult = state->dataHeatBal->MRT(1);
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::MRTControl;
-    expectedResult = MRT(1);
+    expectedResult = state->dataHeatBal->MRT(1);
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 3: Operative Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + state->dataHeatBal->MRT(1))/2.0;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + state->dataHeatBal->MRT(1))/2.0;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OperativeControl;
-    expectedResult = (DataHeatBalFanSys::MAT(1) + MRT(1))/2.0;
+    expectedResult = (DataHeatBalFanSys::MAT(1) + state->dataHeatBal->MRT(1))/2.0;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 4: ODB Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
-    expectedResult = Zone(1).OutDryBulbTemp;
+    expectedResult = state->dataHeatBal->Zone(1).OutDryBulbTemp;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
-    expectedResult = Zone(1).OutDryBulbTemp;
+    expectedResult = state->dataHeatBal->Zone(1).OutDryBulbTemp;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::ODBControl;
-    expectedResult = Zone(1).OutDryBulbTemp;
+    expectedResult = state->dataHeatBal->Zone(1).OutDryBulbTemp;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
 
     // Test 5: OWB Temperature Control
     state->dataLowTempRadSys->HydrRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
-    expectedResult = Zone(1).OutWetBulbTemp;
+    expectedResult = state->dataHeatBal->Zone(1).OutWetBulbTemp;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->HydrRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->HydrRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->CFloRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
-    expectedResult = Zone(1).OutWetBulbTemp;
+    expectedResult = state->dataHeatBal->Zone(1).OutWetBulbTemp;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->CFloRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->CFloRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
     state->dataLowTempRadSys->ElecRadSys(1).ControlType = LowTempRadiantControlTypes::OWBControl;
-    expectedResult = Zone(1).OutWetBulbTemp;
+    expectedResult = state->dataHeatBal->Zone(1).OutWetBulbTemp;
     actualResult = 0.0; // reset
     actualResult = state->dataLowTempRadSys->ElecRadSys(1).setRadiantSystemControlTemperature(*state, state->dataLowTempRadSys->ElecRadSys(1).ControlType);
     EXPECT_NEAR(expectedResult, actualResult, acceptibleError);
@@ -3178,7 +3178,7 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     thisRadSys.SurfacePtr(3) = 3;
     thisRadSys.ZonePtr = 1;
     Surface.allocate(3);
-    Zone.allocate(3);
+    state->dataHeatBal->Zone.allocate(3);
     state->dataConstruction->Construct.allocate(2);
     state->dataConstruction->Construct(1).SourceSinkPresent = true;
     state->dataConstruction->Construct(2).SourceSinkPresent = false;
@@ -3189,12 +3189,12 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Zone = 1;
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).ListMultiplier = 1.0;
-    Zone(2).Multiplier = 1.0;
-    Zone(2).ListMultiplier = 1.0;
-    Zone(3).Multiplier = 1.0;
-    Zone(3).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(3).Multiplier = 1.0;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
@@ -3207,12 +3207,12 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Zone = 1;
     Surface(2).Zone = 2;
     Surface(3).Zone = 3;
-    Zone(1).Multiplier = 1.0;
-    Zone(1).ListMultiplier = 1.0;
-    Zone(2).Multiplier = 1.0;
-    Zone(2).ListMultiplier = 1.0;
-    Zone(3).Multiplier = 1.0;
-    Zone(3).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(3).Multiplier = 1.0;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
@@ -3225,12 +3225,12 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Zone = 1;
     Surface(2).Zone = 2;
     Surface(3).Zone = 3;
-    Zone(1).Multiplier = 2.0;
-    Zone(1).ListMultiplier = 1.0;
-    Zone(2).Multiplier = 2.0;
-    Zone(2).ListMultiplier = 1.0;
-    Zone(3).Multiplier = 7.0;
-    Zone(3).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 2.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(2).Multiplier = 2.0;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(3).Multiplier = 7.0;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 1;
@@ -3243,12 +3243,12 @@ TEST_F(LowTempRadiantSystemTest, errorCheckZonesAndConstructionsTest)
     Surface(1).Zone = 1;
     Surface(2).Zone = 1;
     Surface(3).Zone = 1;
-    Zone(1).Multiplier = 2.0;
-    Zone(1).ListMultiplier = 1.0;
-    Zone(2).Multiplier = 2.0;
-    Zone(2).ListMultiplier = 1.0;
-    Zone(3).Multiplier = 2.0;
-    Zone(3).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 2.0;
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(2).Multiplier = 2.0;
+    state->dataHeatBal->Zone(2).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(3).Multiplier = 2.0;
+    state->dataHeatBal->Zone(3).ListMultiplier = 1.0;
     Surface(1).Construction = 1;
     Surface(2).Construction = 1;
     Surface(3).Construction = 2;
@@ -3710,10 +3710,10 @@ TEST_F(LowTempRadiantSystemTest, GetLowTempRadiantSystem_MultipleTypes)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    Zone.allocate(3);
-    Zone(1).Name = "WEST ZONE";
-    Zone(2).Name = "EAST ZONE";
-    Zone(3).Name = "SOUTH ZONE";
+    state->dataHeatBal->Zone.allocate(3);
+    state->dataHeatBal->Zone(1).Name = "WEST ZONE";
+    state->dataHeatBal->Zone(2).Name = "EAST ZONE";
+    state->dataHeatBal->Zone(3).Name = "SOUTH ZONE";
 
     DataSurfaces::TotSurfaces = 6;
     Surface.allocate(DataSurfaces::TotSurfaces);

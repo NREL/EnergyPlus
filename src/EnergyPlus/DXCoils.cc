@@ -126,7 +126,6 @@ namespace EnergyPlus::DXCoils {
     using namespace DataLoopNode;
     using namespace DataHVACGlobals;
     using namespace Psychrometrics;
-    using DataHeatBalance::HeatReclaimDXCoil;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -690,7 +689,7 @@ namespace EnergyPlus::DXCoils {
                 state.dataDXCoils->DXCoilPartLoadRatio(DXCoilNum) = S1PLR;
 
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
-                HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
+                state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
 
                 state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilStg2RuntimeFrac = S12RuntimeFraction;
 
@@ -741,7 +740,6 @@ namespace EnergyPlus::DXCoils {
         using DataHeatBalance::IntGainTypeOf_SecCoolingDXCoilTwoSpeed;
         using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilMultiSpeed;
         using DataHeatBalance::IntGainTypeOf_SecHeatingDXCoilSingleSpeed;
-        using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using EMSManager::ManageEMS;
 
@@ -881,7 +879,7 @@ namespace EnergyPlus::DXCoils {
         // Derived types
         state.dataDXCoils->DXCoil.allocate(state.dataDXCoils->NumDXCoils);
         state.dataDXCoils->DXCoilNumericFields.allocate(state.dataDXCoils->NumDXCoils);
-        HeatReclaimDXCoil.allocate(state.dataDXCoils->NumDXCoils);
+        state.dataHeatBal->HeatReclaimDXCoil.allocate(state.dataDXCoils->NumDXCoils);
         state.dataDXCoils->CheckEquipName.dimension(state.dataDXCoils->NumDXCoils, true);
 
         // Module level variable arrays
@@ -936,8 +934,8 @@ namespace EnergyPlus::DXCoils {
 
             state.dataDXCoils->DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
-            HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
-            HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
             state.dataDXCoils->DXCoil(DXCoilNum).Schedule = Alphas(2);
@@ -1337,7 +1335,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A18; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(18) && NumAlphas > 17) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(18), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:SingleSpeed",
@@ -1381,8 +1379,8 @@ namespace EnergyPlus::DXCoils {
 
             state.dataDXCoils->DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
-            HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
-            HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoStageWHumControl;
             state.dataDXCoils->DXCoil(DXCoilNum).Schedule = Alphas(2);
@@ -2244,7 +2242,7 @@ namespace EnergyPlus::DXCoils {
 
             // A14, \field Zone Name for Evaporator Placement
             if (!lAlphaBlanks(14) && NumAlphas > 13) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(14), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Heating:DX:SingleSpeed",
@@ -2327,8 +2325,8 @@ namespace EnergyPlus::DXCoils {
 
             state.dataDXCoils->DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
-            HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
-            HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_CoolingTwoSpeed;
             state.dataDXCoils->DXCoil(DXCoilNum).Schedule = Alphas(2);
@@ -2815,7 +2813,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A21; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(21) && NumAlphas > 20) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(21), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(21), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:TwoSpeed",
@@ -3657,8 +3655,8 @@ namespace EnergyPlus::DXCoils {
             VerifyUniqueCoilName(state, CurrentModuleObject, Alphas(1), ErrorsFound, CurrentModuleObject + " Name");
             state.dataDXCoils->DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
-            HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
-            HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedCooling;
             state.dataDXCoils->DXCoil(DXCoilNum).Schedule = Alphas(2);
@@ -4132,7 +4130,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A37; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(37) && NumAlphas > 36) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(37), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Cooling:DX:MultiSpeed",
@@ -4181,8 +4179,8 @@ namespace EnergyPlus::DXCoils {
 
             state.dataDXCoils->DXCoil(DXCoilNum).Name = Alphas(1);
             // Initialize DataHeatBalance heat reclaim variable name for use by heat reclaim coils
-            HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
-            HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).Name = state.dataDXCoils->DXCoil(DXCoilNum).Name;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).SourceType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType = CurrentModuleObject;
             state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num = CoilDX_MultiSpeedHeating;
             state.dataDXCoils->DXCoil(DXCoilNum).Schedule = Alphas(2);
@@ -4566,7 +4564,7 @@ namespace EnergyPlus::DXCoils {
             }
             // A34; \field Zone Name for Condenser Placement
             if (!lAlphaBlanks(34) && NumAlphas > 33) {
-                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(34), Zone);
+                state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = UtilityRoutines::FindItemInList(Alphas(34), state.dataHeatBal->Zone);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr > 0) {
                     SetupZoneInternalGain(state, state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr,
                                           "Coil:Heating:DX:MultiSpeed",
@@ -8378,7 +8376,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
@@ -8495,7 +8492,7 @@ namespace EnergyPlus::DXCoils {
         InletAirHumRat = state.dataDXCoils->DXCoil(DXCoilNum).InletAirHumRat;
         //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
         // InletAirPressure    = DXCoil(DXCoilNum)%InletAirPressure
-        HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
+        state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).PartLoadRatio = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPower = 0.0;
@@ -9238,7 +9235,7 @@ namespace EnergyPlus::DXCoils {
 
             // Set DataHeatGlobal heat reclaim variable for use by heat reclaim coil (part load ratio is accounted for)
             // Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
-            HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
+            state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
 
             // Calculate crankcase heater power using the runtime fraction for this DX cooling coil only if there is no companion DX coil.
             // Else use the largest runtime fraction of this DX cooling coil and the companion DX heating coil.
@@ -9491,7 +9488,7 @@ namespace EnergyPlus::DXCoils {
         InletAirHumRat = state.dataDXCoils->DXCoil(DXCoilNum).InletAirHumRat;
         //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
         // InletAirPressure    = DXCoil(DXCoilNum)%InletAirPressure
-        HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
+        state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).PartLoadRatio = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPower = 0.0;
@@ -10823,7 +10820,7 @@ namespace EnergyPlus::DXCoils {
                                                   state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate);
                 state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower = TotCap * EIR;
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
-                HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
+                state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).PartLoadRatio = 1.0;
                 state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 1.0;
 
@@ -10950,7 +10947,7 @@ namespace EnergyPlus::DXCoils {
                                                   state.dataDXCoils->DXCoil(DXCoilNum).SensCoolingEnergyRate,
                                                   state.dataDXCoils->DXCoil(DXCoilNum).LatCoolingEnergyRate,
                                                   state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate);
-                HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
+                state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy = OutletAirEnthalpy;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat = OutletAirHumRat;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp = OutletAirDryBulbTemp;
@@ -11919,7 +11916,7 @@ namespace EnergyPlus::DXCoils {
         }
 
         state.dataDXCoils->DXCoil(DXCoilNum).PartLoadRatio = 0.0;
-        HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
+        state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 0.0;
         InletAirDryBulbTemp = state.dataDXCoils->DXCoil(DXCoilNum).InletAirTemp;
         InletAirEnthalpy = state.dataDXCoils->DXCoil(DXCoilNum).InletAirEnthalpy;
@@ -12240,7 +12237,7 @@ namespace EnergyPlus::DXCoils {
                                                          (1.0 - state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction) * LSElecCoolingPower;
                 }
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
-                HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
+                state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
 
                 // Waste heat calculation
                 // TODO: waste heat not considered even if defined in Cooling:DX:MultiSpeed, N16, \field Speed 1 Rated Waste Heat Fraction of
@@ -12469,7 +12466,7 @@ namespace EnergyPlus::DXCoils {
                     }
                 }
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
-                HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
+                state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = state.dataDXCoils->DXCoil(DXCoilNum).TotalCoolingEnergyRate + state.dataDXCoils->DXCoil(DXCoilNum).ElecCoolingPower;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirEnthalpy = OutletAirEnthalpy;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirHumRat = OutletAirHumRat;
                 state.dataDXCoils->DXCoil(DXCoilNum).OutletAirTemp = OutletAirDryBulbTemp;
@@ -12772,7 +12769,7 @@ namespace EnergyPlus::DXCoils {
             CrankcaseHeatingPower = 0.0;
         }
         state.dataDXCoils->DXCoil(DXCoilNum).PartLoadRatio = 0.0;
-        HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
+        state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
 
         if ((AirMassFlow > 0.0) && (GetCurrentScheduleValue(state, state.dataDXCoils->DXCoil(DXCoilNum).SchedPtr) > 0.0) &&
             ((CycRatio > 0.0) || (SpeedRatio > 0.0 && SingleMode == 0)) && OutdoorDryBulb > state.dataDXCoils->DXCoil(DXCoilNum).MinOATCompressor) {
@@ -15827,7 +15824,7 @@ namespace EnergyPlus::DXCoils {
         InletAirDryBulbTemp = state.dataDXCoils->DXCoil(DXCoilNum).InletAirTemp;
         InletAirEnthalpy = state.dataDXCoils->DXCoil(DXCoilNum).InletAirEnthalpy;
         InletAirHumRat = state.dataDXCoils->DXCoil(DXCoilNum).InletAirHumRat;
-        HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
+        state.dataHeatBal->HeatReclaimDXCoil(DXCoilNum).AvailCapacity = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).PartLoadRatio = 0.0;
         state.dataDXCoils->DXCoil(DXCoilNum).BasinHeaterPower = 0.0;

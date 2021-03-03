@@ -2051,29 +2051,9 @@ namespace EMSManager {
         // PURPOSE OF THIS SUBROUTINE:
         // setup EMS actuators available for surface construction
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::TotConstructs;
         using DataSurfaces::Surface;
         using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // local loop index.
@@ -2092,10 +2072,10 @@ namespace EMSManager {
 
         // Setup error checking storage
 
-        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorChecked)) state.dataRuntimeLang->EMSConstructActuatorChecked.allocate(TotConstructs, TotSurfaces);
+        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorChecked)) state.dataRuntimeLang->EMSConstructActuatorChecked.allocate(state.dataHeatBal->TotConstructs, TotSurfaces);
         state.dataRuntimeLang->EMSConstructActuatorChecked = false;
 
-        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorIsOkay)) state.dataRuntimeLang->EMSConstructActuatorIsOkay.allocate(TotConstructs, TotSurfaces);
+        if (!allocated(state.dataRuntimeLang->EMSConstructActuatorIsOkay)) state.dataRuntimeLang->EMSConstructActuatorIsOkay.allocate(state.dataHeatBal->TotConstructs, TotSurfaces);
         state.dataRuntimeLang->EMSConstructActuatorIsOkay = false;
     }
 
@@ -2200,7 +2180,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2218,6 +2197,7 @@ namespace EMSManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int ZoneNum;
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (allocated(Zone)) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
@@ -2249,10 +2229,10 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // local loop index.
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
 

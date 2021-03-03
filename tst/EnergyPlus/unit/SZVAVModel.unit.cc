@@ -560,7 +560,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     DataSizing::CurZoneEqNum = 1;
     InitializePsychRoutines();
     GetZoneData(*state, ErrorsFound);
-    EXPECT_EQ("WEST ZONE", Zone(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     ScheduleInputProcessed = true;

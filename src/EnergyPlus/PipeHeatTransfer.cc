@@ -197,7 +197,6 @@ namespace EnergyPlus::PipeHeatTransfer {
 
         // Using/Aliasing
         using DataHeatBalance::IntGainTypeOf_PipeIndoor;
-        using DataHeatBalance::Zone;
         using namespace DataIPShortCuts; // Data for field names, blank numerics
         using BranchNodeConnections::TestCompSet;
 
@@ -303,7 +302,7 @@ namespace EnergyPlus::PipeHeatTransfer {
 
                 if (SELECT_CASE_var == "ZONE") {
                     state.dataPipeHT->PipeHT(Item).EnvironmentPtr = iEnvrnPtr::ZoneEnv;
-                    state.dataPipeHT->PipeHT(Item).EnvrZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(6), Zone);
+                    state.dataPipeHT->PipeHT(Item).EnvrZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(6), state.dataHeatBal->Zone);
                     if (state.dataPipeHT->PipeHT(Item).EnvrZonePtr == 0) {
                         ShowSevereError(state, "Invalid " + cAlphaFieldNames(6) + '=' + cAlphaArgs(6));
                         ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));

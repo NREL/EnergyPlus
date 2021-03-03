@@ -122,12 +122,6 @@ namespace AirflowNetworkBalanceManager {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataHeatBalance::TotCrossMixing;
-    using DataHeatBalance::TotInfiltration;
-    using DataHeatBalance::TotMixing;
-    using DataHeatBalance::TotVentilation;
-    using DataHeatBalance::TotZoneAirBalance;
-    using DataHeatBalance::Zone;
     using DataHeatBalFanSys::MAT;
     using DataHeatBalFanSys::WZoneTimeMinus1;
     using DataHeatBalFanSys::XMAT;
@@ -1507,8 +1501,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
         using DataLoopNode::Node;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
@@ -1626,6 +1618,8 @@ namespace AirflowNetworkBalanceManager {
 
         ErrorsFound = false;
         AirflowNetworkInitFlag = false;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         // Read AirflowNetwork OccupantVentilationControl before reading other AirflowNetwork objects, so that this object can be called by other
         // simple ventilation objects
@@ -1862,7 +1856,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
-            if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotZoneAirBalance +
+            if (state.dataHeatBal->TotInfiltration + state.dataHeatBal->TotVentilation + state.dataHeatBal->TotMixing + state.dataHeatBal->TotCrossMixing + state.dataHeatBal->TotZoneAirBalance +
                     inputProcessor->getNumObjectsFound(state, "ZoneEarthtube") + inputProcessor->getNumObjectsFound(state, "ZoneThermalChimney") +
                     inputProcessor->getNumObjectsFound(state, "ZoneCoolTower:Shower") ==
                 0) {
@@ -1876,27 +1870,27 @@ namespace AirflowNetworkBalanceManager {
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple) return;
 
         if (SimulateAirflowNetwork == AirflowNetworkControlMultizone || SimulateAirflowNetwork == AirflowNetworkControlMultiADS) {
-            if (TotInfiltration > 0) {
+            if (state.dataHeatBal->TotInfiltration > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneInfiltration:* objects are present.");
                 ShowContinueError(state, "..ZoneInfiltration objects will not be simulated.");
             }
-            if (TotVentilation > 0) {
+            if (state.dataHeatBal->TotVentilation > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneVentilation:* objects are present.");
                 ShowContinueError(state, "..ZoneVentilation objects will not be simulated.");
             }
-            if (TotMixing > 0) {
+            if (state.dataHeatBal->TotMixing > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneMixing objects are present.");
                 ShowContinueError(state, "..ZoneMixing objects will not be simulated.");
             }
-            if (TotCrossMixing > 0) {
+            if (state.dataHeatBal->TotCrossMixing > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey + "\" and ZoneCrossMixing objects are present.");
                 ShowContinueError(state, "..ZoneCrossMixing objects will not be simulated.");
             }
-            if (TotZoneAirBalance > 0) {
+            if (state.dataHeatBal->TotZoneAirBalance > 0) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " object, ");
                 ShowContinueError(state, "..Specified " + cAlphaFields(2) + " = \"" + SimAirNetworkKey +
                                   "\" and ZoneAirBalance:OutdoorAir objects are present.");
@@ -2200,8 +2194,8 @@ namespace AirflowNetworkBalanceManager {
                 } else if (SELECT_CASE_var == "ASHRAE55ADAPTIVE") {
                     // Check that for the given zone, there is a people object for which ASHRAE 55 calculations are carried out
                     ZoneNum = MultizoneZoneData(i).ZoneNum;
-                    for (j = 1; j <= TotPeople; ++j) {
-                        if (ZoneNum == People(j).ZonePtr && People(j).AdaptiveASH55) {
+                    for (j = 1; j <= state.dataHeatBal->TotPeople; ++j) {
+                        if (ZoneNum == state.dataHeatBal->People(j).ZonePtr && state.dataHeatBal->People(j).AdaptiveASH55) {
                             MultizoneZoneData(i).ASH55PeopleInd = j;
                         }
                     }
@@ -2212,8 +2206,8 @@ namespace AirflowNetworkBalanceManager {
                 } else if (SELECT_CASE_var == "CEN15251ADAPTIVE") {
                     // Check that for the given zone, there is a people object for which CEN-15251 calculations are carried out
                     ZoneNum = MultizoneZoneData(i).ZoneNum;
-                    for (j = 1; j <= TotPeople; ++j) {
-                        if (ZoneNum == People(j).ZonePtr && People(j).AdaptiveCEN15251) {
+                    for (j = 1; j <= state.dataHeatBal->TotPeople; ++j) {
+                        if (ZoneNum == state.dataHeatBal->People(j).ZonePtr && state.dataHeatBal->People(j).AdaptiveCEN15251) {
                             MultizoneZoneData(i).CEN15251PeopleInd = j;
                             break;
                         }
@@ -4781,6 +4775,7 @@ namespace AirflowNetworkBalanceManager {
         int i;
         int j;
         int ZoneNum;
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (initializeOneTimeFlag) {
             exchangeData.allocate(state.dataGlobal->NumOfZones); // AirflowNetwork exchange data due to air-forced system
@@ -4800,35 +4795,35 @@ namespace AirflowNetworkBalanceManager {
                                         exchangeData(i).SumMHr,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Mixing Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHr,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Outdoor Air CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMHrCO,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Mixing CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHrCO,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Total CO2 Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).TotalCO2,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                 }
             }
             if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
@@ -4840,14 +4835,14 @@ namespace AirflowNetworkBalanceManager {
                                             exchangeData(i).SumMHr,
                                             "System",
                                             "Average",
-                                            AirflowNetworkBalanceManager::Zone(i).Name);
+                                            Zone(i).Name);
                         SetupOutputVariable(state,
                                             "AFN Zone Mixing Mass Flow Rate",
                                             OutputProcessor::Unit::kg_s,
                                             exchangeData(i).SumMMHr,
                                             "System",
                                             "Average",
-                                            AirflowNetworkBalanceManager::Zone(i).Name);
+                                            Zone(i).Name);
                     }
                     SetupOutputVariable(state,
                                         "AFN Zone Outdoor Air Generic Air Contaminant Mass Flow Rate",
@@ -4855,21 +4850,21 @@ namespace AirflowNetworkBalanceManager {
                                         exchangeData(i).SumMHrGC,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Mixing Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).SumMMHrGC,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                     SetupOutputVariable(state,
                                         "AFN Zone Total Generic Air Contaminant Mass Flow Rate",
                                         OutputProcessor::Unit::kg_s,
                                         exchangeData(i).TotalGC,
                                         "System",
                                         "Average",
-                                        AirflowNetworkBalanceManager::Zone(i).Name);
+                                        Zone(i).Name);
                 }
             }
         }
@@ -5048,6 +5043,7 @@ namespace AirflowNetworkBalanceManager {
         int ZoneNum;
         int n;
         int SurfNum;
+        auto &Zone(state.dataHeatBal->Zone);
 
         AirflowNetworkNodeSimu.allocate(AirflowNetworkNumOfNodes);   // Node simulation variable in air distribution system
         AirflowNetworkLinkSimu.allocate(AirflowNetworkNumOfLinks);   // Link simulation variable in air distribution system
@@ -6592,6 +6588,7 @@ namespace AirflowNetworkBalanceManager {
         // ASTM C1340
 
         Real64 k = airThermConductivity(state, Ts);
+        auto &Zone(state.dataHeatBal->Zone);
 
         Real64 hOut_final = 0;
 
@@ -7931,15 +7928,14 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine reports outputs of air distribution systems
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
-        using DataHeatBalance::ZonePreDefRep;
-        using DataHeatBalance::ZoneTotalExfiltrationHeatLoss;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Lam(2.5e6); // Heat of vaporization (J/kg)
+        constexpr Real64 Lam(2.5e6); // Heat of vaporization (J/kg)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
@@ -7969,7 +7965,7 @@ namespace AirflowNetworkBalanceManager {
         }
         ReportingConstant = TimeStepSys * DataGlobalConstants::SecInHour;
 
-        ZoneTotalExfiltrationHeatLoss = 0.0;
+        state.dataHeatBal->ZoneTotalExfiltrationHeatLoss = 0.0;
 
         for (auto &e : AirflowNetworkReportData) {
             e.MultiZoneInfiSenGainW = 0.0;
@@ -8521,14 +8517,14 @@ namespace AirflowNetworkBalanceManager {
             Real64 StdDensInfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(i).SumMCp / CpAir / state.dataEnvrn->StdRhoAir) *
                                         ReportingConstant; // compute volume using standard density air
             // MJWToDo - Separate AFN Vent and InfilVolFlow
-            ZonePreDefRep(i).AFNVentVolTotalStdDen += 0.0;
-            ZonePreDefRep(i).AFNInfilVolTotalStdDen += StdDensInfilVolume;
-            if (ZonePreDefRep(i).isOccupied) {
-                ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
-                ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
-                ZonePreDefRep(i).AFNInfilVolTotalOcc += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
-                if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < ZonePreDefRep(i).AFNInfilVolMin) {
-                    ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+            state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalStdDen += 0.0;
+            state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalStdDen += StdDensInfilVolume;
+            if (state.dataHeatBal->ZonePreDefRep(i).isOccupied) {
+                state.dataHeatBal->ZonePreDefRep(i).AFNVentVolTotalOccStdDen += 0.0;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOccStdDen += StdDensInfilVolume;
+                state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolTotalOcc += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
+                if (state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume < state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin) {
+                    state.dataHeatBal->ZonePreDefRep(i).AFNInfilVolMin = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).InfilVolume * Zone(i).Multiplier * Zone(i).ListMultiplier;
                 }
             }
 
@@ -8553,7 +8549,7 @@ namespace AirflowNetworkBalanceManager {
                 state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilMass / ReportingConstant * (ZoneAirHumRat(i) - state.dataEnvrn->OutHumRat) * H2OHtOfVap;
             state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss = state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilSensiLoss + state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilLatentLoss;
 
-            ZoneTotalExfiltrationHeatLoss += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
+            state.dataHeatBal->ZoneTotalExfiltrationHeatLoss += state.dataAirflowNetworkBalanceManager->AirflowNetworkZnRpt(i).ExfilTotalLoss * ReportingConstant;
         } // ... end of zone loads report variable update loop.
 
         // Rewrite AirflowNetwork airflow rate
@@ -8646,6 +8642,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 AFNMass;
         bool WriteFlag;
 
+        auto &Zone(state.dataHeatBal->Zone);
 
         for (auto &e : state.dataAirflowNetworkBalanceManager->exchangeData) {
             e.SumMCp = 0.0;
@@ -10565,7 +10562,7 @@ namespace AirflowNetworkBalanceManager {
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(state, RoutineName +
                                      "The hybrid ventilation control schedule value indicates global control in the controlled zone = " +
-                                     Zone(HybridVentSysAvailMaster(SysAvailNum)).Name);
+                                     state.dataHeatBal->Zone(HybridVentSysAvailMaster(SysAvailNum)).Name);
                     ShowContinueError(state, "The exterior surface containing an opening component in the controlled zone is not found.  No global control "
                                       "will not be modeled.");
                     ShowContinueError(state, "The individual control is assumed.");
@@ -10949,7 +10946,7 @@ namespace AirflowNetworkBalanceManager {
         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
         RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
         InfilVolume = (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp / CpAir / RhoAir) * TimeStepSys * DataGlobalConstants::SecInHour;
-        ACH = InfilVolume / (TimeStepSys * Zone(ZoneNum).Volume);
+        ACH = InfilVolume / (TimeStepSys * state.dataHeatBal->Zone(ZoneNum).Volume);
 
         return ACH;
     }
@@ -11264,14 +11261,13 @@ namespace AirflowNetworkBalanceManager {
                                               int &OpeningProbStatus,
                                               int &ClosingProbStatus)
     {
-        using DataHeatBalance::MRT;
 
         Real64 Tcomfort;    // Thermal comfort temperature
         Real64 ComfortBand; // Thermal comfort band
         Real64 Toperative;  // Operative temperature
         Real64 OutDryBulb;  // Outdoor dry-bulb temperature
 
-        // flow
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (TimeOpenDuration > 0) {
             if (TimeOpenDuration >= MinOpeningTime) {
@@ -11302,7 +11298,7 @@ namespace AirflowNetworkBalanceManager {
             Tcomfort = CurveValue(state, ComfortHighTempCurveNum, OutDryBulb);
         }
         ComfortBand = -0.0028 * (100 - MaxPPD) * (100 - MaxPPD) + 0.3419 * (100 - MaxPPD) - 6.6275;
-        Toperative = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+        Toperative = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
 
         if (Toperative > (Tcomfort + ComfortBand)) {
             if (openingProbability(state, ZoneNum, TimeCloseDuration)) {
@@ -11329,7 +11325,6 @@ namespace AirflowNetworkBalanceManager {
                                                             int const ZoneNum,
                                                             Real64 const TimeCloseDuration) // function to perform calculations of opening probability
     {
-        using DataHeatBalance::ZoneIntGain;
         using DataHeatBalFanSys::TempControlType;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHeatBalFanSys::ZoneThermostatSetPointLo;
@@ -11345,7 +11340,7 @@ namespace AirflowNetworkBalanceManager {
             return false;
         }
         if (OccupancyCheck) {
-            if (ZoneIntGain(ZoneNum).NOFOCC <= 0.0) {
+            if (state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC <= 0.0) {
                 return false;
             }
         }

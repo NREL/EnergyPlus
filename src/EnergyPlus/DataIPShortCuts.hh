@@ -63,15 +63,6 @@ namespace DataIPShortCuts {
     // -only module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
     // MODULE VARIABLE DECLARATIONS:
     extern Array1D_string cAlphaFieldNames;
     extern Array1D_string cNumericFieldNames;

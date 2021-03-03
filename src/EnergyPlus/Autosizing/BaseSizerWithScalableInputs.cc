@@ -136,7 +136,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             if (coolingSAFMethod == DataSizing::FlowPerFloorArea) {
                 DataSizing::DataScalableSizingON = true;
                 this->dataConstantUsedForSizing =
-                    this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * DataHeatBalance::Zone(DataSizing::DataZoneNumber).FloorArea;
+                    this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataSizing::DataZoneNumber).FloorArea;
             } else if (coolingSAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
                 DataSizing::DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
                 DataSizing::DataScalableSizingON = true;

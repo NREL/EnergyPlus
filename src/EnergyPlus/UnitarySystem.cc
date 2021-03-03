@@ -3145,7 +3145,7 @@ namespace UnitarySystems {
                     ShowContinueError(state, "Controlling Zone or Thermostat Location cannot be blank when Control Type = Load or SingleZoneVAV");
                     errorsFound = true;
                 }
-                if (loc_controlZoneName != "") thisSys.ControlZoneNum = UtilityRoutines::FindItemInList(loc_controlZoneName, DataHeatBalance::Zone);
+                if (loc_controlZoneName != "") thisSys.ControlZoneNum = UtilityRoutines::FindItemInList(loc_controlZoneName, state.dataHeatBal->Zone);
                 // check that control zone name is valid for load based control
                 if (thisSys.m_ControlType == ControlType::Load || thisSys.m_ControlType == ControlType::CCMASHRAE) {
                     if (thisSys.ControlZoneNum == 0) {
@@ -3226,7 +3226,7 @@ namespace UnitarySystems {
                             //               Find the controlled zone number for the specified thermostat location
                             thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                             TotalFloorAreaOnAirLoop =
-                                DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
+                                state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                             thisSys.m_AirLoopEquipment = false;
                             thisSys.m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ExhaustNode(ZoneExhNum);
                             if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
@@ -3298,7 +3298,7 @@ namespace UnitarySystems {
                                 //               Find the controlled zone number for the specified thermostat location
                                 thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                                 TotalFloorAreaOnAirLoop =
-                                    DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
+                                    state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                                 thisSys.m_AirLoopEquipment = false;
                                 thisSys.m_ZoneInletNode = thisSys.AirOutNode;
                                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
@@ -3367,7 +3367,7 @@ namespace UnitarySystems {
                                 //               Find the controlled zone number for the specified thermostat location
                                 thisSys.NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
                                 TotalFloorAreaOnAirLoop =
-                                    DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
+                                    state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum).FloorArea;
                                 thisSys.m_AirLoopEquipment = false;
                                 thisSys.m_ZoneInletNode = thisSys.ATMixerOutNode;
                                 if (state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).EquipListIndex > 0) {
@@ -3450,7 +3450,7 @@ namespace UnitarySystems {
                                                 AirLoopNumber) {
                                                 thisSys.m_ZoneInletNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).InletNode(zoneInNode);
                                                 TotalFloorAreaOnAirLoop +=
-                                                    DataHeatBalance::Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
+                                                    state.dataHeatBal->Zone(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ActualZoneNum)
                                                         .FloorArea;
                                             }
                                         }
@@ -9641,7 +9641,7 @@ namespace UnitarySystems {
 
         if (allocated(state.dataZoneEquip->ZoneEquipConfig) && this->m_MyCheckFlag) {
             if (this->m_AirLoopEquipment) {
-                int zoneNum = DataHeatBalance::Zone(this->ControlZoneNum).ZoneEqNum;
+                int zoneNum = state.dataHeatBal->Zone(this->ControlZoneNum).ZoneEqNum;
                 int zoneInlet = this->m_ZoneInletNode;
                 if (zoneInlet == 0) {
                     this->m_ThisSysInputShouldBeGotten = true; // need to find zone inlet node once data is available
@@ -9662,7 +9662,7 @@ namespace UnitarySystems {
                 this->m_MyCheckFlag = false;
                 if (this->m_ZoneSequenceCoolingNum == 0 || this->m_ZoneSequenceHeatingNum == 0) {
                     ShowSevereError(state, this->UnitType + " \"" + this->Name + "\": Airloop air terminal in the zone equipment list for zone = " +
-                                    DataHeatBalance::Zone(this->ControlZoneNum).Name +
+                                    state.dataHeatBal->Zone(this->ControlZoneNum).Name +
                                     " not found or is not allowed Zone Equipment Cooling or Heating Sequence = 0.");
                     ShowFatalError(state, "Subroutine InitLoadBasedControl: Errors found in getting " + this->UnitType +
                                    " input.  Preceding condition(s) causes termination.");
@@ -9670,7 +9670,7 @@ namespace UnitarySystems {
             }
             if (this->m_ZoneInletNode == 0) {
                 ShowSevereError(state, this->UnitType + " \"" + this->Name + "\": The zone inlet node in the controlled zone (" +
-                                DataHeatBalance::Zone(this->ControlZoneNum).Name + ") is not found.");
+                                state.dataHeatBal->Zone(this->ControlZoneNum).Name + ") is not found.");
                 ShowFatalError(state, "Subroutine InitLoadBasedControl: Errors found in getting " + this->UnitType +
                                " input.  Preceding condition(s) causes termination.");
             }

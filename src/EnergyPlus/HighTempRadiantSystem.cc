@@ -273,7 +273,6 @@ namespace HighTempRadiantSystem {
         // Standard EnergyPlus methodology.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
@@ -354,7 +353,7 @@ namespace HighTempRadiantSystem {
             }
 
             HighTempRadSys(Item).ZoneName = cAlphaArgs(3);
-            HighTempRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            HighTempRadSys(Item).ZonePtr = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
             if (HighTempRadSys(Item).ZonePtr == 0) {
                 ShowSevereError(state, "Invalid " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));
                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
@@ -751,7 +750,7 @@ namespace HighTempRadiantSystem {
 
         if (state.dataGlobal->BeginTimeStepFlag && FirstHVACIteration) { // This is the first pass through in a particular time step
             ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
-            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure out what part of the load the radiant system meets
+            ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure out what part of the load the radiant system meets
             QHTRadSrcAvg(RadSysNum) = 0.0;                       // Initialize this variable to zero (radiant system defaults to off)
             LastQHTRadSrc(RadSysNum) = 0.0;      // At the beginning of a time step, reset to zero so average calculation can start again
             LastSysTimeElapsed(RadSysNum) = 0.0; // At the beginning of a time step, reset to zero so average calculation can start again
@@ -781,7 +780,6 @@ namespace HighTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
 
         // Locals
@@ -844,7 +842,7 @@ namespace HighTempRadiantSystem {
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HighTempRadSys(RadSysNum).ScaledHeatingCapacity * Zone(DataZoneNumber).FloorArea;
+                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = HighTempRadSys(RadSysNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
                     TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
                     DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -900,7 +898,6 @@ namespace HighTempRadiantSystem {
         //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -941,7 +938,7 @@ namespace HighTempRadiantSystem {
             // Determine the current setpoint temperature and the temperature at which the unit should be completely off
             SetPtTemp = GetCurrentScheduleValue(state, HighTempRadSys(RadSysNum).SetptSchedPtr);
             OffTemp = SetPtTemp + 0.5 * HighTempRadSys(RadSysNum).ThrottlRange;
-            OpTemp = (MAT(ZoneNum) + MRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
+            OpTemp = (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum)) / 2.0; // Approximate the "operative" temperature
 
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             {
@@ -949,9 +946,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == MATControl) {
                     HeatFrac = (OffTemp - MAT(ZoneNum)) / HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == MRTControl) {
-                    HeatFrac = (OffTemp - MRT(ZoneNum)) / HighTempRadSys(RadSysNum).ThrottlRange;
+                    HeatFrac = (OffTemp - state.dataHeatBal->MRT(ZoneNum)) / HighTempRadSys(RadSysNum).ThrottlRange;
                 } else if (SELECT_CASE_var == OperativeControl) {
-                    OpTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                    OpTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                     HeatFrac = (OffTemp - OpTemp) / HighTempRadSys(RadSysNum).ThrottlRange;
                 }
             }
@@ -997,7 +994,6 @@ namespace HighTempRadiantSystem {
         //   Urbana-Champaign (Dept. of Mechanical and Industrial Engineering).
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
         using DataHeatBalFanSys::MAT;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1056,9 +1052,9 @@ namespace HighTempRadiantSystem {
                 if (SELECT_CASE_var == MATSPControl) {
                     ZoneTemp = MAT(ZoneNum);
                 } else if (SELECT_CASE_var == MRTSPControl) {
-                    ZoneTemp = MRT(ZoneNum);
+                    ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
                 } else if (SELECT_CASE_var == OperativeSPControl) {
-                    ZoneTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                    ZoneTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                 } else {
                     assert(false);
                 }
@@ -1098,9 +1094,9 @@ namespace HighTempRadiantSystem {
                         if (SELECT_CASE_var == MATControl) {
                             ZoneTemp = MAT(ZoneNum);
                         } else if (SELECT_CASE_var == MRTControl) {
-                            ZoneTemp = MRT(ZoneNum);
+                            ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
                         } else if (SELECT_CASE_var == OperativeControl) {
-                            ZoneTemp = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));
+                            ZoneTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                         }
                     }
 
@@ -1216,7 +1212,7 @@ namespace HighTempRadiantSystem {
             LoadMet = 0.0; // System wasn't running so it can't meet a load
         } else {
             ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
-            LoadMet = (SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + SumConvHTRadSys(ZoneNum);
+            LoadMet = (SumHATsurf(state, ZoneNum) - ZeroSourceSumHATsurf(ZoneNum)) + SumConvHTRadSys(ZoneNum);
         }
     }
 
@@ -1308,7 +1304,6 @@ namespace HighTempRadiantSystem {
         // na
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::MaxRadHeatFlux;
         using DataHeatBalFanSys::QHTRadSysSurf;
         using DataHeatBalFanSys::QHTRadSysToPerson;
@@ -1447,7 +1442,7 @@ namespace HighTempRadiantSystem {
         HighTempRadSys(RadSysNum).HeatEnergy = HighTempRadSys(RadSysNum).HeatPower * TimeStepSys * DataGlobalConstants::SecInHour;
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -1485,7 +1480,7 @@ namespace HighTempRadiantSystem {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = Surface(SurfNum).Area;
@@ -1498,18 +1493,18 @@ namespace HighTempRadiantSystem {
 
                 if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
                                   SurfWinFrameTempSurfIn(SurfNum);
                 }
 
                 if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
                                   SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 
-            SumHATsurf += HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
+            SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
         }
 
         return SumHATsurf;

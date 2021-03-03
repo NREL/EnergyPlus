@@ -76,7 +76,6 @@
 using namespace EnergyPlus;
 using namespace SimulationManager;
 using namespace DataSizing;
-using DataHeatBalance::Zone;
 
 TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 {
@@ -1306,14 +1305,14 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     Real64 AirLoopOAFrac;
 
     state->dataSingleDuct->sd_airterminal.allocate(1);
-    Zone.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     DataSizing::OARequirements.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
     state->dataSingleDuct->sd_airterminal(1).CtrlZoneNum = 1;
     state->dataSingleDuct->sd_airterminal(1).ActualZoneNum = 1;
     state->dataSingleDuct->sd_airterminal(1).NoOAFlowInputFromUser = false;
@@ -1330,7 +1329,7 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
     DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
     state->dataSingleDuct->sd_airterminal(1).CalcOAMassFlow(*state, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.0131547, SAMassFlow, 0.00001);
@@ -1338,12 +1337,12 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
 
     // Cleanup
     state->dataSingleDuct->sd_airterminal.deallocate();
-    Zone.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
     DataSizing::OARequirements.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
@@ -2493,15 +2492,15 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     int ATMixerNum = 1;
     state->dataSingleDuct->NumATMixers = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
     DataSizing::OARequirements.allocate(1);
-    Zone.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     state->dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = 2;
@@ -2514,7 +2513,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
-    Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
     OARequirements(1).OAFlowMethod = OAFlowSum;
     OARequirements(1).OAFlowPerZone = 0.1;
     OARequirements(1).OAFlowPerPerson = 0.1;
@@ -2523,7 +2522,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     DataLoopNode::Node(2).Temp = 23.0;
     DataLoopNode::Node(2).HumRat = 0.001;
 
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 5.0;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 5.0;
 
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataSingleDuct->SysATMixer(1).MassFlowRateMaxAvail = 1.0;
@@ -2536,7 +2535,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.72, 0.0001);
     // Design occupancy
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = 2;
-    Zone(1).TotOccupants = 10;
+    state->dataHeatBal->Zone(1).TotOccupants = 10;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 1.32, 0.0001);
 
@@ -2545,8 +2544,8 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataAirLoop->AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
     DataSizing::OARequirements.deallocate();
-    Zone.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 {
@@ -2556,15 +2555,15 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     int ATMixerNum = 1;
     state->dataSingleDuct->NumATMixers = 1;
-    DataHeatBalance::TotPeople = 1;
+    state->dataHeatBal->TotPeople = 1;
 
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
     DataSizing::OARequirements.allocate(1);
-    Zone.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
     state->dataSingleDuct->SysATMixer(ATMixerNum).SecInNode = 1;
     state->dataSingleDuct->SysATMixer(ATMixerNum).PriInNode = 2;
@@ -2580,7 +2579,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 1.0;
 
-    Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
     OARequirements(1).OAFlowMethod = OAFlowSum;
     OARequirements(1).OAFlowPerZone = 0.5;
     OARequirements(1).OAFlowPerPerson = 0.0;
@@ -2591,7 +2590,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     DataLoopNode::Node(2).Temp = 23.0;
     DataLoopNode::Node(2).HumRat = 0.001;
 
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 5.0;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 5.0;
 
     state->dataEnvrn->StdRhoAir = 1.0;
     state->dataSingleDuct->SysATMixer(1).MassFlowRateMaxAvail = 1.0;
@@ -2628,8 +2627,8 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataAirLoop->AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
     DataSizing::OARequirements.deallocate();
-    Zone.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VAVReheatTerminal_SizeMinFrac)

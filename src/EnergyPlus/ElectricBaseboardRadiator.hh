@@ -182,7 +182,7 @@ namespace ElectricBaseboardRadiator {
 
     void ReportElectricBaseboard(int const BaseboardNum);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum); // Zone number
 
 } // namespace ElectricBaseboardRadiator
 

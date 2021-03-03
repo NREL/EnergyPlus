@@ -128,7 +128,6 @@ namespace DesiccantDehumidifiers {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;
     using DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
@@ -2675,11 +2674,11 @@ namespace DesiccantDehumidifiers {
                 //     condenser waste heat is proportional to DX coil PLR
                 if ((DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
                     (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
-                    CondenserWasteHeat = HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
-                    HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
+                    CondenserWasteHeat = state.dataHeatBal->HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
+                    state.dataHeatBal->HeatReclaimDXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
                 } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    CondenserWasteHeat = DataHeatBalance::HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
-                    DataHeatBalance::HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
+                    CondenserWasteHeat = state.dataHeatBal->HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity;
+                    state.dataHeatBal->HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
                 }
 
                 CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat);

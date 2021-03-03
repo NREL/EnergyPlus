@@ -138,8 +138,6 @@ namespace LowTempRadiantSystem {
     // Using/Aliasing
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
-    using DataHeatBalance::TotConstructs;
-    using DataHeatBalance::TotMaterials;
     using DataHeatBalFanSys::QRadSysSource; // Heat source/sink value & temperature for CondFD algo.
     using DataHeatBalFanSys::TCondFDSourceNode;
     using DataHVACGlobals::SmallLoad;
@@ -318,7 +316,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::CoolingDesignCapacity;
@@ -366,6 +363,8 @@ namespace LowTempRadiantSystem {
         int BaseNum;                           // Temporary number for creating RadiantSystemTypes structure
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         Array1D_string VarFlowRadDesignNames;
         Array1D_string CFlowRadDesignNames;
@@ -1737,6 +1736,8 @@ namespace LowTempRadiantSystem {
 
     void RadiantSystemBaseData::errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound)
     {
+        auto &Zone(state.dataHeatBal->Zone);
+
         Real64 zoneMultipliers = 0.0;
         Real64 zoneMultipliersSurface = 0.0;
         Real64 zoneMultiplersTolerance = 0.001;
@@ -1750,7 +1751,7 @@ namespace LowTempRadiantSystem {
                 if (Surface(this->SurfacePtr(SurfNum)).Zone != this->ZonePtr) {
                     ShowWarningError(state, "A surface referenced in a Low Temperature Radiant System is not in same zone as the radiant system itself");
                     ShowContinueError(state, "Surface = " + Surface(this->SurfacePtr(SurfNum)).Name);
-                    ShowContinueError(state, "Surface in Zone = " + DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
+                    ShowContinueError(state, "Surface in Zone = " + Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Name +
                                       ". Radiant System in Zone = " + this->ZoneName);
                     ShowContinueError(state, "Occurs in Low Temperature Radiant System = " + this->Name);
                     ShowContinueError(state, "If this is intentionally a radiant system with surfaces in more than one thermal zone,");
@@ -1761,9 +1762,9 @@ namespace LowTempRadiantSystem {
             // check zone multipliers--these must be the same
             if (SurfNum == 1)
                 zoneMultipliers =
-                    double(DataHeatBalance::Zone(this->ZonePtr).Multiplier) * double(DataHeatBalance::Zone(this->ZonePtr).ListMultiplier);
-            zoneMultipliersSurface = double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier) *
-                                     double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
+                    double(Zone(this->ZonePtr).Multiplier) * double(Zone(this->ZonePtr).ListMultiplier);
+            zoneMultipliersSurface = double(Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier) *
+                                     double(Zone(Surface(this->SurfacePtr(SurfNum)).Zone).ListMultiplier);
             if (std::abs(zoneMultipliers - zoneMultipliersSurface) > zoneMultiplersTolerance) {
                 ShowSevereError(state, "The zone multipliers are not the same for all surfaces contained in this radiant system");
                 ShowContinueError(state, "This is not allowed and must be fixed for the simulation to run.");
@@ -2295,7 +2296,7 @@ namespace LowTempRadiantSystem {
                 if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::HydronicSystem) {
 
                     ZoneNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).ZonePtr;
-                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->HydrRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = state.dataLowTempRadSys->HydrRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                         state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -2307,7 +2308,7 @@ namespace LowTempRadiantSystem {
                 } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ConstantFlowSystem) {
 
                     ZoneNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ZonePtr;
-                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->CFloRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = state.dataLowTempRadSys->CFloRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                         state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -2319,7 +2320,7 @@ namespace LowTempRadiantSystem {
                 } else if (SELECT_CASE_var == LowTempRadiantSystem::SystemType::ElectricSystem) {
 
                     ZoneNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).ZonePtr;
-                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(ZoneNum); // Set this to figure what part of the load the radiant system meets
+                    state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum) = SumHATsurf(state, ZoneNum); // Set this to figure what part of the load the radiant system meets
                     for (RadSurfNum = 1; RadSurfNum <= state.dataLowTempRadSys->ElecRadSys(RadSysNum).NumOfSurfaces; ++RadSurfNum) {
                         SurfNum = state.dataLowTempRadSys->ElecRadSys(RadSysNum).SurfacePtr(RadSurfNum);
                         state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) = 0.0;      // Initialize this variable to zero (radiant system defaults to off)
@@ -2521,7 +2522,6 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::AutoCalculateSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingCapacitySizing;
@@ -2578,6 +2578,8 @@ namespace LowTempRadiantSystem {
         DesCoilLoad = 0.0;
         DataScalableCapSizingON = false;
         DataFracOfAutosizedHeatingCapacity = 1.0;
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         if (SystemType == LowTempRadiantSystem::SystemType::ElectricSystem) {
 
@@ -3315,7 +3317,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
@@ -3487,8 +3488,9 @@ namespace LowTempRadiantSystem {
         //   of Illinois at Urbana-Champaign, Department of Mechanical and Industrial
         //   Engineering.
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
@@ -3502,7 +3504,6 @@ namespace LowTempRadiantSystem {
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
         using DataSurfaces::Surface;
-
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3962,7 +3963,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
+        LoadMet = SumHATsurf(state, ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
     }
 
     void ConstantFlowRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state,
@@ -3997,8 +3998,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
-        using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
@@ -4502,8 +4501,9 @@ namespace LowTempRadiantSystem {
         //   of Illinois at Urbana-Champaign, Department of Mechanical and Industrial
         //   Engineering.
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHeatBalFanSys::CTFTsrcConstPart;
         using DataHeatBalFanSys::RadSysTiHBConstCoef;
         using DataHeatBalFanSys::RadSysTiHBQsrcCoef;
@@ -4518,7 +4518,6 @@ namespace LowTempRadiantSystem {
         using DataSurfaces::HeatTransferModel_CTF;
         using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4985,7 +4984,7 @@ namespace LowTempRadiantSystem {
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-        LoadMet = SumHATsurf(this->ZonePtr) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
+        LoadMet = SumHATsurf(state, this->ZonePtr) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(this->ZonePtr);
     }
 //TODO Write unit tests for baseboard
     void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state,
@@ -5059,8 +5058,6 @@ namespace LowTempRadiantSystem {
         //   of Wisconsin-Madison.
 
         // Using/Aliasing
-        using DataHeatBalance::MRT;
-        using DataHeatBalance::Zone;
         using DataHeatBalance::ZoneData;
         using DataHeatBalFanSys::MAT;
         using DataHVACGlobals::SmallLoad;
@@ -5116,7 +5113,7 @@ namespace LowTempRadiantSystem {
                 HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
-                LoadMet = SumHATsurf(ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
+                LoadMet = SumHATsurf(state, ZoneNum) - state.dataLowTempRadSys->ZeroSourceSumHATsurf(ZoneNum);
 
             } else { //  OFF or COOLING MODE (not allowed for an electric low temperature radiant system), turn it off
 
@@ -5140,7 +5137,6 @@ namespace LowTempRadiantSystem {
         // added.  If the system time step elapsed is different, then we just need to add the new values to the running average.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
 
@@ -5170,7 +5166,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
@@ -5184,6 +5179,8 @@ namespace LowTempRadiantSystem {
         int waterInletNode;   // Node number for the water side inlet of the radiant system
         Real64 waterMassFlow; // Flow rate of water in the radiant system
         int waterOutletNode;  // Node number for the water side outlet of the radiant system
+
+        auto &Zone(state.dataHeatBal->Zone);
 
         // For a hydronic system, calculate the water side outlet conditions and set the
         // appropriate conditions on the correct HVAC node.
@@ -5249,7 +5246,6 @@ namespace LowTempRadiantSystem {
     {
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
@@ -5386,13 +5382,13 @@ namespace LowTempRadiantSystem {
         case LowTempRadiantControlTypes::MATControl:
             return DataHeatBalFanSys::MAT(this->ZonePtr);
         case LowTempRadiantControlTypes::MRTControl:
-            return DataHeatBalance::MRT(this->ZonePtr);
+            return state.dataHeatBal->MRT(this->ZonePtr);
         case LowTempRadiantControlTypes::OperativeControl:
-            return 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + DataHeatBalance::MRT(this->ZonePtr));
+            return 0.5 * (DataHeatBalFanSys::MAT(this->ZonePtr) + state.dataHeatBal->MRT(this->ZonePtr));
         case LowTempRadiantControlTypes::ODBControl:
-            return DataHeatBalance::Zone(this->ZonePtr).OutDryBulbTemp;
+            return state.dataHeatBal->Zone(this->ZonePtr).OutDryBulbTemp;
         case LowTempRadiantControlTypes::OWBControl:
-            return DataHeatBalance::Zone(this->ZonePtr).OutWetBulbTemp;
+            return state.dataHeatBal->Zone(this->ZonePtr).OutWetBulbTemp;
         case LowTempRadiantControlTypes::SurfFaceTempControl:
             return DataHeatBalSurface::TempSurfIn(this->SurfacePtr(1)); // Grabs the inside face temperature of the first surface in the list
         case LowTempRadiantControlTypes::SurfIntTempControl:
@@ -5724,7 +5720,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    Real64 SumHATsurf(int const ZoneNum) // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int const ZoneNum) // Zone number
     {
 
         // FUNCTION INFORMATION:
@@ -5744,6 +5740,8 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 sumHATsurf(0.0);
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         for (int surfNum = Zone(ZoneNum).SurfaceFirst; surfNum <= Zone(ZoneNum).SurfaceLast; ++surfNum) {
             if (!Surface(surfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
@@ -5757,18 +5755,18 @@ namespace LowTempRadiantSystem {
 
                 if (SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
                                   SurfWinFrameTempSurfIn(surfNum);
                 }
 
                 if (SurfWinDividerArea(surfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
                                   SurfWinDividerTempSurfIn(surfNum);
                 }
             }
 
-            sumHATsurf += HConvIn(surfNum) * Area * TempSurfInTmp(surfNum);
+            sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * Area * TempSurfInTmp(surfNum);
         }
 
         return sumHATsurf;
@@ -5777,8 +5775,9 @@ namespace LowTempRadiantSystem {
     void VariableFlowRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     {
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
 
@@ -5823,8 +5822,9 @@ namespace LowTempRadiantSystem {
     void ConstantFlowRadiantSystemData::reportLowTemperatureRadiantSystem(EnergyPlusData &state)
     {
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
@@ -5896,8 +5896,9 @@ namespace LowTempRadiantSystem {
     void ElectricRadiantSystemData::reportLowTemperatureRadiantSystem([[maybe_unused]] EnergyPlusData &state)
     {
 
+        auto &Zone(state.dataHeatBal->Zone);
+
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::TimeStepSys;
 
         Real64 totalRadSysPower(0.0); // Total source/sink power for the radiant system (sum of all surfaces of the system)
