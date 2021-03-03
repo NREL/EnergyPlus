@@ -5457,7 +5457,7 @@ namespace Furnaces {
                 if (state.dataFurnaces->Furnace(FurnaceNum).bIsIHP) // set max fan flow rate to the IHP collection
                 {
                     IHPIndex = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
-                };
+                }
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow != AutoSize) {
                     //     Check fan versus system supply air flow rates
@@ -5477,7 +5477,7 @@ namespace Furnaces {
                         {
                             state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).MaxCoolAirVolFlow = state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow;
                             state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).MaxCoolAirMassFlow = state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow * state.dataEnvrn->StdRhoAir;
-                        };
+                        }
 
                         // Check flow rates in other speeds and ensure flow rates are not above the max flow rate
                         for (int i = NumOfSpeedCooling - 1; i >= 1; --i) {
@@ -5509,7 +5509,7 @@ namespace Furnaces {
                                 state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).MaxHeatAirVolFlow = state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow;
                                 state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).MaxHeatAirMassFlow =
                                     state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow * state.dataEnvrn->StdRhoAir;
-                            };
+                            }
 
                             for (int i = NumOfSpeedHeating - 1; i >= 1; --i) {
                                 if (state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(i) > state.dataFurnaces->Furnace(FurnaceNum).HeatVolumeFlowRate(i + 1)) {
@@ -11566,7 +11566,7 @@ namespace Furnaces {
             if (IHPOperationMode::SCWHMatchWHMode == state.dataIntegratedHP->IntegratedHeatPumps(state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex).CurMode) {
                 state.dataFurnaces->CompOnMassFlow = GetAirMassFlowRateIHP(state, state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, SpeedRatio, false);
                 AverageUnitMassFlow = state.dataFurnaces->CompOnMassFlow;
-            };
+            }
         } else {
             if (!state.dataZoneEnergyDemand->CurDeadBandOrSetback(state.dataFurnaces->Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).HeatCoolMode == Furnaces::ModeOfOperation::HeatingMode) {
