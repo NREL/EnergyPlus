@@ -2522,11 +2522,11 @@ namespace LowTempRadiantSystem {
         // SUBROUTINE PARAMETER DEFINITIONS:
         auto constexpr RoutineName("SizeLowTempRadiantSystem");
 
-        enum OperatingMode : int {
-            OFF = 0,
-            ClgHtg = 1,
-            ClgOnly = 2,
-            HtgOnly = 3
+        enum class OperatingMode {
+            OFF,
+            ClgHtg,
+            ClgOnly,
+            HtgOnly
         };
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2553,7 +2553,7 @@ namespace LowTempRadiantSystem {
         int CapSizingMethod(0);     // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                     // FractionOfAutosizedHeatingCapacity )
         Real64 DesCoilLoad;         // design autosized or user specified capacity
-        OperatingMode OpMode(ClgHtg);              // System operating mode
+        OperatingMode OpMode(OperatingMode::ClgHtg);              // System operating mode
         int HeatNode;               // Hot water inlet node to determine system operating mode
         int CoolNode;               // Chilled water inlet node to determine system operating mode
         Real64 WaterVolFlowMaxDes;  // Design water volume flow rate for reproting
@@ -3046,13 +3046,13 @@ namespace LowTempRadiantSystem {
             HeatNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode;
             CoolNode = state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode;
             if (HeatNode > 0 && CoolNode > 0) {
-                OpMode = ClgHtg;
+                OpMode = OperatingMode::ClgHtg;
             } else if (HeatNode > 0 && CoolNode <= 0) {
-                OpMode = HtgOnly;
+                OpMode = OperatingMode::HtgOnly;
             } else if (CoolNode > 0 && HeatNode <= 0) {
-                OpMode = ClgOnly;
+                OpMode = OperatingMode::ClgOnly;
             } else {
-                OpMode = OFF; // It shouldn't happen here
+                OpMode = OperatingMode::OFF; // It shouldn't happen here
             }
 
             if (state.dataLowTempRadSys->CFloRadSys(RadSysNum).WaterVolFlowMax == AutoSize) {
@@ -3069,7 +3069,7 @@ namespace LowTempRadiantSystem {
                     CheckZoneSizing(state, CompType, state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name);
                     // Estimate hot water and chilled water flows
                     // Index only if it provides heating to avoid severe error
-                    if (OpMode == ClgHtg || OpMode == HtgOnly) {
+                    if (OpMode == OperatingMode::ClgHtg || OpMode == OperatingMode::HtgOnly) {
                         PltSizHeatNum = MyPlantSizingIndex(state, CompType,
                                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
                                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).HotWaterInNode,
@@ -3094,7 +3094,7 @@ namespace LowTempRadiantSystem {
                             WaterVolFlowMaxHeatDes = 0.0;
                         }
                     } else {
-                        if (OpMode == ClgHtg || OpMode == HtgOnly) {
+                        if (OpMode == OperatingMode::ClgHtg || OpMode == OperatingMode::HtgOnly) {
                             ShowSevereError(state, "Autosizing of water flow requires a heating loop Sizing:Plant object");
                             ShowContinueError(state, "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" + state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name);
                             ErrorsFound = true;
@@ -3102,7 +3102,7 @@ namespace LowTempRadiantSystem {
                     }
 
                     // Index only if it provides cooling system to avoid severe error
-                    if (OpMode == ClgHtg || OpMode == ClgOnly) {
+                    if (OpMode == OperatingMode::ClgHtg || OpMode == OperatingMode::ClgOnly) {
                         PltSizCoolNum = MyPlantSizingIndex(state, CompType,
                                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name,
                                                            state.dataLowTempRadSys->CFloRadSys(RadSysNum).ColdWaterInNode,
@@ -3127,7 +3127,7 @@ namespace LowTempRadiantSystem {
                             WaterVolFlowMaxCoolDes = 0.0;
                         }
                     } else {
-                        if (OpMode == ClgHtg || OpMode == ClgOnly) {
+                        if (OpMode == OperatingMode::ClgHtg || OpMode == OperatingMode::ClgOnly) {
                             ShowSevereError(state, "Autosizing of water flow requires a cooling loop Sizing:Plant object");
                             ShowContinueError(state, "Occurs in ZoneHVAC:LowTemperatureRadiant:ConstantFlow Object=" + state.dataLowTempRadSys->CFloRadSys(RadSysNum).Name);
                             ErrorsFound = true;
@@ -3135,11 +3135,11 @@ namespace LowTempRadiantSystem {
                     }
 
                     // Determine maximum water flow rate depending upon system type
-                    if (OpMode == ClgHtg) {
+                    if (OpMode == OperatingMode::ClgHtg) {
                         WaterVolFlowMaxDes = std::max(WaterVolFlowMaxHeatDes, WaterVolFlowMaxCoolDes);
-                    } else if (OpMode == ClgOnly) {
+                    } else if (OpMode == OperatingMode::ClgOnly) {
                         WaterVolFlowMaxDes = WaterVolFlowMaxCoolDes;
-                    } else if (OpMode == HtgOnly) {
+                    } else if (OpMode == OperatingMode::HtgOnly) {
                         WaterVolFlowMaxDes = WaterVolFlowMaxHeatDes;
                     } else {
                         WaterVolFlowMaxDes = 0.0;
