@@ -151,7 +151,6 @@ namespace LowTempRadiantSystem {
     // System types:
     auto constexpr cHydronicSystem("ZoneHVAC:LowTemperatureRadiant:VariableFlow");
     auto constexpr cConstantFlowSystem("ZoneHVAC:LowTemperatureRadiant:ConstantFlow");
-    auto constexpr cElectricSystem("ZoneHVAC:LowTemperatureRadiant:Electric");
     auto constexpr OnePerSurf("OnePerSurface");
     auto constexpr CalcFromLength("CalculateFromCircuitLength");
 
