@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
 
     ScheduleInputProcessed = true;
     state->dataEnvrn->DSTIndicator = 0;
-    ScheduleManager::NumSchedules = 1;
+    state->dataScheduleMgr->NumSchedules = 1;
     ScheduleManager::Schedule.allocate(1);
     Schedule(1).WeekSchedulePointer.allocate(367);
     WeekSchedule.allocate(3);
@@ -106,7 +106,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     DaySchedule(2).TSValue.allocate(1, 24);
     DaySchedule(3).TSValue.allocate(1, 24);
 
-    for (int ScheduleIndex = 1; ScheduleIndex <= ScheduleManager::NumSchedules; ScheduleIndex++) {
+    for (int ScheduleIndex = 1; ScheduleIndex <= state->dataScheduleMgr->NumSchedules; ScheduleIndex++) {
         for (int i = 1; i <= 366; i++) {
             int x = 1;
             if (i > 250) {
@@ -979,14 +979,14 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
 
     ScheduleManager::ScheduleInputProcessed = true;
     EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
-    ScheduleManager::NumSchedules = 1;
-    ScheduleManager::Schedule.allocate(ScheduleManager::NumSchedules);
+    state->dataScheduleMgr->NumSchedules = 1;
+    ScheduleManager::Schedule.allocate(state->dataScheduleMgr->NumSchedules);
 
     ScheduleManager::Schedule(1).WeekSchedulePointer.allocate(nDays);
     ScheduleManager::WeekSchedule.allocate(nDays);
     ScheduleManager::DaySchedule.allocate(nDays);
 
-    for (int ScheduleIndex = 1; ScheduleIndex <= ScheduleManager::NumSchedules; ScheduleIndex++) {
+    for (int ScheduleIndex = 1; ScheduleIndex <= state->dataScheduleMgr->NumSchedules; ScheduleIndex++) {
         for (int day = 1; day <= nDays; ++day) {
             // int DayOfWeek = ((day-1) % 7) + 1;
             ScheduleManager::Schedule(ScheduleIndex).WeekSchedulePointer(day) = day;
@@ -1161,8 +1161,8 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
     ScheduleManager::ScheduleInputProcessed = true;
     EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
-    ScheduleManager::NumSchedules = 1;
-    ScheduleManager::Schedule.allocate(ScheduleManager::NumSchedules);
+    state->dataScheduleMgr->NumSchedules = 1;
+    ScheduleManager::Schedule.allocate(state->dataScheduleMgr->NumSchedules);
 
     ScheduleManager::Schedule(1).WeekSchedulePointer.allocate(366);
     ScheduleManager::Schedule(1).WeekSchedulePointer = -1;

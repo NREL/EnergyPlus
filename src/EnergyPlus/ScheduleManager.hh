@@ -78,23 +78,20 @@ namespace ScheduleManager {
     extern int const NumScheduleTypeLimitUnitTypes;
     extern Array1D_string const ScheduleTypeLimitUnitTypes;
 
-    extern int const ScheduleInput_year;
-    extern int const ScheduleInput_compact;
-    extern int const ScheduleInput_file;
-    extern int const ScheduleInput_constant;
-    extern int const ScheduleInput_external;
+    enum class SchedType :int {
+        Unassigned = 0,
+        ScheduleInput_year = 1,
+        ScheduleInput_compact = 2,
+        ScheduleInput_file = 3,
+        ScheduleInput_constant = 4,
+        ScheduleInput_external = 5
+    };
 
     // DERIVED TYPE DEFINITIONS
 
     // INTERFACE BLOCK SPECIFICATIONS
 
     // MODULE VARIABLE DECLARATIONS:
-
-    // Integer Variables for the Module
-    extern int NumScheduleTypes;
-    extern int NumDaySchedules;
-    extern int NumWeekSchedules;
-    extern int NumSchedules;
 
     // Logical Variables for Module
     extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
@@ -162,21 +159,21 @@ namespace ScheduleManager {
     struct ScheduleData
     {
         // Members
-        std::string Name;                // Schedule Name
-        int ScheduleTypePtr;             // Index of Schedule Type
-        Array1D_int WeekSchedulePointer; // one created for each day of possible simulation
-        int SchType;                     // what kind of object has been input.
-        bool Used;                       // Indicator for this schedule being "used".
-        bool MaxMinSet;                  // Max/min values have been stored for this schedule
-        Real64 MaxValue;                 // Maximum value for this schedule
-        Real64 MinValue;                 // Minimum value for this schedule
-        Real64 CurrentValue;             // For Reporting
-        bool EMSActuatedOn;              // indicates if EMS computed
+        std::string Name;                          // Schedule Name
+        int ScheduleTypePtr;                       // Index of Schedule Type
+        Array1D_int WeekSchedulePointer;           // one created for each day of possible simulation
+        SchedType SchType = SchedType::Unassigned; // what kind of object has been input.
+        bool Used;                                 // Indicator for this schedule being "used".
+        bool MaxMinSet;                            // Max/min values have been stored for this schedule
+        Real64 MaxValue;                           // Maximum value for this schedule
+        Real64 MinValue;                           // Minimum value for this schedule
+        Real64 CurrentValue;                       // For Reporting
+        bool EMSActuatedOn;                        // indicates if EMS computed
         Real64 EMSValue;
 
         // Default Constructor
         ScheduleData()
-            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), SchType(0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0),
+            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0),
               CurrentValue(0.0), EMSActuatedOn(false), EMSValue(0.0)
         {
         }
@@ -347,15 +344,24 @@ namespace ScheduleManager {
                                 bool const isItLeapYear   // true if it is a leap year containing February 29
     );
 
-    int GetNumberOfSchedules();
+    int GetNumberOfSchedules(EnergyPlusData &state);
 
 } // namespace ScheduleManager
 
 struct ScheduleManagerData : BaseGlobalStruct
 {
+    // Integer Variables for the Module
+    int NumScheduleTypes = 0;
+    int NumDaySchedules = 0;
+    int NumWeekSchedules = 0;
+    int NumSchedules = 0;
 
     void clear_state() override
     {
+        NumScheduleTypes = 0;
+        NumDaySchedules = 0;
+        NumWeekSchedules = 0;
+        NumSchedules = 0;
     }
 };
 

@@ -160,7 +160,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int groupNum = 1; groupNum <= state.dataHeatBal->NumOfZoneGroups; ++groupNum) {
             sqlite->addZoneGroupData(groupNum, state.dataHeatBal->ZoneGroup(groupNum));
         }
-        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
+        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(state); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             sqlite->addScheduleData(scheduleNumber,
                                     ScheduleManager::GetScheduleName(state, scheduleNumber),
