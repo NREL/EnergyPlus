@@ -98,27 +98,7 @@ namespace HVACUnitaryBypassVAV {
         UseCompressorOffFlow        // Set compressor OFF air flow rate equal to user defined value
     };
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumCBVAV;                  // Number of CBVAV systems in input file
-    extern Real64 CompOnMassFlow;         // System air mass flow rate w/ compressor ON
-    extern Real64 OACompOnMassFlow;       // OA mass flow rate w/ compressor ON
-    extern Real64 CompOffMassFlow;        // System air mass flow rate w/ compressor OFF
-    extern Real64 OACompOffMassFlow;      // OA mass flow rate w/ compressor OFF
-    extern Real64 CompOnFlowRatio;        // fan flow ratio when coil on
-    extern Real64 CompOffFlowRatio;       // fan flow ratio when coil off
-    extern Real64 FanSpeedRatio;          // ratio of air flow ratio passed to fan object
-    extern Real64 BypassDuctFlowFraction; // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
-    extern Real64 PartLoadFrac;           // Compressor part-load fraction
-    extern Real64 SaveCompressorPLR;      // Holds DX compressor PLR from active DX coil
-    extern Real64 TempSteamIn;            // steam coil steam inlet temperature
-    extern Array1D_bool CheckEquipName;
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
 
     struct CBVAVData
     {
@@ -309,14 +289,6 @@ namespace HVACUnitaryBypassVAV {
         }
     };
 
-    // Object Data
-    extern Array1D<CBVAVData> CBVAV;
-    extern bool GetInputFlag; // Flag set to make sure you get input once
-
-    // Functions
-
-    void clear_state();
-
     void SimUnitaryBypassVAV(EnergyPlusData &state, std::string const &CompName,   // Name of the CBVAV system
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                              int const AirLoopNum,          // air loop index
@@ -406,9 +378,41 @@ namespace HVACUnitaryBypassVAV {
 
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct {
 
+    int NumCBVAV;                  // Number of CBVAV systems in input file
+    Real64 CompOnMassFlow;         // System air mass flow rate w/ compressor ON
+    Real64 OACompOnMassFlow;       // OA mass flow rate w/ compressor ON
+    Real64 CompOffMassFlow;        // System air mass flow rate w/ compressor OFF
+    Real64 OACompOffMassFlow;      // OA mass flow rate w/ compressor OFF
+    Real64 CompOnFlowRatio;        // fan flow ratio when coil on
+    Real64 CompOffFlowRatio;       // fan flow ratio when coil off
+    Real64 FanSpeedRatio;          // ratio of air flow ratio passed to fan object
+    Real64 BypassDuctFlowFraction; // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
+    Real64 PartLoadFrac;           // Compressor part-load fraction
+    Real64 SaveCompressorPLR;      // Holds DX compressor PLR from active DX coil
+    Real64 TempSteamIn;            // steam coil steam inlet temperature
+    Array1D_bool CheckEquipName;
+
+    Array1D<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
+    bool GetInputFlag; // Flag set to make sure you get input once
+
+
     void clear_state() override
     {
-
+        this->CBVAV.deallocate();
+        this->NumCBVAV = 0;
+        this->CompOnMassFlow = 0.0;
+        this->OACompOnMassFlow = 0.0;
+        this->CompOffMassFlow = 0.0;
+        this->OACompOffMassFlow = 0.0;
+        this->CompOnFlowRatio = 0.0;
+        this->CompOffFlowRatio = 0.0;
+        this->FanSpeedRatio = 0.0;
+        this->BypassDuctFlowFraction = 0.0;
+        this->PartLoadFrac = 0.0;
+        this->SaveCompressorPLR = 0.0;
+        this->TempSteamIn = 100.0;
+        this->CheckEquipName.deallocate();
+        this->GetInputFlag = true;
     }
 };
 

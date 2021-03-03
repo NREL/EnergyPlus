@@ -98,7 +98,6 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -189,7 +188,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACManager::clear_state();
     HVACMultiSpeedHeatPump::clear_state();
     HVACSingleDuctInduc::clear_state();
-    HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
     LowTempRadiantSystem::clear_state();
