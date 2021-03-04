@@ -1018,12 +1018,6 @@ namespace DataSizing {
     };
 
     // Object Data
-    extern Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level
-                                            // Vps) Vdz includes secondary flows and primary flows
-    extern Array1D<Real64> VdzMinClgByZone; // minimum discarge flow for cooling, Vdz includes secondary and primary flows for dual path
-    extern Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level
-                                            // Vps) Vdz includes secondary flows and primary flows
-    extern Array1D<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
     extern Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
     extern Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
     extern Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
@@ -1221,6 +1215,14 @@ struct SizingData : BaseGlobalStruct
     Array1D<DataSizing::FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
     DataSizing::FacilitySizingData CalcFinalFacilitySizing;     // Final data for zone sizing
     Array1D<Real64> VbzByZone;                                  // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
+    Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+    Array1D<Real64> VdzMinClgByZone; // minimum discharge flow for cooling, Vdz includes secondary and primary flows for dual path
+    Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
+    Array1D<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
+    Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
+    Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
+    Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
+    Array1D<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
 
     void clear_state() override
     {
@@ -1356,6 +1358,14 @@ struct SizingData : BaseGlobalStruct
         this->CalcFacilitySizing.deallocate();
         this->CalcFinalFacilitySizing = DataSizing::FacilitySizingData();
         this->VbzByZone.deallocate();
+        this->VdzClgByZone.deallocate();
+        this->VdzMinClgByZone.deallocate();
+        this->VdzHtgByZone.deallocate();
+        this->VdzMinHtgByZone.deallocate();
+        this->ZdzClgByZone.deallocate();
+        this->ZdzHtgByZone.deallocate();
+        this->VpzClgByZone.deallocate();
+        this->VpzMinClgByZone.deallocate();
     }
 };
 

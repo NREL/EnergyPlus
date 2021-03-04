@@ -866,7 +866,7 @@ namespace EnergyPlus::SizingManager {
                                 AirDistUnit(sd_airterminal(singleDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate;
 
-                            DataSizing::VpzClgByZone(termUnitSizingIndex) =
+                            state.dataSize->VpzClgByZone(termUnitSizingIndex) =
                                 sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
 
                             if (sd_airterminal(singleDuctATUNum).SysType_Num == SingleDuct::SysType::SingleDuctConstVolReheat ||
@@ -876,7 +876,7 @@ namespace EnergyPlus::SizingManager {
 
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                     sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate; // store std 62.1 values
@@ -884,7 +884,7 @@ namespace EnergyPlus::SizingManager {
                             } else {
                                 airLoopHeatingMinimumFlowRateSum += sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
                                                                     sd_airterminal(singleDuctATUNum).ZoneMinAirFrac;
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     sd_airterminal(singleDuctATUNum).MaxAirVolFlowRate *
                                     sd_airterminal(singleDuctATUNum).ZoneMinAirFrac; // store std 62.1 values
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
@@ -920,11 +920,11 @@ namespace EnergyPlus::SizingManager {
                                 }
                             }
                             // single-path air terminal so Vdz = Vpz
-                            DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex); // store std 62.1 values
-                            DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex);                                          // store std 62.1 values
-                            DataSizing::VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex); // store std 62.1 values
-                            DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = state.dataSize->VpzClgByZone(termUnitSizingIndex); // store std 62.1 values
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex);                                          // store std 62.1 values
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex); // store std 62.1 values
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) =
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex); // store std 62.1 values
                         }
                     }
@@ -936,28 +936,28 @@ namespace EnergyPlus::SizingManager {
                         if (AirLoopNum == DualDuct::dd_airterminal(dualDuctATUNum).AirLoopNum) {
                             int termUnitSizingIndex = AirDistUnit(DualDuct::dd_airterminal(dualDuctATUNum).ADUNum).TermUnitSizingNum;
                             airLoopMaxFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
-                            DataSizing::VpzClgByZone(termUnitSizingIndex) =
+                            state.dataSize->VpzClgByZone(termUnitSizingIndex) =
                                 DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
 
                             if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_ConstantVolume) {
                                 airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 airLoopHeatingMinimumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                     DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate; // store std 62.1 value
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex);
-                                DataSizing::VdzMinClgByZone(termUnitSizingIndex) = DataSizing::VpzMinClgByZone(termUnitSizingIndex);
-                                DataSizing::VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex);
-                                DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzClgByZone(termUnitSizingIndex) = state.dataSize->VpzClgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = state.dataSize->VpzMinClgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
 
                             } else if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_VariableVolume) {
                                 airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 airLoopHeatingMinimumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
                                                                     DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac;
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
                                     DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
@@ -965,10 +965,10 @@ namespace EnergyPlus::SizingManager {
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate *
                                     DualDuct::dd_airterminal(dualDuctATUNum).ZoneMinAirFrac; // store std 62.1 value
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) = DataSizing::VpzClgByZone(termUnitSizingIndex);
-                                DataSizing::VdzMinClgByZone(termUnitSizingIndex) = DataSizing::VpzMinClgByZone(termUnitSizingIndex);
-                                DataSizing::VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex);
-                                DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzClgByZone(termUnitSizingIndex) = state.dataSize->VpzClgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = state.dataSize->VpzMinClgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzHtgByZone(termUnitSizingIndex) = DataSizing::VpzHtgByZone(termUnitSizingIndex);
+                                state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                             } else if (DualDuct::dd_airterminal(dualDuctATUNum).DamperType == DualDuct::DualDuct_OutdoorAir) {
                                 airLoopHeatingMaximumFlowRateSum += DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
                                 // Calculate the design OA flow rate for this zone
@@ -984,13 +984,13 @@ namespace EnergyPlus::SizingManager {
                                 airLoopHeatingMinimumFlowRateSum += designOAductFlow;
                                 // is this a dual duct is dual path for Std 62.1 ?? not sure, assume not because Vpz = Vdz
                                 // anyDualPathAirTerminals = true;
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) = designOAductFlow; // not sure about this
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) = designOAductFlow; // not sure about this
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) = designOAductFlow;    // no heating for this terminal
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) = designOAductFlow;
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) = DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
-                                DataSizing::VdzMinClgByZone(termUnitSizingIndex) = designOAductFlow;
-                                DataSizing::VdzHtgByZone(termUnitSizingIndex) = designOAductFlow;
-                                DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = designOAductFlow;
+                                state.dataSize->VdzClgByZone(termUnitSizingIndex) = DualDuct::dd_airterminal(dualDuctATUNum).MaxAirVolFlowRate;
+                                state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = designOAductFlow;
+                                state.dataSize->VdzHtgByZone(termUnitSizingIndex) = designOAductFlow;
+                                state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = designOAductFlow;
                             }
                         }
                     }
@@ -1009,12 +1009,12 @@ namespace EnergyPlus::SizingManager {
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
 
                                 // dual path for std 62.1
-                                DataSizing::VpzClgByZone(termUnitSizingIndex) = state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzClgByZone(termUnitSizingIndex) = state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzClgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
-                                DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzMinClgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum)
                                         .MaxTotAirVolFlow; // min dz is the same as max because series PIU has constant discharge volume
 
@@ -1024,17 +1024,17 @@ namespace EnergyPlus::SizingManager {
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow; // runs at minimum primary for heating always
-                                DataSizing::VdzHtgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzHtgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
-                                DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxTotAirVolFlow; // which is constant for series PIU
 
                                 // store Ep for 62.1 calculations
                                 state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
-                                    DataSizing::VpzMinClgByZone(termUnitSizingIndex) /
-                                    DataSizing::VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
+                                    state.dataSize->VpzMinClgByZone(termUnitSizingIndex) /
+                                    state.dataSize->VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
                                 state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
-                                    DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / DataSizing::VdzHtgByZone(termUnitSizingIndex);
+                                    DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
 
                             } else if (state.dataPowerInductionUnits->PIU(pIUATUNum).UnitType_Num == DataDefineEquip::iZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
                                 airLoopHeatingMaximumFlowRateSum +=
@@ -1043,13 +1043,13 @@ namespace EnergyPlus::SizingManager {
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
 
                                 // dual path for std 62.1
-                                DataSizing::VpzClgByZone(termUnitSizingIndex) = state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzClgByZone(termUnitSizingIndex) = state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow;
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzClgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum)
                                         .MaxPriAirVolFlow; // for Parallel PIU expect Fan off durign max cooling, so discharge is all primary
-                                DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzMinClgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
                                     state.dataPowerInductionUnits->PIU(pIUATUNum)
                                         .MaxSecAirVolFlow; // expect secondary fan to be running at min cooling, for reheat
@@ -1060,18 +1060,18 @@ namespace EnergyPlus::SizingManager {
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac *
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow; // primary at minimum
-                                DataSizing::VdzHtgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzHtgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
-                                DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) =
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MinPriAirFlowFrac * state.dataPowerInductionUnits->PIU(pIUATUNum).MaxPriAirVolFlow +
                                     state.dataPowerInductionUnits->PIU(pIUATUNum).MaxSecAirVolFlow; // expect min primary and CV fan running
 
                                 state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFraction =
-                                    DataSizing::VpzMinClgByZone(termUnitSizingIndex) /
-                                    DataSizing::VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
+                                    state.dataSize->VpzMinClgByZone(termUnitSizingIndex) /
+                                    state.dataSize->VdzClgByZone(termUnitSizingIndex); // min primary divided by max total
                                 state.dataSize->TermUnitFinalZoneSizing(termUnitSizingIndex).ZonePrimaryAirFractionHtg =
-                                    DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / DataSizing::VdzHtgByZone(termUnitSizingIndex);
+                                    DataSizing::VpzMinHtgByZone(termUnitSizingIndex) / state.dataSize->VdzHtgByZone(termUnitSizingIndex);
                             }
                         }
                     }
@@ -1090,18 +1090,18 @@ namespace EnergyPlus::SizingManager {
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             airLoopMaxFlowRateSum += HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             // store Std 62.1 values, CV system
-                            DataSizing::VpzClgByZone(termUnitSizingIndex) =
+                            state.dataSize->VpzClgByZone(termUnitSizingIndex) =
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                            state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            DataSizing::VdzClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
-                            DataSizing::VdzMinClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
                             DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
                             DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                 HVACSingleDuctInduc::IndUnit(indUnitNum).MaxPriAirMassFlow / state.dataEnvrn->StdRhoAir;
-                            DataSizing::VdzHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
-                            DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = HVACSingleDuctInduc::IndUnit(indUnitNum).MaxTotAirVolFlow;
                         }
                     }
                 }
@@ -1117,14 +1117,14 @@ namespace EnergyPlus::SizingManager {
 
                             // store std 62.1 values, beam will actually have secondary flow but that is not part of the model since it uses non air
                             // system term, we have no secondary flow rate information to work with
-                            DataSizing::VpzClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            DataSizing::VpzMinClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VpzClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VpzMinClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                             DataSizing::VpzHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                             DataSizing::VpzMinHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            DataSizing::VdzClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            DataSizing::VdzMinClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            DataSizing::VdzHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
-                            DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = HVACCooledBeam::CoolBeam(coolBeamNum).MaxAirVolFlow;
                         }
                     }
                 }
@@ -1139,21 +1139,21 @@ namespace EnergyPlus::SizingManager {
                                 airLoopMaxFlowRateSum += AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 // store Std 62.1 values, have no modeling of secondary flow rates for induced flow from beam
                                 int termUnitSizingIndex = AirDistUnit(aDUNum).airTerminalPtr->getTermUnitSizingIndex();
-                                DataSizing::VpzClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzClgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                DataSizing::VpzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VpzMinClgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzHtgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                                 DataSizing::VpzMinHtgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                DataSizing::VdzClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzClgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                DataSizing::VdzMinClgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzMinClgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                DataSizing::VdzHtgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzHtgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
-                                DataSizing::VdzMinHtgByZone(termUnitSizingIndex) =
+                                state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) =
                                     AirDistUnit(aDUNum).airTerminalPtr->getPrimAirDesignVolFlow();
                             }
                         }
@@ -1169,15 +1169,15 @@ namespace EnergyPlus::SizingManager {
                             airLoopHeatingMinimumFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             airLoopMaxFlowRateSum += state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
 
-                            DataSizing::VpzClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
-                            DataSizing::VpzMinClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
+                            state.dataSize->VpzClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
+                            state.dataSize->VpzMinClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             DataSizing::VpzHtgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             DataSizing::VpzMinHtgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                             // the ZoneHVAC devices will have secondary flow but how to get it, future work
-                            DataSizing::VdzClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
-                            DataSizing::VdzMinClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
-                            DataSizing::VdzHtgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
-                            DataSizing::VdzMinHtgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
+                            state.dataSize->VdzClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
+                            state.dataSize->VdzMinClgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
+                            state.dataSize->VdzHtgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
+                            state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) = state.dataSingleDuct->SysATMixer(aTMixerNum).DesignPrimaryAirVolRate;
                         }
                     }
                 }
@@ -1298,32 +1298,32 @@ namespace EnergyPlus::SizingManager {
                 // each zone
                 for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                     int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                    if (DataSizing::VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
-                        DataSizing::ZdzClgByZone(termUnitSizingIndex) =
-                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / DataSizing::VdzMinClgByZone(termUnitSizingIndex));
+                    if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
+                        state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
+                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
                     } else { // would divide by zero, so set to max ??
-                        DataSizing::ZdzClgByZone(termUnitSizingIndex) = 1.0;
+                        state.dataSize->ZdzClgByZone(termUnitSizingIndex) = 1.0;
                     }
-                    if (DataSizing::VdzMinHtgByZone(termUnitSizingIndex) > 0.0) {
-                        DataSizing::ZdzHtgByZone(termUnitSizingIndex) =
-                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozHtgByZone / DataSizing::VdzMinHtgByZone(termUnitSizingIndex));
+                    if (state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) > 0.0) {
+                        state.dataSize->ZdzHtgByZone(termUnitSizingIndex) =
+                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozHtgByZone / state.dataSize->VdzMinHtgByZone(termUnitSizingIndex));
                     } else { // would divide by zero, so set to max
-                        DataSizing::ZdzHtgByZone(termUnitSizingIndex) = 1.0;
+                        state.dataSize->ZdzHtgByZone(termUnitSizingIndex) = 1.0;
                     }
                 }
                 for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
                     int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
-                    if (DataSizing::VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
-                        DataSizing::ZdzClgByZone(termUnitSizingIndex) =
-                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / DataSizing::VdzMinClgByZone(termUnitSizingIndex));
+                    if (state.dataSize->VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
+                        state.dataSize->ZdzClgByZone(termUnitSizingIndex) =
+                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / state.dataSize->VdzMinClgByZone(termUnitSizingIndex));
                     } else { // would divide by zero, so set to max ??
-                        DataSizing::ZdzClgByZone(termUnitSizingIndex) = 1.0;
+                        state.dataSize->ZdzClgByZone(termUnitSizingIndex) = 1.0;
                     }
-                    if (DataSizing::VdzMinHtgByZone(termUnitSizingIndex) > 0.0) {
-                        DataSizing::ZdzHtgByZone(termUnitSizingIndex) =
-                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozHtgByZone / DataSizing::VdzMinHtgByZone(termUnitSizingIndex));
+                    if (state.dataSize->VdzMinHtgByZone(termUnitSizingIndex) > 0.0) {
+                        state.dataSize->ZdzHtgByZone(termUnitSizingIndex) =
+                            min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozHtgByZone / state.dataSize->VdzMinHtgByZone(termUnitSizingIndex));
                     } else { // would divide by zero, so set to max
-                        DataSizing::ZdzHtgByZone(termUnitSizingIndex) = 1.0;
+                        state.dataSize->ZdzHtgByZone(termUnitSizingIndex) = 1.0;
                     }
                 } // end loop over zones on air loop to calculate Zdz values
 
@@ -1334,7 +1334,7 @@ namespace EnergyPlus::SizingManager {
                 DataSizing::VpzClgSumBySys(AirLoopNum) = 0.0;
                 for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                     int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                    DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
+                    DataSizing::VpzClgSumBySys(AirLoopNum) += state.dataSize->VdzClgByZone(termUnitSizingIndex);
                 }
                 for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
                     int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
@@ -1342,7 +1342,7 @@ namespace EnergyPlus::SizingManager {
                                                                           AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
                                                                           AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
-                        DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
+                        DataSizing::VpzClgSumBySys(AirLoopNum) += state.dataSize->VdzClgByZone(termUnitSizingIndex);
                     }
                 }
 
@@ -1407,7 +1407,7 @@ namespace EnergyPlus::SizingManager {
                             Real64 Fc_Clg = 1.0 - (1.0 - Ez_Clg) * (1.0 - Er) * (1 - Ep_Clg);
                             FcByZoneCool(termUnitSizingIndex) = Fc_Clg;
                             DataSizing::EvzByZoneCool(termUnitSizingIndex) =
-                                (Fa_Clg + DataSizing::XsBySysCool(AirLoopNum) * Fb_Clg - DataSizing::ZdzClgByZone(termUnitSizingIndex) * Fc_Clg) /
+                                (Fa_Clg + DataSizing::XsBySysCool(AirLoopNum) * Fb_Clg - state.dataSize->ZdzClgByZone(termUnitSizingIndex) * Fc_Clg) /
                                 Fa_Clg;
                             // note that SimAirServingZones::LimitZoneVentEff is intended only for single path per I/O ref
 
@@ -1423,18 +1423,18 @@ namespace EnergyPlus::SizingManager {
                             Real64 Fc_Htg = 1.0 - (1.0 - Ez_Htg) * (1.0 - Er) * (1 - Ep_Htg);
                             FcByZoneHeat(termUnitSizingIndex) = Fc_Htg;
                             DataSizing::EvzByZoneHeat(termUnitSizingIndex) =
-                                (Fa_Htg + DataSizing::XsBySysHeat(AirLoopNum) * Fb_Htg - DataSizing::ZdzHtgByZone(termUnitSizingIndex) * Fc_Htg) /
+                                (Fa_Htg + DataSizing::XsBySysHeat(AirLoopNum) * Fb_Htg - state.dataSize->ZdzHtgByZone(termUnitSizingIndex) * Fc_Htg) /
                                 Fa_Htg;
 
                         } else { // single path zone
                             DataSizing::EvzByZoneCool(termUnitSizingIndex) =
-                                1.0 + DataSizing::XsBySysCool(AirLoopNum) - DataSizing::ZdzClgByZone(termUnitSizingIndex);
+                                1.0 + DataSizing::XsBySysCool(AirLoopNum) - state.dataSize->ZdzClgByZone(termUnitSizingIndex);
                             SimAirServingZones::LimitZoneVentEff(state, DataSizing::XsBySysCool(AirLoopNum),
                                                                  VbzByZone(termUnitSizingIndex) / DataSizing::EvzByZoneCool(termUnitSizingIndex),
                                                                  termUnitSizingIndex,
                                                                  DataSizing::EvzByZoneCool(termUnitSizingIndex));
                             DataSizing::EvzByZoneHeat(termUnitSizingIndex) =
-                                1.0 + DataSizing::XsBySysHeat(AirLoopNum) - DataSizing::ZdzHtgByZone(termUnitSizingIndex);
+                                1.0 + DataSizing::XsBySysHeat(AirLoopNum) - state.dataSize->ZdzHtgByZone(termUnitSizingIndex);
                             SimAirServingZones::LimitZoneVentEff(state, DataSizing::XsBySysHeat(AirLoopNum),
                                                                  VbzByZone(termUnitSizingIndex) / DataSizing::EvzByZoneHeat(termUnitSizingIndex),
                                                                  termUnitSizingIndex,
@@ -1468,7 +1468,7 @@ namespace EnergyPlus::SizingManager {
                 DataSizing::EvzByZoneCool(termUnitSizingIndex) = TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
                 DataSizing::EvzMinBySysCool(AirLoopNum) = DataSizing::EvzByZoneCool(termUnitSizingIndex);
                 DataSizing::VpsClgBySys(AirLoopNum) = FinalSysSizing(SysSizNum).DesCoolVolFlow;
-                DataSizing::VpzClgSumBySys(AirLoopNum) = DataSizing::VdzClgByZone(termUnitSizingIndex);
+                DataSizing::VpzClgSumBySys(AirLoopNum) = state.dataSize->VdzClgByZone(termUnitSizingIndex);
                 // single zone heating
                 DataSizing::VotHtgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
                 DataSizing::EvzByZoneHeat(termUnitSizingIndex) = TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
@@ -1493,7 +1493,7 @@ namespace EnergyPlus::SizingManager {
                 DataSizing::VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
                 for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
                     int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
-                    DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
+                    DataSizing::VpzClgSumBySys(AirLoopNum) += state.dataSize->VdzClgByZone(termUnitSizingIndex);
                     DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                     DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
                 }
@@ -1503,7 +1503,7 @@ namespace EnergyPlus::SizingManager {
                                                                           AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
                                                                           AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
-                        DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
+                        DataSizing::VpzClgSumBySys(AirLoopNum) += state.dataSize->VdzClgByZone(termUnitSizingIndex);
                         DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                         DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
                     }
@@ -1698,10 +1698,10 @@ namespace EnergyPlus::SizingManager {
                             VozHtgSum += VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffHeating;
                         }
 
-                        VpzMinClgSum += VpzMinClgByZone(termUnitSizingIndex);
-                        VdzClgSum += VdzClgByZone(termUnitSizingIndex);
+                        VpzMinClgSum += state.dataSize->VpzMinClgByZone(termUnitSizingIndex);
+                        VdzClgSum += state.dataSize->VdzClgByZone(termUnitSizingIndex);
                         VpzMinHtgSum += VpzMinHtgByZone(termUnitSizingIndex);
-                        VdzHtgSum += VdzMinHtgByZone(termUnitSizingIndex);
+                        VdzHtgSum += state.dataSize->VdzMinHtgByZone(termUnitSizingIndex);
 
                         // Zone Ventilation Calculations for Cooling Design, (Table 5)
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdAlN,
@@ -1718,15 +1718,15 @@ namespace EnergyPlus::SizingManager {
                         }
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 VpzClgByZone(termUnitSizingIndex),
+                                                                 state.dataSize->VpzClgByZone(termUnitSizingIndex),
                                                                  4); // Vpz LS:
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVdz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 VdzClgByZone(termUnitSizingIndex),
+                                                                 state.dataSize->VdzClgByZone(termUnitSizingIndex),
                                                                  4); // Vdz
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdVpzmin,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 VpzMinClgByZone(termUnitSizingIndex),
+                                                                 state.dataSize->VpzMinClgByZone(termUnitSizingIndex),
                                                                  4); // Vpz-min
                         Real64 VozClg = 0.0;
                         if (TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling > 0.0) {
@@ -1738,7 +1738,7 @@ namespace EnergyPlus::SizingManager {
                         }
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdZpz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 DataSizing::ZdzClgByZone(termUnitSizingIndex),
+                                                                 state.dataSize->ZdzClgByZone(termUnitSizingIndex),
                                                                  4); // Zpz = Voz/Vpz (see eq 6-5 in 62.1-2010)
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdEp,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
@@ -1784,7 +1784,7 @@ namespace EnergyPlus::SizingManager {
                                                                  4); // Vpz
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zhdVdz,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 VdzHtgByZone(termUnitSizingIndex),
+                                                                 state.dataSize->VdzHtgByZone(termUnitSizingIndex),
                                                                  4); // Vdz
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zhdVpzmin,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,

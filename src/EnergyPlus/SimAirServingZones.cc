@@ -4045,15 +4045,15 @@ namespace EnergyPlus::SimAirServingZones {
         // have moved a large number of std 62.1 variables to DataSizing.hh so they can be used outside of this routine
 
         // allocate arrays used to store values for standard 62.1 tabular report
-        if (!allocated(VpzClgByZone)) {
-            DataSizing::VdzClgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::VdzMinClgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::VdzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::VdzMinHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::ZdzClgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::ZdzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::VpzClgByZone.dimension(NumAirTerminalUnits, 0.0);
-            DataSizing::VpzMinClgByZone.dimension(NumAirTerminalUnits, 0.0);
+        if (!allocated(state.dataSize->VpzClgByZone)) {
+            state.dataSize->VdzClgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->VdzMinClgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->VdzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->VdzMinHtgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->ZdzClgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->ZdzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->VpzClgByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->VpzMinClgByZone.dimension(NumAirTerminalUnits, 0.0);
             DataSizing::VpzHtgByZone.dimension(NumAirTerminalUnits, 0.0);
             DataSizing::VpzMinHtgByZone.dimension(NumAirTerminalUnits, 0.0);
             DataSizing::VpzClgSumBySys.dimension(NumPrimaryAirSys, 0.0);
@@ -4781,7 +4781,7 @@ namespace EnergyPlus::SimAirServingZones {
                         // Std 62.1-2010, section 6.2.5.1: "Vpz (used to determin Zpz) is the primary airflow rate
                         // rate to the ventilation zone from the air handler, including outdoor air and recirculated air.
                         // MJW - Not sure this is correct, seems like it should be ZonePA - above comments contradict each other
-                        DataSizing::VpzMinClgByZone(TermUnitSizingIndex) = ZoneSA;
+                        state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) = ZoneSA;
 
                     } else { // single path system
                         // Vdz: "Discharge" supply air delivered to zone by terminal unit
@@ -4792,26 +4792,26 @@ namespace EnergyPlus::SimAirServingZones {
                         // Save VpzMin in case this is a single path VAV system.
                         // Std 62.1-2010, section 6.2.5.1: "For VAV-system design purposes, Vpz is the lowest zone primary
                         // airflow value expected at the design condition analyzed."
-                        DataSizing::VpzMinClgByZone(TermUnitSizingIndex) =
+                        state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) =
                             TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin; // this may be getting used before it gets filled ??
 
                         // In case for some reason the VAV minimum has not been defined, use the design primary airflow
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesCoolVolFlowMin <= 0)
-                            DataSizing::VpzMinClgByZone(TermUnitSizingIndex) = ZonePA;
+                            state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) = ZonePA;
                     }
 
                     // save zone discharge supply airflow
-                    DataSizing::VdzClgByZone(TermUnitSizingIndex) = ZoneSA;
+                    state.dataSize->VdzClgByZone(TermUnitSizingIndex) = ZoneSA;
 
                     // save Vpz zone primary airflow for standard 62.1 report
-                    DataSizing::VpzClgByZone(TermUnitSizingIndex) = ZonePA;
+                    state.dataSize->VpzClgByZone(TermUnitSizingIndex) = ZonePA;
                     DataSizing::VpzClgSumBySys(AirLoopNum) += ZonePA;
 
                     // Fraction of required zone ventilation to minimum primary airflow expected at condition analyzed
                     TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone = 0.0;
-                    if (DataSizing::VpzMinClgByZone(TermUnitSizingIndex) > 0) {
+                    if (state.dataSize->VpzMinClgByZone(TermUnitSizingIndex) > 0) {
                         TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone =
-                            min(1.0, TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone / DataSizing::VpzMinClgByZone(TermUnitSizingIndex));
+                            min(1.0, TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone / state.dataSize->VpzMinClgByZone(TermUnitSizingIndex));
                     }
 
                     // calc zone primary air fraction
@@ -4957,7 +4957,7 @@ namespace EnergyPlus::SimAirServingZones {
                         }
 
                         // save Vdz zone discharge supply airflow for standard 62.1 report
-                        DataSizing::VdzHtgByZone(TermUnitSizingIndex) = ZoneSA;
+                        state.dataSize->VdzHtgByZone(TermUnitSizingIndex) = ZoneSA;
 
                         // save Vpz zone primary airflow for standard 62.1 report
                         DataSizing::VpzHtgByZone(TermUnitSizingIndex) = ZonePA;
@@ -5039,7 +5039,7 @@ namespace EnergyPlus::SimAirServingZones {
                         ZonePA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
                         ZoneSA = TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow;
                         // save Vdz zone discharge airflow for standard 62.1 report
-                        DataSizing::VdzHtgByZone(TermUnitSizingIndex) = ZoneSA;
+                        state.dataSize->VdzHtgByZone(TermUnitSizingIndex) = ZoneSA;
                         // save Vpz zone primary airflow for standard 62.1 report
                         DataSizing::VpzHtgByZone(TermUnitSizingIndex) = ZonePA;
                         DataSizing::VpzHtgSumBySys(AirLoopNum) += ZonePA;

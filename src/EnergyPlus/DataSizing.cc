@@ -84,14 +84,6 @@ namespace EnergyPlus::DataSizing {
     //  before applying user input sys flow rates.
 
     // Object Data
-    Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
-    Array1D<Real64> VdzMinClgByZone; // minimum discharge flow for cooling, Vdz includes secondary and primary flows for dual path
-    Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
-    Array1D<Real64> VdzMinHtgByZone; // minimum discharge flow for heating, Vdz includes secondary and primary flows for dual path
-    Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
-    Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
-    Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
-    Array1D<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
     Array1D<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
     Array1D<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
     Array1D<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
@@ -131,14 +123,6 @@ namespace EnergyPlus::DataSizing {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        VdzClgByZone.deallocate();
-        VdzMinClgByZone.deallocate();
-        VdzHtgByZone.deallocate();
-        VdzMinHtgByZone.deallocate();
-        ZdzClgByZone.deallocate();
-        ZdzHtgByZone.deallocate();
-        VpzClgByZone.deallocate();
-        VpzMinClgByZone.deallocate();
         VpzHtgByZone.deallocate();
         VpzMinHtgByZone.deallocate();
         VpzClgSumBySys.deallocate();
