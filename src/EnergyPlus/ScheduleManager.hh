@@ -72,8 +72,8 @@ namespace ScheduleManager {
 
     // Data
     // MODULE PARAMETER DEFINITIONS
-    extern int const MaxDayTypes;
-    extern int const NumScheduleTypeLimitUnitTypes;
+
+    int const MaxDayTypes(12);
 
     enum class SchedType :int {
         Unassigned = 0,
