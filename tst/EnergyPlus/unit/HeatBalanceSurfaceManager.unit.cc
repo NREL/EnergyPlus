@@ -1319,10 +1319,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
     OutAirNodeManager::GetOutAirNodesInput(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 25.0;
-    ScheduleManager::Schedule(2).CurrentValue = 20.0;
-    ScheduleManager::Schedule(3).CurrentValue = 1.5;
-    ScheduleManager::Schedule(4).CurrentValue = 90.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 20.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1.5;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 90.0;
 
     OutAirNodeManager::InitOutAirNodes(*state);
 
@@ -1891,9 +1891,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     InitSurfaceHeatBalance(*state);
 
     state->dataSurface->AirSkyRadSplit.allocate(6);
-    ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
-    ScheduleManager::Schedule(2).CurrentValue = 15.0; // Sky temp
-    ScheduleManager::Schedule(3).CurrentValue = 22.0; // Grd temp
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 15.0; // Sky temp
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 22.0; // Grd temp
 
     int SurfNum;
     for (SurfNum = 1; SurfNum <= 6; SurfNum++) {
@@ -2447,8 +2447,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRepEnergy.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = -0.1;
-    ScheduleManager::Schedule(2).CurrentValue = 0.1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = -0.1;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0.1;
 
     AllocateSurfaceHeatBalArrays(*state);
     createFacilityElectricPowerServiceObject();
@@ -2641,7 +2641,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     state->dataHeatBal->People(1).Pierce = true;
     state->dataHeatBal->People(1).NumberOfPeople = 2;
     state->dataHeatBal->People(1).NumberOfPeoplePtr = 1;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
     state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
     DataHeatBalFanSys::ZoneOccPierceSET.dimension(state->dataGlobal->NumOfZones, 0);
@@ -2650,7 +2650,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZoneHighSETHours.allocate(state->dataGlobal->NumOfZones);
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 31;
-    ScheduleManager::Schedule(1).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
 
     // Heat Index Case 1: Zone T < 80 F;
     state->dataGlobal->HourOfDay = 1;
@@ -2704,7 +2704,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours
 
     state->dataThermalComforts->ThermalComfortData(1).PierceSET = 11.2;
-    ScheduleManager::Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     for (int hour = 5; hour <= 7; hour++) {
         state->dataGlobal->HourOfDay = hour;
 //        CalcThermalResilience(*state);
@@ -2733,7 +2733,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
         state->dataGlobal->HourOfDay = hour;
         ReportThermalResilience(*state);
     }
-    ScheduleManager::Schedule(1).CurrentValue = 0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0;
     for (int hour = 18; hour <= 20; hour++) {
         state->dataGlobal->HourOfDay = hour;
         ReportThermalResilience(*state);
@@ -2751,7 +2751,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
     DataHeatBalFanSys::ZoneCO2LevelOccuHourBins.allocate(state->dataGlobal->NumOfZones);
     state->dataContaminantBalance->ZoneAirCO2Avg.allocate(state->dataGlobal->NumOfZones);
     state->dataContaminantBalance->Contaminant.CO2Simulation = true;
-    ScheduleManager::Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataOutRptTab->displayCO2ResilienceSummary = true;
     state->dataContaminantBalance->ZoneAirCO2Avg(1) = 1100;
     ReportCO2Resilience(*state);

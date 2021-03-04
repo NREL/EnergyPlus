@@ -799,7 +799,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -1056,7 +1056,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     // Cooling coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 17.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -1339,7 +1339,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
                                                                            // Cooling coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 17.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -1553,7 +1553,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
                                                                            // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -1795,7 +1795,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
                                                                            // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -2025,7 +2025,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoil_Only)
                                                                            // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -2241,7 +2241,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only_ContFan
                                                                            // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -2751,7 +2751,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 16.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -3165,7 +3165,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).Temp = 60.0;
     DataLoopNode::Node(suppHeatingCoilWaterInletNodeIndex).Enthalpy = 251221.6; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -3496,7 +3496,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl_Latent)
     DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Temp = 6.0;
     DataLoopNode::Node(coolingCoilWaterInletNodeIndex).Enthalpy = 25321.8; // www.peacesoftware.de/einigewerte/calc_dampf.php5
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -3689,7 +3689,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
 
     thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(*state, "FanAndCoilAvailSched"); // "Get" the schedule inputs
     thisSys.m_FanAvailSchedPtr = ScheduleManager::GetScheduleIndex(*state, "FanAndCoilAvailSched");
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
 
     thisSys.m_HeatMassFlowRate.resize(4);
     thisSys.m_CoolMassFlowRate.resize(4);
@@ -4706,7 +4706,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     // UnitarySystem does not care (or look at) if Tstat is in deadband
     // This line tests case where other zone equipment changes deadband status
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = true;
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
@@ -5595,8 +5595,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
 
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // FanAndCoilAvailSchedule
-    ScheduleManager::Schedule(2).CurrentValue = 1.0; // ContinuousFanSchedule
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // FanAndCoilAvailSchedule
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // ContinuousFanSchedule
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
@@ -6060,7 +6060,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
 
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_MaxCoolAirVolFlow * state->dataEnvrn->StdRhoAir;
@@ -8176,7 +8176,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
 
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -8512,8 +8512,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     DataHeatBalFanSys::TempControlType.allocate(1);
     DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     // fill the schedule values
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // availability
-    ScheduleManager::Schedule(2).CurrentValue = 1.0; // constant fan
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // availability
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // constant fan
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
     DataLoopNode::Node(InletNode).MassFlowRateMaxAvail = thisSys->m_DesignFanVolFlowRate * state->dataEnvrn->StdRhoAir;
@@ -10280,7 +10280,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
 
     thisSys->m_ZoneInletNode = state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1);
 
-    ScheduleManager::Schedule(thisSys->m_SysAvailSchedPtr).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(thisSys->m_SysAvailSchedPtr).CurrentValue = 1.0;
 
     DataSizing::CurSysNum = 1;
     DataSizing::UnitarySysEqSizing.allocate(1);
@@ -14355,15 +14355,15 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
 
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
-    ScheduleManager::Schedule(6).CurrentValue = 1.0; // Enable schedule without calling schedule manager
-    ScheduleManager::Schedule(7).CurrentValue = 4.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(7).CurrentValue = 4.0; // Enable schedule without calling schedule manager
 
     ZoneEquipmentManager::GetZoneEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
-    ScheduleManager::Schedule(7).MinValue = 4.0; // Enable schedule without calling schedule manager
-    ScheduleManager::Schedule(7).MaxValue = 4.0; // Enable schedule without calling schedule manager
-    ScheduleManager::Schedule(7).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(7).MinValue = 4.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(7).MaxValue = 4.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(7).MaxMinSet = true;
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
     std::string compName = "SYS 1 FURNACE DX COOL UNITARY SYSTEM";
@@ -16233,7 +16233,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FuelHeatCoilStptNodeTest)
     // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -16429,7 +16429,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_ElecHeatCoilStptNodeTest)
     // Heating coil air outlet node = 2
     DataLoopNode::Node(2).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 
@@ -16743,7 +16743,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_DesuperHeatCoilStptNodeTest)
     // Heating coil air outlet node = 5
     DataLoopNode::Node(5).TempSetPoint = 25.0;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     state->dataGlobal->BeginEnvrnFlag = true; // act as if simulation is beginning
 

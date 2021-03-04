@@ -1255,10 +1255,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     // Set up
     OutAirNodeManager::GetOutAirNodesInput(*state);
     state->dataEnvrn->OutBaroPress = 101325;
-    ScheduleManager::Schedule(1).CurrentValue = 25.0;
-    ScheduleManager::Schedule(2).CurrentValue = 20.0;
-    ScheduleManager::Schedule(3).CurrentValue = 1.5;
-    ScheduleManager::Schedule(4).CurrentValue = 90.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 20.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1.5;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 90.0;
 
     OutAirNodeManager::InitOutAirNodes(*state);
 

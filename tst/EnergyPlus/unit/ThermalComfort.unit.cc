@@ -991,7 +991,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).ClothingPtr = 2;
     state->dataHeatBal->People(1).AirVelocityPtr = 3;
     state->dataHeatBal->People(1).AnkleAirVelocityPtr = 4;
-    ScheduleManager::Schedule.allocate(4);
+    state->dataScheduleMgr->Schedule.allocate(4);
 
     // Part 1: Test SET calculations.
     // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D - Table D3 Validation Table for SET Computer Model
@@ -1019,12 +1019,12 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     ZTAVComf(1) = AirTemp;
     state->dataHeatBal->MRT(1) = RadTemp;
     ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
-    ScheduleManager::Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
-    ScheduleManager::Schedule(2).CurrentValue = CloUnit;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
 
     // Test 1 - Air velocity = 0.15 m/s.
     Real64 AirVel = 0.15;
-    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
     CalcThermalComfortCoolingEffectASH(*state);
     Real64 CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
     Real64 StillAirVel = 0.1;
@@ -1035,7 +1035,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 
     // Test 2 - Air velocity = 1 m/s.
     AirVel = 1;
-    ScheduleManager::Schedule(3).CurrentValue = AirVel;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
     CalcThermalComfortCoolingEffectASH(*state);
     CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
     CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
@@ -1048,8 +1048,8 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
     state->dataHeatBal->People(1).AnkleDraftASH55 = true;
     AirVel = 0.15;
     Real64 AnkleAirVel = 0.3;
-    ScheduleManager::Schedule(3).CurrentValue = AirVel;
-    ScheduleManager::Schedule(4).CurrentValue = AnkleAirVel;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = AnkleAirVel;
     CalcThermalComfortAnkleDraftASH(*state);
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).AnkleDraftPPDASH55, 25.0, 0.1);
 }

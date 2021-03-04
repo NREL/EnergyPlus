@@ -410,12 +410,12 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     InitSimpleMixingConvectiveHeatGains(*state);
@@ -2093,10 +2093,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -3067,7 +3067,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.0;
@@ -3311,7 +3311,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
@@ -3573,7 +3573,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
@@ -3838,7 +3838,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
