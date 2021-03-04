@@ -1732,7 +1732,7 @@ namespace WeatherManager {
             ReportMissing_RangeData(state);
         }
 
-        // set the state.dataGlobal->EndDesignDayEnvrnsFlag (dataGlobal)
+        // set the EndDesignDayEnvrnsFlag (dataGlobal)
         // True at the end of the last design day environment (last time step of last hour of last day of environ which is a design day)
         state.dataGlobal->EndDesignDayEnvrnsFlag = false;
         if (state.dataGlobal->EndEnvrnFlag) {

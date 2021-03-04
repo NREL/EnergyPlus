@@ -92,9 +92,9 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        CurZoneEqNum = 0;
-        CurSysNum = 0;
-        CurOASysNum = 0;
+        state->dataSize->CurZoneEqNum = 0;
+        state->dataSize->CurSysNum = 0;
+        state->dataSize->CurOASysNum = 0;
         state->dataGlobal->NumOfZones = 1;
         NumOfNodes = 5;
         state->dataGlobal->BeginEnvrnFlag = true;

@@ -52,6 +52,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 struct CoolingSHRSizer : BaseSizer
 {
     CoolingSHRSizer()
@@ -62,9 +65,9 @@ struct CoolingSHRSizer : BaseSizer
     }
     ~CoolingSHRSizer() = default;
 
-    Real64 size(EnergyPlusData &State, Real64 originalValue, bool &errorsFound) override;
+    Real64 size(EnergyPlusData &state, Real64 originalValue, bool &errorsFound) override;
 
-    void updateSizingString();
+    void updateSizingString(EnergyPlusData &state);
 
 };
 

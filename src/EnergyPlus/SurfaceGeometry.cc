@@ -4721,7 +4721,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = ExternalEnvironment;
                 }
 
-                //      state.dataSurfaceGeometry->SurfaceTmp(SurfNum)%ViewFactorGround = AutoCalculate
+                //      SurfaceTmp(SurfNum)%ViewFactorGround = AutoCalculate
 
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides = 4;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
@@ -8073,7 +8073,7 @@ namespace SurfaceGeometry {
 
         NVert = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Vertex.allocate(NVert);
-        // doesn't work when Vertex are pointers  state.dataSurfaceGeometry->SurfaceTmp(SurfNum+1)=state.dataSurfaceGeometry->SurfaceTmp(SurfNum)
+        // doesn't work when Vertex are pointers  SurfaceTmp(SurfNum+1)=SurfaceTmp(SurfNum)
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Name = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Construction = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ConstructionStoredInputValue = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ConstructionStoredInputValue;

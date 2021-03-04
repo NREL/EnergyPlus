@@ -368,7 +368,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
             TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Chilled Water Nodes");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
-            RegisterPlantCompDesignFlow(state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum, 0.5 * state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideVolFlowRate);
+            RegisterPlantCompDesignFlow(state, state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideInletNodeNum, 0.5 * state.dataHPWaterToWaterClg->GSHP(GSHPNum).SourceSideVolFlowRate);
 
             state.dataHPWaterToWaterClg->GSHP(GSHPNum).QLoad = 0.0;
             state.dataHPWaterToWaterClg->GSHP(GSHPNum).QSource = 0.0;
