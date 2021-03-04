@@ -295,18 +295,18 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
 
     state->dataConstruction->Construct.allocate(1);
     state->dataMaterial->Material.allocate(1);
-    DataSurfaces::Surface.allocate(1);
+    state->dataSurface->Surface.allocate(1);
 
     SurfNum = 1;
-    DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    DataSurfaces::Surface(1).MovInsulIntPresent = false;
-    DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
-    DataSurfaces::Surface(1).Construction = 1;
-    DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface(1).MovInsulIntPresent = false;
+    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = false;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(1).MaterialMovInsulInt = 1;
     state->dataConstruction->Construct(1).InsideAbsorpThermal = 0.9;
     state->dataMaterial->Material(1).AbsorpThermal = 0.5;
     state->dataMaterial->Material(1).Resistance = 1.25;
-    DataSurfaces::Surface(1).SchedMovInsulInt = -1;
+    state->dataSurface->Surface(1).SchedMovInsulInt = -1;
     state->dataMaterial->Material(1).AbsorpSolar = 0.25;
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
@@ -315,13 +315,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     EXPECT_TRUE(DidMIChange);
 
     // Test 2: Movable insulation present and was also present in previous time step.  This should result in a false value since nothing has changed.
-    DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = true;
+    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = true;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
 
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
-    DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
+    state->dataSurface->Surface(1).MovInsulIntPresentPrevTS = false;
     state->dataMaterial->Material(1).AbsorpThermal = state->dataConstruction->Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(*state, DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);

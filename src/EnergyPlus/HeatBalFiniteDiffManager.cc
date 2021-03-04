@@ -124,8 +124,6 @@ namespace HeatBalFiniteDiffManager {
     using DataHeatBalSurface::TempUserLoc;
     using DataSurfaces::Ground;
     using DataSurfaces::HeatTransferModel_CondFD;
-    using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
     using DataHeatBalFanSys::QPVSysSource;
     using DataHeatBalFanSys::QRadSysSource;
@@ -514,10 +512,10 @@ namespace HeatBalFiniteDiffManager {
 
         // now do begin environment inits.
         if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag) {
-            for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
-                if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
-                ConstrNum = Surface(SurfNum).Construction;
+            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+                if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+                if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
+                ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
                 if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
                 SurfaceFD(SurfNum).T = TempInitValue;
                 SurfaceFD(SurfNum).TOld = TempInitValue;
@@ -565,10 +563,10 @@ namespace HeatBalFiniteDiffManager {
 
         // now do every timestep inits
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
-            if (Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
-            ConstrNum = Surface(SurfNum).Construction;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+            if (state.dataSurface->Surface(SurfNum).Construction <= 0) continue; // Shading surface, not really a heat transfer surface
+            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue; //  Windows simulated in Window module
             SurfaceFD(SurfNum).T = SurfaceFD(SurfNum).TOld;
             SurfaceFD(SurfNum).Rhov = SurfaceFD(SurfNum).RhovOld;
@@ -639,9 +637,9 @@ namespace HeatBalFiniteDiffManager {
         SigmaR.allocate(state.dataHeatBal->TotConstructs);
         SigmaC.allocate(state.dataHeatBal->TotConstructs);
 
-        SurfaceFD.allocate(TotSurfaces);
-        QHeatInFlux.allocate(TotSurfaces);
-        QHeatOutFlux.allocate(TotSurfaces);
+        SurfaceFD.allocate(state.dataSurface->TotSurfaces);
+        QHeatInFlux.allocate(state.dataSurface->TotSurfaces);
+        QHeatOutFlux.allocate(state.dataSurface->TotSurfaces);
 
         // And then initialize
         QHeatInFlux = 0.0;
@@ -857,11 +855,11 @@ namespace HeatBalFiniteDiffManager {
             }
         }
 
-        for (Surf = 1; Surf <= TotSurfaces; ++Surf) {
-            if (!Surface(Surf).HeatTransSurf) continue;
-            if (Surface(Surf).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (Surface(Surf).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
-            ConstrNum = Surface(Surf).Construction;
+        for (Surf = 1; Surf <= state.dataSurface->TotSurfaces; ++Surf) {
+            if (!state.dataSurface->Surface(Surf).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(Surf).Class == DataSurfaces::SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(Surf).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+            ConstrNum = state.dataSurface->Surface(Surf).Construction;
             TotNodes = ConstructFD(ConstrNum).TotNodes;
 
             // Allocate the Surface Arrays
@@ -927,27 +925,27 @@ namespace HeatBalFiniteDiffManager {
                 // Setup material layer names actuators
                 int matLay = state.dataConstruction->Construct(ConstrNum).LayerPoint(lay);
                 // Actuator name format: "{SurfName}:{MaterialLayerName}"
-                std::string actName = fmt::format("{}:{}", Surface(Surf).Name, state.dataMaterial->Material(matLay).Name);
+                std::string actName = fmt::format("{}:{}", state.dataSurface->Surface(Surf).Name, state.dataMaterial->Material(matLay).Name);
                 SurfaceFD(Surf).condMaterialActuators(lay).actuatorName = actName;
                 SurfaceFD(Surf).specHeatMaterialActuators(lay).actuatorName = actName;
             }
 
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
-            if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
 
             SetupOutputVariable(state, "CondFD Inner Solver Loop Iteration Count",
                                 OutputProcessor::Unit::None,
                                 SurfaceFD(SurfNum).GSloopCounter,
                                 "Zone",
                                 "Sum",
-                                Surface(SurfNum).Name);
+                                state.dataSurface->Surface(SurfNum).Name);
 
             // Setup EMS Material Actuators
-            ConstrNum = Surface(SurfNum).Construction;
+            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             for (int mat = 1; mat <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++mat) {
                 EnergyPlus::SetupEMSActuator(state,
                                              "CondFD Surface Material Layer",
@@ -965,7 +963,7 @@ namespace HeatBalFiniteDiffManager {
                                              SurfaceFD(SurfNum).specHeatMaterialActuators(mat).actuatedValue);
             }
 
-            TotNodes = ConstructFD(Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
+            TotNodes = ConstructFD(state.dataSurface->Surface(SurfNum).Construction).TotNodes; // Full size nodes, start with outside face.
             for (Lay = 1; Lay <= TotNodes + 1; ++Lay) {                     // include inside face node
                 SetupOutputVariable(state,
                                     format("CondFD Surface Temperature Node {}", Lay),
@@ -973,49 +971,49 @@ namespace HeatBalFiniteDiffManager {
                                     SurfaceFD(SurfNum).TDreport(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Surface Heat Flux Node {}", Lay),
                                     OutputProcessor::Unit::W_m2,
                                     SurfaceFD(SurfNum).QDreport(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change State {}", Lay),
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeState(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Previous State {}", Lay),
                                     OutputProcessor::Unit::None,
                                     SurfaceFD(SurfNum).PhaseChangeStateOld(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Temperature {}", Lay),
                                     OutputProcessor::Unit::C,
                                     SurfaceFD(SurfNum).TDT(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Conductivity {}", Lay),
                                     OutputProcessor::Unit::W_mK,
                                     SurfaceFD(SurfNum).condNodeReport(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 SetupOutputVariable(state,
                                     format("CondFD Phase Change Node Specific Heat {}", Lay),
                                     OutputProcessor::Unit::J_kgK,
                                     SurfaceFD(SurfNum).specHeatNodeReport(Lay),
                                     "Zone",
                                     "State",
-                                    Surface(SurfNum).Name);
+                                    state.dataSurface->Surface(SurfNum).Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Outer Half Node {}", Lay),
@@ -1023,14 +1021,14 @@ namespace HeatBalFiniteDiffManager {
                                         SurfaceFD(SurfNum).CpDelXRhoS1(Lay),
                                         "Zone",
                                         "State",
-                                        Surface(SurfNum).Name);
+                                        state.dataSurface->Surface(SurfNum).Name);
                     SetupOutputVariable(state,
                                         format("CondFD Surface Heat Capacitance Inner Half Node {}", Lay),
                                         OutputProcessor::Unit::W_m2K,
                                         SurfaceFD(SurfNum).CpDelXRhoS2(Lay),
                                         "Zone",
                                         "State",
-                                        Surface(SurfNum).Name);
+                                        state.dataSurface->Surface(SurfNum).Name);
                 }
             }
 
@@ -1042,7 +1040,7 @@ namespace HeatBalFiniteDiffManager {
 
     int numNodesInMaterialLayer(EnergyPlusData &state, std::string const &surfName, std::string const &matName)
     {
-        for (auto &surface : Surface) {
+        for (auto &surface : state.dataSurface->Surface) {
             if (surface.Name == surfName) {
                 int constrNum = surface.Construction;
                 for (int lay = 1; lay <= state.dataConstruction->Construct(constrNum).TotLayers; ++lay) {
@@ -1107,7 +1105,7 @@ namespace HeatBalFiniteDiffManager {
 
         static Real64 MaxDelTemp(0.0);
 
-        int const ConstrNum(Surface(Surf).Construction);
+        int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
 
         int const TotNodes(ConstructFD(ConstrNum).TotNodes);
         int const TotLayers(state.dataConstruction->Construct(ConstrNum).TotLayers);
@@ -1472,10 +1470,9 @@ namespace HeatBalFiniteDiffManager {
         using DataHeatBalSurface::QdotRadOutRepPerArea;
         using DataHeatBalSurface::QRadOutReport;
         using DataSurfaces::HeatTransferModel_CondFD;
-        using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
 
-        auto const &surface(Surface(Surf));
+        auto const &surface(state.dataSurface->Surface(Surf));
         int const surface_ExtBoundCond(surface.ExtBoundCond);
 
         Real64 Tsky;
@@ -1483,7 +1480,7 @@ namespace HeatBalFiniteDiffManager {
         Real64 QRadSWOutMvInsulFD(0.0); // SW radiation at outside of Movable Insulation
         if (surface_ExtBoundCond == OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
-            Tsky = OSCM(surface.OSCMPtr).TRad;
+            Tsky = state.dataSurface->OSCM(surface.OSCMPtr).TRad;
             QRadSWOutFD = 0.0; // eliminate incident shortwave on underlying surface
         } else {               // Set the external conditions to local variables
             QRadSWOutFD = SurfOpaqQRadSWOutAbs(Surf);
@@ -1500,7 +1497,7 @@ namespace HeatBalFiniteDiffManager {
             // this is actually the inside face of another surface, or maybe this same surface if adiabatic
             // switch around arguments for the other surf and call routines as for interior side BC from opposite face
 
-            int const ext_bound_construction(Surface(surface_ExtBoundCond).Construction);
+            int const ext_bound_construction(state.dataSurface->Surface(surface_ExtBoundCond).Construction);
             int const LayIn(state.dataConstruction->Construct(ext_bound_construction).TotLayers);       // layer number for call to interior eqs
             int const NodeIn(ConstructFD(ext_bound_construction).TotNodes + 1); // node number "I" for call to interior eqs
             int const TotNodesPlusOne(TotNodes + 1);
@@ -1751,7 +1748,7 @@ namespace HeatBalFiniteDiffManager {
         //       MODIFIED       May 2011, B. Griffith and P. Tabares
         //       RE-ENGINEERED  C. O. Pedersen, 2006
 
-        int const ConstrNum(Surface(Surf).Construction);
+        int const ConstrNum(state.dataSurface->Surface(Surf).Construction);
 
         int const MatLay(state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay));
         auto const &mat(state.dataMaterial->Material(MatLay));
@@ -1870,7 +1867,7 @@ namespace HeatBalFiniteDiffManager {
         // PURPOSE OF THIS SUBROUTINE:
         // calculate finite difference heat transfer for nodes that interface two different material layers inside construction
 
-        auto const &surface(Surface(Surf));
+        auto const &surface(state.dataSurface->Surface(Surf));
 
         if (surface.HeatTransferAlgorithm == HeatTransferModel_CondFD) { // HT Algo issue
 
@@ -2232,7 +2229,7 @@ namespace HeatBalFiniteDiffManager {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataSurfaces::HeatTransferModel_CondFD;
 
-        auto const &surface(Surface(Surf));
+        auto const &surface(state.dataSurface->Surface(Surf));
 
         int const ConstrNum(surface.Construction);
 
@@ -2404,17 +2401,17 @@ namespace HeatBalFiniteDiffManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
 
-        ZoneNum = Surface(SurfNum).Zone;
+        ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
 
         if (state.dataGlobal->WarmupFlag) ++WarmupSurfTemp;
         if (!state.dataGlobal->WarmupFlag || WarmupSurfTemp > 10 || state.dataGlobal->DisplayExtraWarnings) {
             if (CheckTemperature < MinSurfaceTempLimit) {
-                if (Surface(SurfNum).LowTempErrCount == 0) {
+                if (state.dataSurface->Surface(SurfNum).LowTempErrCount == 0) {
                     ShowSevereMessage(state,
                                       format("Temperature (low) out of bounds [{:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
                                              state.dataHeatBal->Zone(ZoneNum).Name,
-                                             Surface(SurfNum).Name));
+                                             state.dataSurface->Surface(SurfNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     if (!state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported) {
                         ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\", Diagnostic Details:");
@@ -2438,8 +2435,8 @@ namespace HeatBalFiniteDiffManager {
                         state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
                     ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
-                                                      " for surface=" + Surface(SurfNum).Name,
-                                                  Surface(SurfNum).LowTempErrCount,
+                                                      " for surface=" + state.dataSurface->Surface(SurfNum).Name,
+                                                  state.dataSurface->Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,
@@ -2447,8 +2444,8 @@ namespace HeatBalFiniteDiffManager {
                                                   "C");
                 } else {
                     ShowRecurringSevereErrorAtEnd(state, "Temperature (low) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
-                                                      " for surface=" + Surface(SurfNum).Name,
-                                                  Surface(SurfNum).LowTempErrCount,
+                                                      " for surface=" + state.dataSurface->Surface(SurfNum).Name,
+                                                  state.dataSurface->Surface(SurfNum).LowTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,
@@ -2456,12 +2453,12 @@ namespace HeatBalFiniteDiffManager {
                                                   "C");
                 }
             } else {
-                if (Surface(SurfNum).HighTempErrCount == 0) {
+                if (state.dataSurface->Surface(SurfNum).HighTempErrCount == 0) {
                     ShowSevereMessage(state,
                                       format("Temperature (high) out of bounds ({:.2R}] for zone=\"{}\", for surface=\"{}\"",
                                              CheckTemperature,
                                              state.dataHeatBal->Zone(ZoneNum).Name,
-                                             Surface(SurfNum).Name));
+                                             state.dataSurface->Surface(SurfNum).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     if (!state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported) {
                         ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\", Diagnostic Details:");
@@ -2485,8 +2482,8 @@ namespace HeatBalFiniteDiffManager {
                         state.dataHeatBal->Zone(ZoneNum).TempOutOfBoundsReported = true;
                     }
                     ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
-                                                      " for surface=" + Surface(SurfNum).Name,
-                                                  Surface(SurfNum).HighTempErrCount,
+                                                      " for surface=" + state.dataSurface->Surface(SurfNum).Name,
+                                                  state.dataSurface->Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,
@@ -2494,8 +2491,8 @@ namespace HeatBalFiniteDiffManager {
                                                   "C");
                 } else {
                     ShowRecurringSevereErrorAtEnd(state, "Temperature (high) out of bounds for zone=" + state.dataHeatBal->Zone(ZoneNum).Name +
-                                                      " for surface=" + Surface(SurfNum).Name,
-                                                  Surface(SurfNum).HighTempErrCount,
+                                                      " for surface=" + state.dataSurface->Surface(SurfNum).Name,
+                                                  state.dataSurface->Surface(SurfNum).HighTempErrCount,
                                                   CheckTemperature,
                                                   CheckTemperature,
                                                   _,

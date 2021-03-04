@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -77,7 +76,6 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -149,7 +147,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataSizing::clear_state();
     DataStringGlobals::clear_state();
     DataSurfaceLists::clear_state();
-    DataSurfaces::clear_state();
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
@@ -158,7 +155,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DualDuct::clear_state();
     clearFacilityElectricPowerServiceObject();
     ElectricBaseboardRadiator::clear_state();
-    EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
     ExternalInterface::clear_state();
     FanCoilUnits::clear_state();

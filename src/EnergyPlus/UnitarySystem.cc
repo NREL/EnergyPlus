@@ -1454,7 +1454,7 @@ namespace UnitarySystems {
         int CoolingSAFlowMethod = this->m_CoolingSAFMethod;
         int HeatingSAFlowMethod = this->m_HeatingSAFMethod;
         // can't reset this to 0 for systems where DX heating coil is in downstream unit and DX cooling coil is in upstream unit
-        //		DXCoolCap = 0.0;
+        //        DXCoolCap = 0.0;
         DataSizing::UnitaryHeatCap = 0.0;
         DataSizing::SuppHeatCap = 0.0;
         bool TempCoolingLoad = state.dataUnitarySystems->CoolingLoad;
@@ -1749,7 +1749,7 @@ namespace UnitarySystems {
                     HeatCapAtPeak = this->m_DesignHeatingCapacity;
                 }
             }
-            //			if ( ! UnitarySystem( UnitarySysNum ).CoolCoilExists )DXCoolCap = HeatCapAtPeak;
+            //            if ( ! UnitarySystem( UnitarySysNum ).CoolCoilExists )DXCoolCap = HeatCapAtPeak;
             DataSizing::DataIsDXCoil = false;
             DataSizing::DataTotCapCurveIndex = 0;
             DataSizing::DataFlowUsedForSizing = 0.0;
@@ -1766,8 +1766,8 @@ namespace UnitarySystems {
         if (this->m_HeatPump) { // if a heat pump, use maximum values and set main air flow and capacity variables
             EqSizing.AirFlow = true;
             EqSizing.AirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
-            //			EqSizing.CoolingAirVolFlow = EqSizing.AirVolFlow;
-            //			EqSizing.HeatingAirVolFlow = EqSizing.AirVolFlow;
+            //            EqSizing.CoolingAirVolFlow = EqSizing.AirVolFlow;
+            //            EqSizing.HeatingAirVolFlow = EqSizing.AirVolFlow;
             EqSizing.Capacity = true;
             EqSizing.DesCoolingLoad = max(EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad);
             EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
@@ -5337,14 +5337,14 @@ namespace UnitarySystems {
                             }
 
                             // **** How to get this info ****
-                            //						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity =
+                            //                        UnitarySystem( UnitarySysNum ).DesignCoolingCapacity =
                             // GetWtoAHPCoilCapacity(
-                            // CoolingCoilType, loc_m_CoolingCoilName, errFlag ); 						if ( errFlag ) {
-                            //							ShowContinueError(state,  "Occurs in " + CurrentModuleObject + " = "
+                            // CoolingCoilType, loc_m_CoolingCoilName, errFlag );                         if ( errFlag ) {
+                            //                            ShowContinueError(state,  "Occurs in " + CurrentModuleObject + " = "
                             //+
-                            // UnitarySystem( UnitarySysNum ).Name ); 							ErrorsFound = true;
-                            //							errFlag = false;
-                            //						}
+                            // UnitarySystem( UnitarySysNum ).Name );                             ErrorsFound = true;
+                            //                            errFlag = false;
+                            //                        }
 
                             // Get the Cooling Coil Inlet Node
                             errFlag = false;
@@ -16008,7 +16008,7 @@ namespace UnitarySystems {
             // FanPartLoadRatio is used to pass info over to function SetAverageAirFlow since air and coil PLR are disassociated in the model
             // FanPartLoadRatio is a report variable that is updated (overwritten) in ReportUnitarySystem
             thisSys.FanPartLoadRatio = PartLoadRatio;
-            //			if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
+            //            if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
 
         } else {
 

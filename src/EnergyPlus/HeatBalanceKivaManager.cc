@@ -139,7 +139,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
 
         ss.dir = format("{}/{} {:.2R} {}",
                         FileSystem::getAbsolutePath(DataStringGlobals::outDirPathName),
-                        DataSurfaces::Surface(floorSurface).Name,
+                        state.dataSurface->Surface(floorSurface).Name,
                         ground.foundation.foundationDepth,
                         constructionName);
 
@@ -394,7 +394,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                        DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
                        DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC
 
-            Real64 &A = DataSurfaces::Surface(wl).Area;
+            Real64 &A = state.dataSurface->Surface(wl).Area;
 
             Real64 Trad = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, wl);
             Real64 Tconv = state.dataHeatBal->TempEffBulkAir(wl);
@@ -644,7 +644,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
 
         readWeatherData(state);
 
-        auto &Surfaces = DataSurfaces::Surface;
+        auto &Surfaces = state.dataSurface->Surface;
         auto &Constructs = state.dataConstruction->Construct;
         auto &Materials = state.dataMaterial->Material;
 
@@ -702,7 +702,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                 }
 
                 Kiva::Polygon floorPolygon;
-                if (DataSurfaces::CCW) {
+                if (state.dataSurface->CCW) {
                     for (std::size_t i = 0; i < surface.Vertex.size(); ++i) {
                         auto &v = surface.Vertex[i];
                         floorPolygon.outer().push_back(Kiva::Point(v.x, v.y));
@@ -1068,13 +1068,13 @@ namespace EnergyPlus::HeatBalanceKivaManager {
 
             std::string wallSurfaceString;
             for (auto &wl : kv.wallSurfaces) {
-                wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
+                wallSurfaceString += "," + state.dataSurface->Surface(wl).Name;
             }
 
             static constexpr auto fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
             print(state.files.eio,
                   fmt,
-                  foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name,
+                  foundationInputs[state.dataSurface->Surface(kv.floorSurface).OSCPtr].name,
                   grnd->nX,
                   grnd->nZ,
                   grnd->nX * grnd->nZ,
@@ -1082,7 +1082,7 @@ namespace EnergyPlus::HeatBalanceKivaManager {
                   kv.floorWeight,
                   grnd->foundation.foundationDepth,
                   constructionName,
-                  DataSurfaces::Surface(kv.floorSurface).Name,
+                  state.dataSurface->Surface(kv.floorSurface).Name,
                   wallSurfaceString);
         }
 
@@ -1199,9 +1199,9 @@ namespace EnergyPlus::HeatBalanceKivaManager {
 
     void KivaManager::calcKivaSurfaceResults(EnergyPlusData &state)
     {
-        for (int surfNum = 1; surfNum <= (int)DataSurfaces::Surface.size(); ++surfNum) {
-            if (DataSurfaces::Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                std::string contextStr = "Surface=\"" + DataSurfaces::Surface(surfNum).Name + "\"";
+        for (int surfNum = 1; surfNum <= (int)state.dataSurface->Surface.size(); ++surfNum) {
+            if (state.dataSurface->Surface(surfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
+                std::string contextStr = "Surface=\"" + state.dataSurface->Surface(surfNum).Name + "\"";
                 Kiva::setMessageCallback(kivaErrorCallback, &contextStr);
                 surfaceMap[surfNum].calc_weighted_results();
                 state.dataHeatBal->HConvIn(surfNum) = state.dataSurfaceGeometry->kivaManager.surfaceMap[surfNum].results.hconv;

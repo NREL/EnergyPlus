@@ -429,14 +429,14 @@ namespace FaultsManager {
 
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil")) {
                     // Read in evaporative cooler is not done yet
-                    if (EvaporativeCoolers::GetInputEvapComponentsFlag) {
+                    if (state.dataEvapCoolers->GetInputEvapComponentsFlag) {
                         EvaporativeCoolers::GetEvapInput(state);
-                        EvaporativeCoolers::GetInputEvapComponentsFlag = false;
+                        state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
                     }
 
                     // Check whether the evaporative cooler  name and type match each other;
                     EvapCoolerNum = UtilityRoutines::FindItemInList(FaultsEvapCoolerFouling(jFault_EvapCoolerFouling).EvapCoolerName,
-                                                                    EvaporativeCoolers::EvapCond,
+                                                                    state.dataEvapCoolers->EvapCond,
                                                                     &EvaporativeCoolers::EvapConditions::EvapCoolerName);
                     if (EvapCoolerNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
@@ -444,8 +444,8 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the boiler with the fault model
-                        EvaporativeCoolers::EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingFlag = true;
-                        EvaporativeCoolers::EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingIndex = jFault_EvapCoolerFouling;
+                        state.dataEvapCoolers->EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingFlag = true;
+                        state.dataEvapCoolers->EvapCond(EvapCoolerNum).FaultyEvapCoolerFoulingIndex = jFault_EvapCoolerFouling;
                     }
                 }
             }

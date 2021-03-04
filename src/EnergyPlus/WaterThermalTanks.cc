@@ -90,9 +90,7 @@
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 
-namespace EnergyPlus {
-
-namespace WaterThermalTanks {
+namespace EnergyPlus::WaterThermalTanks {
 
     // MODULE INFORMATION:
     //       AUTHOR         Brandon Anderson
@@ -5390,7 +5388,7 @@ namespace WaterThermalTanks {
         //       DATE WRITTEN   February 2004
         //       MODIFIED       FSEC, July 2005
         //                      Brent Griffith, October 2007 indirect fired water heater
-        //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
+        //                        B. Shen 12/2014, add air-source variable-speed heat pump water heating
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -6059,7 +6057,7 @@ namespace WaterThermalTanks {
             {
                 IntegratedHeatPump::SizeIHP(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum); //
                 // IntegratedHeatPump::SimIHP(modBlankString, HPWaterHeater(HPNum).DXCoilNum,
-                //	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
+                //    0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
                 int VSCoilID = state.dataIntegratedHP->IntegratedHeatPumps(state.dataWaterThermalTanks->HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
                 state.dataWaterThermalTanks->HPWaterHeater(HPNum).NumofSpeed = state.dataVariableSpeedCoils->VarSpeedCoil(VSCoilID).NumOfSpeeds;
 
@@ -6801,10 +6799,10 @@ namespace WaterThermalTanks {
     )
     {
         // Function Information:
-        //		Author: Noel Merket
-        //		Date Written: January 2015
-        //		Modified: na
-        //		Re-engineered: na
+        //        Author: Noel Merket
+        //        Date Written: January 2015
+        //        Modified: na
+        //        Re-engineered: na
 
         // Purpose of this function:
         // Determines if the source side heat transfer is coming from a heat pump.
@@ -8349,7 +8347,7 @@ namespace WaterThermalTanks {
         //       AUTHOR         Richard Raustad
         //       DATE WRITTEN   March 2005
         //       MODIFIED       B. Griffith, Jan 2012 for stratified tank
-        //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
+        //                        B. Shen 12/2014, add air-source variable-speed heat pump water heating
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -10770,7 +10768,7 @@ namespace WaterThermalTanks {
 
                 this->Sizing.TotalSolarCollectorArea = 0.0;
                 for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-                    this->Sizing.TotalSolarCollectorArea += DataSurfaces::Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+                    this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
                 }
 
                 if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
@@ -11287,7 +11285,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == SizeEnum::PerSolarColArea) {
                     this->Sizing.TotalSolarCollectorArea = 0.0;
                     for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
-                        this->Sizing.TotalSolarCollectorArea += DataSurfaces::Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
+                        this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(state.dataSolarCollectors->Collector(CollectorNum).Surface).Area;
                     }
 
                     if (this->VolumeWasAutoSized) tmpTankVolume = this->Sizing.TotalSolarCollectorArea * this->Sizing.TankCapacityPerCollectorArea;
@@ -11862,7 +11860,7 @@ namespace WaterThermalTanks {
         // and can be excluded from an airflow network.
 
         // Return value
-        bool HeatPumpWaterHeaterNodeException; 
+        bool HeatPumpWaterHeaterNodeException;
 
         int HeatPumpWaterHeaterIndex;
 
@@ -11937,5 +11935,3 @@ namespace WaterThermalTanks {
     }
 
 } // namespace WaterThermalTanks
-
-} // namespace EnergyPlus

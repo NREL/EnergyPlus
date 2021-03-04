@@ -268,18 +268,18 @@ namespace EcoRoofManager {
         //  INTEGER,EXTERNAL :: GetNewUnitNumber ! external function to return a new (unique) unit for ecoroof writing
         int unit(0); // not actually used in the function it is passed into
 
-        Ws = DataEnvironment::WindSpeedAt(state, Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
+        Ws = DataEnvironment::WindSpeedAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
         if (Ws < 2.0) {                                // Later we need to adjust for building roof height...
             Ws = 2.0;                                  // Set minimum possible wind speed outside vegetation to 2.0 m/s
                                                        // consistent with FASST TR-04-25 p. x (W' = 2.0)
         }
 
-        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+        if (state.dataSurface->SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = state.dataSurface->Surface(SurfNum).StormWinConstruction;
         RoughSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         HMovInsul = 0.0;
 
-        if (Surface(SurfNum).ExtWind) {
+        if (state.dataSurface->Surface(SurfNum).ExtWind) {
             InitExteriorConvectionCoeff(state,
                                         SurfNum,
                                         HMovInsul,
@@ -294,12 +294,12 @@ namespace EcoRoofManager {
 
         RS = state.dataEnvrn->BeamSolarRad + state.dataHeatBal->AnisoSkyMult(SurfNum) * state.dataEnvrn->DifSolarRad;
 
-        Latm = 1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
-               1.0 * Sigma * 1.0 * Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
+        Latm = 1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorGround * pow_4(state.dataEnvrn->GroundTempKelvin) +
+               1.0 * Sigma * 1.0 * state.dataSurface->Surface(SurfNum).ViewFactorSky * pow_4(state.dataEnvrn->SkyTempKelvin);
 
         if (state.dataEcoRoofMgr->EcoRoofbeginFlag) {
             state.dataEcoRoofMgr->EcoRoofbeginFlag = false;
-            if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF)
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF)
                 ShowSevereError(state,
                                 "CalcEcoRoof: EcoRoof simulation but HeatBalanceAlgorithm is not ConductionTransferFunction(CTF). EcoRoof model "
                                 "currently works only with CTF heat balance solution algorithm.");
@@ -416,8 +416,8 @@ namespace EcoRoofManager {
         // DJS July 2007
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataEcoRoofMgr->CalcEcoRoofMyEnvrnFlag) {
-            state.dataEcoRoofMgr->Tgold = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
-            state.dataEcoRoofMgr->Tfold = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
+            state.dataEcoRoofMgr->Tgold = OutDryBulbTempAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
+            state.dataEcoRoofMgr->Tfold = OutDryBulbTempAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tg = 10.0;
             Tf = 10.0;
             Vfluxf = 0.0;
@@ -442,7 +442,7 @@ namespace EcoRoofManager {
             UpdateSoilProps(
                 state, Moisture, MeanRootMoisture, MoistureMax, MoistureResidual, SoilThickness, Vfluxf, Vfluxg, ConstrNum, Alphag, unit, Tg, Tf, Qsoil);
 
-            Ta = OutDryBulbTempAt(state, Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
+            Ta = OutDryBulbTempAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
             Tg = state.dataEcoRoofMgr->Tgold;
             Tf = state.dataEcoRoofMgr->Tfold;
 
