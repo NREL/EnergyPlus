@@ -219,6 +219,8 @@ namespace SurfaceGeometry {
         SurfWinSlatAngThisTSDegEMSon.dimension(NumSurfaces, 0);
         SurfWinSlatAngThisTSDegEMSValue.dimension(NumSurfaces, 0);
         SurfWinSlatsBlockBeam.dimension(NumSurfaces, 0);
+        SurfWinSlatsAngIndex.dimension(NumSurfaces, 0);
+        SurfWinSlatsAngInterpFac.dimension(NumSurfaces, 0);
         SurfWinBlindAirFlowPermeability.dimension(NumSurfaces, 0);
         SurfWinTotGlazingThickness.dimension(NumSurfaces, 0);
         SurfWinTanProfileAngHor.dimension(NumSurfaces, 0);

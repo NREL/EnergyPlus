@@ -157,6 +157,14 @@ namespace General {
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
     );
 
+    constexpr Real64 InterpGeneral(Real64 const Lower,
+                                Real64 const Upper,
+                                Real64 const InterpFac
+    )
+    {
+        return Lower + InterpFac * (Upper - Lower);
+    };
+
     Real64 InterpSw(Real64 const SwitchFac, // Switching factor: 0.0 if glazing is unswitched, = 1.0 if fully switched
                     Real64 const A,         // Glazing property in unswitched state
                     Real64 const B          // Glazing property in fully switched state

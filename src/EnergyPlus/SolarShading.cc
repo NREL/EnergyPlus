@@ -8641,6 +8641,8 @@ namespace EnergyPlus::SolarShading {
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
 
+        static Real64 const DeltaAng(DataGlobalConstants::Pi / (double(MaxSlatAngs) - 1.0));
+        static Real64 const DeltaAng_inv((double(MaxSlatAngs) - 1.0) / DataGlobalConstants::Pi);
         static Real64 ThetaBig(0.0);   // Larger of ThetaBlock1 and ThetaBlock2 	//Autodesk Used uninitialized in some runs
         static Real64 ThetaSmall(0.0); // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
         static Real64 ThetaMin(0.0);   // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
@@ -9144,7 +9146,18 @@ namespace EnergyPlus::SolarShading {
                     }
                 }
             } // End of surface loop
+            for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
+                if (!SurfWinMovableSlats(ISurf)) continue;
+                Real64 SlatAng = SurfWinSlatAngThisTS(ISurf);
+                if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {
+                    SlatAng = min(max(SlatAng, 0.0), DataGlobalConstants::Pi);
+                }
+                Real64 SlatsAngIndex = 1 + int(SlatAng * DeltaAng_inv);
+                SurfWinSlatsAngIndex(ISurf) = SlatsAngIndex;
+                SurfWinSlatsAngInterpFac(ISurf) = (SlatAng - DeltaAng * (SlatsAngIndex - 1)) * DeltaAng_inv;
+            }
         }
+
     }
 
     DataSurfaces::WinShadingType findValueInEnumeration(Real64 controlValue) {

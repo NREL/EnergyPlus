@@ -506,6 +506,10 @@ namespace DataSurfaces {
     Array1D<bool> SurfWinSlatAngThisTSDegEMSon;             // flag that indicate EMS system is actuating SlatAngThisTSDeg
     Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue;        // value that EMS sets for slat angle in degrees
     Array1D<bool> SurfWinSlatsBlockBeam;                    // True if blind slats block incident beam solar
+
+    Array1D<int> SurfWinSlatsAngIndex;
+    Array1D<Real64> SurfWinSlatsAngInterpFac;
+
     Array1D<Real64> SurfWinBlindAirFlowPermeability;        // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
     Array1D<Real64> SurfWinTotGlazingThickness;             // Total glazing thickness from outside of outer glass to inside of inner glass (m)
     Array1D<Real64> SurfWinTanProfileAngHor;                // Tangent of horizontal profile angle
@@ -1321,6 +1325,8 @@ namespace DataSurfaces {
         SurfWinSlatAngThisTSDegEMSon.clear();
         SurfWinSlatAngThisTSDegEMSValue.clear();
         SurfWinSlatsBlockBeam.clear();
+        SurfWinSlatsAngIndex.clear();
+        SurfWinSlatsAngInterpFac.clear();
         SurfWinBlindAirFlowPermeability.clear();
         SurfWinTotGlazingThickness.clear();
         SurfWinTanProfileAngHor.clear();

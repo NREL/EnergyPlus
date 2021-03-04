@@ -628,6 +628,8 @@ namespace DataSurfaces {
     extern Array1D<bool> SurfWinSlatAngThisTSDegEMSon; // flag that indicate EMS system is actuating SlatAngThisTSDeg
     extern Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
     extern Array1D<bool> SurfWinSlatsBlockBeam;             // True if blind slats block incident beam solar
+    extern Array1D<int> SurfWinSlatsAngIndex;
+    extern Array1D<Real64> SurfWinSlatsAngInterpFac;
     extern Array1D<Real64>
         SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
     extern Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
