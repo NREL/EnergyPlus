@@ -545,8 +545,8 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
-                    if (state.dataSurface->Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                    ++numEnclosureSurfaces;
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
@@ -568,14 +568,12 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
-                    if (!state.dataSurface->Surface(surfNum).HeatTransSurf) continue;
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
-                    if (!state.dataSurface->Surface(state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
+                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
                     for (int enclSNum = priorZoneTotEnclSurfs+1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);
@@ -847,9 +845,9 @@ namespace HeatBalanceIntRadExchange {
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Include only heat transfer surfaces
-                    if (state.dataSurface->Surface(surfNum).HeatTransSurf) ++numEnclosureSurfaces;
+                    ++numEnclosureSurfaces;
                 }
             }
             thisEnclosure.NumOfSurfaces = numEnclosureSurfaces;
@@ -867,9 +865,8 @@ namespace HeatBalanceIntRadExchange {
             int enclosureSurfNum = 0;
             for (int const zoneNum : thisEnclosure.ZoneNums) {
                 int priorZoneTotEnclSurfs = enclosureSurfNum;
-                for (int surfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; surfNum <= surfNum_end; ++surfNum) {
+                for (int surfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; surfNum <= surfNum_end; ++surfNum) {
                     // Do not include non-heat transfer surfaces
-                    if (!state.dataSurface->Surface(surfNum).HeatTransSurf) continue;
                     ++enclosureSurfNum;
                     thisEnclosure.SurfacePtr(enclosureSurfNum) = surfNum;
                     // Store pointers back to here
@@ -877,8 +874,7 @@ namespace HeatBalanceIntRadExchange {
                     state.dataSurface->Surface(surfNum).SolarEnclIndex = enclosureNum;
                 }
                 // Store SurfaceReportNums to maintain original reporting order
-                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).SurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).SurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
-                    if (!state.dataSurface->Surface(state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]).HeatTransSurf) continue;
+                for (int allSurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst, surfNum_end = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; allSurfNum <= surfNum_end; ++allSurfNum) {
                     for (int enclSNum = priorZoneTotEnclSurfs + 1; enclSNum <= enclosureSurfNum; ++enclSNum) {
                         if (thisEnclosure.SurfacePtr(enclSNum) == state.dataSurface->AllSurfaceListReportOrder[allSurfNum - 1]) {
                             thisEnclosure.SurfaceReportNums.push_back(enclSNum);

@@ -1685,11 +1685,9 @@ namespace EnergyPlus::CoolingPanelSimple {
         Real64 Area; // Effective surface area
         SumHATsurf = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             auto &ThisSurf(state.dataSurface->Surface(SurfNum));
-
-            if (!ThisSurf.HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = ThisSurf.Area;
 

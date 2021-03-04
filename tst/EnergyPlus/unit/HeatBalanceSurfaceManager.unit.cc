@@ -266,10 +266,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->TotMaterials = 1;
     state->dataHeatBal->TotConstructs = 1;
-
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 1;
     state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
@@ -313,6 +312,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_UpdateFinalThermalHistories)
     state->dataSurface->Surface(1).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
     state->dataSurface->Surface(1).ExtBoundCond = 1;
     state->dataSurface->Surface(1).Construction = 1;
+    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).OpaqOrIntMassSurfaceLast = 1;
 
     state->dataConstruction->Construct(1).NumCTFTerms = 2;
     state->dataConstruction->Construct(1).SourceSinkPresent = true;

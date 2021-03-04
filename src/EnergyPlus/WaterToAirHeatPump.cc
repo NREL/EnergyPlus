@@ -1624,6 +1624,7 @@ namespace WaterToAirHeatPump {
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
+        DataHVACGlobals::DXElecCoolingPower = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSensible = QSensible;
@@ -2143,6 +2144,7 @@ namespace WaterToAirHeatPump {
         QSource *= PartLoadRatio;
 
         // Update heat pump data structure
+        DataHVACGlobals::DXElecHeatingPower = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = Power;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QLoadTotal = QLoadTotal;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSensible = QLoadTotal;

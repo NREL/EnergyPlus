@@ -1747,9 +1747,7 @@ namespace HWBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
             Area = state.dataSurface->Surface(SurfNum).Area;
 
             if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {

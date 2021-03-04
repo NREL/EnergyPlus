@@ -730,7 +730,8 @@ namespace OutputReportTabular {
 
     std::string ConvertUnicodeToUTF8(unsigned long const codepoint);
 
-    std::string ConvertToEscaped(std::string const &inString); // Input String
+    std::string ConvertToEscaped(std::string const &inString,  // Input String
+                                 bool isXML=true);             // isXML if false assumes HTML and will not convert quotes and apostrophes, for HTML4
 
     void DetermineBuildingFloorArea(EnergyPlusData &state);
 
