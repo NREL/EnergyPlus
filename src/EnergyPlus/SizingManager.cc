@@ -1281,6 +1281,8 @@ namespace EnergyPlus::SizingManager {
         auto &AirDistUnit(state.dataDefineEquipment->AirDistUnit);
         auto &FinalSysSizing(state.dataSize->FinalSysSizing);
         auto &TermUnitFinalZoneSizing(state.dataSize->TermUnitFinalZoneSizing);
+        auto &VbzByZone(state.dataSize->VbzByZone);
+        auto &AirToZoneNodeInfo(state.dataAirLoop->AirToZoneNodeInfo);
 
         // redo std 62.1 calculations using latest information on zone flows and report to tables
 
@@ -1294,8 +1296,8 @@ namespace EnergyPlus::SizingManager {
 
                 // Loop over all zones connected to air loop, redo both cooling and heating calcs for Zdz minimum discharge outdoor air fraction for
                 // each zone
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     if (DataSizing::VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                         DataSizing::ZdzClgByZone(termUnitSizingIndex) =
                             min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / DataSizing::VdzMinClgByZone(termUnitSizingIndex));
@@ -1309,8 +1311,8 @@ namespace EnergyPlus::SizingManager {
                         DataSizing::ZdzHtgByZone(termUnitSizingIndex) = 1.0;
                     }
                 }
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     if (DataSizing::VdzMinClgByZone(termUnitSizingIndex) > 0.0) {
                         DataSizing::ZdzClgByZone(termUnitSizingIndex) =
                             min(1.0, TermUnitFinalZoneSizing(termUnitSizingIndex).VozClgByZone / DataSizing::VdzMinClgByZone(termUnitSizingIndex));
@@ -1330,15 +1332,15 @@ namespace EnergyPlus::SizingManager {
                 DataSizing::VouBySys(AirLoopNum) = DataSizing::DBySys(AirLoopNum) * SumRpxPzBySys(AirLoopNum) + SumRaxAzBySys(AirLoopNum);
                 // redo VpzClgSumBySys( AirLoopNum ) with latest values, for reporting
                 DataSizing::VpzClgSumBySys(AirLoopNum) = 0.0;
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                 }
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                     }
@@ -1351,16 +1353,16 @@ namespace EnergyPlus::SizingManager {
                 // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
                 DataSizing::VpsHtgBySys(AirLoopNum) = 0.0;
                 DataSizing::VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                     DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
                 }
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                         DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
@@ -1378,16 +1380,16 @@ namespace EnergyPlus::SizingManager {
                 for (int coolHeatPass = 1; coolHeatPass <= 2; ++coolHeatPass) {
                     int numZones = 0;
                     if (coolHeatPass == 1) {
-                        numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                        numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                     } else {
-                        numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                        numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                     }
                     for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
                         int termUnitSizingIndex = 0;
                         if (coolHeatPass == 1) {
-                            termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                            termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                         } else {
-                            termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                            termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                         }
                         Real64 Er = TermUnitFinalZoneSizing(termUnitSizingIndex)
                                         .ZoneSecondaryRecirculation; // user input in Zone Air Distribution design spec object
@@ -1457,9 +1459,9 @@ namespace EnergyPlus::SizingManager {
             else if ((FinalSysSizing(AirLoopNum).OAAutoSized && state.dataSize->SysSizInput(SysSizNum).SystemOAMethod == SOAM_VRP &&
                       state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones == 1)) { // single zone VRP
                 int termUnitSizingIndex = 0;
-                termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
+                termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(1);
                 if (termUnitSizingIndex == 0) {
-                    termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
+                    termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(1);
                 }
                 // single zone cooling
                 DataSizing::VotClgBySys(AirLoopNum) = VbzByZone(termUnitSizingIndex) / TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneADEffCooling;
@@ -1489,17 +1491,17 @@ namespace EnergyPlus::SizingManager {
                 // Fill Vps for heating VRP calculation, use heating min by zone from air terminal scan in ManageSystemSizingAdjustments
                 DataSizing::VpsHtgBySys(AirLoopNum) = 0.0;
                 DataSizing::VpzHtgSumBySys(AirLoopNum) = 0.0; // for reporting only
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                     DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
                     DataSizing::VpzHtgSumBySys(AirLoopNum) += DataSizing::VpzHtgByZone(termUnitSizingIndex);
                 }
-                for (int zoneNum = 1; zoneNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
-                    int termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                for (int zoneNum = 1; zoneNum <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++zoneNum) {
+                    int termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                     int MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     if (MatchingCooledZoneNum == 0) {
                         DataSizing::VpzClgSumBySys(AirLoopNum) += DataSizing::VdzClgByZone(termUnitSizingIndex);
                         DataSizing::VpsHtgBySys(AirLoopNum) += DataSizing::VpzMinHtgByZone(termUnitSizingIndex);
@@ -1582,20 +1584,20 @@ namespace EnergyPlus::SizingManager {
             for (int coolHeatPass = 1; coolHeatPass <= 2; ++coolHeatPass) {
                 int numZones = 0;
                 if (coolHeatPass == 1) {
-                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                    numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                 } else {
-                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                    numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                 }
                 for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
                     int termUnitSizingIndex = 0;
                     int MatchingCooledZoneNum = 0;
                     if (coolHeatPass == 1) {
-                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                        termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     } else {
-                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                        termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                         MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     }
                     if (MatchingCooledZoneNum == 0) {
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zvpAlN,
@@ -1665,20 +1667,20 @@ namespace EnergyPlus::SizingManager {
             for (int coolHeatPass = 1; coolHeatPass <= 2; ++coolHeatPass) {
                 int numZones = 0;
                 if (coolHeatPass == 1) {
-                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
+                    numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
                 } else {
-                    numZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+                    numZones = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
                 }
                 for (int zoneNum = 1; zoneNum <= numZones; ++zoneNum) {
                     int termUnitSizingIndex = 0;
                     int MatchingCooledZoneNum = 0;
                     if (coolHeatPass == 1) {
-                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
+                        termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(zoneNum);
                     } else {
-                        termUnitSizingIndex = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
+                        termUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitHeatSizingIndex(zoneNum);
                         MatchingCooledZoneNum = General::FindNumberInList(termUnitSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
-                                                                          state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
+                                                                          AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex,
+                                                                          AirToZoneNodeInfo(AirLoopNum).NumZonesCooled);
                     }
                     if (MatchingCooledZoneNum == 0) {
 
@@ -1704,7 +1706,7 @@ namespace EnergyPlus::SizingManager {
                         // Zone Ventilation Calculations for Cooling Design, (Table 5)
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
+                                                                 AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
                         for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
                             if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(state,
@@ -1766,7 +1768,7 @@ namespace EnergyPlus::SizingManager {
                         // Zone Ventilation Calculations for Heating Design (Table 7)
                         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zhdAlN,
                                                                  TermUnitFinalZoneSizing(termUnitSizingIndex).ZoneName,
-                                                                 state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
+                                                                 AirToZoneNodeInfo(AirLoopNum).AirLoopName); // Air loop name
                         for (int iAirDistUnit = 1; iAirDistUnit <= state.dataDefineEquipment->NumAirDistUnits; ++iAirDistUnit) {
                             if (AirDistUnit(iAirDistUnit).TermUnitSizingNum == termUnitSizingIndex) {
                                 OutputReportPredefined::PreDefTableEntry(state,
@@ -4769,7 +4771,7 @@ namespace EnergyPlus::SizingManager {
         inputProcessor->getObjectDefMaxArgs(state, cCurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
 
         if (state.dataSize->NumAirTerminalSizingSpec > 0) {
-            AirTerminalSizingSpec.allocate(state.dataSize->NumAirTerminalSizingSpec);
+            state.dataSize->AirTerminalSizingSpec.allocate(state.dataSize->NumAirTerminalSizingSpec);
 
             // Start Loading the System Input
             for (int zSIndex = 1; zSIndex <= state.dataSize->NumAirTerminalSizingSpec; ++zSIndex) {
@@ -4789,7 +4791,7 @@ namespace EnergyPlus::SizingManager {
 
                 UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-                auto &thisATSizing(DataSizing::AirTerminalSizingSpec(zSIndex));
+                auto &thisATSizing(state.dataSize->AirTerminalSizingSpec(zSIndex));
                 thisATSizing.Name = cAlphaArgs(1);
                 thisATSizing.DesSensCoolingFrac = rNumericArgs(1);
                 thisATSizing.DesCoolSATRatio = rNumericArgs(2);
@@ -4808,6 +4810,9 @@ namespace EnergyPlus::SizingManager {
     void UpdateFacilitySizing([[maybe_unused]] EnergyPlusData &state, DataGlobalConstants::CallIndicator const CallIndicator)
     {
         int NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+
+        auto &CalcFacilitySizing(state.dataSize->CalcFacilitySizing);
+        auto &CalcFinalFacilitySizing(state.dataSize->CalcFinalFacilitySizing);
 
         //  test if allocated here
         if (!CalcFacilitySizing.allocated()) {

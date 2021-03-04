@@ -12914,12 +12914,12 @@ namespace EnergyPlus::OutputReportTabular {
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataSizing::CalcFinalFacilitySizing;
 
         auto &SysSizPeakDDNum(state.dataSize->SysSizPeakDDNum);
         auto &FinalSysSizing(state.dataSize->FinalSysSizing);
         auto &ort(state.dataOutRptTab);
         auto &Zone(state.dataHeatBal->Zone);
+        auto &CalcFinalFacilitySizing(state.dataSize->CalcFinalFacilitySizing);
 
         if (!((ort->displayZoneComponentLoadSummary || ort->displayAirLoopComponentLoadSummary || ort->displayFacilityComponentLoadSummary) && state.dataGlobal->CompLoadReportIsReq))
             return;

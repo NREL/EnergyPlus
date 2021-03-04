@@ -84,10 +84,6 @@ namespace EnergyPlus::DataSizing {
     //  before applying user input sys flow rates.
 
     // Object Data
-    Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for zone HVAC sizing used only for Facility Load Component Summary
-    Array1D<FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
-    FacilitySizingData CalcFinalFacilitySizing;     // Final data for zone sizing
-    Array1D<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
     Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
     Array1D<Real64> VdzMinClgByZone; // minimum discharge flow for cooling, Vdz includes secondary and primary flows for dual path
     Array1D<Real64> VdzHtgByZone;    // saved value of heating based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)
@@ -135,19 +131,6 @@ namespace EnergyPlus::DataSizing {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        AirTerminalSizingSpec.deallocate();
-        CalcFacilitySizing.deallocate();
-        CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
-        CalcFinalFacilitySizing.DOASLatAddSeq.deallocate();
-        CalcFinalFacilitySizing.CoolOutHumRatSeq.deallocate();
-        CalcFinalFacilitySizing.CoolOutTempSeq.deallocate();
-        CalcFinalFacilitySizing.CoolZoneTempSeq.deallocate();
-        CalcFinalFacilitySizing.CoolLoadSeq.deallocate();
-        CalcFinalFacilitySizing.HeatOutHumRatSeq.deallocate();
-        CalcFinalFacilitySizing.HeatOutTempSeq.deallocate();
-        CalcFinalFacilitySizing.HeatZoneTempSeq.deallocate();
-        CalcFinalFacilitySizing.HeatLoadSeq.deallocate();
-        VbzByZone.deallocate();
         VdzClgByZone.deallocate();
         VdzMinClgByZone.deallocate();
         VdzHtgByZone.deallocate();

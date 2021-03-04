@@ -7040,10 +7040,10 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // Set up Facility to peak like the zone too
-    DataSizing::CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
     AllocateLoadComponentArrays(*state);

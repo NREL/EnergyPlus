@@ -4058,7 +4058,7 @@ namespace EnergyPlus::SimAirServingZones {
             DataSizing::VpzMinHtgByZone.dimension(NumAirTerminalUnits, 0.0);
             DataSizing::VpzClgSumBySys.dimension(NumPrimaryAirSys, 0.0);
             DataSizing::VpzHtgSumBySys.dimension(NumPrimaryAirSys, 0.0);
-            DataSizing::VbzByZone.dimension(NumAirTerminalUnits, 0.0);
+            state.dataSize->VbzByZone.dimension(NumAirTerminalUnits, 0.0);
             DataSizing::PzSumBySys.dimension(NumPrimaryAirSys, 0.0);
             DataSizing::PsBySys.dimension(NumPrimaryAirSys, 0.0);
             DataSizing::DBySys.dimension(NumPrimaryAirSys, 0.0);
@@ -4683,7 +4683,7 @@ namespace EnergyPlus::SimAirServingZones {
                         SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
 
                         // save for Standard 62 tabular report
-                        DataSizing::VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
+                        state.dataSize->VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
                         // Save Std 62.1 cooling ventilation required by zone
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling > 0.0) {
                             TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone =
@@ -4850,7 +4850,7 @@ namespace EnergyPlus::SimAirServingZones {
                                 SumRpxPzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromPeople;
                                 SumRaxAzBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).TotalOAFromArea;
                                 // save for Standard 62 tabular report
-                                DataSizing::VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
+                                state.dataSize->VbzByZone(TermUnitSizingIndex) = ZoneOAUnc; // fixed now, previously RHS already had Ez factored in.
                                 // Save Std 62.1 heating ventilation required by zone
                                 if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating > 0.0) {
                                     TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone =
@@ -4996,9 +4996,9 @@ namespace EnergyPlus::SimAirServingZones {
                         // Save Std 62.1 heating ventilation required by zone
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating > 0.0) {
                             TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone =
-                                DataSizing::VbzByZone(TermUnitSizingIndex) / TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                state.dataSize->VbzByZone(TermUnitSizingIndex) / TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
                         } else {
-                            TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone = DataSizing::VbzByZone(TermUnitSizingIndex);
+                            TermUnitFinalZoneSizing(TermUnitSizingIndex).VozHtgByZone = state.dataSize->VbzByZone(TermUnitSizingIndex);
                         }
 
                         if (TermUnitFinalZoneSizing(TermUnitSizingIndex).DesHeatVolFlow > 0.0) {
