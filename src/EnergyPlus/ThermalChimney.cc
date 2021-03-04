@@ -643,13 +643,13 @@ namespace ThermalChimney {
 
             ZoneNum = state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr;
             // start off with first surface in zone widths
-            majorW = Surface(state.dataHeatBal->Zone(ZoneNum).SurfaceFirst).Width;
+            majorW = Surface(state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst).Width;
             minorW = majorW;
             TempmajorW = 0.0;
             TemporaryWallSurfTemp = -10000.0;
 
             // determine major width and minor width
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
                 if (Surface(SurfNum).Width > majorW) {
@@ -661,7 +661,7 @@ namespace ThermalChimney {
                 }
             }
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Width == majorW) {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
@@ -671,12 +671,8 @@ namespace ThermalChimney {
                 }
             }
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-
-                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Window) {
-
                     if (Surface(SurfNum).Width > TempmajorW) {
                         TempmajorW = Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = state.dataHeatBal->HConvIn(SurfNum);

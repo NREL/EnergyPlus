@@ -481,7 +481,7 @@ namespace SurfaceGeometry {
                                                                     state.dataHeatBal->Zone(ZoneNum).ExtWindowArea);
             }
             // Use AllSurfaceFirst which includes air boundaries
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Roof) {
                     // Use Average Z for surface, more important for roofs than floors...
                     ++CeilCount;
@@ -558,7 +558,7 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->Zone(ZoneNum).MinimumZ = Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
                 state.dataHeatBal->Zone(ZoneNum).MaximumZ = Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst).Vertex(1).z;
             }
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::IntMass) continue;
                 nonInternalMassSurfacesPresent = true;
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || (Surface(SurfNum).Class == SurfaceClass::Roof) ||
@@ -849,13 +849,16 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // The order of surfaces does not matter and the surfaces are resorted into
         // the hierarchical order:
-        //  Detached Surfaces
-        //  Base Surface for zone x
-        //    Subsurfaces for base surface
-        //  Base Surface for zone x
-        //    etc
-        //  Heat Transfer Surfaces and Shading surfaces are mixed in the list
-        //  Pointers are set in the zones (First, Last)
+        //  All Shading Surfaces
+        //  Airwalls for zone x1
+        //  Base Surfaces for zone x1
+        //  Opaque Subsurfaces for zone x1
+        //  Window Subsurfaces for zone x1
+        //  TDD Dome Surfaces for zone x1
+        //  Airwalls for zone x2
+        //  Base Surfaces for zone x2
+        //  etc
+        //  Pointers are set in the zones (AllSurfaceFirst/Last, HTSurfaceFirst/Last, OpaqOrIntMassSurfaceFirst/Last, WindowSurfaceFirst/Last, OpaqOrWinSurfaceFirst/Last, TDDDomeFirst/Last)
 
         // REFERENCES:
         //   This routine manages getting the input for the following Objects:
@@ -1324,8 +1327,9 @@ namespace SurfaceGeometry {
         //      Floors
         //      Roofs/Ceilings
         //      Internal Mass
-        //      Non-Window subsurfaces (doors and TubularDaylightingDomes)
+        //      Non-Window subsurfaces (including doors)
         //      Window subsurfaces (including TubularDaylightingDiffusers)
+        //      TubularDaylightingDomes
         //    After reordering, MovedSurfs should equal TotSurfaces
 
         // For reporting purposes, the legacy surface order is also saved in DataSurfaces::AllSurfaceListReportOrder:
@@ -1437,16 +1441,12 @@ namespace SurfaceGeometry {
                 DataSurfaces::AllSurfaceListReportOrder.push_back(MovedSurfs);
             }
 
-            // Non-window) subsurfaces are next (anything left in this zone that's not a window or a glass door)
-            // includes SurfaceClass::TDD_Dome which transmits light but is not a window for heat balance purposes
+            // Opaque door goes next
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::Window) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::GlassDoor) continue;
-                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class == SurfaceClass::TDD_Diffuser) continue;
-
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Door) continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
@@ -1458,14 +1458,68 @@ namespace SurfaceGeometry {
                 std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
             }
 
-            // Last but not least, the window subsurfaces (includes SurfaceClass::TDD_Diffuser)
+            // The exterior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
             for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
 
                 if (SurfaceTmpClassMoved(SubSurfNum)) continue;
                 if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
-                if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) && (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor) &&
-                    (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser))
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond > 0) continue; // Exterior window
+                if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) && (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor))
                     continue;
+
+                ++MovedSurfs;
+                Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                // Reset BaseSurf to it's positive value (set to negative earlier)
+                Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
+                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
+                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
+                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
+            }
+
+            // The interior window subsurfaces (includes SurfaceClass::Window and SurfaceClass::GlassDoor) goes next
+            for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).ExtBoundCond <= 0) continue;
+                if ((state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::Window) && (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::GlassDoor))
+                    continue;
+
+                ++MovedSurfs;
+                Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                // Reset BaseSurf to it's positive value (set to negative earlier)
+                Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
+                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
+                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
+                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
+            }
+
+            // The SurfaceClass::TDD_Diffuser (OriginalClass = Window) goes next
+            for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Diffuser)
+                    continue;
+
+                ++MovedSurfs;
+                Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
+                SurfaceTmpClassMoved(SubSurfNum) = true; // 'Moved'
+                // Reset BaseSurf to it's positive value (set to negative earlier)
+                Surface(MovedSurfs).BaseSurf = -Surface(MovedSurfs).BaseSurf;
+                state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).BaseSurf = -1;
+                // Find and replace negative SubSurfNum with new MovedSurfs num in surface list for reporting
+                std::replace(DataSurfaces::AllSurfaceListReportOrder.begin(), DataSurfaces::AllSurfaceListReportOrder.end(), -SubSurfNum, MovedSurfs);
+            }
+
+            // Last but not least, SurfaceClass::TDD_Dome
+            for (int SubSurfNum = 1; SubSurfNum <= TotSurfaces; ++SubSurfNum) {
+
+                if (SurfaceTmpClassMoved(SubSurfNum)) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Zone != ZoneNum) continue;
+                if (state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum).Class != SurfaceClass::TDD_Dome) continue;
 
                 ++MovedSurfs;
                 Surface(MovedSurfs) = state.dataSurfaceGeometry->SurfaceTmp(SubSurfNum);
@@ -1895,17 +1949,28 @@ namespace SurfaceGeometry {
                         state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = SurfNum;
                     }
                     if (Surface(SurfNum).IsAirBoundarySurf) continue;
-                    if (state.dataHeatBal->Zone(ZoneNum).SurfaceFirst == 0) {
-                        state.dataHeatBal->Zone(ZoneNum).SurfaceFirst = SurfNum;
+                    if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) {
+                        state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = SurfNum;
                         // Non window surfaces are grouped next within each zone
-                        state.dataHeatBal->Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
+                        state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst = SurfNum;
                     }
                     if ((state.dataHeatBal->Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) ||
                                                                     (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
                                                                     (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Diffuser))) {
                         // Window surfaces are grouped last within each zone
                         state.dataHeatBal->Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
-                        state.dataHeatBal->Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
+                        state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = SurfNum - 1;
+                    }
+                    if ((state.dataHeatBal->Zone(ZoneNum).TDDDomeFirst == 0) && (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome)) {
+                        // Window surfaces are grouped last within each zone
+                        state.dataHeatBal->Zone(ZoneNum).TDDDomeFirst = SurfNum;
+                        if (state.dataHeatBal->Zone(ZoneNum).WindowSurfaceFirst != 0) {
+                            state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = SurfNum - 1;
+                        } else {
+                            // No window in the zone.
+                            state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = SurfNum - 1;
+                            state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = -1;
+                        }
                         break;
                     }
                 }
@@ -1913,34 +1978,34 @@ namespace SurfaceGeometry {
         }
         //  Surface First pointers are set, set last
         if (state.dataGlobal->NumOfZones > 0) {
-            state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).SurfaceLast = TotSurfaces;
-            if ((Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::Window) ||
-                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
-                (Surface(TotSurfaces).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
-                state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).WindowSurfaceLast = TotSurfaces;
-            } else {
-                // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
-                // execute
-                state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).WindowSurfaceLast = -1;
-                state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).NonWindowSurfaceLast = TotSurfaces;
-            }
+            state.dataHeatBal->Zone(state.dataGlobal->NumOfZones).AllSurfaceLast = TotSurfaces;
         }
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones - 1; ++ZoneNum) {
-            state.dataHeatBal->Zone(ZoneNum).SurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
-            if ((Surface(state.dataHeatBal->Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
-                (Surface(state.dataHeatBal->Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
-                (Surface(state.dataHeatBal->Zone(ZoneNum).SurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
-                state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
+            state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast = state.dataHeatBal->Zone(ZoneNum + 1).AllSurfaceFirst - 1;
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            if (Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Dome) {
+                state.dataHeatBal->Zone(ZoneNum).TDDDomeLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
+            } else if ((Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::Window) ||
+                (Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::GlassDoor) ||
+                (Surface(state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast).Class == DataSurfaces::SurfaceClass::TDD_Diffuser)) {
+                state.dataHeatBal->Zone(ZoneNum).TDDDomeLast = - 1;
+                state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
             } else {
                 // If there are no windows in the zone, then set this to -1 so any for loops on WindowSurfaceFirst to WindowSurfaceLast will not
                 // execute
+                state.dataHeatBal->Zone(ZoneNum).TDDDomeLast = - 1;
                 state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast = -1;
-                state.dataHeatBal->Zone(ZoneNum).NonWindowSurfaceLast = state.dataHeatBal->Zone(ZoneNum).SurfaceLast;
+                state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
             }
+            state.dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceFirst = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst;
+            state.dataHeatBal->Zone(ZoneNum).OpaqOrWinSurfaceLast = std::max(state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast, state.dataHeatBal->Zone(ZoneNum).WindowSurfaceLast);
+            state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast;
         }
 
+
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (state.dataHeatBal->Zone(ZoneNum).SurfaceFirst == 0) {
+            if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) {
                 ShowSevereError(state, RoutineName + "Zone has no surfaces, Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                 SurfError = true;
             }
@@ -1949,7 +2014,7 @@ namespace SurfaceGeometry {
         // Set up Floor Areas for Zones
         if (!SurfError) {
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                     if (Surface(SurfNum).Class == SurfaceClass::Floor) {
                         state.dataHeatBal->Zone(ZoneNum).FloorArea += Surface(SurfNum).Area;
                         state.dataHeatBal->Zone(ZoneNum).HasFloor = true;
@@ -2082,8 +2147,8 @@ namespace SurfaceGeometry {
             OpaqueHTSurfs = 0;
             OpaqueHTSurfsWithWin = 0;
             InternalMassSurfs = 0;
-            if (state.dataHeatBal->Zone(ZoneNum).SurfaceFirst == 0) continue; // Zone with no surfaces
-            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            if (state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst == 0) continue; // Zone with no surfaces
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass::Floor || Surface(SurfNum).Class == SurfaceClass::Wall ||
                     Surface(SurfNum).Class == SurfaceClass::Roof)
                     ++OpaqueHTSurfs;
@@ -10287,14 +10352,14 @@ namespace SurfaceGeometry {
             SumAreas = 0.0;
             SurfCount = 0.0;
             // Use AllSurfaceFirst which includes air boundaries
-            NFaces = state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1;
+            NFaces = state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1;
             notused = 0;
             ZoneStruct.NumSurfaceFaces = NFaces;
             ZoneStruct.SurfaceFace.allocate(NFaces);
             NActFaces = 0;
             surfacenotused.dimension(NFaces, 0);
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast; ++SurfNum) {
 
                 // Only include Base Surfaces in Calc.
 

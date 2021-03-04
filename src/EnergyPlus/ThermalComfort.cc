@@ -1911,8 +1911,8 @@ namespace ThermalComfort {
         // Note that area*emissivity needs to be recalculated because of the possibility of changes to the emissivity via the EMS
         SumAET = 0.0;
         ZoneAESum(ZoneNum) = 0.0;
-        for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum2) {
-            if ((Surface(SurfNum2).HeatTransSurf) && (SurfNum2 != SurfNum)) {
+        for (SurfNum2 = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum2 <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum2) {
+            if (SurfNum2 != SurfNum) {
                 SurfaceAE(SurfNum2) = Surface(SurfNum2).Area * state.dataConstruction->Construct(Surface(SurfNum2).Construction).InsideAbsorpThermal;
                 SumAET += SurfaceAE(SurfNum2) * TH(2, 1, SurfNum2);
                 ZoneAESum(ZoneNum) += SurfaceAE(SurfNum2);
