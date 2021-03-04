@@ -1380,7 +1380,7 @@ namespace ScheduleManager {
                     Alphas(NumField).erase(0, sPos);
                     strip(Alphas(NumField));
                 }
-                state.dataScheduleMgr->CurrentThrough = Alphas(NumField);
+                CurrentThrough = Alphas(NumField);
                 ErrorHere = false;
                 ProcessDateString(state, Alphas(NumField), EndMonth, EndDay, PWeekDay, PDateType, ErrorHere);
                 if (PDateType == WeatherManager::DateType::NthDayInMonth || PDateType == WeatherManager::DateType::LastDayInMonth) {
@@ -1404,7 +1404,7 @@ namespace ScheduleManager {
                             ShowSevereError(state,
                                             RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
                                                 "\", New \"Through\" entry when \"full year\" already set");
-                            ShowContinueError(state, "\"Through\" field=" + state.dataScheduleMgr->CurrentThrough);
+                            ShowContinueError(state, "\"Through\" field=" + CurrentThrough);
                             ErrorsFound = true;
                         }
                         FullYearSet = true;
@@ -1433,7 +1433,7 @@ namespace ScheduleManager {
                         state.dataScheduleMgr->DaySchedule(AddDaySch).Used = true;
                         TheseDays = false;
                         ErrorHere = false;
-                        state.dataScheduleMgr->LastFor = Alphas(NumField);
+                        LastFor = Alphas(NumField);
                         ProcessForDayTypes(state, Alphas(NumField), TheseDays, AllDays, ErrorHere);
                         if (ErrorHere) {
                             ShowContinueError(state, "ref " + CurrentModuleObject + "=\"" + Alphas(1) + "\"");
@@ -1565,16 +1565,16 @@ namespace ScheduleManager {
                 if (!all(AllDays)) {
                     ShowWarningError(state,
                                      RoutineName + CurrentModuleObject + "=\"" + state.dataScheduleMgr->Schedule(SchNum).Name +
-                                         "\" has missing day types in Through=" + state.dataScheduleMgr->CurrentThrough);
-                    ShowContinueError(state, "Last \"For\" field=" + state.dataScheduleMgr->LastFor);
-                    state.dataScheduleMgr->errmsg = "Missing day types=,";
+                                         "\" has missing day types in Through=" + CurrentThrough);
+                    ShowContinueError(state, "Last \"For\" field=" + LastFor);
+                    errmsg = "Missing day types=,";
                     for (kdy = 1; kdy <= MaxDayTypes; ++kdy) {
                         if (AllDays(kdy)) continue;
-                        state.dataScheduleMgr->errmsg.erase(state.dataScheduleMgr->errmsg.length() - 1);
-                        state.dataScheduleMgr->errmsg += "\"" + ValidDayTypes(kdy) + "\",-";
+                        errmsg.erase(errmsg.length() - 1);
+                        errmsg += "\"" + ValidDayTypes(kdy) + "\",-";
                     }
-                    state.dataScheduleMgr->errmsg.erase(state.dataScheduleMgr->errmsg.length() - 2);
-                    ShowContinueError(state, state.dataScheduleMgr->errmsg);
+                    errmsg.erase(errmsg.length() - 2);
+                    ShowContinueError(state, errmsg);
                     ShowContinueError(state, "Missing day types will have 0.0 as Schedule Values");
                 }
             }
