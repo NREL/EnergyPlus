@@ -90,7 +90,6 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -181,7 +180,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACControllers::clear_state();
     HVACCooledBeam::clear_state();
     HVACDuct::clear_state();
-    HVACDXHeatPumpSystem::clear_state();
     HVACDXSystem::clear_state();
     HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();

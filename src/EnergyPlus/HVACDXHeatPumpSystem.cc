@@ -98,45 +98,6 @@ namespace HVACDXHeatPumpSystem {
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    Real64 const MinAirMassFlow(0.001);
-
-    bool GetInputFlag(true); // Flag to get input only once
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    int NumDXHeatPumpSystems(0); // The Number of DXHeatPumpSystems found in the Input
-    bool EconomizerFlag(false);  // holds air loop economizer status
-
-    // Make this type allocatable
-    Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Update routine to check convergence and update nodes
-
-    // Object Data
-    Array1D<DXHeatPumpSystemStruct> DXHeatPumpSystem;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
-
-    void clear_state()
-    {
-        GetInputFlag = true;
-        NumDXHeatPumpSystems = 0;
-        EconomizerFlag = false;
-        CheckEquipName.deallocate();
-        DXHeatPumpSystem.deallocate();
-    }
-
     void SimDXHeatPumpSystem(EnergyPlusData &state, std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
                              bool const FirstHVACIteration,           // True when first HVAC iteration
                              int const AirLoopNum,                    // Primary air loop number

@@ -393,7 +393,7 @@ struct HVACUnitaryBypassVAVData : BaseGlobalStruct {
     Array1D_bool CheckEquipName;
 
     Array1D<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
-    bool GetInputFlag; // Flag set to make sure you get input once
+    bool GetInputFlag = true; // Flag set to make sure you get input once
 
 
     void clear_state() override
