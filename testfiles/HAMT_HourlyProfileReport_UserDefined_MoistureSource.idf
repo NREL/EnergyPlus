@@ -873,7 +873,7 @@
 
   ConstructionProperty:InternalMoistureSource,
     InternalMoistureSourceEast,  !- Name
-	East wall,                   !- Construction Name 
+	Exterior wall,                   !- Construction Name 
     3,                       !- Moisture Source Present In Layer Number
     UserDefined,             !- Source Type
     0.0001,                  !- Air Flow Rate {m/s}
