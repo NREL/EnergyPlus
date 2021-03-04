@@ -370,6 +370,7 @@ struct ScheduleManagerData : BaseGlobalStruct
 
         ScheduleInputProcessed = false;
         ScheduleDSTSFileWarningIssued = false;
+        ScheduleFileShadingProcessed = false;
 
         ScheduleType.clear(); // Allowed Schedule Types
         DaySchedule.clear();  // Day Schedule Storage

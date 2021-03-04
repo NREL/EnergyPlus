@@ -1875,7 +1875,7 @@ namespace LowTempRadiantSystem {
                     TotalEffic = state.dataLowTempRadSys->CFloRadSys(RadNum).WaterVolFlowMax * state.dataLowTempRadSys->CFloRadSys(RadNum).NomPumpHead / state.dataLowTempRadSys->CFloRadSys(RadNum).NomPowerUse;
                     state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic = TotalEffic / MotorEffic;
                     PEC = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic;
-                    static constexpr auto fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
+                    auto constexpr fmt = "Check input.  Calc Pump Efficiency={:.5R}% {}, for pump in radiant system {}";
                     Real64 pumpEfficiency = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic * 100.0;
                     PEC = state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic;
                     if (state.dataLowTempRadSys->CFloRadSys(RadNum).PumpEffic < 0.50) {
