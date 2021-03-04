@@ -221,7 +221,6 @@ namespace ScheduleManager {
         using DataStringGlobals::CharSpace;
         using DataStringGlobals::CharTab;
         using DataSystemVariables::CheckForActualFileName;
-        using DataSystemVariables::iUnicode_end;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -531,7 +530,7 @@ namespace ScheduleManager {
             auto LineIn = SchdFile.readLine();
             const auto endLine = len(LineIn.data);
             if (endLine > 0) {
-                if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
+                if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
                     SchdFile.close();
                     ShowSevereError(state, RoutineName + ":\"" + ShadingSunlitFracFileName + "\" appears to be a Unicode or binary file.");
                     ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
@@ -1768,7 +1767,7 @@ namespace ScheduleManager {
                 auto LineIn = SchdFile.readLine();
                 const auto endLine = len(LineIn.data);
                 if (endLine > 0) {
-                    if (int(LineIn.data[endLine - 1]) == iUnicode_end) {
+                    if (int(LineIn.data[endLine - 1]) == state.dataSysVars->iUnicode_end) {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                         " appears to be a Unicode or binary file.");
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");

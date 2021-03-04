@@ -95,9 +95,6 @@ namespace DataSystemVariables {
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
-    int const iASCII_CR(13);   // endline value when just CR instead of CR/LF
-    int const iUnicode_end(0); // endline value when Unicode file
-    char const tabchar('\t');
 
     std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
     std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
@@ -143,57 +140,10 @@ namespace DataSystemVariables {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    bool DDOnly(false);                           // TRUE if design days (sizingperiod:*) only are to be run.
-    bool ReverseDD(false);                        // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
-    bool DisableGLHECaching(false);               // TRUE if caching is to be disabled, for example, during unit tests.
-    bool FullAnnualRun(false);                    // TRUE if full annual simulation is to be run.
-    bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
-    bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
 
     // Shading methods
     ShadingMethod shadingMethod(ShadingMethod::PolygonClipping);
-    bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
-    bool SlaterBarsky(false);                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
-    bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
-    bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
-    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
-
-    bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
-    //  controller on each air loop
-    bool TraceAirLoopEnvFlag(false); // If TRUE generates a trace file with the converged solutions of all
-    // HVAC controllers on each air loop at each call to SimAirLoop()
-    bool TraceHVACControllerEnvFlag(false); // If TRUE generates a trace file for each individual HVAC
-    // controller with all controller iterations
-    bool ReportDuringWarmup(false);                      // True when the report outputs even during warmup
-    bool ReportDuringHVACSizingSimulation(false);        // true when reporting outputs during HVAC sizing Simulation
-    bool ReportDetailedWarmupConvergence(false);         // True when the detailed warmup convergence is requested
-    bool UpdateDataDuringWarmupExternalInterface(false); // variable sets in the external interface.
-    bool ReportExtShadingSunlitFrac(false);              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-
-    // This update the value during the warmup added for FMI
-    Real64 Elapsed_Time(0.0);       // For showing elapsed time at end of run
-    Real64 Time_Start(0.0);         // Call to CPU_Time for start time of simulation
-    Real64 Time_Finish(0.0);        // Call to CPU_Time for end time of simulation
-    std::string MinReportFrequency; // String for minimum reporting frequency
-    bool SortedIDD(true);           // after processing, use sorted IDD to obtain Defs, etc.
-    bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string envinputpath1;
-    std::string envinputpath2;
-    bool TestAllPaths(false);
-    int iEnvSetThreads(0);
-    bool lEnvSetThreadsInput(false);
-    int iepEnvSetThreads(0);
-    bool lepSetThreadsInput(false);
-    int iIDFSetThreads(0);
-    bool lIDFSetThreadsInput(false);
-    int inumActiveSims(1);
-    bool lnumActiveSims(false);
-    int MaxNumberOfThreads(1);
-    int NumberIntRadThreads(1);
-    int iNominalTotSurfaces(0);
-    bool Threading(false);
     bool firstTime(true);
 
     // Functions
@@ -228,12 +178,12 @@ namespace DataSystemVariables {
 
         if (firstTime) {
             state.files.audit.ensure_open(state, "CheckForActualFileName", state.files.outputControl.audit);
-            get_environment_variable(cInputPath1, envinputpath1);
-            if (!envinputpath1.empty()) {
-                pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
-                if (pos != std::string::npos) envinputpath1.erase(pos + 1);
+            get_environment_variable(cInputPath1, state.dataSysVars->envinputpath1);
+            if (!state.dataSysVars->envinputpath1.empty()) {
+                pos = index(state.dataSysVars->envinputpath1, pathChar, true); // look backwards for pathChar
+                if (pos != std::string::npos) state.dataSysVars->envinputpath1.erase(pos + 1);
             }
-            get_environment_variable(cInputPath2, envinputpath2);
+            get_environment_variable(cInputPath2, state.dataSysVars->envinputpath2);
             get_environment_variable(cProgramPath, ProgramPath);
             firstTime = false;
         }
@@ -249,13 +199,13 @@ namespace DataSystemVariables {
             {InputFileName, "Current Working Directory"},
             {DataStringGlobals::inputDirPathName + InputFileName, "IDF Directory"},
             {DataStringGlobals::exeDirectory + InputFileName, "EnergyPlus Executable Directory"},
-            {envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
-            {envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
+            {state.dataSysVars->envinputpath1 + InputFileName, "\"epin\" Environment Variable"},
+            {state.dataSysVars->envinputpath2 + InputFileName, "\"input_path\" Environment Variable"},
             {CurrentWorkingFolder + InputFileName, "INI File Directory"},
             {ProgramPath + InputFileName, "\"program\", \"dir\" from INI File"}}
         };
 
-        std::size_t numPathsToNotTest = (TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
+        std::size_t numPathsToNotTest = (state.dataSysVars->TestAllPaths) ? pathsToCheck.size()-2 : pathsToCheck.size();
 
         for(std::size_t i = 0; i < numPathsToNotTest; i++) {
             if (FileSystem::fileExists(pathsToCheck[i].first)) {
@@ -291,45 +241,7 @@ namespace DataSystemVariables {
 
     void clear_state()
     {
-        DDOnly = false;
-        ReverseDD = false;
-        DisableGLHECaching = false;
-        FullAnnualRun = false;
-        DeveloperFlag = false;
-        TimingFlag = false;
         shadingMethod = ShadingMethod::PolygonClipping;
-        SutherlandHodgman = true;
-        SlaterBarsky = false;
-        DetailedSkyDiffuseAlgorithm = false;
-        DetailedSolarTimestepIntegration = false;
-        TrackAirLoopEnvFlag = false;
-        TraceAirLoopEnvFlag = false;
-        TraceHVACControllerEnvFlag = false;
-        ReportDuringWarmup = false;
-        ReportDuringHVACSizingSimulation = false;
-        ReportDetailedWarmupConvergence = false;
-        UpdateDataDuringWarmupExternalInterface = false;
-        ReportExtShadingSunlitFrac = false;
-        DisableGroupSelfShading = false;
-        DisableAllSelfShading = false;
-        Elapsed_Time = 0.0;
-        Time_Start = 0.0;
-        Time_Finish = 0.0;
-        SortedIDD = true;
-        lMinimalShadowing = false;
-        TestAllPaths = false;
-        iEnvSetThreads = 0;
-        lEnvSetThreadsInput = false;
-        iepEnvSetThreads = 0;
-        lepSetThreadsInput = false;
-        iIDFSetThreads = 0;
-        lIDFSetThreadsInput = false;
-        inumActiveSims = 1;
-        lnumActiveSims = false;
-        MaxNumberOfThreads = 1;
-        NumberIntRadThreads = 1;
-        iNominalTotSurfaces = 0;
-        Threading = false;
         firstTime = true;
     }
 
@@ -338,18 +250,18 @@ namespace DataSystemVariables {
         static std::string cEnvValue;
 
         get_environment_variable(DDOnlyEnvVar, cEnvValue);
-        DDOnly = env_var_on(cEnvValue); // Yes or True
-        if (state.dataGlobal->DDOnlySimulation) DDOnly = true;
+        state.dataSysVars->DDOnly = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->DDOnlySimulation) state.dataSysVars->DDOnly = true;
 
         get_environment_variable(ReverseDDEnvVar, cEnvValue);
-        ReverseDD = env_var_on(cEnvValue); // Yes or True
+        state.dataSysVars->ReverseDD = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(DisableGLHECachingEnvVar, cEnvValue);
-        DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
+        state.dataSysVars->DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
-        FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (state.dataGlobal->AnnualSimulation) FullAnnualRun = true;
+        state.dataSysVars->FullAnnualRun = env_var_on(cEnvValue); // Yes or True
+        if (state.dataGlobal->AnnualSimulation) state.dataSysVars->FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         state.dataGlobal->DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
@@ -376,15 +288,15 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) state.dataGlobal->DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cReportDuringWarmup, cEnvValue);
-        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
-        if (ReverseDD) ReportDuringWarmup = false;                          // force to false for ReverseDD runs
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (state.dataSysVars->ReverseDD) state.dataSysVars->ReportDuringWarmup = false;                          // force to false for ReverseDD runs
 
         get_environment_variable(cReportDuringWarmup, cEnvValue);
-        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
-        if (DisableGLHECaching) ReportDuringWarmup = true;                  // force to true for standard runs runs
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (state.dataSysVars->DisableGLHECaching) state.dataSysVars->ReportDuringWarmup = true;                  // force to true for standard runs runs
 
         get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
-        if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
         if (!cEnvValue.empty()) state.dataEnvrn->IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
@@ -393,13 +305,13 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) state.dataGlobal->CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cSortIDD, cEnvValue);
-        if (!cEnvValue.empty()) SortedIDD = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->SortedIDD = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(MinReportFrequencyEnvVar, cEnvValue);
-        if (!cEnvValue.empty()) MinReportFrequency = cEnvValue; // turned into value later
+        if (!cEnvValue.empty()) state.dataSysVars->MinReportFrequency = cEnvValue; // turned into value later
 
         get_environment_variable(cDeveloperFlag, cEnvValue);
-        if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->DeveloperFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
         if (!cEnvValue.empty()) state.dataEnvrn->IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
@@ -408,26 +320,26 @@ namespace DataSystemVariables {
         if (!cEnvValue.empty()) state.dataEnvrn->IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cSutherlandHodgman, cEnvValue);
-        if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cSlaterBarsky, cEnvValue);
-        if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->SlaterBarsky = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cMinimalShadowing, cEnvValue);
-        if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cTimingFlag, cEnvValue);
-        if (!cEnvValue.empty()) TimingFlag = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->TimingFlag = env_var_on(cEnvValue); // Yes or True
 
         // Initialize env flags for air loop simulation debugging
         get_environment_variable(TrackAirLoopEnvVar, cEnvValue);
-        if (!cEnvValue.empty()) TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(TraceAirLoopEnvVar, cEnvValue);
-        if (!cEnvValue.empty()) TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(TraceHVACControllerEnvVar, cEnvValue);
-        if (!cEnvValue.empty()) TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
+        if (!cEnvValue.empty()) state.dataSysVars->TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
         if (!cEnvValue.empty()) state.dataGlobal->DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True

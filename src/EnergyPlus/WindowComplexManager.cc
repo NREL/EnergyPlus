@@ -546,7 +546,6 @@ namespace WindowComplexManager {
         // Refactoring from Klems code
 
         using namespace Vectors;
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         static Vector SunDir(0.0, 0.0, 1.0); // unit vector pointing toward sun (world CS)
         static Vector Posit(0.0, 0.0, 1.0);  // vector location of current ground point
@@ -563,7 +562,7 @@ namespace WindowComplexManager {
         auto &complexWindowGeom(complexWindow.Geom(iState));
         auto &surfaceWindowState(SurfaceWindow(iSurf).ComplexFen.State(iState));
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             std::size_t lHT(0);  // Linear index for ( Hour, TS )
             std::size_t lHTI(0); // Linear index for ( Hour, TS, I )
             for (int Hour = 1; Hour <= 24; ++Hour) {

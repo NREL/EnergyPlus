@@ -190,7 +190,7 @@ namespace HeatBalanceIntRadExchange {
             SurfaceTempInKto4th.allocate(MaxNumOfRadEnclosureSurfs);
             SurfaceEmiss.allocate(MaxNumOfRadEnclosureSurfs);
             CalcInteriorRadExchangefirstTime = false;
-            if (DeveloperFlag) {
+            if (state.dataSysVars->DeveloperFlag) {
                 DisplayString(state, " OMP turned off, HBIRE loop executed in serial");
             }
         }

@@ -687,18 +687,18 @@ namespace UtilityRoutines {
         NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
 
         // catch up with timings if in middle
-        Time_Finish = epElapsedTime();
-        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-        Elapsed_Time = Time_Finish - Time_Start;
+        state.dataSysVars->Time_Finish = epElapsedTime();
+        if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+        state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
 #endif
-        if (Elapsed_Time < 0.0) Elapsed_Time = 0.0;
-        Hours = Elapsed_Time / 3600.0;
-        Elapsed_Time -= Hours * 3600.0;
-        Minutes = Elapsed_Time / 60.0;
-        Elapsed_Time -= Minutes * 60.0;
-        Seconds = Elapsed_Time;
+        if (state.dataSysVars->Elapsed_Time < 0.0) state.dataSysVars->Elapsed_Time = 0.0;
+        Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+        state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+        Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+        state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+        Seconds = state.dataSysVars->Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
@@ -841,20 +841,20 @@ namespace UtilityRoutines {
         NumSevereDuringSizing = fmt::to_string(state.dataErrTracking->TotalSevereErrorsDuringSizing);
         strip(NumSevereDuringSizing);
 
-        Time_Finish = epElapsedTime();
-        if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
-        Elapsed_Time = Time_Finish - Time_Start;
+        state.dataSysVars->Time_Finish = epElapsedTime();
+        if (state.dataSysVars->Time_Finish < state.dataSysVars->Time_Start) state.dataSysVars->Time_Finish += 24.0 * 3600.0;
+        state.dataSysVars->Elapsed_Time = state.dataSysVars->Time_Finish - state.dataSysVars->Time_Start;
         if (state.dataGlobal->createPerfLog) {
-            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", Elapsed_Time));
+            UtilityRoutines::appendPerfLog(state, "Run Time [seconds]", format("{:.2R}", state.dataSysVars->Elapsed_Time));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
 #endif
-        Hours = Elapsed_Time / 3600.0;
-        Elapsed_Time -= Hours * 3600.0;
-        Minutes = Elapsed_Time / 60.0;
-        Elapsed_Time -= Minutes * 60.0;
-        Seconds = Elapsed_Time;
+        Hours = state.dataSysVars->Elapsed_Time / 3600.0;
+        state.dataSysVars->Elapsed_Time -= Hours * 3600.0;
+        Minutes = state.dataSysVars->Elapsed_Time / 60.0;
+        state.dataSysVars->Elapsed_Time -= Minutes * 60.0;
+        Seconds = state.dataSysVars->Elapsed_Time;
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
