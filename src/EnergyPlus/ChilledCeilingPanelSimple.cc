@@ -1708,11 +1708,9 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             auto &ThisSurf(Surface(SurfNum));
-
-            if (!ThisSurf.HeatTransSurf) continue; // Skip non-heat transfer surfaces
 
             Area = ThisSurf.Area;
 

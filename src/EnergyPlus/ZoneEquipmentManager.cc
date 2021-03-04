@@ -4506,7 +4506,7 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 WinGapFlowTtoRA = 0.0;
 
                 if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
-                    for (SurfNum = state.dataHeatBal->Zone(ActualZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ActualZoneNum).SurfaceLast; ++SurfNum) {
+                    for (SurfNum = state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceLast; ++SurfNum) {
                         if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
                             DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *

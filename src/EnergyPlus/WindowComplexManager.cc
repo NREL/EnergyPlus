@@ -920,11 +920,11 @@ namespace WindowComplexManager {
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             ComplexFenInZone = false;
-            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
             }
             if (ComplexFenInZone) {
-                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1;
+                NumSurfInZone = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1;
                 if (state.dataBSDFWindow->MaxBkSurf < NumSurfInZone) state.dataBSDFWindow->MaxBkSurf = NumSurfInZone;
             }
         }

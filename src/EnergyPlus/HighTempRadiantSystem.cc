@@ -1480,8 +1480,7 @@ namespace HighTempRadiantSystem {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
             Area = Surface(SurfNum).Area;
 
