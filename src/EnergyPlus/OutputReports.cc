@@ -1391,7 +1391,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
     }
 
     for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-        *eiostream << "Zone Surfaces," << state.dataHeatBal->Zone(ZoneNum).Name << "," << (state.dataHeatBal->Zone(ZoneNum).SurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
+        *eiostream << "Zone Surfaces," << state.dataHeatBal->Zone(ZoneNum).Name << "," << (state.dataHeatBal->Zone(ZoneNum).AllSurfaceLast - state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst + 1) << '\n';
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";

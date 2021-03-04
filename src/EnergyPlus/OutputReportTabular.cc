@@ -13689,8 +13689,7 @@ namespace EnergyPlus::OutputReportTabular {
                 Real64 adjFeneSurfNetRadSeq = 0.0;
 
                 // code from ComputeDelayedComponents starts
-                for (int jSurf = Zone(zoneIndex).SurfaceFirst; jSurf <= Zone(zoneIndex).SurfaceLast; ++jSurf) {
-                    if (!Surface(jSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                for (int jSurf = Zone(zoneIndex).HTSurfaceFirst; jSurf <= Zone(zoneIndex).HTSurfaceLast; ++jSurf) {
 
                     // for each time step, step back through time and apply decay curve to radiant heat for each end use absorbed in each surface
                     Real64 peopleConvFromSurf = 0.0;
@@ -13903,8 +13902,7 @@ namespace EnergyPlus::OutputReportTabular {
 
             // opaque surfaces - must combine individual surfaces by class and other side conditions
             delayOpaque = 0.0;
-            for (int kSurf = Zone(zoneIndex).SurfaceFirst; kSurf <= Zone(zoneIndex).SurfaceLast; ++kSurf) {
-                if (!Surface(kSurf).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            for (int kSurf = Zone(zoneIndex).HTSurfaceFirst; kSurf <= Zone(zoneIndex).HTSurfaceLast; ++kSurf) {
 
                 curExtBoundCond = Surface(kSurf).ExtBoundCond;
                 // if exterior is other side coefficients using ground preprocessor terms then
