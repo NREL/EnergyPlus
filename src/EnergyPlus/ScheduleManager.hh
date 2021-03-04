@@ -341,6 +341,12 @@ struct ScheduleManagerData : BaseGlobalStruct
     int NumWeekSchedules = 0;
     int NumSchedules = 0;
 
+    // from ProcessScheduleInput(),
+    // TODO: Should variables that were not previously in clear_state, be added to clear_state override?
+    std::string CurrentThrough;
+    std::string LastFor;
+    std::string errmsg;
+
 //    Array1D_string const ValidDayTypes;
 //    Array1D_string const ScheduleTypeLimitUnitTypes;
 
