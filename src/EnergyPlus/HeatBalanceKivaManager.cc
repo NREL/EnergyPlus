@@ -371,9 +371,9 @@ namespace EnergyPlus::HeatBalanceKivaManager {
 
         bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
                                state.dataHeatBal->SurfQRadThermInAbs(floorSurface) + // internal gains
-                               DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
-                               DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
-                               DataHeatBalFanSys::QElecBaseboardSurf(floorSurface); // HVAC
+                                                                                     state.dataHeatBalFanSys->QHTRadSysSurf(floorSurface) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
+                state.dataHeatBalFanSys->QCoolingPanelSurf(floorSurface) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
+                state.dataHeatBalFanSys->QElecBaseboardSurf(floorSurface); // HVAC
 
         bcs->slabConvectiveTemp = state.dataHeatBal->TempEffBulkAir(floorSurface) + DataGlobalConstants::KelvinConv;
         bcs->slabRadiantTemp = ThermalComfort::CalcSurfaceWeightedMRT(state, zoneNum, floorSurface) + DataGlobalConstants::KelvinConv;
@@ -390,9 +390,9 @@ namespace EnergyPlus::HeatBalanceKivaManager {
         for (auto &wl : wallSurfaces) {
             Real64 Q = DataHeatBalSurface::SurfOpaqQRadSWInAbs(wl) + // solar
                        state.dataHeatBal->SurfQRadThermInAbs(wl) + // internal gains
-                       DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
-                       DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
-                       DataHeatBalFanSys::QElecBaseboardSurf(wl); // HVAC
+                       state.dataHeatBalFanSys->QHTRadSysSurf(wl) + state.dataHeatBalFanSys->QHWBaseboardSurf(floorSurface) +
+                       state.dataHeatBalFanSys->QCoolingPanelSurf(wl) + state.dataHeatBalFanSys->QSteamBaseboardSurf(floorSurface) +
+                       state.dataHeatBalFanSys->QElecBaseboardSurf(wl); // HVAC
 
             Real64 &A = DataSurfaces::Surface(wl).Area;
 

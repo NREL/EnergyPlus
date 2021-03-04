@@ -755,7 +755,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
 
         Real64 thisAmbientTemp;
         if (this->ZoneID > 0) {
-            thisAmbientTemp = DataHeatBalFanSys::MAT(this->ZoneID);
+            thisAmbientTemp = state.dataHeatBalFanSys->MAT(this->ZoneID);
         } else { // outdoor location, no zone
             thisAmbientTemp = state.dataEnvrn->OutDryBulbTemp;
         }

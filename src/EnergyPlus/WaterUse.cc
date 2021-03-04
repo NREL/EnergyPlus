@@ -925,7 +925,7 @@ namespace WaterUse {
                 this->SensibleEnergy = 0.0;
             } else {
                 this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(state, this->SensibleFracSchedule) * this->TotalMassFlowRate *
-                                     Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - DataHeatBalFanSys::MAT(this->Zone));
+                                     Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - state.dataHeatBalFanSys->MAT(this->Zone));
                 this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
@@ -933,10 +933,10 @@ namespace WaterUse {
                 this->LatentRate = 0.0;
                 this->LatentEnergy = 0.0;
             } else {
-                Real64 ZoneHumRat = DataHeatBalFanSys::ZoneAirHumRat(this->Zone);
+                Real64 ZoneHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(this->Zone);
                 Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
-                    DataHeatBalFanSys::MAT(this->Zone), 1.0, state.dataEnvrn->OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
-                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
+                    state.dataHeatBalFanSys->MAT(this->Zone), 1.0, state.dataEnvrn->OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
+                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
                     (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * state.dataHeatBal->Zone(this->Zone).Volume; // Max water that can be evaporated to zone
                 Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // Max water in flow
@@ -945,7 +945,7 @@ namespace WaterUse {
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
                 this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
 
-                this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, DataHeatBalFanSys::MAT(this->Zone));
+                this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, state.dataHeatBalFanSys->MAT(this->Zone));
                 this->LatentEnergy = this->LatentRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
             }
 

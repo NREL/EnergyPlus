@@ -146,8 +146,6 @@ namespace WindowAC {
         // PURPOSE OF THIS SUBROUTINE:
         // Manages the simulation of a window AC unit. Called from SimZone Equipment
 
-        using DataHeatBalFanSys::TempControlType;
-
         int WindACNum;                     // index of window AC unit being simulated
         Real64 QZnReq;                     // zone load (W)
         Real64 RemainingOutputToCoolingSP; // - remaining load to cooling setpoint (W)
@@ -188,7 +186,7 @@ namespace WindowAC {
 
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
-        if (RemainingOutputToCoolingSP < 0.0 && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
             QZnReq = RemainingOutputToCoolingSP;
         } else {
             QZnReq = 0.0;

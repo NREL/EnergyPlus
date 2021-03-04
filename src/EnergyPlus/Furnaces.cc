@@ -308,7 +308,6 @@ namespace Furnaces {
         // Using/Aliasing
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using namespace DataZoneEnergyDemands;
-        using DataHeatBalFanSys::TempControlType;
 
         using WaterToAirHeatPumpSimple::SimWatertoAirHPSimple;
 
@@ -377,16 +376,16 @@ namespace Furnaces {
             ZoneLoadToHeatSPSequenced = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(Furnace(FurnaceNum).ControlZoneNum)
                                             .SequencedOutputRequiredToHeatingSP(Furnace(FurnaceNum).ZoneSequenceHeatingNum);
             if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
-                TempControlType(Furnace(FurnaceNum).ControlZoneNum) != SingleCoolingSetPoint) {
+                    state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) != SingleCoolingSetPoint) {
                 ZoneLoad = ZoneLoadToHeatSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced > 0.0 && ZoneLoadToCoolSPSequenced > 0.0 &&
-                       TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleCoolingSetPoint) {
+                    state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleCoolingSetPoint) {
                 ZoneLoad = 0.0;
             } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0 &&
-                       TempControlType(Furnace(FurnaceNum).ControlZoneNum) != SingleHeatingSetPoint) {
+                    state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) != SingleHeatingSetPoint) {
                 ZoneLoad = ZoneLoadToCoolSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced < 0.0 && ZoneLoadToCoolSPSequenced < 0.0 &&
-                       TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleHeatingSetPoint) {
+                    state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleHeatingSetPoint) {
                 ZoneLoad = 0.0;
             } else if (ZoneLoadToHeatSPSequenced <= 0.0 && ZoneLoadToCoolSPSequenced >= 0.0) {
                 ZoneLoad = 0.0;
@@ -4790,7 +4789,6 @@ namespace Furnaces {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using DataSizing::AutoSize;
@@ -5687,8 +5685,8 @@ namespace Furnaces {
                         QZnReq = QToHeatSetPt;
                         CoolingLoad = false;
                         //         Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                        if (TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleCoolingSetPoint ||
-                            TempControlType(Furnace(FurnaceNum).ControlZoneNum) == 0) {
+                        if (state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleCoolingSetPoint ||
+                                state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) == 0) {
                             HeatingLoad = false;
                         } else {
                             HeatingLoad = true;
@@ -5749,8 +5747,8 @@ namespace Furnaces {
                     if (SensibleOutput > QToCoolSetPt) {
                         QZnReq = QToCoolSetPt;
                         //         Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                        if (TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleHeatingSetPoint ||
-                            TempControlType(Furnace(FurnaceNum).ControlZoneNum) == 0) {
+                        if (state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) == SingleHeatingSetPoint ||
+                                state.dataHeatBalFanSys->TempControlType(Furnace(FurnaceNum).ControlZoneNum) == 0) {
                             CoolingLoad = false;
                         } else {
                             CoolingLoad = true;
@@ -6432,7 +6430,6 @@ namespace Furnaces {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataHeatBalFanSys::MAT;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6728,10 +6725,8 @@ namespace Furnaces {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using namespace ScheduleManager;
         using namespace DataZoneEnergyDemands;
-        using DataHeatBalFanSys::ZT;
 
         using TempSolveRoot::SolveRoot;
 
@@ -6802,9 +6797,9 @@ namespace Furnaces {
 
         if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
             if (state.dataDXCoils->DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).IsSecondaryDXCoilInZone) { // assumes compressor is in same location as secondary coil
-                OutdoorDryBulbTemp = ZT(state.dataDXCoils->DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr);
+                OutdoorDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(Furnace(FurnaceNum).HeatingCoilIndex).SecZonePtr);
             } else if (state.dataDXCoils->DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).IsSecondaryDXCoilInZone) {
-                OutdoorDryBulbTemp = ZT(state.dataDXCoils->DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr);
+                OutdoorDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(Furnace(FurnaceNum).CoolingCoilIndex).SecZonePtr);
             } else {
                 if (Furnace(FurnaceNum).CondenserNodeNum > 0) {
                     OutdoorDryBulbTemp = Node(Furnace(FurnaceNum).CondenserNodeNum).Temp;
@@ -8057,7 +8052,6 @@ namespace Furnaces {
         // Calculate the part-load ratio required to meet the zone sensible load.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using TempSolveRoot::SolveRoot;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

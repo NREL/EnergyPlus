@@ -111,12 +111,12 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
 
     // Zone
     surface.Zone = 1;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     DataMoistureBalance::RhoVaporAirIn.allocate(1);
     DataMoistureBalance::HMassConvInFD.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 20.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0061285406810457849;
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     EXPECT_DOUBLE_EQ(-0.47694608375620229, DataMoistureBalanceEMPD::HeatFluxLatent(1));
 
     // Clean up
-    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     DataMoistureBalance::RhoVaporAirIn.deallocate();
 }
 
@@ -237,12 +237,12 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
 
     // Zone
     surface.Zone = 1;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     DataMoistureBalance::RhoVaporAirIn.allocate(1);
     DataMoistureBalance::HMassConvInFD.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 20.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0061285406810457849;
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 20.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0061285406810457849;
 
     // Construction
     surface.Construction = 1;
@@ -280,7 +280,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     EXPECT_DOUBLE_EQ(-0.45295492522779346, DataMoistureBalanceEMPD::HeatFluxLatent(1));
 
     // Clean up
-    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     DataMoistureBalance::RhoVaporAirIn.deallocate();
 }
 TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
@@ -328,12 +328,12 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     // Zone
     int zoneNum = 1;
     surface.Zone = 1;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate( zoneNum );
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate( zoneNum );
     DataMoistureBalance::RhoVaporAirIn.allocate( surfNum );
     DataMoistureBalance::HMassConvInFD.allocate( surfNum );
-    DataHeatBalFanSys::MAT.allocate( zoneNum );
-    DataHeatBalFanSys::MAT( zoneNum ) = 20.0;
-    DataHeatBalFanSys::ZoneAirHumRat( zoneNum ) = 0.0061285406810457849;
+    state->dataHeatBalFanSys->MAT.allocate( zoneNum );
+    state->dataHeatBalFanSys->MAT( zoneNum ) = 20.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat( zoneNum ) = 0.0061285406810457849;
 
     // Construction
     int constNum = 1;

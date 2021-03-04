@@ -261,10 +261,6 @@ namespace RoomAirModelAirflowNetwork {
         // Perform one-time checking and term calculations
 
         // Using/Aliasing
-        using DataHeatBalFanSys::NonAirSystemResponse;
-        using DataHeatBalFanSys::SumLatentHTRadSys;
-        using DataHeatBalFanSys::SysDepZoneLoadsLagged;
-        using DataHeatBalFanSys::ZoneLatentGain;
         using DataLoopNode::NodeID;
         using DataLoopNode::NumOfNodes;
 
@@ -642,8 +638,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::UseZoneTimeStepHistory;
         using Psychrometrics::PsyHgAirFnWTdb;
@@ -760,7 +754,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::TempTstatAir;
         using DataLoopNode::Node;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -840,8 +833,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // USE STATEMENTS:
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
@@ -967,7 +958,7 @@ namespace RoomAirModelAirflowNetwork {
                         NodeW = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat;
                         MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         SumSysM += MassFlowRate;
@@ -980,7 +971,7 @@ namespace RoomAirModelAirflowNetwork {
                 // Get node conditions
                 NodeTemp = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
@@ -991,7 +982,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -999,7 +990,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -1008,7 +999,7 @@ namespace RoomAirModelAirflowNetwork {
             // Get node conditions
             NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
@@ -1099,7 +1090,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
-                RefAirTemp = MAT(ZoneNum);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA += HA;
             } else if (Surface(SurfNum).TAirRef == AdjacentAirTemp) {
                 RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
@@ -1114,7 +1105,7 @@ namespace RoomAirModelAirflowNetwork {
                 RefAirTemp = SumSysMCpT / SumSysMCp;
                 SumHATref += HA * RefAirTemp;
             } else {
-                RefAirTemp = MAT(ZoneNum);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA = SumHA + HA;
             }
 
@@ -1156,7 +1147,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TempSurfInTmp;
         using DataMoistureBalanceEMPD::RVSurface;
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
@@ -1203,7 +1193,7 @@ namespace RoomAirModelAirflowNetwork {
                 SumHmAW += HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
 
                 RhoAirZone = PsyRhoAirFnPbTdbW(state,
-                    state.dataEnvrn->OutBaroPress, MAT(Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, MAT(Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
+                    state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, state.dataHeatBalFanSys->MAT(Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
                 Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), state.dataEnvrn->OutBaroPress);
 

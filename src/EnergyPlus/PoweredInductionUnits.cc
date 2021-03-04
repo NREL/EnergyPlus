@@ -121,7 +121,6 @@ namespace EnergyPlus::PoweredInductionUnits {
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using SteamCoils::SimulateSteamCoilComponents;
     using namespace FluidProperties;
-    using DataHeatBalFanSys::TempControlType;
 
     constexpr const char *fluidNameSteam("STEAM");
     constexpr const char *fluidNameWater("WATER");
@@ -1643,7 +1642,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         }
         // check if heating coil is off
         QActualHeating = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
-        if ((!UnitOn) || (QActualHeating < SmallLoad) || (TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
+        if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
             (PriAirMassFlow > PriAirMassFlowMin)) {
             HCoilOn = false;
         }
@@ -1937,7 +1936,7 @@ namespace EnergyPlus::PoweredInductionUnits {
         SimAirMixer(state, state.dataPowerInductionUnits->PIU(PIUNum).MixerName, state.dataPowerInductionUnits->PIU(PIUNum).Mixer_Num);
         // check if heating coil is off
         QActualHeating = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
-        if ((!UnitOn) || (QActualHeating < SmallLoad) || (TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
+        if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint) ||
             (PriAirMassFlow > PriAirMassFlowMin)) {
             HCoilOn = false;
         }

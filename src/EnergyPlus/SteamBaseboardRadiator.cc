@@ -1331,8 +1331,6 @@ namespace SteamBaseboardRadiator {
         // but them it is assumed to be convected to the air.
 
         using DataHeatBalFanSys::MaxRadHeatFlux;
-        using DataHeatBalFanSys::QSteamBaseboardSurf;
-        using DataHeatBalFanSys::QSteamBaseboardToPerson;
         using DataSurfaces::Surface;
 
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1344,21 +1342,21 @@ namespace SteamBaseboardRadiator {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
 
-        QSteamBaseboardSurf = 0.0;
-        QSteamBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
+        state.dataHeatBalFanSys->QSteamBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= state.dataSteamBaseboardRadiator->NumSteamBaseboards; ++BaseboardNum) {
 
             ZoneNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).ZonePtr;
             SteamBaseboardDesignData SteamBaseboardDesignDataObject{state.dataSteamBaseboardRadiator->SteamBaseboardDesign(state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
-            QSteamBaseboardToPerson(ZoneNum) += state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum) * SteamBaseboardDesignDataObject.FracDistribPerson;
+            state.dataHeatBalFanSys->QSteamBaseboardToPerson(ZoneNum) += state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum) * SteamBaseboardDesignDataObject.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
                 if (Surface(SurfNum).Area > SmallestArea) {
                     ThisSurfIntensity =
                         (state.dataSteamBaseboardRadiator->QBBSteamRadSource(BaseboardNum) * state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) / Surface(SurfNum).Area);
-                    QSteamBaseboardSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) += ThisSurfIntensity;
 
                     if (ThisSurfIntensity > MaxRadHeatFlux) { // CR 8074, trap for excessive intensity (throws off surface balance )
                         ShowSevereError(state, "DistributeBBSteamRadGains:  excessive thermal radiation heat flux intensity detected");

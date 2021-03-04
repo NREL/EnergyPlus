@@ -184,8 +184,8 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   SPACE2-1 Air Node
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     EXPECT_EQ(1.0, state->dataPowerInductionUnits->PIU(SysNum).PriDamperPosition);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
@@ -413,8 +413,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   SPACE2-1 Air Node
@@ -538,7 +538,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     EXPECT_EQ(1.0, state->dataPowerInductionUnits->PIU(SysNum).PriDamperPosition);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
@@ -694,8 +694,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;

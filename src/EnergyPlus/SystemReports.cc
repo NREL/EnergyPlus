@@ -4196,8 +4196,6 @@ namespace EnergyPlus::SystemReports {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataZoneEnergyDemands;
         using namespace DataGlobalConstants;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRatAvg;
         using FanCoilUnits::GetFanCoilMixedAirNode;
         using FanCoilUnits::GetFanCoilOutAirNode;
         using FanCoilUnits::GetFanCoilReturnAirNode;
@@ -4680,7 +4678,7 @@ namespace EnergyPlus::SystemReports {
             }
 
             // determine volumetric values from mass flow using current air density for zone (adjusted for elevation)
-            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ActualZoneNum), ZoneAirHumRatAvg(ActualZoneNum));
+            currentZoneAirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ActualZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatAvg(ActualZoneNum));
             if (currentZoneAirDensity > 0.0) state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) = state.dataSysRpts->ZoneOAMassFlow(CtrlZoneNum) / currentZoneAirDensity;
             state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) = state.dataSysRpts->ZoneOAVolFlowCrntRho(CtrlZoneNum) * TimeStepSys * DataGlobalConstants::SecInHour;
             if (ZoneVolume > 0.0) state.dataSysRpts->ZoneMechACH(CtrlZoneNum) = (state.dataSysRpts->ZoneOAVolCrntRho(CtrlZoneNum) / TimeStepSys) / ZoneVolume;

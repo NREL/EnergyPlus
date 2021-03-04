@@ -8636,7 +8636,6 @@ namespace EnergyPlus::SolarShading {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -8802,7 +8801,7 @@ namespace EnergyPlus::SolarShading {
                         break;
 
                     case WindowShadingControlType::HiZoneAirTemp: // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
-                        if (MAT(IZone) > SetPoint && SchedAllowsControl) {
+                        if (state.dataHeatBalFanSys->MAT(IZone) > SetPoint && SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;
@@ -8831,7 +8830,7 @@ namespace EnergyPlus::SolarShading {
 
                     case WindowShadingControlType::OnHiZoneTemp_HiSolarWindow: // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
                         if (state.dataEnvrn->SunIsUp) {
-                            if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                            if (state.dataHeatBalFanSys->MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -8841,7 +8840,7 @@ namespace EnergyPlus::SolarShading {
 
                     case WindowShadingControlType::OnHiZoneTemp_HiHorzSolar: // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
                         if (state.dataEnvrn->SunIsUp) {
-                            if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                            if (state.dataHeatBalFanSys->MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -8888,7 +8887,7 @@ namespace EnergyPlus::SolarShading {
                         break;
 
                     case WindowShadingControlType::OnNightLoInTemp_OffDay: // 'OnNightIfLowInsideTempAndOffDay')
-                        if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
+                        if (!state.dataEnvrn->SunIsUp && state.dataHeatBalFanSys->MAT(IZone) < SetPoint && SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;

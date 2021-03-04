@@ -5289,10 +5289,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::SumConvHTRadSys;
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
         using DataSizing::CurOverallSimDay;
         using DaylightingDevices::FigureTDDZoneGains;
         using FuelCellElectricGenerator::FigureFuelCellZoneGains;
@@ -5423,8 +5419,8 @@ namespace InternalHeatGains {
                     if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
-                                               MAT(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
-                                                          MAT(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
+                                    state.dataHeatBalFanSys->MAT(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
+                                            state.dataHeatBalFanSys->MAT(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
@@ -5680,10 +5676,10 @@ namespace InternalHeatGains {
 
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
 
-            SumAllInternalLatentGains(state, NZ, ZoneLatentGain(NZ));
+            SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
             // Added for hybrid model
             if (HybridModel::FlagHybridModel_PC) {
-                SumAllInternalLatentGainsExceptPeople(state, NZ, ZoneLatentGainExceptPeople(NZ));
+                SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
             }
         }
 
@@ -5698,7 +5694,7 @@ namespace InternalHeatGains {
             }
         }
 
-        SumConvHTRadSys = 0.0;
+        state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
 
         pulseMultipler = 0.01; // the W/sqft pulse for the zone
         if (state.dataGlobal->CompLoadReportIsReq) {
@@ -5768,8 +5764,6 @@ namespace InternalHeatGains {
         // This broken into a separate subroutine, because the calculations are more detailed than the other
         // types of internal gains.
 
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
@@ -5922,21 +5916,21 @@ namespace InternalHeatGains {
                     } else {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac;
                     }
-                    TRecirc = MAT(NZ);
-                    WRecirc = ZoneAirHumRat(NZ);
+                    TRecirc = state.dataHeatBalFanSys->MAT(NZ);
+                    WRecirc = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletRoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
-                    TAirIn = MAT(NZ);
+                    TAirIn = state.dataHeatBalFanSys->MAT(NZ);
                     TSupply = TAirIn;
-                    WAirIn = ZoneAirHumRat(NZ);
+                    WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
                     int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                     TSupply = Node(ZoneAirInletNode).Temp;
-                    TAirIn = MAT(NZ);
-                    WAirIn = ZoneAirHumRat(NZ);
+                    TAirIn = state.dataHeatBalFanSys->MAT(NZ);
+                    WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 }
             }
             TDPAirIn = PsyTdpFnWPb(state, WAirIn, state.dataEnvrn->StdBaroPress, RoutineName);
@@ -6531,8 +6525,6 @@ namespace InternalHeatGains {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6563,10 +6555,10 @@ namespace InternalHeatGains {
                 state.dataHeatBal->ZoneIntGain(NZ).Device(Loop).GenericContamGainRate = *state.dataHeatBal->ZoneIntGain(NZ).Device(Loop).PtrGenericContamGainRate;
             }
             if (ReSumLatentGains) {
-                SumAllInternalLatentGains(state, NZ, ZoneLatentGain(NZ));
+                SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
                 // Added for the hybrid model
                 if (HybridModel::FlagHybridModel_PC) {
-                    SumAllInternalLatentGainsExceptPeople(state, NZ, ZoneLatentGainExceptPeople(NZ));
+                    SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
                 }
             }
         }
