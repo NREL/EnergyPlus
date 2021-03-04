@@ -6794,8 +6794,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataGlobal->NumOfZones = 4;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBal->Zone(iZone).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).SurfaceLast = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
     state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
 
     TotSurfaces = 4;
@@ -6957,8 +6957,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 100.;
     // Trick E+ into not iterating on Surfaces
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 0;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 0;
 
 
 
@@ -8131,8 +8131,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBal->Zone(iZone).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).SurfaceLast = 4;
+    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
     state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 

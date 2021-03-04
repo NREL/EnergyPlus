@@ -1001,9 +1001,7 @@ namespace EnergyPlus::SwimmingPool {
 
         Real64 SumHATsurf = 0.0; // Return value
 
-        for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!DataSurfaces::Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
+        for (int SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
             Real64 Area = DataSurfaces::Surface(SurfNum).Area; // Effective surface area
 
             if (DataSurfaces::Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {

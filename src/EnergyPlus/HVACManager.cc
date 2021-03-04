@@ -2752,7 +2752,7 @@ namespace EnergyPlus::HVACManager {
                             break;
                         }
                     }
-                    for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                    for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                         if (DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             ShowWarningError(state, "For zone=" + Zone(ZoneNum).Name +
                                              " return air heat gain from air flow windows will be applied to the zone air.");

@@ -504,7 +504,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).ExtSolar) {
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
@@ -662,7 +661,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
             int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
                 if (IS_SHADED(SurfWinShadingFlag(SurfNum))) {
@@ -719,16 +717,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             InitHeatBalFiniteDiff(state);
         }
 
-        CTFConstOutPart = 0.0;
-        CTFConstInPart = 0.0;
-        if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
-            CTFTsrcConstPart = 0.0;
-            CTFTuserConstPart = 0.0;
-        }
-
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
                 auto const &surface(Surface(SurfNum));
                 if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF &&
@@ -809,8 +800,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         // Zero out all of the radiant system heat balance coefficient arrays
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 RadSysTiHBConstCoef(SurfNum) = 0.0;
                 RadSysTiHBToutCoef(SurfNum) = 0.0;
@@ -1383,7 +1374,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         TempSurfIn.dimension(TotSurfaces, 0.0);
         TempInsOld.dimension(TotSurfaces, 0.0);
-        TempSurfInTmp.dimension(TotSurfaces, 0.0);
         TempSurfInTmp.dimension(TotSurfaces, 0.0);
         RefAirTemp.dimension(TotSurfaces, 0.0);
         SurfQRadLWOutSrdSurfs.dimension(TotSurfaces, 0.0);
@@ -2080,8 +2070,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             // Loop through zones...
             state.dataHeatBal->TempEffBulkAir(zoneNum) = 23.0;
             TempTstatAir(zoneNum) = 23.0;
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 SUMH(SurfNum) = 0;             // module level array
                 TempSurfIn(SurfNum) = 23.0;    // module level array
@@ -2121,8 +2111,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 QAirExtReport(SurfNum) = 0.0;
                 QHeatEmiReport(SurfNum) = 0.0;
             } // end of  Surf array
-            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             if (firstSurfOpaq >= 0) {
                 for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                     SurfOpaqInsFaceConduction(SurfNum) = 0.0;
@@ -2246,7 +2236,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // (I)BLAST legacy routine QSUN
 
         // TODO: InterpSlatAng (XL)
-        // TODO: TDD in Zone
 
         // Using/Aliasing
         using SolarShading::CalcInteriorSolarDistribution;
@@ -2291,8 +2280,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             state.dataHeatBal->ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = 0.0;
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
@@ -2300,7 +2289,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 SurfOpaqQRadSWLightsInAbs(SurfNum) = 0.0;
                 SurfOpaqQRadSWOutAbs(SurfNum) = 0.0;
                 SurfOpaqInitialDifSolInAbs(SurfNum) = 0.0;
-
                 SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
                 state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(SurfNum) = 0.0;
                 state.dataHeatBal->SurfOpaqSWOutAbsEnergyReport(SurfNum) = 0.0;
@@ -2756,8 +2744,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
 
             for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-                int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                     int ConstrNum = Surface(SurfNum).Construction;
                     if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
@@ -3316,8 +3304,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                         SurfWinA(Lay, SurfNum) * currBeamSolar(SurfNum);
                     state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum) = state.dataHeatBal->SurfWinQRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
                     state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) += state.dataHeatBal->SurfWinQRadSWwinAbsLayer(Lay, SurfNum);
+                    state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) = state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                 }
-                state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) = state.dataHeatBal->SurfWinQRadSWwinAbsTot(SurfNum) * state.dataGlobal->TimeStepZoneSec;
             }
         } // End of sun-up check
     }
@@ -3439,12 +3427,11 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         // COMPUTE RADIANT GAINS ON SURFACES
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
             int const solEnclosureNum = state.dataHeatBal->Zone(zoneNum).SolarEnclosureNum;
             for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-                if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
                 Real64 AbsIntSurf = state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar; // Inside opaque surface solar absorptance
@@ -3487,9 +3474,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
             int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
-                if (Surface(SurfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip tubular daylighting device domes
                 int ConstrNum = Surface(SurfNum).Construction;
 
                 if (SurfWinWindowModelType(SurfNum) != WindowEQLModel) {
@@ -3805,9 +3790,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
-            if (firstSurf <= 0) continue;
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                 int ConstrNum = Surface(SurfNum).Construction;
                 state.dataHeatBal->ITABSF(SurfNum) = state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal;
@@ -3823,7 +3807,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
             int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
                 WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum);
@@ -4567,7 +4550,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         int HistTermNum; // DO loop counter for history terms
         int SideNum;     // DO loop counter for surfaces sides (inside, outside)
-        int SurfNum;     // Surface number DO loop counter
 
         static Array1D<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
         static Array1D<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
@@ -4607,33 +4589,34 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         auto const l111(TH.index(1, 1, 1));
         auto const l211(TH.index(2, 1, 1));
-        auto l11(l111);
-        auto l21(l211);
-        for (SurfNum = 1; SurfNum <= TotSurfaces;
-             ++SurfNum, ++l11, ++l21) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-            auto const &surface(Surface(SurfNum));
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+            // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
+                int l11 = l111 + SurfNum - 1;
+                int l21 = l211 + SurfNum - 1;
+                auto const &surface(Surface(SurfNum));
 
-            if (surface.Class == SurfaceClass::Window || !surface.HeatTransSurf) continue;
+                if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)) continue;
 
-            if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)) continue;
+                int const ConstrNum(surface.Construction);
+                auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
-            int const ConstrNum(surface.Construction);
-            auto const &construct(state.dataConstruction->Construct(ConstrNum));
+                if (construct.NumCTFTerms == 0) continue; // Skip surfaces with no history terms
 
-            if (construct.NumCTFTerms == 0) continue; // Skip surfaces with no history terms
+                // Sign convention for the various terms in the following two equations
+                // is based on the form of the Conduction Transfer Function equation
+                // given by:
+                // Qin,now  = (Sum of)(Y Tout) - (Sum of)(Z Tin) + (Sum of)(F Qin,old) + (Sum of)(V Qsrc)
+                // Qout,now = (Sum of)(X Tout) - (Sum of)(Y Tin) + (Sum of)(F Qout,old) + (Sum of)(W Qsrc)
+                // In both equations, flux is positive from outside to inside.  The V and W terms are for radiant systems only.
 
-            // Sign convention for the various terms in the following two equations
-            // is based on the form of the Conduction Transfer Function equation
-            // given by:
-            // Qin,now  = (Sum of)(Y Tout) - (Sum of)(Z Tin) + (Sum of)(F Qin,old) + (Sum of)(V Qsrc)
-            // Qout,now = (Sum of)(X Tout) - (Sum of)(Y Tin) + (Sum of)(F Qout,old) + (Sum of)(W Qsrc)
-            // In both equations, flux is positive from outside to inside.  The V and W terms are for radiant systems only.
-
-            // Set current inside flux:
-            Real64 const QH_12 = QH[l21] = TH[l11] * construct.CTFCross(0) - TempSurfIn(SurfNum) * construct.CTFInside(0) +
-                                           CTFConstInPart(SurfNum); // Heat source/sink term for radiant systems
-            if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall || surface.Class == SurfaceClass::IntMass ||
-                surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) {
+                // Set current inside flux:
+                Real64 const QH_12 = QH[l21] = TH[l11] * construct.CTFCross(0) - TempSurfIn(SurfNum) * construct.CTFInside(0) +
+                                               CTFConstInPart(SurfNum); // Heat source/sink term for radiant systems
+                // Only HT opaq surfaces are evaluated, previous if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall || surface.Class == SurfaceClass::IntMass ||
+                // surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) checks are reduncant.
                 if (construct.SourceSinkPresent) {
                     Real64 const QH_12s = QH[l21] = QH_12 + QsrcHist(SurfNum, 1) * construct.CTFSourceIn(0);
                     SurfOpaqInsFaceConduction(SurfNum) = surface.Area * QH_12s;
@@ -4652,52 +4635,48 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 } else {
                     SurfOpaqInsFaceCondLossRep(SurfNum) = - SurfOpaqInsFaceConduction(SurfNum);
                 }
-            }
 
-            // Update the temperature at the source/sink location (if one is present)
-            if (construct.SourceSinkPresent) {
-                TempSource(SurfNum) = TsrcHist(SurfNum, 1) = TH[l11] * construct.CTFTSourceOut(0) + TempSurfIn(SurfNum) * construct.CTFTSourceIn(0) +
-                                                             QsrcHist(SurfNum, 1) * construct.CTFTSourceQ(0) + CTFTsrcConstPart(SurfNum);
-                TempUserLoc(SurfNum) = TuserHist(SurfNum, 1) = TH[l11] * construct.CTFTUserOut(0) + TempSurfIn(SurfNum) * construct.CTFTUserIn(0) +
-                                                               QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + CTFTuserConstPart(SurfNum);
-            }
+                // Update the temperature at the source/sink location (if one is present)
+                if (construct.SourceSinkPresent) {
+                    TempSource(SurfNum) = TsrcHist(SurfNum, 1) = TH[l11] * construct.CTFTSourceOut(0) + TempSurfIn(SurfNum) * construct.CTFTSourceIn(0) +
+                                                                 QsrcHist(SurfNum, 1) * construct.CTFTSourceQ(0) + CTFTsrcConstPart(SurfNum);
+                    TempUserLoc(SurfNum) = TuserHist(SurfNum, 1) = TH[l11] * construct.CTFTUserOut(0) + TempSurfIn(SurfNum) * construct.CTFTUserIn(0) +
+                                                                   QsrcHist(SurfNum, 1) * construct.CTFTUserSource(0) + CTFTuserConstPart(SurfNum);
+                }
 
-            if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
+                if (surface.ExtBoundCond > 0) continue; // Don't need to evaluate outside for partitions
 
-            // Set current outside flux:
-            if (construct.SourceSinkPresent) {
-                QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) +
-                          QsrcHist(SurfNum, 1) * construct.CTFSourceOut(0) + CTFConstOutPart(SurfNum); // Heat source/sink term for radiant systems
-            } else {
-                QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) + CTFConstOutPart(SurfNum);
-            }
-            if (surface.Class == SurfaceClass::Floor || surface.Class == SurfaceClass::Wall || surface.Class == SurfaceClass::IntMass ||
-                surface.Class == SurfaceClass::Roof || surface.Class == SurfaceClass::Door) {
+                // Set current outside flux:
+                if (construct.SourceSinkPresent) {
+                    QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) +
+                              QsrcHist(SurfNum, 1) * construct.CTFSourceOut(0) + CTFConstOutPart(SurfNum); // Heat source/sink term for radiant systems
+                } else {
+                    QH[l11] = TH[l11] * construct.CTFOutside(0) - TempSurfIn(SurfNum) * construct.CTFCross(0) + CTFConstOutPart(SurfNum);
+                }
                 SurfOpaqOutsideFaceConductionFlux(SurfNum) = -QH[l11]; // switch sign for balance at outside face
                 SurfOpaqOutsideFaceConduction(SurfNum) = surface.Area * SurfOpaqOutsideFaceConductionFlux(SurfNum);
             }
-
         } // ...end of loop over all (heat transfer) surfaces...
 
-        l11 = l111;
-        l21 = l211;
-        for (SurfNum = 1; SurfNum <= TotSurfaces;
-             ++SurfNum, ++l11, ++l21) { // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
-            auto const &surface(Surface(SurfNum));
-
-            if (surface.Class == SurfaceClass::Window || !surface.HeatTransSurf) continue;
-            if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD) &&
-                (surface.HeatTransferAlgorithm != HeatTransferModel_TDD))
-                continue;
-            if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
-                TempExt1(SurfNum) = TH[l11];
-                TempInt1(SurfNum) = TempSurfIn(SurfNum);
-                QExt1(SurfNum) = QH[l11];
-                QInt1(SurfNum) = QH[l21];
-                if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
-                    Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
-                    Tuser1(SurfNum) = TuserHist(SurfNum, 1);
-                    Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                // Loop through all (heat transfer) surfaces...  [ l11 ] = ( 1, 1, SurfNum ), [ l21 ] = ( 2, 1, SurfNum )
+                int l11 = l111 + SurfNum - 1;
+                int l21 = l211 + SurfNum - 1;
+                if ((Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF) && (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD))
+                    continue;
+                if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
+                    TempExt1(SurfNum) = TH[l11];
+                    TempInt1(SurfNum) = TempSurfIn(SurfNum);
+                    QExt1(SurfNum) = QH[l11];
+                    QInt1(SurfNum) = QH[l21];
+                    if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
+                        Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
+                        Tuser1(SurfNum) = TuserHist(SurfNum, 1);
+                        Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
+                    }
                 }
             }
 
@@ -4705,149 +4684,151 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         // SHIFT TEMPERATURE AND FLUX HISTORIES:
         // SHIFT AIR TEMP AND FLUX SHIFT VALUES WHEN AT BOTTOM OF ARRAY SPACE.
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all (heat transfer) surfaces...
-            auto const &surface(Surface(SurfNum));
 
-            if (surface.Class == SurfaceClass::Window || surface.Class == SurfaceClass::TDD_Dome || !surface.HeatTransSurf) continue;
-            if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD) &&
-                (surface.HeatTransferAlgorithm != HeatTransferModel_TDD))
-                continue;
+        for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                auto const &surface(Surface(SurfNum));
 
-            int const ConstrNum(surface.Construction);
-            auto const &construct(state.dataConstruction->Construct(ConstrNum));
+                if ((surface.HeatTransferAlgorithm != HeatTransferModel_CTF) && (surface.HeatTransferAlgorithm != HeatTransferModel_EMPD))
+                    continue;
 
-            ++SUMH(SurfNum);
-            SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
+                int const ConstrNum(surface.Construction);
+                auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
-            if (SUMH(SurfNum) == construct.NumHistories) {
+                ++SUMH(SurfNum);
+                SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
 
-                SUMH(SurfNum) = 0;
+                if (SUMH(SurfNum) == construct.NumHistories) {
 
-                if (construct.NumCTFTerms > 1) {
-                    int const numCTFTerms(construct.NumCTFTerms);
-                    for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
-                        auto l(THM.index(SideNum, numCTFTerms, SurfNum));
-                        auto const li(THM.size3());
-                        auto l1(l + li);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= li) { // Tuned Linear indexing
-                            // TH( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum - 1, SurfNum );
-                            // QH( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum - 1, SurfNum );
-                            TH[l1] = THM[l1] = THM[l];
-                            QH[l1] = QHM[l1] = QHM[l];
+                    SUMH(SurfNum) = 0;
+
+                    if (construct.NumCTFTerms > 1) {
+                        int const numCTFTerms(construct.NumCTFTerms);
+                        for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
+                            auto l(THM.index(SideNum, numCTFTerms, SurfNum));
+                            auto const li(THM.size3());
+                            auto l1(l + li);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= li) { // Tuned Linear indexing
+                                // TH( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum, SurfNum ) = THM( SideNum, HistTermNum - 1, SurfNum );
+                                // QH( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum, SurfNum ) = QHM( SideNum, HistTermNum - 1, SurfNum );
+                                TH[l1] = THM[l1] = THM[l];
+                                QH[l1] = QHM[l1] = QHM[l];
+                            }
+                        }
+                        if (construct.SourceSinkPresent) {
+                            auto m(TsrcHistM.index(SurfNum, numCTFTerms));
+                            auto m1(m + 1);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
+                                // TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
+                                // QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
+                                TsrcHist[m1] = TsrcHistM[m1] = TsrcHistM[m];
+                                QsrcHist[m1] = QsrcHistM[m1] = QsrcHistM[m];
+                                TuserHist[m1] = TuserHistM[m1] = TuserHistM[m];
+                            }
                         }
                     }
+
+                    // Tuned Linear indexing
+                    // THM( 1, 2, SurfNum ) = TempExt1( SurfNum );
+                    // THM( 2, 2, SurfNum ) = TempInt1( SurfNum );
+                    // TsrcHistM( SurfNum, 2 ) = Tsrc1( SurfNum );
+                    // QHM( 1, 2, SurfNum ) = QExt1( SurfNum );
+                    // QHM( 2, 2, SurfNum ) = QInt1( SurfNum );
+                    // QsrcHistM( SurfNum, 2 ) = Qsrc1( SurfNum );
+                    //
+                    // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum );
+                    // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum );
+                    // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 );
+                    // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum );
+                    // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum );
+                    // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 );
+
+                    auto const l21(TH.index(1, 2, SurfNum)); // Linear index
+                    auto const l22(TH.index(2, 2, SurfNum)); // Linear index
+                    THM[l21] = TempExt1(SurfNum);
+                    THM[l22] = TempInt1(SurfNum);
+                    QHM[l21] = QExt1(SurfNum);
+                    QHM[l22] = QInt1(SurfNum);
+
+                    TH[l21] = THM[l21];
+                    TH[l22] = THM(2, 2, SurfNum);
+                    QH[l21] = QHM[l21];
+                    QH[l22] = QHM(2, 2, SurfNum);
+
                     if (construct.SourceSinkPresent) {
-                        auto m(TsrcHistM.index(SurfNum, numCTFTerms));
-                        auto m1(m + 1);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing
-                            // TsrcHist( SurfNum, HistTerm ) = TsrcHistM( SurfNum, HHistTerm ) = TsrcHistM( SurfNum, HistTermNum - 1 );
-                            // QsrcHist( SurfNum, HistTerm ) = QsrcHistM( SurfNum, HHistTerm ) = QsrcHistM( SurfNum, HistTermNum - 1 );
-                            TsrcHist[m1] = TsrcHistM[m1] = TsrcHistM[m];
-                            QsrcHist[m1] = QsrcHistM[m1] = QsrcHistM[m];
-                            TuserHist[m1] = TuserHistM[m1] = TuserHistM[m];
+                        TsrcHistM(SurfNum, 2) = Tsrc1(SurfNum);
+                        TuserHistM(SurfNum, 2) = Tuser1(SurfNum);
+                        QsrcHistM(SurfNum, 2) = Qsrc1(SurfNum);
+                        TsrcHist(SurfNum, 2) = TsrcHistM(SurfNum, 2);
+                        TuserHist(SurfNum, 2) = TuserHistM(SurfNum, 2);
+                        QsrcHist(SurfNum, 2) = QsrcHistM(SurfNum, 2);
+                    }
+
+                } else {
+
+                    Real64 const sum_steps(SumTime(SurfNum) / construct.CTFTimeStep);
+                    if (construct.NumCTFTerms > 1) {
+                        int const numCTFTerms(construct.NumCTFTerms);
+                        for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
+                            auto l(THM.index(SideNum, numCTFTerms, SurfNum));
+                            auto const s3(THM.size3());
+                            auto l1(l + s3);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= s3) { // Tuned Linear indexing
+                                // Real64 const THM_l1( THM( SideNum, HistTermNum, SurfNum ) );
+                                // TH( SideNum, HistTermNum, SurfNum ) = THM_l1 - ( THM_l1 - THM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
+                                // Real64 const QHM_l1( QHM( SideNum, HistTermNum, SurfNum ) );
+                                // QH( SideNum, HistTermNum, SurfNum ) = QHM_l1 - ( QHM_l1 - QHM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
+                                Real64 const THM_l1(THM[l1]);
+                                TH[l1] = THM_l1 - (THM_l1 - THM[l]) * sum_steps;
+                                Real64 const QHM_l1(QHM[l1]);
+                                QH[l1] = QHM_l1 - (QHM_l1 - QHM[l]) * sum_steps;
+                            }
+                        }
+                        if (construct.SourceSinkPresent) {
+                            auto m(TsrcHistM.index(SurfNum, numCTFTerms));
+                            auto m1(m + 1);
+                            for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
+                                // Real64 const TsrcHistM_elem( TsrcHistM( SurfNum, HistTermNum ) );
+                                // TsrcHist( SurfNum, HistTermNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( SurfNum, HistTermNum - 1 ) ) *
+                                // sum_steps;  Real64 const QsrcHistM_elem( QsrcHistM( SurfNum, HistTermNum ) );  QsrcHist( SurfNum, HistTermNum ) =
+                                // QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
+                                Real64 const TsrcHistM_m1(TsrcHistM[m1]);
+                                TsrcHist[m1] = TsrcHistM_m1 - (TsrcHistM_m1 - TsrcHistM[m]) * sum_steps;
+                                Real64 const QsrcHistM_m1(QsrcHistM[m1]);
+                                QsrcHist[m1] = QsrcHistM_m1 - (QsrcHistM_m1 - QsrcHistM[m]) * sum_steps;
+                                Real64 const TuserHistM_m1(TuserHistM[m1]);
+                                TuserHist[m1] = TuserHistM_m1 - (TuserHistM_m1 - TuserHistM[m]) * sum_steps;
+                            }
                         }
                     }
-                }
 
-                // Tuned Linear indexing
-                // THM( 1, 2, SurfNum ) = TempExt1( SurfNum );
-                // THM( 2, 2, SurfNum ) = TempInt1( SurfNum );
-                // TsrcHistM( SurfNum, 2 ) = Tsrc1( SurfNum );
-                // QHM( 1, 2, SurfNum ) = QExt1( SurfNum );
-                // QHM( 2, 2, SurfNum ) = QInt1( SurfNum );
-                // QsrcHistM( SurfNum, 2 ) = Qsrc1( SurfNum );
-                //
-                // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum );
-                // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum );
-                // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 );
-                // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum );
-                // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum );
-                // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 );
+                    // Tuned Linear indexing
+                    // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum ) - ( THM( 1, 2, SurfNum ) - TempExt1( SurfNum ) ) * sum_steps;
+                    // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum ) - ( THM( 2, 2, SurfNum ) - TempInt1( SurfNum ) ) * sum_steps;
+                    // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum ) - ( QHM( 1, 2, SurfNum ) - QExt1( SurfNum ) ) * sum_steps;
+                    // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum ) - ( QHM( 2, 2, SurfNum ) - QInt1( SurfNum ) ) * sum_steps;
 
-                auto const l21(TH.index(1, 2, SurfNum)); // Linear index
-                auto const l22(TH.index(2, 2, SurfNum)); // Linear index
-                THM[l21] = TempExt1(SurfNum);
-                THM[l22] = TempInt1(SurfNum);
-                QHM[l21] = QExt1(SurfNum);
-                QHM[l22] = QInt1(SurfNum);
+                    auto const l21(TH.index(1, 2, SurfNum)); // Linear index
+                    auto const l22(TH.index(2, 2, SurfNum)); // Linear index
+                    TH[l21] = THM[l21] - (THM[l21] - TempExt1(SurfNum)) * sum_steps;
+                    TH[l22] = THM[l22] - (THM[l22] - TempInt1(SurfNum)) * sum_steps;
+                    QH[l21] = QHM[l21] - (QHM[l21] - QExt1(SurfNum)) * sum_steps;
+                    QH[l22] = QHM[l22] - (QHM[l22] - QInt1(SurfNum)) * sum_steps;
 
-                TH[l21] = THM[l21];
-                TH[l22] = THM(2, 2, SurfNum);
-                QH[l21] = QHM[l21];
-                QH[l22] = QHM(2, 2, SurfNum);
+                    // Tuned Linear indexing
+                    // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
+                    // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 ) - ( QsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
 
-                if (construct.SourceSinkPresent) {
-                    TsrcHistM(SurfNum, 2) = Tsrc1(SurfNum);
-                    TuserHistM(SurfNum, 2) = Tuser1(SurfNum);
-                    QsrcHistM(SurfNum, 2) = Qsrc1(SurfNum);
-                    TsrcHist(SurfNum, 2) = TsrcHistM(SurfNum, 2);
-                    TuserHist(SurfNum, 2) = TuserHistM(SurfNum, 2);
-                    QsrcHist(SurfNum, 2) = QsrcHistM(SurfNum, 2);
-                }
-
-            } else {
-
-                Real64 const sum_steps(SumTime(SurfNum) / construct.CTFTimeStep);
-                if (construct.NumCTFTerms > 1) {
-                    int const numCTFTerms(construct.NumCTFTerms);
-                    for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
-                        auto l(THM.index(SideNum, numCTFTerms, SurfNum));
-                        auto const s3(THM.size3());
-                        auto l1(l + s3);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, l1 = l, l -= s3) { // Tuned Linear indexing
-                            // Real64 const THM_l1( THM( SideNum, HistTermNum, SurfNum ) );
-                            // TH( SideNum, HistTermNum, SurfNum ) = THM_l1 - ( THM_l1 - THM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
-                            // Real64 const QHM_l1( QHM( SideNum, HistTermNum, SurfNum ) );
-                            // QH( SideNum, HistTermNum, SurfNum ) = QHM_l1 - ( QHM_l1 - QHM( SideNum, HistTermNum - 1, SurfNum ) ) * sum_steps;
-                            Real64 const THM_l1(THM[l1]);
-                            TH[l1] = THM_l1 - (THM_l1 - THM[l]) * sum_steps;
-                            Real64 const QHM_l1(QHM[l1]);
-                            QH[l1] = QHM_l1 - (QHM_l1 - QHM[l]) * sum_steps;
-                        }
-                    }
                     if (construct.SourceSinkPresent) {
-                        auto m(TsrcHistM.index(SurfNum, numCTFTerms));
-                        auto m1(m + 1);
-                        for (HistTermNum = numCTFTerms + 1; HistTermNum >= 3; --HistTermNum, --m, --m1) { // Tuned Linear indexing [ l ] == ()
-                            // Real64 const TsrcHistM_elem( TsrcHistM( SurfNum, HistTermNum ) );
-                            // TsrcHist( SurfNum, HistTermNum ) = TsrcHistM_elem - ( TsrcHistM_elem - TsrcHistM( SurfNum, HistTermNum - 1 ) ) *
-                            // sum_steps;  Real64 const QsrcHistM_elem( QsrcHistM( SurfNum, HistTermNum ) );  QsrcHist( SurfNum, HistTermNum ) =
-                            // QsrcHistM_elem - ( QsrcHistM_elem - QsrcHistM( SurfNum, HistTermNum - 1 ) ) * sum_steps;
-                            Real64 const TsrcHistM_m1(TsrcHistM[m1]);
-                            TsrcHist[m1] = TsrcHistM_m1 - (TsrcHistM_m1 - TsrcHistM[m]) * sum_steps;
-                            Real64 const QsrcHistM_m1(QsrcHistM[m1]);
-                            QsrcHist[m1] = QsrcHistM_m1 - (QsrcHistM_m1 - QsrcHistM[m]) * sum_steps;
-                            Real64 const TuserHistM_m1(TuserHistM[m1]);
-                            TuserHist[m1] = TuserHistM_m1 - (TuserHistM_m1 - TuserHistM[m]) * sum_steps;
-                        }
+                        auto const l2(TsrcHist.index(SurfNum, 2));
+                        TsrcHist[l2] = TsrcHistM[l2] - (TsrcHistM[l2] - Tsrc1(SurfNum)) * sum_steps;
+                        QsrcHist[l2] = QsrcHistM[l2] - (QsrcHistM[l2] - Qsrc1(SurfNum)) * sum_steps;
+                        TuserHist[l2] = TuserHistM[l2] - (TuserHistM[l2] - Tuser1(SurfNum)) * sum_steps;
                     }
-                }
-
-                // Tuned Linear indexing
-                // TH( 1, 2, SurfNum ) = THM( 1, 2, SurfNum ) - ( THM( 1, 2, SurfNum ) - TempExt1( SurfNum ) ) * sum_steps;
-                // TH( 2, 2, SurfNum ) = THM( 2, 2, SurfNum ) - ( THM( 2, 2, SurfNum ) - TempInt1( SurfNum ) ) * sum_steps;
-                // QH( 1, 2, SurfNum ) = QHM( 1, 2, SurfNum ) - ( QHM( 1, 2, SurfNum ) - QExt1( SurfNum ) ) * sum_steps;
-                // QH( 2, 2, SurfNum ) = QHM( 2, 2, SurfNum ) - ( QHM( 2, 2, SurfNum ) - QInt1( SurfNum ) ) * sum_steps;
-
-                auto const l21(TH.index(1, 2, SurfNum)); // Linear index
-                auto const l22(TH.index(2, 2, SurfNum)); // Linear index
-                TH[l21] = THM[l21] - (THM[l21] - TempExt1(SurfNum)) * sum_steps;
-                TH[l22] = THM[l22] - (THM[l22] - TempInt1(SurfNum)) * sum_steps;
-                QH[l21] = QHM[l21] - (QHM[l21] - QExt1(SurfNum)) * sum_steps;
-                QH[l22] = QHM[l22] - (QHM[l22] - QInt1(SurfNum)) * sum_steps;
-
-                // Tuned Linear indexing
-                // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
-                // QsrcHist( SurfNum, 2 ) = QsrcHistM( SurfNum, 2 ) - ( QsrcHistM( SurfNum, 2 ) - Qsrc1( SurfNum ) ) * sum_steps;
-
-                if (construct.SourceSinkPresent) {
-                    auto const l2(TsrcHist.index(SurfNum, 2));
-                    TsrcHist[l2] = TsrcHistM[l2] - (TsrcHistM[l2] - Tsrc1(SurfNum)) * sum_steps;
-                    QsrcHist[l2] = QsrcHistM[l2] - (QsrcHistM[l2] - Qsrc1(SurfNum)) * sum_steps;
-                    TuserHist[l2] = TuserHistM[l2] - (TuserHistM[l2] - Tuser1(SurfNum)) * sum_steps;
                 }
             }
-
         } // ...end of loop over all (heat transfer) surfaces
     }
 
@@ -4888,7 +4869,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
             SumAET = 0.0;
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
                 SumAET += SurfaceAE(SurfNum) * TempSurfIn(SurfNum);
             }
             if (ZoneAESum(ZoneNum) > 0.01) {
@@ -5310,14 +5291,17 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                                     QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)) *
                 surfaceArea;
             QRadHVACInReport(SurfNum) = QdotRadHVACInRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-
-            if (Surface(SurfNum).Class == SurfaceClass::Floor || Surface(SurfNum).Class == SurfaceClass::Wall ||
-                Surface(SurfNum).Class == SurfaceClass::IntMass || Surface(SurfNum).Class == SurfaceClass::Roof ||
-                Surface(SurfNum).Class == SurfaceClass::Door) {
-
+            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
+                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+            }
+        }
+        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+            int const firstSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastSurfOpaq = state.dataHeatBal->Zone(ZoneNum).OpaqOrIntMassSurfaceLast;
+            for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
                 // inside face conduction updates
                 SurfOpaqInsFaceConductionEnergy(SurfNum) = SurfOpaqInsFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                state.dataHeatBal->ZoneOpaqSurfInsFaceCond(Surface(SurfNum).Zone) += SurfOpaqInsFaceConduction(SurfNum);
+                state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum) += SurfOpaqInsFaceConduction(SurfNum);
                 SurfOpaqInsFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqInsFaceCondLossRep(SurfNum) = 0.0;
                 if (SurfOpaqInsFaceConduction(SurfNum) >= 0.0) {
@@ -5328,7 +5312,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                 // outside face conduction updates
                 SurfOpaqOutsideFaceConductionEnergy(SurfNum) = SurfOpaqOutsideFaceConduction(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-                state.dataHeatBal->ZoneOpaqSurfExtFaceCond(Surface(SurfNum).Zone) += SurfOpaqOutsideFaceConduction(SurfNum);
+                state.dataHeatBal->ZoneOpaqSurfExtFaceCond(ZoneNum) += SurfOpaqOutsideFaceConduction(SurfNum);
                 SurfOpaqExtFaceCondGainRep(SurfNum) = 0.0;
                 SurfOpaqExtFaceCondLossRep(SurfNum) = 0.0;
                 if (SurfOpaqOutsideFaceConduction(SurfNum) >= 0.0) {
@@ -5361,13 +5345,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 } else {
                     SurfOpaqStorageCondLossRep(SurfNum) = - SurfOpaqStorageConduction(SurfNum);
                 }
-
             } // opaque heat transfer surfaces.
-            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
-                SumSurfaceHeatEmission += QHeatEmiReport(SurfNum) * state.dataGlobal->TimeStepZoneSec;
-            }
-        } // loop over surfaces
-        for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
+
             if (state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum) >= 0.0) {
                 state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) = state.dataHeatBal->ZoneOpaqSurfInsFaceCond(ZoneNum);
                 state.dataHeatBal->ZnOpqSurfInsFaceCondGnRepEnrg(ZoneNum) = state.dataHeatBal->ZoneOpaqSurfInsFaceCondGainRep(ZoneNum) * state.dataGlobal->TimeStepZoneSec;
@@ -5511,11 +5490,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            int const firstSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastSurfOpaque = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
-            if (firstSurfOpaque <= 0) continue;
-            for (int SurfNum = firstSurfOpaque; SurfNum <= lastSurfOpaque; ++SurfNum) {
-
+            for (int SurfNum = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(zoneNum).HTSurfaceLast; ++SurfNum) {
+                if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
                 if (present(ZoneToResimulate)) {
                     if ((zoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone
@@ -5958,7 +5934,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             }
                         }
                         // Calculate LWR from surrounding surfaces if defined for an exterior surface
-                        SurfQRadLWOutSrdSurfs(SurfNum) = 0;
                         if (Surface(SurfNum).HasSurroundingSurfProperties) {
                             int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
                             // Absolute temperature of the outside surface of an exterior surface
@@ -5973,8 +5948,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         }
 
                         if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_CTF ||
-                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
-
+                            Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD ||
+                            Surface(SurfNum).Class == SurfaceClass::TDD_Dome) {
                             CalcOutsideSurfTemp(state, SurfNum, zoneNum, ConstrNum, HMovInsul, TempExt, MovInsulErrorFlag);
                             if (MovInsulErrorFlag)
                                 ShowFatalError(state, "CalcOutsideSurfTemp: Program terminates due to preceding conditions.");
@@ -6091,7 +6066,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             DataHeatBalSurface::Zone_has_mixed_HT_models.resize(state.dataGlobal->NumOfZones + 1, false);
             for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 auto const &zone(state.dataHeatBal->Zone(iZone));
-                for (int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf) {
+                for (int iSurf = zone.HTSurfaceFirst, eSurf = zone.HTSurfaceLast; iSurf <= eSurf; ++iSurf) {
                     auto const alg(Surface(iSurf).HeatTransferAlgorithm);
                     if ((alg == HeatTransferModel_CondFD) || (alg == HeatTransferModel_HAMT) || (alg == HeatTransferModel_Kiva)) {
                         DataHeatBalSurface::Zone_has_mixed_HT_models[iZone] = true;
@@ -6796,7 +6771,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 Real64 &TH12(TH(2, 1, SurfNum));
                 TH12 = TempSurfInRep(SurfNum) = TempSurfIn(SurfNum);
                 SurfTempOut(SurfNum) = TH11; // For reporting
-
+                if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Dome) continue;
                 if (SurfWinOriginalClass(SurfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                     // Tubular daylighting devices are treated as one big object with an effective R value.
                     // The outside face temperature of the TDD:DOME and the inside face temperature of the
@@ -7030,8 +7005,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         if (calcHeatBalInsideSurfCTFOnlyFirstTime) {
             // Set up coefficient arrays that never change - loop over non-window HT surfaces
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                int const firstSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     int const ConstrNum = Surface(surfNum).Construction;
                     auto const &construct(state.dataConstruction->Construct(ConstrNum));
@@ -7061,9 +7036,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         }
 
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
-
+            // loop over all heat transfer surface except TDD Dome.
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
             // determine reference air temperatures and other variable terms - loop over all surfaces
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
 
@@ -7088,49 +7063,43 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         IsNotPoolSurf(surfNum) = 1;
                     }
                 }
-
-                // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
-                if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue;
-
-                {
-                    auto const SELECT_CASE_var(Surface(surfNum).TAirRef);
-                    if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                        RefAirTemp(surfNum) = MAT(zoneNum);
-                        state.dataHeatBal->TempEffBulkAir(surfNum) = MAT(zoneNum); // for reporting surf adjacent air temp
-                    } else if (SELECT_CASE_var == AdjacentAirTemp) {
-                        RefAirTemp(surfNum) = state.dataHeatBal->TempEffBulkAir(surfNum);
-                    } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
-                        // determine ZoneEquipConfigNum for this zone
-                        int ZoneEquipConfigNum = zoneNum;
-                        // check whether this zone is a controlled zone or not
-                        if (!state.dataHeatBal->Zone(zoneNum).IsControlled) {
-                            ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
-                                           state.dataHeatBal->Zone(zoneNum).Name);
-                            return;
-                        }
-                        // determine supply air conditions
-                        Real64 SumSysMCp = 0.0;
-                        Real64 SumSysMCpT = 0.0;
-                        Real64 const CpAir = Psychrometrics::PsyCpAirFnW(ZoneAirHumRat(zoneNum));
-                        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                            Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                            Real64 MassFlowRate =
-                                DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            SumSysMCp += MassFlowRate * CpAir;
-                            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                        }
-                        // a weighted average of the inlet temperatures.
-                        if (SumSysMCp > 0.0) {                            // protect div by zero
-                            RefAirTemp(surfNum) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
-                        } else {
-                            RefAirTemp(surfNum) = MAT(zoneNum);
-                        }
-                        state.dataHeatBal->TempEffBulkAir(surfNum) = RefAirTemp(surfNum); // for reporting surf adjacent air temp
-                    } else {
-                        // currently set to mean air temp but should add error warning here
-                        RefAirTemp(surfNum) = MAT(zoneNum);
-                        state.dataHeatBal->TempEffBulkAir(surfNum) = MAT(zoneNum); // for reporting surf adjacent air temp
+                auto const SELECT_CASE_var(Surface(surfNum).TAirRef);
+                if (SELECT_CASE_var == ZoneMeanAirTemp) {
+                    RefAirTemp(surfNum) = MAT(zoneNum);
+                    state.dataHeatBal->TempEffBulkAir(surfNum) = MAT(zoneNum); // for reporting surf adjacent air temp
+                } else if (SELECT_CASE_var == AdjacentAirTemp) {
+                    RefAirTemp(surfNum) = state.dataHeatBal->TempEffBulkAir(surfNum);
+                } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
+                    // determine ZoneEquipConfigNum for this zone
+                    int ZoneEquipConfigNum = zoneNum;
+                    // check whether this zone is a controlled zone or not
+                    if (!state.dataHeatBal->Zone(zoneNum).IsControlled) {
+                        ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " +
+                                state.dataHeatBal->Zone(zoneNum).Name);
+                        return;
                     }
+                    // determine supply air conditions
+                    Real64 SumSysMCp = 0.0;
+                    Real64 SumSysMCpT = 0.0;
+                    Real64 const CpAir = Psychrometrics::PsyCpAirFnW(ZoneAirHumRat(zoneNum));
+                    for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
+                        Real64 NodeTemp = DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
+                        Real64 MassFlowRate =
+                            DataLoopNode::Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+                        SumSysMCp += MassFlowRate * CpAir;
+                        SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+                    }
+                    // a weighted average of the inlet temperatures.
+                    if (SumSysMCp > 0.0) {                            // protect div by zero
+                        RefAirTemp(surfNum) = SumSysMCpT / SumSysMCp; // BG changed 02-16-2005 to add index (SurfNum)
+                    } else {
+                        RefAirTemp(surfNum) = MAT(zoneNum);
+                    }
+                    state.dataHeatBal->TempEffBulkAir(surfNum) = RefAirTemp(surfNum); // for reporting surf adjacent air temp
+                } else {
+                    // currently set to mean air temp but should add error warning here
+                    RefAirTemp(surfNum) = MAT(zoneNum);
+                    state.dataHeatBal->TempEffBulkAir(surfNum) = MAT(zoneNum); // for reporting surf adjacent air temp
                 }
             }
 
@@ -7170,8 +7139,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
 
             // Set up coefficient arrays prior to calculations and precalc terms that do no change during iteration - non-window surfaces
-            int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-            int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+            int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+            int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
             Real64 const timeStepZoneSeconds = state.dataGlobal->TimeStepZoneSec; // local for vectorization
             Real64 const iterDampConstant = IterDampConst;      // local for vectorization
             // this loop auto-vectorizes
@@ -7207,8 +7176,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 ConvectionCoefficients::InitInteriorConvectionCoeffs(state, TempSurfIn, ZoneToResimulate);
                 // Since HConvIn has changed re-calculate a few terms - non-window surfaces
                 for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                    int const firstSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-                    int const lastSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+                    int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                    int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                     Real64 const timeStepZoneSeconds = state.dataGlobal->TimeStepZoneSec; // local for vectorization
                     Real64 const iterDampConstant = IterDampConst;      // local for vectorization
                     // this loop auto-vectorizes
@@ -7226,8 +7195,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
             // Loop over non-window surfaces
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 Real64 const iterDampConstant = IterDampConst; // local for vectorization
                 // this loop auto-vectorizes
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
@@ -7490,9 +7459,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     }
                 }
 
-                // Loop over all HT surfaces
-                int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-                int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
+                int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
+                int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
                 for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
                     auto &surface(Surface(surfNum));
                     auto &zone(state.dataHeatBal->Zone(zoneNum));
@@ -7500,7 +7468,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     Real64 &TH12(TH(2, 1, surfNum));
                     TH12 = TempSurfInRep(surfNum) = TempSurfIn(surfNum);
                     SurfTempOut(surfNum) = TH11; // For reporting
-
                     if (SurfWinOriginalClass(surfNum) == SurfaceClass::TDD_Diffuser) { // Tubular daylighting device
                         // Tubular daylighting devices are treated as one big object with an effective R value.
                         // The outside face temperature of the TDD:DOME and the inside face temperature of the
@@ -7545,8 +7512,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             // Convergence check - Loop through all relevant non-window surfaces to check for convergence...
             Real64 MaxDelTemp = 0.0; // Maximum change in surface temperature for any opaque surface from one iteration to the next
             for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-                int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).NonWindowSurfaceLast;
+                int const firstNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceFirst;
+                int const lastNonWinSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrIntMassSurfaceLast;
                 for (int surfNum = firstNonWinSurf; surfNum <= lastNonWinSurf; ++surfNum) {
                     Real64 delta = TempSurfIn(surfNum) - TempInsOld(surfNum);
                     Real64 absDif = std::abs(delta);
@@ -7589,11 +7556,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
         // Set various surface output variables and other record keeping - after iterations are complete - all HT surfaces
         for (int zoneNum = FirstZone; zoneNum <= LastZone; ++zoneNum) {
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).OpaqOrWinSurfaceLast;
             for (int surfNum = firstSurf; surfNum <= lastSurf; ++surfNum) {
-                if (Surface(surfNum).Class == SurfaceClass::TDD_Dome) continue; // Skip TDD:DOME objects.  Inside temp is handled by TDD:DIFFUSER.
-
                 // Inside Face Convection - sign convention is positive means energy going into inside face from the air.
                 auto const HConvInTemp_fac(-state.dataHeatBal->HConvIn(surfNum) * (TempSurfIn(surfNum) - RefAirTemp(surfNum)));
                 QdotConvInRep(surfNum) = Surface(surfNum).Area * HConvInTemp_fac;

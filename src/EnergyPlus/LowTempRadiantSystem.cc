@@ -5740,11 +5740,7 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 sumHATsurf(0.0);
 
-        auto &Zone(state.dataHeatBal->Zone);
-
-        for (int surfNum = Zone(ZoneNum).SurfaceFirst; surfNum <= Zone(ZoneNum).SurfaceLast; ++surfNum) {
-            if (!Surface(surfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
+        for (int surfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; surfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++surfNum) {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass::Window) {
