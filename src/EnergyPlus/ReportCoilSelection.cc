@@ -728,7 +728,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
 
             c->plantLoopName = state.dataPlnt->PlantLoop(c->waterLoopNum).Name;
-            if (DataSizing::PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
                 c->rhoFluid = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                 DataGlobalConstants::InitConvTemp,
@@ -802,18 +802,18 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
 
         // fill out some plant design info
         if (c->pltSizNum > 0) {
-            c->plantDesSupTemp = DataSizing::PlantSizData(c->pltSizNum).ExitTemp;
-            c->plantDesDeltaTemp = DataSizing::PlantSizData(c->pltSizNum).DeltaT;
-            if (DataSizing::PlantSizData(c->pltSizNum).LoopType == DataSizing::HeatingLoop) {
+            c->plantDesSupTemp = state.dataSize->PlantSizData(c->pltSizNum).ExitTemp;
+            c->plantDesDeltaTemp = state.dataSize->PlantSizData(c->pltSizNum).DeltaT;
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::HeatingLoop) {
                 c->plantDesRetTemp = c->plantDesSupTemp - c->plantDesDeltaTemp;
-            } else if (DataSizing::PlantSizData(c->pltSizNum).LoopType == DataSizing::CoolingLoop ||
-                       DataSizing::PlantSizData(c->pltSizNum).LoopType == DataSizing::CondenserLoop) {
+            } else if (state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::CoolingLoop ||
+                       state.dataSize->PlantSizData(c->pltSizNum).LoopType == DataSizing::CondenserLoop) {
                 c->plantDesRetTemp = c->plantDesSupTemp + c->plantDesDeltaTemp;
             }
 
-            if (DataSizing::PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+            if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
                 c->plantDesCapacity =
-                    c->cpFluid * c->rhoFluid * DataSizing::PlantSizData(c->pltSizNum).DeltaT * DataSizing::PlantSizData(c->pltSizNum).DesVolFlowRate;
+                    c->cpFluid * c->rhoFluid * state.dataSize->PlantSizData(c->pltSizNum).DeltaT * state.dataSize->PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
                 // find boiler on this plant loop and get capacity from it
                 if (allocated(state.dataBoilerSteam->Boiler)) {
@@ -1017,7 +1017,7 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(EnergyPlusData &state,
     }
 
     if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
-        if (DataSizing::PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
+        if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::SteamLoop) {
             c->rhoFluid = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                             DataGlobalConstants::InitConvTemp,

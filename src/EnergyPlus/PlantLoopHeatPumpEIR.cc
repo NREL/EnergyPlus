@@ -581,16 +581,16 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (pltLoadSizNum > 0) {
             // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
             // these represent what the unit would size those to, whether it is doing auto-sizing or not
-            if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
-                tmpLoadVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
+            if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+                tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
                 if (this->companionHeatPumpCoil) {
                     tmpLoadVolFlow = max(tmpLoadVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
                     if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                 }
-                tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
+                tmpCapacity = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
             } else if (this->companionHeatPumpCoil && this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {
                 tmpLoadVolFlow = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
-                tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
+                tmpCapacity = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
             } else {
                 if (this->referenceCapacityWasAutoSized) tmpCapacity = 0.0;
                 if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;
@@ -771,7 +771,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             // To get the design source flow rate, just apply the sensible heat rate equation:
             //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
             //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
-            tmpSourceVolFlow = designSourceSideHeatTransfer / (DataSizing::PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
+            tmpSourceVolFlow = designSourceSideHeatTransfer / (state.dataSize->PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
         } else {
             // just assume it's the same as the load side if we don't have any sizing information
             tmpSourceVolFlow = tmpLoadVolFlow;

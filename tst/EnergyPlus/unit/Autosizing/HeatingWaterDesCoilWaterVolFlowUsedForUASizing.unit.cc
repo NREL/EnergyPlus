@@ -101,7 +101,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilWaterVolFlowUsedForUASizingGauntlet
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    DataSizing::PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataSize->DataWaterFlowUsedForSizing = 0.0001;
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(state->dataSize->CurZoneEqNum).ZoneNum = state->dataSize->CurZoneEqNum;

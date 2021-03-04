@@ -366,10 +366,10 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     int TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(TotNumLoops);
-    PlantSizData.allocate(TotNumLoops);
-    PlantSizData(1).DeltaT = 10.0;
+    state->dataSize->PlantSizData.allocate(TotNumLoops);
+    state->dataSize->PlantSizData(1).DeltaT = 10.0;
     // unit test results are based on a low HW temp at 40 C. Baseboard does not have the capacity to meet the zone load.
-    PlantSizData(1).ExitTemp = 40.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 40.0;
 
     for (int l = 1; l <= TotNumLoops; ++l) {
         auto &loop(state->dataPlnt->PlantLoop(l));

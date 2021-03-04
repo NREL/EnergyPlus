@@ -1018,10 +1018,6 @@ namespace DataSizing {
     };
 
     // Object Data
-    extern Array1D<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
-    extern Array1D<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
-    extern Array1D<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
-    extern Array1D<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
     extern Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for air terminal sizing
     // used only for Facility Load Component Summary
     extern Array1D<FacilitySizingData> CalcFacilitySizing; // Data for facility sizing
@@ -1221,6 +1217,10 @@ struct SizingData : BaseGlobalStruct
     Array1D<DataSizing::ZoneEqSizingData> ZoneEqSizing;                   // Data added in zone eq component sizing routines
     Array1D<DataSizing::ZoneEqSizingData> UnitarySysEqSizing;             // Data added in unitary system sizing routines
     Array1D<DataSizing::ZoneEqSizingData> OASysEqSizing;                  // Data added in unitary system sizing routines
+    Array1D<DataSizing::PlantSizingData> PlantSizData;                    // Input data array for plant sizing
+    Array1D<DataSizing::DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
+    Array1D<DataSizing::CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
+    Array1D<DataSizing::ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
 
     void clear_state() override
     {
@@ -1348,6 +1348,10 @@ struct SizingData : BaseGlobalStruct
         this->ZoneEqSizing.deallocate();
         this->UnitarySysEqSizing.deallocate();
         this->OASysEqSizing.deallocate();
+        this->PlantSizData.deallocate();
+        this->DesDayWeath.deallocate();
+        this->CompDesWaterFlow.deallocate();
+        this->ZoneHVACSizing.deallocate();
     }
 };
 

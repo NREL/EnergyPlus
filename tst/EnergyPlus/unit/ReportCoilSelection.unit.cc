@@ -138,8 +138,8 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
 
     // Now add a plant sizing object
     state->dataSize->NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).PlantLoopName = "Chilled Water Loop";
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).PlantLoopName = "Chilled Water Loop";
     isAutoSized = true; // true if autosized
     coilSelectionReportObj->setCoilWaterFlowNodeNums(*state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
@@ -272,9 +272,9 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
 
     // Now add a plant sizing object
     state->dataSize->NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).PlantLoopName = "Steam Loop";
-    DataSizing::PlantSizData(1).LoopType = DataSizing::SteamLoop;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).PlantLoopName = "Steam Loop";
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::SteamLoop;
     isAutoSized = true; // true if autosized
     coilSelectionReportObj->setCoilWaterFlowNodeNums(*state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);

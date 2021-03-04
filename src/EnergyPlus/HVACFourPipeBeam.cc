@@ -588,7 +588,7 @@ namespace FourPipeBeam {
         }
 
         if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
-            //    if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
+            //    if ( SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
             this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
             state.dataDefineEquipment->AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates
@@ -840,7 +840,7 @@ namespace FourPipeBeam {
                     ShowContinueError(state, "Occurs in " + this->unitType + " Object=" + this->name);
                     ErrorsFound = true;
                 } else {
-                    this->cWTempIn = DataSizing::PlantSizData(pltSizCoolNum).ExitTemp;
+                    this->cWTempIn = state.dataSize->PlantSizData(pltSizCoolNum).ExitTemp;
                 }
                 this->mDotHW = 0.0;
                 this->tDBZoneAirTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak;
@@ -881,7 +881,7 @@ namespace FourPipeBeam {
                     ShowContinueError(state, "Occurs in " + this->unitType + " Object=" + this->name);
                     ErrorsFound = true;
                 } else {
-                    this->hWTempIn = DataSizing::PlantSizData(pltSizHeatNum).ExitTemp;
+                    this->hWTempIn = state.dataSize->PlantSizData(pltSizHeatNum).ExitTemp;
                 }
                 this->mDotCW = 0.0;
                 this->tDBZoneAirTemp = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtHeatPeak;

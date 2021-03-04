@@ -132,8 +132,8 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     state->dataSize->FinalZoneSizing(1).HeatDesHumRat = 0.007;
     state->dataSize->FinalZoneSizing(1).ZoneName = "MyZone";
     state->dataSize->ZoneEqSizing.allocate(1);
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).ExitTemp = 60.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).ExitTemp = 60.0;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
 

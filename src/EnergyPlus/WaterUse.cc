@@ -1198,7 +1198,7 @@ namespace WaterUse {
             this->ReturnTemp = this->ColdSupplyTemp;
             this->WasteTemp = this->DrainTemp;
 
-        } else { // state.dataWaterUse->WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
+        } else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
             {
                 auto const SELECT_CASE_var(this->HeatRecoveryConfig);

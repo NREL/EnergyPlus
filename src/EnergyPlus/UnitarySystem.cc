@@ -7107,7 +7107,7 @@ namespace UnitarySystems {
                                         "Cooling",
                                         _,
                                         "System");
-                }    
+                }
                 if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists || state.dataUnitarySystems->unitarySys[sysNum].m_SuppCoilExists) {
                     SetupOutputVariable(state,
                                         "Unitary System Heating Ancillary Electricity Energy",
@@ -14549,7 +14549,7 @@ namespace UnitarySystems {
         //       Par(3)  = REAL(OpMode,r64)     ! Fan control, IF 1.0 then cycling fan, if 0.0 then continuous fan
         //       Par(4)  = REAL(CompOp,r64)     ! Compressor control, IF 1.0 then compressor ON, if 0.0 then compressor OFF
         //       Par(5)  = SensLoad or MoistureLoad   ! Sensible or Latent load to be met by unitary system
-        //       Par(6)  = state.dataUnitarySystems->HeatingLoad or CoolingLoad ! Type of load FLAG, 0.0 IF heating load, 1.0 IF cooling or moisture load
+        //       Par(6)  = HeatingLoad or CoolingLoad ! Type of load FLAG, 0.0 IF heating load, 1.0 IF cooling or moisture load
         //       Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
         //       Par(8)  = OnOffAirFlowRatio    ! Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
         //       Par(9)  = HXUnitOn             ! flag to enable HX, 1=ON and 2=OFF

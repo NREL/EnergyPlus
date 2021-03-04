@@ -958,8 +958,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 
         int pltLoadSizNum = state.dataPlnt->PlantLoop(this->LoadLoopNum).PlantSizNum;
         if (pltLoadSizNum > 0) {
-            if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
-                tmpLoadSideVolFlowRate = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizFac;
+            if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+                tmpLoadSideVolFlowRate = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizFac;
                 // now compare to companion coil and take higher
                 if (this->companionIdentified) {
                     tmpLoadSideVolFlowRate = max(tmpLoadSideVolFlowRate, this->RatedLoadVolFlowHeat);
@@ -976,7 +976,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpCoolingCap = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
+                tmpCoolingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
             } else if (this->companionIdentified && this->RatedLoadVolFlowHeat > 0.0) {
                 tmpLoadSideVolFlowRate = this->RatedLoadVolFlowHeat;
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
@@ -989,7 +989,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpCoolingCap = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
+                tmpCoolingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
             } else {
                 if (this->ratedCapCoolWasAutoSized) tmpCoolingCap = 0.0;
                 if (this->ratedLoadVolFlowCoolWasAutoSized) tmpLoadSideVolFlowRate = 0.0;
@@ -1151,7 +1151,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                DataGlobalConstants::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                                RoutineName);
-            tmpSourceSideVolFlowRate = tmpCoolingCap * (1.0 + (1.0 / this->refCOP)) / (DataSizing::PlantSizData(pltSourceSizNum).DeltaT * Cp * rho);
+            tmpSourceSideVolFlowRate = tmpCoolingCap * (1.0 + (1.0 / this->refCOP)) / (state.dataSize->PlantSizData(pltSourceSizNum).DeltaT * Cp * rho);
         } else {
             tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
         }
@@ -1294,8 +1294,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
 
         int pltLoadSizNum = state.dataPlnt->PlantLoop(this->LoadLoopNum).PlantSizNum;
         if (pltLoadSizNum > 0) {
-            if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
-                tmpLoadSideVolFlowRate = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizFac;
+            if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+                tmpLoadSideVolFlowRate = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizFac;
                 // now compare to companion coil and take higher
                 if (this->companionIdentified) {
                     tmpLoadSideVolFlowRate = max(tmpLoadSideVolFlowRate, this->RatedLoadVolFlowCool);
@@ -1313,7 +1313,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    DataGlobalConstants::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpHeatingCap = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
+                tmpHeatingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
             } else if (this->companionIdentified && this->RatedLoadVolFlowCool > 0.0) {
                 tmpLoadSideVolFlowRate = this->RatedLoadVolFlowCool;
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
@@ -1326,7 +1326,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                    DataGlobalConstants::HWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->LoadLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpHeatingCap = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
+                tmpHeatingCap = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadSideVolFlowRate;
             } else {
                 if (this->ratedCapHeatWasAutoSized) tmpHeatingCap = 0.0;
                 if (this->ratedLoadVolFlowHeatWasAutoSized) tmpLoadSideVolFlowRate = 0.0;
@@ -1487,7 +1487,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                                                DataGlobalConstants::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                                RoutineName);
-            tmpSourceSideVolFlowRate = tmpHeatingCap * (1.0 - (1.0 / this->refCOP)) / (DataSizing::PlantSizData(pltSourceSizNum).DeltaT * Cp * rho);
+            tmpSourceSideVolFlowRate = tmpHeatingCap * (1.0 - (1.0 / this->refCOP)) / (state.dataSize->PlantSizData(pltSourceSizNum).DeltaT * Cp * rho);
         } else {
             tmpSourceSideVolFlowRate = tmpLoadSideVolFlowRate; // set source side flow equal to load side flow, assumption
         }

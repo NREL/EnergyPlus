@@ -101,7 +101,7 @@ TEST_F(AutoSizingFixture, CoolingWaterNumofTubesPerRowSizingGauntlet)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    DataSizing::PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataSize->DataWaterFlowUsedForSizing = 0.0001; // should cap at 3 tubes
 
     // Test 2 - Zone Equipment, Single Duct TU

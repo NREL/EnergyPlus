@@ -117,8 +117,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataPlnt->PlantLoop.allocate(1);
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).ExitTemp = 7.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).ExitTemp = 7.0;
     state->dataSize->DataPltSizCoolNum = 1;
     state->dataSize->DataDesInletWaterTemp = 7.0;
 

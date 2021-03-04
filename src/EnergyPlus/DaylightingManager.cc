@@ -7013,7 +7013,7 @@ namespace EnergyPlus::DaylightingManager {
         }
         state.dataDaylightingData->ZoneDaylight(ZoneNum).ZonePowerReductionFactor = TotReduction;
 
-        //  IF(DataDaylighting::TotIllumMaps > 0 .and. .not. state.dataGlobal->DoingSizing .and. .not. WarmupFlag .and. .not. KickoffSimulation) THEN
+        //  IF(DataDaylighting::TotIllumMaps > 0 .and. .not. DoingSizing .and. .not. WarmupFlag .and. .not. KickoffSimulation) THEN
         if (state.dataDaylightingData->TotIllumMaps > 0 && !state.dataGlobal->DoingSizing && !state.dataGlobal->WarmupFlag) {
             // If an illuminance map is associated with this zone, generate the map
             if (state.dataGlobal->TimeStep == 1) state.dataDaylightingData->mapResultsToReport = false;

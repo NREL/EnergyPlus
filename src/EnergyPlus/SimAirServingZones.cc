@@ -1856,7 +1856,7 @@ namespace EnergyPlus::SimAirServingZones {
                 }
             }
 
-            // now fill out state.dataAirLoop->AirLoopZoneInfo for cleaner struct of zones attached to air loop, moved from MixedAir to here for use with Std. 62.1
+            // now fill out AirLoopZoneInfo for cleaner struct of zones attached to air loop, moved from MixedAir to here for use with Std. 62.1
             int MaxNumAirLoopZones = 0;
             for (int NumofAirLoop = 1; NumofAirLoop <= NumPrimaryAirSys; ++NumofAirLoop) {
                 int NumAirLoopZones = AirToZoneNodeInfo(NumofAirLoop).NumZonesCooled + AirToZoneNodeInfo(NumofAirLoop).NumZonesHeated;
@@ -1870,14 +1870,14 @@ namespace EnergyPlus::SimAirServingZones {
                 int NumAirLoopCooledZones = AirToZoneNodeInfo(NumofAirLoop).NumZonesCooled;
                 int AirLoopZones = NumAirLoopCooledZones;
                 int NumAirLoopHeatedZones = AirToZoneNodeInfo(NumofAirLoop).NumZonesHeated;
-                // Store cooling zone numbers in state.dataAirLoop->AirLoopZoneInfo data structure
+                // Store cooling zone numbers in AirLoopZoneInfo data structure
                 for (int NumAirLoopCooledZonesTemp = 1; NumAirLoopCooledZonesTemp <= NumAirLoopCooledZones; ++NumAirLoopCooledZonesTemp) {
                     state.dataAirLoop->AirLoopZoneInfo(NumofAirLoop).Zone(NumAirLoopCooledZonesTemp) =
                         AirToZoneNodeInfo(NumofAirLoop).CoolCtrlZoneNums(NumAirLoopCooledZonesTemp);
                     state.dataAirLoop->AirLoopZoneInfo(NumofAirLoop).ActualZoneNumber(NumAirLoopCooledZonesTemp) =
                         state.dataZoneEquip->ZoneEquipConfig(AirToZoneNodeInfo(NumofAirLoop).CoolCtrlZoneNums(NumAirLoopCooledZonesTemp)).ActualZoneNum;
                 }
-                // Store heating zone numbers in state.dataAirLoop->AirLoopZoneInfo data structure
+                // Store heating zone numbers in AirLoopZoneInfo data structure
                 // Only store zone numbers that aren't already defined as cooling zones above
                 for (int NumAirLoopHeatedZonesTemp = 1; NumAirLoopHeatedZonesTemp <= NumAirLoopHeatedZones; ++NumAirLoopHeatedZonesTemp) {
                     ZoneNum = AirToZoneNodeInfo(NumofAirLoop).HeatCtrlZoneNums(NumAirLoopHeatedZonesTemp);
@@ -6287,7 +6287,7 @@ namespace EnergyPlus::SimAirServingZones {
 
                         if (SysSizing(DDNum, AirLoopNum).SensCoolCap > SensCoolCapTemp(AirLoopNum)) {
                             SysSizPeakDDNum(AirLoopNum).SensCoolPeakDD = DDNum;
-                            SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = DesDayWeath(DDNum).DateString;
+                            SysSizPeakDDNum(AirLoopNum).cSensCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                             SensCoolCapTemp(AirLoopNum) = SysSizing(DDNum, AirLoopNum).SensCoolCap;
                             if (SysSizing(DDNum, AirLoopNum).CoolingPeakLoadType == SensibleCoolingLoad) {
                                 CalcSysSizing(AirLoopNum).DesCoolVolFlow = SysSizing(DDNum, AirLoopNum).DesCoolVolFlow;
@@ -6319,7 +6319,7 @@ namespace EnergyPlus::SimAirServingZones {
 
                         if (SysSizing(DDNum, AirLoopNum).TotCoolCap > TotCoolCapTemp(AirLoopNum)) {
                             SysSizPeakDDNum(AirLoopNum).TotCoolPeakDD = DDNum;
-                            SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = DesDayWeath(DDNum).DateString;
+                            SysSizPeakDDNum(AirLoopNum).cTotCoolPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                             TotCoolCapTemp(AirLoopNum) = SysSizing(DDNum, AirLoopNum).TotCoolCap;
                             if (SysSizing(DDNum, AirLoopNum).CoolingPeakLoadType == TotalCoolingLoad) {
                                 CalcSysSizing(AirLoopNum).DesCoolVolFlow = SysSizing(DDNum, AirLoopNum).DesCoolVolFlow;
@@ -6352,12 +6352,12 @@ namespace EnergyPlus::SimAirServingZones {
                         if (SysSizing(DDNum, AirLoopNum).CoinCoolMassFlow > CalcSysSizing(AirLoopNum).CoinCoolMassFlow) {
                             CalcSysSizing(AirLoopNum).CoinCoolMassFlow = SysSizing(DDNum, AirLoopNum).CoinCoolMassFlow;
                             SysSizPeakDDNum(AirLoopNum).CoolFlowPeakDD = DDNum;
-                            SysSizPeakDDNum(AirLoopNum).cCoolFlowPeakDDDate = DesDayWeath(DDNum).DateString;
+                            SysSizPeakDDNum(AirLoopNum).cCoolFlowPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                         }
 
                         if (SysSizing(DDNum, AirLoopNum).HeatCap > CalcSysSizing(AirLoopNum).HeatCap) {
                             SysSizPeakDDNum(AirLoopNum).HeatPeakDD = DDNum;
-                            SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate = DesDayWeath(DDNum).DateString;
+                            SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate = state.dataSize->DesDayWeath(DDNum).DateString;
                             CalcSysSizing(AirLoopNum).DesHeatVolFlow = SysSizing(DDNum, AirLoopNum).DesHeatVolFlow;
                             CalcSysSizing(AirLoopNum).HeatDesDay = SysSizing(DDNum, AirLoopNum).HeatDesDay;
                             CalcSysSizing(AirLoopNum).CoinHeatMassFlow = SysSizing(DDNum, AirLoopNum).CoinHeatMassFlow;
@@ -6426,9 +6426,9 @@ namespace EnergyPlus::SimAirServingZones {
                         CoolDDNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).CoolDDNum;
                         CoolTimeStepNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtCoolMax;
                         OutAirTemp +=
-                            DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                            state.dataSize->DesDayWeath(CoolDDNum).Temp(CoolTimeStepNum) * coolMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                         OutAirHumRat +=
-                            DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                            state.dataSize->DesDayWeath(CoolDDNum).HumRat(CoolTimeStepNum) * coolMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                     }
                     if (CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow > 0.0) {
                         SysCoolRetTemp /= CalcSysSizing(AirLoopNum).NonCoinCoolMassFlow;
@@ -6487,9 +6487,9 @@ namespace EnergyPlus::SimAirServingZones {
                             HeatDDNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
                             HeatTimeStepNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
                             OutAirTemp +=
-                                DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                                state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                             OutAirHumRat +=
-                                DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                                state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                         }
                         if (CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                             SysHeatRetTemp /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;
@@ -6531,9 +6531,9 @@ namespace EnergyPlus::SimAirServingZones {
                             HeatDDNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).HeatDDNum;
                             HeatTimeStepNum = TermUnitFinalZoneSizing(TermUnitSizingIndex).TimeStepNumAtHeatMax;
                             OutAirTemp +=
-                                DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                                state.dataSize->DesDayWeath(HeatDDNum).Temp(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                             OutAirHumRat +=
-                                DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
+                                state.dataSize->DesDayWeath(HeatDDNum).HumRat(HeatTimeStepNum) * heatMassFlow / (1.0 + TermUnitSizing(TermUnitSizingIndex).InducRat);
                         }
                         if (CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow > 0.0) {
                             SysHeatRetTemp /= CalcSysSizing(AirLoopNum).NonCoinHeatMassFlow;

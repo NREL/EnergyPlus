@@ -144,10 +144,10 @@ TEST_F(EvapFluidCoolersFixture, EvapFluidCoolerSpecs_getDesignCapacitiesTest)
     state->dataPlnt->PlantFinalSizesOkayToReport = false;
     state->dataSize->SaveNumPlantComps = 0;
     thisEFC.DesignWaterFlowRate = 0.001;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).ExitTemp = 20.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 20.0;
 
     // Now set the specific data for the actual test
     MaxLoad = 0.0;

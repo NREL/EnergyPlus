@@ -980,12 +980,12 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
 
     state->dataSize->NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataSizing::PlantSizData(1).ExitTemp = 6.0;
-    DataSizing::PlantSizData(1).PlantLoopName = "CHW LOOP";
-    DataSizing::PlantSizData(1).LoopType = DataSizing::CoolingLoop;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 6.0;
+    state->dataSize->PlantSizData(1).PlantLoopName = "CHW LOOP";
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;

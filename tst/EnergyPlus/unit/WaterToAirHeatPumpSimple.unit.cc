@@ -93,8 +93,8 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(HPNum);
     state->dataSize->FinalZoneSizing.allocate(state->dataSize->CurZoneEqNum);
     state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
-    DesDayWeath.allocate(1);
-    DesDayWeath(1).Temp.allocate(24);
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(24);
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = AutoSize;
@@ -162,7 +162,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPCool = 5.12;
 
-    DesDayWeath(1).Temp(15) = 32.0;
+    state->dataSize->DesDayWeath(1).Temp(15) = 32.0;
     state->dataEnvrn->StdBaroPress = 101325.0;
     state->dataSize->ZoneEqDXCoil = true;
 

@@ -166,9 +166,9 @@ protected:
         state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutTemp = 10.0;
         state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatOutHumRat = 0.004;
         state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolDDNum = 1;
-        DataSizing::DesDayWeath.allocate(1);
-        DataSizing::DesDayWeath(1).Temp.allocate(1);
-        DataSizing::DesDayWeath(1).Temp(1) = 35.0;
+        state->dataSize->DesDayWeath.allocate(1);
+        state->dataSize->DesDayWeath(1).Temp.allocate(1);
+        state->dataSize->DesDayWeath(1).Temp(1) = 35.0;
 
         state->dataSize->ZoneEqSizing.allocate(1);
         state->dataSize->ZoneEqSizing(state->dataSize->CurSysNum).SizingMethod.allocate(25);

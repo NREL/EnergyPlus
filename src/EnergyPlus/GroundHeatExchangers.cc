@@ -2136,7 +2136,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             return;
         }
 
-        // Store state.dataGroundHeatExchanger->currentSimTime in prevTimeSteps only if a time step occurs
+        // Store currentSimTime in prevTimeSteps only if a time step occurs
         if (state.dataGroundHeatExchanger->prevTimeSteps(1) != state.dataGroundHeatExchanger->currentSimTime) {
             state.dataGroundHeatExchanger->prevTimeSteps =
                 eoshift(state.dataGroundHeatExchanger->prevTimeSteps, -1, state.dataGroundHeatExchanger->currentSimTime);

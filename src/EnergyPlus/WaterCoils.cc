@@ -2079,7 +2079,7 @@ namespace WaterCoils {
                 state.dataSize->DataWaterCoilSizCoolDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
             } else {
                 if (PltSizCoolNum > 0) {
-                    state.dataSize->DataWaterCoilSizCoolDeltaT = PlantSizData(PltSizCoolNum).DeltaT;
+                    state.dataSize->DataWaterCoilSizCoolDeltaT = state.dataSize->PlantSizData(PltSizCoolNum).DeltaT;
                 }
             }
 
@@ -2444,7 +2444,7 @@ namespace WaterCoils {
                 state.dataSize->DataWaterCoilSizHeatDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
             } else {
                 if (PltSizHeatNum > 0) {
-                    state.dataSize->DataWaterCoilSizHeatDeltaT = PlantSizData(PltSizHeatNum).DeltaT;
+                    state.dataSize->DataWaterCoilSizHeatDeltaT = state.dataSize->PlantSizData(PltSizHeatNum).DeltaT;
                 }
             }
 
@@ -2638,7 +2638,7 @@ namespace WaterCoils {
                     HeatingWaterDesCoilWaterVolFlowUsedForUASizer sizerHWWaterVolFlowUA;
                     sizerHWWaterVolFlowUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                     state.dataSize->DataWaterFlowUsedForSizing = sizerHWWaterVolFlowUA.size(state, DataSizing::AutoSize, ErrorsFound);
-                    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = PlantSizData(PltSizHeatNum).ExitTemp;
+                    state.dataWaterCoils->WaterCoil(CoilNum).InletWaterTemp = state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp;
                     state.dataWaterCoils->WaterCoil(CoilNum).InletWaterMassFlowRate = rho * state.dataSize->DataWaterFlowUsedForSizing;
                     state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * state.dataSize->DataWaterFlowUsedForSizing;
                     state.dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate = state.dataSize->DataCapacityUsedForSizing;
@@ -2671,7 +2671,7 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).UACoil = sizerHWCoilUA.size(state, TempSize, ErrorsFound);
                 if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
                     ShowWarningError(state, "Autosizing of heating coil UA for Coil:Heating:Water \"" + CompName + "\"");
-                    ShowContinueError(state, format(" Plant design loop exit temperature = {:.2T} C", PlantSizData(state.dataSize->DataPltSizHeatNum).ExitTemp));
+                    ShowContinueError(state, format(" Plant design loop exit temperature = {:.2T} C", state.dataSize->PlantSizData(state.dataSize->DataPltSizHeatNum).ExitTemp));
                     ShowContinueError(state, " Plant design loop exit temperature is low for design load and leaving air temperature anticipated.");
                     ShowContinueError(
                         state, format(" Heating coil UA-value is sized using coil water inlet temperature = {:.2T} C", DesCoilInletWaterTempUsed));

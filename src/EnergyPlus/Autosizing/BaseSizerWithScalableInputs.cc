@@ -90,7 +90,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     this->suppHeatCap = state.dataSize->SuppHeatCap;
     this->unitaryHeatCap = state.dataSize->UnitaryHeatCap;
 
-    this->zoneHVACSizing = DataSizing::ZoneHVACSizing;
+    this->zoneHVACSizing = state.dataSize->ZoneHVACSizing;
 
     // set supply air fan properties
     if (this->isCoilReportObject && this->curSysNum > 0 && int(this->primaryAirSystem.size()) > 0 &&

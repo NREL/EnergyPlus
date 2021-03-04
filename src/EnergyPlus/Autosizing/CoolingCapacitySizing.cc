@@ -165,7 +165,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             int DDNum = this->finalZoneSizing(this->curZoneEqNum).CoolDDNum;
                             Real64 OutTemp = 0.0;
                             if (DDNum > 0 && TimeStepNumAtMax > 0) {
-                                OutTemp = DataSizing::DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+                                OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                             }
                             Real64 rhoair =
                                 Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, CoilInTemp, CoilInHumRat, this->callingRoutine);

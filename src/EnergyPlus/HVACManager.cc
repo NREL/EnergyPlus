@@ -2669,7 +2669,7 @@ namespace EnergyPlus::HVACManager {
         // to tell ManageZoneAirUpdates (predict and correct) what to do with the heat to return air.
 
         // METHODOLOGY EMPLOYED:
-        // Uses program data structures state.dataAirLoop->AirLoopControlInfo and ZoneEquipInfo
+        // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;

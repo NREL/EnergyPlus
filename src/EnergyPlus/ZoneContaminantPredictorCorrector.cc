@@ -2484,7 +2484,7 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
             // operating and system shutdown.
 
             RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
-            //    RhoAir = state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum)
+            //    RhoAir = ZoneAirDensityCO(ZoneNum)
 
             if (state.dataContaminantBalance->Contaminant.CO2Simulation) state.dataContaminantBalance->ZoneAirDensityCO(ZoneNum) = RhoAir;
             // Calculate Co2 internal gain

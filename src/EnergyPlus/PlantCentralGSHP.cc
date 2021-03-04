@@ -229,8 +229,8 @@ namespace EnergyPlus::PlantCentralGSHP {
 
                 // auto-size the Evaporator Flow Rate
                 if (PltSizNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                        tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->ChillerHeater(NumChillerHeater).SizFac;
+                    if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->ChillerHeater(NumChillerHeater).SizFac;
                         this->ChillerHeater(NumChillerHeater).tmpEvapVolFlowRate = tmpEvapVolFlowRate;
                         if (!this->ChillerHeater(NumChillerHeater).EvapVolFlowRateWasAutoSized)
                             tmpEvapVolFlowRate = this->ChillerHeater(NumChillerHeater).EvapVolFlowRate;
@@ -305,7 +305,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                 // auto-size the Reference Cooling Capacity
                 // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
+                    if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                            DataGlobalConstants::CWInitConvTemp,
                                                                            state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
@@ -315,7 +315,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                                        DataGlobalConstants::CWInitConvTemp,
                                                                        state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                        RoutineName);
-                        tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
+                        tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
                         if (!this->ChillerHeater(NumChillerHeater).RefCapCoolingWasAutoSized)
                             tmpNomCap = this->ChillerHeater(NumChillerHeater).RefCapCooling;
                     } else {
@@ -398,7 +398,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                 // auto-size the condenser volume flow rate
                 // each individual chiller heater module is sized to be capable of supporting the total load on the wrapper
                 if (PltSizCondNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 rho = FluidProperties::GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidName,
                                                                        DataGlobalConstants::CWInitConvTemp,
                                                                        state.dataPlnt->PlantLoop(this->GLHELoopNum).FluidIndex,
@@ -411,7 +411,7 @@ namespace EnergyPlus::PlantCentralGSHP {
                         tmpCondVolFlowRate =
                             tmpNomCap *
                             (1.0 + (1.0 / this->ChillerHeater(NumChillerHeater).RefCOPCooling) * this->ChillerHeater(NumChillerHeater).OpenMotorEff) /
-                            (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                            (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
                         this->ChillerHeater(NumChillerHeater).tmpCondVolFlowRate = tmpCondVolFlowRate;
                         if (!this->ChillerHeater(NumChillerHeater).CondVolFlowRateWasAutoSized)
                             tmpCondVolFlowRate = this->ChillerHeater(NumChillerHeater).CondVolFlowRate;

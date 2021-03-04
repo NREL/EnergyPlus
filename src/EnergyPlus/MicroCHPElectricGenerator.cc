@@ -553,7 +553,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
             if (state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate > 0.0) {
                 this->PlantMassFlowRateMax = state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate;
             } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum > 0) {
-                this->PlantMassFlowRateMax = DataSizing::PlantSizData(this->CWLoopNum).DesVolFlowRate * rho;
+                this->PlantMassFlowRateMax = state.dataSize->PlantSizData(this->CWLoopNum).DesVolFlowRate * rho;
             } else {
                 this->PlantMassFlowRateMax = 2.0;
             }

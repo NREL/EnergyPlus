@@ -227,7 +227,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
@@ -271,10 +271,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
     state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
     state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
-    PlantSizData(1).DeltaT = 11.0;
-    PlantSizData(1).ExitTemp = 82;
-    PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).DeltaT = 11.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 82;
+    state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
+    state->dataSize->PlantSizData(1).LoopType = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     state->dataSingleDuct->sd_airterminal.deallocate();
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
-    PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataWaterCoils->MySizeFlag.deallocate();
     state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
@@ -465,7 +465,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
@@ -509,10 +509,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
     state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
     state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
-    PlantSizData(1).DeltaT = 11.0;
-    PlantSizData(1).ExitTemp = 82;
-    PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).DeltaT = 11.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 82;
+    state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
+    state->dataSize->PlantSizData(1).LoopType = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -565,7 +565,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     state->dataSingleDuct->sd_airterminal.deallocate();
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
-    PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataWaterCoils->MySizeFlag.deallocate();
     state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
@@ -702,7 +702,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
@@ -746,10 +746,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
     state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
     state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
-    PlantSizData(1).DeltaT = 11.0;
-    PlantSizData(1).ExitTemp = 82;
-    PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).DeltaT = 11.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 82;
+    state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
+    state->dataSize->PlantSizData(1).LoopType = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -801,7 +801,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     state->dataSingleDuct->sd_airterminal.deallocate();
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
-    PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataWaterCoils->MySizeFlag.deallocate();
     state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
@@ -939,7 +939,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
@@ -983,10 +983,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSingleDuct->sd_airterminal(1).HWLoopNum = 1;
     state->dataSingleDuct->sd_airterminal(1).HWLoopSide = 1;
     state->dataSingleDuct->sd_airterminal(1).HWBranchIndex = 1;
-    PlantSizData(1).DeltaT = 11.0;
-    PlantSizData(1).ExitTemp = 82;
-    PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).DeltaT = 11.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 82;
+    state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
+    state->dataSize->PlantSizData(1).LoopType = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 1;
     state->dataSize->CurSysNum = 0;
@@ -1038,7 +1038,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     state->dataSingleDuct->sd_airterminal.deallocate();
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
-    PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataWaterCoils->MySizeFlag.deallocate();
     state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
 }
@@ -1140,7 +1140,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
-    PlantSizData.allocate(1);
+    state->dataSize->PlantSizData.allocate(1);
     state->dataWaterCoils->MySizeFlag.allocate(1);
     state->dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
     state->dataSize->NumPltSizInput = 1;
@@ -1175,10 +1175,10 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
-    PlantSizData(1).DeltaT = 11.0;
-    PlantSizData(1).ExitTemp = 82;
-    PlantSizData(1).PlantLoopName = "HotWaterLoop";
-    PlantSizData(1).LoopType = 1;
+    state->dataSize->PlantSizData(1).DeltaT = 11.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 82;
+    state->dataSize->PlantSizData(1).PlantLoopName = "HotWaterLoop";
+    state->dataSize->PlantSizData(1).LoopType = 1;
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 0;
@@ -1203,7 +1203,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     Node.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
-    PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataWaterCoils->MySizeFlag.deallocate();
     state->dataWaterCoils->MyUAAndFlowCalcFlag.deallocate();
     state->dataSize->FinalSysSizing.deallocate();

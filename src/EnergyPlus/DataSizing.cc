@@ -84,12 +84,7 @@ namespace EnergyPlus::DataSizing {
     //  before applying user input sys flow rates.
 
     // Object Data
-    Array1D<PlantSizingData> PlantSizData;                    // Input data array for plant sizing
-    Array1D<DesDayWeathData> DesDayWeath;                     // design day weather saved at major time step
-    Array1D<CompDesWaterFlowData> CompDesWaterFlow;           // array to store components' design water flow
-    Array1D<ZoneHVACSizingData> ZoneHVACSizing;               // Input data for zone HVAC sizing
-    Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for zone HVAC sizing
-    // used only for Facility Load Component Summary
+    Array1D<AirTerminalSizingSpecData> AirTerminalSizingSpec; // Input data for zone HVAC sizing used only for Facility Load Component Summary
     Array1D<FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
     FacilitySizingData CalcFinalFacilitySizing;     // Final data for zone sizing
     Array1D<Real64> VbzByZone;                      // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
@@ -140,10 +135,6 @@ namespace EnergyPlus::DataSizing {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        PlantSizData.deallocate();
-        DesDayWeath.deallocate();
-        CompDesWaterFlow.deallocate();
-        ZoneHVACSizing.deallocate();
         AirTerminalSizingSpec.deallocate();
         CalcFacilitySizing.deallocate();
         CalcFinalFacilitySizing.DOASHeatAddSeq.deallocate();
@@ -234,7 +225,7 @@ namespace EnergyPlus::DataSizing {
     void ZoneSizingData::scaleZoneCooling(Real64 const ratio // Scaling ratio
     )
     {
-        // Apply scaling ratio to state.dataSize->TermUnitFinalZoneSizing cooling flow and load
+        // Apply scaling ratio to TermUnitFinalZoneSizing cooling flow and load
         this->DesCoolVolFlow = this->DesCoolVolFlow * ratio;
         this->DesCoolMassFlow = this->DesCoolMassFlow * ratio;
         this->DesCoolLoad = this->DesCoolLoad * ratio;
@@ -245,7 +236,7 @@ namespace EnergyPlus::DataSizing {
     void ZoneSizingData::scaleZoneHeating(Real64 const ratio // Scaling ratio
     )
     {
-        // Apply scaling ratio to state.dataSize->TermUnitFinalZoneSizing heating flow and load
+        // Apply scaling ratio to TermUnitFinalZoneSizing heating flow and load
         this->DesHeatVolFlow = this->DesHeatVolFlow * ratio;
         this->DesHeatMassFlow = this->DesHeatMassFlow * ratio;
         this->DesHeatLoad = this->DesHeatLoad * ratio;
