@@ -1319,10 +1319,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
-    DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
+    state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
     auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
@@ -1342,15 +1342,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     bool firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1400,15 +1400,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
 
     // UniformPLR Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
@@ -1537,10 +1537,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
-    DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
+    state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
     auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
@@ -1560,15 +1560,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     bool firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1666,15 +1666,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
 
     // SequentialUniformPLR Test 4a - Cooling, FirstHVACIteration = false, low load requiring 1 equipment
     firstHVACIteration = false;
@@ -2172,14 +2172,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     int totDesDays = state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays;
     state->dataGlobal->NumOfZones = 5;
     state->dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
-    DataSizing::ZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::CalcZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
-    DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
         for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
-            auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
             thisSizingType.ADUName = "test";
             thisSizingType.CoolDesDay = "test";
@@ -2376,7 +2376,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
                 thisSizingType.CoolOutHumRatSeq(TimeStepIndex) = 1.0;
             }
 
-            auto &thisSizingType2(DataSizing::CalcZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType2(state->dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType2.ZoneName = "test";
             thisSizingType2.ADUName = "test";
             thisSizingType2.CoolDesDay = "test";
@@ -2579,7 +2579,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
 
     for ( int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum ) {
         for ( int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum ) {
-            auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType.ZoneName, "");
             //EXPECT_EQ(thisSizingType.ADUName, "");
             EXPECT_EQ(thisSizingType.CoolDesDay, "");
@@ -2747,7 +2747,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
                 EXPECT_EQ(thisSizingType.CoolOutHumRatSeq(TimeStepIndex), 0.0);
             }
 
-            auto &thisSizingType2(DataSizing::CalcZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType2(state->dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType2.ZoneName, "");
             //EXPECT_EQ(thisSizingType2.ADUName, "");
             EXPECT_EQ(thisSizingType2.CoolDesDay, "");

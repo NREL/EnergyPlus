@@ -1416,7 +1416,7 @@ namespace HVACUnitaryBypassVAV {
             // speed up test based on code from 16 years ago to correct cycling fan economizer defect
             // see https://github.com/NREL/EnergyPlusArchive/commit/a2202f8a168fd0330bf3a45392833405e8bd08f2
             // This test sets simple flag so air loop doesn't iterate twice each pass (reverts above change)
-            // state.dataAirLoop->AirLoopControlInfo(AirLoopNum).Simple = true;
+            // AirLoopControlInfo(AirLoopNum).Simple = true;
         }
 
         if (MyPlantScanFlag(CBVAVNum) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1965,8 +1965,8 @@ namespace HVACUnitaryBypassVAV {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone sizing arrays.
 
-        int curSysNum = DataSizing::CurSysNum;
-        int curOASysNum = DataSizing::CurOASysNum;
+        int curSysNum = state.dataSize->CurSysNum;
+        int curOASysNum = state.dataSize->CurOASysNum;
 
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
@@ -1990,7 +1990,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).MaxCoolAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesMainVolFlow;
+                CBVAV(CBVAVNum).MaxCoolAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxCoolAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).MaxCoolAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2012,7 +2012,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).MaxHeatAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesMainVolFlow;
+                CBVAV(CBVAVNum).MaxHeatAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxHeatAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).MaxHeatAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2034,7 +2034,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesMainVolFlow;
+                CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesMainVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).MaxNoCoolHeatAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2059,7 +2059,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).CoolOutAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                CBVAV(CBVAVNum).CoolOutAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).CoolOutAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).CoolOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowWarningError(state, CBVAV(CBVAVNum).UnitType + " \"" + CBVAV(CBVAVNum).Name + "\"");
@@ -2083,7 +2083,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).HeatOutAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                CBVAV(CBVAVNum).HeatOutAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).HeatOutAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).HeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowContinueError(state, "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate "
@@ -2106,7 +2106,7 @@ namespace HVACUnitaryBypassVAV {
             if (curSysNum > 0) {
 
                 CheckSysSizing(state, CBVAV(CBVAVNum).UnitType, CBVAV(CBVAVNum).Name);
-                CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = DataSizing::FinalSysSizing(curSysNum).DesOutAirVolFlow;
+                CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = state.dataSize->FinalSysSizing(curSysNum).DesOutAirVolFlow;
                 if (CBVAV(CBVAVNum).FanVolFlow < CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow && CBVAV(CBVAVNum).FanVolFlow != DataSizing::AutoSize) {
                     CBVAV(CBVAVNum).NoCoolHeatOutAirVolFlow = CBVAV(CBVAVNum).FanVolFlow;
                     ShowContinueError(state, "The CBVAV system supply air fan air flow rate is less than the autosized value for the outdoor air flow rate "
@@ -3992,7 +3992,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (CBVAV(CBVAVNum).FirstPass) {
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, CBVAV(CBVAVNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, CBVAV(CBVAVNum).FirstPass);
             }
         }
 

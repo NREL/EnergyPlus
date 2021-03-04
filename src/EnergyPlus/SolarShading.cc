@@ -11156,7 +11156,7 @@ namespace EnergyPlus::SolarShading {
             // ZoneDifSolarDistTransmittedTotl
             //    CALL DisplayString('Diffuse Solar Distribution Zone Totals')
 
-        } // ZoneNum = 1, state.dataGlobal->NumOfZones
+        } // ZoneNum = 1, NumOfZones
     }
     void CalcInteriorWinTransDifSolInitialDistribution(
         EnergyPlusData &state,

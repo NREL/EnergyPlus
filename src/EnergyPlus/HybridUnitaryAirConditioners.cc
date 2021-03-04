@@ -421,7 +421,6 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
         using BranchNodeConnections::SetUpCompSets;
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
-        using DataSizing::OARequirements; // to find DesignSpecification:OutdoorAir pointer
         std::string cCurrentModuleObject;  // Object type for getting and error messages
         Array1D_string Alphas;            // Alpha items for object
         Array1D<Real64> Numbers;          // Numeric items for object
@@ -606,7 +605,7 @@ namespace EnergyPlus::HybridUnitaryAirConditioners {
 
                 // A19, \ OA requirement pointer
                 if (!lAlphaBlanks(19)) {
-                    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), OARequirements);
+                    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(19), state.dataSize->OARequirements);
                     if (state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
                         ShowSevereError(state, RoutineName + cCurrentModuleObject + " = " + Alphas(1) + " invalid data");
                         ShowContinueError(state, "Invalid-not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");

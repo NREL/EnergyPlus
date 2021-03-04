@@ -480,16 +480,16 @@ namespace BoilerSteam {
         int PltSizNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 SizingTemp = this->TempUpLimitBoilerOut;
                 Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, SizingTemp, 1.0, this->FluidIndex, RoutineName);
                 Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, SizingTemp, 1.0, this->FluidIndex, RoutineName);
                 Real64 EnthSteamOutWet = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, SizingTemp, 0.0, this->FluidIndex, RoutineName);
                 Real64 LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
                 Real64 CpWater = FluidProperties::GetSatSpecificHeatRefrig(state, fluidNameSteam, SizingTemp, 0.0, this->FluidIndex, RoutineName);
-                tmpNomCap = (CpWater * SteamDensity * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT *
-                                 DataSizing::PlantSizData(PltSizNum).DesVolFlowRate +
-                             DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * SteamDensity * LatentEnthSteam);
+                tmpNomCap = (CpWater * SteamDensity * this->SizFac * state.dataSize->PlantSizData(PltSizNum).DeltaT *
+                                 state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate +
+                             state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * SteamDensity * LatentEnthSteam);
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -513,7 +513,7 @@ namespace BoilerSteam {
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePump: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));

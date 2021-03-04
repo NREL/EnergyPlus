@@ -235,18 +235,18 @@ namespace HVACFan {
 
         Real64 tempFlow = designAirVolFlowRate;
         bool bPRINT = true;
-        DataSizing::DataAutosizable = true;
-        DataSizing::DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
-        DataSizing::DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
+        state.dataSize->DataAutosizable = true;
+        state.dataSize->DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
+        state.dataSize->DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
         designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 
-        DataSizing::DataAutosizable = true; // should be false?
-        DataSizing::DataEMSOverrideON = false;
-        DataSizing::DataEMSOverride = 0.0;
+        state.dataSize->DataAutosizable = true; // should be false?
+        state.dataSize->DataEMSOverrideON = false;
+        state.dataSize->DataEMSOverride = 0.0;
 
         if (m_designElecPowerWasAutosized) {
 

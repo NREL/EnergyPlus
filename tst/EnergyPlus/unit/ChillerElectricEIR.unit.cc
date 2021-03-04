@@ -108,19 +108,19 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     thisEIR.RefCOP = 3.0;
 
     state->dataPlnt->PlantLoop.allocate(2);
-    DataSizing::PlantSizData.allocate(2);
+    state->dataSize->PlantSizData.allocate(2);
     // chilled water loop
     state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
     state->dataPlnt->PlantLoop(1).FluidIndex = 1;
     state->dataPlnt->PlantLoop(1).FluidName = "WATER";
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
     // condenser water loop
     state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
     state->dataPlnt->PlantLoop(2).FluidIndex = 1;
     state->dataPlnt->PlantLoop(2).FluidName = "WATER";
-    DataSizing::PlantSizData(2).DesVolFlowRate = 1.0;
-    DataSizing::PlantSizData(2).DeltaT = 5.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 1.0;
+    state->dataSize->PlantSizData(2).DeltaT = 5.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
 
@@ -129,7 +129,7 @@ TEST_F(EnergyPlusFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
-    DataSizing::PlantSizData.deallocate();
+    state->dataSize->PlantSizData.deallocate();
     state->dataPlnt->PlantLoop.deallocate();
 }
 
@@ -218,9 +218,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisEIR.EvapInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisEIR.EvapOutletNodeNum;
 
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
@@ -325,9 +325,9 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisEIRChiller.EvapInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisEIRChiller.EvapOutletNodeNum;
 
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.001;
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;

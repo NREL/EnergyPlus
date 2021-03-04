@@ -288,7 +288,7 @@ namespace CTElectricGenerator {
                 }
                 BranchNodeConnections::TestCompSet(state,
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum, state.dataCTElectricGenerator->CTGenerator(genNum).DesignHeatRecVolFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum, state.dataCTElectricGenerator->CTGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecActive = false;
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum = 0;

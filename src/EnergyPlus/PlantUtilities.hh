@@ -165,7 +165,8 @@ namespace PlantUtilities {
 
     void ShiftPlantLoopSideCallingOrder(EnergyPlusData &state, int OldIndex, int NewIndex);
 
-    void RegisterPlantCompDesignFlow(int ComponentInletNodeNum, // the component's water inlet node number
+    void RegisterPlantCompDesignFlow(EnergyPlusData &state,
+                                     int ComponentInletNodeNum, // the component's water inlet node number
                                      Real64 DesPlantFlow        // the component's design fluid volume flow rate [m3/s]
     );
 

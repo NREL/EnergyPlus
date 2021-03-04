@@ -1323,13 +1323,14 @@ namespace EnergyPlus::PlantUtilities {
         }
     }
 
-    void RegisterPlantCompDesignFlow(int const ComponentInletNodeNum, // the component's water inlet node number
+    void RegisterPlantCompDesignFlow(EnergyPlusData &state,
+                                     int const ComponentInletNodeNum, // the component's water inlet node number
                                      Real64 const DesPlantFlow        // the component's design fluid volume flow rate [m3/s]
     )
     {
 
         // SUBROUTINE INFORMATION:
-        //       AUTHOR         Fred Buhl(previosly SaveCompDesWaterFlow in General.cc)
+        //       AUTHOR         Fred Buhl(previously SaveCompDesWaterFlow in General.cc)
         //       DATE WRITTEN   January 2004
         //       MODIFIED
         //       RE-ENGINEERED  B. Griffith April 2011, allow to enter repeatedly
@@ -1354,22 +1355,22 @@ namespace EnergyPlus::PlantUtilities {
         bool Found;
         int thisCallNodeIndex;
 
-        NumPlantComps = SaveNumPlantComps;
+        NumPlantComps = state.dataSize->SaveNumPlantComps;
 
         if (NumPlantComps == 0) { // first time in, fill and return
             NumPlantComps = 1;
-            CompDesWaterFlow.allocate(NumPlantComps);
+            state.dataSize->CompDesWaterFlow.allocate(NumPlantComps);
             // save the new data
-            CompDesWaterFlow(NumPlantComps).SupNode = ComponentInletNodeNum;
-            CompDesWaterFlow(NumPlantComps).DesVolFlowRate = DesPlantFlow;
-            SaveNumPlantComps = NumPlantComps;
+            state.dataSize->CompDesWaterFlow(NumPlantComps).SupNode = ComponentInletNodeNum;
+            state.dataSize->CompDesWaterFlow(NumPlantComps).DesVolFlowRate = DesPlantFlow;
+            state.dataSize->SaveNumPlantComps = NumPlantComps;
             return;
         }
 
         Found = false;
         // find node num index in structure if any
         for (PlantCompNum = 1; PlantCompNum <= NumPlantComps; ++PlantCompNum) {
-            if (ComponentInletNodeNum == CompDesWaterFlow(PlantCompNum).SupNode) {
+            if (ComponentInletNodeNum == state.dataSize->CompDesWaterFlow(PlantCompNum).SupNode) {
                 Found = true;
                 thisCallNodeIndex = PlantCompNum;
             }
@@ -1378,11 +1379,11 @@ namespace EnergyPlus::PlantUtilities {
 
         if (!Found) {        // grow structure and add new node at the end
             ++NumPlantComps; // increment the number of components that use water as a source of heat or coolth
-            CompDesWaterFlow.emplace_back(ComponentInletNodeNum, DesPlantFlow); // Append the new element
-            SaveNumPlantComps = NumPlantComps;
+            state.dataSize->CompDesWaterFlow.emplace_back(ComponentInletNodeNum, DesPlantFlow); // Append the new element
+            state.dataSize->SaveNumPlantComps = NumPlantComps;
         } else {
-            CompDesWaterFlow(thisCallNodeIndex).SupNode = ComponentInletNodeNum;
-            CompDesWaterFlow(thisCallNodeIndex).DesVolFlowRate = DesPlantFlow;
+            state.dataSize->CompDesWaterFlow(thisCallNodeIndex).SupNode = ComponentInletNodeNum;
+            state.dataSize->CompDesWaterFlow(thisCallNodeIndex).DesVolFlowRate = DesPlantFlow;
         }
     }
 
@@ -1938,8 +1939,6 @@ namespace EnergyPlus::PlantUtilities {
         // to search the Plant Sizing array for the matching Plant Sizing object.
 
         // Using/Aliasing
-        using DataSizing::NumPltSizInput;
-        using DataSizing::PlantSizData;
         using DataSizing::PlantSizingData;
 
         // Return value
@@ -1968,8 +1967,8 @@ namespace EnergyPlus::PlantUtilities {
         }
 
         if (MyPltLoopNum > 0) {
-            if (NumPltSizInput > 0) {
-                MyPltSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(MyPltLoopNum).Name, PlantSizData, &PlantSizingData::PlantLoopName);
+            if (state.dataSize->NumPltSizInput > 0) {
+                MyPltSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(MyPltLoopNum).Name, state.dataSize->PlantSizData, &PlantSizingData::PlantLoopName);
             }
             if (MyPltSizNum == 0) {
                 if (PrintErrorFlag) {

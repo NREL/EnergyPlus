@@ -721,7 +721,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
@@ -794,7 +794,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_EQ(24.0, state->dataHeatBal->TempEffBulkAir(3));
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     DataHeatBalFanSys::MAT.deallocate(); // Zone temperature C
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataLoopNode::Node.deallocate();
@@ -1257,7 +1257,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
@@ -1832,7 +1832,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
@@ -2391,7 +2391,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).FixedReturnFlow.allocate(1);
 
-    DataSizing::ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     DataHeatBalFanSys::MAT.allocate(1); // Zone temperature C
@@ -2466,7 +2466,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     EXPECT_EQ(0.1, DataHeatBalSurface::SurfQAdditionalHeatSourceInside(6));
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    DataSizing::ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     DataHeatBalFanSys::MAT.deallocate(); // Zone temperature C
     DataHeatBalFanSys::ZoneAirHumRat.deallocate();
     DataLoopNode::Node.deallocate();

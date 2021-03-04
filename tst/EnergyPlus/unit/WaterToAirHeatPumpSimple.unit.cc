@@ -85,16 +85,16 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     int HPNum(1);
     int CurveNum;
 
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
-    CurSysNum = 0;
-    CurZoneEqNum = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurZoneEqNum = 1;
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP.allocate(HPNum);
-    FinalZoneSizing.allocate(CurZoneEqNum);
-    ZoneEqSizing.allocate(CurZoneEqNum);
-    DesDayWeath.allocate(1);
-    DesDayWeath(1).Temp.allocate(24);
+    state->dataSize->FinalZoneSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->DesDayWeath.allocate(1);
+    state->dataSize->DesDayWeath(1).Temp.allocate(24);
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).WatertoAirHPType = "COOLING";
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedAirVolFlowRate = AutoSize;
@@ -102,18 +102,18 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens = AutoSize;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedWaterVolFlowRate = 0.0;
 
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.20;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.20;
-    FinalZoneSizing(CurZoneEqNum).CoolDesTemp = 13.0;
-    FinalZoneSizing(CurZoneEqNum).CoolDesHumRat = 0.0075;
-    FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 15;
-    FinalZoneSizing(CurZoneEqNum).CoolDDNum = 1;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 25.5;
-    FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.0045;
-    FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 25.5;
-    FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0045;
-    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0;
-    
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.20;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.20;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0075;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).TimeStepNumAtCoolMax = 15;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDDNum = 1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 25.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.0045;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak = 25.5;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.0045;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).OAVolFlow = 0.0;
+
     state->dataCurveManager->NumCurves = 2;
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
@@ -162,14 +162,14 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimpleTest_SizeHVACWaterToAir)
 
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCOPCool = 5.12;
 
-    DesDayWeath(1).Temp(15) = 32.0;
+    state->dataSize->DesDayWeath(1).Temp(15) = 32.0;
     state->dataEnvrn->StdBaroPress = 101325.0;
-    ZoneEqDXCoil = true;
+    state->dataSize->ZoneEqDXCoil = true;
 
     WaterToAirHeatPumpSimple::SizeHVACWaterToAir(*state, HPNum);
 
-    // check that the design oulet air humidity ratio did not change
-    EXPECT_DOUBLE_EQ(0.0075, FinalZoneSizing(CurZoneEqNum).CoolDesHumRat);
+    // check that the design outlet air humidity ratio did not change
+    EXPECT_DOUBLE_EQ(0.0075, state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat);
 
     // check that the total cooling capacity is >= the sensible cooling capacity
     EXPECT_GE(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolTotal, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).RatedCapCoolSens);
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
-        
+
         "Curve:QuadLinear,",
         "  TotCoolCapCurve,      ! Curve Name",
         "  -0.68126221,          ! CoefficientC1",
@@ -255,7 +255,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
-        
+
         "Curve:QuadLinear,",
         "  CoolPowCurve,      ! Curve Name",
         "  -3.20456384,          ! CoefficientC1",
@@ -273,7 +273,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
         "  100,                  ! Maximum Value of z",
         "  0.,                   ! Minimum Curve Output",
         "  38.;                  ! Maximum Curve Output",
-        
+
         "Curve:QuadLinear,",
         "  HeatCapCurve,         ! Curve Name",
         "  -5.50102734,          ! CoefficientC1",
@@ -313,7 +313,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpSimple_TestWaterFlowControl)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    
+
     GetCurveInput(*state);
     GetSimpleWatertoAirHPInput(*state);
 

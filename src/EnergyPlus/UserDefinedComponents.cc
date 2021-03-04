@@ -141,7 +141,7 @@ namespace UserDefinedComponents {
                                                this->Loop(thisLoop).BranchNum,
                                                this->Loop(thisLoop).CompNum);
 
-            PlantUtilities::RegisterPlantCompDesignFlow(this->Loop(thisLoop).InletNodeNum, this->Loop(thisLoop).DesignVolumeFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->Loop(thisLoop).InletNodeNum, this->Loop(thisLoop).DesignVolumeFlowRate);
 
         } else {
             // throw warning
@@ -285,7 +285,7 @@ namespace UserDefinedComponents {
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.BranchNum,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.CompNum);
 
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum, state.dataUserDefinedComponents->UserCoil(CompNum).Loop.DesignVolumeFlowRate);
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum, state.dataUserDefinedComponents->UserCoil(CompNum).Loop.DesignVolumeFlowRate);
             }
         }
 
@@ -384,7 +384,7 @@ namespace UserDefinedComponents {
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).BranchNum,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).CompNum);
 
-                    PlantUtilities::RegisterPlantCompDesignFlow(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
                                                                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).DesignVolumeFlowRate);
                 }
             }
@@ -491,7 +491,7 @@ namespace UserDefinedComponents {
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).BranchNum,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).CompNum);
 
-                    PlantUtilities::RegisterPlantCompDesignFlow(state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
                                                                 state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).DesignVolumeFlowRate);
                 }
             }

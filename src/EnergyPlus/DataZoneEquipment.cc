@@ -159,6 +159,8 @@ namespace EnergyPlus::DataZoneEquipment {
         int Loop1;
         int Loop2;
 
+        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+
         struct EquipListAudit
         {
             // Members
@@ -805,13 +807,13 @@ namespace EnergyPlus::DataZoneEquipment {
 
         // Allocate TermUnitSizing array and set zone number
         if (locTermUnitSizingCounter > 0) {
-            DataSizing::NumAirTerminalUnits = locTermUnitSizingCounter;
-            DataSizing::TermUnitSizing.allocate(DataSizing::NumAirTerminalUnits);
+            state.dataSize->NumAirTerminalUnits = locTermUnitSizingCounter;
+            TermUnitSizing.allocate(state.dataSize->NumAirTerminalUnits);
             for (int loopZoneNum = 1; loopZoneNum <= state.dataGlobal->NumOfZones; ++loopZoneNum) {
                 {
                     auto &thisZoneEqConfig(state.dataZoneEquip->ZoneEquipConfig(loopZoneNum));
                     for (int loopNodeNum = 1; loopNodeNum <= thisZoneEqConfig.NumInletNodes; ++loopNodeNum) {
-                        DataSizing::TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
+                        TermUnitSizing(thisZoneEqConfig.AirDistUnitCool(loopNodeNum).TermUnitSizingIndex).CtrlZoneNum = loopZoneNum;
                     }
                 }
             }
@@ -1300,7 +1302,6 @@ namespace EnergyPlus::DataZoneEquipment {
         using DataSizing::OAFlowPerArea;
         using DataSizing::OAFlowPPer;
         using DataSizing::OAFlowSum;
-        using DataSizing::OARequirements; // to access DesignSpecification:OutdoorAir inputs
         using DataSizing::ZOAM_IAQP;
         using DataSizing::ZOAM_ProportionalControlDesOcc;
         using DataSizing::ZOAM_ProportionalControlSchOcc;
@@ -1309,6 +1310,7 @@ namespace EnergyPlus::DataZoneEquipment {
         using ScheduleManager::GetScheduleMaxValue;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &OARequirements(state.dataSize->OARequirements);
 
         // Return value
         Real64 OAVolumeFlowRate; // Return value for calculated outdoor air volume flow rate [m3/s]
@@ -1339,7 +1341,7 @@ namespace EnergyPlus::DataZoneEquipment {
         if (DSOAPtr == 0) return OAVolumeFlowRate;
 
         if (state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag) {
-            MyEnvrnFlag.allocate(DataSizing::NumOARequirements);
+            MyEnvrnFlag.allocate(state.dataSize->NumOARequirements);
             MyEnvrnFlag = true;
             state.dataZoneEquip->CalcDesignSpecificationOutdoorAirOneTimeFlag = false;
         }
