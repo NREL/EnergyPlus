@@ -142,8 +142,6 @@ namespace LowTempRadiantSystem {
     using DataHeatBalFanSys::TCondFDSourceNode;
     using DataHVACGlobals::SmallLoad;
     using DataSurfaces::HeatTransferModel_CTF;
-    using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     using Psychrometrics::PsyTdpFnWPb;
 
     // Data
@@ -352,6 +350,7 @@ namespace LowTempRadiantSystem {
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         Array1D_string VarFlowRadDesignNames;
         Array1D_string CFlowRadDesignNames;
@@ -1299,7 +1298,7 @@ namespace LowTempRadiantSystem {
         // and thus indicative that there is an error in the input file.  This is to make sure that two
         // different radiant systems are competing for the same surface.  Allowing this to happen would
         // result in lost energy somewhere and the situation really is not physically possible anyway.
-        AssignedAsRadiantSurface.dimension(TotSurfaces, false);
+        AssignedAsRadiantSurface.dimension(state.dataSurface->TotSurfaces, false);
 
         for (Item = 1; Item <= state.dataLowTempRadSys->NumOfHydrLowTempRadSys; ++Item) {
             for (SurfNum = 1; SurfNum <= state.dataLowTempRadSys->HydrRadSys(Item).NumOfSurfaces; ++SurfNum) {
@@ -1724,6 +1723,7 @@ namespace LowTempRadiantSystem {
     void RadiantSystemBaseData::errorCheckZonesAndConstructions(EnergyPlusData &state, bool &errorsFound)
     {
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         Real64 zoneMultipliers = 0.0;
         Real64 zoneMultipliersSurface = 0.0;
@@ -1811,6 +1811,8 @@ namespace LowTempRadiantSystem {
 
         InitErrorsFound = false;
 
+        auto &Surface(state.dataSurface->Surface);
+
         if (MyOneTimeFlag) {
             state.dataLowTempRadSys->MyEnvrnFlagHydr.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
             state.dataLowTempRadSys->MyEnvrnFlagCFlo.allocate(state.dataLowTempRadSys->NumOfCFloLowTempRadSys);
@@ -1828,10 +1830,10 @@ namespace LowTempRadiantSystem {
         if (FirstTimeInit) {
 
             state.dataLowTempRadSys->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataLowTempRadSys->QRadSysSrcAvg.dimension(TotSurfaces, 0.0);
-            state.dataLowTempRadSys->LastQRadSysSrc.dimension(TotSurfaces, 0.0);
-            state.dataLowTempRadSys->LastSysTimeElapsed.dimension(TotSurfaces, 0.0);
-            state.dataLowTempRadSys->LastTimeStepSys.dimension(TotSurfaces, 0.0);
+            state.dataLowTempRadSys->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataLowTempRadSys->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataLowTempRadSys->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataLowTempRadSys->LastTimeStepSys.dimension(state.dataSurface->TotSurfaces, 0.0);
             state.dataLowTempRadSys->MySizeFlagHydr.allocate(state.dataLowTempRadSys->NumOfHydrLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagCFlo.allocate(state.dataLowTempRadSys->NumOfCFloLowTempRadSys);
             state.dataLowTempRadSys->MySizeFlagElec.allocate(state.dataLowTempRadSys->NumOfElecLowTempRadSys);
@@ -3262,7 +3264,7 @@ namespace LowTempRadiantSystem {
         Real64 tubeLength(0.0); // temporary holding place for the function calculation
 
         for (int surfNum = 1; surfNum <= this->NumOfSurfaces; ++surfNum) {
-            auto &thisHydrSysSurf(Surface(this->SurfacePtr(surfNum)));
+            auto &thisHydrSysSurf(state.dataSurface->Surface(this->SurfacePtr(surfNum)));
             auto &thisHydrSpacing(state.dataConstruction->Construct(thisHydrSysSurf.Construction).ThicknessPerpend);
             if ((thisHydrSpacing > 0.005) && (thisHydrSpacing < 0.5)) { // limit allowable spacing to between 1cm and 1m
                 tubeLength += thisHydrSysSurf.Area / (2.0 * thisHydrSpacing);
@@ -3325,6 +3327,8 @@ namespace LowTempRadiantSystem {
         bool SysRunning;     // True when system is running
 
         VarFlowRadDesignData variableFlowDesignDataObject{state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+
+        auto &Surface(state.dataSurface->Surface);
 
         ControlNode = 0;
         MaxWaterFlow = 0.0;
@@ -3491,7 +3495,6 @@ namespace LowTempRadiantSystem {
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
-        using DataSurfaces::Surface;
         using PlantUtilities::SetComponentFlowRate;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3516,6 +3519,8 @@ namespace LowTempRadiantSystem {
         int ZoneNum;              // Zone pointer for this radiant system
 
         VarFlowRadDesignData variableFlowDesignDataObject{state.dataLowTempRadSys->HydronicRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+
+        auto &Surface(state.dataSurface->Surface);
 
         Real64 Ca; // Coefficients to relate the inlet water temperature to the heat source
         Real64 Cb;
@@ -3991,7 +3996,6 @@ namespace LowTempRadiantSystem {
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4023,6 +4027,7 @@ namespace LowTempRadiantSystem {
         Real64 mdot;            // local temporary for water mass flow rate kg/s
 
         ConstantFlowRadDesignData ConstantFlowDesignDataObject{state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+        auto &Surface(state.dataSurface->Surface);
 
         // initialize local variables
         ZoneNum = this->ZonePtr;
@@ -4504,7 +4509,6 @@ namespace LowTempRadiantSystem {
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_CondFD;
         using DataSurfaces::HeatTransferModel_CTF;
-        using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
@@ -4538,6 +4542,7 @@ namespace LowTempRadiantSystem {
         Real64 ZoneMult;              // Zone multiplier for this system
 
         ConstantFlowRadDesignData ConstantFlowDesignDataObject{state.dataLowTempRadSys->CflowRadiantSysDesign(this->DesignObjectPtr)}; // Contains the data for variable flow hydronic systems
+        auto &Surface(state.dataSurface->Surface);
 
         Real64 Ca; // Coefficients to relate the inlet water temperature to the heat source
         Real64 Cb;
@@ -5061,6 +5066,7 @@ namespace LowTempRadiantSystem {
         // initialize local variables
         ZoneNum = this->ZonePtr;
         HeatFrac = 0.0;
+        auto &Surface(state.dataSurface->Surface);
 
         if (GetCurrentScheduleValue(state, this->SchedPtr) <= 0.0) {
 
@@ -5617,7 +5623,7 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 calculateUFromISOStandard;
 
-        int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
+        int constructionNumber = state.dataSurface->Surface(SurfNum).Construction;
 
         Real64 TubeDiameterOuter(0.0);
         Real64 TubeDiameterInner(0.0);
@@ -5682,7 +5688,7 @@ namespace LowTempRadiantSystem {
         if (!allocated(state.dataLowTempRadSys->QRadSysSrcAvg)) return;
 
         // If it was allocated, then we have to check to see if this was running at all...
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataLowTempRadSys->QRadSysSrcAvg(SurfNum) != 0.0) {
                 LowTempRadSysOn = true;
                 break; // DO loop
@@ -5690,10 +5696,11 @@ namespace LowTempRadiantSystem {
         }
 
         QRadSysSource = state.dataLowTempRadSys->QRadSysSrcAvg;
+        auto &Surface(state.dataSurface->Surface);
 
         // For interzone surfaces, QRadSysSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond > 0 && Surface(SurfNum).ExtBoundCond != SurfNum) {
                 if (std::abs(QRadSysSource(SurfNum) - QRadSysSource(Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
                     if (std::abs(QRadSysSource(SurfNum)) > std::abs(QRadSysSource(Surface(SurfNum).ExtBoundCond))) {
@@ -5726,25 +5733,27 @@ namespace LowTempRadiantSystem {
         // Return value
         Real64 sumHATsurf(0.0);
 
+        auto &Surface(state.dataSurface->Surface);
+
         for (int surfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; surfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++surfNum) {
             Real64 Area = Surface(surfNum).Area;
 
             if (Surface(surfNum).Class == SurfaceClass::Window) {
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(surfNum))) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfWinDividerArea(surfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(surfNum);
                 }
 
-                if (SurfWinFrameArea(surfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(surfNum) > 0.0) {
                     // Window frame contribution
-                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinFrameArea(surfNum) * (1.0 + SurfWinProjCorrFrIn(surfNum)) *
-                                  SurfWinFrameTempSurfIn(surfNum);
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * state.dataSurface->SurfWinFrameArea(surfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(surfNum)) *
+                                  state.dataSurface->SurfWinFrameTempSurfIn(surfNum);
                 }
 
-                if (SurfWinDividerArea(surfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(surfNum))) {
+                if (state.dataSurface->SurfWinDividerArea(surfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(surfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * SurfWinDividerArea(surfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(surfNum)) *
-                                  SurfWinDividerTempSurfIn(surfNum);
+                    sumHATsurf += state.dataHeatBal->HConvIn(surfNum) * state.dataSurface->SurfWinDividerArea(surfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(surfNum)) *
+                                  state.dataSurface->SurfWinDividerTempSurfIn(surfNum);
                 }
             }
 
@@ -5809,7 +5818,6 @@ namespace LowTempRadiantSystem {
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
-        using DataSurfaces::Surface;
         using FluidProperties::GetSpecificHeatGlycol;
 
         auto constexpr routineName("ReportConstantFlowSystem");

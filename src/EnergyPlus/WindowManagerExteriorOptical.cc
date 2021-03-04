@@ -122,43 +122,43 @@ namespace WindowManager {
     }
 
     // void InitWCE_BSDFOpticalData() {
-    // 	// SUBROUTINE INFORMATION:
-    // 	//       AUTHOR         Simon Vidanovic
-    // 	//       DATE WRITTEN   September 2016
-    // 	//       MODIFIED       na
-    // 	//       RE-ENGINEERED  na
+    //     // SUBROUTINE INFORMATION:
+    //     //       AUTHOR         Simon Vidanovic
+    //     //       DATE WRITTEN   September 2016
+    //     //       MODIFIED       na
+    //     //       RE-ENGINEERED  na
     //
-    // 	// PURPOSE OF THIS SUBROUTINE:
-    // 	// Initialize BSDF construction layers in Solar and Visible spectrum.
+    //     // PURPOSE OF THIS SUBROUTINE:
+    //     // Initialize BSDF construction layers in Solar and Visible spectrum.
     //
-    // 	auto aWinConstBSDF = CWindowConstructionsBSDF::instance();
-    // 	for ( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
-    // 		auto& construction( Construct( ConstrNum ) );
-    // 		if ( construction.isGlazingConstruction() ) {
-    // 			for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
-    // 				auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
-    // 				if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
-    // 					material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
-    // 					auto aMaterial = std::make_shared< Material::MaterialProperties >();
-    // 					*aMaterial = material;
+    //     auto aWinConstBSDF = CWindowConstructionsBSDF::instance();
+    //     for ( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
+    //         auto& construction( Construct( ConstrNum ) );
+    //         if ( construction.isGlazingConstruction() ) {
+    //             for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
+    //                 auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
+    //                 if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
+    //                     material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
+    //                     auto aMaterial = std::make_shared< Material::MaterialProperties >();
+    //                     *aMaterial = material;
     //
-    // 					// This is necessary because rest of EnergyPlus code relies on TransDiff property
-    // 					// of construction. It will basically trigger Window optical calculations if this
-    // 					// property is >0.
-    // 					construction.TransDiff = 0.1;
+    //                     // This is necessary because rest of EnergyPlus code relies on TransDiff property
+    //                     // of construction. It will basically trigger Window optical calculations if this
+    //                     // property is >0.
+    //                     construction.TransDiff = 0.1;
     //
-    // 					auto aRange = WavelengthRange::Solar;
-    // 					auto aSolarLayer = getBSDFLayer( aMaterial, aRange );
-    // 					aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
+    //                     auto aRange = WavelengthRange::Solar;
+    //                     auto aSolarLayer = getBSDFLayer( aMaterial, aRange );
+    //                     aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
     //
-    // 					aRange = WavelengthRange::Visible;
-    // 					auto aVisibleLayer = getBSDFLayer( aMaterial, aRange );
-    // 					aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
-    // 				}
+    //                     aRange = WavelengthRange::Visible;
+    //                     auto aVisibleLayer = getBSDFLayer( aMaterial, aRange );
+    //                     aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+    //                 }
     //
-    // 			}
-    // 		}
-    // 	}
+    //             }
+    //         }
+    //     }
     // }
 
     void InitWCE_SimplifiedOpticalData(EnergyPlusData &state)
@@ -210,12 +210,12 @@ namespace WindowManager {
         // shade. These are used to calculate zone MRT contribution from window when
         // interior blind/shade is deployed.
 
-        for (auto SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-            if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
-            if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
-            auto ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+        for (auto SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
+            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
+            auto ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             auto TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
             auto IntShade = false;
@@ -243,15 +243,15 @@ namespace WindowManager {
                         auto TauShIR = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
                         auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
                         auto TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
                         auto EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind

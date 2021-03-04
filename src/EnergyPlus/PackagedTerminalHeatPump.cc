@@ -1263,13 +1263,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 state.dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp = AutoSize; // what should happen here
             }
 
-            //			if ( PTUnit( PTUnitNum ).MaxOATSupHeat > 21.0 ) {
-            //				ShowWarningError(state,  CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) +
+            //            if ( PTUnit( PTUnitNum ).MaxOATSupHeat > 21.0 ) {
+            //                ShowWarningError(state,  CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) +
             //"
             // should  be
             //<=  to 21."
-            //); 				ShowContinueError(state,  format("...{} = {:.1T}", cNumericFields( 11 ),  Numbers( 11 )) );
-            //			}
+            //);                 ShowContinueError(state,  format("...{} = {:.1T}", cNumericFields( 11 ),  Numbers( 11 )) );
+            //            }
 
             //   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
             //                              UseCompressorOffFlow = operate at value specified by user
@@ -1366,7 +1366,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowContinueError(state, "... when " + cAlphaFields(19) + " = " + Alphas(19) +
                                       " the minimum operating air flow rate should be autosized or > 0.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
-                    //					ErrorsFound = true;
+                    //                    ErrorsFound = true;
                 }
 
                 // only allowed for DX cooling coils at this time
@@ -2175,7 +2175,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowContinueError(state, "... when " + cAlphaFields(17) + " = " + Alphas(17) +
                                       " the minimum operating air flow rate should be autosized or > 0.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
-                    //					ErrorsFound = true;
+                    //                    ErrorsFound = true;
                 }
 
                 // only allowed for DX cooling coils at this time
@@ -4544,7 +4544,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }     // from IF(FirstHVACIteration .AND. PartLoadFrac > 0.0) THEN
 
         // Initialize each time step
-        //		PTUnit( PTUnitNum ).CoolCoilWaterFlowRatio = 0.0; // water cooling coils are not allowed in PTUnit model
+        //        PTUnit( PTUnitNum ).CoolCoilWaterFlowRatio = 0.0; // water cooling coils are not allowed in PTUnit model
         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilWaterFlowRatio = 0.0;
 
         SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -8818,7 +8818,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             // FanPartLoadRatio is used to pass info over to function SetAverageAirFlow since air and coil PLR are disassociated in the SZVAV model
             // FanPartLoadRatio is a report variable that is updated (overwritten) in ReportUnitarySystem
             state.dataPTHP->PTUnit(UnitarySysNum).FanPartLoadRatio = PartLoadRatio;
-            //			if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
+            //            if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
 
         } else {
 
@@ -8838,19 +8838,19 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySysNum).CoolCoilFluidInletNode) {
             // cooling load using water cooling coil
             coolingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).CoolingPartLoadFrac = PartLoadRatio;
+            //            PTUnit( UnitarySysNum ).CoolingPartLoadFrac = PartLoadRatio;
             state.dataPTHP->PTUnit(UnitarySysNum).CoolCoilWaterFlowRatio = Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxCoolCoilFluidFlow;
         } else if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilFluidInletNode) {
             // heating load using water heating coil
             heatingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).HeatingPartLoadFrac = PartLoadRatio;
+            //            PTUnit( UnitarySysNum ).HeatingPartLoadFrac = PartLoadRatio;
             state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilWaterFlowRatio = Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxHeatCoilFluidFlow;
         } else if (coolingLoad) { // non-water coil with cooling load
             coolingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;
+            //            PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;
         } else { // must be non-water coil with heating load
             heatingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).HeatingPartLoadFrac = heatingPLR;
+            //            PTUnit( UnitarySysNum ).HeatingPartLoadFrac = heatingPLR;
         }
 
         SensOutput = 0.0;

@@ -100,9 +100,9 @@ TEST_F(EnergyPlusFixture, HighTempRadiantSystemTest_GetHighTempRadiantSystem)
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "ZONE1";
-    Surface.allocate(1);
-    Surface(1).Name = "WALL1";
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "WALL1";
+    state->dataSurface->Surface(1).Zone = 1;
 
     ErrorsFound = false;
 

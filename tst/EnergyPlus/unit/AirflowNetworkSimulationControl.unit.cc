@@ -83,27 +83,27 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "SOFF";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SOFF";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SOFF";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SOFF";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SOFF";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     state->dataHeatBal->Zone.deallocate();
-    Surface.deallocate();
+    state->dataSurface->Surface.deallocate();
     state->dataHeatBal->People.deallocate();
 }
 
@@ -177,27 +177,27 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = "SOFF";
 
-    Surface.allocate(2);
-    Surface(1).Name = "WINDOW 1";
-    Surface(1).Zone = 1;
-    Surface(1).ZoneName = "SOFF";
-    Surface(1).Azimuth = 0.0;
-    Surface(1).ExtBoundCond = 0;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Tilt = 90.0;
-    Surface(1).Sides = 4;
-    Surface(2).Name = "WINDOW 2";
-    Surface(2).Zone = 1;
-    Surface(2).ZoneName = "SOFF";
-    Surface(2).Azimuth = 180.0;
-    Surface(2).ExtBoundCond = 0;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).Tilt = 90.0;
-    Surface(2).Sides = 4;
+    state->dataSurface->Surface.allocate(2);
+    state->dataSurface->Surface(1).Name = "WINDOW 1";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "SOFF";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(2).Name = "WINDOW 2";
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).ZoneName = "SOFF";
+    state->dataSurface->Surface(2).Azimuth = 180.0;
+    state->dataSurface->Surface(2).ExtBoundCond = 0;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).Tilt = 90.0;
+    state->dataSurface->Surface(2).Sides = 4;
 
-    SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
-    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
+    SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
+    state->dataSurface->SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::Window;;
+    state->dataSurface->SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::Window;;
     state->dataGlobal->NumOfZones = 1;
 
     state->dataHeatBal->TotPeople = 1; // Total number of people statements
@@ -263,7 +263,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     EXPECT_EQ(AirflowNetwork::AirflowNetworkSimuProp::Solver::SkylineLU, AirflowNetwork::AirflowNetworkSimu.solver);
 
     state->dataHeatBal->Zone.deallocate();
-    Surface.deallocate();
+    state->dataSurface->Surface.deallocate();
     state->dataHeatBal->People.deallocate();
 }
 

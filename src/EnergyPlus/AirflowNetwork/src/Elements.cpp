@@ -2122,8 +2122,8 @@ namespace AirflowNetwork {
         OpenFactor = MultizoneSurfaceData(i).OpenFactor;
         if (OpenFactor > 0.0) {
             Width *= OpenFactor;
-            if (DataSurfaces::Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90.0) {
-                Height *= DataSurfaces::Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
+            if (state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90.0) {
+                Height *= state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
             }
         }
 

@@ -88,19 +88,9 @@ namespace AirflowNetwork {
     // Walton, G. N., 1989, "AIRNET - A Computer Program for Building Airflow Network Modeling,"
     // NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland
 
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    using DataSurfaces::Surface;
-
-    //std::vector<AirProperties> properties;
-
     // Data
     int NetworkNumOfLinks(0);
     int NetworkNumOfNodes(0);
-
     int const NrInt(20); // Number of intervals for a large opening
 
     // Common block AFEDAT
@@ -2035,8 +2025,8 @@ namespace AirflowNetwork {
         for (i = 1; i <= Nl; ++i) {
             // Check surface tilt
             if (i <= Nl - NumOfLinksIntraZone) { // Revised by L.Gu, on 9 / 29 / 10
-                if (AirflowNetworkLinkageData(i).DetOpenNum > 0 && Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
-                    Hfl(i) = Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
+                if (AirflowNetworkLinkageData(i).DetOpenNum > 0 && state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
+                    Hfl(i) = state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
                 }
             }
             // Initialisation
