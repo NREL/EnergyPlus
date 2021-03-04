@@ -530,14 +530,6 @@ namespace Furnaces {
 struct FurnacesData : BaseGlobalStruct {
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D_bool MyEnvrnFlag;             // environment flag
-    Array1D_bool MySecondOneTimeFlag;     // additional one time flag
-    Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
-    Array1D_bool MyCheckFlag;             // Used to obtain the zone inlet node number in the controlled zone
-    Array1D_bool MyFlowFracFlag;          // Used for calculatig flow fraction once
-    Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
-    Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
-
     int NumFurnaces = 0; // The number of furnaces found in the input data file
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
@@ -560,12 +552,18 @@ struct FurnacesData : BaseGlobalStruct {
     // starting add variables for variable speed water source heat pump
     Real64 SaveCompressorPLR = 0.0;  // holds compressor PLR from active DX coil
     std::string CurrentModuleObject; // Object type for getting and error messages
-
-
     int Iter = 0;    // Iteration counter for CalcNewZoneHeatOnlyFlowRates
 
     // Object Data
     Array1D<Furnaces::FurnaceEquipConditions> Furnace;
+
+    Array1D_bool MyEnvrnFlag;             // environment flag
+    Array1D_bool MySecondOneTimeFlag;     // additional one time flag
+    Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
+    Array1D_bool MyCheckFlag;             // Used to obtain the zone inlet node number in the controlled zone
+    Array1D_bool MyFlowFracFlag;          // Used for calculatig flow fraction once
+    Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
+    Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
 
     void clear_state() override
     {
@@ -589,6 +587,7 @@ struct FurnacesData : BaseGlobalStruct {
         TempSteamIn = 100.0;
         SaveCompressorPLR = 0.0;
         CurrentModuleObject = "";
+        Iter = 0;
         Furnace.clear();
 
         MyEnvrnFlag.clear();
