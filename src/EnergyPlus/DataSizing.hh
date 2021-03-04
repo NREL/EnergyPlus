@@ -943,10 +943,7 @@ namespace DataSizing {
         std::string DateString; // date of design day weather values
         Array1D<Real64> Temp;   // design day temperatures at the major time step
         Array1D<Real64> HumRat; // design day humidity ratios at the major time step
-        Array1D<Real64> Press;  // design day braometric pressure at the major time step
-
-        // Default Constructor
-        DesDayWeathData() = default;
+        Array1D<Real64> Press;  // design day barometric pressure at the major time step
     };
 
     struct CompDesWaterFlowData // design water flow rate for components that use water as an
@@ -1016,52 +1013,6 @@ namespace DataSizing {
 
         Real64 calculateEz(EnergyPlusData &state, int ZoneNum); // Zone index
     };
-
-    // Object Data
-    extern Array1D<Real64> ZdzClgByZone;    // minimum discharge outdoor-air fraction for cooling
-    extern Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
-    extern Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
-    extern Array1D<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
-    extern Array1D<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
-    extern Array1D<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
-    extern Array1D<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
-    extern Array1D<Real64> VpzHtgSumBySys;  // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
-    extern Array1D<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
-    extern Array1D<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
-    extern Array1D<Real64> DBySys;          // Population Diversity by system
-    extern Array1D<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
-    extern Array1D<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
-    extern Array1D<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing date and time when Ps peak occurs
-    extern Array1D<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
-
-    extern Array1D<Real64> VouBySys; // uncorrected system outdoor air requirement, for std 62.1 VRP
-
-    extern Array1D<Real64> VpsClgBySys;       // System primary airflow Vps, for cooling for std 62.1 VRP
-    extern Array1D<Real64> VpsHtgBySys;       // system primary airflow Vps, for heating for std 62.1 VRP
-    extern Array1D<Real64> FaByZoneHeat;      // saved value of Fa used in 62.1 tabular report
-    extern Array1D<Real64> FbByZoneCool;      // saved value of Fb used in 62.1 tabular report
-    extern Array1D<Real64> FbByZoneHeat;      // saved value of Fb used in 62.1 tabular report
-    extern Array1D<Real64> FcByZoneCool;      // saved value of Fc used in 62.1 tabular report
-    extern Array1D<Real64> FcByZoneHeat;      // saved value of Fc used in 62.1 tabular report
-    extern Array1D<Real64> XsBySysCool;       // saved value of Xs used in 62.1 tabular report
-    extern Array1D<Real64> XsBySysHeat;       // saved value of Xs used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneCool;     // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneHeat;     // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneCoolPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> EvzByZoneHeatPrev; // saved value of Evz (zone vent effy) used in 62.1 tabular report
-    extern Array1D<Real64> VotClgBySys;       // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
-    extern Array1D<Real64> VotHtgBySys;       // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
-    extern Array1D<Real64> VozSumClgBySys;    // saved value of cooling ventilation required at clg zones
-    extern Array1D<Real64> VozSumHtgBySys;    // saved value of heating ventilation required at htg zones
-    extern Array1D<Real64> TotCoolCapTemp;    // scratch variable used for calulating peak load [W]
-    extern Array1D<Real64> EvzMinBySysHeat;   // saved value of EvzMin used in 62.1 tabular report
-    extern Array1D<Real64> EvzMinBySysCool;   // saved value of EvzMin used in 62.1 tabular report
-    extern Array1D<Real64> FaByZoneCool;      // triggers allocation in UpdateSysSizing
-    extern Array1D<Real64> SensCoolCapTemp;   // triggers allocation in UpdateSysSizing
-
-    // Clears the global data in DataSizing.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
 
     // Resets Data globals so that previously set variables are not used in other equipment models
     void resetHVACSizingGlobals(EnergyPlusData &state,
@@ -1223,6 +1174,40 @@ struct SizingData : BaseGlobalStruct
     Array1D<Real64> ZdzHtgByZone;    // minimum discharge outdoor-air fraction for heating
     Array1D<Real64> VpzClgByZone;    // saved value of cooling based ZonePA which is Vpz used in 62.1 tabular report
     Array1D<Real64> VpzMinClgByZone; // saved value of minimum cooling based ZonePA which is VpzClg-min used in 62.1 tabular report
+    Array1D<Real64> VpzHtgByZone;    // saved value of heating based ZonePA which is Vpz used in 62.1 tabular report
+    Array1D<Real64> VpzMinHtgByZone; // saved value of minimum heating based ZonePA which is VpzHtg-min used in 62.1 tabular report
+    Array1D<Real64> VpzClgSumBySys;  // sum of saved value of cooling based ZonePA which is Vpz-sum used in 62.1 tabular report
+    Array1D<Real64> VpzHtgSumBySys;  // sum of saved value of heating based ZonePA which is Vpz-sum used in 62.1 tabular report
+    Array1D<Real64> PzSumBySys;      // sum of design people for system, Pz_sum
+    Array1D<Real64> PsBySys;         // sum of peak concurrent people by system, Ps
+    Array1D<Real64> DBySys;          // Population Diversity by system
+    Array1D<Real64> SumRpxPzBySys;   // Sum of per person OA times number of people by system, No D yet
+    Array1D<Real64> SumRaxAzBySys;   // sum of per area OA time zone area by system, does not get altered by D
+    Array1D<std::string> PeakPsOccurrenceDateTimeStringBySys;    // string describing when Ps peak occurs
+    Array1D<std::string> PeakPsOccurrenceEnvironmentStringBySys; // string describing Environment when Ps peak occurs
+    Array1D<Real64> VouBySys;                                    // uncorrected system outdoor air requirement, for std 62.1 VRP
+    Array1D<Real64> VpsClgBySys;                                 // System primary airflow Vps, for cooling for std 62.1 VRP
+    Array1D<Real64> VpsHtgBySys;                                 // system primary airflow Vps, for heating for std 62.1 VRP
+    Array1D<Real64> FaByZoneHeat;                                // saved value of Fa used in 62.1 tabular report
+    Array1D<Real64> FbByZoneCool;                                // saved value of Fb used in 62.1 tabular report
+    Array1D<Real64> FbByZoneHeat;                                // saved value of Fb used in 62.1 tabular report
+    Array1D<Real64> FcByZoneCool;                                // saved value of Fc used in 62.1 tabular report
+    Array1D<Real64> FcByZoneHeat;                                // saved value of Fc used in 62.1 tabular report
+    Array1D<Real64> XsBySysCool;                                 // saved value of Xs used in 62.1 tabular report
+    Array1D<Real64> XsBySysHeat;                                 // saved value of Xs used in 62.1 tabular report
+    Array1D<Real64> EvzByZoneCool;                               // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    Array1D<Real64> EvzByZoneHeat;                               // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    Array1D<Real64> EvzByZoneCoolPrev;                           // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    Array1D<Real64> EvzByZoneHeatPrev;                           // saved value of Evz (zone vent effy) used in 62.1 tabular report
+    Array1D<Real64> VotClgBySys;     // saved value of cooling ventilation required at primary AHU, used in 62.1 tabular report
+    Array1D<Real64> VotHtgBySys;     // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
+    Array1D<Real64> VozSumClgBySys;  // saved value of cooling ventilation required at clg zones
+    Array1D<Real64> VozSumHtgBySys;  // saved value of cooling ventilation required at htg zones
+    Array1D<Real64> TotCoolCapTemp;  // scratch variable used for calculating peak load [W]
+    Array1D<Real64> EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
+    Array1D<Real64> EvzMinBySysCool; // saved value of EvzMin used in 62.1 tabular report
+    Array1D<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
+    Array1D<Real64> SensCoolCapTemp; // triggers allocation in UpdateSysSizing
 
     void clear_state() override
     {
@@ -1366,6 +1351,40 @@ struct SizingData : BaseGlobalStruct
         this->ZdzHtgByZone.deallocate();
         this->VpzClgByZone.deallocate();
         this->VpzMinClgByZone.deallocate();
+        this->VpzHtgByZone.deallocate();
+        this->VpzMinHtgByZone.deallocate();
+        this->VpzClgSumBySys.deallocate();
+        this->VpzHtgSumBySys.deallocate();
+        this->PzSumBySys.deallocate();
+        this->PsBySys.deallocate();
+        this->DBySys.deallocate();
+        this->SumRpxPzBySys.deallocate();
+        this->SumRaxAzBySys.deallocate();
+        this->PeakPsOccurrenceDateTimeStringBySys.deallocate();
+        this->PeakPsOccurrenceEnvironmentStringBySys.deallocate();
+        this->VouBySys.deallocate();
+        this->VpsClgBySys.deallocate();
+        this->VpsHtgBySys.deallocate();
+        this->FaByZoneHeat.deallocate();
+        this->FbByZoneCool.deallocate();
+        this->FbByZoneHeat.deallocate();
+        this->FcByZoneCool.deallocate();
+        this->FcByZoneHeat.deallocate();
+        this->XsBySysCool.deallocate();
+        this->XsBySysHeat.deallocate();
+        this->EvzByZoneCool.deallocate();
+        this->EvzByZoneHeat.deallocate();
+        this->EvzByZoneCoolPrev.deallocate();
+        this->EvzByZoneHeatPrev.deallocate();
+        this->VotClgBySys.deallocate();
+        this->VotHtgBySys.deallocate();
+        this->VozSumClgBySys.deallocate();
+        this->VozSumHtgBySys.deallocate();
+        this->TotCoolCapTemp.deallocate();
+        this->EvzMinBySysHeat.deallocate();
+        this->EvzMinBySysCool.deallocate();
+        this->FaByZoneCool.deallocate();
+        this->SensCoolCapTemp.deallocate();
     }
 };
 
