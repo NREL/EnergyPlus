@@ -180,10 +180,10 @@ struct HeatBalHAMTMgrData : BaseGlobalStruct {
     Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
     Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
     Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
-    Real64 deltat; // time step in seconds
-    int TotCellsMax; // Maximum number of cells per material
-    bool latswitch;  // latent heat switch,
-    bool rainswitch; // rain switch,
+    Real64 deltat = 0.0; // time step in seconds
+    int TotCellsMax = 0; // Maximum number of cells per material
+    bool latswitch = false;  // latent heat switch,
+    bool rainswitch = false; // rain switch,
     Array1D<HeatBalanceHAMTManager::subcell> cells;
 
     void clear_state() override
