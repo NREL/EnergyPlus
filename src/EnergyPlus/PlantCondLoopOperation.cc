@@ -1369,9 +1369,9 @@ CurrentModuleObject, PlantOpSchemeName);
 
                         if (rNumericArgs(CompNumN) == AutoSize) {
                             int Num = 1;
-                            for (; Num <= SaveNumPlantComps; ++Num) {
-                                CompInNode = CompDesWaterFlow(Num).SupNode;
-                                CompFlowRate = CompDesWaterFlow(Num).DesVolFlowRate;
+                            for (; Num <= state.dataSize->SaveNumPlantComps; ++Num) {
+                                CompInNode = state.dataSize->CompDesWaterFlow(Num).SupNode;
+                                CompFlowRate = state.dataSize->CompDesWaterFlow(Num).DesVolFlowRate;
                                 if (CompInNode == state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum) {
                                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = CompFlowRate;
                                 } else {

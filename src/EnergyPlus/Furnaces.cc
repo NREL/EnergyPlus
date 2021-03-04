@@ -824,7 +824,6 @@ namespace Furnaces {
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetSteamCoilIndex;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
-        using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanIndex;
@@ -1475,7 +1474,7 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = Numbers(2);
 
             // Compare the flow rates.
-            if (FanVolFlowRate != AutoSize && state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != AutoSize) {
+            if (FanVolFlowRate != DataSizing::AutoSize && state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate > FanVolFlowRate) {
                     ShowWarningError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "... The " + cNumericFields(2) + " > Max Volume Flow Rate defined in the associated fan object, should be <=.");
@@ -1489,7 +1488,7 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
             }
-            if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate <= 0.0) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "... The " + cNumericFields(2) + " <= 0.0, it must be > 0.0.");
@@ -2623,30 +2622,30 @@ namespace Furnaces {
             state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp = Numbers(1);
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = Numbers(2);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = Numbers(3);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = Numbers(4);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow < 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow < 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(4), Numbers(4)));
                 ErrorsFound = true;
             }
 
-            if (Numbers(2) != AutoSize && Numbers(3) != AutoSize && Numbers(4) != AutoSize) {
+            if (Numbers(2) != DataSizing::AutoSize && Numbers(3) != DataSizing::AutoSize && Numbers(4) != DataSizing::AutoSize) {
                 state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = max(Numbers(2), Numbers(3), Numbers(4));
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = AutoSize;
+                state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = DataSizing::AutoSize;
             }
 
             if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
@@ -2665,15 +2664,15 @@ namespace Furnaces {
                 }
 
                 state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = min(state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow, state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = max(state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow, state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = AutoSize;
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = DataSizing::AutoSize;
                 }
             }
 
-            if (FanVolFlowRate != AutoSize) {
-                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+            if (FanVolFlowRate != DataSizing::AutoSize) {
+                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(
                         state,
@@ -2684,7 +2683,7 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = FanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
-                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize) {
+                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(
                         state,
@@ -3512,21 +3511,21 @@ namespace Furnaces {
             SetUpCompSets(state, CurrentModuleObject, Alphas(1), Alphas(12), Alphas(13), "UNDEFINED", Alphas(4));
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = Numbers(1);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(1), Numbers(1)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = Numbers(2);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow <= 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(2), Numbers(2)));
                 ErrorsFound = true;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = Numbers(3);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow < 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow < 0 && state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow != DataSizing::AutoSize) {
                 ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                 ShowContinueError(state, format("Illegal {} = {:.7T}", cNumericFields(3), Numbers(3)));
                 ErrorsFound = true;
@@ -3546,10 +3545,10 @@ namespace Furnaces {
                 }
             }
 
-            if (Numbers(1) != AutoSize && Numbers(2) != AutoSize && Numbers(3) != AutoSize) {
+            if (Numbers(1) != DataSizing::AutoSize && Numbers(2) != DataSizing::AutoSize && Numbers(3) != DataSizing::AutoSize) {
                 state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = max(Numbers(1), Numbers(2), Numbers(3));
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = AutoSize;
+                state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = DataSizing::AutoSize;
             }
 
             if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
@@ -3571,15 +3570,15 @@ namespace Furnaces {
                 }
 
                 state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = min(state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow, state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = max(state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow, state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
                 } else {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = AutoSize;
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = DataSizing::AutoSize;
                 }
             }
 
-            if (FanVolFlowRate != AutoSize) {
-                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+            if (FanVolFlowRate != DataSizing::AutoSize) {
+                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(
                         state,
@@ -3590,7 +3589,7 @@ namespace Furnaces {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = FanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FanVolFlowRate;
                 }
-                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize) {
+                if (FanVolFlowRate < state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow && state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize) {
                     ShowSevereError(state, CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(
                         state,
@@ -4358,15 +4357,15 @@ namespace Furnaces {
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = min(state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow, state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
-            if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != AutoSize && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow != DataSizing::AutoSize && state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow != DataSizing::AutoSize) {
                 state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = max(state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow, state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow);
             } else {
-                state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = AutoSize;
+                state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = DataSizing::AutoSize;
             }
 
             state.dataFurnaces->Furnace(FurnaceNum).AirFlowControl = AirFlowControlConstFan::UseCompressorOnFlow;
 
-            if (FanVolFlowRate != AutoSize && state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != AutoSize) {
+            if (FanVolFlowRate != DataSizing::AutoSize && state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate > FanVolFlowRate) {
                     ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "... has a Cooling or Heating Air Flow Rate > Max Fan Volume Flow Rate, should be <=.");
@@ -4378,7 +4377,7 @@ namespace Furnaces {
                                              FanVolFlowRate));
                 }
             }
-            if (FanVolFlowRate != AutoSize && state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != AutoSize) {
+            if (FanVolFlowRate != DataSizing::AutoSize && state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate <= 0.0) {
                     ShowContinueError(state, "...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ShowContinueError(state, "... has a Design Fan Flow Rate <= 0.0, it must be >0.0");
@@ -4759,7 +4758,6 @@ namespace Furnaces {
         using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
-        using DataSizing::AutoSize;
         using Fans::GetFanDesignVolumeFlowRate;
         using Fans::GetFanSpeedRatioCurveIndex;
 
@@ -4897,7 +4895,7 @@ namespace Furnaces {
             if (errFlag) {
                 ShowContinueError(state, "...occurs in " + cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + " =" + state.dataFurnaces->Furnace(FurnaceNum).Name);
             }
-            if (FanVolFlowRate != AutoSize) {
+            if (FanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate > FanVolFlowRate) {
                     ShowWarningError(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num) + '=' + state.dataFurnaces->Furnace(FurnaceNum).Name +
                                      " has a Design Fan Volume Flow Rate > Max Fan Volume Flow Rate, should be <=");
@@ -5083,12 +5081,12 @@ namespace Furnaces {
             //   set fluid-side hardware limits
             if (state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode > 0) {
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow == AutoSize) {
+                if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
                     // If water coil max water flow rate is autosized, simulate once in order to mine max flow rate
                     if (state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
                         SimulateWaterCoilComponents(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
-                        if (CoilMaxVolFlowRate != AutoSize) {
+                        if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
                                                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNum).FluidIndex,
@@ -5105,7 +5103,7 @@ namespace Furnaces {
                                                     1.0,
                                                     QActual); // QCoilReq, simulate any load > 0 to get max capacity
                         CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).HeatingCoilIndex, ErrorsFound);
-                        if (CoilMaxVolFlowRate != AutoSize) {
+                        if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
@@ -5123,12 +5121,12 @@ namespace Furnaces {
                                    state.dataFurnaces->Furnace(FurnaceNum).CompNum);
             }
             if (state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode > 0) {
-                if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow == AutoSize) {
+                if (state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
                     if (state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                         // If water coil max water flow rate is autosized, simulate once in order to mine max flow rate
                         SimulateWaterCoilComponents(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
-                        if (CoilMaxVolFlowRate != AutoSize) {
+                        if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(state,
                                                    state.dataPlnt->PlantLoop(state.dataFurnaces->Furnace(FurnaceNum).LoopNumSupp).FluidName,
                                                    DataGlobalConstants::HWInitConvTemp,
@@ -5145,7 +5143,7 @@ namespace Furnaces {
                                                     1.0,
                                                     QActual); // QCoilReq, simulate any load > 0 to get max capacity
                         CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(state, state.dataFurnaces->Furnace(FurnaceNum).SuppHeatCoilIndex, ErrorsFound);
-                        if (CoilMaxVolFlowRate != AutoSize) {
+                        if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, state.dataFurnaces->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
@@ -5169,7 +5167,7 @@ namespace Furnaces {
         }
 
         if (state.dataFurnaces->MyFanFlag(FurnaceNum)) {
-            if (state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate != AutoSize) {
+            if (state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate != DataSizing::AutoSize) {
                 if (state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate > 0.0) {
                     state.dataFurnaces->Furnace(FurnaceNum).HeatingSpeedRatio = state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow / state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate;
                     state.dataFurnaces->Furnace(FurnaceNum).CoolingSpeedRatio = state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow / state.dataFurnaces->Furnace(FurnaceNum).ActualFanVolFlowRate;
@@ -5481,7 +5479,7 @@ namespace Furnaces {
                     IHPIndex = state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilIndex;
                 }
 
-                if (state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow != AutoSize) {
+                if (state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow != DataSizing::AutoSize) {
                     //     Check fan versus system supply air flow rates
                     if (state.dataFurnaces->Furnace(FurnaceNum).FanVolFlow + 1e-10 < state.dataFurnaces->Furnace(FurnaceNum).CoolVolumeFlowRate(NumOfSpeedCooling)) {
                         ShowWarningError(state,
@@ -6041,25 +6039,25 @@ namespace Furnaces {
         ManageEMS(state, EMSManager::EMSCallFrom::UnitarySystemSizing, anyRan, ObjexxFCL::Optional_int_const()); // calling point
 
         ThisCtrlZoneNum = 0;
-        DXCoolCap = 0.0;
-        UnitaryHeatCap = 0.0;
-        SuppHeatCap = 0.0;
+        state.dataSize->DXCoolCap = 0.0;
+        state.dataSize->UnitaryHeatCap = 0.0;
+        state.dataSize->SuppHeatCap = 0.0;
 
         if (state.dataFurnaces->Furnace(FurnaceNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
-            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-            DataSizing::DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         } else {
-            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-            DataSizing::DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanIndex = state.dataFurnaces->Furnace(FurnaceNum).FanIndex;
         }
         if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == BlowThru) {
-            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
         } else if (state.dataFurnaces->Furnace(FurnaceNum).FanPlace == DrawThru) {
-            state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
         }
 
         if (state.dataFurnaces->Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -6179,11 +6177,11 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).DesignFanVolFlowRate = 0.0;
                 }
@@ -6201,11 +6199,11 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxHeatAirVolFlow = 0.0;
                 }
@@ -6222,11 +6220,11 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxCoolAirVolFlow = 0.0;
                 }
@@ -6244,11 +6242,11 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                if (FinalSysSizing(CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
-                    state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= SmallAirVolFlow) {
+                    state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow = 0.0;
                 }
@@ -6266,19 +6264,19 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ||
                     state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir) {
 
                     CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = DXCoolCap;
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->DXCoolCap;
 
                 } else {
 
                     CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
 
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = FinalSysSizing(CurSysNum).HeatCap;
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
                 }
 
                 if (state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity < SmallLoad) {
@@ -6294,11 +6292,11 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                if (DXCoolCap >= SmallLoad) {
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity = DXCoolCap;
+                if (state.dataSize->DXCoolCap >= SmallLoad) {
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity = state.dataSize->DXCoolCap;
                 } else {
                     state.dataFurnaces->Furnace(FurnaceNum).DesignCoolingCapacity = 0.0;
                 }
@@ -6311,10 +6309,10 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
-                state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp = FinalSysSizing(CurSysNum).HeatSupTemp;
+                state.dataFurnaces->Furnace(FurnaceNum).DesignMaxOutletTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
                 BaseSizer::reportSizerOutput(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num),
                                              state.dataFurnaces->Furnace(FurnaceNum).Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
@@ -6324,13 +6322,13 @@ namespace Furnaces {
 
         if (state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, cFurnaceTypes(state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num), state.dataFurnaces->Furnace(FurnaceNum).Name);
                 if (state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir ||
                     state.dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_WaterToAir) {
                     // set the supplemental heating capacity to the actual heating load
-                    state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity = FinalSysSizing(CurSysNum).HeatCap;
+                    state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
                     // if reheat needed for humidity control, make sure supplemental heating is at least as big
                     // as the cooling capacity
                     if (state.dataFurnaces->Furnace(FurnaceNum).Humidistat && state.dataFurnaces->Furnace(FurnaceNum).DehumidControlType_Num == DehumidificationControlMode::DehumidControl_CoolReheat) {
@@ -6357,8 +6355,8 @@ namespace Furnaces {
             }
         }
 
-        UnitaryHeatCap = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
-        SuppHeatCap = state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity;
+        state.dataSize->UnitaryHeatCap = state.dataFurnaces->Furnace(FurnaceNum).DesignHeatingCapacity;
+        state.dataSize->SuppHeatCap = state.dataFurnaces->Furnace(FurnaceNum).DesignSuppHeatingCapacity;
     }
 
     // End Initialization Section of the Module
@@ -9603,7 +9601,7 @@ namespace Furnaces {
         }
         if (state.dataFurnaces->Furnace(FurnaceNum).FirstPass) {
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(0, DataSizing::CurSysNum, state.dataFurnaces->Furnace(FurnaceNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, 0, state.dataSize->CurSysNum, state.dataFurnaces->Furnace(FurnaceNum).FirstPass);
             }
         }
         DataHVACGlobals::OnOffFanPartLoadFraction =

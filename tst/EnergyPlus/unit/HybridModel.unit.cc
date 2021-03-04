@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
     state->dataHeatBal->ZoneIntGain.allocate(1);
     state->dataHeatBal->ZoneIntGain(1).NumberOfDevices = 0;
-    ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneHumRat variable initialization
     ZoneLatentGain.allocate(1);
@@ -237,7 +237,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
@@ -592,7 +592,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
-    ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     ZoneLatentGain.deallocate();
     SumLatentHTRadSys.deallocate();
     SumHmARaW.deallocate();
@@ -679,7 +679,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataHeatBal->ZnAirRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
-    ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing.allocate(1);
 
     // CorrectZoneContaminants variable initialization
     MixingMassFlowZone.allocate(1);
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
 
     // Parameter setup
     state->dataGlobal->NumOfZones = 1;
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     state->dataZonePlenum->NumZoneReturnPlenums = 0;
     state->dataZonePlenum->NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
@@ -919,7 +919,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     state->dataRoomAirMod->ZoneDVMixedFlag.deallocate();
     state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
-    ZoneEqSizing.deallocate();
+    state->dataSize->ZoneEqSizing.deallocate();
     MixingMassFlowZone.deallocate();
     ZoneW1.deallocate();
     ZoneAirHumRatTemp.deallocate();

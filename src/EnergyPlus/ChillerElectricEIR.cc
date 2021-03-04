@@ -575,7 +575,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                    "Heat Recovery Nodes");
                 // store heat recovery volume flow for plant sizing
                 if (thisChiller.DesignHeatRecVolFlowRate > 0.0) {
-                    PlantUtilities::RegisterPlantCompDesignFlow(thisChiller.HeatRecInletNodeNum,
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, thisChiller.HeatRecInletNodeNum,
                                                                 thisChiller.DesignHeatRecVolFlowRate); // CR 6953
                 }
                 if (NumNums > 17) {
@@ -1254,8 +1254,8 @@ namespace EnergyPlus::ChillerElectricEIR {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
@@ -1282,7 +1282,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                                     EvapVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Reference Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
@@ -1310,10 +1310,10 @@ namespace EnergyPlus::ChillerElectricEIR {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                    DataGlobalConstants::CWInitConvTemp,
@@ -1325,7 +1325,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                                DataGlobalConstants::CWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                RoutineName);
-                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
+                tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * tmpEvapVolFlowRate;
             } else {
                 tmpNomCap = 0.0;
             }
@@ -1350,7 +1350,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                                     "User-Specified Reference Capacity [W]",
                                                                     RefCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - RefCapUser) / RefCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Reference Capacity of {:.2R} [W]", RefCapUser));
                                     ShowContinueError(state, format("differs from Design Size Reference Capacity of {:.2R} [W]", tmpNomCap));
@@ -1375,7 +1375,7 @@ namespace EnergyPlus::ChillerElectricEIR {
         }
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
 
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
@@ -1388,7 +1388,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                                    state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
                 tmpCondVolFlowRate = tmpNomCap * (1.0 + (1.0 / this->RefCOP) * this->CompPowerToCondenserFrac) /
-                                     (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                                     (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
 
             } else {
                 if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
@@ -1416,7 +1416,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                                     CondVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Reference Condenser Fluid Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
@@ -1451,8 +1451,8 @@ namespace EnergyPlus::ChillerElectricEIR {
                 // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     std::string CompType = DataPlant::ccSimPlantEquipTypes(DataPlant::TypeOf_Chiller_ElectricEIR);
-                    DataSizing::DataConstantUsedForSizing = this->RefCap;
-                    DataSizing::DataFractionUsedForSizing = 0.000114;
+                    state.dataSize->DataConstantUsedForSizing = this->RefCap;
+                    state.dataSize->DataFractionUsedForSizing = 0.000114;
                     Real64 TempSize = this->CondVolFlowRate;
                     bool bPRINT = true; // TRUE if sizing is reported to output (eio)
                     AutoCalculateSizer sizerCondAirFlow;
@@ -1466,7 +1466,7 @@ namespace EnergyPlus::ChillerElectricEIR {
         }
 
         // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-        PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
 
         // now do heat recovery flow rate sizing if active
         if (this->HeatRecActive) {
@@ -1502,7 +1502,7 @@ namespace EnergyPlus::ChillerElectricEIR {
 
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tempHeatRecVolFlowRate - nomHeatRecVolFlowRateUser) / nomHeatRecVolFlowRateUser) >
-                                DataSizing::AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeChillerElectricEIR: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state,
                                                   format("User-Specified Heat Recovery Water Flow Rate of {:.5R} [m3/s]", nomHeatRecVolFlowRateUser));
@@ -1517,7 +1517,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                 }
             }
             if (!this->DesignHeatRecVolFlowRateWasAutoSized) tempHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
-            PlantUtilities::RegisterPlantCompDesignFlow(this->HeatRecInletNodeNum, tempHeatRecVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->HeatRecInletNodeNum, tempHeatRecVolFlowRate);
         } // Heat recovery active
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {

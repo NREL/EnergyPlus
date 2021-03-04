@@ -3999,7 +3999,7 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                         }
                         // Commented out as we are using %NumZonesCooled instead of %NumZonesHeated for all systems for now
-                        // IF (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated == 0) THEN
+                        // IF (AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated == 0) THEN
                         //  CALL ShowSevereError(state, TRIM(cSetPointManagerType)//': Air Loop provides no heating ' // &
                         //                       TRIM(MZAverageHeatingSetPtMgr(SetPtMgrNum)%Name))
                         //  CALL ShowContinueError(state, 'Occurs in Setpoint Manager='//TRIM(MZAverageHeatingSetPtMgr(SetPtMgrNum)%Name))
@@ -6135,14 +6135,14 @@ namespace EnergyPlus::SetPointManager {
         SetPointTemp = this->MinSetTemp;
 
         for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
-            // DO ZonesHeatedIndex=1,state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
-            // Using state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
+            // DO ZonesHeatedIndex=1,AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
+            // Using AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
 
             // The data for number of zones heated is included in the data structure of the variable
-            // "state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" for all systems.  The data structure
-            // "state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated" applies to Dual Duct System only and
+            // "AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" for all systems.  The data structure
+            // "AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated" applies to Dual Duct System only and
             // if used will limit the application of this setpoint manager to other systems.  Thus,
-            // the "state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" data is used instead.
+            // the "AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" data is used instead.
 
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);

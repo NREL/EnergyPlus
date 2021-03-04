@@ -2469,7 +2469,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_NEAR(1.86168, DataSizing::FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
+    EXPECT_NEAR(1.86168, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
 
 // TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
@@ -6466,24 +6466,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    CalcFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
-    CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolOutHumRatSeq(63) = 0.01459;
-    CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolZoneTempSeq(63) = 24.;
-    CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolZoneHumRatSeq(63) = 0.00979;
-    CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(63) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(63) = 24.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(63) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     CollectPeakZoneConditions(*state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
@@ -6886,18 +6886,18 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 0;
     state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
     WriteLoadComponentSummaryTables(*state);
 
@@ -6944,11 +6944,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataWeatherManager->DesDayInput(2).Month = 1;
     state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
-
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
-
 
     // One Zone
     state->dataGlobal->NumOfZones = 1;
@@ -6960,69 +6958,66 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).HTSurfaceLast = 0;
 
-
-
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
-    DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     int coolDDNum = 1;
     int coolTimeOfMax = 64;
-    DataSizing::CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
-    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
-    DataSizing::CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    DataSizing::CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    DataSizing::CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    DataSizing::CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
-
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
     int heatDDNum = 2;
     int heatTimeOfMax = 4;
-    DataSizing::CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
-    DataSizing::HeatPeakDateHrMin.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
-    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
-    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
 
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     // One airloop, that serves this zone.
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataSizing::SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
-    DataSizing::CalcFinalZoneSizing(1).DesHeatLoad = 750.;
-    DataSizing::CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
-    DataSizing::CalcFinalZoneSizing(1).HeatDesTemp = 35.;
-    DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesHeatLoad = 750.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).HeatDesTemp = 35.;
+    state->dataSize->CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
 
 
-    DataSizing::CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
@@ -7034,21 +7029,21 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
-    DataSizing::FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
 
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
 
 
     // Set up Facility to peak like the zone too
-    DataSizing::CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
     AllocateLoadComponentArrays(*state);

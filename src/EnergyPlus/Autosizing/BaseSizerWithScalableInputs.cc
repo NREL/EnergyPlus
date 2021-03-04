@@ -63,34 +63,34 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
 {
     BaseSizerWithFanHeatInputs::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
 
-    this->dataScalableSizingON = DataSizing::DataScalableSizingON;
-    this->dataScalableCapSizingON = DataSizing::DataScalableCapSizingON;
-    this->dataHRFlowSizingFlag = DataSizing::HRFlowSizingFlag;
-    this->zoneCoolingOnlyFan = DataSizing::ZoneCoolingOnlyFan;
-    this->zoneHeatingOnlyFan = DataSizing::ZoneHeatingOnlyFan;
-    this->dataFracOfAutosizedCoolingAirflow = DataSizing::DataFracOfAutosizedCoolingAirflow;
-    this->dataFracOfAutosizedHeatingAirflow = DataSizing::DataFracOfAutosizedHeatingAirflow;
-    this->dataFlowPerCoolingCapacity = DataSizing::DataFlowPerCoolingCapacity;
-    this->dataAutosizedCoolingCapacity = DataSizing::DataAutosizedCoolingCapacity;
-    this->dataFlowPerHeatingCapacity = DataSizing::DataFlowPerHeatingCapacity;
-    this->dataAutosizedHeatingCapacity = DataSizing::DataAutosizedHeatingCapacity;
+    this->dataScalableSizingON = state.dataSize->DataScalableSizingON;
+    this->dataScalableCapSizingON = state.dataSize->DataScalableCapSizingON;
+    this->dataHRFlowSizingFlag = state.dataSize->HRFlowSizingFlag;
+    this->zoneCoolingOnlyFan = state.dataSize->ZoneCoolingOnlyFan;
+    this->zoneHeatingOnlyFan = state.dataSize->ZoneHeatingOnlyFan;
+    this->dataFracOfAutosizedCoolingAirflow = state.dataSize->DataFracOfAutosizedCoolingAirflow;
+    this->dataFracOfAutosizedHeatingAirflow = state.dataSize->DataFracOfAutosizedHeatingAirflow;
+    this->dataFlowPerCoolingCapacity = state.dataSize->DataFlowPerCoolingCapacity;
+    this->dataAutosizedCoolingCapacity = state.dataSize->DataAutosizedCoolingCapacity;
+    this->dataFlowPerHeatingCapacity = state.dataSize->DataFlowPerHeatingCapacity;
+    this->dataAutosizedHeatingCapacity = state.dataSize->DataAutosizedHeatingCapacity;
 
-    this->dataCoilSizingAirInTemp = DataSizing::DataCoilSizingAirInTemp;
-    this->dataCoilSizingAirInHumRat = DataSizing::DataCoilSizingAirInHumRat;
-    this->dataCoilSizingAirOutTemp = DataSizing::DataCoilSizingAirOutTemp;
-    this->dataCoilSizingAirOutHumRat = DataSizing::DataCoilSizingAirOutHumRat;
-    this->dataCoilSizingFanCoolLoad = DataSizing::DataCoilSizingFanCoolLoad;
-    this->dataCoilSizingCapFT = DataSizing::DataCoilSizingCapFT;
-    this->dataTotCapCurveIndex = DataSizing::DataTotCapCurveIndex;
-    this->dataTotCapCurveValue = DataSizing::DataTotCapCurveValue;
-    this->dataFracOfAutosizedCoolingCapacity = DataSizing::DataFracOfAutosizedCoolingCapacity;
-    this->dataFracOfAutosizedHeatingCapacity = DataSizing::DataFracOfAutosizedHeatingCapacity;
-    this->dataCoolCoilCap = DataSizing::DataCoolCoilCap;
-    this->dataCoilIsSuppHeater = DataSizing::DataCoilIsSuppHeater;
-    this->suppHeatCap = DataSizing::SuppHeatCap;
-    this->unitaryHeatCap = DataSizing::UnitaryHeatCap;
+    this->dataCoilSizingAirInTemp = state.dataSize->DataCoilSizingAirInTemp;
+    this->dataCoilSizingAirInHumRat = state.dataSize->DataCoilSizingAirInHumRat;
+    this->dataCoilSizingAirOutTemp = state.dataSize->DataCoilSizingAirOutTemp;
+    this->dataCoilSizingAirOutHumRat = state.dataSize->DataCoilSizingAirOutHumRat;
+    this->dataCoilSizingFanCoolLoad = state.dataSize->DataCoilSizingFanCoolLoad;
+    this->dataCoilSizingCapFT = state.dataSize->DataCoilSizingCapFT;
+    this->dataTotCapCurveIndex = state.dataSize->DataTotCapCurveIndex;
+    this->dataTotCapCurveValue = state.dataSize->DataTotCapCurveValue;
+    this->dataFracOfAutosizedCoolingCapacity = state.dataSize->DataFracOfAutosizedCoolingCapacity;
+    this->dataFracOfAutosizedHeatingCapacity = state.dataSize->DataFracOfAutosizedHeatingCapacity;
+    this->dataCoolCoilCap = state.dataSize->DataCoolCoilCap;
+    this->dataCoilIsSuppHeater = state.dataSize->DataCoilIsSuppHeater;
+    this->suppHeatCap = state.dataSize->SuppHeatCap;
+    this->unitaryHeatCap = state.dataSize->UnitaryHeatCap;
 
-    this->zoneHVACSizing = DataSizing::ZoneHVACSizing;
+    this->zoneHVACSizing = state.dataSize->ZoneHVACSizing;
 
     // set supply air fan properties
     if (this->isCoilReportObject && this->curSysNum > 0 && int(this->primaryAirSystem.size()) > 0 &&
@@ -134,12 +134,12 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             this->dataFractionUsedForSizing = 1.0;
             this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
             if (coolingSAFMethod == DataSizing::FlowPerFloorArea) {
-                DataSizing::DataScalableSizingON = true;
+                state.dataSize->DataScalableSizingON = true;
                 this->dataConstantUsedForSizing =
-                    this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataSizing::DataZoneNumber).FloorArea;
+                    this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
             } else if (coolingSAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
-                DataSizing::DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
-                DataSizing::DataScalableSizingON = true;
+                state.dataSize->DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
+                state.dataSize->DataScalableSizingON = true;
             }
         } else {
             if (int(this->zoneEqSizing.size()) > 0 && int(this->zoneEqSizing(this->curZoneEqNum).SizingMethod.size()) > 0) {

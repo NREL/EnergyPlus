@@ -726,14 +726,14 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlus::EnergyPlu
         //        }
         //
         //        if (countStaticInputs == NumDXMulSpeedCoils) {
-        //            OutputReportPredefined::addFootNoteSubTable(state.dataOutRptPredefined->pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI
+        //            OutputReportPredefined::addFootNoteSubTable(pdstVAVDXCoolCoil, "Packaged VAV unit ratings per ANSI/AHRI
         //            Standard 340/360-2007 with Addenda 1 and 2");
         //        } else if (countStaticInputs == 0) {
-        //            OutputReportPredefined::addFootNoteSubTable(state.dataOutRptPredefined->pdstVAVDXCoolCoil,
+        //            OutputReportPredefined::addFootNoteSubTable(pdstVAVDXCoolCoil,
         //                                "Indoor-coil-only unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, with "
         //                                "supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
         //        } else { // both
-        //            OutputReportPredefined::addFootNoteSubTable(state.dataOutRptPredefined->pdstVAVDXCoolCoil,
+        //            OutputReportPredefined::addFootNoteSubTable(pdstVAVDXCoolCoil,
         //                                "Packaged VAV unit ratings per ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2, "
         //                                "indoor-coil-only units with supply fan specific power at 365 {W/1000cfm} (773.3 {W/(m3/s)})");
         //        }

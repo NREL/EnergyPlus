@@ -189,15 +189,15 @@ namespace WindowComplexManager {
             state.dataWindowComplexManager->WindowList(state.dataWindowComplexManager->NumComplexWind).NumStates = 1; // Having found the construction reference in
             // the Surface array defines the first state for this window
             state.dataWindowComplexManager->WindowList(state.dataWindowComplexManager->NumComplexWind).SurfNo = ISurf;
-            // state.dataWindowComplexManager->WindowList( state.dataWindowComplexManager-> NumComplexWind ).Azimuth = DegToRadians * Surface( ISurf ).Azimuth;
-            // state.dataWindowComplexManager->WindowList( state.dataWindowComplexManager-> NumComplexWind ).Tilt = DegToRadians * Surface( ISurf ).Tilt;
+            // WindowList(  NumComplexWind ).Azimuth = DegToRadians * Surface( ISurf ).Azimuth;
+            // WindowList(  NumComplexWind ).Tilt = DegToRadians * Surface( ISurf ).Tilt;
             state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).InitInc = state.dataWindowComplexManager->Calculate_Geometry;
             state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).InitTrn = state.dataWindowComplexManager->Calculate_Geometry;
             state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).CopyIncState = 0;
             state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).CopyTrnState = 0;
             state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).Konst = IConst;
             // Simon Check: ThermalConstruction assigned to current construction
-            // state.dataWindowComplexManager->WindowStateList(NumComplexWind, NumStates)%ThermConst = ThConst
+            // WindowStateList(NumComplexWind, NumStates)%ThermConst = ThConst
             for (int I = 1; I <= state.dataWindowComplexManager->NumBasis; ++I) { // Find basis in Basis List
                 if (state.dataConstruction->Construct(IConst).BSDFInput.BasisMatIndex == state.dataWindowComplexManager->BasisList(I).BasisMatIndex) {
                     state.dataWindowComplexManager->WindowStateList(NumStates, state.dataWindowComplexManager->NumComplexWind).IncBasisIndx = I; // Note: square property matrices
@@ -304,7 +304,7 @@ namespace WindowComplexManager {
                 // SurfaceWindow(ISurf)%ComplexFen%State(IState)%ThermConst = ThConst
                 if (state.dataWindowComplexManager->WindowStateList(IState, IWind).InitInc == state.dataWindowComplexManager->Calculate_Geometry) {
                     state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Inc =
-                        state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->WindowStateList(IState, IWind).IncBasisIndx); // Put in the basis structure from the state.dataWindowComplexManager->BasisList
+                        state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->WindowStateList(IState, IWind).IncBasisIndx); // Put in the basis structure from the BasisList
                     state.dataBSDFWindow->ComplexWind(ISurf).Geom(IState).Trn = state.dataWindowComplexManager->BasisList(state.dataWindowComplexManager->WindowStateList(IState, IWind).TrnBasisIndx);
 
                     SetupComplexWindowStateGeometry(state,

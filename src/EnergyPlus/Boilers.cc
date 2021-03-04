@@ -556,7 +556,7 @@ namespace EnergyPlus::Boilers {
         int const PltSizNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum; // Plant Sizing index corresponding to CurLoopNum
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
 
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                      state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
@@ -568,7 +568,7 @@ namespace EnergyPlus::Boilers {
                                                                          DataGlobalConstants::HWInitConvTemp,
                                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                          RoutineName);
-                tmpNomCap = Cp * rho * this->SizFac * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
+                tmpNomCap = Cp * rho * this->SizFac * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -592,7 +592,7 @@ namespace EnergyPlus::Boilers {
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
@@ -616,8 +616,8 @@ namespace EnergyPlus::Boilers {
         }
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpBoilerVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpBoilerVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->VolFlowRateWasAutoSized) tmpBoilerVolFlowRate = 0.0;
             }
@@ -643,7 +643,7 @@ namespace EnergyPlus::Boilers {
                                                          "User-Specified Design Water Flow Rate [m3/s]",
                                                          VolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpBoilerVolFlowRate - VolFlowRateUser) / VolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeBoilerHotWater: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", VolFlowRateUser));
                                     ShowContinueError(
@@ -669,7 +669,7 @@ namespace EnergyPlus::Boilers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->BoilerInletNodeNum, tmpBoilerVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->BoilerInletNodeNum, tmpBoilerVolFlowRate);
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             // create predefined report

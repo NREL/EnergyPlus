@@ -680,7 +680,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     // Check subtotals used in zone component loads
     state->dataEnvrn->TotDesDays = 1;
     state->dataEnvrn->TotRunDesPersDays = 0;
-    DataSizing::CurOverallSimDay = 1;
+    state->dataSize->CurOverallSimDay = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 10;
     state->dataGlobal->TimeStep = 1;
@@ -690,13 +690,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     state->dataGlobal->CompLoadReportIsReq = true;
     state->dataGlobal->isPulseZoneSizing = false;
     InternalHeatGains::GatherComponentLoadsIntGain(*state);
-    totConvGains = state->dataOutRptTab->peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
+    totConvGains = state->dataOutRptTab->peopleInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->lightInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->equipInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->refrigInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->waterUseInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->hvacLossInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->powerGenInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum);
 
     // Legitimate gain types excluded from this total
     expectedTotConvGains -= convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide); // this is only used for CO2

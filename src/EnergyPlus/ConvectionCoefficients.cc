@@ -5794,7 +5794,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // METHODOLOGY EMPLOYED:
         // Long case statement depends on surface classification determined in DynamicIntConvSurfaceClassification
-        // then simply map data stored in state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo into the surface's structure
+        // then simply map data stored in InsideFaceAdaptiveConvectionAlgo into the surface's structure
         // if model type is user-defined, also store the index to the user curve to be used.
 
         auto &Surface(state.dataSurface->Surface);

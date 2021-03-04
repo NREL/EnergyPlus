@@ -1409,14 +1409,16 @@ namespace UnitarySystems {
         // References
         DataSizing::ZoneEqSizingData *select_EqSizing(nullptr);
 
+        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+
         // sweep specific data into one pointer to avoid if statements throughout this subroutine
-        if (DataSizing::CurOASysNum > 0) {
-            select_EqSizing = &DataSizing::OASysEqSizing(DataSizing::CurOASysNum);
-        } else if (DataSizing::CurSysNum > 0) {
-            select_EqSizing = &DataSizing::UnitarySysEqSizing(DataSizing::CurSysNum);
-        } else if (DataSizing::CurZoneEqNum > 0) {
-            select_EqSizing = &DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum);
-            DataSizing::ZoneEqUnitarySys = true;
+        if (state.dataSize->CurOASysNum > 0) {
+            select_EqSizing = &OASysEqSizing(state.dataSize->CurOASysNum);
+        } else if (state.dataSize->CurSysNum > 0) {
+            select_EqSizing = &state.dataSize->UnitarySysEqSizing(state.dataSize->CurSysNum);
+        } else if (state.dataSize->CurZoneEqNum > 0) {
+            select_EqSizing = &state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
+            state.dataSize->ZoneEqUnitarySys = true;
         } else {
             assert(false);
         }
@@ -1442,7 +1444,7 @@ namespace UnitarySystems {
         bool HardSizeNoDesRun; // Indicator to a hard-sized field with no design sizing data
 
         // Initiate all reporting variables
-        if (DataSizing::SysSizingRunDone || DataSizing::ZoneSizingRunDone) {
+        if (state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone) {
             HardSizeNoDesRun = false;
         } else {
             HardSizeNoDesRun = true;
@@ -1455,62 +1457,62 @@ namespace UnitarySystems {
         int HeatingSAFlowMethod = this->m_HeatingSAFMethod;
         // can't reset this to 0 for systems where DX heating coil is in downstream unit and DX cooling coil is in upstream unit
         //        DXCoolCap = 0.0;
-        DataSizing::UnitaryHeatCap = 0.0;
-        DataSizing::SuppHeatCap = 0.0;
+        state.dataSize->UnitaryHeatCap = 0.0;
+        state.dataSize->SuppHeatCap = 0.0;
         bool TempCoolingLoad = state.dataUnitarySystems->CoolingLoad;
         bool TempHeatingLoad = state.dataUnitarySystems->HeatingLoad;
         state.dataUnitarySystems->CoolingLoad = true;
         state.dataUnitarySystems->HeatingLoad = false;
-        DataSizing::ZoneCoolingOnlyFan = false;
-        DataSizing::ZoneHeatingOnlyFan = false;
+        state.dataSize->ZoneCoolingOnlyFan = false;
+        state.dataSize->ZoneHeatingOnlyFan = false;
         bool IsAutoSize = false;
         Real64 SysCoolingFlow = 0.0;
         Real64 SysHeatingFlow = 0.0;
         Real64 CoolCapAtPeak = 0.0;
         Real64 HeatCapAtPeak = 0.0;
 
-        if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0 && this->m_FanExists) {
+        if (state.dataSize->CurSysNum > 0 && state.dataSize->CurOASysNum == 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanVecIndex = this->m_FanIndex;
-                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
-                DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-                DataSizing::DataFanIndex = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataSize->DataFanIndex = this->m_FanIndex;
             } else {
-                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).SupFanNum = this->m_FanIndex;
-                state.dataAirSystemsData->PrimaryAirSystems(DataSizing::CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
-                DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-                DataSizing::DataFanIndex = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = this->m_FanIndex;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                state.dataSize->DataFanIndex = this->m_FanIndex;
             }
             if (this->m_FanPlace == FanPlace::BlowThru) {
                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
             } else if (this->m_FanPlace == FanPlace::DrawThru) {
                 state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
-        } else if (DataSizing::CurZoneEqNum > 0 && this->m_FanExists) {
+        } else if (state.dataSize->CurZoneEqNum > 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
             } else {
-                DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
             }
-            DataSizing::DataFanIndex = this->m_FanIndex;
+            state.dataSize->DataFanIndex = this->m_FanIndex;
             if (this->m_FanPlace == FanPlace::BlowThru) {
-                DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
             } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+                state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
             }
         }
 
-        if (this->ATMixerExists && DataSizing::CurZoneEqNum > 0) { // set up ATMixer conditions for scalable capacity sizing
-            SingleDuct::setATMixerSizingProperties(state, this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
+        if (this->ATMixerExists && state.dataSize->CurZoneEqNum > 0) { // set up ATMixer conditions for scalable capacity sizing
+            SingleDuct::setATMixerSizingProperties(state, this->m_ATMixerIndex, this->ControlZoneNum, state.dataSize->CurZoneEqNum);
         }
 
         PrintFlag = false;
         // STEP 1: find the DataSizing::AutoSized cooling air flow rate and capacity
         if (this->m_CoolCoilExists) {
-            if (!this->m_HeatCoilExists) DataSizing::ZoneCoolingOnlyFan = true;
+            if (!this->m_HeatCoilExists) state.dataSize->ZoneCoolingOnlyFan = true;
             TempSize = this->m_MaxCoolAirVolFlow;
-            SaveCurDuctType = DataSizing::CurDuctType;
-            DataSizing::CurDuctType = DataHVACGlobals::Cooling;
+            SaveCurDuctType = state.dataSize->CurDuctType;
+            state.dataSize->CurDuctType = DataHVACGlobals::Cooling;
             bool errorsFound = false;
             if ((CoolingSAFlowMethod == state.dataUnitarySystems->SupplyAirFlowRate) || (CoolingSAFlowMethod == state.dataUnitarySystems->None)) {
                 CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1537,31 +1539,31 @@ namespace UnitarySystems {
                     CoolingAirFlowSizer sizingCoolingAirFlow;
                     // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataSizing::DataFlowUsedForSizing = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
+                    state.dataSize->DataFlowUsedForSizing = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                     TempSize = DataSizing::AutoSize;
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].performance.normalMode.speeds[0].indexCapFT;
-                        DataSizing::DataIsDXCoil = true;
+                        state.dataSize->DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].performance.normalMode.speeds[0].indexCapFT;
+                        state.dataSize->DataIsDXCoil = true;
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                        DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
-                        DataSizing::DataIsDXCoil = true;
+                        state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
+                        state.dataSize->DataIsDXCoil = true;
                     }
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                     SysCoolingFlow = CoolCapAtPeak * this->m_MaxCoolAirVolFlow;
-                    DataSizing::DataTotCapCurveIndex = 0;
+                    state.dataSize->DataTotCapCurveIndex = 0;
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
                 } else {
                     SysCoolingFlow = this->m_DesignCoolingCapacity * this->m_MaxCoolAirVolFlow;
                     CoolCapAtPeak = this->m_DesignCoolingCapacity;
-                    DataSizing::DXCoolCap = CoolCapAtPeak;
+                    state.dataSize->DXCoolCap = CoolCapAtPeak;
                 }
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             } else {
@@ -1570,74 +1572,74 @@ namespace UnitarySystems {
                 ShowContinueError(state, "Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
-            DataSizing::CurDuctType = SaveCurDuctType;
+            state.dataSize->CurDuctType = SaveCurDuctType;
             EqSizing.CoolingAirFlow = true;
             EqSizing.CoolingAirVolFlow = SysCoolingFlow;
 
             // Cooling airflow should be known at this point. Now find DataSizing::AutoSized design cooling capacity.
             if (CoolingSAFlowMethod != state.dataUnitarySystems->FlowPerCoolingCapacity && this->m_DesignCoolingCapacity < 0.0) {
                 SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-                DataSizing::DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
+                state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                    DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].performance.normalMode.speeds[0].indexCapFT;
-                    DataSizing::DataIsDXCoil = true;
+                    state.dataSize->DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].performance.normalMode.speeds[0].indexCapFT;
+                    state.dataSize->DataIsDXCoil = true;
                 } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                            this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
                            this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed ||
                            this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
-                    DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
-                    DataSizing::DataIsDXCoil = true;
+                    state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
+                    state.dataSize->DataIsDXCoil = true;
                 }
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                    DataSizing::DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
-                    DataSizing::DataIsDXCoil = true;
+                    state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
+                    state.dataSize->DataIsDXCoil = true;
                 }
                 CoolingCapacitySizer sizerCoolingCapacity;
                 sizerCoolingCapacity.overrideSizingString(SizingString);
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                DataSizing::DXCoolCap = CoolCapAtPeak;
+                state.dataSize->DXCoolCap = CoolCapAtPeak;
                 EqSizing.CoolingCapacity = true;
                 EqSizing.DesCoolingLoad = CoolCapAtPeak;
             } else {
                 if (!HardSizeNoDesRun && (CoolingSAFlowMethod != state.dataUnitarySystems->FlowPerCoolingCapacity && this->m_DesignCoolingCapacity > 0.0)) {
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
-                        DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
-                        DataSizing::DataIsDXCoil = true;
+                        state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
+                        state.dataSize->DataIsDXCoil = true;
                     }
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
-                        DataSizing::DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
-                        DataSizing::DataIsDXCoil = true;
+                        state.dataSize->DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
+                        state.dataSize->DataIsDXCoil = true;
                     }
                     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-                    DataSizing::DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
+                    state.dataSize->DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                     TempSize = DataSizing::AutoSize;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolCapAtPeak = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataSizing::DXCoolCap = CoolCapAtPeak;
+                    state.dataSize->DXCoolCap = CoolCapAtPeak;
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
                 } else {
                     CoolCapAtPeak = this->m_DesignCoolingCapacity;
                 }
             }
-            DataSizing::DataIsDXCoil = false;
-            DataSizing::DataTotCapCurveIndex = 0;
-            DataSizing::DataFlowUsedForSizing = 0.0;
+            state.dataSize->DataIsDXCoil = false;
+            state.dataSize->DataTotCapCurveIndex = 0;
+            state.dataSize->DataFlowUsedForSizing = 0.0;
         }
 
         // STEP 2: find the DataSizing::AutoSized heating air flow rate and capacity
         if (this->m_HeatCoilExists) {
-            if (!this->m_CoolCoilExists) DataSizing::ZoneHeatingOnlyFan = true;
+            if (!this->m_CoolCoilExists) state.dataSize->ZoneHeatingOnlyFan = true;
             FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
             SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxHeatAirVolFlow;
-            SaveCurDuctType = DataSizing::CurDuctType;
-            DataSizing::CurDuctType = DataHVACGlobals::Heating;
+            SaveCurDuctType = state.dataSize->CurDuctType;
+            state.dataSize->CurDuctType = DataHVACGlobals::Heating;
             if ((HeatingSAFlowMethod == state.dataUnitarySystems->SupplyAirFlowRate) || (HeatingSAFlowMethod == state.dataUnitarySystems->None)) {
                 bool errorsFound = false;
                 HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -1670,24 +1672,24 @@ namespace UnitarySystems {
                 sizingHeatingAirFlow.overrideSizingString(SizingString);
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                DataSizing::DataFlowUsedForSizing = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
+                state.dataSize->DataFlowUsedForSizing = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                 SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                 TempSize = DataSizing::AutoSize;
-                DataSizing::DataFracOfAutosizedCoolingCapacity = 1.0;
-                DataSizing::DataHeatSizeRatio = this->m_HeatingSizingRatio;
+                state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
+                state.dataSize->DataHeatSizeRatio = this->m_HeatingSizingRatio;
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
-                    DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_HeatingCoilIndex, ErrFound);
-                    DataSizing::DataIsDXCoil = true;
+                    state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_HeatingCoilIndex, ErrFound);
+                    state.dataSize->DataIsDXCoil = true;
                 }
-                if (DataSizing::CurSysNum > 0)
+                if (state.dataSize->CurSysNum > 0)
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                         false; // set to false to allow calculation of actual heating capacity
                 HeatingCapacitySizer sizerHeatingCapacity;
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
+                if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 SysHeatingFlow = HeatCapAtPeak * this->m_MaxHeatAirVolFlow;
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
                 EqSizing.HeatingCapacity = true;
@@ -1698,22 +1700,22 @@ namespace UnitarySystems {
                 ShowContinueError(state, "Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
-            DataSizing::CurDuctType = SaveCurDuctType;
+            state.dataSize->CurDuctType = SaveCurDuctType;
             EqSizing.HeatingAirFlow = true;
             EqSizing.HeatingAirVolFlow = SysHeatingFlow;
 
             // Heating airflow should be known at this point. Now find DataSizing::AutoSized design heating capacity.
             if (HeatingSAFlowMethod != state.dataUnitarySystems->FlowPerHeatingCapacity && this->m_DesignHeatingCapacity == DataSizing::AutoSize) {
                 SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
-                DataSizing::DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
+                state.dataSize->DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
-                DataSizing::DataHeatSizeRatio = this->m_HeatingSizingRatio;
+                state.dataSize->DataHeatSizeRatio = this->m_HeatingSizingRatio;
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
-                    DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_HeatingCoilIndex, ErrFound);
-                    DataSizing::DataIsDXCoil = true;
+                    state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_HeatingCoilIndex, ErrFound);
+                    state.dataSize->DataIsDXCoil = true;
                 }
-                if (DataSizing::CurSysNum > 0)
+                if (state.dataSize->CurSysNum > 0)
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                         false; // set to false to allow calculation of actual heating capacity
                 bool errorsFound = false;
@@ -1721,19 +1723,19 @@ namespace UnitarySystems {
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
+                if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
                 if (!HardSizeNoDesRun && (HeatingSAFlowMethod != state.dataUnitarySystems->FlowPerHeatingCapacity && this->m_DesignHeatingCapacity != DataSizing::AutoSize)) {
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating) {
                         SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
-                        DataSizing::DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
+                        state.dataSize->DataFlowUsedForSizing = EqSizing.HeatingAirVolFlow;
                         TempSize = DataSizing::AutoSize;
-                        DataSizing::DataHeatSizeRatio = this->m_HeatingSizingRatio;
-                        DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_HeatingCoilIndex, ErrFound);
-                        DataSizing::DataIsDXCoil = true;
-                        if (DataSizing::CurSysNum > 0)
+                        state.dataSize->DataHeatSizeRatio = this->m_HeatingSizingRatio;
+                        state.dataSize->DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_HeatingCoilIndex, ErrFound);
+                        state.dataSize->DataIsDXCoil = true;
+                        if (state.dataSize->CurSysNum > 0)
                             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                                 false; // set to false to allow calculation of actual heating capacity
                         bool errorsFound = false;
@@ -1741,7 +1743,7 @@ namespace UnitarySystems {
                         sizerHeatingCapacity.overrideSizingString(SizingString);
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         HeatCapAtPeak = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                        if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
+                        if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
                         EqSizing.HeatingCapacity = true;
                         EqSizing.DesHeatingLoad = HeatCapAtPeak;
                     }
@@ -1750,9 +1752,9 @@ namespace UnitarySystems {
                 }
             }
             //            if ( ! UnitarySystem( UnitarySysNum ).CoolCoilExists )DXCoolCap = HeatCapAtPeak;
-            DataSizing::DataIsDXCoil = false;
-            DataSizing::DataTotCapCurveIndex = 0;
-            DataSizing::DataFlowUsedForSizing = 0.0;
+            state.dataSize->DataIsDXCoil = false;
+            state.dataSize->DataTotCapCurveIndex = 0;
+            state.dataSize->DataFlowUsedForSizing = 0.0;
         }
 
         // STEP 3: use the greater of cooling and heating air flow rates for system flow
@@ -1771,9 +1773,9 @@ namespace UnitarySystems {
             EqSizing.Capacity = true;
             EqSizing.DesCoolingLoad = max(EqSizing.DesCoolingLoad, EqSizing.DesHeatingLoad);
             EqSizing.DesHeatingLoad = EqSizing.DesCoolingLoad;
-            DataSizing::DXCoolCap = EqSizing.DesCoolingLoad;
-        } else if (!this->m_CoolCoilExists && DataSizing::CurZoneEqNum > 0) {
-            DataSizing::DXCoolCap = EqSizing.DesHeatingLoad;
+            state.dataSize->DXCoolCap = EqSizing.DesCoolingLoad;
+        } else if (!this->m_CoolCoilExists && state.dataSize->CurZoneEqNum > 0) {
+            state.dataSize->DXCoolCap = EqSizing.DesHeatingLoad;
         }
 
         if (this->m_OKToPrintSizing) PrintFlag = true;
@@ -1785,8 +1787,8 @@ namespace UnitarySystems {
             if (this->m_DesignFanVolFlowRate <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
                 this->m_DesignFanVolFlowRate = DataSizing::AutoSize;
             }
-            DataSizing::DataEMSOverrideON = this->m_DesignFanVolFlowRateEMSOverrideOn;
-            DataSizing::DataEMSOverride = this->m_DesignFanVolFlowRateEMSOverrideValue;
+            state.dataSize->DataEMSOverrideON = this->m_DesignFanVolFlowRateEMSOverrideOn;
+            state.dataSize->DataEMSOverride = this->m_DesignFanVolFlowRateEMSOverrideValue;
 
             bool errorsFound = false;
             SystemAirFlowSizer sizerSystemAirFlow;
@@ -1795,7 +1797,7 @@ namespace UnitarySystems {
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_DesignFanVolFlowRate = sizerSystemAirFlow.size(state, this->m_DesignFanVolFlowRate, errorsFound);
 
-            DataSizing::DataEMSOverrideON = false;
+            state.dataSize->DataEMSOverrideON = false;
             EqSizing.SystemAirFlow = false;
         }
 
@@ -1814,8 +1816,8 @@ namespace UnitarySystems {
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
             }
             FieldNum = 7; // N7 , \field Heating Supply Air Flow Rate
-            DataSizing::DataEMSOverrideON = this->m_MaxHeatAirVolFlowEMSOverrideOn;
-            DataSizing::DataEMSOverride = this->m_MaxHeatAirVolFlowEMSOverrideValue;
+            state.dataSize->DataEMSOverrideON = this->m_MaxHeatAirVolFlowEMSOverrideOn;
+            state.dataSize->DataEMSOverride = this->m_MaxHeatAirVolFlowEMSOverrideValue;
             TempSize = this->m_MaxHeatAirVolFlow;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             SizingString = "Heating Supply Air Flow Rate [m3/s]";
@@ -1825,8 +1827,8 @@ namespace UnitarySystems {
             // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
-            DataSizing::DataEMSOverrideON = false;
-            DataSizing::DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataEMSOverrideON = false;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
         }
 
         if (this->m_CoolCoilExists) {
@@ -1834,8 +1836,8 @@ namespace UnitarySystems {
             if (this->m_MaxCoolAirVolFlow <= 0.0) { // attempt to catch any missed logic in GetUnitarySystem
                 this->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
             }
-            DataSizing::DataEMSOverrideON = this->m_MaxCoolAirVolFlowEMSOverrideOn;
-            DataSizing::DataEMSOverride = this->m_MaxCoolAirVolFlowEMSOverrideValue;
+            state.dataSize->DataEMSOverrideON = this->m_MaxCoolAirVolFlowEMSOverrideOn;
+            state.dataSize->DataEMSOverride = this->m_MaxCoolAirVolFlowEMSOverrideValue;
             TempSize = this->m_MaxCoolAirVolFlow;
             bool errorsFound = false;
             CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1845,8 +1847,8 @@ namespace UnitarySystems {
             // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-            DataSizing::DataEMSOverrideON = false;
-            DataSizing::DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataEMSOverrideON = false;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
         }
 
         // If not set, set DesignFanVolFlowRate as greater of cooling and heating to make sure this value > 0.
@@ -1903,7 +1905,7 @@ namespace UnitarySystems {
             }
             if (this->m_NoCoolHeatSAFMethod <= state.dataUnitarySystems->SupplyAirFlowRate && this->m_ControlType == ControlType::CCMASHRAE) {
                 if (this->m_MaxNoCoolHeatAirVolFlow == DataSizing::AutoSize) {
-                    DataSizing::DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
+                    state.dataSize->DataConstantUsedForSizing = max(this->m_MaxCoolAirVolFlow, this->m_MaxHeatAirVolFlow);
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                         this->m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical) {
                         minNoLoadFlow = 0.6667; // TODO: Should this have a Coil:Cooling:DX block?
@@ -1915,23 +1917,23 @@ namespace UnitarySystems {
                         }
                     }
                     if (this->m_MaxCoolAirVolFlow >= this->m_MaxHeatAirVolFlow) {
-                        DataSizing::DataFractionUsedForSizing = min(minNoLoadFlow, (this->m_MaxHeatAirVolFlow / this->m_MaxCoolAirVolFlow) - 0.01);
+                        state.dataSize->DataFractionUsedForSizing = min(minNoLoadFlow, (this->m_MaxHeatAirVolFlow / this->m_MaxCoolAirVolFlow) - 0.01);
                     } else {
-                        DataSizing::DataFractionUsedForSizing = min(minNoLoadFlow, (this->m_MaxCoolAirVolFlow / this->m_MaxHeatAirVolFlow) - 0.01);
+                        state.dataSize->DataFractionUsedForSizing = min(minNoLoadFlow, (this->m_MaxCoolAirVolFlow / this->m_MaxHeatAirVolFlow) - 0.01);
                     }
                 } else {
-                    DataSizing::DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-                    DataSizing::DataFractionUsedForSizing = 1.0;
+                    state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+                    state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
             } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FractionOfAutoSizedCoolingValue) {
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.CoolingAirVolFlow;
-                DataSizing::DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
             } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FractionOfAutoSizedHeatingValue) {
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.HeatingAirVolFlow;
-                DataSizing::DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
             } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FlowPerCoolingCapacity) {
                 if (EqSizing.DesCoolingLoad <= 0.0) {
@@ -1946,8 +1948,8 @@ namespace UnitarySystems {
                     }
                 }
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.DesCoolingLoad;
-                DataSizing::DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
             } else if (this->m_NoCoolHeatSAFMethod == state.dataUnitarySystems->FlowPerHeatingCapacity) {
                 if (EqSizing.DesHeatingLoad <= 0.0) {
@@ -1962,16 +1964,16 @@ namespace UnitarySystems {
                     }
                 }
                 this->m_MaxNoCoolHeatAirVolFlow *= EqSizing.DesHeatingLoad;
-                DataSizing::DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 this->m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
             } else {
-                DataSizing::DataFractionUsedForSizing = this->m_NoLoadAirFlowRateRatio;
+                state.dataSize->DataFractionUsedForSizing = this->m_NoLoadAirFlowRateRatio;
             }
 
             FieldNum = 11; // N11 , \field No Load Supply Air Flow Rate
-            DataSizing::DataEMSOverrideON = this->m_MaxNoCoolHeatAirVolFlowEMSOverrideOn;
-            DataSizing::DataEMSOverride = this->m_MaxNoCoolHeatAirVolFlowEMSOverrideValue;
+            state.dataSize->DataEMSOverrideON = this->m_MaxNoCoolHeatAirVolFlowEMSOverrideOn;
+            state.dataSize->DataEMSOverride = this->m_MaxNoCoolHeatAirVolFlowEMSOverrideValue;
             TempSize = this->m_MaxNoCoolHeatAirVolFlow;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             SizingString = "No Load Supply Air Flow Rate [m3/s]";
@@ -1981,9 +1983,9 @@ namespace UnitarySystems {
             // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
-            DataSizing::DataEMSOverrideON = false;
-            DataSizing::DataConstantUsedForSizing = 0.0;
-            DataSizing::DataFractionUsedForSizing = 0.0;
+            state.dataSize->DataEMSOverrideON = false;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataFractionUsedForSizing = 0.0;
         }
 
         if (this->m_MaxCoolAirVolFlow > 0.0) {
@@ -1993,8 +1995,8 @@ namespace UnitarySystems {
             this->LowSpeedHeatFanRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_MaxHeatAirVolFlow;
         }
 
-        if (this->ATMixerExists && DataSizing::CurZoneEqNum > 0) { // set up ATMixer conditions for use in component sizing
-            SingleDuct::setATMixerSizingProperties(state, this->m_ATMixerIndex, this->ControlZoneNum, DataSizing::CurZoneEqNum);
+        if (this->ATMixerExists && state.dataSize->CurZoneEqNum > 0) { // set up ATMixer conditions for use in component sizing
+            SingleDuct::setATMixerSizingProperties(state, this->m_ATMixerIndex, this->ControlZoneNum, state.dataSize->CurZoneEqNum);
         }
 
         // Change the Volume Flow Rates to Mass Flow Rates
@@ -2054,10 +2056,10 @@ namespace UnitarySystems {
                 ShowFatalError(state, "Cooling coil = " + state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).VarSpeedCoilType + ": " +
                                state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).Name);
             }
-            DataSizing::DXCoolCap = VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
+            state.dataSize->DXCoolCap = VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
                 DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
-            EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
-            EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
+            EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
+            EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
 
             for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
                 this->m_CoolVolumeFlowRate[Iter] = state.dataVariableSpeedCoils->VarSpeedCoil(this->m_CoolingCoilIndex).MSRatedAirVolFlowRate(Iter);
@@ -2124,9 +2126,9 @@ namespace UnitarySystems {
                 }
             }
 
-            DataSizing::DXCoolCap = newCoil.performance.normalMode.ratedGrossTotalCap;
-            EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
-            if (this->m_HeatPump) EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
+            state.dataSize->DXCoolCap = newCoil.performance.normalMode.ratedGrossTotalCap;
+            EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
+            if (this->m_HeatPump) EqSizing.DesHeatingLoad = state.dataSize->DXCoolCap;
 
             if (MSHPIndex > 0) {
                 this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * state.dataUnitarySystems->designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
@@ -2156,8 +2158,8 @@ namespace UnitarySystems {
                 // do nothing, the vars EqSizing.DesCoolingLoad and DataSizing::DXCoolCap are already set earlier and the values could be max of the
                 // cooling and heating austosized values. Thus reseting them here to user specified value may not be the design size used else where
             } else {
-                DataSizing::DXCoolCap = DXCoils::GetCoilCapacityByIndexType(state, this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound);
-                EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
+                state.dataSize->DXCoolCap = DXCoils::GetCoilCapacityByIndexType(state, this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound);
+                EqSizing.DesCoolingLoad = state.dataSize->DXCoolCap;
             }
             MSHPIndex = this->m_DesignSpecMSHPIndex;
 
@@ -2398,7 +2400,7 @@ namespace UnitarySystems {
 
         // Not sure if this may be needed for special cases
         if (this->m_CoolCoilExists && this->m_MaxCoolAirVolFlow < 0.0) {
-            if (!DataSizing::SysSizingRunDone) {
+            if (!state.dataSize->SysSizingRunDone) {
                 BranchNum = BranchInputManager::GetAirBranchIndex(state, "AirloopHVAC:UnitarySystem", this->Name);
                 FanType = "";
                 m_FanName = "";
@@ -2439,12 +2441,12 @@ namespace UnitarySystems {
                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
                 WaterCoils::SimulateWaterCoilComponents(
                     state, this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
+                state.dataSize->DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
                                                                                          UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num)),
                                                                                          this->m_CoolingCoilName,
                                                                                          ErrFound);
-                EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted) {
@@ -2454,12 +2456,12 @@ namespace UnitarySystems {
                     state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound, true);
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
                     state, blankString, true, state.dataUnitarySystems->On, 1.0, this->m_CoolingCoilIndex, 1, false, 1.0, false);
-                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
+                state.dataSize->DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
                                                                                          UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType)),
                                                                                          HXCoilName,
                                                                                          ErrFound);
-                EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
@@ -2476,15 +2478,15 @@ namespace UnitarySystems {
                                                                 0,
                                                                 0.0,
                                                                 FirstHVACIteration);
-                DataSizing::DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
+                state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPumpSimple::GetCoilCapacity(
                     state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
-                EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignCoolingCapacity = DataSizing::AutoSize;
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP)
-                    EqSizing.DesHeatingLoad = DataSizing::DataConstantUsedForSizing;
+                    EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHP) {
                 WaterToAirHeatPump::SimWatertoAirHP(state,
                                                     blankString,
@@ -2501,35 +2503,35 @@ namespace UnitarySystems {
                                                     0.0,
                                                     0,
                                                     0.0);
-                DataSizing::DataConstantUsedForSizing = WaterToAirHeatPump::GetCoilCapacity(
+                state.dataSize->DataConstantUsedForSizing = WaterToAirHeatPump::GetCoilCapacity(
                     state, DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound);
-                EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHP ||
                     this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple)
-                    EqSizing.DesHeatingLoad = DataSizing::DataConstantUsedForSizing;
+                    EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
             } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_PackagedThermalStorageCooling) {
                 PackagedThermalStorageCoil::SimTESCoil(
                     state, this->m_CoolingCoilName, this->m_CoolingCoilIndex, this->m_FanOpMode, this->m_TESOpMode, 0.0);
                 PackagedThermalStorageCoil::GetTESCoilCoolingCapacity(
-                    state, this->m_CoolingCoilName, DataSizing::DataConstantUsedForSizing, ErrFound, CompType);
-                EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                    state, this->m_CoolingCoilName, state.dataSize->DataConstantUsedForSizing, ErrFound, CompType);
+                EqSizing.DesCoolingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
             }
 
             TempSize = this->m_DesignCoolingCapacity;
-            DataSizing::DataFlowUsedForSizing = this->m_MaxCoolAirVolFlow;
+            state.dataSize->DataFlowUsedForSizing = this->m_MaxCoolAirVolFlow;
             SizingString = "Nominal Cooling Capacity [W]";
             bool errorsFound = false;
             CoolingCapacitySizer sizerCoolingCapacity;
             sizerCoolingCapacity.overrideSizingString(SizingString);
             sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_DesignCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-            DataSizing::DataConstantUsedForSizing = 0.0;
-            DataSizing::DataFractionUsedForSizing = 0.0;
-            DataSizing::DataFlowUsedForSizing = 0.0;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataFractionUsedForSizing = 0.0;
+            state.dataSize->DataFlowUsedForSizing = 0.0;
         }
 
         if (this->m_HeatCoilExists) {
@@ -2540,19 +2542,19 @@ namespace UnitarySystems {
             if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 WaterCoils::SimulateWaterCoilComponents(
                     state, this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
+                state.dataSize->DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
                                                                                          UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num)),
                                                                                          this->m_HeatingCoilName,
                                                                                          ErrFound);
-                EqSizing.DesHeatingLoad = DataSizing::DataConstantUsedForSizing;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                EqSizing.DesHeatingLoad = state.dataSize->DataConstantUsedForSizing;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 this->m_DesignHeatingCapacity = DataSizing::AutoSize;
             }
 
             TempSize = this->m_DesignHeatingCapacity;
             SizingString = "Nominal Heating Capacity [W]";
-            if (DataSizing::CurSysNum > 0)
+            if (state.dataSize->CurSysNum > 0)
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                     false; // set to false to allow calculation of parent object heating capacity
             bool errorsFound = false;
@@ -2560,21 +2562,21 @@ namespace UnitarySystems {
             sizerHeatingCapacity.overrideSizingString(SizingString);
             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-            if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) DataSizing::DXCoolCap = TempSize;
-            if (DataSizing::CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
+            if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) state.dataSize->DXCoolCap = TempSize;
+            if (state.dataSize->CurSysNum > 0) state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
             this->m_DesignHeatingCapacity = TempSize;
-            DataSizing::DataConstantUsedForSizing = 0.0;
-            DataSizing::DataFractionUsedForSizing = 0.0;
-            DataSizing::DataHeatSizeRatio = 1.0;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataFractionUsedForSizing = 0.0;
+            state.dataSize->DataHeatSizeRatio = 1.0;
         }
 
         if (!HardSizeNoDesRun && (EqSizing.Capacity && EqSizing.DesHeatingLoad > 0.0)) {
             // vars EqSizing.DesHeatingLoad is already set earlier and supplemental heating coil should
             // be sized to design value instead of user specified value if HardSizeNoDesRun is false
-            DataSizing::UnitaryHeatCap = EqSizing.DesHeatingLoad;
+            state.dataSize->UnitaryHeatCap = EqSizing.DesHeatingLoad;
 
         } else {
-            DataSizing::UnitaryHeatCap = this->m_DesignHeatingCapacity;
+            state.dataSize->UnitaryHeatCap = this->m_DesignHeatingCapacity;
         }
 
         if ((this->m_HeatCoilExists || this->m_SuppCoilExists) && this->m_ControlType != ControlType::CCMASHRAE) {
@@ -2604,8 +2606,8 @@ namespace UnitarySystems {
             TempSize = this->m_DesignSuppHeatingCapacity;
 
             if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat && IsAutoSize) {
-                DataSizing::DataConstantUsedForSizing = max(this->m_DesignSuppHeatingCapacity, this->m_DesignCoolingCapacity);
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = max(this->m_DesignSuppHeatingCapacity, this->m_DesignCoolingCapacity);
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 SizingMethod = DataHVACGlobals::AutoCalculateSizing;
                 TempSize = DataSizing::AutoSize;
             }
@@ -2617,19 +2619,19 @@ namespace UnitarySystems {
             sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
             IsAutoSize = false;
-            DataSizing::DataConstantUsedForSizing = 0.0;
-            DataSizing::DataFractionUsedForSizing = 0.0;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataFractionUsedForSizing = 0.0;
 
-            DataSizing::SuppHeatCap = this->m_DesignSuppHeatingCapacity;
+            state.dataSize->SuppHeatCap = this->m_DesignSuppHeatingCapacity;
         }
 
         // register plant flow rate. Not sure this has ever been tested.
         if (this->m_HeatRecActive) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->m_HeatRecoveryInletNodeNum, this->m_DesignHRWaterVolumeFlow);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->m_HeatRecoveryInletNodeNum, this->m_DesignHRWaterVolumeFlow);
         }
 
         // Set flow rate for unitary system with no fan
-        if (DataSizing::CurOASysNum == 0 && DataSizing::CurZoneEqNum == 0 && this->m_DesignFanVolFlowRate <= 0.0) {
+        if (state.dataSize->CurOASysNum == 0 && state.dataSize->CurZoneEqNum == 0 && this->m_DesignFanVolFlowRate <= 0.0) {
             SystemFlow = 0;
             if (AirLoopNum > 0) SystemFlow = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).DesignVolFlowRate;
             if (SystemFlow > 0.0) {
@@ -2696,17 +2698,17 @@ namespace UnitarySystems {
         if (this->m_ControlType == ControlType::CCMASHRAE) {
 
             SizingDesRunThisSys = false;
-            DataSizing::DataZoneUsedForSizing = this->ControlZoneNum;
-            CheckThisZoneForSizing(DataSizing::DataZoneUsedForSizing, SizingDesRunThisSys);
+            state.dataSize->DataZoneUsedForSizing = this->ControlZoneNum;
+            CheckThisZoneForSizing(state, state.dataSize->DataZoneUsedForSizing, SizingDesRunThisSys);
 
             capacityMultiplier = 0.5; // one-half of design zone load
             if (SizingDesRunThisSys) {
-                DataSizing::DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesCoolLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(this->ControlZoneNum).DesCoolLoad * capacityMultiplier;
             } else {
-                DataSizing::DataCapacityUsedForSizing = this->m_DesignCoolingCapacity * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = this->m_DesignCoolingCapacity * capacityMultiplier;
             }
-            DataSizing::DataCapacityUsedForSizing /= this->ControlZoneMassFlowFrac;
-            DataSizing::DataFlowUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+            state.dataSize->DataCapacityUsedForSizing /= this->ControlZoneMassFlowFrac;
+            state.dataSize->DataFlowUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
             ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
             std::string stringOverride = "Minimum Supply Air Temperature [C]";
             if (state.dataGlobal->isEpJSON) stringOverride = "minimum_supply_air_temperature [C]";
@@ -2715,12 +2717,12 @@ namespace UnitarySystems {
             this->DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, this->DesignMinOutletTemp, ErrFound);
 
             if (SizingDesRunThisSys) {
-                DataSizing::DataCapacityUsedForSizing = DataSizing::FinalZoneSizing(this->ControlZoneNum).DesHeatLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(this->ControlZoneNum).DesHeatLoad * capacityMultiplier;
             } else {
-                DataSizing::DataCapacityUsedForSizing = this->m_DesignHeatingCapacity * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = this->m_DesignHeatingCapacity * capacityMultiplier;
             }
-            DataSizing::DataCapacityUsedForSizing /= this->ControlZoneMassFlowFrac;
-            DataSizing::DataFlowUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
+            state.dataSize->DataCapacityUsedForSizing /= this->ControlZoneMassFlowFrac;
+            state.dataSize->DataFlowUsedForSizing = this->m_MaxNoCoolHeatAirVolFlow;
             ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
             stringOverride = "Maximum Supply Air Temperature [C]";
             if (state.dataGlobal->isEpJSON) stringOverride = "maximum_supply_air_temperature [C]";
@@ -2728,9 +2730,9 @@ namespace UnitarySystems {
             sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             this->DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(state, this->DesignMaxOutletTemp, ErrFound);
 
-            DataSizing::DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
-            DataSizing::DataFlowUsedForSizing = 0.0;
-            DataSizing::DataZoneUsedForSizing = 0;
+            state.dataSize->DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
+            state.dataSize->DataFlowUsedForSizing = 0.0;
+            state.dataSize->DataZoneUsedForSizing = 0;
 
             // check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
             if (this->m_MaxNoCoolHeatAirVolFlow >= this->m_MaxCoolAirVolFlow || this->m_MaxNoCoolHeatAirVolFlow >= this->m_MaxHeatAirVolFlow) {
@@ -3459,7 +3461,7 @@ namespace UnitarySystems {
                     }
 
                     // check if the UnitarySystem is connected to an outside air system
-                    if (!AirLoopFound && DataSizing::CurOASysNum > 0) {
+                    if (!AirLoopFound && state.dataSize->CurOASysNum > 0) {
                         for (int OASysNum = 1; OASysNum <= state.dataAirLoop->NumOASystems; ++OASysNum) {
                             for (int OACompNum = 1; OACompNum <= state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
                                 if (!UtilityRoutines::SameString(state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(OACompNum), thisObjectName) ||
@@ -7105,7 +7107,7 @@ namespace UnitarySystems {
                                         "Cooling",
                                         _,
                                         "System");
-                }    
+                }
                 if (state.dataUnitarySystems->unitarySys[sysNum].m_HeatCoilExists || state.dataUnitarySystems->unitarySys[sysNum].m_SuppCoilExists) {
                     SetupOutputVariable(state,
                                         "Unitary System Heating Ancillary Electricity Energy",
@@ -10288,11 +10290,7 @@ namespace UnitarySystems {
                 DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
             }
         } else if (this->m_DiscreteSpeedCoolingCoil && (state.dataUnitarySystems->CoolingLoad && CoolSpeedNum == 1)) {
-            if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow; // #5737
-            } else {
-                DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow * PartLoadRatio; // proportional to PLR when speed = 1,  #5518
-            }
+            DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow;
         } else {
             DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOffMassFlow; // these need to be set for multi-speed coils
         }
@@ -13883,6 +13881,9 @@ namespace UnitarySystems {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variable for the coils.
 
+        auto &OASysEqSizing(state.dataSize->OASysEqSizing);
+        auto &CurOASysNum(state.dataSize->CurOASysNum);
+
         Real64 ReportingConstant = DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
 
         Real64 SensibleOutput = 0.0; // sensible output rate, {W}
@@ -14205,19 +14206,19 @@ namespace UnitarySystems {
 
             if (!state.dataGlobal->SysSizingCalc) {
 
-                if (DataSizing::CurOASysNum > 0) {
-                    DataSizing::OASysEqSizing(DataSizing::CurOASysNum).AirFlow = false;
-                    DataSizing::OASysEqSizing(DataSizing::CurOASysNum).CoolingAirFlow = false;
-                    DataSizing::OASysEqSizing(DataSizing::CurOASysNum).HeatingAirFlow = false;
-                    DataSizing::OASysEqSizing(DataSizing::CurOASysNum).Capacity = false;
-                    DataSizing::OASysEqSizing(DataSizing::CurOASysNum).CoolingCapacity = false;
-                    DataSizing::OASysEqSizing(DataSizing::CurOASysNum).HeatingCapacity = false;
+                if (CurOASysNum > 0) {
+                    OASysEqSizing(CurOASysNum).AirFlow = false;
+                    OASysEqSizing(CurOASysNum).CoolingAirFlow = false;
+                    OASysEqSizing(CurOASysNum).HeatingAirFlow = false;
+                    OASysEqSizing(CurOASysNum).Capacity = false;
+                    OASysEqSizing(CurOASysNum).CoolingCapacity = false;
+                    OASysEqSizing(CurOASysNum).HeatingCapacity = false;
                     this->m_FirstPass = false;
-                } else if (DataSizing::CurSysNum > 0) {
-                    state.dataAirLoop->AirLoopControlInfo(DataSizing::CurSysNum).UnitarySysSimulating = false;
-                    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, this->m_FirstPass);
-                } else if (DataSizing::CurZoneEqNum > 0) {
-                    DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, this->m_FirstPass);
+                } else if (state.dataSize->CurSysNum > 0) {
+                    state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;
+                    DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
+                } else if (state.dataSize->CurZoneEqNum > 0) {
+                    DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
                 } else {
                     this->m_FirstPass = false;
                 }
@@ -14226,7 +14227,7 @@ namespace UnitarySystems {
 
         // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
         DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
-        DataSizing::ZoneEqUnitarySys = false;
+        state.dataSize->ZoneEqUnitarySys = false;
     }
 
     void UnitarySys::unitarySystemHeatRecovery(EnergyPlusData &state)
@@ -14544,7 +14545,7 @@ namespace UnitarySystems {
         //       Par(3)  = REAL(OpMode,r64)     ! Fan control, IF 1.0 then cycling fan, if 0.0 then continuous fan
         //       Par(4)  = REAL(CompOp,r64)     ! Compressor control, IF 1.0 then compressor ON, if 0.0 then compressor OFF
         //       Par(5)  = SensLoad or MoistureLoad   ! Sensible or Latent load to be met by unitary system
-        //       Par(6)  = state.dataUnitarySystems->HeatingLoad or CoolingLoad ! Type of load FLAG, 0.0 IF heating load, 1.0 IF cooling or moisture load
+        //       Par(6)  = HeatingLoad or CoolingLoad ! Type of load FLAG, 0.0 IF heating load, 1.0 IF cooling or moisture load
         //       Par(7)  = 1.0                  ! Output calculation FLAG, 0.0 for latent capacity, 1.0 for sensible capacity
         //       Par(8)  = OnOffAirFlowRatio    ! Ratio of compressor ON air mass flow to AVERAGE air mass flow over time step
         //       Par(9)  = HXUnitOn             ! flag to enable HX, 1=ON and 2=OFF
@@ -16136,11 +16137,7 @@ namespace UnitarySystems {
                 if (this->m_CoolingSpeedNum <= 1) {
                     this->m_CoolingSpeedRatio = 0.0;
                     this->m_CoolingCycRatio = PartLoadRatio;
-                    if (this->m_FanOpMode == DataHVACGlobals::ContFanCycCoil) {
-                        DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow; // #5737
-                    } else {
-                        DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow * PartLoadRatio; // #5518
-                    }
+                    DataHVACGlobals::MSHPMassFlowRateLow = state.dataUnitarySystems->CompOnMassFlow;
                 } else {
                     if (this->m_SingleMode == 0) {
                         this->m_CoolingSpeedRatio = PartLoadRatio;
