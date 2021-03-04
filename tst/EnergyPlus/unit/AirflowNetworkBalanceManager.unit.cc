@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     GetAirflowNetworkInput(*state);
 
     // MultizoneZoneData has only 1 element so may be hardcoded
-    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
+    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
 
     state->dataHeatBal->Zone.deallocate();
@@ -2260,13 +2260,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     Real64 PressureSet = 0.5;
 
-    Schedule(UtilityRoutines::FindItemInList("PRESSURE SETPOINT SCHEDULE", Schedule({1, NumSchedules}))).CurrentValue =
+    state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("PRESSURE SETPOINT SCHEDULE", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue =
         PressureSet; // Pressure setpoint
-    Schedule(UtilityRoutines::FindItemInList("FANANDCOILAVAILSCHED", Schedule({1, NumSchedules}))).CurrentValue =
+    state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("FANANDCOILAVAILSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue =
         1.0;                                                                                         // set availability and fan schedule to 1
-    Schedule(UtilityRoutines::FindItemInList("ON", Schedule({1, NumSchedules}))).CurrentValue = 1.0; // On
-    Schedule(UtilityRoutines::FindItemInList("VENTINGSCHED", Schedule({1, NumSchedules}))).CurrentValue = 25.55;  // VentingSched
-    Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", Schedule({1, NumSchedules}))).CurrentValue = 1.0; // WindowVentSched
+    state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("ON", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue = 1.0; // On
+    state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("VENTINGSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue = 25.55;  // VentingSched
+    state->dataScheduleMgr->Schedule(UtilityRoutines::FindItemInList("WINDOWVENTSCHED", state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}))).CurrentValue = 1.0; // WindowVentSched
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
@@ -2493,7 +2493,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
 
     // changed index 2 to 1 because in new sorted scheedule MultizoneZone(1).VentingSchName ("FREERUNNINGSEASON")
     // has index 1 which is the .VentSchNum
-    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
+    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneZoneData(1).VentingSchNum);
 
     state->dataHeatBal->Zone.deallocate();
@@ -13119,12 +13119,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
 
     Real64 PresssureSet = 0.5;
     // Assign values
-    Schedule(1).CurrentValue = 25.55;         // WindowVentSched
-    Schedule(9).CurrentValue = 1.0;           // FanAndCoilAvailSched
-    Schedule(14).CurrentValue = 1.0;          // VentingSched
-    Schedule(16).CurrentValue = PresssureSet; // Pressure setpoint
-    Schedule(17).CurrentValue = 1.0;          // HVACTemplate-Always 1
-    Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.55;         // WindowVentSched
+    state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;           // FanAndCoilAvailSched
+    state->dataScheduleMgr->Schedule(14).CurrentValue = 1.0;          // VentingSched
+    state->dataScheduleMgr->Schedule(16).CurrentValue = PresssureSet; // Pressure setpoint
+    state->dataScheduleMgr->Schedule(17).CurrentValue = 1.0;          // HVACTemplate-Always 1
+    state->dataScheduleMgr->Schedule(18).CurrentValue = 0.0;          // HVACTemplate-Always 0
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
@@ -15590,20 +15590,20 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     // Read AirflowNetwork inputs
     GetAirflowNetworkInput(*state);
 
-    Schedule(1).CurrentValue = 1.0;
-    Schedule(2).CurrentValue = 100.0;
-    Schedule(3).CurrentValue = 1.0;
-    Schedule(4).CurrentValue = 1.0;
-    Schedule(5).CurrentValue = 0.1;
-    Schedule(6).CurrentValue = 1.0;
-    Schedule(7).CurrentValue = 1.0;
-    Schedule(8).CurrentValue = 1.0;
-    Schedule(9).CurrentValue = 1.0;
-    Schedule(10).CurrentValue = 1.0;
-    Schedule(11).CurrentValue = 21.0;
-    Schedule(12).CurrentValue = 25.0;
-    Schedule(13).CurrentValue = 1.0;
-    Schedule(14).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 100.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(5).CurrentValue = 0.1;
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(7).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(8).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(9).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(10).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(11).CurrentValue = 21.0;
+    state->dataScheduleMgr->Schedule(12).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(13).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(14).CurrentValue = 1.0;
 
     AirflowNetwork::AirflowNetworkFanActivated = true;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
@@ -20131,7 +20131,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
 
     // MultizoneSurfaceData(1) is connected to a normal heat transfer surface -
     // venting schedule should be non-zero and venting method should be ZoneLevel
-    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneSurfaceData(1).VentingSchName, Schedule({1, NumSchedules}));
+    auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneSurfaceData(1).VentingSchName, state->dataScheduleMgr->Schedule({1, state->dataScheduleMgr->NumSchedules}));
     EXPECT_GT(GetIndex, 0);
     EXPECT_EQ(GetIndex, AirflowNetwork::MultizoneSurfaceData(1).VentingSchNum);
     EXPECT_EQ(AirflowNetwork::MultizoneSurfaceData(1).VentSurfCtrNum, AirflowNetwork::VentControlType::Temp);
