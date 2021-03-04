@@ -7541,7 +7541,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
 
     auto &thisFanCoil(FanCoil(1));
@@ -7969,7 +7969,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
 

@@ -1702,7 +1702,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -2366,7 +2366,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -2640,7 +2640,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -3034,7 +3034,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -3193,7 +3193,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -3686,7 +3686,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;

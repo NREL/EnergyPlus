@@ -1123,7 +1123,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     GetMaterialData(*state, ErrorsFound);

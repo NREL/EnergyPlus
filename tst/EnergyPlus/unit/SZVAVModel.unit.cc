@@ -563,7 +563,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(FanCoil(1));
     EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);

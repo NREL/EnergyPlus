@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep)
 TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
 {
 
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataScheduleMgr->NumSchedules = 1;
     state->dataScheduleMgr->Schedule.allocate(1);
@@ -977,8 +977,8 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     int nDays = 366;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
-    ScheduleManager::ScheduleInputProcessed = true;
-    EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    EXPECT_TRUE(state->dataScheduleMgr->ScheduleInputProcessed);
     state->dataScheduleMgr->NumSchedules = 1;
     state->dataScheduleMgr->Schedule.allocate(state->dataScheduleMgr->NumSchedules);
 
@@ -1159,8 +1159,8 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     int nDays = 365;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
-    ScheduleManager::ScheduleInputProcessed = true;
-    EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    EXPECT_TRUE(state->dataScheduleMgr->ScheduleInputProcessed);
     state->dataScheduleMgr->NumSchedules = 1;
     state->dataScheduleMgr->Schedule.allocate(state->dataScheduleMgr->NumSchedules);
 

@@ -1113,7 +1113,7 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
     SurfaceGeometry::GetSurfaceData(*state, localErrorsFound);
     EXPECT_FALSE(localErrorsFound);
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataHeatBal->Zone(2).HasWindow = true;
     state->dataHeatBal->Zone(4).HasWindow = true;

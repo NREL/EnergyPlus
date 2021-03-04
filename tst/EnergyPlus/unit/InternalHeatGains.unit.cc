@@ -290,7 +290,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     HeatBalanceManager::GetZoneData(*state, ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataScheduleMgr->Schedule(1).Used = true;
 
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;

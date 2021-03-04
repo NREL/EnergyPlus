@@ -562,7 +562,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     Fans::GetFanInput(*state);
 
     OutdoorAirUnit::GetOutdoorAirUnitInputs(*state);
@@ -868,7 +868,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     Fans::GetFanInput(*state);
 
     OutdoorAirUnit::GetOutdoorAirUnitInputs(*state);

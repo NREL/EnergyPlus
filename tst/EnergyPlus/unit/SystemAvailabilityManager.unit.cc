@@ -249,7 +249,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataGlobal->NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -631,7 +631,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     // get system availability schedule
     SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
     // check the three cycling run time control types
