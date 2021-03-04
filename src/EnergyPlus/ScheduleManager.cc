@@ -271,6 +271,9 @@ namespace ScheduleManager {
         int UntilFld;
         int xxcount;
         //  REAL(r64) tempval
+        static std::string CurrentThrough;
+        static std::string LastFor;
+        static std::string errmsg;
         int kdy;
         bool FileExists;
         // for SCHEDULE:FILE
