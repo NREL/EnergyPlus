@@ -90,12 +90,6 @@ namespace ScheduleManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    // Logical Variables for Module
-    extern bool ScheduleInputProcessed; // This is false until the Schedule Input has been processed.
-    extern bool ScheduleDSTSFileWarningIssued;
-
-    extern bool ScheduleFileShadingProcessed; // This is false unless there is a Schedule:File:Shading object.
-
     enum class ScheduleInterpolation
     {
         No,      // no interpolation
@@ -350,6 +344,11 @@ struct ScheduleManagerData : BaseGlobalStruct
 //    Array1D_string const ValidDayTypes;
 //    Array1D_string const ScheduleTypeLimitUnitTypes;
 
+    // Logical Variables for Module
+    bool ScheduleInputProcessed = false; // This is false until the Schedule Input has been processed.
+    bool ScheduleDSTSFileWarningIssued = false;
+    bool ScheduleFileShadingProcessed = false; // This is false unless there is a Schedule:File:Shading object.
+
     // Object Data
     Array1D<ScheduleManager::ScheduleTypeData> ScheduleType; // Allowed Schedule Types
     Array1D<ScheduleManager::DayScheduleData> DaySchedule;   // Day Schedule Storage
@@ -362,6 +361,9 @@ struct ScheduleManagerData : BaseGlobalStruct
         NumDaySchedules = 0;
         NumWeekSchedules = 0;
         NumSchedules = 0;
+
+        ScheduleInputProcessed = false;
+        ScheduleDSTSFileWarningIssued = false;
 
         ScheduleType.clear(); // Allowed Schedule Types
         DaySchedule.clear();  // Day Schedule Storage

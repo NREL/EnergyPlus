@@ -135,11 +135,6 @@ namespace ScheduleManager {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    // Logical Variables for Module
-    bool ScheduleInputProcessed(false); // This is false until the Schedule Input has been processed.
-    bool ScheduleDSTSFileWarningIssued(false);
-    bool ScheduleFileShadingProcessed(false);
-
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
         // to facilitate easier unit testing of those functions.
@@ -166,8 +161,6 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ScheduleInputProcessed = false;
-        ScheduleDSTSFileWarningIssued = false;
         CheckScheduleValueMinMaxRunOnceOnly = true;
         UniqueDayScheduleNames.clear();
         UniqueWeekScheduleNames.clear();
@@ -315,10 +308,10 @@ namespace ScheduleManager {
         int ifld;
         int hrLimitCount;
 
-        if (ScheduleInputProcessed) {
+        if (state.dataScheduleMgr->ScheduleInputProcessed) {
             return;
         }
-        ScheduleInputProcessed = true;
+        state.dataScheduleMgr->ScheduleInputProcessed = true;
 
         MaxNums = 1; // Need at least 1 number because it's used as a local variable in the Schedule Types loop
         MaxAlps = 0;
@@ -618,7 +611,7 @@ namespace ScheduleManager {
             }
 
             // schedule values have been filled into the CSVAllColumnNameAndValues map.
-            ScheduleFileShadingProcessed = true;
+            state.dataScheduleMgr->ScheduleFileShadingProcessed = true;
 
             if (numerrors > 0) {
                 ShowWarningError(
@@ -2676,7 +2669,7 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (!ScheduleDSTSFileWarningIssued) {
+        if (!state.dataScheduleMgr->ScheduleDSTSFileWarningIssued) {
             if (state.dataEnvrn->DSTIndicator == 1) {
                 if (state.dataScheduleMgr->Schedule(ScheduleIndex).SchType == SchedType::ScheduleInput_file) {
                     ShowWarningError(state, "GetCurrentScheduleValue: Schedule=\"" + state.dataScheduleMgr->Schedule(ScheduleIndex).Name + "\" is a Schedule:File");
@@ -2686,7 +2679,7 @@ namespace ScheduleManager {
                     ShowContinueError(state, "...   If you have already done this, you can ignore this message.");
                     ShowContinueError(state, "...When active, DaylightSavingTime will shift all scheduled items by one hour, retaining the same day type as "
                                       "the original.");
-                    ScheduleDSTSFileWarningIssued = true;
+                    state.dataScheduleMgr->ScheduleDSTSFileWarningIssued = true;
                 }
             }
         }
@@ -2741,9 +2734,9 @@ namespace ScheduleManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         for (int ScheduleIndex = 1; ScheduleIndex <= state.dataScheduleMgr->NumSchedules; ++ScheduleIndex) {
@@ -2806,9 +2799,9 @@ namespace ScheduleManager {
             return 0.0;
         }
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         //  so, current date, but maybe TimeStep added
@@ -2868,9 +2861,9 @@ namespace ScheduleManager {
         int DayCtr;
         int WeekCtr;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if (state.dataScheduleMgr->NumSchedules > 0) {
@@ -2934,9 +2927,9 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int curSchType;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if ((ScheduleIndex > 0) && (ScheduleIndex <= state.dataScheduleMgr->NumSchedules)) {
@@ -2967,9 +2960,9 @@ namespace ScheduleManager {
         // Return value
         int GetDayScheduleIndex;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if (state.dataScheduleMgr->NumDaySchedules > 0) {
@@ -3003,9 +2996,9 @@ namespace ScheduleManager {
         int WeekSchedulePointer;
         int DaySchedulePointer;
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if (ScheduleIndex == -1) {
@@ -3081,9 +3074,9 @@ namespace ScheduleManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         // Return Values
@@ -4716,9 +4709,9 @@ namespace ScheduleManager {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if (ScheduleIndex > 0) {
@@ -4747,9 +4740,9 @@ namespace ScheduleManager {
         // This subroutine puts the proper current schedule values into the "reporting"
         // slot for later reporting.
 
-        if (!ScheduleInputProcessed) {
+        if (!state.dataScheduleMgr->ScheduleInputProcessed) {
             ProcessScheduleInput(state);
-            ScheduleInputProcessed = true;
+            state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
         if (DoScheduleReportingSetup) { // CurrentModuleObject='Any Schedule'
