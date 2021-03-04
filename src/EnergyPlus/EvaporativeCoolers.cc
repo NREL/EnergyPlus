@@ -4818,11 +4818,11 @@ namespace EvaporativeCoolers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichEvapCond;
 
-        if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
+        if (state.dataEvapCoolers->GetInputEvapComponentsFlag) { // First time subroutine has been entered
             GetEvapInput(state);
-            GetInputEvapComponentsFlag = false;
+            state.dataEvapCoolers->GetInputEvapComponentsFlag = false;
         }
-        WhichEvapCond = UtilityRoutines::FindItemInList(EvapCondName, EvapCond, &EvapConditions::EvapCoolerName, NumEvapCool);
+        WhichEvapCond = UtilityRoutines::FindItemInList(EvapCondName, state.dataEvapCoolers->EvapCond, &EvapConditions::EvapCoolerName, state.dataEvapCoolers->NumEvapCool);
         if (WhichEvapCond != 0) {
             IndexNum = WhichEvapCond;
         } else {

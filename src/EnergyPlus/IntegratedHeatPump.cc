@@ -1694,7 +1694,6 @@ namespace IntegratedHeatPump {
         using VariableSpeedCoils::IsGridResponsiveMode;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::UpdateVarSpeedCoil;
-        using EvaporativeCoolers::EvapCond; 
         using EvaporativeCoolers::SimEvapCooler; 
         using WaterCoils::SimulateWaterCoilComponents;
         using Psychrometrics::PsyTwbFnTdbWPb;
@@ -2013,16 +2012,16 @@ namespace IntegratedHeatPump {
                     }
 
                     if (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0) {
-                        EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = airMassFlowRate;
+                        state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletMassFlowRate = airMassFlowRate;
 
                         SimEvapCooler(
                             state, state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilName, 
                             state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex, PartLoadFrac);
-                        EvapCSecTin = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).SecInletTemp; 
-                        EvapSecWin = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).SecInletHumRat; 
+                        EvapCSecTin = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).SecInletTemp; 
+                        EvapSecWin = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).SecInletHumRat; 
 
-                        EvapCMainTin = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletTemp;
-                        EvapCMainTout = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletTemp;
+                        EvapCMainTin = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletTemp;
+                        EvapCMainTout = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletTemp;
                         EvapSecInWB = PsyTwbFnTdbWPb(state, EvapCSecTin, EvapSecWin, 1.013e5);  
                         DehumInWB = PsyTwbFnTdbWPb(state, DehumTin, DehumWin, 1.013e5);  
                     }
@@ -3241,7 +3240,6 @@ namespace IntegratedHeatPump {
         using VariableSpeedCoils::GetCoilIndexVariableSpeed;
         using WaterCoils::GetWaterCoilInput;
         using WaterCoils::GetWaterCoilIndex;
-        using EvaporativeCoolers::EvapCond; 
         using EvaporativeCoolers::GetEvapInput;
         using EvaporativeCoolers::GetEvapCoolerIndex; 
         using IceThermalStorage::GetTankIndex; 
@@ -4776,7 +4774,7 @@ namespace IntegratedHeatPump {
             ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex;
             InNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
             if (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex > 0)
-                OutNode = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode; 
+                OutNode = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode; 
             else
                 OutNode = state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
 
@@ -4787,9 +4785,9 @@ namespace IntegratedHeatPump {
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = 
                     state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirInletNodeNum;
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolOutletNodeNum = 
-                    EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode;
+                    state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode;
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirHeatInletNodeNum = 
-                    EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode; 
+                    state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode; 
             } else if ((state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DehumPlace == DehumPlacement::UPSTREAM) &&
                        (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).LDDehumCoilIndex > 0)) {
                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum = 
@@ -5281,8 +5279,8 @@ namespace IntegratedHeatPump {
              // evaportive cooling coil node connection
             if (state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex != 0 ) {
                 ChildCoilIndex = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex;
-                InNode = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode;
-                OutNode = EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode;
+                InNode = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).InletNode;
+                OutNode = state.dataEvapCoolers->EvapCond(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex).OutletNode;
                 // state.dataVariableSpeedCoils->VarSpeedCoil(ChildCoilIndex).AirOutletNodeNum;
                 InNodeName = NodeID(InNode);
                 OutNodeName = NodeID(OutNode);
@@ -5676,8 +5674,7 @@ namespace IntegratedHeatPump {
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::SizeVarSpeedCoil;
         using WaterCoils::SizeWaterCoil_NotInPlant;
-        using WaterCoils::SizeWaterCoil;
-        using EvaporativeCoolers::EvapCond; 
+        using WaterCoils::SizeWaterCoil; 
         using EvaporativeCoolers::SizeEvapCooler;
 
         static bool ErrorsFound(false); // If errors detected in input
@@ -5951,7 +5948,7 @@ namespace IntegratedHeatPump {
 
         iCoilID = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).EvapCoolCoilIndex;
         if (iCoilID != 0) {
-            EvapCond(iCoilID).IndirectVolFlowRate = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DehumAirMasslowSize *
+            state.dataEvapCoolers->EvapCond(iCoilID).IndirectVolFlowRate = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).DehumAirMasslowSize *
                 state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex)
                     .MSRatedAirVolFlowRate(state.dataVariableSpeedCoils->VarSpeedCoil(state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).SCCoilIndex).NormSpedLevel);
 
@@ -6598,7 +6595,6 @@ namespace IntegratedHeatPump {
     void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     {
         using VariableSpeedCoils::SimVariableSpeedCoils;
-        using EvaporativeCoolers::EvapCond; 
         using EvaporativeCoolers::SimEvapCooler; 
         using WaterCoils::SimulateWaterCoilComponents;
 
