@@ -962,7 +962,7 @@ void ReportCoilSelection::setRatedCoilConditions(EnergyPlusData &state, std::str
 
     c->ratedCoilEff = RatedCoilEff;
     c->ratedCoilBpFactor = RatedCoilBpFactor;
-    // TODO	//c->ratedCoilAppDewPt =
+    // TODO    //c->ratedCoilAppDewPt =
     c->ratedCoilOadbRef = RatedCoilOadbRef;
     c->ratedCoilOawbRef = RatedCoilOawbRef;
 }
@@ -1161,7 +1161,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 {
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
-    // no this is adjusted back to ratings	c->coilTotCapAtPeak = TotalCoolingCap;
+    // no this is adjusted back to ratings    c->coilTotCapAtPeak = TotalCoolingCap;
     c->coilCapFTIdealPeak = coilCapFunTempFac;
     c->coilTotCapAtPeak = TotalCoolingCap / c->coilCapFTIdealPeak;
     c->capIsAutosized = isAutoSize;
@@ -1172,7 +1172,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     c->airloopNum = curSysNum;
     doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
-    //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
+    //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     c->oASysNum = curOASysNum;
 
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(DataSizing::FinalSysSizing) && allocated(DataSizing::SysSizPeakDDNum)) {
@@ -1366,8 +1366,8 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         } else if (DataSizing::ZoneEqFanCoil) {
             // should be picked up by CoolingWaterDesAirInletHumRatSizing and CoolingWaterDesWaterInletTempSizing
             // if ( DataSizing::FinalZoneSizing( curZoneEqNum ).DesCoolMassFlow > 0.0 ) {
-            //	c->oaPeakVolFrac = min( (DataEnvironment::StdRhoAir * c->oaPeakVolFlow)/DataSizing::FinalZoneSizing( curZoneEqNum
-            //).DesCoolMassFlow, 1.0 ); } else { 	c->oaPeakVolFrac = 0.0;
+            //    c->oaPeakVolFrac = min( (DataEnvironment::StdRhoAir * c->oaPeakVolFlow)/DataSizing::FinalZoneSizing( curZoneEqNum
+            //).DesCoolMassFlow, 1.0 ); } else {     c->oaPeakVolFrac = 0.0;
             //}
             // c->coilDesEntTemp = c->oaPeakVolFrac * DataSizing::FinalZoneSizing( curZoneEqNum ).OutTempAtCoolPeak + ( 1.0 - c->oaPeakVolFrac ) *
             // DataSizing::FinalZoneSizing( curZoneEqNum ).ZoneTempAtCoolPeak;  c->coilDesEntHumRat =  c->oaPeakVolFrac *
@@ -1442,7 +1442,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     c->airloopNum = curSysNum;
     doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
-    //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
+    //    if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(DataSizing::FinalSysSizing)) {
         c->desDayNameAtSensPeak = DataSizing::FinalSysSizing(curSysNum).HeatDesDay;
 

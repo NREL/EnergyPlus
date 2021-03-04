@@ -2237,7 +2237,7 @@ namespace EnergyPlus::PlantManager {
                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
-                    //				if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
+                    //                if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
                     //).VolFlowSizingDone = true;
                 }
 

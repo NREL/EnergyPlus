@@ -121,7 +121,7 @@ protected:
         SysDepZoneLoads.allocate(1);
         state->dataHeatBal->MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
-        SurfaceWindow.allocate(1);
+        state->dataSurface->SurfaceWindow.allocate(1);
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
         ZoneLatentGain.allocate(1);
 
@@ -391,8 +391,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -501,8 +501,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -623,8 +623,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -799,8 +799,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
@@ -909,8 +909,8 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
     ScheduleManager::Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors

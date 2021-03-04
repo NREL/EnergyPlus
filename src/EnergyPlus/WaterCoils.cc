@@ -3094,7 +3094,7 @@ namespace WaterCoils {
                 DataConstantUsedForSizing = 0.0; // reset these in case NomCapUserInp was true
                 DataFractionUsedForSizing = 0.0;
                 if (state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate <= 0.0) {
-                    //					MaxWaterVolFlowRateDes = 0.0;
+                    //                    MaxWaterVolFlowRateDes = 0.0;
                     ShowWarningError(state, "The design coil load is zero for Coil:Heating:Water " + state.dataWaterCoils->WaterCoil(CoilNum).Name);
                     ShowContinueError(state, "The autosize value for maximum water flow rate is zero");
                     ShowContinueError(state, "To change this, input a value for UA, change the heating design day, or raise the");
@@ -3788,13 +3788,13 @@ namespace WaterCoils {
             //       dry coil fin efficiency
             DryCoilEfficiency = 0.0;
             // Tuned Replaced by below to eliminate pow calls
-            //			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
-            //				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow(
+            //            for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
+            //                DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow(
             // DryFinEfficncy,
             // CoefPointer
             //-
             // 1
-            //); 			} // CoefPointer
+            //);             } // CoefPointer
             auto const &dry_fin_eff_coef(state.dataWaterCoils->WaterCoil(CoilNum).DryFinEfficncyCoef);
             auto DryFinEfficncy_pow(1.0);
             for (CoefPointer = 1; CoefPointer <= 5; ++CoefPointer) {

@@ -106,7 +106,7 @@ protected:
         state->dataHeatBal->ZoneIntGain.allocate(state->dataGlobal->NumOfZones);
         NodeID.allocate(NumOfNodes);
         Node.allocate(NumOfNodes);
-        Surface.allocate(NumOfSurfaces);
+        state->dataSurface->Surface.allocate(NumOfSurfaces);
         state->dataHeatBal->HConvIn.allocate(NumOfSurfaces);
         TempSurfInTmp.allocate(NumOfSurfaces);
         RVSurface.allocate(NumOfSurfaces);
@@ -247,8 +247,8 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     state->dataHeatBal->Zone(ZoneNum).Volume = 100;
     state->dataHeatBal->Zone(ZoneNum).IsControlled = true;
-    state->dataHeatBal->Zone(ZoneNum).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(ZoneNum).SurfaceLast = 2;
+    state->dataHeatBal->Zone(ZoneNum).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(ZoneNum).HTSurfaceLast = 2;
     state->dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist = 0;
 
     state->dataHeatBal->ZoneIntGain(ZoneNum).NumberOfDevices = 1;
@@ -258,13 +258,13 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).ConvectGainRate = 300.0;
     state->dataHeatBal->ZoneIntGain(ZoneNum).Device(1).LatentGainRate = 200.0;
 
-    Surface(1).HeatTransSurf = true;
-    Surface(2).HeatTransSurf = true;
-    Surface(1).Area = 1.0;
-    Surface(2).Area = 2.0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Area = 1.0;
+    state->dataSurface->Surface(2).Area = 2.0;
 
-    Surface(1).HeatTransferAlgorithm = HeatTransferModel_EMPD;
-    Surface(2).HeatTransferAlgorithm = HeatTransferModel_EMPD;
+    state->dataSurface->Surface(1).HeatTransferAlgorithm = HeatTransferModel_EMPD;
+    state->dataSurface->Surface(2).HeatTransferAlgorithm = HeatTransferModel_EMPD;
     RVSurface(1) = 0.0011;
     RVSurface(2) = 0.0012;
 

@@ -4539,11 +4539,11 @@ namespace EnergyPlus::SystemReports {
                         }
 
                     } else if (SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
-                               //	ZoneHVAC:EvaporativeCoolerUnit ?????
+                               //    ZoneHVAC:EvaporativeCoolerUnit ?????
                                SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num ||
                                SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == BBWaterConvective_Num ||
                                SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
-                               //	not sure how HeatExchanger:* could be used as zone equipment ?????
+                               //    not sure how HeatExchanger:* could be used as zone equipment ?????
                                SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||
                                // HPWaterHeater can be used as zone equipment
                                SELECT_CASE_var == HPWaterHeater_Num || SELECT_CASE_var == BBWater_Num || SELECT_CASE_var == ZoneDXDehumidifier_Num ||

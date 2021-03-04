@@ -2143,7 +2143,7 @@ CurrentModuleObject, PlantOpSchemeName);
         //       MODIFIED       na
         //       RE-ENGINEERED  July 2010
         //                      Sept 2010 B. Griffith, retain actual sign of load values
-        //						July 2014 M. Mitchell, added SequentialUniformPLR and UniformPLR schemes
+        //                        July 2014 M. Mitchell, added SequentialUniformPLR and UniformPLR schemes
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine distributes the load
         // to plant equipment according to one of two distribution schemes:

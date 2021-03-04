@@ -91,8 +91,8 @@ TEST_F(EnergyPlusFixture, SwimmingPool_CalcSwimmingPoolEvap)
     // Tests for CalcSwimmingPoolEvap--Evaporate Rate Calculation for Swimming Pools
     state->dataSwimmingPools->NumSwimmingPools = 1;
     state->dataSwimmingPools->Pool.allocate(1);
-    DataSurfaces::Surface.allocate(1);
-    Surface(1).Area = 10.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Area = 10.0;
     SurfNum = 1;
     PoolNum = 1;
     state->dataEnvrn->OutBaroPress = 101400.0;
@@ -245,7 +245,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Tests for InitSwimmingPoolPlantLoopIndex
     state->dataSwimmingPools->NumSwimmingPools = 1;
     state->dataSwimmingPools->Pool.allocate(state->dataSwimmingPools->NumSwimmingPools);
-    DataSurfaces::Surface.allocate(1);
+    state->dataSurface->Surface.allocate(1);
     state->dataConstruction->Construct.allocate(1);
 
     // testing variables
@@ -267,7 +267,7 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 2: The surface is already pointing to a radiant system, ventilated slab, or other pool--this is not allowed and should produce an error
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = true;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -276,8 +276,8 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 3: The heat transfer method has to be CTFs to simulate the pool, otherwise it should produce and error
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CondFD;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CondFD;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -286,9 +286,9 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 4: The pool surface is defined as a window--this is not allowed and should produce an error
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Window;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -297,10 +297,10 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 5: The pool is defined with movable insulation--this is not allowed and should produce an error
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
-    DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
+    state->dataSurface->Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -309,12 +309,12 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 6: The pool is defined with a source/sink (usually associated with radiant systems)--this is not allowed and should produce an error
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
-    DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Construction = 1;
-    state->dataConstruction->Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = true;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
+    state->dataSurface->Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Construction = 1;
+    state->dataConstruction->Construct(state->dataSurface->Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = true;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -323,11 +323,11 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 7: The pool is not defined as a floor--this is not allowed and should produce an error
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Wall;
-    DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
-    state->dataConstruction->Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 1;
+    state->dataConstruction->Construct(state->dataSurface->Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
@@ -336,21 +336,21 @@ TEST_F(EnergyPlusFixture, SwimmingPool_ErrorCheckSetupPoolSurfaceTest)
     // Test 8: Everything about the surface that is being used by the "legal"--no error is produced
     ErrFnd = false;
     poolReference.SurfacePtr = 1;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
-    DataSurfaces::Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 0;
-    state->dataConstruction->Construct(DataSurfaces::Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).Zone = 7;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
-    DataSurfaces::Surface(poolReference.SurfacePtr).IsPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Class = DataSurfaces::SurfaceClass::Floor;
+    state->dataSurface->Surface(poolReference.SurfacePtr).MaterialMovInsulInt = 0;
+    state->dataConstruction->Construct(state->dataSurface->Surface(poolReference.SurfacePtr).Construction).SourceSinkPresent = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).Zone = 7;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool = false;
+    state->dataSurface->Surface(poolReference.SurfacePtr).IsPool = false;
     poolReference.ZonePtr = 0;
 
     poolReference.ErrorCheckSetupPoolSurface(*state, Alpha1,Alpha2,AlphaField2,ErrFnd);
 
     EXPECT_FALSE(ErrFnd);
-    EXPECT_TRUE(DataSurfaces::Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool);
-    EXPECT_TRUE(DataSurfaces::Surface(poolReference.SurfacePtr).IsPool);
-    EXPECT_EQ(DataSurfaces::Surface(poolReference.SurfacePtr).Zone,poolReference.ZonePtr);
+    EXPECT_TRUE(state->dataSurface->Surface(poolReference.SurfacePtr).IsRadSurfOrVentSlabOrPool);
+    EXPECT_TRUE(state->dataSurface->Surface(poolReference.SurfacePtr).IsPool);
+    EXPECT_EQ(state->dataSurface->Surface(poolReference.SurfacePtr).Zone,poolReference.ZonePtr);
 
 }
