@@ -298,12 +298,6 @@ namespace DataLoopNode {
         }
 
     };
-
-
-    // Clears the global data in DataLoopNode.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
 } // namespace DataLoopNode
 
 struct LoopNodeData : BaseGlobalStruct {
@@ -320,7 +314,62 @@ struct LoopNodeData : BaseGlobalStruct {
 
     void clear_state() override
     {
-
+        NumOfNodes = 0;
+        NumofSplitters = 0;
+        NumofMixers = 0;
+        NodeID.deallocate();
+        Node.deallocate();
+        DefaultNodeValues = DataLoopNode::NodeData(0,
+                                     0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     DataLoopNode::SensedNodeFlagValue,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     DataLoopNode::SensedNodeFlagValue,
+                                     DataLoopNode::SensedNodeFlagValue,
+                                     DataLoopNode::SensedNodeFlagValue,
+                                     DataLoopNode::SensedNodeFlagValue,
+                                     DataLoopNode::SensedNodeFlagValue,
+                                     -1.0,
+                                     false,
+                                     0,
+                                     0,
+                                     0,
+                                     0,
+                                     0.0,
+                                     false,
+                                     0.0,
+                                     0.0,
+                                     false,
+                                     0.0,
+                                     0.0,
+                                     false,
+                                     0.0,
+                                     0.0,
+                                     false,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     0.0,
+                                     false,
+                                     false);
+        MoreNodeInfo.deallocate();
+        MarkedNode.deallocate();
+        NodeSetpointCheck.deallocate();
     }
 };
 
