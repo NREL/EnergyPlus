@@ -842,9 +842,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PTUnitNum = 1;
     state->dataPTHP->PTUnit(1).OpMode = ContFanCycCoil;
 
-    Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
-    Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // initialize mass flow rates
     Node(state->dataPTHP->PTUnit(1).AirInNode).MassFlowRate = HVACInletMassFlowRate;
@@ -1188,9 +1188,9 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     PTUnitNum = 1;
     state->dataPTHP->PTUnit(1).OpMode = ContFanCycCoil;
 
-    Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
-    Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // initialize mass flow rates
     //		Node( PTUnit( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;

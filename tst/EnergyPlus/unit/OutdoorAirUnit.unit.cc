@@ -332,9 +332,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     ZoneInletNode = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(*state, OAUnitNum);
 
     // schedule values will get reset to 0 if initialized before GetInput
-    Schedule(1).CurrentValue = 1.0; // enable the VRF condenser
-    Schedule(2).CurrentValue = 1.0; // enable the terminal unit
-    Schedule(3).CurrentValue = 1.0; // turn on fan
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // enable the terminal unit
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1.0; // turn on fan
     int EAFanInletNode = Fans::Fan(2).InletNodeNum;
     DataLoopNode::Node(EAFanInletNode).MassFlowRate = 0.60215437;         // zone exhaust flow rate
     DataLoopNode::Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
@@ -562,7 +562,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     Fans::GetFanInput(*state);
 
     OutdoorAirUnit::GetOutdoorAirUnitInputs(*state);
@@ -868,7 +868,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
 
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     Fans::GetFanInput(*state);
 
     OutdoorAirUnit::GetOutdoorAirUnitInputs(*state);
