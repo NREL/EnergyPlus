@@ -814,14 +814,6 @@
     Air,                     !- Layer 2
     Glass;                   !- Layer 3
 
-!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION:INTERNALMOISTURESOURCE ===========
-
-  ConstructionProperty:InternalMoistureSource,
-    InternalMoistureSourceEast,  !- Name
-    East wall,               !- Surface Name
-    3,                       !- Source Present In Layer Number
-    UserDefined,             !- Source Type
-    0.0001;                  !- Air Flow Rate {m/s}
 
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 
@@ -877,6 +869,18 @@
     8,6,0,  !- X,Y,Z ==> Vertex 3 {m}
     8,6,2.7;  !- X,Y,Z ==> Vertex 4 {m}
 
+!-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION:INTERNALMOISTURESOURCE ===========
+
+  ConstructionProperty:InternalMoistureSource,
+    InternalMoistureSourceEast,  !- Name
+	East wall,                   !- Construction Name 
+    3,                       !- Moisture Source Present In Layer Number
+    UserDefined,             !- Source Type
+    0.0001,                  !- Air Flow Rate {m/s}
+	0.1,                     !- Stack Height {m}
+    0.001,                    !-    Component Air Permeance
+	0.01;                     !- Mechanical Ventilation Overpressure
+	
   BuildingSurface:Detailed,
     North wall,              !- Name
     WALL,                    !- Surface Type
@@ -1096,6 +1100,10 @@
     0.0000000625,            !- External Vapor Coefficient Value {kg/Pa-s-m2}
     Yes,                     !- Constant Internal vapor Transfer Coefficient
     0.00000002;              !- Internal Vapor Coefficient Value {kg/Pa-s-m2}
+
+
+
+
 
 !-   ===========  ALL OBJECTS IN CLASS: OTHEREQUIPMENT ===========
 
