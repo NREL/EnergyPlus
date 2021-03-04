@@ -607,7 +607,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     int seasonSchPtr = state->dataEconTariff->tariff(1).seasonSchIndex;
     EXPECT_GT(seasonSchPtr, 0);
-    EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", ScheduleManager::Schedule(seasonSchPtr).Name);
+    EXPECT_EQ("ELECTRICITY SEASON SCHEDULE", state->dataScheduleMgr->Schedule(seasonSchPtr).Name);
 
     // Two Simple Charges
     EXPECT_EQ(2, state->dataEconTariff->numChargeSimple);
@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, state->dataEconTariff->tariff(1).seasonSchIndex));
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(seasonSchPtr).CurrentValue);
+    EXPECT_EQ(1.0, state->dataScheduleMgr->Schedule(seasonSchPtr).CurrentValue);
 
     ExteriorEnergyUse::ManageExteriorEnergyUse(*state);
 

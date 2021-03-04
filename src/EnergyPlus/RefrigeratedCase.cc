@@ -11878,11 +11878,11 @@ namespace EnergyPlus::RefrigeratedCase {
                 TsatforPsuct = this->TIntercooler;
                 HsatVaporforTevapneeded =
                     FluidProperties::GetSatEnthalpyRefrig(state, this->RefrigerantName, this->TIntercooler, 1.0, this->RefIndex, RoutineName);
-                //				HSatLiqCond = FluidProperties::GetSatEnthalpyRefrig(state, RefrigerantName, TCondense, 0.0, RefIndex,
+                //                HSatLiqCond = FluidProperties::GetSatEnthalpyRefrig(state, RefrigerantName, TCondense, 0.0, RefIndex,
                 // RoutineName
                 //);
                 ////Autodesk:Tuned These don't change for 2nd stage
-                //				CpSatLiqCond = FluidProperties::GetSatSpecificHeatRefrig(RefrigerantName, TCondense, 0.0, RefIndex,
+                //                CpSatLiqCond = FluidProperties::GetSatSpecificHeatRefrig(RefrigerantName, TCondense, 0.0, RefIndex,
                 //RoutineName );
                 ////Autodesk:Tuned These don't change for 2nd stage
                 this->HCaseIn = this->HSatLiqCond - this->CpSatLiqCond * Condenser1.RatedSubcool;

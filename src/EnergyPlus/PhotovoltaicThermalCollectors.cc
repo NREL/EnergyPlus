@@ -245,7 +245,7 @@ namespace PhotovoltaicThermalCollectors {
             PVT(Item).Name = DataIPShortCuts::cAlphaArgs(1);
             PVT(Item).TypeNum = DataPlant::TypeOf_PVTSolarCollectorFlatPlate;
 
-            PVT(Item).SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), DataSurfaces::Surface);
+            PVT(Item).SurfNum = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(2), state.dataSurface->Surface);
             // check surface
             if (PVT(Item).SurfNum == 0) {
                 if (DataIPShortCuts::lAlphaFieldBlanks(2)) {
@@ -260,20 +260,20 @@ namespace PhotovoltaicThermalCollectors {
                 ErrorsFound = true;
             } else {
 
-                if (!DataSurfaces::Surface(PVT(Item).SurfNum).ExtSolar) {
+                if (!state.dataSurface->Surface(PVT(Item).SurfNum).ExtSolar) {
                     ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError(state, "Surface must be exposed to solar.");
                     ErrorsFound = true;
                 }
                 // check surface orientation, warn if upside down
-                if ((DataSurfaces::Surface(PVT(Item).SurfNum).Tilt < -95.0) || (DataSurfaces::Surface(PVT(Item).SurfNum).Tilt > 95.0)) {
+                if ((state.dataSurface->Surface(PVT(Item).SurfNum).Tilt < -95.0) || (state.dataSurface->Surface(PVT(Item).SurfNum).Tilt > 95.0)) {
                     ShowWarningError(state, "Suspected input problem with " + DataIPShortCuts::cAlphaFieldNames(2) + " = " + DataIPShortCuts::cAlphaArgs(2));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError(state, "Surface used for solar collector faces down");
                     ShowContinueError(
                         state,
-                        format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", DataSurfaces::Surface(PVT(Item).SurfNum).Tilt));
+                        format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(PVT(Item).SurfNum).Tilt));
                 }
 
             } // check surface
@@ -289,7 +289,7 @@ namespace PhotovoltaicThermalCollectors {
                 if (ThisParamObj > 0) {
                     PVT(Item).Simple = tmpSimplePVTperf(ThisParamObj); // entire structure assigned
                     // do one-time setups on input data
-                    PVT(Item).AreaCol = DataSurfaces::Surface(PVT(Item).SurfNum).Area * PVT(Item).Simple.ThermalActiveFract;
+                    PVT(Item).AreaCol = state.dataSurface->Surface(PVT(Item).SurfNum).Area * PVT(Item).Simple.ThermalActiveFract;
                     PVT(Item).PVTModelType = SimplePVTmodel;
                 } else {
                     ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + " = " + DataIPShortCuts::cAlphaArgs(3));
@@ -986,8 +986,8 @@ namespace PhotovoltaicThermalCollectors {
 
                 Real64 Tcollector =
                     (2.0 * mdot * CpInlet * Tinlet + this->AreaCol * (HrGround * state.dataEnvrn->OutDryBulbTemp + HrSky * state.dataEnvrn->SkyTemp +
-                                                                      HrAir * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp +
-                                                                      HcExt * DataSurfaces::Surface(this->SurfNum).OutDryBulbTemp)) /
+                                                                      HrAir * state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp +
+                                                                      HcExt * state.dataSurface->Surface(this->SurfNum).OutDryBulbTemp)) /
                     (2.0 * mdot * CpInlet + this->AreaCol * (HrGround + HrSky + HrAir + HcExt));
 
                 PotentialOutletTemp = 2.0 * Tcollector - Tinlet;

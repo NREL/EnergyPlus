@@ -6999,7 +6999,7 @@ namespace EnergyPlus::SimAirServingZones {
                 print(state.files.ssz, "Time");
                 // static ObjexxFCL::gio::Fmt SSizeFmt11("(A1,A,A,A1,A,A,A1,A,A,A1,A,A)");
                 // for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
-                // 	{ IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
+                //     { IOFlags flags; flags.ADVANCE( "No" ); ObjexxFCL::gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep <<
                 // CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName <<
                 // ":Des Cool Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Cap [W]" <<
                 // SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
@@ -7702,7 +7702,7 @@ namespace EnergyPlus::SimAirServingZones {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchS62zcdZpz,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneName,
                              TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone,
-                             3); // Zpz = Voz/Vpz		}
+                             3); // Zpz = Voz/Vpz        }
         }
     }
 

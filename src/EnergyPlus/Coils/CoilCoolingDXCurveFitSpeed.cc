@@ -259,7 +259,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(EnergyPlus::EnergyPlusDat
       PLR(0.0),                  // coil operating part load ratio
       CondInletTemp(0.0),        // condenser inlet temperature {C}
       AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
-                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+                                 // RatedTotCap( 0.0 ), // rated total capacity at speed {W}
 
       fullLoadPower(0.0),     // full load power at speed {W}
       fullLoadWasteHeat(0.0), // full load waste heat at speed {W}

@@ -86,7 +86,7 @@ namespace FourPipeBeam {
 
     Array1D<std::shared_ptr<HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
 
-    //	HVACFourPipeBeam::HVACFourPipeBeam(){}
+    //    HVACFourPipeBeam::HVACFourPipeBeam(){}
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
     std::shared_ptr<AirTerminalUnit> HVACFourPipeBeam::fourPipeBeamFactory(EnergyPlusData &state, std::string objectName)
     {
@@ -588,7 +588,7 @@ namespace FourPipeBeam {
         }
 
         if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
-            //	if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
+            //    if ( state.dataGlobal->SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
             this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
             state.dataDefineEquipment->AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates
