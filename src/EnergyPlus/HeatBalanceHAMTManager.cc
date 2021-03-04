@@ -203,7 +203,7 @@ namespace HeatBalanceHAMTManager {
         int red;
         int mu;
         int tc;
-        // unused1208    INTEGER :: sid
+
         int HAMTitems;
         int item;
         int ii;
