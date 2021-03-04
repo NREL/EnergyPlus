@@ -1596,54 +1596,54 @@ TEST_F(EnergyPlusFixture, EMSManager_TestOANodeAsActuators)
 TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOption)
 {
     // #7586
-    DataSurfaces::Surface.allocate(2);
-    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(2);
+    state->dataSurface->Surface.allocate(2);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
-    DataSurfaces::WindowShadingControl.allocate(2);
+    state->dataSurface->WindowShadingControl.allocate(2);
     state->dataDaylightingData->ZoneDaylight.allocate(1);
-    DataSurfaces::Surface(1).Name = "Surface1";
-    DataSurfaces::Surface(2).Name = "Surface2";
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(2).Zone = 1;
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Window;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
-    DataSurfaces::Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    DataSurfaces::Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
-    DataSurfaces::Surface(1).windowShadingControlList.push_back(1);
-    DataSurfaces::Surface(2).windowShadingControlList.push_back(2);
-    DataSurfaces::Surface(1).HasShadeControl = true;
-    DataSurfaces::Surface(2).HasShadeControl = true;
+    state->dataSurface->Surface(1).Name = "Surface1";
+    state->dataSurface->Surface(2).Name = "Surface2";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(2).ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    state->dataSurface->Surface(1).windowShadingControlList.push_back(1);
+    state->dataSurface->Surface(2).windowShadingControlList.push_back(2);
+    state->dataSurface->Surface(1).HasShadeControl = true;
+    state->dataSurface->Surface(2).HasShadeControl = true;
 
-    DataSurfaces::SurfWinHasShadeOrBlindLayer(1) = false;
-    DataSurfaces::SurfWinHasShadeOrBlindLayer(2) = false;
-    DataSurfaces::Surface(1).activeShadedConstruction = 1;
-    DataSurfaces::Surface(2).activeShadedConstruction = 1;
+    state->dataSurface->SurfWinHasShadeOrBlindLayer(1) = false;
+    state->dataSurface->SurfWinHasShadeOrBlindLayer(2) = false;
+    state->dataSurface->Surface(1).activeShadedConstruction = 1;
+    state->dataSurface->Surface(2).activeShadedConstruction = 1;
 
     state->dataConstruction->Construct(1).Name = "Construction1";
 
-    DataSurfaces::WindowShadingControl(1).ShadingType = DataSurfaces::WinShadingType::NoShade;
-    DataSurfaces::WindowShadingControl(2).ShadingType = DataSurfaces::WinShadingType::ExtScreen;
+    state->dataSurface->WindowShadingControl(1).ShadingType = DataSurfaces::WinShadingType::NoShade;
+    state->dataSurface->WindowShadingControl(2).ShadingType = DataSurfaces::WinShadingType::ExtScreen;
 
-    DataSurfaces::TotSurfaces = 2;
+    state->dataSurface->TotSurfaces = 2;
 
-    DataSurfaces::Surface(1).activeWindowShadingControl =
-        DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
-    DataSurfaces::Surface(2).activeWindowShadingControl =
-        DataSurfaces::Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
+    state->dataSurface->Surface(1).activeWindowShadingControl =
+        state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 1)];
+    state->dataSurface->Surface(2).activeWindowShadingControl =
+        state->dataSurface->Surface(1).windowShadingControlList[SolarShading::selectActiveWindowShadingControlIndex(*state, 2)];
 
     SetupWindowShadingControlActuators(*state);
 
-    EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
-    EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0.0);
+    EXPECT_FALSE(state->dataSurface->SurfWinShadingFlagEMSOn(2));
+    EXPECT_EQ(state->dataSurface->SurfWinShadingFlagEMSValue(2), 0.0);
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).WindowSurfaceFirst = 1;
     state->dataHeatBal->Zone(1).WindowSurfaceLast = 2;
     state->dataGlobal->NumOfZones = 1;
-    DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
-    DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0; // WinShadingType::IntShade
+    state->dataSurface->SurfWinShadingFlagEMSOn(2) = true;
+    state->dataSurface->SurfWinShadingFlagEMSValue(2) = 1.0; // WinShadingType::IntShade
     SolarShading::WindowShadingManager(*state);
-    EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::WinShadingType::IntShade);
+    EXPECT_EQ(state->dataSurface->SurfWinShadingFlag(2), DataSurfaces::WinShadingType::IntShade);
 }
 TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 {
@@ -2196,8 +2196,8 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
 
     SimulationManager::ManageSimulation(*state);
 
-    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("WALL", DataSurfaces::Surface);
+    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    int wallSurfNum = UtilityRoutines::FindItemInList("WALL", state->dataSurface->Surface);
     bool anyRan;
 
     // Test 1 - Set day of year to 121
@@ -2213,8 +2213,8 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
     HeatBalanceManager::ManageHeatBalance(*state);
 
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
-    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).ViewFactorGround, 0.35);
-    EXPECT_EQ(DataSurfaces::Surface(wallSurfNum).ViewFactorGround, 0.35);
+    EXPECT_EQ(state->dataSurface->Surface(winSurfNum).ViewFactorGround, 0.35);
+    EXPECT_EQ(state->dataSurface->Surface(wallSurfNum).ViewFactorGround, 0.35);
 
     // Test 2 - Set day of year to 321
     state->dataGlobal->DayOfSim = 321; // avoid array bounds problem in RecKeepHeatBalance
@@ -2229,6 +2229,6 @@ TEST_F(EnergyPlusFixture, EMS_ViewFactorToGround)
     HeatBalanceManager::ManageHeatBalance(*state);
 
     EMSManager::ManageEMS(*state, EMSManager::EMSCallFrom::BeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
-    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).ViewFactorGround, 0.425);
-    EXPECT_EQ(DataSurfaces::Surface(wallSurfNum).ViewFactorGround, 0.425);
+    EXPECT_EQ(state->dataSurface->Surface(winSurfNum).ViewFactorGround, 0.425);
+    EXPECT_EQ(state->dataSurface->Surface(wallSurfNum).ViewFactorGround, 0.425);
 }

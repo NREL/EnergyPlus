@@ -1214,7 +1214,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                  state.dataHVACVarRefFlow->VRF(VRFCond).SourceCompNum);
 
             // should be the same as above just entering this function
-            //			VRF( VRFCond ).CondenserInletTemp = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp;
+            //            VRF( VRFCond ).CondenserInletTemp = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp;
             state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserMassFlow = DataLoopNode::Node(state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).MassFlowRate;
 
             CpCond = GetSpecificHeatGlycol(state,
@@ -10541,17 +10541,17 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
 
         //*************
         // VRF-HP MODES:
-        //	 1. Cooling
-        //	 2. Heating
-        //	 3. No running
+        //     1. Cooling
+        //     2. Heating
+        //     3. No running
         // VRF-HR MODES:
-        //	 1. Cooling Only
-        //	 2. Cooling Dominant w/o HR Loss
-        //	 3. Cooling Dominant w/ HR Loss
-        //	 4. Heating Dominant w/ HR Loss
-        //	 5. Heating Dominant w/o HR Loss
-        //	 6. Heating Only
-        //	 7. No running
+        //     1. Cooling Only
+        //     2. Cooling Dominant w/o HR Loss
+        //     3. Cooling Dominant w/ HR Loss
+        //     4. Heating Dominant w/ HR Loss
+        //     5. Heating Dominant w/o HR Loss
+        //     6. Heating Only
+        //     7. No running
 
         // Flag for VRF-HR Operations
         if (TU_HeatingLoad > 0) {
@@ -11927,12 +11927,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // 		This subroutine is part of the new VRF model based on physics, applicable for Fluid Temperature Control.
-        // 		This is adapted from subroutine CalcVRF, which is part of the VRF model based on system curves.
-        // 		This subroutine simulates the components making up the VRF indoor terminal unit.
+        //         This subroutine is part of the new VRF model based on physics, applicable for Fluid Temperature Control.
+        //         This is adapted from subroutine CalcVRF, which is part of the VRF model based on system curves.
+        //         This subroutine simulates the components making up the VRF indoor terminal unit.
 
         // METHODOLOGY EMPLOYED:
-        //		A new physics based VRF model applicable for Fluid Temperature Control.
+        //        A new physics based VRF model applicable for Fluid Temperature Control.
         using DXCoils::SimDXCoil;
         using MixedAir::SimOAMixer;
         using SingleDuct::SimATMixer;
@@ -12239,13 +12239,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // 		Calculates residual function ( FanSpdRatioAct - FanSpdRatio ) / FanSpdRatio
-        // 		This is used to address the coupling between OA mixer simulation and VRF-FluidTCtrl coil simulation.
+        //         Calculates residual function ( FanSpdRatioAct - FanSpdRatio ) / FanSpdRatio
+        //         This is used to address the coupling between OA mixer simulation and VRF-FluidTCtrl coil simulation.
 
         // METHODOLOGY EMPLOYED:
-        // 		VRF-FluidTCtrl TU airflow rate is determined by the control logic of VRF-FluidTCtrl coil to match the
-        // 		coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
-        // 		OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
+        //         VRF-FluidTCtrl TU airflow rate is determined by the control logic of VRF-FluidTCtrl coil to match the
+        //         coil load. This is affected by the coil inlet conditions. However, the airflow rate will affect the
+        //         OA mixer simulation, which leads to different coil inlet conditions. So, there is a coupling issue here.
 
         using DXCoils::ControlVRFIUCoil;
         using Fans::Fan;
@@ -12257,13 +12257,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         Real64 AirFlowRateResidual;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // 	Par( 1 ) = FirstHVACIteration;
-        // 	Par( 2 ) = VRFTUNum;
-        // 	Par( 3 ) = DXCoilNum;
-        // 	Par( 4 ) = QCoilReq;
-        // 	Par( 5 ) = TeTc;
-        // 	Par( 6 ) = PartLoadRatio;
-        // 	Par( 7 ) = OACompOnMassFlow;
+        //     Par( 1 ) = FirstHVACIteration;
+        //     Par( 2 ) = VRFTUNum;
+        //     Par( 3 ) = DXCoilNum;
+        //     Par( 4 ) = QCoilReq;
+        //     Par( 5 ) = TeTc;
+        //     Par( 6 ) = PartLoadRatio;
+        //     Par( 7 ) = OACompOnMassFlow;
 
         int const Mode(1);       // Performance mode for MultiMode DX coil. Always 1 for other coil types
         int CoilIndex;           // index to coil
@@ -12364,12 +12364,12 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // 		Calculates residual function ( Tsuction - Tsuction_new )
-        // 		This is used to calculate the VRF OU evaporating temperature at the given compressor speed and operational conditions.
+        //         Calculates residual function ( Tsuction - Tsuction_new )
+        //         This is used to calculate the VRF OU evaporating temperature at the given compressor speed and operational conditions.
 
         // METHODOLOGY EMPLOYED:
-        // 		Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
-        // 		conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
+        //         Call VRFOU_CompCap to calculate the total evaporative capacity Q_c_tot, at the given compressor speed and operational
+        //         conditions, and then call VRFOU_TeTc to obtain Tsuction_new based on OU evaporator air-side calculations
 
         // Return value
         Real64 TeResidual;
@@ -12416,7 +12416,7 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         //       RE-ENGINEERED
         //
         // PURPOSE OF THIS FUNCTION:
-        //  	 Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
+        //       Calculates residual function ((VRV terminal unit cooling output - Zone sensible cooling load)
         //
         using CurveManager::CurveValue;
 
@@ -13914,13 +13914,13 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
         RefPHigh = RefrigData(RefrigerantIndex).PsHighPresValue;
 
         // **Q_OU: HR mode determination
-        //	 HRMode-1. Cooling Only
-        //	 HRMode-2. Cooling Dominant w/o HR Loss
-        //	 HRMode-3. Cooling Dominant w/ HR Loss
-        //	 HRMode-4. Heating Dominant w/ HR Loss
-        //	 HRMode-5. Heating Dominant w/o HR Loss
-        //	 HRMode-6. Heating Only
-        //	 HRMode-7. OU Hex not running
+        //     HRMode-1. Cooling Only
+        //     HRMode-2. Cooling Dominant w/o HR Loss
+        //     HRMode-3. Cooling Dominant w/ HR Loss
+        //     HRMode-4. Heating Dominant w/ HR Loss
+        //     HRMode-5. Heating Dominant w/o HR Loss
+        //     HRMode-6. Heating Only
+        //     HRMode-7. OU Hex not running
         {
 
             bool FlagMode5;   // true if compressor speed satisfying IU cooling load < that satisfying IU heating load

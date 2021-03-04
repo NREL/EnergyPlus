@@ -135,13 +135,13 @@ namespace PVWatts {
             }
             m_azimuth = azimuth;
         } else if (m_geometryType == GeometryType::SURFACE) {
-            if (surfaceNum == 0 || surfaceNum > DataSurfaces::Surface.size()) {
+            if (surfaceNum == 0 || surfaceNum > state.dataSurface->Surface.size()) {
                 ShowSevereError(state, format("PVWatts: SurfaceNum not in Surfaces: {}", surfaceNum));
                 errorsFound = true;
             } else {
                 m_surfaceNum = surfaceNum;
-                m_tilt = getSurface().Tilt;
-                m_azimuth = getSurface().Azimuth;
+                m_tilt = getSurface(state).Tilt;
+                m_azimuth = getSurface(state).Azimuth;
                 // TODO: Do some bounds checking on Tilt and Azimuth.
             }
         } else {
@@ -277,7 +277,7 @@ namespace PVWatts {
         if (lAlphaFieldBlanks(AlphaFields::SURFACE_NAME)) {
             surfaceNum = 0;
         } else {
-            surfaceNum = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), DataSurfaces::Surface);
+            surfaceNum = UtilityRoutines::FindItemInList(cAlphaArgs(AlphaFields::SURFACE_NAME), state.dataSurface->Surface);
         }
 
         if (errorsFound) {
@@ -329,9 +329,9 @@ namespace PVWatts {
         return m_azimuth;
     }
 
-    DataSurfaces::SurfaceData &PVWattsGenerator::getSurface()
+    DataSurfaces::SurfaceData &PVWattsGenerator::getSurface(EnergyPlusData &state)
     {
-        return DataSurfaces::Surface(m_surfaceNum);
+        return state.dataSurface->Surface(m_surfaceNum);
     }
 
     Real64 PVWattsGenerator::getGroundCoverageRatio()

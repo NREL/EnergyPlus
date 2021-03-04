@@ -686,7 +686,7 @@ namespace ScheduleManager {
         UniqueWeekScheduleNames.reserve(static_cast<unsigned>(NumWeekSchedules));
 
         Schedule.allocate({-1, NumSchedules});
-        //		UniqueScheduleNames.clear();
+        //        UniqueScheduleNames.clear();
         UniqueScheduleNames.reserve(static_cast<unsigned>(NumSchedules));
         Schedule(-1).ScheduleTypePtr = -1;
         Schedule(-1).WeekSchedulePointer = 1;

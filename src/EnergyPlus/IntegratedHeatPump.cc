@@ -1806,11 +1806,11 @@ namespace EnergyPlus::IntegratedHeatPump {
         } else {
             // set up output variables, not reported in the individual coil models
 
-            //				TODO: Figure out how to get enum class to work with SetupOutputVariable
-            //				Setup Output Variable( "Operation Mode []",
-            //				                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
-            //				                     "System", "Average",
-            //				                     IntegratedHeatPumps( DXCoilNum ).Name );
+            //                TODO: Figure out how to get enum class to work with SetupOutputVariable
+            //                Setup Output Variable( "Operation Mode []",
+            //                                     static_cast< int >( IntegratedHeatPumps( DXCoilNum ).CurMode ),
+            //                                     "System", "Average",
+            //                                     IntegratedHeatPumps( DXCoilNum ).Name );
             SetupOutputVariable(state, "Integrated Heat Pump Air Loop Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum).AirLoopFlowRate,

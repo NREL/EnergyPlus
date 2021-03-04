@@ -7698,8 +7698,8 @@ CurrentModuleObject,
             auto const &glycol_CpValues(glycol_data.CpValues);
             // bracket is temp > low, <= high (for interpolation
             // for ( int Loop = glycol_data.CpLowTempIndex + 1; Loop <= glycol_data.CpHighTempIndex; ++Loop ) { //Tuned Replaced by binary search
-            // below 	if ( Temperature > glycol_data.CpTemps( Loop ) ) continue; 	return GetInterpValue( Temperature, glycol_CpTemps( Loop - 1
-            //), glycol_CpTemps( Loop ), glycol_CpValues( Loop - 1 ), glycol_CpValues( Loop ) ); 	break; // DO loop
+            // below     if ( Temperature > glycol_data.CpTemps( Loop ) ) continue;     return GetInterpValue( Temperature, glycol_CpTemps( Loop - 1
+            //), glycol_CpTemps( Loop ), glycol_CpValues( Loop - 1 ), glycol_CpValues( Loop ) );     break; // DO loop
             //}
             // assert( std::is_sorted( glycol_CpTemps.begin(), glycol_CpTemps.end() ) ); // Sorted temperature array is assumed: Enable if/when arrays
             // have begin()/end()

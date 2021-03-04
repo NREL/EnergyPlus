@@ -4441,7 +4441,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
         using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-        using DataSurfaces::Surface;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
 
@@ -4507,12 +4506,12 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
                 if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneHasAirFlowWindowReturn) {
                     for (SurfNum = state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ActualZoneNum).HTSurfaceLast; ++SurfNum) {
-                        if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
-                            DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
-                            FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
-                                         DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
+                        if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                            state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                            FlowThisTS = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                                state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                             WinGapFlowToRA += FlowThisTS;
-                            WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
+                            WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
                         }
                     }
                 }
@@ -5837,8 +5836,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
 
         // BSLLC Start
         // if ( sqlite ) {
-        // 	sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
-        // 		PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
+        //     sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin,
+        //         PeakTemp, PeakHumRat, MinOAVolFlow, DOASHeatAddRate );
         // }
         // BSLLC Finish
     }

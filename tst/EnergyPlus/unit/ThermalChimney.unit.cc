@@ -1117,17 +1117,17 @@ TEST_F(EnergyPlusFixture, ThermalChimney_EMSAirflow_Test)
 
     state->dataHeatBal->Zone(2).HasWindow = true;
     state->dataHeatBal->Zone(4).HasWindow = true;
-    EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(TotSurfaces);
-    state->dataHeatBal->HConvIn.allocate(TotSurfaces);
+    EnergyPlus::DataHeatBalSurface::TempSurfIn.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->HConvIn.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->HConvIn = 0.1;
     DataHeatBalSurface::TempSurfIn = 25.00;
-    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", DataSurfaces::Surface);
+    int surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001", state->dataSurface->Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", DataSurfaces::Surface);
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL001:WIN001", state->dataSurface->Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 25.92;
-    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", DataSurfaces::Surface);
+    surfNum = UtilityRoutines::FindItemInList("ZN002:WALL004", state->dataSurface->Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 26.99;
-    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", DataSurfaces::Surface);
+    surfNum = UtilityRoutines::FindItemInList("ZN004:WALL001:WIN001", state->dataSurface->Surface);
     DataHeatBalSurface::TempSurfIn(surfNum) = 22.99;
     DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);

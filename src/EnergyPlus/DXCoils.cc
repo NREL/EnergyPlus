@@ -6822,37 +6822,37 @@ namespace EnergyPlus::DXCoils {
                 // *** RAR this if block is a last minute addition to correct capacity reporting when not autosized and a sizing run is done. Test
                 // suite was not run with this code included. *** The question here is if the autosized air flow rate or the user specified air flow
                 // rate should be used to calculate capacity removing this for now until more is known
-                //				if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) ||
-                //(  ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) { 					if ( DXCoil( DXCoilNum ).DXCoilType_Num ==
-                // CoilDX_CoolingTwoStageWHumControl ) { 						SizingMethod = CoolingAirflowSizing;
-                //						DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
-                //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
-                //						SizingMethod = HeatingAirflowSizing;
-                ////						DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e.,
+                //                if ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) != AutoSize && ( ( SysSizingRunDone && CurSysNum > 0 ) ||
+                //(  ZoneSizingRunDone && CurZoneEqNum > 0 ) ) ) {                     if ( DXCoil( DXCoilNum ).DXCoilType_Num ==
+                // CoilDX_CoolingTwoStageWHumControl ) {                         SizingMethod = CoolingAirflowSizing;
+                //                        DataBypassFrac = DXCoil ( DXCoilNum ).BypassedFlowFrac ( Mode );
+                //                    } else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatingEmpirical ) {
+                //                        SizingMethod = HeatingAirflowSizing;
+                ////                        DataCoolCoilCap = DXCoolCap; // pass global variable used only for heat pumps (i.e.,
                 /// DX  cooling  and  heating coils)
-                //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
-                //						SizingMethod = HeatingAirflowSizing;
-                //					} else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
-                //						SizingMethod = CoolingAirflowSizing;
-                //					} else {
-                //						SizingMethod = CoolingAirflowSizing;
-                //					}
-                //					CompName = DXCoil( DXCoilNum ).Name;
-                //					TempSize = AutoSize;
-                //					SizingString.clear(); // don't care
-                //					CompType = DXCoil( DXCoilNum ).DXCoilType;
-                //					DataIsDXCoil = true;
-                //					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
-                //					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
+                //                    } else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Heating ) {
+                //                        SizingMethod = HeatingAirflowSizing;
+                //                    } else if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilVRF_Cooling ) {
+                //                        SizingMethod = CoolingAirflowSizing;
+                //                    } else {
+                //                        SizingMethod = CoolingAirflowSizing;
+                //                    }
+                //                    CompName = DXCoil( DXCoilNum ).Name;
+                //                    TempSize = AutoSize;
+                //                    SizingString.clear(); // don't care
+                //                    CompType = DXCoil( DXCoilNum ).DXCoilType;
+                //                    DataIsDXCoil = true;
+                //                    DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
+                //                    DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
                 //                  CoolingAirFlowSizer sizingCoolingAirFlow;
                 //                  sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 //                  sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 //                  DataAirFlowUsedForSizing = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
-                //					DataIsDXCoil = false; // don't need this and next 2, they are just overwritten below. Delete
-                // on  next  pass so testing will show problems if any. 					DataEMSOverrideON = false;
-                //					DataEMSOverride = 0.0;
-                //					DataBypassFrac = 0.0;
-                //				}
+                //                    DataIsDXCoil = false; // don't need this and next 2, they are just overwritten below. Delete
+                // on  next  pass so testing will show problems if any.                     DataEMSOverrideON = false;
+                //                    DataEMSOverride = 0.0;
+                //                    DataBypassFrac = 0.0;
+                //                }
                 PrintFlag = true;
                 DataTotCapCurveIndex = state.dataDXCoils->DXCoil(DXCoilNum).CCapFTemp(Mode);
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
@@ -7116,7 +7116,7 @@ namespace EnergyPlus::DXCoils {
                     state.dataDXCoils->DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 = sizerEvapCondPumpPower2.size(state, TempSize, ErrorsFound);
                 }
 
-                //				// Sizing rated low speed air flow rate
+                //                // Sizing rated low speed air flow rate
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                     CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                     CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
@@ -7132,7 +7132,7 @@ namespace EnergyPlus::DXCoils {
                     state.dataDXCoils->DXCoil(DXCoilNum).RatedAirVolFlowRate2 = sizerLowSpdAirFlow.size(state, TempSize, ErrorsFound);
                 }
 
-                //				// Sizing rated low speed total cooling capacity
+                //                // Sizing rated low speed total cooling capacity
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                     CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                     CompType = state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType;
@@ -7187,7 +7187,7 @@ namespace EnergyPlus::DXCoils {
                     }
                 }
 
-                //				// Sizing rated low speed SHR2
+                //                // Sizing rated low speed SHR2
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed) {
                     CompName = state.dataDXCoils->DXCoil(DXCoilNum).Name;
                     FieldNum = 7;
@@ -7207,7 +7207,7 @@ namespace EnergyPlus::DXCoils {
                     DataDXSpeedNum = 0;
                 }
 
-                //				// Sizing resistive defrost heater capacity
+                //                // Sizing resistive defrost heater capacity
                 if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating &&
                     state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num != CoilDX_MultiSpeedHeating) {
                     // IF (DXCoil(DXCoilNum)%DXCoilType_Num == CoilDX_MultiSpeedHeating .OR. &
@@ -9868,7 +9868,7 @@ namespace EnergyPlus::DXCoils {
             if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = PLF;
 
             //  Calculate full load output conditions
-            //			if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+            //            if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
             if (SHR > 1.0) SHR = 1.0;
             FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
             hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
@@ -9918,7 +9918,7 @@ namespace EnergyPlus::DXCoils {
                     DXCoilNum, SHR, state.dataDXCoils->DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, QLatRated, QLatActual, InletAirDryBulbTemp, InletAirWetBulbC, Mode);
 
                 //  Calculate full load output conditions
-                //				if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
+                //                if ( SHR > 1.0 || Counter > 0 ) SHR = 1.0;
                 if (SHR > 1.0) SHR = 1.0;
                 FullLoadOutAirEnth = InletAirEnthalpy - TotCap / AirMassFlow;
                 hTinwout = InletAirEnthalpy - (1.0 - SHR) * hDelta;
@@ -15739,11 +15739,11 @@ namespace EnergyPlus::DXCoils {
         //       MODIFIED       Nov 2015, RP Zhang, LBNL
 
         // PURPOSE OF THIS SUBROUTINE:
-        // 		Calculates the air-side performance of a direct-expansion, air-cooled
-        // 		VRF terminal unit cooling coil, for the VRF_FluidTCtrl model.
+        //         Calculates the air-side performance of a direct-expansion, air-cooled
+        //         VRF terminal unit cooling coil, for the VRF_FluidTCtrl model.
 
         // METHODOLOGY EMPLOYED:
-        // 		This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
+        //         This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
 
         // Using/Aliasing
         using CurveManager::CurveValue;
@@ -15891,31 +15891,31 @@ namespace EnergyPlus::DXCoils {
         //   the warning for the last iteration only. Must wait for next time step to accomplish this.
         //   If a warning occurs and the simulation down shifts, the warning is not valid.
         // if ( DXCoil( DXCoilNum ).PrintLowAmbMessage ) { // .AND. &
-        // 	if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
-        // 		if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
-        // 			ShowWarningMessage(state,  DXCoil( DXCoilNum ).LowAmbBuffer1 );
-        // 			ShowContinueError(state,  DXCoil( DXCoilNum ).LowAmbBuffer2 );
-        // 			ShowContinueError(state,  "... Operation at low inlet temperatures may require special performance curves." );
-        // 		}
-        // 		ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet
+        //     if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
+        //         if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
+        //             ShowWarningMessage(state,  DXCoil( DXCoilNum ).LowAmbBuffer1 );
+        //             ShowContinueError(state,  DXCoil( DXCoilNum ).LowAmbBuffer2 );
+        //             ShowContinueError(state,  "... Operation at low inlet temperatures may require special performance curves." );
+        //         }
+        //         ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Low condenser inlet
         // temperature error continues...", DXCoil( DXCoilNum ).LowAmbErrIndex, DXCoil( DXCoilNum ).LowTempLast, DXCoil( DXCoilNum ).LowTempLast,
         // _,
         // "[C]", "[C]" );
-        // 	}
+        //     }
         // }
         //
         // if ( DXCoil( DXCoilNum ).PrintHighAmbMessage ) { // .AND. &
-        // 	if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
-        // 		if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
-        // 			ShowWarningMessage(state,  DXCoil( DXCoilNum ).HighAmbBuffer1 );
-        // 			ShowContinueError(state,  DXCoil( DXCoilNum ).HighAmbBuffer2 );
-        // 			ShowContinueError(state,  "... Operation at high inlet temperatures may require special performance curves." );
-        // 		}
-        // 		ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet
+        //     if ( CurrentEndTime > DXCoil( DXCoilNum ).CurrentEndTimeLast && TimeStepSys >= DXCoil( DXCoilNum ).TimeStepSysLast ) {
+        //         if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
+        //             ShowWarningMessage(state,  DXCoil( DXCoilNum ).HighAmbBuffer1 );
+        //             ShowContinueError(state,  DXCoil( DXCoilNum ).HighAmbBuffer2 );
+        //             ShowContinueError(state,  "... Operation at high inlet temperatures may require special performance curves." );
+        //         }
+        //         ShowRecurringWarningErrorAtEnd(state,  DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - High condenser inlet
         // temperature error continues...", DXCoil( DXCoilNum ).HighAmbErrIndex, DXCoil( DXCoilNum ).HighTempLast, DXCoil( DXCoilNum
         // ).HighTempLast,
         // _, "[C]", "[C]" );
-        // 	}
+        //     }
         // }
 
         if (state.dataDXCoils->DXCoil(DXCoilNum).PrintLowOutTempMessage) {
@@ -16000,28 +16000,28 @@ namespace EnergyPlus::DXCoils {
             // at low inlet temperatures
             // // check boundary for low ambient temperature and post warnings to individual DX coil buffers to print at end of time step
             // if ( OutdoorDryBulb < DXCoil( DXCoilNum ).MinOATCompressor && ! WarmupFlag ) {
-            // 	DXCoil( DXCoilNum ).PrintLowAmbMessage = true;
-            // 	DXCoil( DXCoilNum ).LowTempLast = OutdoorDryBulb;
-            // 	if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
-            // 		DXCoil( DXCoilNum ).LowAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser
+            //     DXCoil( DXCoilNum ).PrintLowAmbMessage = true;
+            //     DXCoil( DXCoilNum ).LowTempLast = OutdoorDryBulb;
+            //     if ( DXCoil( DXCoilNum ).LowAmbErrIndex == 0 ) {
+            //         DXCoil( DXCoilNum ).LowAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser
             // inlet temperature below " + RoundSigDigits( DXCoil( DXCoilNum ).MinOATCompressor, 2 ) + " C. Condenser inlet temperature = " +
             // RoundSigDigits( OutdoorDryBulb, 2 );
-            // 		DXCoil( DXCoilNum ).LowAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " +
+            //         DXCoil( DXCoilNum ).LowAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ", " + CurMnDy + " " +
             // CreateSysTimeIntervalString();
-            // 	}
+            //     }
             // }
             //
             // // check boundary for high ambient temperature and post warnings to individual DX coil buffers to print at end of time step
             // if ( OutdoorDryBulb > DXCoil( DXCoilNum ).MaxOATCompressor && ! WarmupFlag ) {
-            // 	DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
-            // 	DXCoil( DXCoilNum ).HighTempLast = OutdoorDryBulb;
-            // 	if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
-            // 		DXCoil( DXCoilNum ).HighAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser
+            //     DXCoil( DXCoilNum ).PrintHighAmbMessage = true;
+            //     DXCoil( DXCoilNum ).HighTempLast = OutdoorDryBulb;
+            //     if ( DXCoil( DXCoilNum ).HighAmbErrIndex == 0 ) {
+            //         DXCoil( DXCoilNum ).HighAmbBuffer1 = DXCoil( DXCoilNum ).DXCoilType + " \"" + DXCoil( DXCoilNum ).Name + "\" - Condenser
             // inlet temperature above " + RoundSigDigits( DXCoil( DXCoilNum ).MaxOATCompressor, 2 ) + " C. Condenser temperature = " +
-            // RoundSigDigits( OutdoorDryBulb, 2 ); 		DXCoil( DXCoilNum ).HighAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ",
+            // RoundSigDigits( OutdoorDryBulb, 2 );         DXCoil( DXCoilNum ).HighAmbBuffer2 = " ... Occurrence info = " + EnvironmentName + ",
             // "
             // + CurMnDy + " " + CreateSysTimeIntervalString();
-            // 	}
+            //     }
             // }
 
             //  Get total capacity modifying factor (function of temperature) for off-rated conditions
@@ -16195,11 +16195,11 @@ namespace EnergyPlus::DXCoils {
         //       MODIFIED       Nov 2015, RP Zhang, LBNL
 
         // PURPOSE OF THIS SUBROUTINE:
-        // 		Calculates the air-side performance of a direct-expansion, air-cooled
-        // 		VRF terminal unit heating coil, for the new VRF model.
+        //         Calculates the air-side performance of a direct-expansion, air-cooled
+        //         VRF terminal unit heating coil, for the new VRF model.
 
         // METHODOLOGY EMPLOYED:
-        // 		This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
+        //         This subroutine is derived from CalcVRFCoolingCoil, and implements the new VRF model for FluidTCtrl.
 
         // Using/Aliasing
         using CurveManager::CurveValue;

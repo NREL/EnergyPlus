@@ -606,7 +606,7 @@ namespace EnergyPlus::MixedAir {
                             // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
                             // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
                             // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
-                            //					AirloopPLR = state.dataAirLoop->AirLoopFlow( AirLoopNum ).FanPLR;
+                            //                    AirloopPLR = state.dataAirLoop->AirLoopFlow( AirLoopNum ).FanPLR;
                             AirloopPLR = state.dataMixedAir->OAController(OASysNum).OAMassFlow / state.dataMixedAir->OAController(OASysNum).MaxOAMassFlowRate;
                         } else {
                             AirloopPLR = 1.0;
@@ -2419,11 +2419,11 @@ namespace EnergyPlus::MixedAir {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        //		if ( BeginEnvrnFlag && FirstHVACIteration ) {
-        //		}
+        //        if ( BeginEnvrnFlag && FirstHVACIteration ) {
+        //        }
 
-        //		if ( state.dataGlobal->BeginDayFlag ) {
-        //		}
+        //        if ( state.dataGlobal->BeginDayFlag ) {
+        //        }
 
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
 
@@ -4514,7 +4514,7 @@ namespace EnergyPlus::MixedAir {
             // This should not be messing with OutAirMinFrac, freeze protection should only limit economizer operation
             // if (MaximumOAFracBySetPoint < OutAirMinFrac) {
             // OutAirMinFrac = MaximumOAFracBySetPoint;
-            //	if (AirLoopNum > 0) state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            //    if (AirLoopNum > 0) state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
             //}
             OASignal = max(min(MaximumOAFracBySetPoint, OASignal), OutAirMinFrac);
         }
