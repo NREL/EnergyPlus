@@ -325,7 +325,7 @@ namespace AirLoopHVACDOAS {
                     for (auto NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = UtilityRoutines::MakeUPPERCase(NodeDOASName.at("outlet_node_name"));
-                        int NodeNum = UtilityRoutines::FindItemInList(name, NodeID);
+                        int NodeNum = UtilityRoutines::FindItemInList(name, state.dataLoopNodes->NodeID);
                         if (NodeNum > 0 && num <= thisSplitter.numOfOutletNodes) {
                             thisSplitter.OutletNodeName.push_back(name);
                             thisSplitter.OutletNodeNum.push_back(NodeNum);
