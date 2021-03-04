@@ -65,57 +65,39 @@ namespace DataLoopNode {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // Valid Fluid Types for Nodes
-    extern int const NodeType_Unknown;  // 'blank'
-    extern int const NodeType_Air;      // 'Air'
-    extern int const NodeType_Water;    // 'Water'
-    extern int const NodeType_Steam;    // 'Steam'
-    extern int const NodeType_Electric; // 'Electric'
-    extern Array1D_string const ValidNodeFluidTypes;
+    constexpr int NodeType_Unknown(0);  // 'blank'
+    constexpr int NodeType_Air(1);      // 'Air'
+    constexpr int NodeType_Water(2);     // 'Water'
+    constexpr int NodeType_Steam(3);     // 'Steam'
+    constexpr int NodeType_Electric(4);   // 'Electric'
+        
+    constexpr int NumValidConnectionTypes(15);
 
-    // Valid Connection Types for Nodes
-    extern Array1D_string const ValidConnectionTypes;
+    constexpr int NodeConnectionType_Inlet(1);
+    constexpr int NodeConnectionType_Outlet(2);
+    constexpr int NodeConnectionType_Internal(3);
+    constexpr int NodeConnectionType_ZoneNode(4);
+    constexpr int NodeConnectionType_Sensor(5);
+    constexpr int NodeConnectionType_Actuator(6);
+    constexpr int NodeConnectionType_OutsideAir(7);
+    constexpr int NodeConnectionType_ReliefAir(8);
+    constexpr int NodeConnectionType_ZoneInlet(9);
+    constexpr int NodeConnectionType_ZoneReturn(10);
+    constexpr int NodeConnectionType_ZoneExhaust(11);
+    constexpr int NodeConnectionType_SetPoint(12);
+    constexpr int NodeConnectionType_Electric(13);
+    constexpr int NodeConnectionType_OutsideAirReference(14);
+    constexpr int NodeConnectionType_InducedAir(15);
 
-    extern int const NumValidConnectionTypes;
-
-    extern int const NodeConnectionType_Inlet;
-    extern int const NodeConnectionType_Outlet;
-    extern int const NodeConnectionType_Internal;
-    extern int const NodeConnectionType_ZoneNode;
-    extern int const NodeConnectionType_Sensor;
-    extern int const NodeConnectionType_Actuator;
-    extern int const NodeConnectionType_OutsideAir;
-    extern int const NodeConnectionType_ReliefAir;
-    extern int const NodeConnectionType_ZoneInlet;
-    extern int const NodeConnectionType_ZoneReturn;
-    extern int const NodeConnectionType_ZoneExhaust;
-    extern int const NodeConnectionType_SetPoint;
-    extern int const NodeConnectionType_Electric;
-    extern int const NodeConnectionType_OutsideAirReference;
-    extern int const NodeConnectionType_InducedAir;
-
+    constexpr Real64 SensedLoadFlagValue(-999.0);
+    constexpr Real64 SensedNodeFlagValue(-999.0);
+    
     // Valid IsParent Types for Node Connections
-    extern bool const ObjectIsParent;
-    extern bool const ObjectIsNotParent;
-    extern bool const IncrementFluidStreamYes;
-    extern Real64 const SensedNodeFlagValue;
-    extern Real64 const SensedLoadFlagValue;
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumOfNodes;
-    extern int NumofSplitters;
-    extern int NumofMixers;
-
-    // You will be tempted to put the following into the Node Derived type as
-    // the "Name" for the Node.  Don't do it!!!  Several areas of the code have
-    // the following assignments:  Node(somenodenumber)=Node(someothernodenumber) to
-    // set/update Node conditions.  If the Node derived type would include the name
-    // then the name would get changed and bad things would result...
-    extern Array1D_string NodeID;
+    constexpr bool ObjectIsParent(true);
+    constexpr bool ObjectIsNotParent(false);
+    constexpr bool IncrementFluidStreamYes(true);
 
     // Types
-
     struct NodeData
     {
         // Members
@@ -317,12 +299,6 @@ namespace DataLoopNode {
 
     };
 
-    // Object Data
-    extern Array1D<NodeData> Node; // dim to num nodes in SimHVAC
-    extern NodeData DefaultNodeValues;
-    extern Array1D<MoreNodeData> MoreNodeInfo;
-    extern Array1D<MarkedNodeData> MarkedNode;
-    extern Array1D<NodeSetpointCheckData> NodeSetpointCheck;
 
     // Clears the global data in DataLoopNode.
     // Needed for unit tests, should not be normally called.
@@ -331,6 +307,16 @@ namespace DataLoopNode {
 } // namespace DataLoopNode
 
 struct LoopNodeData : BaseGlobalStruct {
+
+    int NumOfNodes = 0;
+    int NumofSplitters = 0;
+    int NumofMixers = 0;
+    Array1D_string NodeID;
+    Array1D<DataLoopNode::NodeData> Node; // dim to num nodes in SimHVAC
+    DataLoopNode::NodeData DefaultNodeValues;
+    Array1D<DataLoopNode::MoreNodeData> MoreNodeInfo;
+    Array1D<DataLoopNode::MarkedNodeData> MarkedNode;
+    Array1D<DataLoopNode::NodeSetpointCheckData> NodeSetpointCheck;
 
     void clear_state() override
     {
