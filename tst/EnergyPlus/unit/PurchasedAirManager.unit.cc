@@ -1061,9 +1061,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
@@ -1234,9 +1234,9 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_EMSOverrideTest_Revised_ZeroFlow)
 
     bool ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 1;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 1;
+    state->dataScheduleMgr->Schedule.allocate(1);
     AllocateHeatBalArrays(*state);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
