@@ -131,7 +131,14 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        int brIdentity(0);
+        enum brLoopType
+        {
+            CHILLER,
+            HEATER,
+            CONDENSER,
+            NOMATCH
+        };
+        brLoopType brIdentity(NOMATCH);
 
         int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
                                   .LoopSide(calledFromLocation.loopSideNum)
@@ -148,30 +155,30 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
 
             // Match inlet node name of calling branch to determine if this call is for heating or cooling
             if (compInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
-                brIdentity = 1; // chiller
+                brIdentity = CHILLER; // chiller
                 break;
             } else if (compInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
-                brIdentity = 2; // heater
+                brIdentity = HEATER; // heater
                 break;
             } else if (compInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
-                brIdentity = 3; // condenser
+                brIdentity = CONDENSER; // condenser
                 break;
             } else {
-                brIdentity = 0;
+                brIdentity = NOMATCH;
             }
         }
 
-        if (brIdentity == 1) {
+        if (brIdentity == CHILLER) {
             this->InCoolingMode = RunFlag != 0;
             this->initialize(state);
             this->calcChiller(state, CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
-        } else if (brIdentity == 2) {
+        } else if (brIdentity == HEATER) {
             this->InHeatingMode = RunFlag != 0;
             this->initialize(state);
             this->calcHeater(state, CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
-        } else if (brIdentity == 3) {
+        } else if (brIdentity == CONDENSER) {
             if (this->CDLoopNum > 0) {
                 PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                     this->CDLoopNum,
