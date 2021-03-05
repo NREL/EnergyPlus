@@ -2173,7 +2173,7 @@ namespace EnergyPlus::PlantManager {
                     for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                         LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                         LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                        CurLoopNum = LoopNum;
+                        state.dataSize->CurLoopNum = LoopNum;
 
                         for (BranchNum = 1;
                              BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2195,7 +2195,7 @@ namespace EnergyPlus::PlantManager {
 
                         LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                         LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                        CurLoopNum = LoopNum;
+                        state.dataSize->CurLoopNum = LoopNum;
                         if (LoopSideNum == SupplySide) {
                             SizePlantLoop(state, LoopNum, FinishSizingFlag);
                         }
@@ -2218,7 +2218,7 @@ namespace EnergyPlus::PlantManager {
                     }
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                    CurLoopNum = LoopNum;
+                    state.dataSize->CurLoopNum = LoopNum;
                     if (LoopSideNum == SupplySide) {
                         SizePlantLoop(state, LoopNum, FinishSizingFlag);
                     }
@@ -2231,7 +2231,7 @@ namespace EnergyPlus::PlantManager {
                             state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, state.dataPlantMgr->InitLoopEquip, state.dataPlantMgr->GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
-                    //				if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
+                    //                if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
                     //).VolFlowSizingDone = true;
                 }
 
@@ -2252,7 +2252,7 @@ namespace EnergyPlus::PlantManager {
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                    CurLoopNum = LoopNum;
+                    state.dataSize->CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2275,7 +2275,7 @@ namespace EnergyPlus::PlantManager {
                 for (HalfLoopNum = 1; HalfLoopNum <= state.dataPlnt->TotNumHalfLoops; ++HalfLoopNum) {
                     LoopNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopIndex;
                     LoopSideNum = state.dataPlnt->PlantCallingOrderInfo(HalfLoopNum).LoopSide;
-                    CurLoopNum = LoopNum;
+                    state.dataSize->CurLoopNum = LoopNum;
 
                     for (BranchNum = 1;
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
@@ -2912,35 +2912,15 @@ namespace EnergyPlus::PlantManager {
             // PURPOSE OF THIS SUBROUTINE:
             // one time init what can be set up related to plant sizing data structure.
 
-            // METHODOLOGY EMPLOYED:
-            // <description>
-
-            // REFERENCES:
-            // na
-
             // Using/Aliasing
-            using DataSizing::NumPltSizInput;
-            using DataSizing::PlantSizData;
             using DataSizing::PlantSizingData;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS:
-            // na
-
-            // DERIVED TYPE DEFINITIONS:
-            // na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int PlantSizNum(0); // index of Plant Sizing data for this loop
 
             if (state.dataPlnt->PlantLoop(LoopNum).PlantSizNum == 0) {
-                if (NumPltSizInput > 0) {
-                    PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, PlantSizData,
+                if (state.dataSize->NumPltSizInput > 0) {
+                    PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData,
                                                                   &PlantSizingData::PlantLoopName);
                     if (PlantSizNum > 0) {
                         state.dataPlnt->PlantLoop(LoopNum).PlantSizNum = PlantSizNum;
@@ -2996,8 +2976,8 @@ namespace EnergyPlus::PlantManager {
                 PlantSizNum = state.dataPlnt->PlantLoop(LoopNum).PlantSizNum;
                 // PlantSizData(PlantSizNum)%DesVolFlowRate = 0.0D0 ! DSU2
             } else {
-                if (NumPltSizInput > 0) {
-                    PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, PlantSizData,
+                if (state.dataSize->NumPltSizInput > 0) {
+                    PlantSizNum = UtilityRoutines::FindItemInList(state.dataPlnt->PlantLoop(LoopNum).Name, state.dataSize->PlantSizData,
                                                                   &PlantSizingData::PlantLoopName);
                 }
             }
@@ -3040,7 +3020,7 @@ namespace EnergyPlus::PlantManager {
                         PlantSizFac = 1.0;
                     }
                     // store the sizing factor now, for later reuse,
-                    PlantSizData(PlantSizNum).PlantSizFac = PlantSizFac;
+                    state.dataSize->PlantSizData(PlantSizNum).PlantSizFac = PlantSizFac;
                     // might deprecate this next bit in favor of simpler storage in PlantSizData structure
                     for (BranchNum = 1;
                          BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches; ++BranchNum) {
@@ -3066,14 +3046,14 @@ namespace EnergyPlus::PlantManager {
                 }
 
                 // sum up contributions from CompDesWaterFlow, demand side size request (non-coincident)
-                PlantSizData(PlantSizNum).DesVolFlowRate = 0.0; // init for summation
+                state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate = 0.0; // init for summation
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
                             BranchNum).TotalComponents; ++CompNum) {
                         SupNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                        for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
-                            if (SupNodeNum == CompDesWaterFlow(WaterCompNum).SupNode) {
-                                PlantSizData(PlantSizNum).DesVolFlowRate += CompDesWaterFlow(
+                        for (WaterCompNum = 1; WaterCompNum <= state.dataSize->SaveNumPlantComps; ++WaterCompNum) {
+                            if (SupNodeNum == state.dataSize->CompDesWaterFlow(WaterCompNum).SupNode) {
+                                state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate += state.dataSize->CompDesWaterFlow(
                                         WaterCompNum).DesVolFlowRate;
                             }
                         }
@@ -3084,7 +3064,7 @@ namespace EnergyPlus::PlantManager {
                     // if the user puts in a large throwaway value for hard max plant loop size, they may not want this affecting anything else.
                     //  but if they put in a smaller value, then it should cap the design size, so use hard value if it is smaller than non-coincident
                     //  result
-                    PlantSizData(PlantSizNum).DesVolFlowRate = std::min(PlantSizData(PlantSizNum).DesVolFlowRate,
+                    state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate = std::min(state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate,
                                                                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate);
                 }
             }
@@ -3093,16 +3073,16 @@ namespace EnergyPlus::PlantManager {
 
                 if ((PlantSizNum > 0)) {
 
-                    if (PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+                    if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate =
-                                PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizData(PlantSizNum).PlantSizFac;
+                                state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * state.dataSize->PlantSizData(PlantSizNum).PlantSizFac;
                     } else {
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             ShowWarningError(
                                 state,
                                 format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
-                                       PlantSizData(PlantSizNum).DesVolFlowRate));
+                                       state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate));
                             ShowContinueError(state, "..occurs for PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         }
                     }
@@ -3233,18 +3213,18 @@ namespace EnergyPlus::PlantManager {
                     break;
                 }
             }
-            if (PlantSizData(PlantSizNum).ConcurrenceOption == NonCoincident) {
+            if (state.dataSize->PlantSizData(PlantSizNum).ConcurrenceOption == NonCoincident) {
                 // we can have plant loops that are non-coincident along with some that are coincident
                 // so refresh sum of registered flows (they may have changed)
 
-                PlantSizData(PlantSizNum).DesVolFlowRate = 0.0; // init for summation
+                state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate = 0.0; // init for summation
                 for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches; ++BranchNum) {
                     for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(
                             BranchNum).TotalComponents; ++CompNum) {
                         SupNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DemandSide).Branch(BranchNum).Comp(CompNum).NodeNumIn;
-                        for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
-                            if (SupNodeNum == CompDesWaterFlow(WaterCompNum).SupNode) {
-                                PlantSizData(PlantSizNum).DesVolFlowRate += CompDesWaterFlow(
+                        for (WaterCompNum = 1; WaterCompNum <= state.dataSize->SaveNumPlantComps; ++WaterCompNum) {
+                            if (SupNodeNum == state.dataSize->CompDesWaterFlow(WaterCompNum).SupNode) {
+                                state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate += state.dataSize->CompDesWaterFlow(
                                         WaterCompNum).DesVolFlowRate;
                             }
                         }
@@ -3256,15 +3236,15 @@ namespace EnergyPlus::PlantManager {
 
                 if ((PlantSizNum > 0)) {
 
-                    if (PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
-                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizeFac;
+                    if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+                        state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizeFac;
                     } else {
                         state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;
                         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                             ShowWarningError(
                                 state,
                                 format("SizePlantLoop: Calculated Plant Sizing Design Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
-                                       PlantSizData(PlantSizNum).DesVolFlowRate));
+                                       state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate));
                             ShowContinueError(state, "..occurs for PlantLoop=" + state.dataPlnt->PlantLoop(LoopNum).Name);
                         }
                     }

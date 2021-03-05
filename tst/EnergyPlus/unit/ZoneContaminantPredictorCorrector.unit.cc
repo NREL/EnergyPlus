@@ -191,8 +191,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
-    ZoneEqSizing.allocate(1);
-    CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
@@ -212,9 +212,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     state->dataHeatBalFanSys->CTMFL.allocate(1);
     state->dataHeatBalFanSys->MDotOA.allocate(1);
     state->dataHeatBalFanSys->MDotOA(1) = 0.001;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
 
@@ -348,8 +348,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
-    ZoneEqSizing.allocate(1);
-    CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
@@ -523,8 +523,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataHeatBal->Zone.allocate(3);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
-    ZoneEqSizing.allocate(3);
-    CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(3);
+    state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
@@ -553,9 +553,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     state->dataHeatBalFanSys->CTMFL.allocate(3);
     state->dataHeatBalFanSys->MDotOA.allocate(3);
     state->dataHeatBalFanSys->MDotOA = 0.001;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
 
@@ -731,8 +731,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataHeatBal->Zone.allocate(3);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataHeatBal->Zone(1).ZoneEqNum = 1;
-    ZoneEqSizing.allocate(3);
-    CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing.allocate(3);
+    state->dataSize->CurZoneEqNum = 1;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).Volume = 1000.0;
     state->dataHeatBal->Zone(1).SystemZoneNodeNumber = 5;
@@ -761,9 +761,9 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     state->dataHeatBalFanSys->CTMFL.allocate(3);
     state->dataHeatBalFanSys->MDotOA.allocate(3);
     state->dataHeatBalFanSys->MDotOA = 0.001;
-    ScheduleManager::Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule.allocate(1);
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
 

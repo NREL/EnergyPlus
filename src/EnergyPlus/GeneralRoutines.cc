@@ -699,40 +699,19 @@ void CheckSysSizing(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Checks SysSizingRunDone flag. If false throws a fatal error.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataSizing::NumSysSizInput;
-    using DataSizing::SysSizingRunDone;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    if (!SysSizingRunDone) {
+    if (!state.dataSize->SysSizingRunDone) {
         ShowSevereError(state, "For autosizing of " + CompType + ' ' + CompName + ", a system sizing run must be done.");
-        if (NumSysSizInput == 0) {
+        if (state.dataSize->NumSysSizInput == 0) {
             ShowContinueError(state, "No \"Sizing:System\" objects were entered.");
         }
         if (!state.dataGlobal->DoSystemSizing) {
-            ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do System Sizing Calculation\" set to Yes.");
+            ShowContinueError(state, R"(The "SimulationControl" object did not have the field "Do System Sizing Calculation" set to Yes.)");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");
     }
 }
 
-void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized)
+void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized)
 {
 
     // SUBROUTINE INFORMATION:
@@ -741,39 +720,13 @@ void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized)
     //       MODIFIED       na
     //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS SUBROUTINE:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataSizing::NumSysSizInput;
-    using DataSizing::SysSizingRunDone;
-    using DataSizing::SysSizInput;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
     int ThisAirSysSizineInputLoop;
 
     AirLoopWasSized = false;
-    if (SysSizingRunDone) {
-        for (ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= NumSysSizInput; ++ThisAirSysSizineInputLoop) {
-            if (SysSizInput(ThisAirSysSizineInputLoop).AirLoopNum == AirLoopNum) {
+    if (state.dataSize->SysSizingRunDone) {
+        for (ThisAirSysSizineInputLoop = 1; ThisAirSysSizineInputLoop <= state.dataSize->NumSysSizInput; ++ThisAirSysSizineInputLoop) {
+            if (state.dataSize->SysSizInput(ThisAirSysSizineInputLoop).AirLoopNum == AirLoopNum) {
                 AirLoopWasSized = true;
                 break;
             }
@@ -800,40 +753,20 @@ void CheckZoneSizing(EnergyPlusData &state,
     // METHODOLOGY EMPLOYED:
     // Checks ZoneSizingRunDone flag. If false throws a fatal error.
 
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataSizing::NumZoneSizingInput;
-    using DataSizing::ZoneSizingRunDone;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    if (!ZoneSizingRunDone) {
+    if (!state.dataSize->ZoneSizingRunDone) {
         ShowSevereError(state, "For autosizing of " + CompType + ' ' + CompName + ", a zone sizing run must be done.");
-        if (NumZoneSizingInput == 0) {
+        if (state.dataSize->NumZoneSizingInput == 0) {
             ShowContinueError(state, "No \"Sizing:Zone\" objects were entered.");
         }
         if (!state.dataGlobal->DoZoneSizing) {
-            ShowContinueError(state, "The \"SimulationControl\" object did not have the field \"Do Zone Sizing Calculation\" set to Yes.");
+            ShowContinueError(state, R"(The "SimulationControl" object did not have the field "Do Zone Sizing Calculation" set to Yes.)");
         }
         ShowFatalError(state, "Program terminates due to previously shown condition(s).");
     }
 }
 
-void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
+void CheckThisZoneForSizing(EnergyPlusData &state,
+                            int const ZoneNum, // zone index to be checked
                             bool &ZoneWasSized)
 {
 
@@ -847,36 +780,13 @@ void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
     // utility routine to see if a particular zone has a Sizing:Zone object for it
     // and that sizing was done.
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // Using/Aliasing
-    using DataSizing::NumZoneSizingInput;
-    using DataSizing::ZoneSizingInput;
-    using DataSizing::ZoneSizingRunDone;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int ThisSizingInput;
 
     ZoneWasSized = false;
-    if (ZoneSizingRunDone) {
-        for (ThisSizingInput = 1; ThisSizingInput <= NumZoneSizingInput; ++ThisSizingInput) {
-            if (ZoneSizingInput(ThisSizingInput).ZoneNum == ZoneNum) {
+    if (state.dataSize->ZoneSizingRunDone) {
+        for (ThisSizingInput = 1; ThisSizingInput <= state.dataSize->NumZoneSizingInput; ++ThisSizingInput) {
+            if (state.dataSize->ZoneSizingInput(ThisSizingInput).ZoneNum == ZoneNum) {
                 ZoneWasSized = true;
                 break;
             }
@@ -1013,21 +923,13 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     // REFERENCES:
     // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
 
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataHeatBalSurface::TH;
-    using DataSurfaces::Surface;
     using DataSurfaces::SurfaceData;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 const g(9.807);           // gravitational constant (m/s**2)
@@ -1087,16 +989,16 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     Real64 ICSWaterTemp;                 // ICS solar collector water temp
     Real64 ICSULossbottom;               // ICS solar collector bottom loss Conductance
 
-    Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, SurfPtrARR));
+    Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR));
 
-    //	LocalOutDryBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutDryBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
+    //    LocalOutDryBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutDryBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
     ////Autodesk:F2C++ Array subscript usage: Replaced by below
-    LocalOutDryBulbTemp = sum_product_sub(Surface, &SurfaceData::Area, &SurfaceData::OutDryBulbTemp, SurfPtrARR) /
+    LocalOutDryBulbTemp = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Area, &SurfaceData::OutDryBulbTemp, SurfPtrARR) /
                           surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
-    //	LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
+    //    LocalWetBulbTemp = sum( Surface( SurfPtrARR ).Area * Surface( SurfPtrARR ).OutWetBulbTemp ) / sum( Surface( SurfPtrARR ).Area );
     ////Autodesk:F2C++ Array subscript usage: Replaced by below
-    LocalWetBulbTemp = sum_product_sub(Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR) /
+    LocalWetBulbTemp = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Area, &SurfaceData::OutWetBulbTemp, SurfPtrARR) /
                        surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
     LocalOutHumRat = PsyWFnTdbTwbPb(state, LocalOutDryBulbTemp, LocalWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
@@ -1108,7 +1010,7 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     } else { // when raining we use wetbulb not drybulb
         Tamb = LocalWetBulbTemp;
     }
-    //	A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    A = sum( Surface( SurfPtrARR ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
     A = surfaceArea;
     TmpTsBaf = TsBaffle;
 
@@ -1125,9 +1027,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
         SurfPtr = SurfPtrARR(ThisSurf);
         // Initializations for this surface
         HMovInsul = 0.0;
-        LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
+        LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
         InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
-        ConstrNum = Surface(SurfPtr).Construction;
+        ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
         AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
         TsBaffK = TmpTsBaf + DataGlobalConstants::KelvinConv;
@@ -1137,9 +1039,9 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TsBaffK) - pow_4(TsoK)) / (TsBaffK - TsoK);
         }
         // Added for ICS collector OSCM
-        if (Surface(SurfPtr).IsICS) {
+        if (state.dataSurface->Surface(SurfPtr).IsICS) {
             ICSCollectorIsOn = true;
-            CollectorNum = Surface(SurfPtr).ICSPtr;
+            CollectorNum = state.dataSurface->Surface(SurfPtr).ICSPtr;
         }
     }
 
@@ -1163,35 +1065,35 @@ void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
     }
     if (A == 0.0) { // should have been caught earlier
     }
-    auto Area(array_sub(Surface,
+    auto Area(array_sub(state.dataSurface->Surface,
                         &SurfaceData::Area,
                         SurfPtrARR)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
     // now figure area-weighted averages from underlying surfaces.
-    //	Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    Vwind = sum( LocalWindArr * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Vwind = sum(LocalWindArr * Area) / A;
     LocalWindArr.deallocate();
-    //	HrSky = sum( HSkyARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    HrSky = sum( HSkyARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     HrSky = sum(HSkyARR * Area) / A;
     HSkyARR.deallocate();
-    //	HrGround = sum( HGroundARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    HrGround = sum( HGroundARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     HrGround = sum(HGroundARR * Area) / A;
     HGroundARR.deallocate();
-    //	HrAtm = sum( HAirARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    HrAtm = sum( HAirARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     HrAtm = sum(HAirARR * Area) / A;
     HAirARR.deallocate();
-    //	HrPlen = sum( HPlenARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    HrPlen = sum( HPlenARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     HrPlen = sum(HPlenARR * Area) / A;
     HPlenARR.deallocate();
-    //	HExt = sum( HExtARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    //    HExt = sum( HExtARR * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     HExt = sum(HExtARR * Area) / A;
     HExtARR.deallocate();
 
     if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
-    //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Tso = sum_product_sub(TH(1, 1, _), Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
-    //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
+    //    Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    Tso = sum_product_sub(TH(1, 1, _), state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
+    //    Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
+    Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
 
     TmeanK = 0.5 * (TmpTsBaf + Tso) + DataGlobalConstants::KelvinConv;
 

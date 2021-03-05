@@ -89,9 +89,9 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
                           "1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          "0.006701,                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.006701,                    !- Surface-layer penetration depth {m} (dEMPD)",
                           "0.013402,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -101,10 +101,9 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
-    using DataSurfaces::TotSurfaces;
-    TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface(1);
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(1);
     surface.Name = "Surface1";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
@@ -178,9 +177,9 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
                           "1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          ",                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          ",                    !- Surface-layer penetration depth {m} (dEMPD)",
                           "autocalculate,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -215,9 +214,9 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
                           "1,                       !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0,                       !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "1,                       !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          "0.006701,                    !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.006701,                    !- Surface-layer penetration depth {m} (dEMPD)",
                           "0.013402,                    !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0.002,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0.002,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "1;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -227,10 +226,9 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
-    using DataSurfaces::TotSurfaces;
-    TotSurfaces = 1;
-    DataSurfaces::Surface.allocate(TotSurfaces);
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface(1);
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface(1);
     surface.Name = "Surface1";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;
@@ -304,9 +302,9 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
                           "2.32,                    !- Moisture Equation Coefficient b {dimensionless} (MoistBCoeff)",
                           "0.43,                    !- Moisture Equation Coefficient c {dimensionless} (MoistCCoeff)",
                           "72,                      !- Moisture Equation Coefficient d {dimensionless} (MoistDCoeff)",
-                          "0.0011,                  !- Surface-layer penetrtion depth {m} (dEMPD)",
+                          "0.0011,                  !- Surface-layer penetration depth {m} (dEMPD)",
                           "0.004,                   !- Deep-layer penetration depth {m} (dEPMDdeep)",
-                          "0,                       !- Coating layer permability {m} (CoatingThickness)",
+                          "0,                       !- Coating layer permeability {m} (CoatingThickness)",
                           "0;                       !- Coating layer water vapor diffusion resistance factor {dimensionless} (muCoating)"});
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -316,11 +314,10 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
-    using DataSurfaces::TotSurfaces;
     int surfNum = 1;
-    TotSurfaces = 1;
-    DataSurfaces::Surface.allocate( TotSurfaces );
-    DataSurfaces::SurfaceData &surface = DataSurfaces::Surface( surfNum );
+    state->dataSurface->TotSurfaces = 1;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    DataSurfaces::SurfaceData &surface = state->dataSurface->Surface( surfNum );
     surface.Name = "SurfaceWood";
     surface.Area = 1.0;
     surface.HeatTransSurf = true;

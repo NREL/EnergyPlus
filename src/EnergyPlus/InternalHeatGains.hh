@@ -63,12 +63,6 @@ struct EnergyPlusData;
 
 namespace InternalHeatGains {
 
-    extern bool GetInternalHeatGainsInputFlag; // Controls the GET routine calling (limited to first time)
-    extern bool ErrorsFound;                   // if errors were found in the input
-
-    // Functions
-    void clear_state();
-
     void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
     void GetInternalHeatGainsInput(EnergyPlusData &state);
@@ -196,8 +190,13 @@ namespace InternalHeatGains {
 
 struct InternalHeatGainsData : BaseGlobalStruct {
 
+    bool GetInternalHeatGainsInputFlag = true; // Controls the GET routine calling (limited to first time)
+    bool ErrorsFound = false;                   // if errors were found in the input
+
     void clear_state() override {
 
+        this->GetInternalHeatGainsInputFlag = true;
+        this->ErrorsFound = false;
     }
 };
 

@@ -145,8 +145,8 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).InletAirTemp, HeatingCoils::HeatingCoil(CoilNum).InletAirHumRat);
     state->dataEnvrn->OutBaroPress = 101325.0;
     HeatingCoils::HeatingCoil(CoilNum).SchedPtr = 1;
-    ScheduleManager::Schedule.allocate(1);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     DataHVACGlobals::MSHPMassFlowRateLow = OnMassFlowrate;
     HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity.allocate(1);
     HeatingCoils::HeatingCoil(CoilNum).MSNominalCapacity(1) = 10000;

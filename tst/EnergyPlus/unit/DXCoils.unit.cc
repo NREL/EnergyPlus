@@ -243,8 +243,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoil(CoilIndex).MSWasteHeatFrac(1) = 0;
     state->dataDXCoils->DXCoil(CoilIndex).MSWasteHeatFrac(2) = 0;
     state->dataDXCoils->DXCoil(CoilIndex).SchedPtr = 1;
-    Schedule.allocate(1);
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
@@ -281,14 +281,14 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     int CurveNum;
 
     state->dataGlobal->DisplayExtraWarnings = true;
-    SysSizingRunDone = true;
-    FinalSysSizing.allocate(1);
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->FinalSysSizing.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    CurSysNum = 1;
+    state->dataSize->CurSysNum = 1;
     state->dataDXCoils->NumDXCoils = 2;
     DXCoilNum = 2;
-    UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
     state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilDX_HeatingEmpirical;
@@ -381,8 +381,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     // HSPF {Btu/W-h}, Region Number", " DX Heating Coil Standard Rating Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, 0.0, 0.0, 3.51, 4"
 
     // Clean up
-    UnitarySysEqSizing.deallocate();
-    FinalSysSizing.deallocate();
+    state->dataSize->UnitarySysEqSizing.deallocate();
+    state->dataSize->FinalSysSizing.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
 }
@@ -1325,7 +1325,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).InletAirEnthalpy = PsyHFnTdbW(25.0, 0.005);
 
     state->dataDXCoils->DXCoil(1).SchedPtr = 1;
-    Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
     state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
@@ -1446,23 +1446,23 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     GetCurveInput(*state);
     GetDXCoils(*state);
     SetPredefinedTables(*state);
-    CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
 
     // Need this to prevent crash in Sizers
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.1;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.1;
-    DataFlowUsedForSizing = 0.1;
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-    ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = state->dataDXCoils->DXCoil(1).RatedTotCap(1);
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
-    ZoneSizingInput.allocate(1);
-    ZoneSizingInput(1).ZoneNum = 1;
-    DataSizing::NumZoneSizingInput = 1;
-    ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.1;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.1;
+    state->dataSize->DataFlowUsedForSizing = 0.1;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).CoolingCapacity = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = state->dataDXCoils->DXCoil(1).RatedTotCap(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneSizingInput.allocate(1);
+    state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
+    state->dataSize->NumZoneSizingInput = 1;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataEnvrn->StdBaroPress = 101325.0;
 
     SizeDXCoil(*state, 1); // normal sizing
@@ -2178,37 +2178,37 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DXCoils::GetDXCoils(*state);
     EXPECT_EQ(1, state->dataDXCoils->NumDXCoils);
 
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurOASysNum = 0;
-    DataSizing::CurSysNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 12.0;
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0085;
-    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 28.0;
-    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0075;
-    DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
-    DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurOASysNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 28.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0075;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
-    DataSizing::NumSysSizInput = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
+    state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
 
     // Fake having a parent coil setting the size
     // UnitarySysEqSizing(DXCoilNum).CoolingCapacity = true;
-    DataSizing::CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -2404,36 +2404,36 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     EXPECT_EQ(1, state->dataDXCoils->NumDXCoils);
 
     // All of this is to basically manage to get RatedTotCap to be autosized
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurOASysNum = 0;
-    DataSizing::CurSysNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 12.0;
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0085;
-    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 28.0;
-    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0075;
-    DataSizing::FinalSysSizing(CurSysNum).DesCoolVolFlow = 1.00;
-    DataSizing::FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.2;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurOASysNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 28.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0075;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesCoolVolFlow = 1.00;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.2;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
-    DataSizing::NumSysSizInput = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
+    state->dataSize->NumSysSizInput = 1;
 
     state->dataEnvrn->StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::OASysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->OASysEqSizing.allocate(1);
 
     // Get into a block so that it sets the RatedTotCap
-    DataSizing::CurDuctType = DataHVACGlobals::Cooling;
+    state->dataSize->CurDuctType = DataHVACGlobals::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -3106,10 +3106,10 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
     EXPECT_EQ("ASHP CLG COIL", state->dataDXCoils->DXCoil(1).Name);
     EXPECT_EQ("Coil:Cooling:DX:MultiSpeed", state->dataDXCoils->DXCoil(1).DXCoilType);
     // coils are in an airloop
-    DataSizing::CurSysNum = 1;
-    UnitarySysEqSizing.allocate(CurSysNum);
-    UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
-    UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
     // coil sizing
     SizeDXCoil(*state, 1);
     EXPECT_EQ(14067.4113682534, state->dataDXCoils->DXCoil(1).MSRatedTotCap(2));
@@ -3514,28 +3514,28 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     Psychrometrics::InitializePsychRoutines();
 
     // set system sizing parameters
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurSysNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::FinalSysSizing(CurSysNum).DesMainVolFlow = 1.75;
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 13.0;
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0080;
-    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 24.290004300002032;
-    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
-    DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.75;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 13.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0080;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 24.290004300002032;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
 
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
-    DataSizing::NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
+    state->dataSize->NumSysSizInput = 1;
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
 
     SizeDXCoil(*state, 1);
     // Design flow rate at speed 2 and speed 1
@@ -3766,28 +3766,28 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     Psychrometrics::InitializePsychRoutines();
 
     // set system sizing parameters
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurSysNum = 1;
-    DataSizing::FinalSysSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->FinalSysSizing.allocate(1);
 
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::FinalSysSizing(CurSysNum).DesMainVolFlow = 1.75;
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupTemp = 13.0;
-    DataSizing::FinalSysSizing(CurSysNum).CoolSupHumRat = 0.0080;
-    DataSizing::FinalSysSizing(CurSysNum).MixTempAtCoolPeak = 24.290004300002032;
-    DataSizing::FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
-    DataSizing::FinalSysSizing(CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.75;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 13.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0080;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixTempAtCoolPeak = 24.290004300002032;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).MixHumRatAtCoolPeak = 0.0095218208835786931;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).OutTempAtCoolPeak = 28.244709704058657;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
 
-    DataSizing::SysSizInput.allocate(1);
-    DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
-    DataSizing::NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(1);
+    state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
+    state->dataSize->NumSysSizInput = 1;
     // Need this to prevent crash in Sizers
-    DataSizing::UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing.allocate(1);
 
     // test SHR design size when all autosized
     SizeDXCoil(*state, 1);

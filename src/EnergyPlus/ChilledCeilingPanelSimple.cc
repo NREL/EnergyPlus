@@ -226,8 +226,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataLoopNode::NodeType_Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataPlant::TypeOf_CoolingPanel_Simple;
-        using DataSurfaces::Surface;
-
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
@@ -575,7 +573,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                     ThisCP.TotSurfToDistrib = MinFraction;
                 }
                 if (ThisCP.SurfacePtr(SurfNum) != 0) {
-                    Surface(ThisCP.SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->Surface(ThisCP.SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
                 }
 
                 AllFracsSummed += ThisCP.FracDistribToSurf(SurfNum);
@@ -883,22 +881,11 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::SmallLoad;
         using DataSizing::AutoSize;
-        using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::CoolingDesignCapacity;
-        using DataSizing::CurZoneEqNum;
-        using DataSizing::DataConstantUsedForSizing;
-        using DataSizing::DataFractionUsedForSizing;
-        using DataSizing::DataScalableCapSizingON;
-        using DataSizing::FinalZoneSizing;
         using DataSizing::FractionOfAutosizedCoolingCapacity;
-        using DataSizing::PlantSizData;
-        using DataSizing::ZoneEqSizing;
-        using DataSizing::ZoneSizingRunDone;
-
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -925,9 +912,10 @@ namespace EnergyPlus::CoolingPanelSimple {
         Real64 WaterVolFlowMaxCoolUser(0.0); // User hard-sized chilled water flow for reporting
 
         DesCoilLoad = 0.0;
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
         CompName = ThisCP.EquipID;
@@ -937,7 +925,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             IsAutoSize = true;
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             SizingMethod = CoolingCapacitySizing;
             FieldNum = 4;
@@ -945,21 +933,21 @@ namespace EnergyPlus::CoolingPanelSimple {
             bool errorsFound = false;
             SizingString = state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = ThisCP.CoolingCapMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
-            if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
                 if (CapSizingMethod == CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
                     TempSize = ThisCP.ScaledCoolingCapacity;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataScalableCapSizingON = false;
+                    state.dataSize->DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
                         ShowSevereError(state, RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
@@ -972,11 +960,11 @@ namespace EnergyPlus::CoolingPanelSimple {
                 if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (CapSizingMethod == CoolingDesignCapacity) {
-                        if (ZoneSizingRunDone) {
+                        if (state.dataSize->ZoneSizingRunDone) {
                             CheckZoneSizing(state, CompType, CompName);
                             SizingMethod = AutoCalculateSizing;
-                            DataConstantUsedForSizing = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
-                            DataFractionUsedForSizing = 1.0;
+                            state.dataSize->DataConstantUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                            state.dataSize->DataFractionUsedForSizing = 1.0;
                         }
                         if (ThisCP.ScaledCoolingCapacity == AutoSize) {
                             TempSize = AutoSize;
@@ -984,19 +972,19 @@ namespace EnergyPlus::CoolingPanelSimple {
                             TempSize = ThisCP.ScaledCoolingCapacity;
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
-                        if (ZoneSizingRunDone) {
+                        if (state.dataSize->ZoneSizingRunDone) {
                             CheckZoneSizing(state, CompType, CompName);
-                            ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                         }
                         TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
-                        DataScalableCapSizingON = true;
+                        state.dataSize->DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
-                        DataScalableCapSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
+                        state.dataSize->DataScalableCapSizingON = true;
 
                     } else {
                         TempSize = ThisCP.ScaledCoolingCapacity;
@@ -1004,9 +992,9 @@ namespace EnergyPlus::CoolingPanelSimple {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataConstantUsedForSizing = 0.0;
-                    DataFractionUsedForSizing = 0.0;
-                    DataScalableCapSizingON = false;
+                    state.dataSize->DataConstantUsedForSizing = 0.0;
+                    state.dataSize->DataFractionUsedForSizing = 0.0;
+                    state.dataSize->DataScalableCapSizingON = false;
                 } else {
                     DesCoilLoad = 0.0;
                 }
@@ -1019,8 +1007,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         if (ThisCP.WaterVolFlowRateMax == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
                 if (ThisCP.WaterVolFlowRateMax > 0.0) {
                     BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
                 }
@@ -1031,7 +1019,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                         if (DesCoilLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5., state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                             Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
-                            WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
+                            WaterVolFlowMaxCoolDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                         } else {
                             WaterVolFlowMaxCoolDes = 0.0;
                         }
@@ -1055,7 +1043,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                                            "User-Specified Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
                                     "SizeCoolingPanel: Potential issue with equipment sizing for ZoneHVAC:CoolingPanel:RadiantConvective:Water = \"" +
                                     ThisCP.EquipID + "\".");
@@ -1071,7 +1059,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             }
         }
 
-        RegisterPlantCompDesignFlow(ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax);
+        RegisterPlantCompDesignFlow(state, ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax);
 
         bool SizeCoolingPanelUASuccess;
         SizeCoolingPanelUASuccess = ThisCP.SizeCoolingPanelUA(state);
@@ -1585,7 +1573,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MaxRadHeatFlux;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1596,7 +1583,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         int SurfNum;              // Pointer to the Surface derived type
         int ZoneNum;              // Pointer to the Zone derived type
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
-
 
         // Initialize arrays
         state.dataHeatBalFanSys->QCoolingPanelSurf = 0.0;
@@ -1612,7 +1598,7 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = ThisCP.SurfacePtr(RadSurfNum);
-                auto &ThisSurf(Surface(SurfNum));
+                auto &ThisSurf(state.dataSurface->Surface(SurfNum));
                 if (ThisSurf.Area > SmallestArea) {
                     ThisSurfIntensity = (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
                     state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
@@ -1684,14 +1670,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Using/Aliasing
         using DataHeatBalSurface::TempSurfInTmp;
         using DataSurfaces::WinShadingType;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfWinShadingFlag;
-        using DataSurfaces::SurfWinFrameArea;
-        using DataSurfaces::SurfWinProjCorrFrIn;
-        using DataSurfaces::SurfWinFrameTempSurfIn;
-        using DataSurfaces::SurfWinDividerArea;
-        using DataSurfaces::SurfWinProjCorrDivIn;
-        using DataSurfaces::SurfWinDividerTempSurfIn;
 
         // Return value
         Real64 SumHATsurf;
@@ -1699,34 +1677,30 @@ namespace EnergyPlus::CoolingPanelSimple {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // Surface number
         Real64 Area; // Effective surface area
-
-
         SumHATsurf = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-            auto &ThisSurf(Surface(SurfNum));
-
-            if (!ThisSurf.HeatTransSurf) continue; // Skip non-heat transfer surfaces
+            auto &ThisSurf(state.dataSurface->Surface(SurfNum));
 
             Area = ThisSurf.Area;
 
             if (ThisSurf.Class == DataSurfaces::SurfaceClass::Window) {
 
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += DataSurfaces::SurfWinDividerArea(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf +=
-                        state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);
+                        state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) * state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

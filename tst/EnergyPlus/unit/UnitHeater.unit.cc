@@ -1123,8 +1123,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     EXPECT_EQ("ZONE2UNITHEAT", state->dataUnitHeaters->UnitHeat(1).Name);
 
     ErrorsFound = false;
-    ZoneEqUnitHeater = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->ZoneEqUnitHeater = true;
+    state->dataSize->CurZoneEqNum = 1;
 
     InitUnitHeater(*state, UnitHeatNum, ZoneNum, FirstHVACIteration);
     InitWaterCoil(*state, CoilNum, FirstHVACIteration); // init hot water heating coil
@@ -1146,7 +1146,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
                                  DataGlobalConstants::HWInitConvTemp,
                                  state->dataPlnt->PlantLoop(state->dataUnitHeaters->UnitHeat(UnitHeatNum).HWLoopNum).FluidIndex,
                                  "xxx");
-    HWPlantDeltaTDesign = PlantSizData(PltSizHeatNum).DeltaT;
+    HWPlantDeltaTDesign = state->dataSize->PlantSizData(PltSizHeatNum).DeltaT;
     // calculate hot water coil design capacity
     HWCoilDesignCapacity = HWMaxVolFlowRate * HWDensity * CpHW * HWPlantDeltaTDesign;
     EXPECT_NEAR(HWCoilDesignCapacity, state->dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate, 1.0);
@@ -1300,8 +1300,8 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     EXPECT_EQ("ZONE2UNITHEAT", state->dataUnitHeaters->UnitHeat(1).Name);
 
     ErrorsFound = false;
-    ZoneEqUnitHeater = true;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->ZoneEqUnitHeater = true;
+    state->dataSize->CurZoneEqNum = 1;
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -1329,15 +1329,15 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
 
-    ZoneSizingRunDone = true;
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataGlobal->DoingSizing = true;
 
     ZoneCompTurnFansOn = true;
     ZoneCompTurnFansOff = false;
 
-    Schedule(1).CurrentValue = 1;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 
@@ -1356,10 +1356,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     UHAirInletNode = state->dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode;
     UHAirOutletNode = state->dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode;
 
-    SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataSize->CurZoneEqNum);
     // SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets
     // on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
-    SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(*state, state->dataUnitHeaters->UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, state->dataSize->CurZoneEqNum);
     // verify the total heat rate deleivered by the unit heater
     UHAirMassFlowRate = Node(UHAirInletNode).MassFlowRate;
     UHEnteringAirEnthalpy = PsyHFnTdbW(Node(UHAirInletNode).Temp, Node(UHAirInletNode).HumRat);

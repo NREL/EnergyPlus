@@ -2034,19 +2034,21 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         Real64 deltaT;
         Real64 Cp;
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
                 CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
-                if (CurOASysNum > 0) {
-                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = FinalSysSizing(CurSysNum).DesOutAirVolFlow;
+                if (state.dataSize->CurOASysNum > 0) {
+                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow;
                 } else {
-                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 }
-            } else if (CurZoneEqNum > 0) {
+            } else if (state.dataSize->CurZoneEqNum > 0) {
                 CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                 state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate =
-                    max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                    max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
             }
 
             if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate < SmallAirVolFlow) {
@@ -2072,37 +2074,37 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirMassFlow = state.dataEnvrn->StdRhoAir * state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserAirVolumeFlow;
 
         if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap == AutoSize) {
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
                 CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                 VolFlowRate = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
-                    if (CurOASysNum > 0) { // coil is in the OA stream
-                        MixTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
-                        MixHumRat = FinalSysSizing(CurSysNum).OutHumRatAtCoolPeak;
-                        SupTemp = FinalSysSizing(CurSysNum).PrecoolTemp;
-                        SupHumRat = FinalSysSizing(CurSysNum).PrecoolHumRat;
+                    if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
+                        MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
+                        MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
+                        SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp;
+                        SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat;
                     } else { // coil is on the main air loop
                         //     MixTemp = FinalSysSizing(CurSysNum)%MixTempAtCoolPeak
                         //     MixHumRat = FinalSysSizing(CurSysNum)%MixHumRatAtCoolPeak
-                        SupTemp = FinalSysSizing(CurSysNum).CoolSupTemp;
-                        SupHumRat = FinalSysSizing(CurSysNum).CoolSupHumRat;
-                        if (state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
-                            MixTemp = FinalSysSizing(CurSysNum).MixTempAtCoolPeak;
-                            MixHumRat = FinalSysSizing(CurSysNum).MixHumRatAtCoolPeak;
+                        SupTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupTemp;
+                        SupHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).CoolSupHumRat;
+                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+                            MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixTempAtCoolPeak;
+                            MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).MixHumRatAtCoolPeak;
                         } else { // there is precooling of OA stream
                             if (VolFlowRate > 0.0) {
-                                OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / VolFlowRate;
+                                OutAirFrac = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow / VolFlowRate;
                             } else {
                                 OutAirFrac = 1.0;
                             }
                             OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                             MixTemp =
-                                OutAirFrac * FinalSysSizing(CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetTempAtCoolPeak;
-                            MixHumRat = OutAirFrac * FinalSysSizing(CurSysNum).PrecoolHumRat +
-                                        (1.0 - OutAirFrac) * FinalSysSizing(CurSysNum).RetHumRatAtCoolPeak;
+                                OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolTemp + (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetTempAtCoolPeak;
+                            MixHumRat = OutAirFrac * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).PrecoolHumRat +
+                                        (1.0 - OutAirFrac) * state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).RetHumRatAtCoolPeak;
                         }
                     }
-                    OutTemp = FinalSysSizing(CurSysNum).OutTempAtCoolPeak;
+                    OutTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
                     rhoair = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, MixTemp, MixHumRat, RoutineName);
                     MixEnth = PsyHFnTdbW(MixTemp, MixHumRat);
                     MixWetBulb = PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
@@ -2118,28 +2120,28 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                 } else {
                     state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CoolingOnlyRatedTotCap = 0.0;
                 }
-            } else if (CurZoneEqNum > 0) {
+            } else if (state.dataSize->CurZoneEqNum > 0) {
                 CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).Name);
                 VolFlowRate = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).RatedEvapAirVolFlowRate;
                 if (VolFlowRate >= SmallAirVolFlow) {
-                    if (ZoneEqDXCoil) {
-                        if (ZoneEqSizing(CurZoneEqNum).OAVolFlow > 0.0) {
-                            MixTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
-                            MixHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
+                    if (state.dataSize->ZoneEqDXCoil) {
+                        if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
+                            MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                            MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                         } else {
-                            MixTemp = FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak;
-                            MixHumRat = FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak;
+                            MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneRetTempAtCoolPeak;
+                            MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).ZoneHumRatAtCoolPeak;
                         }
                     } else {
-                        MixTemp = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp;
-                        MixHumRat = FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat;
+                        MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
+                        MixHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInHumRat;
                     }
-                    SupTemp = FinalZoneSizing(CurZoneEqNum).CoolDesTemp;
-                    SupHumRat = FinalZoneSizing(CurZoneEqNum).CoolDesHumRat;
-                    TimeStepNumAtMax = FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax;
-                    DDNum = FinalZoneSizing(CurZoneEqNum).CoolDDNum;
+                    SupTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesTemp;
+                    SupHumRat = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDesHumRat;
+                    TimeStepNumAtMax = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).TimeStepNumAtCoolMax;
+                    DDNum = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).CoolDDNum;
                     if (DDNum > 0 && TimeStepNumAtMax > 0) {
-                        OutTemp = DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
+                        OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                     } else {
                         OutTemp = 0.0;
                     }

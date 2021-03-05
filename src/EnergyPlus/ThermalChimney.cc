@@ -643,26 +643,26 @@ namespace ThermalChimney {
 
             ZoneNum = state.dataThermalChimneys->ThermalChimneySys(Loop).RealZonePtr;
             // start off with first surface in zone widths
-            majorW = Surface(state.dataHeatBal->Zone(ZoneNum).SurfaceFirst).Width;
+            majorW = state.dataSurface->Surface(state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst).Width;
             minorW = majorW;
             TempmajorW = 0.0;
             TemporaryWallSurfTemp = -10000.0;
 
             // determine major width and minor width
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+                if (state.dataSurface->Surface(SurfNum).Class != SurfaceClass::Wall) continue;
 
-                if (Surface(SurfNum).Width > majorW) {
-                    majorW = Surface(SurfNum).Width;
+                if (state.dataSurface->Surface(SurfNum).Width > majorW) {
+                    majorW = state.dataSurface->Surface(SurfNum).Width;
                 }
 
-                if (Surface(SurfNum).Width < minorW) {
-                    minorW = Surface(SurfNum).Width;
+                if (state.dataSurface->Surface(SurfNum).Width < minorW) {
+                    minorW = state.dataSurface->Surface(SurfNum).Width;
                 }
             }
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (Surface(SurfNum).Width == majorW) {
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+                if (state.dataSurface->Surface(SurfNum).Width == majorW) {
                     if (TempSurfIn(SurfNum) > TemporaryWallSurfTemp) {
                         TemporaryWallSurfTemp = TempSurfIn(SurfNum);
                         ConvTransCoeffWallFluid = state.dataHeatBal->HConvIn(SurfNum);
@@ -671,14 +671,10 @@ namespace ThermalChimney {
                 }
             }
 
-            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-
-                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
-                if (Surface(SurfNum).Class == SurfaceClass::Window) {
-
-                    if (Surface(SurfNum).Width > TempmajorW) {
-                        TempmajorW = Surface(SurfNum).Width;
+            for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+                if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                    if (state.dataSurface->Surface(SurfNum).Width > TempmajorW) {
+                        TempmajorW = state.dataSurface->Surface(SurfNum).Width;
                         ConvTransCoeffGlassFluid = state.dataHeatBal->HConvIn(SurfNum);
                         SurfTempGlassCover = TempSurfIn(SurfNum) + DataGlobalConstants::KelvinConv;
                     }

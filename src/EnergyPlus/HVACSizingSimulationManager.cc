@@ -72,20 +72,18 @@ namespace EnergyPlus {
 void HVACSizingSimulationManager::DetermineSizingAnalysesNeeded(EnergyPlusData &state)
 {
     using DataSizing::Coincident;
-    using DataSizing::NumPltSizInput;
-    using DataSizing::PlantSizData;
 
     // currently the only type of advanced sizing analysis available is for coincident plant sizing
     // expect more specialized sizing analysis objects to be added, so minimizing code here and jump to a worker method once we know an instance is to
     // be created.
 
     // Loop over PlantSizData struct and find those plant loops that are to use coincident sizing
-    for (int i = 1; i <= NumPltSizInput; ++i) {
+    for (int i = 1; i <= state.dataSize->NumPltSizInput; ++i) {
 
-        if (PlantSizData(i).ConcurrenceOption == Coincident) {
+        if (state.dataSize->PlantSizData(i).ConcurrenceOption == Coincident) {
 
             // create an instance of analysis object for each loop
-            CreateNewCoincidentPlantAnalysisObject(state, PlantSizData(i).PlantLoopName, i);
+            CreateNewCoincidentPlantAnalysisObject(state, state.dataSize->PlantSizData(i).PlantLoopName, i);
         }
     }
 }
@@ -94,7 +92,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 {
     using DataPlant::SupplySide;
     using namespace FluidProperties;
-    using DataSizing::PlantSizData;
 
     Real64 density;
     Real64 cp;
@@ -113,7 +110,7 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
                                              state.dataPlnt->PlantLoop(i).LoopSide(SupplySide).NodeNumIn,
                                              density,
                                              cp,
-                                             PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
+                                             state.dataSize->PlantSizData(PlantSizingIndex).NumTimeStepsInAvg,
                                              PlantSizingIndex);
         }
     }
@@ -125,16 +122,15 @@ void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;
     using DataSizing::HeatingLoop;
-    using DataSizing::PlantSizData;
     using DataSizing::SteamLoop;
 
     for (auto &P : plantCoincAnalyObjs) {
         // call setup log routine for each coincident plant analysis object
         P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
         P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
-        if (PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
+        if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
             P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
-        } else if (PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
+        } else if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
             P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
         }
     }
@@ -249,7 +245,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
             hvacSizingSimulationManager->sizingLogger.SetupSizingLogsNewEnvironment(state);
 
-            //	if (!state.dataGlobal->DoDesDaySim) continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
+            //    if (!DoDesDaySim) continue; // not sure about this, may need to force users to set this on input for this method, but maybe not
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather) continue;
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) continue;
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodDesign) continue;
