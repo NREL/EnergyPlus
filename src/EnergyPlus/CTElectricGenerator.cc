@@ -471,14 +471,14 @@ namespace CTElectricGenerator {
 
         if (this->HeatRecActive) {
             heatRecInNode = this->HeatRecInletNodeNum;
-            heatRecInTemp = DataLoopNode::Node(heatRecInNode).Temp;
+            heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
 
             heatRecCp = FluidProperties::GetSpecificHeatGlycol(
                 state, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName, heatRecInTemp, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
             if (FirstHVACIteration && RunFlag) {
                 heatRecMdot = this->DesignHeatRecMassFlowRate;
             } else {
-                heatRecMdot = DataLoopNode::Node(heatRecInNode).MassFlowRate;
+                heatRecMdot = state.dataLoopNodes->Node(heatRecInNode).MassFlowRate;
             }
         } else {
             heatRecInTemp = 0.0;
@@ -522,7 +522,7 @@ namespace CTElectricGenerator {
         if (this->OAInletNode == 0) {
             ambientDeltaT = state.dataEnvrn->OutDryBulbTemp - designAirInletTemp;
         } else {
-            ambientDeltaT = DataLoopNode::Node(this->OAInletNode).Temp - designAirInletTemp;
+            ambientDeltaT = state.dataLoopNodes->Node(this->OAInletNode).Temp - designAirInletTemp;
         }
 
         // Use Curve fit to determine Fuel Energy Input.  For electric power generated in Watts, the fuel
@@ -645,7 +645,7 @@ namespace CTElectricGenerator {
 
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
 
@@ -724,8 +724,8 @@ namespace CTElectricGenerator {
             int HeatRecInletNode = this->HeatRecInletNodeNum;
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
-            DataLoopNode::Node(HeatRecInletNode).Temp = 20.0;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
+            state.dataLoopNodes->Node(HeatRecInletNode).Temp = 20.0;
+            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
                                                this->DesignHeatRecMassFlowRate,
