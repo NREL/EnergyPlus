@@ -78,37 +78,37 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->printWarningFlag = _printWarningFlag;
     this->callingRoutine = _callingRoutine;
     this->stdRhoAir = state.dataEnvrn->StdRhoAir;
-    this->sysSizingRunDone = DataSizing::SysSizingRunDone;
-    this->zoneSizingRunDone = DataSizing::ZoneSizingRunDone;
-    this->curSysNum = DataSizing::CurSysNum;
-    this->curOASysNum = DataSizing::CurOASysNum;
-    this->curZoneEqNum = DataSizing::CurZoneEqNum;
-    this->curDuctType = DataSizing::CurDuctType;
+    this->sysSizingRunDone = state.dataSize->SysSizingRunDone;
+    this->zoneSizingRunDone = state.dataSize->ZoneSizingRunDone;
+    this->curSysNum = state.dataSize->CurSysNum;
+    this->curOASysNum = state.dataSize->CurOASysNum;
+    this->curZoneEqNum = state.dataSize->CurZoneEqNum;
+    this->curDuctType = state.dataSize->CurDuctType;
     this->numPrimaryAirSys = DataHVACGlobals::NumPrimaryAirSys;
-    this->numSysSizInput = DataSizing::NumSysSizInput;
+    this->numSysSizInput = state.dataSize->NumSysSizInput;
     this->doSystemSizing = state.dataGlobal->DoSystemSizing;
-    this->numZoneSizingInput = DataSizing::NumZoneSizingInput;
+    this->numZoneSizingInput = state.dataSize->NumZoneSizingInput;
     this->doZoneSizing = state.dataGlobal->DoZoneSizing;
-    this->curTermUnitSizingNum = DataSizing::CurTermUnitSizingNum;
-    this->termUnitSingDuct = DataSizing::TermUnitSingDuct;
-    this->termUnitPIU = DataSizing::TermUnitPIU;
-    this->termUnitIU = DataSizing::TermUnitIU;
-    this->zoneEqFanCoil = DataSizing::ZoneEqFanCoil;
+    this->curTermUnitSizingNum = state.dataSize->CurTermUnitSizingNum;
+    this->termUnitSingDuct = state.dataSize->TermUnitSingDuct;
+    this->termUnitPIU = state.dataSize->TermUnitPIU;
+    this->termUnitIU = state.dataSize->TermUnitIU;
+    this->zoneEqFanCoil = state.dataSize->ZoneEqFanCoil;
     this->otherEqType = !(this->termUnitSingDuct || this->termUnitPIU || this->termUnitIU || this->zoneEqFanCoil);
-    this->zoneEqUnitHeater = DataSizing::ZoneEqUnitHeater;
-    this->zoneEqUnitVent = DataSizing::ZoneEqUnitVent;
-    this->zoneEqVentedSlab = DataSizing::ZoneEqVentedSlab;
-    this->zoneSizingInput = DataSizing::ZoneSizingInput;
-    this->unitarySysEqSizing = DataSizing::UnitarySysEqSizing;
-    this->oaSysEqSizing = DataSizing::OASysEqSizing;
+    this->zoneEqUnitHeater = state.dataSize->ZoneEqUnitHeater;
+    this->zoneEqUnitVent = state.dataSize->ZoneEqUnitVent;
+    this->zoneEqVentedSlab = state.dataSize->ZoneEqVentedSlab;
+    this->zoneSizingInput = state.dataSize->ZoneSizingInput;
+    this->unitarySysEqSizing = state.dataSize->UnitarySysEqSizing;
+    this->oaSysEqSizing = state.dataSize->OASysEqSizing;
     this->outsideAirSys = state.dataAirLoop->OutsideAirSys;
-    this->termUnitSizing = DataSizing::TermUnitSizing;
-    this->finalZoneSizing = DataSizing::FinalZoneSizing;
-    this->termUnitFinalZoneSizing = DataSizing::TermUnitFinalZoneSizing;
-    this->zoneEqSizing = DataSizing::ZoneEqSizing;
-    this->sysSizingInputData = DataSizing::SysSizInput;
-    this->finalSysSizing = DataSizing::FinalSysSizing;
-    this->plantSizData = DataSizing::PlantSizData;
+    this->termUnitSizing = state.dataSize->TermUnitSizing;
+    this->finalZoneSizing = state.dataSize->FinalZoneSizing;
+    this->termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing;
+    this->zoneEqSizing = state.dataSize->ZoneEqSizing;
+    this->sysSizingInputData = state.dataSize->SysSizInput;
+    this->finalSysSizing = state.dataSize->FinalSysSizing;
+    this->plantSizData = state.dataSize->PlantSizData;
     this->primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems;
     this->airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
     this->airloopDOAS = state.dataAirLoopHVACDOAS->airloopDOAS;
@@ -120,52 +120,52 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     }
 
     // global sizing data
-    dataEMSOverrideON = DataSizing::DataEMSOverrideON;
-    dataEMSOverride = DataSizing::DataEMSOverride;
-    this->dataAutosizable = DataSizing::DataAutosizable;
+    dataEMSOverrideON = state.dataSize->DataEMSOverrideON;
+    dataEMSOverride = state.dataSize->DataEMSOverride;
+    this->dataAutosizable = state.dataSize->DataAutosizable;
     this->minOA = DataSizing::MinOA;
-    this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
-    this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
-    DataSizing::DataConstantUsedForSizing = 0.0; // reset here instead of in component model?
-    DataSizing::DataFractionUsedForSizing = 0.0;
+    this->dataConstantUsedForSizing = state.dataSize->DataConstantUsedForSizing;
+    this->dataFractionUsedForSizing = state.dataSize->DataFractionUsedForSizing;
+    state.dataSize->DataConstantUsedForSizing = 0.0; // reset here instead of in component model?
+    state.dataSize->DataFractionUsedForSizing = 0.0;
 
-    this->dataFanIndex = DataSizing::DataFanIndex;
-    this->dataFanEnumType = DataSizing::DataFanEnumType;
+    this->dataFanIndex = state.dataSize->DataFanIndex;
+    this->dataFanEnumType = state.dataSize->DataFanEnumType;
 
     // global Data* sizing constants
-    this->dataPltSizHeatNum = DataSizing::DataPltSizHeatNum;
-    this->dataWaterLoopNum = DataSizing::DataWaterLoopNum;
-    this->dataPltSizCoolNum = DataSizing::DataPltSizCoolNum;
-    this->dataWaterCoilSizHeatDeltaT = DataSizing::DataWaterCoilSizHeatDeltaT;
-    this->dataWaterCoilSizCoolDeltaT = DataSizing::DataWaterCoilSizCoolDeltaT;
-    this->dataCapacityUsedForSizing = DataSizing::DataCapacityUsedForSizing;
-    this->dataHeatSizeRatio = DataSizing::DataHeatSizeRatio;
+    this->dataPltSizHeatNum = state.dataSize->DataPltSizHeatNum;
+    this->dataWaterLoopNum = state.dataSize->DataWaterLoopNum;
+    this->dataPltSizCoolNum = state.dataSize->DataPltSizCoolNum;
+    this->dataWaterCoilSizHeatDeltaT = state.dataSize->DataWaterCoilSizHeatDeltaT;
+    this->dataWaterCoilSizCoolDeltaT = state.dataSize->DataWaterCoilSizCoolDeltaT;
+    this->dataCapacityUsedForSizing = state.dataSize->DataCapacityUsedForSizing;
+    this->dataHeatSizeRatio = state.dataSize->DataHeatSizeRatio;
 
-    this->dataAirFlowUsedForSizing = DataSizing::DataAirFlowUsedForSizing;
-    this->dataDesInletAirTemp = DataSizing::DataDesInletAirTemp;
-    this->dataDesAccountForFanHeat = DataSizing::DataDesAccountForFanHeat;
-    this->dataFanPlacement = DataSizing::DataFanPlacement;
-    this->dataDesInletAirHumRat = DataSizing::DataDesInletAirHumRat;
-    this->dataDesOutletAirHumRat = DataSizing::DataDesOutletAirHumRat;
-    this->dataDesOutletAirTemp = DataSizing::DataDesOutletAirTemp;
-    this->dataDesInletWaterTemp = DataSizing::DataDesInletWaterTemp;
-    this->dataFlowUsedForSizing = DataSizing::DataFlowUsedForSizing;
-    this->dataWaterFlowUsedForSizing = DataSizing::DataWaterFlowUsedForSizing;
+    this->dataAirFlowUsedForSizing = state.dataSize->DataAirFlowUsedForSizing;
+    this->dataDesInletAirTemp = state.dataSize->DataDesInletAirTemp;
+    this->dataDesAccountForFanHeat = state.dataSize->DataDesAccountForFanHeat;
+    this->dataFanPlacement = state.dataSize->DataFanPlacement;
+    this->dataDesInletAirHumRat = state.dataSize->DataDesInletAirHumRat;
+    this->dataDesOutletAirHumRat = state.dataSize->DataDesOutletAirHumRat;
+    this->dataDesOutletAirTemp = state.dataSize->DataDesOutletAirTemp;
+    this->dataDesInletWaterTemp = state.dataSize->DataDesInletWaterTemp;
+    this->dataFlowUsedForSizing = state.dataSize->DataFlowUsedForSizing;
+    this->dataWaterFlowUsedForSizing = state.dataSize->DataWaterFlowUsedForSizing;
 
-    this->dataSizingFraction = DataSizing::DataSizingFraction;
-    this->dataDXSpeedNum = DataSizing::DataDXSpeedNum;
-    this->dataDesicRegCoil = DataSizing::DataDesicRegCoil;
-    this->dataZoneUsedForSizing = DataSizing::DataZoneUsedForSizing;
-    this->dataDesicDehumNum = DataSizing::DataDesicDehumNum;
+    this->dataSizingFraction = state.dataSize->DataSizingFraction;
+    this->dataDXSpeedNum = state.dataSize->DataDXSpeedNum;
+    this->dataDesicRegCoil = state.dataSize->DataDesicRegCoil;
+    this->dataZoneUsedForSizing = state.dataSize->DataZoneUsedForSizing;
+    this->dataDesicDehumNum = state.dataSize->DataDesicDehumNum;
 
-    this->dataNomCapInpMeth = DataSizing::DataNomCapInpMeth;
-    this->dataCoilNum = DataSizing::DataCoilNum;
-    this->dataFanOpMode = DataSizing::DataFanOpMode;
-    this->dataDesignCoilCapacity = DataSizing::DataDesignCoilCapacity;
-    this->dataErrorsFound = DataSizing::DataErrorsFound;
-    this->dataBypassFrac = DataSizing::DataBypassFrac;
-    this->dataIsDXCoil = DataSizing::DataIsDXCoil;
-    this->dataNonZoneNonAirloopValue = DataSizing::DataNonZoneNonAirloopValue;
+    this->dataNomCapInpMeth = state.dataSize->DataNomCapInpMeth;
+    this->dataCoilNum = state.dataSize->DataCoilNum;
+    this->dataFanOpMode = state.dataSize->DataFanOpMode;
+    this->dataDesignCoilCapacity = state.dataSize->DataDesignCoilCapacity;
+    this->dataErrorsFound = state.dataSize->DataErrorsFound;
+    this->dataBypassFrac = state.dataSize->DataBypassFrac;
+    this->dataIsDXCoil = state.dataSize->DataIsDXCoil;
+    this->dataNonZoneNonAirloopValue = state.dataSize->DataNonZoneNonAirloopValue;
 }
 
 void BaseSizer::initializeFromAPI(EnergyPlusData &state, Real64 const elevation)
@@ -383,7 +383,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                 this->reportSizerOutput(state, this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             }
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
-            if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+            if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > state.dataSize->AutoVsHardSizingThreshold) {
                 if (this->dataAutosizable)
                     this->reportSizerOutput(state, this->compType,
                                             this->compName,
@@ -397,7 +397,7 @@ void BaseSizer::selectSizerOutput(EnergyPlusData &state, bool &errorsFound)
                         this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
             }
             if (state.dataGlobal->DisplayExtraWarnings && this->dataAutosizable) {
-                if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+                if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > state.dataSize->AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
                     ShowMessage(state, msg);
@@ -490,7 +490,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                     this->compType, this->compName, "Design Size " + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
             }
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
-            if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+            if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > state.dataSize->AutoVsHardSizingThreshold) {
                 this->reportSizerOutput(state, this->compType,
                                         this->compName,
                                         "Design Size " + this->sizingString,
@@ -522,7 +522,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
                 }
             }
             if (state.dataGlobal->DisplayExtraWarnings) {
-                if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+                if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > state.dataSize->AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
                     ShowMessage(state, msg);

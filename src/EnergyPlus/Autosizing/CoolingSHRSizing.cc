@@ -47,6 +47,7 @@
 
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 
@@ -124,12 +125,12 @@ Real64 CoolingSHRSizer::size(EnergyPlusData &state, Real64 _originalValue, bool 
             }
         }
     }
-    this->updateSizingString();
+    this->updateSizingString(state);
     this->selectSizerOutput(state, errorsFound);
     return this->autoSizedValue;
 }
 
-void CoolingSHRSizer::updateSizingString()
+void CoolingSHRSizer::updateSizingString(EnergyPlusData &state)
 {
     if (!overrideSizeString) return;
     // override sizingString to match existing text
@@ -149,9 +150,9 @@ void CoolingSHRSizer::updateSizingString()
         }
     } else if (this->coilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
         if (this->isEpJSON) {
-            this->sizingString = fmt::format("speed_{}_rated_sensible_heat_ratio", DataSizing::DataDXSpeedNum);
+            this->sizingString = fmt::format("speed_{}_rated_sensible_heat_ratio", state.dataSize->DataDXSpeedNum);
         } else {
-            this->sizingString = fmt::format("Speed {} Rated Sensible Heat Ratio", DataSizing::DataDXSpeedNum);
+            this->sizingString = fmt::format("Speed {} Rated Sensible Heat Ratio", state.dataSize->DataDXSpeedNum);
         }
     } else if (this->coilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
         if (this->isEpJSON) {

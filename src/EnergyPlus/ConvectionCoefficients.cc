@@ -85,9 +85,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 
-namespace EnergyPlus {
-
-namespace ConvectionCoefficients {
+namespace EnergyPlus::ConvectionCoefficients {
 
     // Module containing the routines dealing with the convection coefficients
 
@@ -100,8 +98,7 @@ namespace ConvectionCoefficients {
     // PURPOSE OF THIS MODULE:
     // This module contain the routines dealing with convection coefficients.
     // This module collects correlations/calculations for both the interior and exterior
-    // Manages a portion of the input and calculations for Hc values for use in surface heat balances
-    // .
+    // Manages a portion of the input and calculations for Hc values for use in surface heat balances.
 
     // METHODOLOGY EMPLOYED:
     // Subroutines are called to fill the variable HConvIn with the convection coefficient at
@@ -162,6 +159,7 @@ namespace ConvectionCoefficients {
         int SurfNum;                          // DO loop counter for surfaces in zone
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
             GetUserConvectionCoefficients(state);
@@ -254,7 +252,7 @@ namespace ConvectionCoefficients {
             for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
                 if (present(ZoneToResimulate)) {
-                    if ((ZoneNum != ZoneToResimulate) && (AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
+                    if ((ZoneNum != ZoneToResimulate) && (state.dataSurface->AdjacentZoneToSurface(SurfNum) != ZoneToResimulate)) {
                         continue; // skip surfaces that are not associated with this zone
                     }
                 }
@@ -313,7 +311,8 @@ namespace ConvectionCoefficients {
                 if (Surface(SurfNum).EMSOverrideIntConvCoef) {
                     state.dataHeatBal->HConvIn(SurfNum) = Surface(SurfNum).EMSValueForIntConvCoef;
                     if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(Surface(SurfNum).EMSValueForIntConvCoef);
+                        Real64 hConst = Surface(SurfNum).EMSValueForIntConvCoef;
+                        state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(hConst);
                     }
                 }
             }
@@ -374,6 +373,7 @@ namespace ConvectionCoefficients {
         int SrdSurfsNum; // Srd surface counter
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         if (state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs) {
              GetUserConvectionCoefficients(state);
@@ -387,11 +387,11 @@ namespace ConvectionCoefficients {
 
         if (Surface(SurfNum).HasSurroundingSurfProperties) {
             SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
-            if (SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
-                TSky = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) + DataGlobalConstants::KelvinConv;
+            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum != 0) {
+                TSky = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyTempSchNum) + DataGlobalConstants::KelvinConv;
             }
-            if (SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
-                TGround = GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum) + DataGlobalConstants::KelvinConv;
+            if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum != 0) {
+                TGround = GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundTempSchNum) + DataGlobalConstants::KelvinConv;
             }
         }
 
@@ -401,7 +401,7 @@ namespace ConvectionCoefficients {
 
         if (!Surface(SurfNum).ExtWind) {
             SurfWindSpeed = 0.0; // No wind exposure
-        } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
+        } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
             SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
         } else {
             SurfWindSpeed = Surface(SurfNum).WindSpeed;
@@ -591,7 +591,8 @@ namespace ConvectionCoefficients {
             HExt = Surface(SurfNum).EMSValueForExtConvCoef;
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                 state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
-                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(Surface(SurfNum).EMSValueForExtConvCoef);
+                Real64 hConst = Surface(SurfNum).EMSValueForExtConvCoef;
+                state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(hConst);
             }
         }
 
@@ -600,7 +601,7 @@ namespace ConvectionCoefficients {
         } else {
             // Compute sky radiation coefficient
             HSky =
-                DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
+                DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * state.dataSurface->AirSkyRadSplit(SurfNum) * (pow_4(TSurf) - pow_4(TSky)) / (TSurf - TSky);
         }
 
         if (TSurf == TAir || algoNum == ASHRAESimple) {
@@ -611,7 +612,7 @@ namespace ConvectionCoefficients {
             HGround = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorGroundIR * (pow_4(TSurf) - pow_4(TGround)) / (TSurf - TGround);
 
             // Compute air radiation coefficient
-            HAir = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - AirSkyRadSplit(SurfNum)) * (pow_4(TSurf) - pow_4(TAir)) /
+            HAir = DataGlobalConstants::StefanBoltzmann * AbsExt * Surface(SurfNum).ViewFactorSkyIR * (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * (pow_4(TSurf) - pow_4(TAir)) /
                    (TSurf - TAir);
         }
     }
@@ -906,6 +907,7 @@ namespace ConvectionCoefficients {
         int SurfNum;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         // first get user-defined H models so they can be processed for later objects
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:UserCurve";
@@ -1117,8 +1119,8 @@ namespace ConvectionCoefficients {
         } // 'SurfaceConvectionAlgorithm:Outside:UserCurve'
 
         // now get user directed overrides at the surface level.
-        TotIntConvCoeff = 0;
-        TotExtConvCoeff = 0;
+        state.dataSurface->TotIntConvCoeff = 0;
+        state.dataSurface->TotExtConvCoeff = 0;
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients:MultipleSurface";
         Count = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
         for (int Loop = 1; Loop <= Count; ++Loop) {
@@ -1135,16 +1137,16 @@ namespace ConvectionCoefficients {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(6) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(2) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (Alphas(6) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
                 ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
@@ -1171,16 +1173,16 @@ namespace ConvectionCoefficients {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             if (Alphas(2) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(6) == "INSIDE") {
-                ++TotIntConvCoeff;
+                ++state.dataSurface->TotIntConvCoeff;
             }
             if (Alphas(2) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (Alphas(6) == "OUTSIDE") {
-                ++TotExtConvCoeff;
+                ++state.dataSurface->TotExtConvCoeff;
             }
             if (NumAlphas >= 2 && lAlphaFieldBlanks(2)) {
                 ShowWarningError(state, "GetUserConvectionCoefficients: " + CurrentModuleObject + ", for " + cAlphaFieldNames(1) + '=' + Alphas(1));
@@ -1192,11 +1194,11 @@ namespace ConvectionCoefficients {
             }
         }
 
-        UserIntConvectionCoeffs.allocate(TotIntConvCoeff);
-        UserExtConvectionCoeffs.allocate(TotExtConvCoeff);
+        state.dataSurface->UserIntConvectionCoeffs.allocate(state.dataSurface->TotIntConvCoeff);
+        state.dataSurface->UserExtConvectionCoeffs.allocate(state.dataSurface->TotExtConvCoeff);
 
-        TotIntConvCoeff = 0;
-        TotExtConvCoeff = 0;
+        state.dataSurface->TotIntConvCoeff = 0;
+        state.dataSurface->TotExtConvCoeff = 0;
 
         //   Now, get for real and check for consistency
         CurrentModuleObject = "SurfaceProperty:ConvectionCoefficients";
@@ -1244,9 +1246,9 @@ namespace ConvectionCoefficients {
                             if ((equationName == "SIMPLECOMBINED") || (equationName == "TARP") || (equationName == "MOWITT") || (equationName == "DOE-2") || (equationName == "ADAPTIVECONVECTIONALGORITHM")) {
                                 PotentialAssignedValue = -ExtValue;
                             } else if (equationName == "VALUE") {
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1260,49 +1262,49 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             } else if (equationName == "SCHEDULE") { // Schedule
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             } else if (ExtValue == HcExt_UserCurve) { // User curve
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
+                                if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
                             } else if (ExtValue > HcExt_UserCurve) {
                                 // specificmodel
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(1);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = Found;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                                PotentialAssignedValue = TotExtConvCoeff;
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = Found;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
 
                             } else {
                                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", check input");
@@ -1327,9 +1329,9 @@ namespace ConvectionCoefficients {
                             if ((equationName == "SIMPLE") || (equationName == "TARP") || (equationName == "ADAPTIVECONVECTIONALGORITHM") || (equationName == "ASTMC1340")) {
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1343,49 +1345,49 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 1) + "\", " +
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (equationName == "SCHEDULE") {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (IntValue == HcInt_UserCurve) {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
+                                if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
                             } else if (IntValue > HcInt_UserCurve) {
                                 // specificmodel
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(1);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = Found;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
-                                PotentialAssignedValue = TotIntConvCoeff;
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(1);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = Found;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
 
                             } else {
                                 // treat CeilingDiffuser and TrombeWall special
@@ -1463,9 +1465,9 @@ namespace ConvectionCoefficients {
                                 ApplyConvectionValue(state, Alphas(1), "OUTSIDE", -ExtValue);
                             } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1479,60 +1481,60 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefValue;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideValue = Numbers(NumField);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefValue;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " +
                                                       cAlphaFieldNames(Ptr + 2) + '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else if (equationName == "SCHEDULE") {
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSchedule;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserExtConvectionCoeffs(TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else if (ExtValue == HcExt_UserCurve) { // User curve
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefUserCurve;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcOutsideUserCurve);
-                                if (UserExtConvectionCoeffs(TotExtConvCoeff).UserCurveIndex == 0) {
+                                if (state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).UserCurveIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotExtConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
 
                             } else if (ExtValue > HcExt_UserCurve) {
                                 // specificmodel
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                                PotentialAssignedValue = TotExtConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             } else {
-                                ++TotExtConvCoeff;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserExtConvectionCoeffs(TotExtConvCoeff).WhichSurface = -999;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserExtConvectionCoeffs(TotExtConvCoeff).HcModelEq = ExtValue;
-                                PotentialAssignedValue = TotExtConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", TotExtConvCoeff);
+                                ++state.dataSurface->TotExtConvCoeff;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                state.dataSurface->UserExtConvectionCoeffs(state.dataSurface->TotExtConvCoeff).HcModelEq = ExtValue;
+                                PotentialAssignedValue = state.dataSurface->TotExtConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "OUTSIDE", state.dataSurface->TotExtConvCoeff);
                             }
                         }
                         else {
@@ -1549,9 +1551,9 @@ namespace ConvectionCoefficients {
                                 ApplyConvectionValue(state, Alphas(1), "INSIDE", -IntValue);
                             } else if (equationName == "VALUE") {
                                 // SimpleValueAssignment via UserExtConvectionCoeffs array
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
                                 if (Numbers(NumField) < state.dataHeatBal->LowHConvLimit || Numbers(NumField) > state.dataHeatBal->HighHConvLimit) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", out of range value");
                                     ShowContinueError(state,
@@ -1565,52 +1567,52 @@ namespace ConvectionCoefficients {
                                     ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
                                     ErrorsFound = true;
                                 }
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefValue;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideValue = Numbers(NumField);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefValue;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideValue = Numbers(NumField);
                                 if (!lAlphaFieldBlanks(Ptr + 2)) {
                                     ShowWarningError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", duplicate value");
                                     ShowContinueError(state, "Since VALUE is used for \"" + cAlphaFieldNames(FieldNo + 2) + "\", " + cAlphaFieldNames(Ptr + 2) +
                                                       '=' + Alphas(Ptr + 2) + " is ignored.");
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
                             } else if (equationName == "SCHEDULE") {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSchedule;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleIndex == 0) {
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSchedule;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex = GetScheduleIndex(state, Alphas(Ptr + 2));
+                                if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleIndex == 0) {
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 2) + " entered=" + Alphas(Ptr + 2));
                                     ErrorsFound = true;
                                 } else {
-                                    UserIntConvectionCoeffs(TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
+                                    state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).ScheduleName = Alphas(Ptr + 2);
                                 }
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
                             } else if (IntValue == HcInt_UserCurve) {
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex =
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefUserCurve;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex =
                                     UtilityRoutines::FindItemInList(Alphas(Ptr + 3), state.dataConvectionCoefficient->HcInsideUserCurve);
-                                if (UserIntConvectionCoeffs(TotIntConvCoeff).UserCurveIndex == 0) {
+                                if (state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).UserCurveIndex == 0) {
 
                                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + ", invalid value");
                                     ShowContinueError(state, " Invalid " + cAlphaFieldNames(Ptr + 3) + " entered=" + Alphas(Ptr + 3));
                                     ErrorsFound = true;
                                 }
-                                PotentialAssignedValue = TotIntConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
                             } else if (IntValue > HcInt_UserCurve) {
                                 // specificmodel
-                                ++TotIntConvCoeff;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).SurfaceName = Alphas(Ptr);
-                                UserIntConvectionCoeffs(TotIntConvCoeff).WhichSurface = -999;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
-                                UserIntConvectionCoeffs(TotIntConvCoeff).HcModelEq = IntValue;
-                                PotentialAssignedValue = TotIntConvCoeff;
-                                ApplyConvectionValue(state, Alphas(1), "INSIDE", TotIntConvCoeff);
+                                ++state.dataSurface->TotIntConvCoeff;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).SurfaceName = Alphas(Ptr);
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).WhichSurface = -999;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).OverrideType = ConvCoefSpecifiedModel;
+                                state.dataSurface->UserIntConvectionCoeffs(state.dataSurface->TotIntConvCoeff).HcModelEq = IntValue;
+                                PotentialAssignedValue = state.dataSurface->TotIntConvCoeff;
+                                ApplyConvectionValue(state, Alphas(1), "INSIDE", state.dataSurface->TotIntConvCoeff);
 
                             } else {
                                 // treat CeilingDiffuser and TrombeWall special
@@ -1643,24 +1645,24 @@ namespace ConvectionCoefficients {
             }
         }
 
-        for (int Loop = 1; Loop <= TotIntConvCoeff; ++Loop) {
-            if (UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
-            if (UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
-            if (CheckScheduleValueMinMax(state, UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", state.dataHeatBal->LowHConvLimit, "<=", state.dataHeatBal->HighHConvLimit)) continue;
-            ShowSevereError(state, RoutineName + "Surface=\"" + UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
-            ShowContinueError(state, "Out-of-range value found in schedule=" + UserIntConvectionCoeffs(Loop).ScheduleName);
+        for (int Loop = 1; Loop <= state.dataSurface->TotIntConvCoeff; ++Loop) {
+            if (state.dataSurface->UserIntConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
+            if (state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
+            if (CheckScheduleValueMinMax(state, state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleIndex, ">=", state.dataHeatBal->LowHConvLimit, "<=", state.dataHeatBal->HighHConvLimit)) continue;
+            ShowSevereError(state, RoutineName + "Surface=\"" + state.dataSurface->UserIntConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
+            ShowContinueError(state, "Out-of-range value found in schedule=" + state.dataSurface->UserIntConvectionCoeffs(Loop).ScheduleName);
             ShowContinueError(state,
                               format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit));
             ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
             ErrorsFound = true;
         }
 
-        for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
-            if (UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
-            if (UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
-            if (CheckScheduleValueMinMax(state, UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", state.dataHeatBal->LowHConvLimit, "<=", state.dataHeatBal->HighHConvLimit)) continue;
-            ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
-            ShowContinueError(state, "Out-of-range value found in schedule=" + UserExtConvectionCoeffs(Loop).ScheduleName);
+        for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
+            if (state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSchedule) continue;
+            if (state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex == 0) continue;
+            if (CheckScheduleValueMinMax(state, state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleIndex, ">=", state.dataHeatBal->LowHConvLimit, "<=", state.dataHeatBal->HighHConvLimit)) continue;
+            ShowSevereError(state, RoutineName + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName + "\", out-of-range convection coefficient:");
+            ShowContinueError(state, "Out-of-range value found in schedule=" + state.dataSurface->UserExtConvectionCoeffs(Loop).ScheduleName);
             ShowContinueError(state,
                               format("User supplied convection coefficients must be in range [>={:.9R}, <={:.1R}]", state.dataHeatBal->LowHConvLimit, state.dataHeatBal->HighHConvLimit));
             ShowContinueError(state, "Limits are set (or default) in HeatBalanceAlgorithm object.");
@@ -1671,18 +1673,18 @@ namespace ConvectionCoefficients {
                 return e.OutsideConvectionAlgo == DataHeatBalance::ASHRAESimple;
             })) {
             Count = 0;
-            for (int Loop = 1; Loop <= TotExtConvCoeff; ++Loop) {
-                SurfNum = UserExtConvectionCoeffs(Loop).WhichSurface;
+            for (int Loop = 1; Loop <= state.dataSurface->TotExtConvCoeff; ++Loop) {
+                SurfNum = state.dataSurface->UserExtConvectionCoeffs(Loop).WhichSurface;
                 // Tests show that Zone will override the simple convection specification of global.
                 if (SurfNum <= 0) continue;               // ignore this error condition
                 if (Surface(SurfNum).Zone == 0) continue; // ignore this error condition
                 if (Zone(Surface(SurfNum).Zone).OutsideConvectionAlgo == ASHRAESimple &&
-                    ((UserExtConvectionCoeffs(Loop).OverrideType == ConvCoefSpecifiedModel &&
-                      UserExtConvectionCoeffs(Loop).HcModelEq != ASHRAESimple) ||
-                     UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
+                    ((state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType == ConvCoefSpecifiedModel &&
+                        state.dataSurface->UserExtConvectionCoeffs(Loop).HcModelEq != ASHRAESimple) ||
+                        state.dataSurface->UserExtConvectionCoeffs(Loop).OverrideType != ConvCoefSpecifiedModel)) {
                     ++Count;
                     if (state.dataGlobal->DisplayExtraWarnings) {
-                        ShowSevereError(state, RoutineName + "Surface=\"" + UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
+                        ShowSevereError(state, RoutineName + "Surface=\"" + state.dataSurface->UserExtConvectionCoeffs(Loop).SurfaceName + "\", mixed algorithms.");
                         ShowContinueError(state,
                             "Zone Outside Convection Algorithm specifies \"SimpleCombined\". SimpleCombined will be used for this surface.");
                     }
@@ -1857,6 +1859,8 @@ namespace ConvectionCoefficients {
         int SurfaceCountInside;
         std::string OverwriteMessage;
 
+        auto &Surface(state.dataSurface->Surface);
+
         {
             auto const SELECT_CASE_var(SurfaceTypes);
 
@@ -1864,7 +1868,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     SurfacesOfType = true;
@@ -1908,7 +1912,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
@@ -1953,7 +1957,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
@@ -1998,7 +2002,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
@@ -2043,7 +2047,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
@@ -2088,7 +2092,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     SurfacesOfType = true;
@@ -2132,7 +2136,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
@@ -2177,7 +2181,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Wall) continue;
@@ -2222,7 +2226,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Roof) continue;
@@ -2267,7 +2271,7 @@ namespace ConvectionCoefficients {
                 SurfacesOfType = false;
                 SurfaceCountOutside = 0;
                 SurfaceCountInside = 0;
-                for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
                     if (Surface(SurfNum).Class != SurfaceClass::Floor) continue;
@@ -2430,6 +2434,7 @@ namespace ConvectionCoefficients {
                                       Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     )
     {
+        auto &Surface(state.dataSurface->Surface);
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation){
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
               return CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, cosTilt);
@@ -2500,7 +2505,7 @@ namespace ConvectionCoefficients {
                                         Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     )
     {
-
+        auto &Surface(state.dataSurface->Surface);
         if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
             state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = [](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
                 return CalcASHRAETARPNatural(Tsurf, Tamb, cosTilt);
@@ -2537,6 +2542,7 @@ namespace ConvectionCoefficients {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TAirConv;
         Real64 Hf;
+        auto &Surface(state.dataSurface->Surface);
 
         if (Surface(SurfNum).HeatTransSurf) { // Only treat heat transfer surfaces
 
@@ -2736,6 +2742,7 @@ namespace ConvectionCoefficients {
     {
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         Real64 ACH = CalcCeilingDiffuserACH(state, ZoneNum);
 
@@ -2804,6 +2811,7 @@ namespace ConvectionCoefficients {
         Real64 ZoneMult;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(Node)) {
             ACH = 0.0;
@@ -2882,6 +2890,7 @@ namespace ConvectionCoefficients {
         constexpr Real64 Pr(0.71);    // Prandtl number for air at ?
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum; // DO loop counter for surfaces
@@ -2968,7 +2977,7 @@ namespace ConvectionCoefficients {
 
             Gr = (g * beta * std::abs(Tsi - Tso) * pow_3(gapW)) / pow_2(v); // curve fit for v = v(T)?
 
-            CalcNusselt(SurfNum, asp, Tso, Tsi, Gr, Pr, Nu); // curve fit for Pr = Pr(T)?
+            CalcNusselt(state, SurfNum, asp, Tso, Tsi, Gr, Pr, Nu); // curve fit for Pr = Pr(T)?
 
             HConvNet = (k / gapW) * Nu; // curve fit for k = k(T)?
 
@@ -2994,7 +3003,8 @@ namespace ConvectionCoefficients {
         }
     }
 
-    void CalcNusselt(int const SurfNum, // Surface number
+    void CalcNusselt(EnergyPlusData &state,
+                     int const SurfNum, // Surface number
                      Real64 const asp,  // Aspect ratio: window height to gap width
                      Real64 const tso,  // Temperature of gap surface closest to outside (K)
                      Real64 const tsi,  // Temperature of gap surface closest to zone (K)
@@ -3043,6 +3053,8 @@ namespace ConvectionCoefficients {
         Real64 tiltr;
         Real64 costilt;
         Real64 sintilt;
+
+        auto &Surface(state.dataSurface->Surface);
 
         tilt = Surface(SurfNum).Tilt;
         tiltr = tilt * DataGlobalConstants::DegToRadians;
@@ -3109,11 +3121,13 @@ namespace ConvectionCoefficients {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 HExt(0.0); // Will become the returned value
 
+        auto &Surface(state.dataSurface->Surface);
+
         {
-            auto const SELECT_CASE_var(UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideType);
+            auto const SELECT_CASE_var(state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideType);
 
             if (SELECT_CASE_var == ConvCoefValue) {
-                HExt = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideValue;
+                HExt = state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).OverrideValue;
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].out = KIVA_CONST_CONV(HExt);
@@ -3121,7 +3135,7 @@ namespace ConvectionCoefficients {
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserValue; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
             } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                HExt = GetCurrentScheduleValue(state, UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).ScheduleIndex);
+                HExt = GetCurrentScheduleValue(state, state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).ScheduleIndex);
                 // Need to check for validity
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].f = KIVA_HF_ZERO;
@@ -3130,19 +3144,19 @@ namespace ConvectionCoefficients {
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserSchedule; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;         // reporting
             } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-                CalcUserDefinedOutsideHcModel(state, SurfNum, UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).UserCurveIndex, HExt);
+                CalcUserDefinedOutsideHcModel(state, SurfNum, state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).UserCurveIndex, HExt);
                 // Kiva convection handled in function above
                 Surface(SurfNum).OutConvHfModelEq = HcExt_UserCurve; // reporting
                 Surface(SurfNum).OutConvHnModelEq = HcExt_None;      // reporting
             } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
                 EvaluateExtHcModels(state,
                                     SurfNum,
-                                    UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
-                                    UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
+                                    state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
+                                    state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq,
                                     HExt);
                 // Kiva convection handled in function above
-                Surface(SurfNum).OutConvHfModelEq = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
-                Surface(SurfNum).OutConvHnModelEq = UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
+                Surface(SurfNum).OutConvHfModelEq = state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
+                Surface(SurfNum).OutConvHnModelEq = state.dataSurface->UserExtConvectionCoeffs(Surface(SurfNum).ExtConvCoeff).HcModelEq; // reporting
             } else {
                 assert(false);
             }
@@ -3163,7 +3177,7 @@ namespace ConvectionCoefficients {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS FUNCTION:
-        // This function accesses the data structre for the User
+        // This function accesses the data structure for the User
         // Supplied Interior Convection Coefficients and returns that
         // as the result of this function.  The surface has already
         // been verified to have user supplied interior convection values.
@@ -3176,30 +3190,32 @@ namespace ConvectionCoefficients {
 
         Real64 HInt(0.0); // Will become the returned value
 
+        auto &Surface(state.dataSurface->Surface);
+
         {
-            auto const SELECT_CASE_var(UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideType);
+            auto const SELECT_CASE_var(state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideType);
 
             if (SELECT_CASE_var == ConvCoefValue) {
-                HInt = UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideValue;
+                HInt = state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).OverrideValue;
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
                 }
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserValue; // reporting
             } else if (SELECT_CASE_var == ConvCoefSchedule) {
-                HInt = GetCurrentScheduleValue(state, UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).ScheduleIndex);
+                HInt = GetCurrentScheduleValue(state, state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).ScheduleIndex);
                 // Need to check for validity
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
                     state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in = KIVA_CONST_CONV(HInt);
                 }
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserSchedule; // reporting
             } else if (SELECT_CASE_var == ConvCoefUserCurve) {
-                CalcUserDefinedInsideHcModel(state, SurfNum, UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).UserCurveIndex, HInt);
+                CalcUserDefinedInsideHcModel(state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).UserCurveIndex, HInt);
                 // Kiva convection handled in function above
                 Surface(SurfNum).IntConvHcModelEq = HcInt_UserCurve; // reporting
             } else if (SELECT_CASE_var == ConvCoefSpecifiedModel) {
-                EvaluateIntHcModels(state, SurfNum, UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq, HInt);
+                EvaluateIntHcModels(state, SurfNum, state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq, HInt);
                 // Kiva convection handled in function above
-                Surface(SurfNum).IntConvHcModelEq = UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq;
+                Surface(SurfNum).IntConvHcModelEq = state.dataSurface->UserIntConvectionCoeffs(Surface(SurfNum).IntConvCoeff).HcModelEq;
             } else {
                 assert(false);
             }
@@ -3342,6 +3358,7 @@ namespace ConvectionCoefficients {
                                         Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     )
     {
+        auto &Surface(state.dataSurface->Surface);
 
         // Get humidity ratio
         Real64 AirHumRat;
@@ -3432,9 +3449,7 @@ namespace ConvectionCoefficients {
             Real64 Height;
 
             // Default Constructor
-            FacadeGeoCharactisticsStruct()
-            {
-            }
+            FacadeGeoCharactisticsStruct() = default;
 
             // Member Constructor
             FacadeGeoCharactisticsStruct(Real64 const AzimuthRangeLow,
@@ -3470,6 +3485,7 @@ namespace ConvectionCoefficients {
         static FacadeGeoCharactisticsStruct NorthWestFacade(287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         BldgVolumeSum = 0.0;
         RoofBoundZvals = 0.0;
@@ -3555,7 +3571,7 @@ namespace ConvectionCoefficients {
         state.dataConvectionCoefficient->CubeRootOfOverallBuildingVolume = std::pow(BldgVolumeSum, OneThird);
 
         // first pass over surfaces for outside face params
-        for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             thisAzimuth = Surface(SurfLoop).Azimuth;
@@ -3882,7 +3898,7 @@ namespace ConvectionCoefficients {
             state.dataConvectionCoefficient->RoofLongAxisOutwardAzimuth = 0.0; // flat roofs don't really have azimuth
         }
 
-        for (int SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
+        for (int SurfLoop = 1; SurfLoop <= state.dataSurface->TotSurfaces; ++SurfLoop) {
             if (Surface(SurfLoop).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(SurfLoop).HeatTransSurf) continue;
             thisAzimuth = Surface(SurfLoop).Azimuth;
@@ -3945,7 +3961,7 @@ namespace ConvectionCoefficients {
                 "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
                 "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
             print(state.files.eio, Format_900); // header
-            for (int SurfLoop : DataSurfaces::AllSurfaceListReportOrder) {
+            for (int SurfLoop : state.dataSurface->AllSurfaceListReportOrder) {
                 if (!Surface(SurfLoop).HeatTransSurf) continue;
                 if (Surface(SurfLoop).IntConvSurfGetsRadiantHeat) {
                     YesNo1 = "Yes";
@@ -4173,6 +4189,7 @@ namespace ConvectionCoefficients {
         int SurfLoop;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         for (ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
             state.dataConvectionCoefficient->ActiveWallCount = 0;
@@ -4235,7 +4252,7 @@ namespace ConvectionCoefficients {
         // simple worker routine takes surface classification and fills in model to use (IntConvHcModelEq) for that surface
         MapIntConvClassificationToHcModels(state, SurfNum);
 
-        EvaluateIntHcModels(state, SurfNum, Surface(SurfNum).IntConvHcModelEq, state.dataHeatBal->HConvIn(SurfNum));
+        EvaluateIntHcModels(state, SurfNum, state.dataSurface->Surface(SurfNum).IntConvHcModelEq, state.dataHeatBal->HConvIn(SurfNum));
         // if ( std::isnan( HConvIn( SurfNum ) ) ) { // Use IEEE_IS_NAN when GFortran supports it
         //// throw Error
         // ShowSevereError(state,  "Inside convection coefficient is out of bound = " + Surface( SurfNum ).Name );
@@ -4262,6 +4279,8 @@ namespace ConvectionCoefficients {
         // This routine implements an adaptive structure and classification system for outdoor
         //   It calls a series of separable worker routines
 
+        auto &Surface(state.dataSurface->Surface);
+
         DynamicExtConvSurfaceClassification(state, SurfNum);
 
         MapExtConvClassificationToHcModels(state, SurfNum);
@@ -4287,7 +4306,7 @@ namespace ConvectionCoefficients {
 
         // METHODOLOGY EMPLOYED:
         //  - fills value for Hc by calling the appropriate convection model, usually as a function.
-        //     preperation of argument values for the function calls is contained in each Case block (repeats)
+        //     preparation of argument values for the function calls is contained in each Case block (repeats)
         //  - also updates the reference air temperature type for use in the surface heat balance calcs
 
         // Using/Aliasing
@@ -4296,6 +4315,7 @@ namespace ConvectionCoefficients {
         using DataHeatBalSurface::TH;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         Real64 tmpHc = 0.0;
 
@@ -4649,6 +4669,8 @@ namespace ConvectionCoefficients {
         Kiva::ConvectionAlgorithm HfFn(KIVA_CONST_CONV(0.0));
         Kiva::ConvectionAlgorithm HnFn(KIVA_CONST_CONV(0.0));
 
+        auto &Surface(state.dataSurface->Surface);
+
         // first call Hn models
         {
             auto const SELECT_CASE_var(NaturalConvModelEqNum);
@@ -4717,7 +4739,7 @@ namespace ConvectionCoefficients {
 
             if (!Surface(SurfNum).ExtWind) {
                 SurfWindSpeed = 0.0; // No wind exposure
-            } else if (Surface(SurfNum).Class == SurfaceClass::Window && SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
+            } else if (Surface(SurfNum).Class == SurfaceClass::Window && state.dataSurface->SurfWinShadingFlag(SurfNum) == WinShadingType::ExtShade) {
                 SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
@@ -4942,6 +4964,8 @@ namespace ConvectionCoefficients {
         Real64 DeltaTemp(0.0);
         Real64 surfWindDir;
 
+        auto &Surface(state.dataSurface->Surface);
+
         surfWindDir = Surface(SurfNum).WindDir;
 
         if (Surface(SurfNum).Class == SurfaceClass::Roof ||
@@ -4979,7 +5003,7 @@ namespace ConvectionCoefficients {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
+        auto &Surface(state.dataSurface->Surface);
 
         {
             auto const SELECT_CASE_var(Surface(SurfNum).OutConvClassification);
@@ -5081,6 +5105,7 @@ namespace ConvectionCoefficients {
         int SurfLoop;                  // local for separate looping across surfaces in the zone that has SurfNum
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         EquipOnCount = 0;
         ZoneNum = Surface(SurfNum).Zone;
@@ -5769,8 +5794,10 @@ namespace ConvectionCoefficients {
 
         // METHODOLOGY EMPLOYED:
         // Long case statement depends on surface classification determined in DynamicIntConvSurfaceClassification
-        // then simply map data stored in state.dataConvectionCoefficient->InsideFaceAdaptiveConvectionAlgo into the surface's structure
+        // then simply map data stored in InsideFaceAdaptiveConvectionAlgo into the surface's structure
         // if model type is user-defined, also store the index to the user curve to be used.
+
+        auto &Surface(state.dataSurface->Surface);
 
         {
             auto const SELECT_CASE_var(Surface(SurfNum).IntConvClassification);
@@ -6059,6 +6086,7 @@ namespace ConvectionCoefficients {
         int thisZoneInletNode;
 
         auto &Zone(state.dataHeatBal->Zone);
+        auto &Surface(state.dataSurface->Surface);
 
         ZoneNum = Surface(SurfNum).Zone;
         SumMdotTemp = 0.0;
@@ -6163,6 +6191,7 @@ namespace ConvectionCoefficients {
         Real64 ThetaRad;
 
         auto &UserCurve = state.dataConvectionCoefficient->HcOutsideUserCurve(UserCurveNum);
+        auto &Surface(state.dataSurface->Surface);
 
         {
             auto const SELECT_CASE_var(UserCurve.WindSpeedType);
@@ -6451,7 +6480,7 @@ namespace ConvectionCoefficients {
             Hn = 9.999;
             if (state.dataConvectionCoefficient->AHUnstableHorizontalErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcAlamdariHammondUnstableHorizontal: Convection model not evaluated (would divide by zero)");
-                ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
+                ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,
@@ -6503,7 +6532,7 @@ namespace ConvectionCoefficients {
             Hn = 9.999;
             if (state.dataConvectionCoefficient->AHStableHorizontalErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcAlamdariHammondStableHorizontal: Convection model not evaluated (would divide by zero)");
-                ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
+                ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,
@@ -6555,7 +6584,7 @@ namespace ConvectionCoefficients {
             Hn = 9.999;
             if (state.dataConvectionCoefficient->AHVerticalWallErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcAlamdariHammondVerticalWall: Convection model not evaluated (would divide by zero)");
-                ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
+                ShowContinueError(state, "Effective hydraulic diameter is zero, convection model not applicable for surface =" + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,
@@ -7334,7 +7363,7 @@ namespace ConvectionCoefficients {
             // bad value for Height, but we have little info to identify calling culprit
             if (state.dataConvectionCoefficient->CalcFohannoPolidoriVerticalWallErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcFohannoPolidoriVerticalWall: Convection model not evaluated (would divide by zero)");
-                ShowContinueError(state, "Effective surface height is zero, convection model not applicable for surface =" + Surface(SurfNum).Name);
+                ShowContinueError(state, "Effective surface height is zero, convection model not applicable for surface =" + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state,
@@ -7650,6 +7679,8 @@ namespace ConvectionCoefficients {
     Real64 CalcSparrowWindward(EnergyPlusData &state,
                                int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
     {
+        auto &Surface(state.dataSurface->Surface);
+
         if (FaceArea > 0.0) {
             return CalcSparrowWindward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
 
@@ -7668,6 +7699,8 @@ namespace ConvectionCoefficients {
 
     Real64 CalcSparrowLeeward(EnergyPlusData &state, int const RoughnessIndex, Real64 const FacePerimeter, Real64 const FaceArea, Real64 const WindAtZ, int const SurfNum)
     {
+        auto &Surface(state.dataSurface->Surface);
+
         if (FaceArea > 0.0) {
             return CalcSparrowLeeward(RoughnessIndex, FacePerimeter, FaceArea, WindAtZ);
         } else {
@@ -7905,7 +7938,7 @@ namespace ConvectionCoefficients {
             if (state.dataConvectionCoefficient->CalcMitchellErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcMitchell: Convection model not evaluated (bad length scale)");
                 ShowContinueError(state, format("Value for effective length scale = {:.5R}", LengthScale));
-                ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
+                ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state, "CalcMitchell: Convection model not evaluated because bad length scale and set to 9.999 [W/m2-k]",
@@ -8009,7 +8042,7 @@ namespace ConvectionCoefficients {
             if (state.dataConvectionCoefficient->CalcEmmelVerticalErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcEmmelVertical: Convection model wind angle calculation suspect (developer issue)");
                 ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
-                ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
+                ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state, "CalcEmmelVertical: Convection model wind angle calculation suspect and high theta correlation",
@@ -8067,7 +8100,7 @@ namespace ConvectionCoefficients {
             if (state.dataConvectionCoefficient->CalcEmmelRoofErrorIDX == 0) {
                 ShowSevereMessage(state, "CalcEmmelRoof: Convection model wind angle calculation suspect (developer issue)");
                 ShowContinueError(state, format("Value for theta angle = {:.5R}", Theta));
-                ShowContinueError(state, "Occurs for surface named = " + Surface(SurfNum).Name);
+                ShowContinueError(state, "Occurs for surface named = " + state.dataSurface->Surface(SurfNum).Name);
                 ShowContinueError(state, "Convection model uses high theta correlation and the simulation continues");
             }
             ShowRecurringSevereErrorAtEnd(state, "CalcEmmelRoof: Convection model wind angle calculation suspect and high theta correlation",
@@ -8144,6 +8177,7 @@ namespace ConvectionCoefficients {
                          Real64 const RoofArea,
                          Real64 const RoofPerimeter)
     {
+        auto &Surface(state.dataSurface->Surface);
 
         Real64 x; // distance to roof edge toward wind direction
 
@@ -8173,17 +8207,19 @@ namespace ConvectionCoefficients {
                                 Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     )
     {
+        auto &Surface(state.dataSurface->Surface);
+
         int ZoneNum = Surface(SurfNum).Zone;
         Real64 Volume = state.dataHeatBal->Zone(ZoneNum).Volume; // Volume of the zone in m3
         Real64 Vair = std::pow(Volume, OneThird) * CalcZoneSystemACH(state, ZoneNum) / 3600;
 
-        state.dataHeatBal->HConvIn(SurfNum) = CalcASTMC1340ConvCoeff(SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, Vair, Surface(SurfNum).Tilt);
+        state.dataHeatBal->HConvIn(SurfNum) = CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperature, ZoneMeanAirTemperature, Vair, Surface(SurfNum).Tilt);
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
         if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit) state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
     }
 
-    Real64 CalcASTMC1340ConvCoeff(int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt)
+    Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -8227,6 +8263,8 @@ namespace ConvectionCoefficients {
         Real64 Re;          // Reynolds number
         constexpr Real64 g = DataGlobalConstants::GravityConstant;      // Acceleration of gravity, m/s2
         constexpr Real64 OneThird((1.0 / 3.0));                         // 1/3 in highest precision
+
+        auto &Surface(state.dataSurface->Surface);
 
         if (Tilt == 0 || Tilt == 180) {             // Horizontal surface
             L = std::sqrt(Surface(SurfNum).Area);
@@ -8341,5 +8379,3 @@ namespace ConvectionCoefficients {
     }
 
 } // namespace ConvectionCoefficients
-
-} // namespace EnergyPlus

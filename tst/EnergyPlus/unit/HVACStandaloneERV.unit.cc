@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::Standalone ERV Unit Tests
+// Standalone ERV Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -65,14 +65,14 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::HVACStandAloneERV;
+using namespace HVACStandAloneERV;
 using namespace ObjexxFCL;
-using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
-using namespace EnergyPlus::DataZoneEquipment;
-using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::Fans;
-using namespace EnergyPlus::ScheduleManager;
+using namespace DataHeatBalance;
+using namespace DataHVACGlobals;
+using namespace DataZoneEquipment;
+using namespace DataSizing;
+using namespace Fans;
+using namespace ScheduleManager;
 
 TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 {
@@ -115,9 +115,9 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
 
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
-    ZoneEqSizing.allocate(1);
-    CurZoneEqNum = 1;
-    DataSizing::ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
 
     state->dataHeatBal->TotPeople = 2; // Total number of people statements
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -217,7 +217,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     GetFanInput(*state);
 
-    EnergyPlus::DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "Zone 1";
@@ -228,13 +228,13 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
     state->dataHeatBal->Zone(1).FloorArea = 100.0;
 
-    ZoneEqSizing.allocate(1);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
-    ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.0;
-    FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.0;
 
     state->dataHeatBal->TotPeople = 2; // Total number of people objects
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);

@@ -239,11 +239,8 @@ namespace TranspiredCollector {
         using DataLoopNode::NodeConnectionType_Sensor;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsNotParent;
-        using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
-
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
 
@@ -405,7 +402,7 @@ namespace TranspiredCollector {
             }         // any UTSC Multisystem present
 
             state.dataTranspiredCollector->UTSC(Item).OSCMName = Alphas(2);
-            Found = UtilityRoutines::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, OSCM);
+            Found = UtilityRoutines::FindItemInList(state.dataTranspiredCollector->UTSC(Item).OSCMName, state.dataSurface->OSCM);
             if (Found == 0) {
                 ShowSevereError(state, cAlphaFieldNames(2) + " not found=" + state.dataTranspiredCollector->UTSC(Item).OSCMName + " in " + CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 ErrorsFound = true;
@@ -500,7 +497,7 @@ namespace TranspiredCollector {
             state.dataTranspiredCollector->UTSC(Item).SurfPtrs.allocate(state.dataTranspiredCollector->UTSC(Item).NumSurfs);
             state.dataTranspiredCollector->UTSC(Item).SurfPtrs = 0;
             for (ThisSurf = 1; ThisSurf <= state.dataTranspiredCollector->UTSC(Item).NumSurfs; ++ThisSurf) {
-                Found = UtilityRoutines::FindItemInList(Alphas(ThisSurf + AlphaOffset), Surface);
+                Found = UtilityRoutines::FindItemInList(Alphas(ThisSurf + AlphaOffset), state.dataSurface->Surface);
                 if (Found == 0) {
                     ShowSevereError(state, "Surface Name not found=" + Alphas(ThisSurf + AlphaOffset) + " in " + CurrentModuleObject + " =" +
                                     state.dataTranspiredCollector->UTSC(Item).Name);
@@ -508,25 +505,25 @@ namespace TranspiredCollector {
                     continue;
                 }
                 // check that surface is appropriate, Heat transfer, Sun, Wind,
-                if (!Surface(Found).HeatTransSurf) {
+                if (!state.dataSurface->Surface(Found).HeatTransSurf) {
                     ShowSevereError(state, "Surface " + Alphas(ThisSurf + AlphaOffset) + " not of Heat Transfer type in " + CurrentModuleObject + " =" +
                                     state.dataTranspiredCollector->UTSC(Item).Name);
                     ErrorsFound = true;
                     continue;
                 }
-                if (!Surface(Found).ExtSolar) {
+                if (!state.dataSurface->Surface(Found).ExtSolar) {
                     ShowSevereError(state, "Surface " + Alphas(ThisSurf + AlphaOffset) + " not exposed to sun in " + CurrentModuleObject + " =" +
                                     state.dataTranspiredCollector->UTSC(Item).Name);
                     ErrorsFound = true;
                     continue;
                 }
-                if (!Surface(Found).ExtWind) {
+                if (!state.dataSurface->Surface(Found).ExtWind) {
                     ShowSevereError(state, "Surface " + Alphas(ThisSurf + AlphaOffset) + " not exposed to wind in " + CurrentModuleObject + " =" +
                                     state.dataTranspiredCollector->UTSC(Item).Name);
                     ErrorsFound = true;
                     continue;
                 }
-                if (Surface(Found).ExtBoundCond != OtherSideCondModeledExt) {
+                if (state.dataSurface->Surface(Found).ExtBoundCond != OtherSideCondModeledExt) {
                     ShowSevereError(state, "Surface " + Alphas(ThisSurf + AlphaOffset) +
                                     " does not have OtherSideConditionsModel for exterior boundary conditions in " + CurrentModuleObject + " =" +
                                     state.dataTranspiredCollector->UTSC(Item).Name);
@@ -534,11 +531,11 @@ namespace TranspiredCollector {
                     continue;
                 }
                 // check surface orientation, warn if upside down
-                if ((Surface(Found).Tilt < -95.0) || (Surface(Found).Tilt > 95.0)) {
+                if ((state.dataSurface->Surface(Found).Tilt < -95.0) || (state.dataSurface->Surface(Found).Tilt > 95.0)) {
                     ShowWarningError(state, "Suspected input problem with collector surface = " + Alphas(ThisSurf + AlphaOffset));
                     ShowContinueError(state, "Entered in " + cCurrentModuleObject + " = " + state.dataTranspiredCollector->UTSC(Item).Name);
                     ShowContinueError(state, "Surface used for solar collector faces down");
-                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", Surface(Found).Tilt));
+                    ShowContinueError(state, format("Surface tilt angle (degrees from ground outward normal) = {:.2R}", state.dataSurface->Surface(Found).Tilt));
                 }
 
                 state.dataTranspiredCollector->UTSC(Item).SurfPtrs(ThisSurf) = Found;
@@ -549,25 +546,25 @@ namespace TranspiredCollector {
             // now that we should have all the surfaces, do some preperations and checks.
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
-            Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs));
-            //			AvgAzimuth = sum( Surface( UTSC( Item ).SurfPtrs ).Azimuth * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface(
+            Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs));
+            //            AvgAzimuth = sum( Surface( UTSC( Item ).SurfPtrs ).Azimuth * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface(
             // UTSC(  Item
             //).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            AvgAzimuth = sum_product_sub(Surface, &SurfaceData::Azimuth, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
+            AvgAzimuth = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Azimuth, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
                          surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-            //			AvgTilt = sum( Surface( UTSC( Item ).SurfPtrs ).Tilt * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC(
+            //            AvgTilt = sum( Surface( UTSC( Item ).SurfPtrs ).Tilt * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC(
             // Item
             //).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            AvgTilt = sum_product_sub(Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
+            AvgTilt = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
                       surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
             for (ThisSurf = 1; ThisSurf <= state.dataTranspiredCollector->UTSC(Item).NumSurfs; ++ThisSurf) {
                 SurfID = state.dataTranspiredCollector->UTSC(Item).SurfPtrs(ThisSurf);
-                if (std::abs(Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
-                    ShowWarningError(state, "Surface " + Surface(SurfID).Name + " has Azimuth different from others in the group associated with " +
+                if (std::abs(state.dataSurface->Surface(SurfID).Azimuth - AvgAzimuth) > 15.0) {
+                    ShowWarningError(state, "Surface " + state.dataSurface->Surface(SurfID).Name + " has Azimuth different from others in the group associated with " +
                                      CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 }
-                if (std::abs(Surface(SurfID).Tilt - AvgTilt) > 10.0) {
-                    ShowWarningError(state, "Surface " + Surface(SurfID).Name + " has Tilt different from others in the group associated with " +
+                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
+                    ShowWarningError(state, "Surface " + state.dataSurface->Surface(SurfID).Name + " has Tilt different from others in the group associated with " +
                                      CurrentModuleObject + " =" + state.dataTranspiredCollector->UTSC(Item).Name);
                 }
 
@@ -585,9 +582,9 @@ namespace TranspiredCollector {
             //                            /SUM(Surface(UTSC(Item)%SurfPtrs)%Area)
             //    UTSC(Item)%Centroid%y = SUM(Surface(UTSC(Item)%SurfPtrs)%Centroid%y*Surface(UTSC(Item)%SurfPtrs)%Area) &
             //                            /SUM(Surface(UTSC(Item)%SurfPtrs)%Area)
-            //			UTSC( Item ).Centroid.z = sum( Surface( UTSC( Item ).SurfPtrs ).Centroid.z * Surface( UTSC( Item ).SurfPtrs ).Area ) /
+            //            UTSC( Item ).Centroid.z = sum( Surface( UTSC( Item ).SurfPtrs ).Centroid.z * Surface( UTSC( Item ).SurfPtrs ).Area ) /
             // sum(  Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            state.dataTranspiredCollector->UTSC(Item).Centroid.z = sum_product_sub(Surface, &SurfaceData::Centroid, &Vector::z, Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
+            state.dataTranspiredCollector->UTSC(Item).Centroid.z = sum_product_sub(state.dataSurface->Surface, &SurfaceData::Centroid, &Vector::z, state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
                                     surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
             // now handle numbers from input object
@@ -609,7 +606,7 @@ namespace TranspiredCollector {
 
             // Fill out data we now know
             // sum areas of HT surface areas
-            //			UTSC( Item ).ProjArea = sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced
+            //            UTSC( Item ).ProjArea = sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced
             // by  below
             state.dataTranspiredCollector->UTSC(Item).ProjArea = surfaceArea;
             if (state.dataTranspiredCollector->UTSC(Item).ProjArea == 0) {
@@ -713,20 +710,10 @@ namespace TranspiredCollector {
         //       MODIFIED       B. Griffith, May 2009, added EMS setpoint check
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
         using namespace DataLoopNode;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
@@ -805,15 +792,15 @@ namespace TranspiredCollector {
         }
 
         // determine average ambient temperature
-        Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
         if (!state.dataEnvrn->IsRain) {
-            Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
+            Tamb = sum_product_sub(state.dataSurface->Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
         } else { // when raining we use wet bulb not drybulb
-            Tamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
+            Tamb = sum_product_sub(state.dataSurface->Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) / surfaceArea;
         }
 
         // inits for each iteration
-        //		UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage:
+        //        UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage:
         // Replaced by below
         state.dataTranspiredCollector->UTSC(UTSCNum).InletMDot =
             sum_sub(Node, &DataLoopNode::NodeData::MassFlowRate, state.dataTranspiredCollector->UTSC(UTSCNum).InletNode); // Autodesk:F2C++ Functions handle array subscript usage
@@ -838,29 +825,15 @@ namespace TranspiredCollector {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // <description>
-
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using ConvectionCoefficients::InitExteriorConvectionCoeff;
         using DataHeatBalSurface::TH;
         using DataHVACGlobals::TimeStepSys;
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
-
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalance; // , ONLY: QRadSWOutIncident, Construct, Material
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const nu(15.66e-6); // kinematic viscosity (m**2/s) for air at 300 K
@@ -869,22 +842,14 @@ namespace TranspiredCollector {
         // (Mills 1999 Heat Transfer)
         Real64 const Sigma(5.6697e-08); // Stefan-Boltzmann constant
 
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
         // following arrays are used to temporarily hold results from multiple underlying surfaces
         Array1D<Real64> HSkyARR;
         Array1D<Real64> HGroundARR;
         Array1D<Real64> HAirARR;
         Array1D<Real64> HPlenARR;
         Array1D<Real64> LocalWindArr;
-        //  REAL(r64), ALLOCATABLE, DIMENSION(:) :: IscARR
-        //  REAL(r64), ALLOCATABLE, DIMENSION(:) :: TsoARR
 
         // working variables
-        // unused  INTEGER    :: InletNode  !
         Real64 RhoAir;          // density of air
         Real64 CpAir;           // specific heat of air
         Real64 holeArea;        // area of perforations, includes corrugation of surface
@@ -938,17 +903,17 @@ namespace TranspiredCollector {
 
         // Active UTSC calculation
         // first do common things for both correlations
-        Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
         if (!state.dataEnvrn->IsRain) {
-            //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
+            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
             // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+            Tamb = sum_product_sub(state.dataSurface->Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
 
         } else { // when raining we use wet bulb not drybulb
-            //			Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
+            //            Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum(
             // Surface(  UTSC(  UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            Tamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+            Tamb = sum_product_sub(state.dataSurface->Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                    surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         }
 
@@ -1024,49 +989,49 @@ namespace TranspiredCollector {
             // Initializations for this surface
             HMovInsul = 0.0;
             HExt = 0.0;
-            LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
+            LocalWindArr(ThisSurf) = state.dataSurface->Surface(SurfPtr).WindSpeed;
             InitExteriorConvectionCoeff(state, SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
-            ConstrNum = Surface(SurfPtr).Construction;
+            ConstrNum = state.dataSurface->Surface(SurfPtr).Construction;
             AbsThermSurf = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             TsoK = TH(1, 1, SurfPtr) + DataGlobalConstants::KelvinConv;
             TscollK = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast + DataGlobalConstants::KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
         }
-        //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
+        //        AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
         auto Area(array_sub(
-            Surface,
+            state.dataSurface->Surface,
             &SurfaceData::Area,
             state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs)); // Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
         AreaSum = sum(Area);
         // now figure area-weighted averages from underlying surfaces.
-        //		Vwind = sum( LocalWindArr * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
+        //        Vwind = sum( LocalWindArr * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
         // Replaced by below
         Vwind = sum(LocalWindArr * Area) / AreaSum;
         LocalWindArr.deallocate();
-        //		HrSky = sum( HSkyARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced
+        //        HrSky = sum( HSkyARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced
         // by  below
         HrSky = sum(HSkyARR * Area) / AreaSum;
         HSkyARR.deallocate();
-        //		HrGround = sum( HGroundARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
+        //        HrGround = sum( HGroundARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
         // Replaced by below
         HrGround = sum(HGroundARR * Area) / AreaSum;
         HGroundARR.deallocate();
-        //		HrAtm = sum( HAirARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced
+        //        HrAtm = sum( HAirARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage: Replaced
         // by  below
         HrAtm = sum(HAirARR * Area) / AreaSum;
         HAirARR.deallocate();
-        //		HrPlen = sum( HPlenARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
+        //        HrPlen = sum( HPlenARR * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array subscript usage:
         // Replaced  by below
         HrPlen = sum(HPlenARR * Area) / AreaSum;
         HPlenARR.deallocate();
 
-        //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
+        //        Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
-        Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+        Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
-        //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
+        //        Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below
-        Tso = sum_product_sub(TH(1, 1, _), Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+        Tso = sum_product_sub(TH(1, 1, _), state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
 
         if (Vwind > 5.0) {
@@ -1183,24 +1148,11 @@ namespace TranspiredCollector {
         // REFERENCES:
         // Nat. Vent. equations from ASHRAE HoF 2001 Chapt. 26
 
-        // USE STATEMENTS:
-
         // Using/Aliasing
-        using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbTwbPb;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // DERIVED TYPE DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // local working variables
         Real64 AspRat; // Aspect Ratio of gap
@@ -1218,14 +1170,14 @@ namespace TranspiredCollector {
         Real64 Twbamb;
         Real64 OutHumRatAmb;
 
-        Real64 const surfaceArea(sum_sub(Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
-        //		Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
+        Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs));
+        //        Tamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutDryBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Tamb = sum_product_sub(Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+        Tamb = sum_product_sub(state.dataSurface->Surface, &SurfaceData::OutDryBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-        //		Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
+        //        Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface(
         // UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-        Twbamb = sum_product_sub(Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
+        Twbamb = sum_product_sub(state.dataSurface->Surface, &SurfaceData::OutWetBulbTemp, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
                  surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
         OutHumRatAmb = PsyWFnTdbTwbPb(state, Tamb, Twbamb, state.dataEnvrn->OutBaroPress);
 
@@ -1294,7 +1246,6 @@ namespace TranspiredCollector {
         //       RE-ENGINEERED  na
 
         using DataLoopNode::Node;
-        using DataSurfaces::OSCM;
 
         int OutletNode;
         int InletNode;
@@ -1326,10 +1277,10 @@ namespace TranspiredCollector {
             }
         } else { // Passive and/or bypassed           Note Array assignments in following
                  // Autodesk:F2C++ Array subscript usage: Replaced by below
-            //			Node( UTSC( UTSCNum ).OutletNode ).MassFlowRate = Node( UTSC( UTSCNum ).InletNode ).MassFlowRate;
-            //			Node( UTSC( UTSCNum ).OutletNode ).Temp = Node( UTSC( UTSCNum ).InletNode ).Temp;
-            //			Node( UTSC( UTSCNum ).OutletNode ).HumRat = Node( UTSC( UTSCNum ).InletNode ).HumRat;
-            //			Node( UTSC( UTSCNum ).OutletNode ).Enthalpy = Node( UTSC( UTSCNum ).InletNode ).Enthalpy;
+            //            Node( UTSC( UTSCNum ).OutletNode ).MassFlowRate = Node( UTSC( UTSCNum ).InletNode ).MassFlowRate;
+            //            Node( UTSC( UTSCNum ).OutletNode ).Temp = Node( UTSC( UTSCNum ).InletNode ).Temp;
+            //            Node( UTSC( UTSCNum ).OutletNode ).HumRat = Node( UTSC( UTSCNum ).InletNode ).HumRat;
+            //            Node( UTSC( UTSCNum ).OutletNode ).Enthalpy = Node( UTSC( UTSCNum ).InletNode ).Enthalpy;
             auto const &OutletNode(state.dataTranspiredCollector->UTSC(UTSCNum).OutletNode);
             auto const &InletNode(state.dataTranspiredCollector->UTSC(UTSCNum).InletNode);
             assert(OutletNode.size() == InletNode.size());
@@ -1346,10 +1297,10 @@ namespace TranspiredCollector {
         // update the OtherSideConditionsModel coefficients.
         thisOSCM = state.dataTranspiredCollector->UTSC(UTSCNum).OSCMPtr;
 
-        OSCM(thisOSCM).TConv = state.dataTranspiredCollector->UTSC(UTSCNum).Tplen;
-        OSCM(thisOSCM).HConv = state.dataTranspiredCollector->UTSC(UTSCNum).HcPlen;
-        OSCM(thisOSCM).TRad = state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll;
-        OSCM(thisOSCM).HRad = state.dataTranspiredCollector->UTSC(UTSCNum).HrPlen;
+        state.dataSurface->OSCM(thisOSCM).TConv = state.dataTranspiredCollector->UTSC(UTSCNum).Tplen;
+        state.dataSurface->OSCM(thisOSCM).HConv = state.dataTranspiredCollector->UTSC(UTSCNum).HcPlen;
+        state.dataSurface->OSCM(thisOSCM).TRad = state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll;
+        state.dataSurface->OSCM(thisOSCM).HRad = state.dataTranspiredCollector->UTSC(UTSCNum).HrPlen;
     }
 
     void SetUTSCQdotSource(EnergyPlusData &state, int const UTSCNum,
@@ -1388,9 +1339,6 @@ namespace TranspiredCollector {
         // mine Surface derived type for correct index/number of surface
         // mine UTSC derived type that has the surface.
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int UTSCNum;  // temporary
         int ThisSurf; // temporary
@@ -1403,7 +1351,7 @@ namespace TranspiredCollector {
         }
 
         if (SurfacePtr == 0) {
-            ShowFatalError(state, "Invalid surface passed to GetTranspiredCollectorIndex, Surface name = " + Surface(SurfacePtr).Name);
+            ShowFatalError(state, "Invalid surface passed to GetTranspiredCollectorIndex, Surface name = " + state.dataSurface->Surface(SurfacePtr).Name);
         }
 
         UTSCNum = 0;
@@ -1418,7 +1366,7 @@ namespace TranspiredCollector {
         }
 
         if (!Found) {
-            ShowFatalError(state, "Did not find surface in UTSC description in GetTranspiredCollectorIndex, Surface name = " + Surface(SurfacePtr).Name);
+            ShowFatalError(state, "Did not find surface in UTSC description in GetTranspiredCollectorIndex, Surface name = " + state.dataSurface->Surface(SurfacePtr).Name);
         } else {
 
             UTSCIndex = UTSCNum;

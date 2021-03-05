@@ -214,28 +214,28 @@ namespace HeatBalanceHAMTManager {
         bool isoerrrise;
         bool ErrorsFound;
 
-        state.dataHeatBalHAMTMgr->watertot.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->surfrh.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->surfextrh.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->surftemp.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->surfexttemp.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->surfvp.allocate(TotSurfaces);
+        state.dataHeatBalHAMTMgr->watertot.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfrh.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfextrh.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surftemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfexttemp.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->surfvp.allocate(state.dataSurface->TotSurfaces);
 
-        state.dataHeatBalHAMTMgr->firstcell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->lastcell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->Extcell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->ExtRadcell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->ExtConcell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->ExtSkycell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->ExtGrncell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->Intcell.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->IntConcell.allocate(TotSurfaces);
+        state.dataHeatBalHAMTMgr->firstcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->lastcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->Extcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtRadcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtConcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtSkycell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->ExtGrncell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->Intcell.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->IntConcell.allocate(state.dataSurface->TotSurfaces);
 
-        state.dataHeatBalHAMTMgr->extvtc.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->intvtc.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->extvtcflag.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->intvtcflag.allocate(TotSurfaces);
-        state.dataHeatBalHAMTMgr->MyEnvrnFlag.allocate(TotSurfaces);
+        state.dataHeatBalHAMTMgr->extvtc.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->intvtc.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->extvtcflag.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->intvtcflag.allocate(state.dataSurface->TotSurfaces);
+        state.dataHeatBalHAMTMgr->MyEnvrnFlag.allocate(state.dataSurface->TotSurfaces);
 
         state.dataHeatBalHAMTMgr->extvtc = -1.0;
         state.dataHeatBalHAMTMgr->intvtc = -1.0;
@@ -587,7 +587,7 @@ namespace HeatBalanceHAMTManager {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
 
-            vtcsid = UtilityRoutines::FindItemInList(AlphaArray(1), Surface);
+            vtcsid = UtilityRoutines::FindItemInList(AlphaArray(1), state.dataSurface->Surface);
             if (vtcsid == 0) {
                 ShowSevereError(state, cHAMTObject7 + ' ' + cAlphaFieldNames(1) + "=\"" + AlphaArray(1) + "\" is invalid (undefined).");
                 ShowContinueError(state, "The basic material must be defined in addition to specifying HeatAndMoistureTransfer properties.");
@@ -663,10 +663,10 @@ namespace HeatBalanceHAMTManager {
         // Check the materials information and work out how many cells are required.
         errorCount = 0;
         state.dataHeatBalHAMTMgr->TotCellsMax = 0;
-        for (sid = 1; sid <= TotSurfaces; ++sid) {
-            if (Surface(sid).Class == SurfaceClass::Window) continue;
-            if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
-            conid = Surface(sid).Construction;
+        for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
+            if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
+            conid = state.dataSurface->Surface(sid).Construction;
             if (conid == 0) continue;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
@@ -760,10 +760,10 @@ namespace HeatBalanceHAMTManager {
         cid = 0;
 
         // Set up surface cell structure
-        for (sid = 1; sid <= TotSurfaces; ++sid) {
-            if (!Surface(sid).HeatTransSurf) continue;
-            if (Surface(sid).Class == SurfaceClass::Window) continue;
-            if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
+        for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
+            if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             // Boundary Cells
             runor = -0.02;
             // Air Convection Cell
@@ -810,7 +810,7 @@ namespace HeatBalanceHAMTManager {
             runor += cells(cid).length(1);
 
             // Material Cells
-            conid = Surface(sid).Construction;
+            conid = state.dataSurface->Surface(sid).Construction;
             for (lid = 1; lid <= state.dataConstruction->Construct(conid).TotLayers; ++lid) {
                 matid = state.dataConstruction->Construct(conid).LayerPoint(lid);
 
@@ -839,7 +839,7 @@ namespace HeatBalanceHAMTManager {
                     cells(cid).origin(1) = runor + cells(cid).length(1) / 2.0;
                     runor += cells(cid).length(1);
 
-                    cells(cid).volume = cells(cid).length(1) * Surface(sid).Area;
+                    cells(cid).volume = cells(cid).length(1) * state.dataSurface->Surface(sid).Area;
                 }
             }
 
@@ -886,8 +886,8 @@ namespace HeatBalanceHAMTManager {
                         cells(cid2).adjsl(adj2) = adj1;
 
                         sid = cells(cid1).sid;
-                        cells(cid1).overlap(adj1) = Surface(sid).Area;
-                        cells(cid2).overlap(adj2) = Surface(sid).Area;
+                        cells(cid1).overlap(adj1) = state.dataSurface->Surface(sid).Area;
+                        cells(cid2).overlap(adj2) = state.dataSurface->Surface(sid).Area;
                         cells(cid1).dist(adj1) = cells(cid1).length(1) / 2.0;
                         cells(cid2).dist(adj2) = cells(cid2).length(1) / 2.0;
                     }
@@ -901,10 +901,10 @@ namespace HeatBalanceHAMTManager {
         static constexpr auto Format_1965("! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) \n");
         print(state.files.eio, Format_1965);
         // cCurrentModuleObject='MaterialProperty:HeatAndMoistureTransfer:*'
-        for (sid = 1; sid <= TotSurfaces; ++sid) {
-            if (!Surface(sid).HeatTransSurf) continue;
-            if (Surface(sid).Class == SurfaceClass::Window) continue;
-            if (Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
+        for (sid = 1; sid <= state.dataSurface->TotSurfaces; ++sid) {
+            if (!state.dataSurface->Surface(sid).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(sid).Class == SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(sid).HeatTransferAlgorithm != HeatTransferModel_HAMT) continue;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).origin(1) += cells(state.dataHeatBalHAMTMgr->Extcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Intcell(sid)).origin(1) -= cells(state.dataHeatBalHAMTMgr->Intcell(sid)).length(1) / 2.0;
             cells(state.dataHeatBalHAMTMgr->Extcell(sid)).volume = 0.0;
@@ -916,58 +916,25 @@ namespace HeatBalanceHAMTManager {
             state.dataHeatBalHAMTMgr->surfexttemp(sid) = 0.0;
             state.dataHeatBalHAMTMgr->surfvp(sid) = 0.0;
             SetupOutputVariable(state,
-                                "HAMT Surface Average Water Content Ratio",
-                                OutputProcessor::Unit::kg_kg,
-                                state.dataHeatBalHAMTMgr->watertot(sid),
-                                "Zone",
-                                "State",
-                                Surface(sid).Name);
+                "HAMT Surface Average Water Content Ratio", OutputProcessor::Unit::kg_kg, state.dataHeatBalHAMTMgr->watertot(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
+            SetupOutputVariable(state, "HAMT Surface Inside Face Temperature", OutputProcessor::Unit::C, state.dataHeatBalHAMTMgr->surftemp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                                "HAMT Surface Inside Face Temperature",
-                                OutputProcessor::Unit::C,
-                                state.dataHeatBalHAMTMgr->surftemp(sid),
-                                "Zone",
-                                "State",
-                                Surface(sid).Name);
+                "HAMT Surface Inside Face Relative Humidity", OutputProcessor::Unit::Perc, state.dataHeatBalHAMTMgr->surfrh(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                                "HAMT Surface Inside Face Relative Humidity",
-                                OutputProcessor::Unit::Perc,
-                                state.dataHeatBalHAMTMgr->surfrh(sid),
-                                "Zone",
-                                "State",
-                                Surface(sid).Name);
+                "HAMT Surface Inside Face Vapor Pressure", OutputProcessor::Unit::Pa, state.dataHeatBalHAMTMgr->surfvp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                                "HAMT Surface Inside Face Vapor Pressure",
-                                OutputProcessor::Unit::Pa,
-                                state.dataHeatBalHAMTMgr->surfvp(sid),
-                                "Zone",
-                                "State",
-                                Surface(sid).Name);
+                "HAMT Surface Outside Face Temperature", OutputProcessor::Unit::C, state.dataHeatBalHAMTMgr->surfexttemp(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
             SetupOutputVariable(state,
-                                "HAMT Surface Outside Face Temperature",
-                                OutputProcessor::Unit::C,
-                                state.dataHeatBalHAMTMgr->surfexttemp(sid),
-                                "Zone",
-                                "State",
-                                Surface(sid).Name);
-            SetupOutputVariable(state,
-                                "HAMT Surface Outside Face Relative Humidity",
-                                OutputProcessor::Unit::Perc,
-                                state.dataHeatBalHAMTMgr->surfextrh(sid),
-                                "Zone",
-                                "State",
-                                Surface(sid).Name);
+                "HAMT Surface Outside Face Relative Humidity", OutputProcessor::Unit::Perc, state.dataHeatBalHAMTMgr->surfextrh(sid), "Zone", "State", state.dataSurface->Surface(sid).Name);
 
             // write cell origins to initialization output file
-            conid = Surface(sid).Construction;
-            print(state.files.eio, "HAMT cells, {},{}", Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
-            for (int concell = 1, concell_end = state.dataHeatBalHAMTMgr->Intcell(sid) - state.dataHeatBalHAMTMgr->Extcell(sid) + 1;
-                 concell <= concell_end;
-                 ++concell) {
+            conid = state.dataSurface->Surface(sid).Construction;
+            print(state.files.eio, "HAMT cells, {},{}", state.dataSurface->Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
+            for (int concell = 1, concell_end = state.dataHeatBalHAMTMgr->Intcell(sid) - state.dataHeatBalHAMTMgr->Extcell(sid) + 1; concell <= concell_end; ++concell) {
                 print(state.files.eio, ",{:4}", concell);
             }
             print(state.files.eio, "\n");
-            print(state.files.eio, "HAMT origins,{},{}", Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
+            print(state.files.eio, "HAMT origins,{},{}", state.dataSurface->Surface(sid).Name, state.dataConstruction->Construct(conid).Name);
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid); cellid <= state.dataHeatBalHAMTMgr->Intcell(sid); ++cellid) {
                 print(state.files.eio, ",{:10.7F}", cells(cellid).origin(1));
             }
@@ -981,7 +948,7 @@ namespace HeatBalanceHAMTManager {
                                     cells(cellid).temp,
                                     "Zone",
                                     "State",
-                                    Surface(sid).Name);
+                                    state.dataSurface->Surface(sid).Name);
             }
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
                  ++cellid, ++concell) {
@@ -991,7 +958,7 @@ namespace HeatBalanceHAMTManager {
                                     cells(cellid).wreport,
                                     "Zone",
                                     "State",
-                                    Surface(sid).Name);
+                                    state.dataSurface->Surface(sid).Name);
             }
             for (int cellid = state.dataHeatBalHAMTMgr->Extcell(sid), concell = 1; cellid <= state.dataHeatBalHAMTMgr->Intcell(sid);
                  ++cellid, ++concell) {
@@ -1001,7 +968,7 @@ namespace HeatBalanceHAMTManager {
                                     cells(cellid).rhp,
                                     "Zone",
                                     "State",
-                                    Surface(sid).Name);
+                                    state.dataSurface->Surface(sid).Name);
             }
         }
 
@@ -1032,7 +999,6 @@ namespace HeatBalanceHAMTManager {
 
         // Using/Aliasing
         using DataHeatBalSurface::SurfQAdditionalHeatSourceInside;
-        using DataSurfaces::OSCM;
         using DataSurfaces::OtherSideCondModeledExt;
 
         // Locals
@@ -1121,22 +1087,22 @@ namespace HeatBalanceHAMTManager {
         // Set all the boundary values
         cells(state.dataHeatBalHAMTMgr->ExtRadcell(sid)).temp = TempOutsideAirFD(sid);
         cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = TempOutsideAirFD(sid);
-        if (Surface(sid).ExtBoundCond == OtherSideCondModeledExt) {
+        if (state.dataSurface->Surface(sid).ExtBoundCond == OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
-            cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = OSCM(Surface(sid).OSCMPtr).TRad;
+            cells(Estate.dataHeatBalHAMTMgr->xtSkycell(sid)).temp = state.dataSurface->OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
             cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
 
-            cells(Extcell(sid)).Qadds = Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
+            cells(Extcell(sid)).Qadds = state.dataSurface->Surface(sid).Area * SurfOpaqQRadSWOutAbs(sid);
         }
 
         cells(state.dataHeatBalHAMTMgr->ExtGrncell(sid)).temp = TempOutsideAirFD(sid);
         RhoOut = RhoVaporAirOut(sid);
 
         // Special case when the surface is an internal mass
-        if (Surface(sid).ExtBoundCond == sid) {
-            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = MAT(Surface(sid).Zone);
+        if (state.dataSurface->Surface(sid).ExtBoundCond == sid) {
+            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = MAT(state.dataSurface->Surface(sid).Zone);
             RhoOut = RhoVaporAirIn(sid);
         }
 
@@ -1147,12 +1113,12 @@ namespace HeatBalanceHAMTManager {
         cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).htc = HSkyFD(sid);
         cells(state.dataHeatBalHAMTMgr->ExtGrncell(sid)).htc = HGrndFD(sid);
 
-        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).temp = MAT(Surface(sid).Zone);
+        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).temp = MAT(state.dataSurface->Surface(sid).Zone);
 
         cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds =
-            Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
+            state.dataSurface->Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
                                  QSteamBaseboardSurf(sid) + QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) + SurfQAdditionalHeatSourceInside(sid));
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
@@ -1184,12 +1150,10 @@ namespace HeatBalanceHAMTManager {
 
         if (state.dataHeatBalHAMTMgr->intvtcflag(sid)) {
             cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = state.dataHeatBalHAMTMgr->intvtc(sid);
-            HMassConvInFD(sid) = cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc * PsyPsatFnTemp(state, MAT(Surface(sid).Zone)) *
-                                 cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh / RhoIn;
+            HMassConvInFD(sid) = cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc * PsyPsatFnTemp(state, MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh / RhoIn;
         } else {
             if (cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh > 0) {
-                cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc =
-                    HMassConvInFD(sid) * RhoIn / (PsyPsatFnTemp(state, MAT(Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh);
+                cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = HMassConvInFD(sid) * RhoIn / (PsyPsatFnTemp(state, MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh);
             } else {
                 cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = 10000.0;
             }
@@ -1296,7 +1260,7 @@ namespace HeatBalanceHAMTManager {
                     if (!state.dataGlobal->WarmupFlag) {
                         ++qvpErrCount;
                         if (qvpErrCount < 16) {
-                            ShowWarningError(state, "HeatAndMoistureTransfer: Large Latent Heat for Surface " + Surface(sid).Name);
+                            ShowWarningError(state, "HeatAndMoistureTransfer: Large Latent Heat for Surface " + state.dataSurface->Surface(sid).Name);
                         } else {
                             ShowRecurringWarningErrorAtEnd(state, "HeatAndMoistureTransfer: Large Latent Heat Errors ", qvpErrReport);
                         }
@@ -1314,13 +1278,13 @@ namespace HeatBalanceHAMTManager {
             tempmin = minval(cells, &subcell::tempp1);
             if (tempmax > MaxSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (Surface(sid).HighTempErrCount == 0) {
+                    if (state.dataSurface->Surface(sid).HighTempErrCount == 0) {
                         ShowSevereMessage(state,
-                                          format("HAMT: Temperature (high) out of bounds ({:.2R}) for surface={}", tempmax, Surface(sid).Name));
+                                          format("HAMT: Temperature (high) out of bounds ({:.2R}) for surface={}", tempmax, state.dataSurface->Surface(sid).Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
-                                                   Surface(sid).HighTempErrCount,
+                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + state.dataSurface->Surface(sid).Name,
+                                                   state.dataSurface->Surface(sid).HighTempErrCount,
                                                    tempmax,
                                                    tempmax,
                                                    _,
@@ -1331,19 +1295,19 @@ namespace HeatBalanceHAMTManager {
             if (tempmax > MaxSurfaceTempLimitBeforeFatal) {
                 if (!state.dataGlobal->WarmupFlag) {
                     ShowSevereError(state,
-                                    format("HAMT: HAMT: Temperature (high) out of bounds ( {:.2R}) for surface={}", tempmax, Surface(sid).Name));
+                                    format("HAMT: HAMT: Temperature (high) out of bounds ( {:.2R}) for surface={}", tempmax, state.dataSurface->Surface(sid).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
             }
             if (tempmin < MinSurfaceTempLimit) {
                 if (!state.dataGlobal->WarmupFlag) {
-                    if (Surface(sid).HighTempErrCount == 0) {
-                        ShowSevereMessage(state, format("HAMT: Temperature (low) out of bounds ({:.2R}) for surface={}", tempmin, Surface(sid).Name));
+                    if (state.dataSurface->Surface(sid).HighTempErrCount == 0) {
+                        ShowSevereMessage(state, format("HAMT: Temperature (low) out of bounds ({:.2R}) for surface={}", tempmin, state.dataSurface->Surface(sid).Name));
                         ShowContinueErrorTimeStamp(state, "");
                     }
-                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + Surface(sid).Name,
-                                                   Surface(sid).HighTempErrCount,
+                    ShowRecurringWarningErrorAtEnd(state, "HAMT: Temperature Temperature (high) out of bounds; Surface=" + state.dataSurface->Surface(sid).Name,
+                                                   state.dataSurface->Surface(sid).HighTempErrCount,
                                                    tempmin,
                                                    tempmin,
                                                    _,
@@ -1354,7 +1318,7 @@ namespace HeatBalanceHAMTManager {
             if (tempmin < MinSurfaceTempLimitBeforeFatal) {
                 if (!state.dataGlobal->WarmupFlag) {
                     ShowSevereError(state,
-                                    format("HAMT: HAMT: Temperature (low) out of bounds ( {:.2R}) for surface={}", tempmin, Surface(sid).Name));
+                                    format("HAMT: HAMT: Temperature (low) out of bounds ( {:.2R}) for surface={}", tempmin, state.dataSurface->Surface(sid).Name));
                     ShowContinueErrorTimeStamp(state, "");
                     ShowFatalError(state, "Program terminates due to preceding condition.");
                 }
@@ -1457,7 +1421,7 @@ namespace HeatBalanceHAMTManager {
 
         TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
-        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
+        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)

@@ -290,22 +290,22 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     HeatBalanceManager::GetZoneData(*state, ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
-    ScheduleManager::ScheduleInputProcessed = true;
-    ScheduleManager::Schedule(1).Used = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    state->dataScheduleMgr->Schedule(1).Used = true;
 
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
-    ScheduleManager::Schedule(1).MinValue = 1.0;
-    ScheduleManager::Schedule(1).MaxValue = 1.0;
-    ScheduleManager::Schedule(1).MaxMinSet = true;
-    ScheduleManager::Schedule(2).Used = true;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).MinValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).MaxValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(2).Used = true;
 
-    ScheduleManager::Schedule(2).CurrentValue = 131.8;
-    ScheduleManager::Schedule(2).MinValue = 131.8;
-    ScheduleManager::Schedule(2).MaxValue = 131.8;
-    ScheduleManager::Schedule(2).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 131.8;
+    state->dataScheduleMgr->Schedule(2).MinValue = 131.8;
+    state->dataScheduleMgr->Schedule(2).MaxValue = 131.8;
+    state->dataScheduleMgr->Schedule(2).MaxMinSet = true;
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_FALSE(InternalHeatGains::ErrorsFound);
+    EXPECT_FALSE(state->dataInternalHeatGains->ErrorsFound);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentReset)
@@ -680,7 +680,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     // Check subtotals used in zone component loads
     state->dataEnvrn->TotDesDays = 1;
     state->dataEnvrn->TotRunDesPersDays = 0;
-    DataSizing::CurOverallSimDay = 1;
+    state->dataSize->CurOverallSimDay = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->NumOfTimeStepInHour = 10;
     state->dataGlobal->TimeStep = 1;
@@ -690,13 +690,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     state->dataGlobal->CompLoadReportIsReq = true;
     state->dataGlobal->isPulseZoneSizing = false;
     InternalHeatGains::GatherComponentLoadsIntGain(*state);
-    totConvGains = state->dataOutRptTab->peopleInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->lightInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->equipInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->refrigInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->waterUseInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->hvacLossInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum) +
-                   state->dataOutRptTab->powerGenInstantSeq(DataSizing::CurOverallSimDay, timeStepInDay, zoneNum);
+    totConvGains = state->dataOutRptTab->peopleInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->lightInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->equipInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->refrigInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->waterUseInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->hvacLossInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum) +
+                   state->dataOutRptTab->powerGenInstantSeq(state->dataSize->CurOverallSimDay, timeStepInDay, zoneNum);
 
     // Legitimate gain types excluded from this total
     expectedTotConvGains -= convGains(DataHeatBalance::IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide); // this is only used for CO2

@@ -721,8 +721,8 @@ void FiniteDiffGroundTempsModel::updateBottomCellTemperature()
 
     // REFERENCES:
     // Fridleifsson, I.B., R. Bertani, E.Huenges, J.W. Lund, A. Ragnarsson, L. Rybach. 2008
-    //	'The possible role and contribution of geothermal energy to the mitigation of climate change.'
-    //	IPCC scoping meeting on renewable energy sources: 59-80.
+    //  'The possible role and contribution of geothermal energy to the mitigation of climate change.'
+    //  IPCC scoping meeting on renewable energy sources: 59-80.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 numerator(0.0);

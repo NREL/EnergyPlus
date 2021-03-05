@@ -145,13 +145,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         // Manages the simulation of a fan powered induction terminal unit.
         // Called from SimZoneAirLoopEquipmentin module ZoneAirLoopEquipmentManager.
 
-        // Using/Aliasing
-        using DataSizing::TermUnitPIU;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PIUNum; // index of powered induction unit being simulated
-
-
 
         // First time SimPIU is called, get the input for all the fan coil units
         if (state.dataPowerInductionUnits->GetPIUInputFlag) {
@@ -184,11 +179,11 @@ namespace EnergyPlus::PoweredInductionUnits {
             }
         }
 
-        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).TermUnitSizingNum;
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(state.dataPowerInductionUnits->PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitPIU(state, PIUNum, FirstHVACIteration);
 
-        TermUnitPIU = true;
+        state.dataSize->TermUnitPIU = true;
 
         // Select the correct unit type
         {
@@ -209,7 +204,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             }
         }
 
-        TermUnitPIU = false;
+        state.dataSize->TermUnitPIU = false;
 
         // Update the current unit's outlet nodes
         // no update needed: reheat coil updates outlet node; inlet nodes' mass flow rate set by Calc routine
@@ -1011,11 +1006,14 @@ namespace EnergyPlus::PoweredInductionUnits {
         MaxVolHotSteamFlowDes = 0.0;
         MaxVolHotSteamFlowUser = 0.0;
 
+        auto &TermUnitSizing(state.dataSize->TermUnitSizing);
+        auto &CurTermUnitSizingNum(state.dataSize->CurTermUnitSizingNum);
+
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Maximum Primary Air Flow Rate [m3/s]", state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow);
@@ -1023,7 +1021,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxPriAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxPriAirVolFlowDes < SmallAirVolFlow) {
                     MaxPriAirVolFlowDes = 0.0;
                 }
@@ -1042,7 +1040,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Maximum Primary Air Flow Rate [m3/s]",
                                                      MaxPriAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxPriAirVolFlowDes - MaxPriAirVolFlowUser) / MaxPriAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Primary Air Flow Rate of {:.5R} [m3/s]", MaxPriAirVolFlowUser));
                                 ShowContinueError(state,
@@ -1060,8 +1058,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Maximum Air Flow Rate [m3/s]", state.dataPowerInductionUnits->PIU(PIUNum).MaxTotAirVolFlow);
@@ -1069,7 +1067,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxTotAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxTotAirVolFlowDes < SmallAirVolFlow) {
                     MaxTotAirVolFlowDes = 0.0;
                 }
@@ -1087,7 +1085,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Maximum Air Flow Rate [m3/s]",
                                                      MaxTotAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxTotAirVolFlowDes - MaxTotAirVolFlowUser) / MaxTotAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Maximum Air Flow Rate of {:.5R} [m3/s]", MaxTotAirVolFlowUser));
                                 ShowContinueError(state,
@@ -1105,8 +1103,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxSecAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1116,7 +1114,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
                 MaxSecAirVolFlowDes =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
                 if (MaxSecAirVolFlowDes < SmallAirVolFlow) {
                     MaxSecAirVolFlowDes = 0.0;
                 }
@@ -1134,7 +1132,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Maximum Secondary Air Flow Rate [m3/s]",
                                                      MaxSecAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MaxSecAirVolFlowDes - MaxSecAirVolFlowUser) / MaxSecAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state,
                                                   format("User-Specified Maximum Secondary Air Flow Rate of {:.5R} [m3/s]", MaxSecAirVolFlowUser));
@@ -1153,16 +1151,16 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Minimum Primary Air Flow Fraction", state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
                 }
             } else {
                 CheckZoneSizing(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name);
-                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
-                    MinPriAirFlowFracDes = TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
+                if (state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow >= SmallAirVolFlow && state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA >= SmallAirVolFlow) {
+                    MinPriAirFlowFracDes = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).MinOA / state.dataPowerInductionUnits->PIU(PIUNum).MaxPriAirVolFlow;
                 } else {
                     MinPriAirFlowFracDes = 0.0;
                 }
@@ -1180,7 +1178,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Minimum Primary Air Flow Fraction",
                                                      MinPriAirFlowFracUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(MinPriAirFlowFracDes - MinPriAirFlowFracUser) / MinPriAirFlowFracUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Minimum Primary Air Flow Fraction of {:.1R}", MinPriAirFlowFracUser));
                                 ShowContinueError(
@@ -1210,8 +1208,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac > 0.0) {
                     BaseSizer::reportSizerOutput(state,
                         state.dataPowerInductionUnits->PIU(PIUNum).UnitType, state.dataPowerInductionUnits->PIU(PIUNum).Name, "User-Specified Fan On Flow Fraction", state.dataPowerInductionUnits->PIU(PIUNum).FanOnFlowFrac);
@@ -1232,7 +1230,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                      "User-Specified Fan On Flow Fraction",
                                                      FanOnFlowFracUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(FanOnFlowFracDes - FanOnFlowFracUser) / FanOnFlowFracUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' + state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                 ShowContinueError(state, format("User-Specified Fan On Flow Fraction of {:.1R}", FanOnFlowFracUser));
                                 ShowContinueError(state, format("differs from Design Size Fan On Flow Fraction of {:.1R}", FanOnFlowFracDes));
@@ -1249,8 +1247,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow == AutoSize) { //.or.()) THEN
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1268,11 +1266,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                             MyPlantSizingIndex(state, "Coil:Heating:Water", state.dataPowerInductionUnits->PIU(PIUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
-                                             TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
-                                CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
-                                CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
+                            if (state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                                CoilInTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
+                                             state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
+                                CoilOutTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
+                                CoilOutHumRat = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
                                 DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
 
@@ -1287,7 +1285,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                            state.dataPlnt->PlantLoop(state.dataPowerInductionUnits->PIU(PIUNum).HWLoopNum).FluidIndex,
                                                            RoutineName);
 
-                                MaxVolHotWaterFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
+                                MaxVolHotWaterFlowDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
                             } else {
                                 MaxVolHotWaterFlowDes = 0.0;
                             }
@@ -1304,11 +1302,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                         BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Temperature [C]",
-                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                                                     state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
                         BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                      state.dataPowerInductionUnits->PIU(PIUNum).Name,
                                                      "Design Size Reheat Coil Inlet Air Humidity Ratio [kgWater/kgDryAir]",
-                                                     TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
+                                                     state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                     } else { // Hardsize with sizing data
                         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
@@ -1319,7 +1317,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          "User-Specified Maximum Reheat Water Flow Rate [m3/s]",
                                                          MaxVolHotWaterFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                     ShowContinueError(
@@ -1343,8 +1341,8 @@ namespace EnergyPlus::PoweredInductionUnits {
         if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotSteamFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if ((state.dataSize->CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                  state.dataPowerInductionUnits->PIU(PIUNum).Name,
@@ -1361,11 +1359,11 @@ namespace EnergyPlus::PoweredInductionUnits {
                             MyPlantSizingIndex(state, "Coil:Heating:Steam", state.dataPowerInductionUnits->PIU(PIUNum).HCoil, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
 
-                            if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
-                                CoilInTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
-                                             TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
-                                CoilOutTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
-                                CoilOutHumRat = TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
+                            if (state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
+                                CoilInTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU * state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac +
+                                             state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak * (1.0 - state.dataPowerInductionUnits->PIU(PIUNum).MinPriAirFlowFrac);
+                                CoilOutTemp = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp;
+                                CoilOutHumRat = state.dataSize->TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat;
                                 DesMassFlow = state.dataEnvrn->StdRhoAir * TermUnitSizing(CurTermUnitSizingNum).AirVolFlow;
                                 DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                                 TempSteamIn = 100.00;
@@ -1373,8 +1371,8 @@ namespace EnergyPlus::PoweredInductionUnits {
                                 EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                                 SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, state.dataPowerInductionUnits->PIU(PIUNum).HCoil_FluidIndex, RoutineName);
-                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, PlantSizData(PltSizHeatNum).ExitTemp, DummyWaterIndex, RoutineName);
-                                MaxVolHotSteamFlowDes = DesCoilLoad / (SteamDensity * (LatentHeatSteam + PlantSizData(PltSizHeatNum).DeltaT * Cp));
+                                Cp = GetSpecificHeatGlycol(state, fluidNameWater, state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp, DummyWaterIndex, RoutineName);
+                                MaxVolHotSteamFlowDes = DesCoilLoad / (SteamDensity * (LatentHeatSteam + state.dataSize->PlantSizData(PltSizHeatNum).DeltaT * Cp));
                             } else {
                                 MaxVolHotSteamFlowDes = 0.0;
                             }
@@ -1398,7 +1396,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          "User-Specified Maximum Reheat Steam Flow [m3/s]",
                                                          MaxVolHotSteamFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
+                                if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizePIU: Potential issue with equipment sizing for " + state.dataPowerInductionUnits->PIU(PIUNum).UnitType + ' ' +
                                                 state.dataPowerInductionUnits->PIU(PIUNum).Name);
                                     ShowContinueError(state,

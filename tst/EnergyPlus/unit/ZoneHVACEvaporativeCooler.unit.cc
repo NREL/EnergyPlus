@@ -84,7 +84,7 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        DataSizing::ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing.allocate(1);
         state->dataEnvrn->OutBaroPress = 101325.0;
         state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
@@ -196,7 +196,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     Fans::GetFanInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -320,7 +320,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     Fans::GetFanInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -449,7 +449,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     Fans::GetFanInput(*state);
     ASSERT_FALSE(ErrorsFound);

@@ -795,7 +795,7 @@ namespace AirLoopHVACDOAS {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             Real64 rho;
-            DataSizing::CurSysNum = this->m_OASystemNum;
+            state.dataSize->CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
                 std::string CompType = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
                 std::string CompName = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentName(CompNum);
@@ -943,8 +943,8 @@ namespace AirLoopHVACDOAS {
         if (errorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
-        DataSizing::CurSysNum = DataHVACGlobals::NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
-        DataSizing::CurOASysNum = this->m_OASystemNum;
+        state.dataSize->CurSysNum = DataHVACGlobals::NumPrimaryAirSys + this->m_AirLoopDOASNum + 1;
+        state.dataSize->CurOASysNum = this->m_OASystemNum;
     }
 
     void getAirLoopHVACDOASInput(EnergyPlusData &state)

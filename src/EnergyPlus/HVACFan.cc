@@ -235,18 +235,18 @@ namespace HVACFan {
 
         Real64 tempFlow = designAirVolFlowRate;
         bool bPRINT = true;
-        DataSizing::DataAutosizable = true;
-        DataSizing::DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
-        DataSizing::DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
+        state.dataSize->DataAutosizable = true;
+        state.dataSize->DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
+        state.dataSize->DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
         designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 
-        DataSizing::DataAutosizable = true; // should be false?
-        DataSizing::DataEMSOverrideON = false;
-        DataSizing::DataEMSOverride = 0.0;
+        state.dataSize->DataAutosizable = true; // should be false?
+        state.dataSize->DataEMSOverrideON = false;
+        state.dataSize->DataEMSOverride = 0.0;
 
         if (m_designElecPowerWasAutosized) {
 
@@ -1149,24 +1149,24 @@ namespace HVACFan {
     // void
     // FanSystem::fanIsSecondaryDriver()
     //{
-    //	// this concept is used when the fan may be operating in a situation where there is airflow without it running at all
-    //	// call this when some other fan is feeding the device containing this fan, making it a secondary fan.
-    //	// example is the fan in a VS VAV air terminal used for UFAD.
-    //	fanIsSecondaryDriver = true;
+    //    // this concept is used when the fan may be operating in a situation where there is airflow without it running at all
+    //    // call this when some other fan is feeding the device containing this fan, making it a secondary fan.
+    //    // example is the fan in a VS VAV air terminal used for UFAD.
+    //    fanIsSecondaryDriver = true;
     //}
 
     // void
     // FanSystem::setFaultyFilterOn()
     //{
-    //	// call this to set flag to direct model to use fault for filter
-    //	faultyFilterFlag_ = true;
+    //    // call this to set flag to direct model to use fault for filter
+    //    faultyFilterFlag_ = true;
     //}
 
     // void
     // FanSystem::setFaultyFilterIndex( int const faultyAirFilterIndex  )
     //{
-    //	// this is the index in the FaultsFouledAirFilters structure array in FaultsManager
-    //	m_faultyFilterIndex = faultyAirFilterIndex;
+    //    // this is the index in the FaultsFouledAirFilters structure array in FaultsManager
+    //    m_faultyFilterIndex = faultyAirFilterIndex;
     //}
 
 } // namespace HVACFan
