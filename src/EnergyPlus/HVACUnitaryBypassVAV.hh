@@ -71,46 +71,34 @@ namespace HVACUnitaryBypassVAV {
     constexpr int On(1);  // Normal compressor operation
     constexpr int Off(0); // Signal DXCoil that compressor should not run
 
-    // Dehumidification control modes (DehumidControlMode) for Multimode units only
-    extern int const DehumidControl_None;
-    extern int const DehumidControl_Multimode;
-    extern int const DehumidControl_CoolReheat;
-
     // Mode of operation
-    extern int const CoolingMode; // System operating mode is cooling
-    extern int const HeatingMode; // System operating mode is heating
+    int constexpr CoolingMode(1);      // System operating mode is cooling
+    int constexpr HeatingMode(2);      // System operating mode is heating
 
-    // Priority control mode (prioritized thermostat signal)
-    extern int const CoolingPriority; // Controls CBVAV system based on cooling priority
-    extern int const HeatingPriority; // Controls CBVAV system based on heating priority
-    extern int const ZonePriority;    // Controls CBVAV system based on number of zones priority
-    extern int const LoadPriority;    // Controls CBVAV system based on total load priority
-
-    // Airflow control for contant fan mode
-    extern int const UseCompressorOnFlow;  // Set compressor OFF air flow rate equal to compressor ON air flow rate
-    extern int const UseCompressorOffFlow; // Set compressor OFF air flow rate equal to user defined value
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumCBVAV;                  // Number of CBVAV systems in input file
-    extern Real64 CompOnMassFlow;         // System air mass flow rate w/ compressor ON
-    extern Real64 OACompOnMassFlow;       // OA mass flow rate w/ compressor ON
-    extern Real64 CompOffMassFlow;        // System air mass flow rate w/ compressor OFF
-    extern Real64 OACompOffMassFlow;      // OA mass flow rate w/ compressor OFF
-    extern Real64 CompOnFlowRatio;        // fan flow ratio when coil on
-    extern Real64 CompOffFlowRatio;       // fan flow ratio when coil off
-    extern Real64 FanSpeedRatio;          // ratio of air flow ratio passed to fan object
-    extern Real64 BypassDuctFlowFraction; // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
-    extern Real64 PartLoadFrac;           // Compressor part-load fraction
-    extern Real64 SaveCompressorPLR;      // Holds DX compressor PLR from active DX coil
-    extern Real64 TempSteamIn;            // steam coil steam inlet temperature
-    extern Array1D_bool CheckEquipName;
+    enum class DehumidControl       // Dehumidification control modes (DehumidControlMode) for Multimode units only
+    {
+        None,
+        Multimode,
+        CoolReheat
+    };
+    
+    enum class PriorityCtrlMode     // Priority control mode (prioritized thermostat signal)
+    {
+        Unassigned,
+        CoolingPriority,            // Controls CBVAV system based on cooling priority
+        HeatingPriority,            // Controls CBVAV system based on heating priority
+        ZonePriority,               // Controls CBVAV system based on number of zones priority
+        LoadPriority                // Controls CBVAV system based on total load priority
+    };   
+    
+    enum class AirFlowCtrlMode     // Airflow control for contant fan mode
+    {
+        Unassigned,
+        UseCompressorOnFlow,        // Set compressor OFF air flow rate equal to compressor ON air flow rate
+        UseCompressorOffFlow        // Set compressor OFF air flow rate equal to user defined value
+    };
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
 
     struct CBVAVData
     {
@@ -203,7 +191,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 FanPartLoadRatio;   // Fan part-load ratio for time step
         Real64 CompPartLoadRatio;  // Compressor part-load ratio for time step
         int LastMode;              // Last mode of operation, coolingmode or heatingmode
-        int AirFlowControl;        // Fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
+        AirFlowCtrlMode AirFlowControl; // Fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         Real64 CompPartLoadFrac;   // Compressor part load ratio
         int AirLoopNumber;         // Air loop served by the CBVAV system
         int NumControlledZones;
@@ -213,7 +201,7 @@ namespace HVACUnitaryBypassVAV {
         Array1D_int CBVAVBoxOutletNode;          // Outlet node of CBVAV Box in controlled zone
         Array1D_int ZoneSequenceCoolingNum;      // Index to cooling sequence/priority for this zone
         Array1D_int ZoneSequenceHeatingNum;      // Index to heating sequence/priority for this zone
-        int PriorityControl;                     // Control mode - CoolingPriority, HeatingPriority, ZonePriority or LoadPriority
+        PriorityCtrlMode PriorityControl;        // Control mode - CoolingPriority, HeatingPriority, ZonePriority or LoadPriority
         int NumZonesCooled;                      // Number of zones requesting cooling
         int NumZonesHeated;                      // Number of zones requesting heating
         int PLRMaxIter;                          // Counter for recurring warning message
@@ -228,7 +216,7 @@ namespace HVACUnitaryBypassVAV {
         int HeatCoolMode;                        // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         Real64 BypassMassFlowRate;               // Bypass mass flow rate report variable [m3/s]
         int DehumidificationMode;                // Dehumidification mode (0=normal, 1=enhanced)
-        int DehumidControlType;                  // Dehumidification control type (currently only for multimode coil)
+        DehumidControl DehumidControlType;       // Dehumidification control type (currently only for multimode coil)
         bool HumRatMaxCheck;                     // Used in Init for warning messages
         int DXIterationExceeded;                 // Counter for DX coil messages
         int DXIterationExceededIndex;            // Counter for DX coil messages
@@ -284,10 +272,10 @@ namespace HVACUnitaryBypassVAV {
             MinOATCompressor(0.0), MinLATCooling(0.0), MaxLATHeating(0.0), TotHeatEnergyRate(0.0), TotHeatEnergy(0.0), TotCoolEnergyRate(0.0),
             TotCoolEnergy(0.0), SensHeatEnergyRate(0.0), SensHeatEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatHeatEnergyRate(0.0),
             LatHeatEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0),
-            CompPartLoadRatio(0.0), LastMode(0), AirFlowControl(0), CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0),
-            PriorityControl(0), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0), DXCoilOutletNode(0),
+            CompPartLoadRatio(0.0), LastMode(0), AirFlowControl(AirFlowCtrlMode::Unassigned), CompPartLoadFrac(0.0), AirLoopNumber(0), NumControlledZones(0),
+            PriorityControl(PriorityCtrlMode::Unassigned), NumZonesCooled(0), NumZonesHeated(0), PLRMaxIter(0), PLRMaxIterIndex(0), DXCoilInletNode(0), DXCoilOutletNode(0),
             HeatingCoilInletNode(0), HeatingCoilOutletNode(0), FanInletNodeNum(0), OutletTempSetPoint(0.0), CoilTempSetPoint(0.0), HeatCoolMode(0),
-            BypassMassFlowRate(0.0), DehumidificationMode(0), DehumidControlType(0), HumRatMaxCheck(true), DXIterationExceeded(0),
+            BypassMassFlowRate(0.0), DehumidificationMode(0), DehumidControlType(DehumidControl::None), HumRatMaxCheck(true), DXIterationExceeded(0),
             DXIterationExceededIndex(0), DXIterationFailed(0), DXIterationFailedIndex(0), DXCyclingIterationExceeded(0),
             DXCyclingIterationExceededIndex(0), DXCyclingIterationFailed(0), DXCyclingIterationFailedIndex(0), DXHeatIterationExceeded(0),
             DXHeatIterationExceededIndex(0), DXHeatIterationFailed(0), DXHeatIterationFailedIndex(0), DXHeatCyclingIterationExceeded(0),
@@ -300,14 +288,6 @@ namespace HVACUnitaryBypassVAV {
         {
         }
     };
-
-    // Object Data
-    extern Array1D<CBVAVData> CBVAV;
-    extern bool GetInputFlag; // Flag set to make sure you get input once
-
-    // Functions
-
-    void clear_state();
 
     void SimUnitaryBypassVAV(EnergyPlusData &state, std::string const &CompName,   // Name of the CBVAV system
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
@@ -398,9 +378,41 @@ namespace HVACUnitaryBypassVAV {
 
 struct HVACUnitaryBypassVAVData : BaseGlobalStruct {
 
+    int NumCBVAV = 0;                       // Number of CBVAV systems in input file
+    Real64 CompOnMassFlow = 0.0;            // System air mass flow rate w/ compressor ON
+    Real64 OACompOnMassFlow = 0.0;          // OA mass flow rate w/ compressor ON
+    Real64 CompOffMassFlow = 0.0;           // System air mass flow rate w/ compressor OFF
+    Real64 OACompOffMassFlow = 0.0;         // OA mass flow rate w/ compressor OFF
+    Real64 CompOnFlowRatio = 0.0;           // fan flow ratio when coil on
+    Real64 CompOffFlowRatio = 0.0;          // fan flow ratio when coil off
+    Real64 FanSpeedRatio = 0.0;             // ratio of air flow ratio passed to fan object
+    Real64 BypassDuctFlowFraction = 0.0;    // Fraction of unit mass flow that returns to inlet of CBVAV unit through bypass duct
+    Real64 PartLoadFrac = 0.0;              // Compressor part-load fraction
+    Real64 SaveCompressorPLR = 0.0;         // Holds DX compressor PLR from active DX coil
+    Real64 TempSteamIn = 100.0;               // steam coil steam inlet temperature
+    Array1D_bool CheckEquipName;
+
+    Array1D<HVACUnitaryBypassVAV::CBVAVData> CBVAV;
+    bool GetInputFlag = true; // Flag set to make sure you get input once
+
+
     void clear_state() override
     {
-
+        this->CBVAV.deallocate();
+        this->NumCBVAV = 0;
+        this->CompOnMassFlow = 0.0;
+        this->OACompOnMassFlow = 0.0;
+        this->CompOffMassFlow = 0.0;
+        this->OACompOffMassFlow = 0.0;
+        this->CompOnFlowRatio = 0.0;
+        this->CompOffFlowRatio = 0.0;
+        this->FanSpeedRatio = 0.0;
+        this->BypassDuctFlowFraction = 0.0;
+        this->PartLoadFrac = 0.0;
+        this->SaveCompressorPLR = 0.0;
+        this->TempSteamIn = 100.0;
+        this->CheckEquipName.deallocate();
+        this->GetInputFlag = true;
     }
 };
 
