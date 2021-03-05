@@ -113,34 +113,7 @@ namespace FaultsManager {
         bool ErrorsFound(false);         // True if errors detected in input
     }                                    // namespace
 
-    // ControllerTypeEnum
-    int const iController_AirEconomizer(1001);
-
-    // Input methods for fouling coils
-    int const iFouledCoil_UARated(9001);
-    int const iFouledCoil_FoulingFactor(9002);
-
-    // MODULE VARIABLE DECLARATIONS:
-    int const NumFaultTypes(16);
-    int const NumFaultTypesEconomizer(5);
-
     // FaultTypeEnum
-    int const iFault_TemperatureSensorOffset_OutdoorAir(101);
-    int const iFault_HumiditySensorOffset_OutdoorAir(102);
-    int const iFault_EnthalpySensorOffset_OutdoorAir(103);
-    int const iFault_TemperatureSensorOffset_ReturnAir(104);
-    int const iFault_EnthalpySensorOffset_ReturnAir(105);
-    int const iFault_Fouling_Coil(106);
-    int const iFault_ThermostatOffset(107);
-    int const iFault_HumidistatOffset(108);
-    int const iFault_Fouling_AirFilter(109);
-    int const iFault_TemperatureSensorOffset_ChillerSupplyWater(110);
-    int const iFault_TemperatureSensorOffset_CondenserSupplyWater(111);
-    int const iFault_Fouling_Tower(112);
-    int const iFault_TemperatureSensorOffset_CoilSupplyAir(113);
-    int const iFault_Fouling_Boiler(114);
-    int const iFault_Fouling_Chiller(115);
-    int const iFault_Fouling_EvapCooler(116);
 
     // Types of faults under Group Operational Faults in IDD
     //  1. Temperature sensor offset (FY14)
@@ -207,22 +180,6 @@ namespace FaultsManager {
                                        iFault_Fouling_Chiller,
                                        iFault_Fouling_EvapCooler});
 
-    bool AnyFaultsInModel(false); // True if there are operational faults in the model
-    int NumFaults(0);             // Number of faults (include multiple faults of same type) in the model
-
-    int NumFaultyEconomizer(0);         // Total number of faults related with the economizer
-    int NumFouledCoil(0);               // Total number of fouled coils
-    int NumFaultyThermostat(0);         // Total number of faulty thermostat with offset
-    int NumFaultyHumidistat(0);         // Total number of faulty humidistat with offset
-    int NumFaultyAirFilter(0);          // Total number of fouled air filters
-    int NumFaultyChillerSWTSensor(0);   // Total number of faulty Chillers Supply Water Temperature Sensor
-    int NumFaultyCondenserSWTSensor(0); // Total number of faulty Condenser Supply Water Temperature Sensor
-    int NumFaultyTowerFouling(0);       // Total number of faulty Towers with Scaling
-    int NumFaultyCoilSATSensor(0);      // Total number of faulty Coil Supply Air Temperature Sensor
-    int NumFaultyBoilerFouling(0);      // Total number of faulty Boilers with Fouling
-    int NumFaultyChillerFouling(0);     // Total number of faulty Chillers with Fouling
-    int NumFaultyEvapCoolerFouling(0);  // Total number of faulty Evaporative Coolers with Fouling
-
     // SUBROUTINE SPECIFICATIONS:
 
     // Object Data
@@ -285,78 +242,78 @@ namespace FaultsManager {
         if (RunFaultMgrOnceFlag) return;
 
         // check number of faults
-        NumFaults = 0;
-        NumFaultyEconomizer = 0;
+        state.dataFaultsMgr->NumFaults = 0;
+        state.dataFaultsMgr->NumFaultyEconomizer = 0;
         for (int NumFaultsTemp = 0, i = 1; i <= NumFaultTypes; ++i) {
             NumFaultsTemp = inputProcessor->getNumObjectsFound(state, cFaults(i));
-            NumFaults += NumFaultsTemp;
+            state.dataFaultsMgr->NumFaults += NumFaultsTemp;
 
             if (i <= 5) {
                 // 1st-5th fault: economizer sensor offset
-                NumFaultyEconomizer += NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyEconomizer += NumFaultsTemp;
             } else if (i == 6) {
                 // 6th fault: Coil fouling
-                NumFouledCoil = NumFaultsTemp;
+                state.dataFaultsMgr->NumFouledCoil = NumFaultsTemp;
             } else if (i == 7) {
                 // 7th fault: Faulty thermostat
-                NumFaultyThermostat = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyThermostat = NumFaultsTemp;
             } else if (i == 8) {
                 // 8th fault: Faulty humidistat
-                NumFaultyHumidistat = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyHumidistat = NumFaultsTemp;
             } else if (i == 9) {
                 // 9th fault: Fouled air filter
-                NumFaultyAirFilter = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyAirFilter = NumFaultsTemp;
             } else if (i == 10) {
                 // 10th fault: Faulty Chillers Supply Water Temperature Sensor
-                NumFaultyChillerSWTSensor = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyChillerSWTSensor = NumFaultsTemp;
             } else if (i == 11) {
                 // 11th fault: Faulty Condenser Supply Water Temperature Sensor
-                NumFaultyCondenserSWTSensor = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyCondenserSWTSensor = NumFaultsTemp;
             } else if (i == 12) {
                 // 12th fault: Faulty Towers with Scaling
-                NumFaultyTowerFouling = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyTowerFouling = NumFaultsTemp;
             } else if (i == 13) {
                 // 13th fault: Faulty Coil Supply Air Temperature Sensor
-                NumFaultyCoilSATSensor = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyCoilSATSensor = NumFaultsTemp;
             } else if (i == 14) {
                 // 14th fault: Faulty Boiler with Fouling
-                NumFaultyBoilerFouling = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyBoilerFouling = NumFaultsTemp;
             } else if (i == 15) {
                 // 15th fault: Faulty Chiller with Fouling
-                NumFaultyChillerFouling = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyChillerFouling = NumFaultsTemp;
             } else if (i == 16) {
                 // 16th fault: Faulty Evaporative Cooler with Fouling
-                NumFaultyEvapCoolerFouling = NumFaultsTemp;
+                state.dataFaultsMgr->NumFaultyEvapCoolerFouling = NumFaultsTemp;
             }
         }
 
-        if (NumFaults > 0) {
-            AnyFaultsInModel = true;
+        if (state.dataFaultsMgr->NumFaults > 0) {
+            state.dataFaultsMgr->AnyFaultsInModel = true;
         } else {
-            AnyFaultsInModel = false;
+            state.dataFaultsMgr->AnyFaultsInModel = false;
         }
 
-        if (!AnyFaultsInModel) {
+        if (!state.dataFaultsMgr->AnyFaultsInModel) {
             RunFaultMgrOnceFlag = true;
             return;
         }
 
         // allocate fault array
-        if (NumFaultyEconomizer > 0) FaultsEconomizer.allocate(NumFaultyEconomizer);
-        if (NumFouledCoil > 0) FouledCoils.allocate(NumFouledCoil);
-        if (NumFaultyThermostat > 0) FaultsThermostatOffset.allocate(NumFaultyThermostat);
-        if (NumFaultyHumidistat > 0) FaultsHumidistatOffset.allocate(NumFaultyHumidistat);
-        if (NumFaultyAirFilter > 0) FaultsFouledAirFilters.allocate(NumFaultyAirFilter);
-        if (NumFaultyChillerSWTSensor > 0) FaultsChillerSWTSensor.allocate(NumFaultyChillerSWTSensor);
-        if (NumFaultyCondenserSWTSensor > 0) FaultsCondenserSWTSensor.allocate(NumFaultyCondenserSWTSensor);
-        if (NumFaultyTowerFouling > 0) FaultsTowerFouling.allocate(NumFaultyTowerFouling);
-        if (NumFaultyCoilSATSensor > 0) FaultsCoilSATSensor.allocate(NumFaultyCoilSATSensor);
-        if (NumFaultyBoilerFouling > 0) FaultsBoilerFouling.allocate(NumFaultyBoilerFouling);
-        if (NumFaultyChillerFouling > 0) FaultsChillerFouling.allocate(NumFaultyChillerFouling);
-        if (NumFaultyEvapCoolerFouling > 0) FaultsEvapCoolerFouling.allocate(NumFaultyEvapCoolerFouling);
+        if (state.dataFaultsMgr->NumFaultyEconomizer > 0) FaultsEconomizer.allocate(state.dataFaultsMgr->NumFaultyEconomizer);
+        if (state.dataFaultsMgr->NumFouledCoil > 0) FouledCoils.allocate(state.dataFaultsMgr->NumFouledCoil);
+        if (state.dataFaultsMgr->NumFaultyThermostat > 0) FaultsThermostatOffset.allocate(state.dataFaultsMgr->NumFaultyThermostat);
+        if (state.dataFaultsMgr->NumFaultyHumidistat > 0) FaultsHumidistatOffset.allocate(state.dataFaultsMgr->NumFaultyHumidistat);
+        if (state.dataFaultsMgr->NumFaultyAirFilter > 0) FaultsFouledAirFilters.allocate(state.dataFaultsMgr->NumFaultyAirFilter);
+        if (state.dataFaultsMgr->NumFaultyChillerSWTSensor > 0) FaultsChillerSWTSensor.allocate(state.dataFaultsMgr->NumFaultyChillerSWTSensor);
+        if (state.dataFaultsMgr->NumFaultyCondenserSWTSensor > 0) FaultsCondenserSWTSensor.allocate(state.dataFaultsMgr->NumFaultyCondenserSWTSensor);
+        if (state.dataFaultsMgr->NumFaultyTowerFouling > 0) FaultsTowerFouling.allocate(state.dataFaultsMgr->NumFaultyTowerFouling);
+        if (state.dataFaultsMgr->NumFaultyCoilSATSensor > 0) FaultsCoilSATSensor.allocate(state.dataFaultsMgr->NumFaultyCoilSATSensor);
+        if (state.dataFaultsMgr->NumFaultyBoilerFouling > 0) FaultsBoilerFouling.allocate(state.dataFaultsMgr->NumFaultyBoilerFouling);
+        if (state.dataFaultsMgr->NumFaultyChillerFouling > 0) FaultsChillerFouling.allocate(state.dataFaultsMgr->NumFaultyChillerFouling);
+        if (state.dataFaultsMgr->NumFaultyEvapCoolerFouling > 0) FaultsEvapCoolerFouling.allocate(state.dataFaultsMgr->NumFaultyEvapCoolerFouling);
 
         // read faults input of Fault_type 116: Evaporative Cooler Fouling
-        for (int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= NumFaultyEvapCoolerFouling; ++jFault_EvapCoolerFouling) {
+        for (int jFault_EvapCoolerFouling = 1; jFault_EvapCoolerFouling <= state.dataFaultsMgr->NumFaultyEvapCoolerFouling; ++jFault_EvapCoolerFouling) {
 
             cFaultCurrentObject = cFaults(16); // fault object string
             inputProcessor->getObjectItem(state,
@@ -452,7 +409,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 115: Chiller Fouling
-        for (int jFault_ChillerFouling = 1; jFault_ChillerFouling <= NumFaultyChillerFouling; ++jFault_ChillerFouling) {
+        for (int jFault_ChillerFouling = 1; jFault_ChillerFouling <= state.dataFaultsMgr->NumFaultyChillerFouling; ++jFault_ChillerFouling) {
 
             cFaultCurrentObject = cFaults(15); // fault object string
             inputProcessor->getObjectItem(state,
@@ -702,7 +659,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 114: Boiler Fouling
-        for (int jFault_BoilerFouling = 1; jFault_BoilerFouling <= NumFaultyBoilerFouling; ++jFault_BoilerFouling) {
+        for (int jFault_BoilerFouling = 1; jFault_BoilerFouling <= state.dataFaultsMgr->NumFaultyBoilerFouling; ++jFault_BoilerFouling) {
 
             cFaultCurrentObject = cFaults(14); // fault object string
             inputProcessor->getObjectItem(state,
@@ -788,7 +745,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 113: Coil SAT Sensor Offset
-        for (int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
+        for (int jFault_CoilSAT = 1; jFault_CoilSAT <= state.dataFaultsMgr->NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
 
             cFaultCurrentObject = cFaults(13); // fault object string
             inputProcessor->getObjectItem(state,
@@ -997,7 +954,7 @@ namespace FaultsManager {
         } // End read faults input of Fault_type 113
 
         // read faults input of Fault_type 112: Cooling tower scaling
-        for (int jFault_TowerFouling = 1; jFault_TowerFouling <= NumFaultyTowerFouling; ++jFault_TowerFouling) {
+        for (int jFault_TowerFouling = 1; jFault_TowerFouling <= state.dataFaultsMgr->NumFaultyTowerFouling; ++jFault_TowerFouling) {
 
             cFaultCurrentObject = cFaults(12); // fault object string
             inputProcessor->getObjectItem(state,
@@ -1102,7 +1059,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 111: Condenser SWT Sensor Offset
-        for (int jFault_CondenserSWT = 1; jFault_CondenserSWT <= NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT) {
+        for (int jFault_CondenserSWT = 1; jFault_CondenserSWT <= state.dataFaultsMgr->NumFaultyCondenserSWTSensor; ++jFault_CondenserSWT) {
 
             cFaultCurrentObject = cFaults(11); // fault object string
             inputProcessor->getObjectItem(state,
@@ -1198,7 +1155,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 110: Chiller SWT Sensor Offset
-        for (int jFault_ChillerSWT = 1; jFault_ChillerSWT <= NumFaultyChillerSWTSensor; ++jFault_ChillerSWT) {
+        for (int jFault_ChillerSWT = 1; jFault_ChillerSWT <= state.dataFaultsMgr->NumFaultyChillerSWTSensor; ++jFault_ChillerSWT) {
 
             cFaultCurrentObject = cFaults(10); // fault object string
             inputProcessor->getObjectItem(state,
@@ -1426,7 +1383,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 109: Fouled Air Filters
-        for (int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter) {
+        for (int jFault_AirFilter = 1; jFault_AirFilter <= state.dataFaultsMgr->NumFaultyAirFilter; ++jFault_AirFilter) {
 
             // Read in fan if not done yet
             if (state.dataFans->GetFanInputFlag) {
@@ -1513,7 +1470,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 108: HumidistatOffset
-        for (int jFault_Humidistat = 1; jFault_Humidistat <= NumFaultyHumidistat; ++jFault_Humidistat) {
+        for (int jFault_Humidistat = 1; jFault_Humidistat <= state.dataFaultsMgr->NumFaultyHumidistat; ++jFault_Humidistat) {
 
             cFaultCurrentObject = cFaults(8); // fault object string
             inputProcessor->getObjectItem(state,
@@ -1588,7 +1545,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 107: ThermostatOffset
-        for (int jFault_Thermostat = 1; jFault_Thermostat <= NumFaultyThermostat; ++jFault_Thermostat) {
+        for (int jFault_Thermostat = 1; jFault_Thermostat <= state.dataFaultsMgr->NumFaultyThermostat; ++jFault_Thermostat) {
 
             cFaultCurrentObject = cFaults(7); // fault object string
             inputProcessor->getObjectItem(state,
@@ -1645,7 +1602,7 @@ namespace FaultsManager {
         }
 
         // read faults input of Fault_type 106: Fouling_Coil
-        for (int jFault_FoulingCoil = 1; jFault_FoulingCoil <= NumFouledCoil; ++jFault_FoulingCoil) {
+        for (int jFault_FoulingCoil = 1; jFault_FoulingCoil <= state.dataFaultsMgr->NumFouledCoil; ++jFault_FoulingCoil) {
 
             cFaultCurrentObject = cFaults(6); // fault object string
             inputProcessor->getObjectItem(state,
@@ -2142,37 +2099,15 @@ namespace FaultsManager {
     {
         RunFaultMgrOnceFlag = false;
         ErrorsFound = false;
-        AnyFaultsInModel = false;
-
-        NumFaults = 0;
-        NumFaultyEconomizer = 0;
-        NumFouledCoil = 0;
-        NumFaultyThermostat = 0;
-        NumFaultyHumidistat = 0;
-        NumFaultyAirFilter = 0;
-        NumFaultyChillerSWTSensor = 0;
-        NumFaultyCondenserSWTSensor = 0;
-        NumFaultyTowerFouling = 0;
-        NumFaultyCoilSATSensor = 0;
-
-        FaultsEconomizer.deallocate();
-        FouledCoils.deallocate();
-        FaultsThermostatOffset.deallocate();
-        FaultsHumidistatOffset.deallocate();
-        FaultsFouledAirFilters.deallocate();
-        FaultsChillerSWTSensor.deallocate();
-        FaultsCondenserSWTSensor.deallocate();
-        FaultsTowerFouling.deallocate();
-        FaultsCoilSATSensor.deallocate();
     }
 
-    void SetFaultyCoilSATSensor(std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
+    void SetFaultyCoilSATSensor(EnergyPlusData &state, std::string const &CompType, std::string const &CompName, bool &FaultyCoilSATFlag, int &FaultyCoilSATIndex)
     {
 
         FaultyCoilSATFlag = false;
         FaultyCoilSATIndex = 0;
-        if (NumFaultyCoilSATSensor == 0) return;
-        for (int jFault_CoilSAT = 1; jFault_CoilSAT <= NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
+        if (state.dataFaultsMgr->NumFaultyCoilSATSensor == 0) return;
+        for (int jFault_CoilSAT = 1; jFault_CoilSAT <= state.dataFaultsMgr->NumFaultyCoilSATSensor; ++jFault_CoilSAT) {
             if (UtilityRoutines::SameString(FaultsCoilSATSensor(jFault_CoilSAT).CoilType, CompType) &&
                 UtilityRoutines::SameString(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, CompName)) {
                 FaultyCoilSATFlag = true;

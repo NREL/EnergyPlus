@@ -925,7 +925,6 @@ namespace HVACControllers {
 
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using FaultsManager::FaultsCoilSATSensor;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::ScanPlantLoopsForNodeNum;
         using PlantUtilities::SetActuatedBranchFlowRate;
@@ -1220,7 +1219,7 @@ namespace HVACControllers {
                     if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
                         // calculate the sensor offset using fault information
                         int FaultIndex = ControllerProps(ControlNum).FaultyCoilSATIndex;
-                        ControllerProps(ControlNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+                        ControllerProps(ControlNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
                         // update the SetPointValue
                         ControllerProps(ControlNum).SetPointValue = Node(SensedNode).TempSetPoint - ControllerProps(ControlNum).FaultyCoilSATOffset;
                     }
