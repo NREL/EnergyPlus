@@ -302,6 +302,22 @@ namespace DataLoopNode {
 
 struct LoopNodeData : BaseGlobalStruct {
 
+    Array1D_string const ValidNodeFluidTypes = {"blank", "Air", "Water", "Steam", "Electric"};
+    Array1D_string const ValidConnectionTypes = {"Inlet",
+                                                 "Outlet",
+                                                 "Internal",
+                                                 "ZoneNode",
+                                                 "Sensor",
+                                                 "Actuator",
+                                                 "OutdoorAir",
+                                                 "ReliefAir",
+                                                 "ZoneInlet",
+                                                 "ZoneReturn",
+                                                 "ZoneExhaust",
+                                                 "Setpoint",
+                                                 "Electric",
+                                                 "OutsideAirReference",
+                                                 "InducedAir"};
     int NumOfNodes = 0;
     int NumofSplitters = 0;
     int NumofMixers = 0;
@@ -314,12 +330,12 @@ struct LoopNodeData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        NumOfNodes = 0;
-        NumofSplitters = 0;
-        NumofMixers = 0;
-        NodeID.deallocate();
-        Node.deallocate();
-        DefaultNodeValues = DataLoopNode::NodeData(0,
+        this->NumOfNodes = 0;
+        this->NumofSplitters = 0;
+        this->NumofMixers = 0;
+        this->NodeID.deallocate();
+        this->Node.deallocate();
+        this->DefaultNodeValues = DataLoopNode::NodeData(0,
                                      0,
                                      0.0,
                                      0.0,
@@ -367,9 +383,9 @@ struct LoopNodeData : BaseGlobalStruct {
                                      0.0,
                                      false,
                                      false);
-        MoreNodeInfo.deallocate();
-        MarkedNode.deallocate();
-        NodeSetpointCheck.deallocate();
+        this->MoreNodeInfo.deallocate();
+        this->MarkedNode.deallocate();
+        this->NodeSetpointCheck.deallocate();
     }
 };
 
