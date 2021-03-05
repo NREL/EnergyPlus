@@ -121,7 +121,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Existing code for hot water baseboard models (radiant-convective variety)
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataPlant::TypeOf_CoolingPanel_Simple;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -177,8 +176,8 @@ namespace EnergyPlus::CoolingPanelSimple {
                 MaxWaterFlow = ThisCP.WaterMassFlowRateMax;
                 MinWaterFlow = 0.0;
             } else {
-                MaxWaterFlow = Node(ThisCP.WaterInletNode).MassFlowRateMaxAvail;
-                MinWaterFlow = Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
+                MaxWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMaxAvail;
+                MinWaterFlow = state.dataLoopNodes->Node(ThisCP.WaterInletNode).MassFlowRateMinAvail;
             }
 
             {
@@ -708,7 +707,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -753,7 +751,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         }
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
-        auto &ThisInNode(Node(ThisCP.WaterInletNode));
+        auto &ThisInNode(state.dataLoopNodes->Node(ThisCP.WaterInletNode));
 
         if (ThisCP.ZonePtr <= 0) ThisCP.ZonePtr = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNumSub).ActualZoneNum;
 
@@ -1157,7 +1155,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataHeatBalFanSys::MAT;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
-        using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
         using PlantUtilities::SetComponentFlowRate;
@@ -1304,12 +1301,12 @@ namespace EnergyPlus::CoolingPanelSimple {
                 if (MCpEpsAct <= MCpEpsLow) {
                     MCpEpsAct = MCpEpsLow;
                     waterMassFlowRate = 0.0;
-                    Node(this->WaterInletNode).MassFlowRate = 0.0;
+                    state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = 0.0;
                     CoolingPanelOn = false;
                 } else if (MCpEpsAct >= MCpEpsHigh) {
                     MCpEpsAct = MCpEpsHigh;
                     waterMassFlowRate = waterMassFlowRateMax;
-                    Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
+                    state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
                 } else {
                     for (iter = 1; iter <= Maxiter; ++iter) {
                         FracGuess = (MCpEpsAct - MCpEpsLow) / (MCpEpsHigh - MCpEpsLow);
@@ -1324,7 +1321,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                         }
                         if (((MCpEpsAct - MCpEpsGuess) / MCpEpsAct) <= IterTol) {
                             waterMassFlowRate = MdotGuess;
-                            Node(this->WaterInletNode).MassFlowRate = waterMassFlowRate;
+                            state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRate;
                             break;
                         }
                     }
@@ -1471,7 +1468,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Using/Aliasing
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1494,8 +1490,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         WaterInletNode = ThisCP.WaterInletNode;
         WaterOutletNode = ThisCP.WaterOutletNode;
 
-        auto &ThisInNode(Node(WaterInletNode));
-        auto &ThisOutNode(Node(WaterOutletNode));
+        auto &ThisInNode(state.dataLoopNodes->Node(WaterInletNode));
+        auto &ThisOutNode(state.dataLoopNodes->Node(WaterOutletNode));
 
         // Set the outlet water nodes for the panel
         SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
