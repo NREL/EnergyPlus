@@ -133,8 +133,6 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-    //extern Array1D_string const cFaults;
-    //extern Array1D_int const iFaultTypeEnums;
 
 
 

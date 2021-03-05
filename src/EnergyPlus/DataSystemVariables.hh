@@ -69,41 +69,42 @@ namespace DataSystemVariables {
 
     // MODULE PARAMETER DEFINITIONS:
 
-    extern std::string const DDOnlyEnvVar;             // Only run design days
-    extern std::string const ReverseDDEnvVar;          // Reverse DD during run
-    extern std::string const DisableGLHECachingEnvVar; // GLHE Caching
-    extern std::string const FullAnnualSimulation;     // Generate annual run
-    extern std::string const cDeveloperFlag;
-    extern std::string const cDisplayAllWarnings;
-    extern std::string const cDisplayExtraWarnings;
-    extern std::string const cDisplayAdvancedReportVariables;
-    extern std::string const cDisplayUnusedObjects;
-    extern std::string const cDisplayUnusedSchedules;
-    extern std::string const cDisplayZoneAirHeatBalanceOffBalance;
-    extern std::string const cSortIDD;
-    extern std::string const cReportDuringWarmup;
-    extern std::string const cReportDuringHVACSizingSimulation;
-    extern std::string const cIgnoreSolarRadiation;
-    extern std::string const cIgnoreBeamRadiation;
-    extern std::string const cIgnoreDiffuseRadiation;
-    extern std::string const cSutherlandHodgman;
-    extern std::string const cSlaterBarsky;
-    extern std::string const cMinimalSurfaceVariables;
-    extern std::string const cMinimalShadowing;
-    extern std::string const cNumActiveSims;
-    extern std::string const cInputPath1; // EP-Launch setting.  Full path + project name
-    extern std::string const cInputPath2; // RunEplus.bat setting.  Full path
-    extern std::string const cProgramPath;
-    extern std::string const cTimingFlag;
-    extern std::string const TrackAirLoopEnvVar; // To generate a file with runtime statistics
+    auto constexpr DDOnlyEnvVar("DDONLY");       // Only run design days
+    auto constexpr ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
+    auto constexpr DisableGLHECachingEnvVar("DISABLEGLHECACHING");
+    auto constexpr FullAnnualSimulation("FULLANNUALRUN"); // Generate annual run
+    auto constexpr cDeveloperFlag("DeveloperFlag");
+    auto constexpr cDisplayAllWarnings("DisplayAllWarnings");
+    auto constexpr cDisplayExtraWarnings("DisplayExtraWarnings");
+    auto constexpr cDisplayAdvancedReportVariables("DisplayAdvancedReportVariables");
+    auto constexpr cDisplayUnusedObjects("DisplayUnusedObjects");
+    auto constexpr cDisplayUnusedSchedules("DisplayUnusedSchedules");
+    auto constexpr cDisplayZoneAirHeatBalanceOffBalance("DisplayZoneAirHeatBalanceOffBalance");
+    auto constexpr cSortIDD("SortIDD");
+    auto constexpr cReportDuringWarmup("ReportDuringWarmup");
+    auto constexpr cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
+    auto constexpr cIgnoreSolarRadiation("IgnoreSolarRadiation");
+    auto constexpr cIgnoreBeamRadiation("IgnoreBeamRadiation");
+    auto constexpr cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
+    auto constexpr cSutherlandHodgman("SutherlandHodgman");
+    auto constexpr cSlaterBarsky("SlaterBarsky");
+    auto constexpr cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
+    auto constexpr cMinimalShadowing("MinimalShadowing");
+    auto constexpr cNumActiveSims("cntActv");
+    auto constexpr cInputPath1("epin");       // EP-Launch setting.  Full path + project name
+    auto constexpr cInputPath2("input_path"); // RunEplus.bat setting.  Full path
+    auto constexpr cProgramPath("program_path");
+    auto constexpr cTimingFlag("TimingFlag");
+    auto constexpr TrackAirLoopEnvVar("TRACK_AIRLOOP"); // To generate a file with runtime statistics
     // for each controller on each air loop
-    extern std::string const TraceAirLoopEnvVar; // To generate a trace file with the converged
+    auto constexpr TraceAirLoopEnvVar("TRACE_AIRLOOP"); // To generate a trace file with the converged
     // solutions of all controllers on each air loop at each call to SimAirLoop()
-    extern std::string const TraceHVACControllerEnvVar; // To generate a trace file for
+    auto constexpr TraceHVACControllerEnvVar("TRACE_HVACCONTROLLER"); // To generate a trace file for
     //  each individual HVAC controller with all controller iterations
 
-    extern std::string const MinReportFrequencyEnvVar;   // environment var for reporting frequency.
-    extern std::string const cDisplayInputInAuditEnvVar; // environmental variable that enables the echoing of the input file into the audit file
+    auto constexpr MinReportFrequencyEnvVar("MINREPORTFREQUENCY"); // environment var for reporting frequency.
+    auto constexpr cDisplayInputInAuditEnvVar(
+        "DISPLAYINPUTINAUDIT"); // environmental variable that enables the echoing of the input file into the audit file
 
     // DERIVED TYPE DEFINITIONS
     // na

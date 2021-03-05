@@ -443,7 +443,7 @@ namespace EnergyPlus::SolarShading {
                 ShowContinueError(state, "Value entered=\"" + cAlphaArgs(aNum) + "\"");
                 ShowContinueError(state, "This version of EnergyPlus was not compiled to use OpenGL (required for PixelCounting)");
                 ShowContinueError(state, "PolygonClipping will be used instead");
-                shadingMethod = ShadingMethod::PolygonClipping;
+                state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
                 cAlphaArgs(aNum) = "PolygonClipping";
 #else
                 auto error_callback = [](const int messageType, const std::string & message, void *contextPtr){

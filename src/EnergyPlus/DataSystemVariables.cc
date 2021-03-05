@@ -96,42 +96,6 @@ namespace DataSystemVariables {
 
     // MODULE PARAMETER DEFINITIONS:
 
-    std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
-    std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
-    std::string const DisableGLHECachingEnvVar("DISABLEGLHECACHING");
-    std::string const FullAnnualSimulation("FULLANNUALRUN"); // Generate annual run
-    std::string const cDeveloperFlag("DeveloperFlag");
-    std::string const cDisplayAllWarnings("DisplayAllWarnings");
-    std::string const cDisplayExtraWarnings("DisplayExtraWarnings");
-    std::string const cDisplayAdvancedReportVariables("DisplayAdvancedReportVariables");
-    std::string const cDisplayUnusedObjects("DisplayUnusedObjects");
-    std::string const cDisplayUnusedSchedules("DisplayUnusedSchedules");
-    std::string const cDisplayZoneAirHeatBalanceOffBalance("DisplayZoneAirHeatBalanceOffBalance");
-    std::string const cSortIDD("SortIDD");
-    std::string const cReportDuringWarmup("ReportDuringWarmup");
-    std::string const cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
-    std::string const cIgnoreSolarRadiation("IgnoreSolarRadiation");
-    std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
-    std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
-    std::string const cSutherlandHodgman("SutherlandHodgman");
-    std::string const cSlaterBarsky("SlaterBarsky");
-    std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
-    std::string const cMinimalShadowing("MinimalShadowing");
-    std::string const cNumActiveSims("cntActv");
-    std::string const cInputPath1("epin");       // EP-Launch setting.  Full path + project name
-    std::string const cInputPath2("input_path"); // RunEplus.bat setting.  Full path
-    std::string const cProgramPath("program_path");
-    std::string const cTimingFlag("TimingFlag");
-    std::string const TrackAirLoopEnvVar("TRACK_AIRLOOP"); // To generate a file with runtime statistics
-    // for each controller on each air loop
-    std::string const TraceAirLoopEnvVar("TRACE_AIRLOOP"); // To generate a trace file with the converged
-    // solutions of all controllers on each air loop at each call to SimAirLoop()
-    std::string const TraceHVACControllerEnvVar("TRACE_HVACCONTROLLER"); // To generate a trace file for
-    //  each individual HVAC controller with all controller iterations
-
-    std::string const MinReportFrequencyEnvVar("MINREPORTFREQUENCY"); // environment var for reporting frequency.
-    std::string const
-        cDisplayInputInAuditEnvVar("DISPLAYINPUTINAUDIT"); // environmental variable that enables the echoing of the input file into the audit file
 
     // DERIVED TYPE DEFINITIONS
     // na
