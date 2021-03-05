@@ -1336,19 +1336,17 @@ namespace EnergyPlus::ChillerGasAbsorption {
         lHeatFuelUseRate = this->HeatFuelUseRate;
         lHeatPartLoadRatio = this->HeatPartLoadRatio;
 
-        auto &Node(state.dataLoopNodes->Node);
-
         // initialize entering conditions
-        lChillReturnTemp = Node(lChillReturnNodeNum).Temp;
-        lChillWaterMassFlowRate = Node(lChillReturnNodeNum).MassFlowRate;
-        lCondReturnTemp = Node(lCondReturnNodeNum).Temp;
+        lChillReturnTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+        lChillWaterMassFlowRate = state.dataLoopNodes->Node(lChillReturnNodeNum).MassFlowRate;
+        lCondReturnTemp = state.dataLoopNodes->Node(lCondReturnNodeNum).Temp;
         // Commenting this could be cause of diffs - lCondWaterMassFlowRate = Node(lCondReturnNodeNum).MassFlowRate;
         {
             auto const SELECT_CASE_var(state.dataPlnt->PlantLoop(this->CWLoopNum).LoopDemandCalcScheme);
             if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
-                ChillSupplySetPointTemp = Node(lChillSupplyNodeNum).TempSetPoint;
+                ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPoint;
             } else if (SELECT_CASE_var == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
-                ChillSupplySetPointTemp = Node(lChillSupplyNodeNum).TempSetPointHi;
+                ChillSupplySetPointTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempSetPointHi;
             } else {
                 assert(false);
             }
@@ -1388,7 +1386,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                 // most manufacturers rate have tables of entering condenser water temperature
                 // but a few use leaving condenser water temperature so we have a flag
                 // when leaving is used it uses the previous iterations value of the value
-                lCondReturnTemp = Node(lCondReturnNodeNum).Temp;
+                lCondReturnTemp = state.dataLoopNodes->Node(lCondReturnNodeNum).Temp;
                 if (lIsEnterCondensTemp) {
                     calcCondTemp = lCondReturnTemp;
                 } else {
@@ -1408,9 +1406,9 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                      this->CDCompNum);
             } else {
                 // air cooled
-                Node(lCondReturnNodeNum).Temp = Node(lCondReturnNodeNum).OutAirDryBulb;
-                calcCondTemp = Node(lCondReturnNodeNum).OutAirDryBulb;
-                lCondReturnTemp = Node(lCondReturnNodeNum).Temp;
+                state.dataLoopNodes->Node(lCondReturnNodeNum).Temp = state.dataLoopNodes->Node(lCondReturnNodeNum).OutAirDryBulb;
+                calcCondTemp = state.dataLoopNodes->Node(lCondReturnNodeNum).OutAirDryBulb;
+                lCondReturnTemp = state.dataLoopNodes->Node(lCondReturnNodeNum).Temp;
                 lCondWaterMassFlowRate = 0.0;
                 if (this->CDLoopNum > 0) {
                     PlantUtilities::SetComponentFlowRate(state, lCondWaterMassFlowRate,
@@ -1465,38 +1463,38 @@ namespace EnergyPlus::ChillerGasAbsorption {
                     }
                     lChillSupplyTemp = ChillSupplySetPointTemp;
                 } else if (SELECT_CASE_var == DataPlant::iFlowLock::Locked) { // mass flow rates may not be changed by loop components
-                    lChillWaterMassFlowRate = Node(lChillReturnNodeNum).MassFlowRate;
+                    lChillWaterMassFlowRate = state.dataLoopNodes->Node(lChillReturnNodeNum).MassFlowRate;
                     if (this->PossibleSubcooling) {
                         lCoolingLoad = std::abs(MyLoad);
 
                         ChillDeltaTemp = lCoolingLoad / lChillWaterMassFlowRate / Cp_CW;
-                        lChillSupplyTemp = Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
+                        lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
                     } else {
-                        ChillDeltaTemp = Node(lChillReturnNodeNum).Temp - ChillSupplySetPointTemp;
+                        ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillSupplySetPointTemp;
                         lCoolingLoad = std::abs(lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp);
                         lChillSupplyTemp = ChillSupplySetPointTemp;
                     }
                     // Check that the Chiller Supply outlet temp honors both plant loop temp low limit and also the chiller low limit
                     if (lChillSupplyTemp < lCHWLowLimitTemp) {
-                        if ((Node(lChillReturnNodeNum).Temp - lCHWLowLimitTemp) > DataPlant::DeltaTempTol) {
+                        if ((state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lCHWLowLimitTemp) > DataPlant::DeltaTempTol) {
                             lChillSupplyTemp = lCHWLowLimitTemp;
-                            ChillDeltaTemp = Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                            ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
                             lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
                         } else {
-                            lChillSupplyTemp = Node(lChillReturnNodeNum).Temp;
-                            ChillDeltaTemp = Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                            lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+                            ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
                             lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
                         }
                     }
-                    if (lChillSupplyTemp < Node(lChillSupplyNodeNum).TempMin) {
-                        if ((Node(lChillReturnNodeNum).Temp - Node(lChillSupplyNodeNum).TempMin) >
+                    if (lChillSupplyTemp < state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin) {
+                        if ((state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin) >
                             DataPlant::DeltaTempTol) {
-                            lChillSupplyTemp = Node(lChillSupplyNodeNum).TempMin;
-                            ChillDeltaTemp = Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                            lChillSupplyTemp = state.dataLoopNodes->Node(lChillSupplyNodeNum).TempMin;
+                            ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
                             lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
                         } else {
-                            lChillSupplyTemp = Node(lChillReturnNodeNum).Temp;
-                            ChillDeltaTemp = Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                            lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+                            ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
                             lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
                         }
                     }
@@ -1506,10 +1504,10 @@ namespace EnergyPlus::ChillerGasAbsorption {
                         if (lChillWaterMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                             lCoolingLoad = std::abs(MyLoad);
                             ChillDeltaTemp = lCoolingLoad / lChillWaterMassFlowRate / Cp_CW;
-                            lChillSupplyTemp = Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
+                            lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - ChillDeltaTemp;
                         } else {
-                            lChillSupplyTemp = Node(lChillReturnNodeNum).Temp;
-                            ChillDeltaTemp = Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
+                            lChillSupplyTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp;
+                            ChillDeltaTemp = state.dataLoopNodes->Node(lChillReturnNodeNum).Temp - lChillSupplyTemp;
                             lCoolingLoad = lChillWaterMassFlowRate * Cp_CW * ChillDeltaTemp;
                         }
                     }
