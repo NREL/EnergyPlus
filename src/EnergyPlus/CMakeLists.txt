@@ -182,7 +182,6 @@ set(SRC
     DataHVACGlobals.cc
     DataHVACGlobals.hh
     DataHVACSystems.hh
-    DataHeatBalFanSys.cc
     DataHeatBalFanSys.hh
     DataHeatBalSurface.cc
     DataHeatBalSurface.hh
@@ -1024,6 +1023,12 @@ if(BUILD_TESTING)
     add_test(
       NAME "API.test_DataTransferTypes"
       COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
+      WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_SysExit.py" "${API_TEST_TARGET_DIR}/test_SysExit.py" COPYONLY)
+    add_test(
+      NAME "API.test_SysExit"
+      COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_SysExit.py"
       WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
     configure_file("${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_OutputFiles.py" "${API_TEST_TARGET_DIR}/test_OutputFiles.py" @ONLY)

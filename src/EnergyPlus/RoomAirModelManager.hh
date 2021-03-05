@@ -59,11 +59,6 @@ struct EnergyPlusData;
 
 namespace RoomAirModelManager {
 
-    extern bool GetUCSDDVDataFlag; // UCSD
-    extern bool GetAirModelData;   // Used to "get" all air model data
-
-    void clear_state();
-
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum);
 
     void GetAirModelDatas(EnergyPlusData &state);
@@ -100,9 +95,15 @@ namespace RoomAirModelManager {
 
 struct RoomAirModelManagerData : BaseGlobalStruct {
 
+    bool GetUCSDDVDataFlag = true; // UCSD
+    bool GetAirModelData = true; // Used to "get" all air model data
+    bool MyOneTimeFlag = true;
+
     void clear_state() override
     {
-
+        this->GetUCSDDVDataFlag = true;
+        this->GetAirModelData = true;
+        this->MyOneTimeFlag = true;
     }
 };
 

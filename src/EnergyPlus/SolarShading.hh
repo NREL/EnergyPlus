@@ -101,17 +101,20 @@ namespace SolarShading {
 
     void AnisoSkyViewFactors(EnergyPlusData &state);
 
-    void CHKBKS(EnergyPlusData &state, int const NBS, // Surface Number of the potential back surface
+    void CHKBKS(EnergyPlusData &state,
+                int const NBS, // Surface Number of the potential back surface
                 int const NRS  // Surface Number of the potential shadow receiving surface
     );
 
-    void CHKGSS(int const NRS,     // Surface number of the potential shadow receiving surface
+    void CHKGSS(EnergyPlusData &state,
+                int const NRS,     // Surface number of the potential shadow receiving surface
                 int const NSS,     // Surface number of the potential shadow casting surface
                 Real64 const ZMIN, // Lowest point of the receiving surface
                 bool &CannotShade  // TRUE if shadow casting surface cannot shade receiving surface.
     );
 
-    void CHKSBS(EnergyPlusData &state, int const HTS,   // Heat transfer surface number of the general receiving surf
+    void CHKSBS(EnergyPlusData &state,
+                int const HTS,   // Heat transfer surface number of the general receiving surf
                 int const GRSNR, // Surface number of general receiving surface
                 int const SBSNR  // Surface number of subsurface
     );
@@ -127,7 +130,8 @@ namespace SolarShading {
 
     void CLIP(EnergyPlusData &state, int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
-    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+    void CTRANS(EnergyPlusData &state,
+                int const NS,         // Surface number whose vertex coordinates are being transformed
                 int const NGRS,       // Base surface number for surface NS
                 int &NVT,             // Number of vertices for surface NS
                 Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
@@ -235,11 +239,13 @@ namespace SolarShading {
 
     void CalcInteriorSolarDistributionWCESimple(EnergyPlusData &state);
 
-    int WindowScheduledSolarAbs(int const SurfNum, // Surface number
+    int WindowScheduledSolarAbs(EnergyPlusData &state,
+                                int const SurfNum, // Surface number
                                 int const ConstNum // Construction number
     );
 
-    int SurfaceScheduledSolarInc(int const SurfNum, // Surface number
+    int SurfaceScheduledSolarInc(EnergyPlusData &state,
+                                 int const SurfNum, // Surface number
                                  int const ConstNum // Construction number
     );
 
@@ -491,7 +497,6 @@ struct SolarShadingData : BaseGlobalStruct {
         TrackTooManyFigures.deallocate();
         TrackTooManyVertices.deallocate();
         TrackBaseSubSurround.deallocate();
-        DataSurfaces::EnclSolDBIntWin.deallocate();
         ISABSF.deallocate();
         InitComplexOnce = true;
         ShadowOneTimeFlag = true;

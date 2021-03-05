@@ -170,12 +170,12 @@ namespace General {
                          Array1S<Real64> const PropArray // Array of blind properties
     );
 
-    //	Real64
-    //	InterpSlatAng(
-    //		Real64 const SlatAng, // Slat angle (rad)
-    //		bool const VarSlats, // True if slat angle is variable
-    //		Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
-    //	);
+    //    Real64
+    //    InterpSlatAng(
+    //        Real64 const SlatAng, // Slat angle (rad)
+    //        bool const VarSlats, // True if slat angle is variable
+    //        Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
+    //    );
 
     Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
                          bool const VarSlats,            // True if slat angle is variable

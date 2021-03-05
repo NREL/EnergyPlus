@@ -314,11 +314,11 @@ namespace EnergyPlus::MixedAir {
         // SimOutsideAirSys can handle only 1 controller right now.  This must be
         // an Outside Air Controller.  This is because of the lack of iteration
         // and convergence control in the following code.
-        //  DO CtrlNum=1,state.dataAirLoop->OutsideAirSys(OASysNum)%NumControllers
-        //    CtrlName = state.dataAirLoop->OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
+        //  DO CtrlNum=1,OutsideAirSys(OASysNum)%NumControllers
+        //    CtrlName = OutsideAirSys(OASysNum)%ControllerName(CtrlNum)
         //    CALL SimOAController(CtrlName,FirstHVACIteration)
         //  END DO
-        CurOASysNum = OASysNum;
+        state.dataSize->CurOASysNum = OASysNum;
         auto &CurrentOASystem(state.dataAirLoop->OutsideAirSys(OASysNum));
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
             SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
@@ -363,7 +363,7 @@ namespace EnergyPlus::MixedAir {
             if (FatalErrorFlag) ShowFatalError(state, "Previous severe error(s) cause program termination");
         }
 
-        CurOASysNum = 0;
+        state.dataSize->CurOASysNum = 0;
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
         }
@@ -606,7 +606,7 @@ namespace EnergyPlus::MixedAir {
                             // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
                             // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
                             // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
-                            //					AirloopPLR = state.dataAirLoop->AirLoopFlow( AirLoopNum ).FanPLR;
+                            //                    AirloopPLR = AirLoopFlow( AirLoopNum ).FanPLR;
                             AirloopPLR = state.dataMixedAir->OAController(OASysNum).OAMassFlow / state.dataMixedAir->OAController(OASysNum).MaxOAMassFlowRate;
                         } else {
                             AirloopPLR = 1.0;
@@ -791,7 +791,7 @@ namespace EnergyPlus::MixedAir {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE
-        // Input the Outside Air System data and store it in the state.dataAirLoop->OutsideAirSys array.
+        // Input the Outside Air System data and store it in the OutsideAirSys array.
 
         // METHODOLOGY EMPLOYED:
         // Use the Get routines from the InputProcessor module.
@@ -915,7 +915,7 @@ namespace EnergyPlus::MixedAir {
         state.dataAirLoop->NumOASystems = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
         state.dataAirLoop->OutsideAirSys.allocate(state.dataAirLoop->NumOASystems);
-        OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
+        state.dataSize->OASysEqSizing.allocate(state.dataAirLoop->NumOASystems);
         state.dataMixedAir->ControllerListUniqueNames.reserve(static_cast<unsigned>(state.dataAirLoop->NumOASystems));
         state.dataMixedAir->MyOneTimeErrorFlag.dimension(state.dataAirLoop->NumOASystems, true);
         state.dataMixedAir->MyOneTimeCheckUnitarySysFlag.dimension(state.dataAirLoop->NumOASystems, true);
@@ -1173,8 +1173,6 @@ namespace EnergyPlus::MixedAir {
         // Using/Aliasing
         using namespace DataDefineEquip;
         using CurveManager::GetCurveIndex;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZoneList;
 
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
@@ -1460,7 +1458,7 @@ namespace EnergyPlus::MixedAir {
                     //     Getting OA details from design specification OA object
                     if (!lAlphaBlanks((groupNum - 1) * 3 + 6)) {
                         state.dataMixedAir->DesignSpecOAObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 6);
-                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), OARequirements);
+                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecOAObjName(groupNum), state.dataSize->OARequirements);
                         state.dataMixedAir->DesignSpecOAObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
@@ -1474,7 +1472,7 @@ namespace EnergyPlus::MixedAir {
                     // Get zone air distribution details from design specification Zone Air Distribution object
                     if (!lAlphaBlanks((groupNum - 1) * 3 + 7)) {
                         state.dataMixedAir->DesignSpecZoneADObjName(groupNum) = AlphArray((groupNum - 1) * 3 + 7);
-                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), ZoneAirDistribution);
+                        ObjIndex = UtilityRoutines::FindItemInList(state.dataMixedAir->DesignSpecZoneADObjName(groupNum), state.dataSize->ZoneAirDistribution);
                         state.dataMixedAir->DesignSpecZoneADObjIndex(groupNum) = ObjIndex;
 
                         if (ObjIndex == 0) {
@@ -1486,13 +1484,13 @@ namespace EnergyPlus::MixedAir {
                         }
                     }
 
-                    ZoneNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), Zone);
+                    ZoneNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->Zone);
                     if (ZoneNum > 0) {
                         ++MechVentZoneCount;
                     } else {
-                        ZoneListNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneList);
+                        ZoneListNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->ZoneList);
                         if (ZoneListNum > 0) {
-                            MechVentZoneCount += ZoneList(ZoneListNum).NumOfZones;
+                            MechVentZoneCount += state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones;
                         } else {
                             ShowWarningError(state, CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields((groupNum - 1) * 3 + 5) +
                                              " not found.");
@@ -1532,7 +1530,7 @@ namespace EnergyPlus::MixedAir {
 
                 //   Loop through zone names and list of zone names, remove duplicate zones, and store designspec names and indexes
                 for (groupNum = 1; groupNum <= NumGroups; ++groupNum) {
-                    ZoneNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), Zone);
+                    ZoneNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->Zone);
                     if (ZoneNum > 0) {
                         if (any_eq(thisVentilationMechanical.VentMechZone, ZoneNum)) {
                             //          Disregard duplicate zone names, show warning and do not store data for this zone
@@ -1544,7 +1542,7 @@ namespace EnergyPlus::MixedAir {
                             //          Store unique zone names
                             ++MechVentZoneCount;
                             thisVentilationMechanical.VentMechZone(MechVentZoneCount) = ZoneNum;
-                            thisVentilationMechanical.VentMechZoneName(MechVentZoneCount) = Zone(ZoneNum).Name;
+                            thisVentilationMechanical.VentMechZoneName(MechVentZoneCount) = state.dataHeatBal->Zone(ZoneNum).Name;
 
                             // Populating new temp array to hold design spec OA object for each zone
                             if (state.dataMixedAir->DesignSpecOAObjIndex(groupNum) > 0) {
@@ -1553,12 +1551,12 @@ namespace EnergyPlus::MixedAir {
                             } else {
                                 if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
-                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                         thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
                                     }
                                 }
                             }
@@ -1570,27 +1568,27 @@ namespace EnergyPlus::MixedAir {
                             } else {
                                 if (state.dataGlobal->DoZoneSizing) {
                                     ObjIndex = UtilityRoutines::FindItemInList(
-                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                        state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                     if (ObjIndex > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                         thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) =
-                                            ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
+                                            state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
                                     }
                                 }
                             }
                         }
                     } else {
                         //       Not a zone name, must be a zone list
-                        ZoneListNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), ZoneList);
+                        ZoneListNum = UtilityRoutines::FindItemInList(state.dataMixedAir->VentMechZoneOrListName(groupNum), state.dataHeatBal->ZoneList);
                         if (ZoneListNum > 0) {
-                            for (int ScanZoneListNum = 1; ScanZoneListNum <= ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
+                            for (int ScanZoneListNum = 1; ScanZoneListNum <= state.dataHeatBal->ZoneList(ZoneListNum).NumOfZones; ++ScanZoneListNum) {
                                 ObjIndex = 0;
                                 // check to make sure zone name is unique (not listed more than once)...
-                                ZoneNum = ZoneList(ZoneListNum).Zone(ScanZoneListNum);
+                                ZoneNum = state.dataHeatBal->ZoneList(ZoneListNum).Zone(ScanZoneListNum);
                                 if (any_eq(thisVentilationMechanical.VentMechZone, ZoneNum)) {
                                     //             Disregard duplicate zone names, show warning and do not store data for this zone
-                                    ShowWarningError(state, "Zone name = " + Zone(ZoneNum).Name + " in ZoneList = " + state.dataMixedAir->VentMechZoneOrListName(groupNum) +
+                                    ShowWarningError(state, "Zone name = " + state.dataHeatBal->Zone(ZoneNum).Name + " in ZoneList = " + state.dataMixedAir->VentMechZoneOrListName(groupNum) +
                                                      " for " + CurrentModuleObject + " object = " + thisVentilationMechanical.Name);
                                     ShowContinueError(state, "is a duplicate. The first ventilation values specified for this zone will be used ");
                                     ShowContinueError(state, "and the rest will be ignored. The simulation will continue...");
@@ -1599,7 +1597,7 @@ namespace EnergyPlus::MixedAir {
                                     //           HeatBalanceManager)
                                     ++MechVentZoneCount;
                                     thisVentilationMechanical.VentMechZone(MechVentZoneCount) = ZoneNum;
-                                    thisVentilationMechanical.VentMechZoneName(MechVentZoneCount) = Zone(ZoneNum).Name;
+                                    thisVentilationMechanical.VentMechZoneName(MechVentZoneCount) = state.dataHeatBal->Zone(ZoneNum).Name;
                                     // Populating new temp array to hold design spec OA object for each zone
                                     if (state.dataMixedAir->DesignSpecOAObjIndex(groupNum) > 0) {
                                         thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) = state.dataMixedAir->DesignSpecOAObjName(groupNum);
@@ -1607,12 +1605,12 @@ namespace EnergyPlus::MixedAir {
                                     } else {
                                         if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
-                                                UtilityRoutines::FindItemInList(Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
                                                 thisVentilationMechanical.ZoneDesignSpecOAObjName(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).DesignSpecOAObjName;
                                                 thisVentilationMechanical.ZoneDesignSpecOAObjIndex(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneDesignSpecOAIndex;
                                             }
                                         }
                                     }
@@ -1624,12 +1622,12 @@ namespace EnergyPlus::MixedAir {
                                     } else {
                                         if (state.dataGlobal->DoZoneSizing) {
                                             ObjIndex =
-                                                UtilityRoutines::FindItemInList(Zone(ZoneNum).Name, ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+                                                UtilityRoutines::FindItemInList(state.dataHeatBal->Zone(ZoneNum).Name, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
                                             if (ObjIndex > 0) {
                                                 thisVentilationMechanical.ZoneDesignSpecADObjName(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistEffObjName;
                                                 thisVentilationMechanical.ZoneDesignSpecADObjIndex(MechVentZoneCount) =
-                                                    ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
+                                                    state.dataSize->ZoneSizingInput(ObjIndex).ZoneAirDistributionIndex;
                                             }
                                         }
                                     }
@@ -1646,7 +1644,7 @@ namespace EnergyPlus::MixedAir {
                 for (int ventMechZoneNum = 1; ventMechZoneNum <= MechVentZoneCount; ++ventMechZoneNum) {
                     int zoneOAReqObjIndex = thisVentilationMechanical.ZoneDesignSpecOAObjIndex(ventMechZoneNum);
                     if (zoneOAReqObjIndex > 0) {
-                        auto const &curOARequirements(OARequirements(zoneOAReqObjIndex));
+                        auto const &curOARequirements(state.dataSize->OARequirements(zoneOAReqObjIndex));
                         thisVentilationMechanical.ZoneOAAreaRate(ventMechZoneNum) = curOARequirements.OAFlowPerArea;
                         thisVentilationMechanical.ZoneOAPeopleRate(ventMechZoneNum) = curOARequirements.OAFlowPerPerson;
                         thisVentilationMechanical.ZoneOAFlowRate(ventMechZoneNum) = curOARequirements.OAFlowPerZone;
@@ -1680,7 +1678,7 @@ namespace EnergyPlus::MixedAir {
                     }
                     int zoneAirDistObjIndex = thisVentilationMechanical.ZoneDesignSpecADObjIndex(ventMechZoneNum);
                     if (zoneAirDistObjIndex > 0) {
-                        auto const &curZoneAirDistribution(ZoneAirDistribution(zoneAirDistObjIndex));
+                        auto const &curZoneAirDistribution(state.dataSize->ZoneAirDistribution(zoneAirDistObjIndex));
                         thisVentilationMechanical.ZoneADEffCooling(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffCooling;
                         thisVentilationMechanical.ZoneADEffHeating(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffHeating;
                         thisVentilationMechanical.ZoneADEffSchPtr(ventMechZoneNum) = curZoneAirDistribution.ZoneADEffSchPtr;
@@ -1861,13 +1859,13 @@ namespace EnergyPlus::MixedAir {
                     if (jZone < state.dataMixedAir->VentilationMechanical(VentMechNum).NumofVentMechZones) {
                         print(state.files.eio,
                               "{},{},{},",
-                              Zone(state.dataMixedAir->VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              state.dataHeatBal->Zone(state.dataMixedAir->VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
                               state.dataMixedAir->VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
                               state.dataMixedAir->VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
                         print(state.files.eio,
                               "{},{},{}\n",
-                              Zone(state.dataMixedAir->VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              state.dataHeatBal->Zone(state.dataMixedAir->VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
                               state.dataMixedAir->VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
                               state.dataMixedAir->VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     }
@@ -2062,9 +2060,6 @@ namespace EnergyPlus::MixedAir {
         // Using/Aliasing
         using namespace DataDefineEquip;
         using CurveManager::GetCurveIndex;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZoneList;
-
         using NodeInputManager::GetOnlySingleNode;
         using namespace OutputReportPredefined;
 
@@ -2222,7 +2217,7 @@ namespace EnergyPlus::MixedAir {
         //   High humidity control option can be used with any economizer flag
         if (UtilityRoutines::SameString(AlphArray(16), "Yes")) {
 
-            state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum = UtilityRoutines::FindItemInList(AlphArray(17), Zone);
+            state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum = UtilityRoutines::FindItemInList(AlphArray(17), state.dataHeatBal->Zone);
 
             // Get the node number for the zone with the humidistat
             if (state.dataMixedAir->OAController(OutAirNum).HumidistatZoneNum > 0) {
@@ -2402,7 +2397,7 @@ namespace EnergyPlus::MixedAir {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE
-        // Initialize the state.dataAirLoop->OutsideAirSys data structure
+        // Initialize the OutsideAirSys data structure
 
         // METHODOLOGY EMPLOYED:
 
@@ -2424,11 +2419,11 @@ namespace EnergyPlus::MixedAir {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        //		if ( BeginEnvrnFlag && FirstHVACIteration ) {
-        //		}
+        //        if ( BeginEnvrnFlag && FirstHVACIteration ) {
+        //        }
 
-        //		if ( state.dataGlobal->BeginDayFlag ) {
-        //		}
+        //        if ( BeginDayFlag ) {
+        //        }
 
         if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
 
@@ -2458,11 +2453,6 @@ namespace EnergyPlus::MixedAir {
         // Initialize the OAController data structure with input node data
 
         using namespace DataLoopNode;
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZoneIntGain;
-        using DataHeatBalance::ZoneList;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         using namespace OutputReportPredefined;
@@ -2481,8 +2471,8 @@ namespace EnergyPlus::MixedAir {
         Real64 RhoAirStdInit;                          // Standard air density
         Real64 TotalPeopleOAFlow;                      // Total outside air required for PEOPLE objects served by this OA controller
         int MixedAirNode;                              // Controller:OutdoorAir mixed air node
-        int AirLoopZoneInfoZoneNum;                    // Index to state.dataAirLoop->AirLoopZoneInfo structure
-        int NumZone;                                   // Zone number in state.dataAirLoop->AirLoopZoneInfo structure
+        int AirLoopZoneInfoZoneNum;                    // Index to AirLoopZoneInfo structure
+        int NumZone;                                   // Zone number in AirLoopZoneInfo structure
         int PeopleNum;                                 // Index to PEOPLE objects
         int NumMechVentZone;                           // Index to number of zones in VentilationMechanical structure
         int TempMechVentArrayCounter;                  // Temporary array counter
@@ -2522,7 +2512,7 @@ namespace EnergyPlus::MixedAir {
             state.dataMixedAir->InitOAControllerOneTimeFlag = false;
         }
         if (OAControllerMyOneTimeFlag(OAControllerNum)) {
-            // Determine Inlet node index for OAController, not a user input for controller, but is obtained from state.dataAirLoop->OutsideAirSys and OAMixer
+            // Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
             {
                 auto const SELECT_CASE_var(thisOAController.ControllerType_Num);
 
@@ -2585,7 +2575,7 @@ namespace EnergyPlus::MixedAir {
         if (!state.dataGlobal->SysSizingCalc && state.dataMixedAir->InitOAControllerSetPointCheckFlag(OAControllerNum) && DoSetPointTest && !FirstHVACIteration) {
             MixedAirNode = thisOAController.MixNode;
             if (MixedAirNode > 0) {
-                //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. state.dataAirLoop->AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
+                //      IF (OAController(OAControllerNum)%Econo == 1 .AND. .NOT. AirLoopControlInfo(AirLoopNum)%CyclingFan) THEN
                 if (thisOAController.Econo > iEconoOp::NoEconomizer && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan) {
                     if (Node(MixedAirNode).TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -2742,7 +2732,7 @@ namespace EnergyPlus::MixedAir {
                 TempMechVentArrayCounter = 0;
                 for (NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone) {
                     int ZoneNum = vent_mech.VentMechZone(NumMechVentZone);
-                    auto const &zone(Zone(ZoneNum));
+                    auto const &zone(state.dataHeatBal->Zone(ZoneNum));
                     FoundZone = false;
 
                     for (AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= state.dataAirLoop->AirLoopZoneInfo(AirLoopNum).NumZones; ++AirLoopZoneInfoZoneNum) {
@@ -2805,7 +2795,7 @@ namespace EnergyPlus::MixedAir {
 
                 // predefined report
                 for (jZone = 1; jZone <= vent_mech.NumofVentMechZones; ++jZone) {
-                    zoneName = Zone(vent_mech.VentMechZone(jZone)).Name;
+                    zoneName = state.dataHeatBal->Zone(vent_mech.VentMechZone(jZone)).Name;
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVventMechName, zoneName, vent_mech.Name);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate(jZone), 6);
                     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate(jZone), 6);
@@ -2846,7 +2836,7 @@ namespace EnergyPlus::MixedAir {
                         }
                     }
                     if (!FoundAreaZone) {
-                        ShowWarningError(state, "Zone name = " + Zone(NumZone).Name + " is not accounted for by " +
+                        ShowWarningError(state, "Zone name = " + state.dataHeatBal->Zone(NumZone).Name + " is not accounted for by " +
                                          CurrentModuleObjects(CMO_MechVentilation) + " object name = " + thisOAController.VentilationMechanicalName);
                         ShowContinueError(state, "Ventilation per unit floor area has not been specified for this zone, which is connected to");
                         ShowContinueError(state, "the air loop served by Controller:OutdoorAir = " + thisOAController.Name +
@@ -2854,10 +2844,10 @@ namespace EnergyPlus::MixedAir {
                     }
                     if (!FoundPeopleZone) {
                         // Loop through people objects to see if this zone has a people object and only then show a warning
-                        for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
-                            if (People(PeopleNum).ZonePtr == NumZone) {
+                        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                            if (state.dataHeatBal->People(PeopleNum).ZonePtr == NumZone) {
                                 if (!FoundAreaZone) {
-                                    ShowWarningError(state, "PEOPLE object for zone = " + Zone(NumZone).Name + " is not accounted for by " +
+                                    ShowWarningError(state, "PEOPLE object for zone = " + state.dataHeatBal->Zone(NumZone).Name + " is not accounted for by " +
                                                      CurrentModuleObjects(CMO_MechVentilation) +
                                                      " object name = " + thisOAController.VentilationMechanicalName);
                                     ShowContinueError(state,
@@ -2869,14 +2859,14 @@ namespace EnergyPlus::MixedAir {
                         }
                     } else { // People > 0, check to make sure there is a people statement in the zone
                         FoundAreaZone = false;
-                        for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
-                            if (People(PeopleNum).ZonePtr != NumZone) continue;
+                        for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                            if (state.dataHeatBal->People(PeopleNum).ZonePtr != NumZone) continue;
                             FoundAreaZone = true;
                             break;
                         }
                         if (!FoundAreaZone) {
                             ShowWarningError(state, CurrentModuleObjects(CMO_MechVentilation) + " = \"" + thisOAController.VentilationMechanicalName +
-                                             "\", Zone=\"" + Zone(NumZone).Name + "\".");
+                                             "\", Zone=\"" + state.dataHeatBal->Zone(NumZone).Name + "\".");
                             ShowContinueError(state, "No \"PEOPLE\" object has been specified in the idf for this zone, but the ventilation rate is > 0 in "
                                               "this Controller:MechanicalVentilation Object.");
                             ShowContinueError(state, "Check ventilation rate in Controller:MechanicalVentilation object.  Simulation will continue.");
@@ -2945,7 +2935,7 @@ namespace EnergyPlus::MixedAir {
                     }
                     // Check primary air loop name
                     if (AirLoopFound && thisAirLoop > 0) {
-                        airloopName = state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Name; // state.dataAirLoop->OutsideAirSys(OASysIndex)%Name
+                        airloopName = state.dataAirSystemsData->PrimaryAirSystems(thisAirLoop).Name; // OutsideAirSys(OASysIndex)%Name
                     } else {
                         ShowWarningError(state, "Cannot find the primary air loop for the OA Controller: " + thisOAController.Name);
                         airloopName = "AirLoop not found";
@@ -3095,7 +3085,7 @@ namespace EnergyPlus::MixedAir {
                         // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                         int OAFlowMethod = vent_mech.ZoneOAFlowMethod(ZoneIndex);
                         if (OAFlowMethod == OAFlowPPer || OAFlowMethod == OAFlowSum || OAFlowMethod == OAFlowMax) {
-                            TotalPeopleOAFlow += ZoneIntGain(ZoneNum).NOFOCC * Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier *
+                            TotalPeopleOAFlow += state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier *
                                                  vent_mech.ZoneOAPeopleRate(ZoneIndex) * GetCurrentScheduleValue(state, vent_mech.ZoneOASchPtr(ZoneIndex));
                         }
                     }
@@ -3110,8 +3100,8 @@ namespace EnergyPlus::MixedAir {
         // Each iteration
 
         if (thisOAController.ControllerType_Num == iControllerType::ControllerOutsideAir) {
-            // zone exhaust mass flow is saved in state.dataAirLoop->AirLoopFlow%ZoneExhaust
-            // the zone exhaust mass flow that is said to be balanced by simple air flows is saved in state.dataAirLoop->AirLoopFlow%ZoneExhaustBalanced
+            // zone exhaust mass flow is saved in AirLoopFlow%ZoneExhaust
+            // the zone exhaust mass flow that is said to be balanced by simple air flows is saved in AirLoopFlow%ZoneExhaustBalanced
             if (AirLoopNum > 0) {
                 thisOAController.ExhMassFlow = max(0.0, state.dataAirLoop->AirLoopFlow(AirLoopNum).SupFlow - state.dataAirLoop->AirLoopFlow(AirLoopNum).SysRetFlow);
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ZoneExhMassFlow = thisOAController.ExhMassFlow;
@@ -3126,7 +3116,7 @@ namespace EnergyPlus::MixedAir {
                     // the design supply air flow rate. Capped the mixed air flow rate at design supply air flow rate, issue #77379
                     // thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
                     // thisOAController.MixMassFlow =
-                    //     min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply);
+                    //     min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, AirLoopFlow(AirLoopNum).DesSupply);
                 }
             } else {
                 thisOAController.ExhMassFlow = 0.0;
@@ -3493,7 +3483,7 @@ namespace EnergyPlus::MixedAir {
 
         OutAirMinFrac = min(max(OutAirMinFrac, 0.0), 1.0);
 
-        // At this point, OutAirMinFrac is still based on state.dataAirLoop->AirLoopFlow.DesSupply
+        // At this point, OutAirMinFrac is still based on AirLoopFlow.DesSupply
         if (AirLoopNum > 0) {
             auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
 
@@ -3653,10 +3643,6 @@ namespace EnergyPlus::MixedAir {
         Real64 &MechVentOAMassFlow // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
     )
     {
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-        using DataHeatBalance::Zone;
-        using DataHeatBalance::ZoneIntGain;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         static std::string const RoutineName("CalcMechVentController: ");
@@ -3752,14 +3738,14 @@ namespace EnergyPlus::MixedAir {
                 SysOA = 0.0;
                 for (int ZoneIndex = 1; ZoneIndex <= this->NumofVentMechZones; ++ZoneIndex) {
                     int ZoneNum = this->VentMechZone(ZoneIndex);
-                    auto const &curZone(Zone(ZoneNum));
+                    auto const &curZone(state.dataHeatBal->Zone(ZoneNum));
                     Real64 curZoneOASchValue = GetCurrentScheduleValue(state, this->ZoneOASchPtr(ZoneIndex));
 
                     // Calc the zone OA flow rate based on the people component
                     // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                     //  Checking DCV flag before calculating zone OA per person
                     if (this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc) {
-                        ZoneOAPeople = ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) *
+                        ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) *
                                        curZoneOASchValue;
                     } else {
                         ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) *
@@ -3777,7 +3763,7 @@ namespace EnergyPlus::MixedAir {
                     OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                     if (OAIndex > 0) {
                         {
-                            auto const SELECT_CASE_var(OARequirements(OAIndex).OAFlowMethod);
+                            auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
                             if (SELECT_CASE_var == OAFlowPPer) {
                                 ZoneOABZ = ZoneOAPeople;
                             } else if (SELECT_CASE_var == OAFlow) {
@@ -3829,7 +3815,7 @@ namespace EnergyPlus::MixedAir {
                         ZoneEz = 0.0;
 
                         // Assign references
-                        auto &curZone(Zone(ZoneNum));
+                        auto &curZone(state.dataHeatBal->Zone(ZoneNum));
                         auto &curZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum));
                         auto &curZoneSysEnergyDemand(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneEquipConfigNum));
                         ZoneName = curZone.Name;
@@ -3839,7 +3825,7 @@ namespace EnergyPlus::MixedAir {
                         // ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
                         //  Checking DCV flag before calculating zone OA per person
                         if (this->DCVFlag && this->SystemOAMethod != SOAM_ProportionalControlDesOcc) {
-                            ZoneOAPeople = ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier *
+                            ZoneOAPeople = state.dataHeatBal->ZoneIntGain(ZoneNum).NOFOCC * curZone.Multiplier * curZone.ListMultiplier *
                                            this->ZoneOAPeopleRate(ZoneIndex) * curZoneOASchValue;
                         } else {
                             ZoneOAPeople = curZone.TotOccupants * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAPeopleRate(ZoneIndex) *
@@ -3847,10 +3833,10 @@ namespace EnergyPlus::MixedAir {
                             CO2PeopleGeneration = 0.0;
                             if (this->SystemOAMethod == SOAM_ProportionalControlDesOcc) {
                                 // Accumulate CO2 generation from people at design occupancy and current activity level
-                                for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
-                                    if (People(PeopleNum).ZonePtr != ZoneNum) continue;
-                                    CO2PeopleGeneration += People(PeopleNum).NumberOfPeople * People(PeopleNum).CO2RateFactor *
-                                                           GetCurrentScheduleValue(state, People(PeopleNum).ActivityLevelPtr);
+                                for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                                    if (state.dataHeatBal->People(PeopleNum).ZonePtr != ZoneNum) continue;
+                                    CO2PeopleGeneration += state.dataHeatBal->People(PeopleNum).NumberOfPeople * state.dataHeatBal->People(PeopleNum).CO2RateFactor *
+                                                           GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).ActivityLevelPtr);
                                 }
                             }
                         }
@@ -3859,14 +3845,14 @@ namespace EnergyPlus::MixedAir {
                         ZoneOAArea =
                             curZone.FloorArea * curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAAreaRate(ZoneIndex) * curZoneOASchValue;
                         ZoneOAFlow = curZone.Multiplier * curZone.ListMultiplier * this->ZoneOAFlowRate(ZoneIndex) * curZoneOASchValue;
-                        ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * Zone(ZoneIndex).Volume) *
+                        ZoneOAACH = curZone.Multiplier * curZone.ListMultiplier * (this->ZoneOAACHRate(ZoneIndex) * state.dataHeatBal->Zone(ZoneIndex).Volume) *
                                     curZoneOASchValue / 3600.0;
 
                         // Calc the breathing-zone OA flow rate
                         OAIndex = this->ZoneDesignSpecOAObjIndex(ZoneIndex);
                         if (OAIndex > 0) {
                             {
-                                auto const SELECT_CASE_var(OARequirements(OAIndex).OAFlowMethod);
+                                auto const SELECT_CASE_var(state.dataSize->OARequirements(OAIndex).OAFlowMethod);
                                 if (SELECT_CASE_var == OAFlowPPer) {
                                     ZoneOABZ = ZoneOAPeople;
                                 } else if (SELECT_CASE_var == OAFlow) {
@@ -4271,8 +4257,8 @@ namespace EnergyPlus::MixedAir {
 
                     if (this->MixedAirTempAtMinOAFlow <= Node(this->MixNode).TempSetPoint) {
                         state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconomizerFlowLocked = true;
-                        // this->OAMassFlow = state.dataAirLoop->AirLoopFlow( AirLoopNum ).MinOutAir;
-                        // state.dataAirLoop->AirLoopFlow( AirLoopNum ).OAFrac = this->OAMassFlow / this->MixMassFlow;
+                        // this->OAMassFlow = AirLoopFlow( AirLoopNum ).MinOutAir;
+                        // AirLoopFlow( AirLoopNum ).OAFrac = this->OAMassFlow / this->MixMassFlow;
                         state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = true;
                         EconomizerOperationFlag = false;
                     } else {
@@ -4528,7 +4514,7 @@ namespace EnergyPlus::MixedAir {
             // This should not be messing with OutAirMinFrac, freeze protection should only limit economizer operation
             // if (MaximumOAFracBySetPoint < OutAirMinFrac) {
             // OutAirMinFrac = MaximumOAFracBySetPoint;
-            //	if (AirLoopNum > 0) state.dataAirLoop->AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
+            //    if (AirLoopNum > 0) AirLoopFlow(AirLoopNum).MinOutAir = OutAirMinFrac * this->MixMassFlow;
             //}
             OASignal = max(min(MaximumOAFracBySetPoint, OASignal), OutAirMinFrac);
         }
@@ -4713,7 +4699,7 @@ namespace EnergyPlus::MixedAir {
         ErrorsFound = false;
         if (this->MaxOA == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
@@ -4723,17 +4709,17 @@ namespace EnergyPlus::MixedAir {
                         CheckSysSizing(state, CurrentModuleObject, this->Name);
 
                         {
-                            auto const SELECT_CASE_var1(CurDuctType);
+                            auto const SELECT_CASE_var1(state.dataSize->CurDuctType);
                             if (SELECT_CASE_var1 == Main) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else if (SELECT_CASE_var1 == Cooling) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesCoolVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                             } else if (SELECT_CASE_var1 == Heating) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesHeatVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                             } else if (SELECT_CASE_var1 == Other) {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             } else {
-                                this->MaxOA = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                                this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                             }
                         }
 
@@ -4743,7 +4729,7 @@ namespace EnergyPlus::MixedAir {
                     }
                 }
 
-            } else if (CurZoneEqNum > 0) {
+            } else if (state.dataSize->CurZoneEqNum > 0) {
 
                 {
                     auto const SELECT_CASE_var(this->ControllerType_Num);
@@ -4751,7 +4737,7 @@ namespace EnergyPlus::MixedAir {
                     if (SELECT_CASE_var == iControllerType::ControllerOutsideAir) {
 
                         CheckZoneSizing(state, CurrentModuleObject, this->Name);
-                        this->MaxOA = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                        this->MaxOA = max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
 
                     } else if (SELECT_CASE_var == iControllerType::ControllerStandAloneERV) {
 
@@ -4769,11 +4755,11 @@ namespace EnergyPlus::MixedAir {
 
         if (this->MinOA == AutoSize) {
 
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
 
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
-                if (FinalSysSizing(CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
-                    this->MinOA = min(FinalSysSizing(CurSysNum).DesOutAirVolFlow, this->MaxOA);
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
+                    this->MinOA = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, this->MaxOA);
                 } else {
                     this->MinOA = 0.0;
                 }
@@ -4799,10 +4785,10 @@ namespace EnergyPlus::MixedAir {
         }
         // If there is an outside air system, loop over components in the OA system; pass the design air flow rate
         // to the coil components that don't have design air flow as an input.
-        if (CurOASysNum > 0) {
-            for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(CurOASysNum).NumComponents; ++CompNum) {
-                CompType = state.dataAirLoop->OutsideAirSys(CurOASysNum).ComponentType(CompNum);
-                CompName = state.dataAirLoop->OutsideAirSys(CurOASysNum).ComponentName(CompNum);
+        if (state.dataSize->CurOASysNum > 0) {
+            for (CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).NumComponents; ++CompNum) {
+                CompType = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentType(CompNum);
+                CompName = state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).ComponentName(CompNum);
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
                     UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER") ||
                     UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {

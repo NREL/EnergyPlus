@@ -75,13 +75,13 @@ TEST_F(EnergyPlusFixture, SetCoolingPanelControlTemp)
     ZoneNum = 1;
 
     state->dataChilledCeilingPanelSimple->CoolingPanel.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 22.0;
-    DataHeatBalance::MRT.allocate(1);
-    DataHeatBalance::MRT(1) = 20.0;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).OutDryBulbTemp = 10.0;
-    DataHeatBalance::Zone(1).OutWetBulbTemp = 5.0;
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 22.0;
+    state->dataHeatBal->MRT.allocate(1);
+    state->dataHeatBal->MRT(1) = 20.0;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).OutDryBulbTemp = 10.0;
+    state->dataHeatBal->Zone(1).OutWetBulbTemp = 5.0;
 
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).ControlType = CoolingPanelSimple::Control::MAT;
     state->dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum).SetCoolingPanelControlTemp(*state, ControlTemp, ZoneNum);

@@ -480,19 +480,19 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterInletNodeNum;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state->dataVariableSpeedCoils->VarSpeedCoil(2).WaterOutletNodeNum;
 
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::ZoneSizingRunDone = true;
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolVolFlow = 1.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInTemp = 24.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 12.0;
-    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.05;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 24.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.09;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 12.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.05;
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->StdRhoAir = 1.0;
     OutputReportPredefined::SetPredefinedTables(*state);
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(16);
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(16);
     SizePTUnit(*state, 1);
 
     // This VS coil is rather quirky. It sizes the capacity based on zone sizing air flow rate.
@@ -519,7 +519,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).Name, "LOBBY_ZN_1_FLR_2 WSHP HEATING MODE");
 
     // expect coil air flow to equal PTUnit heating air flow
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).HeatingAirVolFlow);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowRate(9), state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
 
@@ -543,7 +543,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
-    InitPTUnit(*state, 1, DataSizing::CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
+    InitPTUnit(*state, 1, state->dataSize->CurZoneEqNum, true, OnOffAirFlowRatio, ZoneLoad);
 
     // check that an intermediate speed has the correct flow ratio
     Real64 refAirflowRatio = 0.530468926 / 0.891980668; // speed 4 reference cooling data and full flow rate at speed 9
@@ -559,14 +559,14 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     // #6028 child components not sizing correctly on air flow rate
     // VS coils set SystemAirFlow to true and AirVolFlow to a value, all PTUnits set CoolingAirFlow and HeatingAirFlow, and CoolingAirVolFlow and
     // HeatingAirVolFlow
-    EXPECT_TRUE(ZoneEqSizing(1).SystemAirFlow);
-    EXPECT_EQ(ZoneEqSizing(1).AirVolFlow, state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate);
-    EXPECT_TRUE(ZoneEqSizing(1).CoolingAirFlow);
-    EXPECT_TRUE(ZoneEqSizing(1).HeatingAirFlow);
-    EXPECT_EQ(ZoneEqSizing(1).CoolingAirVolFlow, state->dataPTHP->PTUnit(1).MaxCoolAirVolFlow);
-    EXPECT_EQ(ZoneEqSizing(1).HeatingAirVolFlow, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
-    EXPECT_EQ(Fan(1).MaxAirFlowRate, ZoneEqSizing(1).AirVolFlow);
-    EXPECT_EQ(Fan(1).MaxAirFlowRate, max(ZoneEqSizing(1).CoolingAirVolFlow, ZoneEqSizing(1).HeatingAirVolFlow));
+    EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).SystemAirFlow);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(1).AirVolFlow, state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate);
+    EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).CoolingAirFlow);
+    EXPECT_TRUE(state->dataSize->ZoneEqSizing(1).HeatingAirFlow);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataPTHP->PTUnit(1).MaxCoolAirVolFlow);
+    EXPECT_EQ(state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow, state->dataPTHP->PTUnit(1).MaxHeatAirVolFlow);
+    EXPECT_EQ(Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
+    EXPECT_EQ(Fan(1).MaxAirFlowRate, max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
@@ -842,9 +842,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     PTUnitNum = 1;
     state->dataPTHP->PTUnit(1).OpMode = ContFanCycCoil;
 
-    Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
-    Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // initialize mass flow rates
     Node(state->dataPTHP->PTUnit(1).AirInNode).MassFlowRate = HVACInletMassFlowRate;
@@ -873,12 +873,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = true;
 
-    TempControlType.allocate(1);
-    TempControlType(1) = 1;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 1;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero
@@ -1188,9 +1188,9 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     PTUnitNum = 1;
     state->dataPTHP->PTUnit(1).OpMode = ContFanCycCoil;
 
-    Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
-    Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
-    Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanSchedPtr).CurrentValue = 1.0;      // unit is always on
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).SchedPtr).CurrentValue = 1.0;         // unit is always available
+    state->dataScheduleMgr->Schedule(state->dataPTHP->PTUnit(1).FanAvailSchedPtr).CurrentValue = 1.0; // fan is always available
 
     // initialize mass flow rates
     //		Node( PTUnit( 1 ).AirInNode ).MassFlowRate = HVACInletMassFlowRate;
@@ -1219,13 +1219,13 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     Node(state->dataPTHP->PTUnit(1).AirInNode).Enthalpy = Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).Enthalpy;
 
     state->dataPTHP->PTUnit(1).ControlZoneNum = 1;
-    SysSizingRunDone = true;
-    ZoneSizingRunDone = true;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
     state->dataGlobal->SysSizingCalc = false;
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
 
-    TempControlType.allocate(1);
-    TempControlType(1) = 1;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 1;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;    // set heating load to zero

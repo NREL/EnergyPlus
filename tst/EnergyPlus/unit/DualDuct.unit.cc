@@ -87,12 +87,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 
     int numOfdd_airterminals = 2;
 
-    DataHeatBalance::Zone.allocate(1);
-    DataSizing::OARequirements.allocate(1);
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataSize->OARequirements.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
-    DataHeatBalance::ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain.allocate(1);
 
-    DataHeatBalance::Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
 
     dd_airterminal.allocate(numOfdd_airterminals);
     dd_airterminal(1).CtrlZoneNum = 1;
@@ -114,12 +114,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.5;
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
-    DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
-    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
-    DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
-    DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
     DualDuct::dd_airterminal(1).CalcOAMassFlow(*state, SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
@@ -129,10 +129,10 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     EXPECT_NEAR(0.004884, OAMassFlow, 0.00001);
 
     // Cleanup
-    DataHeatBalance::Zone.deallocate();
-    DataSizing::OARequirements.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSize->OARequirements.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 
     dd_airterminal.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -443,8 +443,8 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
