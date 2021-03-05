@@ -106,7 +106,7 @@ namespace EnergyPlus::BranchNodeConnections {
         int Found;
 
         ErrorsFoundHere = false;
-        if (!IsValidConnectionType(ConnectionType)) {
+        if (!IsValidConnectionType(state, ConnectionType)) {
             ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             ErrorsFoundHere = true;
@@ -206,7 +206,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         constexpr auto RoutineName("ModifyNodeConnectionType: ");
 
-        if (!IsValidConnectionType(ConnectionType)) {
+        if (!IsValidConnectionType(state, ConnectionType)) {
             ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
@@ -232,7 +232,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
     }
 
-    bool IsValidConnectionType(std::string const &ConnectionType)
+    bool IsValidConnectionType(EnergyPlusData &state, std::string const &ConnectionType)
     {
 
         // FUNCTION INFORMATION:
@@ -252,7 +252,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         IsValid = false;
         for (Count = 1; Count <= NumValidConnectionTypes; ++Count) {
-            if (ConnectionType != ValidConnectionTypes(Count)) continue;
+            if (ConnectionType != state.dataLoopNodes->ValidConnectionTypes(Count)) continue;
             IsValid = true;
             break;
         }
@@ -318,9 +318,12 @@ namespace EnergyPlus::BranchNodeConnections {
         int MaxFluidStream;
 
         ErrorCounter = 0;
+
+        auto &ValidConnectionTypes(state.dataLoopNodes->ValidConnectionTypes);
+
         //  Check 1 -- check sensor and actuator nodes
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != state.dataLoopNodes->ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
@@ -752,15 +755,19 @@ namespace EnergyPlus::BranchNodeConnections {
             InletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).InletNodeName;
             OutletNodeName = state.dataBranchNodeConnections->ParentNodeList(Which).OutletNodeName;
             // Get Node Numbers
-            InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
-            OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
+            InletNodeNum = UtilityRoutines::FindItemInList(
+                InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
+            OutletNodeNum = UtilityRoutines::FindItemInList(
+                OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
         } else if (IsParentObjectCompSet(state, ComponentType, ComponentName)) {
             Which = WhichCompSet(state, ComponentType, ComponentName);
             if (Which != 0) {
                 InletNodeName = state.dataBranchNodeConnections->CompSets(Which).InletNodeName;
                 OutletNodeName = state.dataBranchNodeConnections->CompSets(Which).OutletNodeName;
-                InletNodeNum = UtilityRoutines::FindItemInList(InletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
-                OutletNodeNum = UtilityRoutines::FindItemInList(OutletNodeName, NodeID({1, NumOfNodes}), NumOfNodes);
+                InletNodeNum = UtilityRoutines::FindItemInList(
+                    InletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
+                OutletNodeNum = UtilityRoutines::FindItemInList(
+                    OutletNodeName, state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}), state.dataLoopNodes->NumOfNodes);
             } else {
                 ErrInObject = true;
                 ShowWarningError(state, "GetParentData: Component Type=" + ComponentType + ", Component Name=" + ComponentName + " not found.");
@@ -1039,8 +1046,12 @@ namespace EnergyPlus::BranchNodeConnections {
                         ChildInNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).InletNodeName;
                         ChildOutNodeName(CountNum) = state.dataBranchNodeConnections->CompSets(Loop).OutletNodeName;
                         // Get Node Numbers
-                        ChildInNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildInNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
-                        ChildOutNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildOutNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
+                        ChildInNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildInNodeName(CountNum),
+                                                                                   state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
+                                                                                   state.dataLoopNodes->NumOfNodes);
+                        ChildOutNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildOutNodeName(CountNum),
+                                                                                    state.dataLoopNodes->NodeID({1, state.dataLoopNodes->NumOfNodes}),
+                                                                                    state.dataLoopNodes->NumOfNodes);
                     }
                 }
                 if (CountNum != NumChildren) {
@@ -1460,12 +1471,13 @@ namespace EnergyPlus::BranchNodeConnections {
 
         if (NumInList > 0) {
             for (NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex) {
-                NodeConnectType(NodeConnectIndex) = UtilityRoutines::FindItemInList(
-                    state.dataBranchNodeConnections->NodeConnections(ListArray(NodeConnectIndex)).ConnectionType, ValidConnectionTypes, NumValidConnectionTypes);
+                NodeConnectType(NodeConnectIndex) = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->NodeConnections(ListArray(NodeConnectIndex)).ConnectionType,
+                                                    state.dataLoopNodes->ValidConnectionTypes,
+                                                    NumValidConnectionTypes);
             }
         } else {
             if (NodeNumber > 0) {
-                ShowWarningError(state, "Node not found = " + NodeID(NodeNumber) + '.');
+                ShowWarningError(state, "Node not found = " + state.dataLoopNodes->NodeID(NodeNumber) + '.');
             } else {
                 ShowWarningError(state, "Invalid node number passed = 0.");
             }
