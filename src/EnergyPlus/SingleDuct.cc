@@ -110,7 +110,6 @@ namespace EnergyPlus::SingleDuct {
     using namespace DataLoopNode;
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
-    using DataHeatBalFanSys::TempControlType;
     using DataHVACGlobals::ATMixer_InletSide;
     using DataHVACGlobals::ATMixer_SupplySide;
     using DataHVACGlobals::DualSetPointWithDeadBand;
@@ -3266,7 +3265,7 @@ namespace EnergyPlus::SingleDuct {
         // the massflow rate for cooling is determined to meet the entire load.  Then
         // if the massflow is below the minimum or greater than the Max it is set to either the Min
         // or the Max as specified for the VAV model.
-        if ((QTotLoad < 0.0) && (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) && (TempControlType(ZoneNum) != SingleHeatingSetPoint) &&
+        if ((QTotLoad < 0.0) && (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) &&
             (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
             // Calculate the flow required for cooling
 
@@ -3307,7 +3306,7 @@ namespace EnergyPlus::SingleDuct {
             }
 
         } else if ((this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-                   (QTotLoad >= 0.0 || TempControlType(ZoneNum) == SingleHeatingSetPoint) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
+                   (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleHeatingSetPoint) && (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
             //     IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. this->sd_airterminalInlet%AirMassFlowRateMinAvail <=
             //     SmallMassFlow) THEN
             // special case for heating: reverse action and damper allowed to close - set the minimum flow rate to a small but nonzero value
@@ -3395,7 +3394,7 @@ namespace EnergyPlus::SingleDuct {
         // do the reheat calculation if there's some air nass flow (or the damper action is "reverse action"), the flow is <= minimum ,
         // there's a heating requirement, and there's a thermostat with a heating setpoint
         // Reverse damper option is working only for water coils for now.
-        if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
+        if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
             // At this point we know that there is a heating requirement: i.e., the heating coil needs to
             // be activated (there's a zone heating load or there's a reheat requirement). There are 3 possible
             // situations: 1) the coil load can be met by variable temperature air (below the max heat temp) at
@@ -3859,7 +3858,7 @@ namespace EnergyPlus::SingleDuct {
 
         QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
 
-        if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
+        if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
             //   VAVHeatandCool boxes operate at varying mass flow rates when reheating, VAV boxes operate at min flow
             //      (MassFlow <= this->sd_airterminalInlet%AirMassFlowRateMinAvail) .AND. &
             //   Per Fred Buhl, don't use DeadBandOrSetback to determine if heaters operate
@@ -4610,7 +4609,7 @@ namespace EnergyPlus::SingleDuct {
         QActualHeating = QToHeatSetPt - MassFlow * CpAir * (this->sd_airterminalInlet.AirTemp - ZoneTemp); // reheat needed
         // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
         // system scheduled OFF then not operational and shut the system down.
-        if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
+        if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) && (state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint)) {
 
             {
                 auto const SELECT_CASE_var(this->ReheatComp_Num);

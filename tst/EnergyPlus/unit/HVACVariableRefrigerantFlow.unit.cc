@@ -3932,14 +3932,14 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     }
 
     // test other ThermostatPriority control types
-    ZoneThermostatSetPointHi.allocate(1);
-    ZoneThermostatSetPointHi = 24.0;
-    ZoneThermostatSetPointLo.allocate(1);
-    ZoneThermostatSetPointLo = 21.0;
-    TempControlType.allocate(1);
-    TempControlType = 4;
-    ZT.allocate(1);
-    ZT = 25.0;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi = 24.0;
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType = 4;
+    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataHeatBalFanSys->ZT = 25.0;
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
@@ -4021,7 +4021,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     }
 
     // ensure that TU turns off when fan heat exceeds the heating load
-    ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataHeatBalFanSys->ZT = 20.0; // set zone temp below heating SP (SP=21) to ensure heating mode
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 20;          // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0064516; // need to set these so OA mixer will get proper mixed air condition
@@ -4049,7 +4049,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(VRFCond).VRFCondPLR, 0.0); // system should be off
 
     // ensure that TU operates when fan heat does not exceed the heating load
-    ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
+    state->dataHeatBalFanSys->ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
     Node(state->dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
     Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 800.0; // set load equal to small value less than expected fan heat
@@ -5726,8 +5726,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     EXPECT_EQ(Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate, 0.0);  // flow should be = 0 for cycling fan mode
     EXPECT_EQ(Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOutletNodeNum).MassFlowRate, 0.0); // flow should be = 0 for cycling fan mode
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue = 1.0; // set constant fan operating mode
     SimulateVRF(*state,

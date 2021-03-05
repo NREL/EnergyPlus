@@ -1055,7 +1055,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     state->dataSurface->ShadingTransmittanceVaries = true;
     state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
-    DataSystemVariables::shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
+    state->dataSysVars->shadingMethod = DataSystemVariables::ShadingMethod::Scheduled;
     state->dataHeatBal->SolarDistribution = FullExterior;
 
     state->dataSolarShading->CalcSkyDifShading = true;
@@ -1069,7 +1069,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     state->dataBSDFWindow->SUNCOSTS(4, 9, 3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
-    EXPECT_TRUE(DataSystemVariables::shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
+    EXPECT_TRUE(state->dataSysVars->shadingMethod == DataSystemVariables::ShadingMethod::Scheduled);
     EXPECT_DOUBLE_EQ(0.5432, ScheduleManager::LookUpScheduleValue(*state, 2, 9, 4));
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < 0.00001);
     EXPECT_DOUBLE_EQ(0.00001, DataEnvironment::SunIsUpValue);

@@ -142,7 +142,6 @@ namespace DataSystemVariables {
     // MODULE VARIABLE DECLARATIONS:
 
     // Shading methods
-    ShadingMethod shadingMethod(ShadingMethod::PolygonClipping);
 
     bool firstTime(true);
 
@@ -241,7 +240,6 @@ namespace DataSystemVariables {
 
     void clear_state()
     {
-        shadingMethod = ShadingMethod::PolygonClipping;
         firstTime = true;
     }
 

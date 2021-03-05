@@ -288,7 +288,7 @@ namespace EnergyPlus {
                         // Set ZoneTemp equal to the average air temperature of the zones the coupled surfaces are part of.
                         for (auto &z: thisDomain.ZoneCoupledSurfaces) {
                             int ZoneNum = z.Zone;
-                            ZoneTemp += DataHeatBalFanSys::ZTAV(ZoneNum);
+                            ZoneTemp += state.dataHeatBalFanSys->ZTAV(ZoneNum);
                         }
 
                         ZoneTemp = ZoneTemp / thisDomain.ZoneCoupledSurfaces.size();

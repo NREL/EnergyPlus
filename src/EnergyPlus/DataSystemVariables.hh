@@ -115,7 +115,6 @@ namespace DataSystemVariables {
 
     // Shading methods
     enum class ShadingMethod {PolygonClipping, PixelCounting, Scheduled, Imported};
-    extern ShadingMethod shadingMethod;           // defines the shading method used
 
     // Functions
 
@@ -133,29 +132,32 @@ namespace DataSystemVariables {
 
 } // namespace DataSystemVariables
 
-struct SystemVarsData : BaseGlobalStruct {
+struct SystemVarsData : BaseGlobalStruct
+{
 
     int const iASCII_CR = 13;   // endline value when just CR instead of CR/LF
     int const iUnicode_end = 0; // endline value when Unicode file
     char const tabchar = '\t';
 
-    bool DDOnly = false;                           // TRUE if design days (sizingperiod:*) only are to be run.
-    bool ReverseDD = false;                        // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
-    bool DisableGLHECaching = false;               // TRUE if caching is to be disabled, for example, during unit tests.
-    bool FullAnnualRun = false;                    // TRUE if full annual simulation is to be run.
-    bool DeveloperFlag = false;                    // TRUE if developer flag is turned on. (turns on more displays to console)
-    bool TimingFlag = false;                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
+    DataSystemVariables::ShadingMethod shadingMethod = DataSystemVariables::ShadingMethod::PolygonClipping; // defines the shading method used
+
+    bool DDOnly = false;             // TRUE if design days (sizingperiod:*) only are to be run.
+    bool ReverseDD = false;          // TRUE if reverse design days (reordering sizingperiod:*) are to be run.
+    bool DisableGLHECaching = false; // TRUE if caching is to be disabled, for example, during unit tests.
+    bool FullAnnualRun = false;      // TRUE if full annual simulation is to be run.
+    bool DeveloperFlag = false;      // TRUE if developer flag is turned on. (turns on more displays to console)
+    bool TimingFlag = false;         // TRUE if timing flag is turned on. (turns on more timing displays to console)
 
     bool SutherlandHodgman = true;                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
-    bool SlaterBarsky = false;                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
+    bool SlaterBarsky = false;                     // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     bool DetailedSkyDiffuseAlgorithm = false;      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration = false; // when true, use detailed timestep integration for all solar,shading, etc.
 
-    bool ReportExtShadingSunlitFrac = false;              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-    bool DisableGroupSelfShading =false; // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    bool DisableAllSelfShading = false;   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+    bool ReportExtShadingSunlitFrac = false; // when true, the sunlit fraction for all surfaces are exported as a csv format output
+    bool DisableGroupSelfShading = false;    // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+    bool DisableAllSelfShading = false;      // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
-    bool TrackAirLoopEnvFlag = false;              // If TRUE generates a file with runtime statistics for each HVAC
+    bool TrackAirLoopEnvFlag = false; // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
     bool TraceAirLoopEnvFlag = false; // If TRUE generates a trace file with the converged solutions of all
     // HVAC controllers on each air loop at each call to SimAirLoop()
@@ -192,6 +194,7 @@ struct SystemVarsData : BaseGlobalStruct {
 
     void clear_state() override
     {
+        shadingMethod = DataSystemVariables::ShadingMethod::PolygonClipping;
         DDOnly = false;
         ReverseDD = false;
         DisableGLHECaching = false;
@@ -235,7 +238,6 @@ struct SystemVarsData : BaseGlobalStruct {
         NumberIntRadThreads = 1;
         iNominalTotSurfaces = 0;
         Threading = false;
-
     }
 };
 

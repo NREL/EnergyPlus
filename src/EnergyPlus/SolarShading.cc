@@ -364,7 +364,6 @@ namespace EnergyPlus::SolarShading {
 
         using namespace DataIPShortCuts;
         using DataSystemVariables::ShadingMethod;
-        using DataSystemVariables::shadingMethod;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -419,11 +418,11 @@ namespace EnergyPlus::SolarShading {
         unsigned pixelRes = 512u;
         if (NumAlphas >= aNum) {
             if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Scheduled")) {
-                shadingMethod = ShadingMethod::Scheduled;
+                state.dataSysVars->shadingMethod = ShadingMethod::Scheduled;
                 cAlphaArgs(aNum) = "Scheduled";
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "Imported")) {
                 if (state.dataScheduleMgr->ScheduleFileShadingProcessed) {
-                    shadingMethod = ShadingMethod::Imported;
+                    state.dataSysVars->shadingMethod = ShadingMethod::Imported;
                     cAlphaArgs(aNum) = "Imported";
                 } else {
                     ShowWarningError(state, cCurrentModuleObject + ": invalid " + cAlphaFieldNames(aNum));
@@ -431,10 +430,10 @@ namespace EnergyPlus::SolarShading {
                                       "\" while no Schedule:File:Shading object is defined, InternalCalculation will be used.");
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PolygonClipping")) {
-                shadingMethod = ShadingMethod::PolygonClipping;
+                state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
                 cAlphaArgs(aNum) = "PolygonClipping";
             } else if (UtilityRoutines::SameString(cAlphaArgs(aNum), "PixelCounting")) {
-                shadingMethod = ShadingMethod::PixelCounting;
+                state.dataSysVars->shadingMethod = ShadingMethod::PixelCounting;
                 cAlphaArgs(aNum) = "PixelCounting";
                 if (NumNumbers >= 3) {
                     pixelRes = (unsigned)rNumericArgs(3);
@@ -462,7 +461,7 @@ namespace EnergyPlus::SolarShading {
                 } else {
                     ShowWarningError(state, "No GPU found (required for PixelCounting)");
                     ShowContinueError(state, "PolygonClipping will be used instead");
-                    shadingMethod = ShadingMethod::PolygonClipping;
+                    state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
                     cAlphaArgs(aNum) = "PolygonClipping";
                 }
 #endif
@@ -472,7 +471,7 @@ namespace EnergyPlus::SolarShading {
             }
         } else {
             cAlphaArgs(aNum) = "PolygonClipping";
-            shadingMethod = ShadingMethod::PolygonClipping;
+            state.dataSysVars->shadingMethod = ShadingMethod::PolygonClipping;
         }
 
         aNum++;
@@ -578,7 +577,7 @@ namespace EnergyPlus::SolarShading {
             state.dataSysVars->ReportExtShadingSunlitFrac = false;
         }
         int ExtShadingSchedNum;
-        if (shadingMethod == ShadingMethod::Imported) {
+        if (state.dataSysVars->shadingMethod == ShadingMethod::Imported) {
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 ExtShadingSchedNum = ScheduleManager::GetScheduleIndex(state, state.dataSurface->Surface(SurfNum).Name + "_shading");
                 if (ExtShadingSchedNum) {
@@ -4612,7 +4611,6 @@ namespace EnergyPlus::SolarShading {
         // This subroutine computes solar gain multipliers for beam solar
 
         using DataSystemVariables::ShadingMethod;
-        using DataSystemVariables::shadingMethod;
         using ScheduleManager::LookUpScheduleValue;
 
         Real64 SurfArea;        // Surface area. For walls, includes all window frame areas.
@@ -4638,7 +4636,7 @@ namespace EnergyPlus::SolarShading {
             state.dataHeatBal->CosIncAng(iTimeStep, iHour, SurfNum) = state.dataSolarShading->CTHETA(SurfNum);
         }
 
-        if ((shadingMethod == ShadingMethod::Scheduled || shadingMethod == ShadingMethod::Imported) && !state.dataGlobal->DoingSizing && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather){
+        if ((state.dataSysVars->shadingMethod == ShadingMethod::Scheduled || state.dataSysVars->shadingMethod == ShadingMethod::Imported) && !state.dataGlobal->DoingSizing && state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather){
             for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (state.dataSurface->Surface(SurfNum).SchedExternalShadingFrac) {
                     state.dataHeatBal->SunlitFrac(iTimeStep, iHour, SurfNum) = LookUpScheduleValue(state, state.dataSurface->Surface(SurfNum).ExternalShadingSchInd, iHour, iTimeStep);
@@ -8619,7 +8617,6 @@ namespace EnergyPlus::SolarShading {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataWindowEquivalentLayer::CFS;
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -8785,7 +8782,7 @@ namespace EnergyPlus::SolarShading {
                         break;
 
                     case WindowShadingControlType::HiZoneAirTemp: // 'OnIfHighZoneAirTemperature'  ! Previous time step zone air temperature
-                        if (MAT(IZone) > SetPoint && SchedAllowsControl) {
+                        if (state.dataHeatBalFanSys->MAT(IZone) > SetPoint && SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;
@@ -8814,7 +8811,7 @@ namespace EnergyPlus::SolarShading {
 
                     case WindowShadingControlType::OnHiZoneTemp_HiSolarWindow: // 'ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW'  ! Zone air temp and solar on window
                         if (state.dataEnvrn->SunIsUp) {
-                            if (MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
+                            if (state.dataHeatBalFanSys->MAT(IZone) > SetPoint && SolarOnWindow > SetPoint2 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -8824,7 +8821,7 @@ namespace EnergyPlus::SolarShading {
 
                     case WindowShadingControlType::OnHiZoneTemp_HiHorzSolar: // 'ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR'  ! Zone air temp and horizontal solar
                         if (state.dataEnvrn->SunIsUp) {
-                            if (MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
+                            if (state.dataHeatBalFanSys->MAT(IZone) > SetPoint && HorizSolar > SetPoint2 && SchedAllowsControl) {
                                 shadingOn = true;
                             } else if (GlareControlIsActive) {
                                 shadingOffButGlareControlOn = true;
@@ -8871,7 +8868,7 @@ namespace EnergyPlus::SolarShading {
                         break;
 
                     case WindowShadingControlType::OnNightLoInTemp_OffDay: // 'OnNightIfLowInsideTempAndOffDay')
-                        if (!state.dataEnvrn->SunIsUp && MAT(IZone) < SetPoint && SchedAllowsControl) {
+                        if (!state.dataEnvrn->SunIsUp && state.dataHeatBalFanSys->MAT(IZone) < SetPoint && SchedAllowsControl) {
                             shadingOn = true;
                         } else if (GlareControlIsActive) {
                             shadingOffButGlareControlOn = true;

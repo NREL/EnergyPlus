@@ -100,10 +100,10 @@ protected:
     {
         EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
-        DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate(1);
-        DataHeatBalFanSys::ZoneThermostatSetPointHi(1) = 23.9; // 75F
-        DataHeatBalFanSys::ZoneThermostatSetPointLo.allocate(1);
-        DataHeatBalFanSys::ZoneThermostatSetPointLo(1) = 23.0; // 73.4F
+        state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(1);
+        state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9; // 75F
+        state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
+        state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 23.0; // 73.4F
 
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataSize->ZoneEqSizing.allocate(1);
@@ -117,22 +117,22 @@ protected:
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 1000.0;
         state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 2000.0;
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
-        NonAirSystemResponse.allocate(1);
-        SysDepZoneLoads.allocate(1);
+        state->dataHeatBalFanSys->NonAirSystemResponse.allocate(1);
+        state->dataHeatBalFanSys->SysDepZoneLoads.allocate(1);
         state->dataHeatBal->MassConservation.allocate(1);
         state->dataHeatBal->ZoneIntGain.allocate(1);
         state->dataSurface->SurfaceWindow.allocate(1);
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
-        ZoneLatentGain.allocate(1);
+        state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
 
-        TempControlType.allocate(1);
-        TempControlType(1) = DataHVACGlobals::SingleHeatingSetPoint;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::SingleHeatingSetPoint;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
 
-        ZoneAirHumRat.allocate(1);
-        ZoneAirHumRat(1) = 0.07;
+        state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+        state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.07;
 
         state->dataZoneEquip->ZoneEquipInputsFilled = false;
     }

@@ -209,19 +209,16 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         // use ZT from DataHeatBalFanSys
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZT;
-        using DataHeatBalFanSys::ZTAV;
 
         // intialize in preperation for calculations
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = MAT(ZoneNum);
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = MAT(ZoneNum);
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = MAT(ZoneNum);
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat = state.dataHeatBalFanSys->MAT(ZoneNum);
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tleaving = state.dataHeatBalFanSys->MAT(ZoneNum);
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Texhaust = state.dataHeatBalFanSys->MAT(ZoneNum);
         for (auto &e : state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Surf)
-            e.TadjacentAir = MAT(ZoneNum);
+            e.TadjacentAir = state.dataHeatBalFanSys->MAT(ZoneNum);
 
         // the only input this method needs is the zone MAT or ZT or ZTAV  ?  (original was ZT)
-        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = MAT(ZoneNum); // this is lagged from previous corrector result
+        state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).TairMean = state.dataHeatBalFanSys->MAT(ZoneNum); // this is lagged from previous corrector result
     }
 
     //*****************************************************************************************
@@ -790,12 +787,6 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         // sets values in Heat balance variables
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::SysDepZoneLoads;
-        using DataHeatBalFanSys::TempTstatAir;
-        using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::RetTempMax;
         using DataHVACGlobals::RetTempMin;
         using DataLoopNode::Node;
@@ -891,7 +882,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                             // All of return air comes from flow through airflow windows
                             TempRetAir = WinGapTtoRA;
                             // Put heat from window airflow that exceeds return air flow into zone air
-                            SysDepZoneLoads(ZoneNum) += (WinGapFlowToRA - MassFlowRA) * CpAir * (WinGapTtoRA - TempZoneAir);
+                            state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += (WinGapFlowToRA - MassFlowRA) * CpAir * (WinGapTtoRA - TempZoneAir);
                         }
                     }
                     // Add heat-to-return from lights
@@ -899,21 +890,21 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                     if (TempRetAir > RetTempMax) {
                         Node(ReturnNode).Temp = RetTempMax;
                         if (!state.dataGlobal->ZoneSizingCalc) {
-                            SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
+                            state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                         }
                     } else if (TempRetAir < RetTempMin) {
                         Node(ReturnNode).Temp = RetTempMin;
                         if (!state.dataGlobal->ZoneSizingCalc) {
-                            SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
+                            state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                         }
                     } else {
                         Node(ReturnNode).Temp = TempRetAir;
                     }
                 } else { // No return air flow
                     // Assign all heat-to-return from window gap airflow to zone air
-                    if (WinGapFlowToRA > 0.0) SysDepZoneLoads(ZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
+                    if (WinGapFlowToRA > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
                     // Assign all heat-to-return from lights to zone air
-                    if (QRetAir > 0.0) SysDepZoneLoads(ZoneNum) += QRetAir;
+                    if (QRetAir > 0.0) state.dataHeatBalFanSys->SysDepZoneLoads(ZoneNum) += QRetAir;
                     Node(ReturnNode).Temp = Node(ZoneNode).Temp;
                 }
             } else {
@@ -938,14 +929,14 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
                     state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                     // shouldn't the HVAC term be zeroed out then?
                     SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, 0);
-                    ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
+                    state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
                 }
             } else {
                 Node(ReturnNode).HumRat = Node(ZoneNode).HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 SumAllReturnAirLatentGains(state, ZoneNum, SumRetAirLatentGainRate, ReturnNode);
-                ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
+                state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) += SumRetAirLatentGainRate;
             }
 
             Node(ReturnNode).Enthalpy = PsyHFnTdbW(Node(ReturnNode).Temp, Node(ReturnNode).HumRat);
@@ -964,7 +955,7 @@ namespace EnergyPlus::RoomAirModelUserTempPattern {
         }
 
         // set thermostat reading for air system .
-        TempTstatAir(ZoneNum) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat;
+        state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->AirPatternZoneInfo(ZoneNum).Tstat;
 
         // set results for all surface
         for (int i = SurfFirst, j = 1; i <= SurfLast; ++i, ++j) {

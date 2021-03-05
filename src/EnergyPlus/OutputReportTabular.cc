@@ -11428,12 +11428,6 @@ namespace EnergyPlus::OutputReportTabular {
     {
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneHeatIndexHourBins;
-        using DataHeatBalFanSys::ZoneHeatIndexOccuHourBins;
-        using DataHeatBalFanSys::ZoneHumidexHourBins;
-        using DataHeatBalFanSys::ZoneHumidexOccuHourBins;
-        using DataHeatBalFanSys::ZoneLowSETHours;
-        using DataHeatBalFanSys::ZoneHighSETHours;
         auto &ort(state.dataOutRptTab);
 
         if (state.dataGlobal->NumOfZones > 0) {
@@ -11443,28 +11437,28 @@ namespace EnergyPlus::OutputReportTabular {
                                            state.dataOutRptPredefined->pdchHIHourExtremeCaution,
                                            state.dataOutRptPredefined->pdchHIHourDanger,
                                            state.dataOutRptPredefined->pdchHIHourExtremeDanger};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHeatIndexHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatIndexHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchHIOccuHourSafe,
                           state.dataOutRptPredefined->pdchHIOccuHourCaution,
                           state.dataOutRptPredefined->pdchHIOccuHourExtremeCaution,
                           state.dataOutRptPredefined->pdchHIOccuHourDanger,
                           state.dataOutRptPredefined->pdchHIOccuHourExtremeDanger};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHeatIndexOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchHumidexHourLittle,
                           state.dataOutRptPredefined->pdchHumidexHourSome,
                           state.dataOutRptPredefined->pdchHumidexHourGreat,
                           state.dataOutRptPredefined->pdchHumidexHourDanger,
                           state.dataOutRptPredefined->pdchHumidexHourStroke};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHumidexHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHumidexHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchHumidexOccuHourLittle,
                           state.dataOutRptPredefined->pdchHumidexOccuHourSome,
                           state.dataOutRptPredefined->pdchHumidexOccuHourGreat,
                           state.dataOutRptPredefined->pdchHumidexOccuHourDanger,
                           state.dataOutRptPredefined->pdchHumidexOccuHourStroke };
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneHumidexOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHumidexOccuHourBins);
 
             bool hasPierceSET = true;
             if (state.dataHeatBal->TotPeople == 0) {
@@ -11492,13 +11486,13 @@ namespace EnergyPlus::OutputReportTabular {
                               state.dataOutRptPredefined->pdchHeatingSETOccuHours,
                               state.dataOutRptPredefined->pdchHeatingSETUnmetDuration,
                               state.dataOutRptPredefined->pdchHeatingSETUnmetTime};
-                WriteSETHoursTable(state, columnNum, columnHead, ZoneLowSETHours);
+                WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLowSETHours);
 
                 columnHead = {state.dataOutRptPredefined->pdchCoolingSETHours,
                               state.dataOutRptPredefined->pdchCoolingSETOccuHours,
                               state.dataOutRptPredefined->pdchCoolingSETUnmetDuration,
                               state.dataOutRptPredefined->pdchCoolingSETUnmetTime};
-                WriteSETHoursTable(state, columnNum, columnHead, ZoneHighSETHours);
+                WriteSETHoursTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneHighSETHours);
             }
         }
     }
@@ -11507,19 +11501,17 @@ namespace EnergyPlus::OutputReportTabular {
     {
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneCO2LevelHourBins;
-        using DataHeatBalFanSys::ZoneCO2LevelOccuHourBins;
         if (state.dataGlobal->NumOfZones > 0) {
             int columnNum = 3;
             std::vector<int> columnHead = {state.dataOutRptPredefined->pdchCO2HourSafe,
                                            state.dataOutRptPredefined->pdchCO2HourCaution,
                                            state.dataOutRptPredefined->pdchCO2HourHazard};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneCO2LevelHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneCO2LevelHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchCO2OccuHourSafe,
                           state.dataOutRptPredefined->pdchCO2OccuHourCaution,
                           state.dataOutRptPredefined->pdchCO2OccuHourHazard};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneCO2LevelOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins);
         }
     }
 
@@ -11527,8 +11519,6 @@ namespace EnergyPlus::OutputReportTabular {
     {
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneLightingLevelHourBins;
-        using DataHeatBalFanSys::ZoneLightingLevelOccuHourBins;
 
         for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::iDaylightingMethod::NoDaylighting) {
@@ -11546,13 +11536,13 @@ namespace EnergyPlus::OutputReportTabular {
                                            state.dataOutRptPredefined->pdchIllumHourDim,
                                            state.dataOutRptPredefined->pdchIllumHourAdequate,
                                            state.dataOutRptPredefined->pdchIllumHourBright};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneLightingLevelHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLightingLevelHourBins);
 
             columnHead = {state.dataOutRptPredefined->pdchIllumOccuHourDark,
                           state.dataOutRptPredefined->pdchIllumOccuHourDim,
                           state.dataOutRptPredefined->pdchIllumOccuHourAdequate,
                           state.dataOutRptPredefined->pdchIllumOccuHourBright};
-            WriteResilienceBinsTable(state, columnNum, columnHead, ZoneLightingLevelOccuHourBins);
+            WriteResilienceBinsTable(state, columnNum, columnHead, state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins);
         }
     }
 

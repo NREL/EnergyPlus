@@ -4163,7 +4163,6 @@ namespace EvaporativeCoolers {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
         using DataHVACGlobals::SmallLoad;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -4179,8 +4178,8 @@ namespace EvaporativeCoolers {
 
             if (ZoneEvapUnit(UnitNum).ControlSchemeType == ControlType::ZoneTemperatureDeadBandOnOffCycling) {
                 ZoneTemp = Node(ZoneEvapUnit(UnitNum).ZoneNodeNum).Temp;
-                CoolSetLowThrottle = ZoneThermostatSetPointHi(ZoneNum) - (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
-                CoolSetHiThrottle = ZoneThermostatSetPointHi(ZoneNum) + (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
+                CoolSetLowThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
+                CoolSetHiThrottle = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + (0.5 * ZoneEvapUnit(UnitNum).ThrottlingRange);
 
                 if ((ZoneTemp < CoolSetLowThrottle) || !ZoneEvapUnit(UnitNum).UnitIsAvailable) {
                     ZoneEvapUnit(UnitNum).IsOnThisTimestep = false;
