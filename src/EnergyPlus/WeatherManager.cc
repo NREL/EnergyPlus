@@ -178,7 +178,7 @@ namespace WeatherManager {
             auto &underwaterBoundary{state.dataWeatherManager->underwaterBoundaries[i - 1]};
             underwaterBoundary.Name = DataIPShortCuts::cAlphaArgs(1);
             underwaterBoundary.distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs(1);
-            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, DataSurfaces::OSCM);
+            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
             if (underwaterBoundary.OSCMIndex <= 0) {
                 ShowSevereError(state, "Could not match underwater boundary condition object with an Other Side Conditions Model input object.");
                 errorsFound = true;
@@ -242,11 +242,11 @@ namespace WeatherManager {
             if (thisBoundary.VelocityScheduleIndex > 0) {
                 freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue(state, thisBoundary.VelocityScheduleIndex); // m/s
             }
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).TConv = curWaterTemp;
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).HConv =
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).TConv = curWaterTemp;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).HConv =
                 WeatherManager::calculateWaterBoundaryConvectionCoefficient(curWaterTemp, freeStreamVelocity, thisBoundary.distanceFromLeadingEdge);
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).TRad = curWaterTemp;
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).TRad = curWaterTemp;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).HRad = 0.0;
         }
     }
 
@@ -287,32 +287,32 @@ namespace WeatherManager {
                 std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
             state.dataSurfaceGeometry->SinBldgRelNorth =
                 std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-            for (size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum) {
-                for (int n = 1; n <= DataSurfaces::Surface(SurfNum).Sides; ++n) {
-                    Real64 Xb = DataSurfaces::Surface(SurfNum).Vertex(n).x;
-                    Real64 Yb = DataSurfaces::Surface(SurfNum).Vertex(n).y;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).x = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).y = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).z = DataSurfaces::Surface(SurfNum).Vertex(n).z;
+            for (size_t SurfNum = 1; SurfNum < state.dataSurface->Surface.size(); ++SurfNum) {
+                for (int n = 1; n <= state.dataSurface->Surface(SurfNum).Sides; ++n) {
+                    Real64 Xb = state.dataSurface->Surface(SurfNum).Vertex(n).x;
+                    Real64 Yb = state.dataSurface->Surface(SurfNum).Vertex(n).y;
+                    state.dataSurface->Surface(SurfNum).NewVertex(n).x = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
+                    state.dataSurface->Surface(SurfNum).NewVertex(n).y = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
+                    state.dataSurface->Surface(SurfNum).NewVertex(n).z = state.dataSurface->Surface(SurfNum).Vertex(n).z;
                 }
-                Vectors::CreateNewellSurfaceNormalVector(DataSurfaces::Surface(SurfNum).NewVertex,
-                                                         DataSurfaces::Surface(SurfNum).Sides,
-                                                         DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
+                Vectors::CreateNewellSurfaceNormalVector(state.dataSurface->Surface(SurfNum).NewVertex,
+                                                         state.dataSurface->Surface(SurfNum).Sides,
+                                                         state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector);
                 Real64 SurfWorldAz = 0.0;
                 Real64 SurfTilt = 0.0;
-                Vectors::DetermineAzimuthAndTilt(DataSurfaces::Surface(SurfNum).NewVertex,
-                                                 DataSurfaces::Surface(SurfNum).Sides,
+                Vectors::DetermineAzimuthAndTilt(state.dataSurface->Surface(SurfNum).NewVertex,
+                                                 state.dataSurface->Surface(SurfNum).Sides,
                                                  SurfWorldAz,
                                                  SurfTilt,
-                                                 DataSurfaces::Surface(SurfNum).lcsx,
-                                                 DataSurfaces::Surface(SurfNum).lcsy,
-                                                 DataSurfaces::Surface(SurfNum).lcsz,
-                                                 DataSurfaces::Surface(SurfNum).GrossArea,
-                                                 DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
-                DataSurfaces::Surface(SurfNum).Azimuth = SurfWorldAz;
-                DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
-                DataSurfaces::Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
-                DataSurfaces::Surface(SurfNum).OutNormVec = DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector;
+                                                 state.dataSurface->Surface(SurfNum).lcsx,
+                                                 state.dataSurface->Surface(SurfNum).lcsy,
+                                                 state.dataSurface->Surface(SurfNum).lcsz,
+                                                 state.dataSurface->Surface(SurfNum).GrossArea,
+                                                 state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector);
+                state.dataSurface->Surface(SurfNum).Azimuth = SurfWorldAz;
+                state.dataSurface->Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
+                state.dataSurface->Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
+                state.dataSurface->Surface(SurfNum).OutNormVec = state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector;
             }
         }
     }
@@ -1732,7 +1732,7 @@ namespace WeatherManager {
             ReportMissing_RangeData(state);
         }
 
-        // set the state.dataGlobal->EndDesignDayEnvrnsFlag (dataGlobal)
+        // set the EndDesignDayEnvrnsFlag (dataGlobal)
         // True at the end of the last design day environment (last time step of last hour of last day of environ which is a design day)
         state.dataGlobal->EndDesignDayEnvrnsFlag = false;
         if (state.dataGlobal->EndEnvrnFlag) {

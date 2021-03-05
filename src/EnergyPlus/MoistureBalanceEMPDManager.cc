@@ -105,9 +105,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
     // Using/Aliasing
     using namespace DataHeatBalance;
-    using DataHeatBalFanSys::ZoneAirHumRat;
-    using DataSurfaces::Surface;
-    using DataSurfaces::TotSurfaces;
     using namespace DataMoistureBalanceEMPD;
     using DataMoistureBalance::HConvInFD;
     using DataMoistureBalance::HMassConvInFD;
@@ -260,14 +257,14 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         // Ensure at least one interior EMPD surface for each zone
         EMPDzone.dimension(state.dataGlobal->NumOfZones, false);
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf || Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf || state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window)
                 continue; // Heat transfer surface only and not a window
-            if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
-            ConstrNum = Surface(SurfNum).Construction;
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD) continue;
+            ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
             MatNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(state.dataConstruction->Construct(ConstrNum).TotLayers);
-            if (state.dataMaterial->Material(MatNum).EMPDmu > 0.0 && Surface(SurfNum).Zone > 0) {
-                EMPDzone(Surface(SurfNum).Zone) = true;
+            if (state.dataMaterial->Material(MatNum).EMPDmu > 0.0 && state.dataSurface->Surface(SurfNum).Zone > 0) {
+                EMPDzone(state.dataSurface->Surface(SurfNum).Zone) = true;
             } else {
                 ++ErrCount;
                 if (ErrCount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
@@ -276,7 +273,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state, "GetMoistureBalanceEMPDInput: EMPD properties are not assigned to the inside layer in Surface=" +
-                                Surface(SurfNum).Name);
+                                state.dataSurface->Surface(SurfNum).Name);
                     ShowContinueError(state, "with Construction=" + state.dataConstruction->Construct(ConstrNum).Name);
                 }
             }
@@ -284,7 +281,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
                 continue;
             } else { // Multiple layer construction
                 if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).EMPDMaterialProps &&
-                    Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
+                    state.dataSurface->Surface(SurfNum).ExtBoundCond <= 0) { // The external layer is not exposed to zone
                     ShowSevereError(state, "GetMoistureBalanceEMPDInput: EMPD properties are assigned to the outside layer in Construction=" +
                                     state.dataConstruction->Construct(ConstrNum).Name);
                     ShowContinueError(state, "..Outside layer material with EMPD properties = " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
@@ -334,7 +331,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         // Create dynamic array for surface moisture calculation
 
         // USE STATEMENTS:
-        using DataHeatBalFanSys::MAT;
         using Psychrometrics::PsyRhovFnTdbRh;
         using Psychrometrics::PsyRhovFnTdbWPb_fast;
 
@@ -343,22 +339,22 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         int SurfNum;
 
         if (state.dataMoistureBalEMPD->InitEnvrnFlag) {
-            RVSurfaceOld.allocate(TotSurfaces);
-            RVSurface.allocate(TotSurfaces);
-            HeatFluxLatent.allocate(TotSurfaces);
-            state.dataMoistureBalEMPD->EMPDReportVars.allocate(TotSurfaces);
-            RVSurfLayer.allocate(TotSurfaces);
-            RVSurfLayerOld.allocate(TotSurfaces);
-            RVDeepLayer.allocate(TotSurfaces);
-            RVdeepOld.allocate(TotSurfaces);
-            RVwall.allocate(TotSurfaces);
+            RVSurfaceOld.allocate(state.dataSurface->TotSurfaces);
+            RVSurface.allocate(state.dataSurface->TotSurfaces);
+            HeatFluxLatent.allocate(state.dataSurface->TotSurfaces);
+            state.dataMoistureBalEMPD->EMPDReportVars.allocate(state.dataSurface->TotSurfaces);
+            RVSurfLayer.allocate(state.dataSurface->TotSurfaces);
+            RVSurfLayerOld.allocate(state.dataSurface->TotSurfaces);
+            RVDeepLayer.allocate(state.dataSurface->TotSurfaces);
+            RVdeepOld.allocate(state.dataSurface->TotSurfaces);
+            RVwall.allocate(state.dataSurface->TotSurfaces);
         }
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            ZoneNum = Surface(SurfNum).Zone;
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
-                                                 PsyRhovFnTdbRh(state, MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(state.dataHeatBalFanSys->MAT(ZoneNum), max(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
+                                                 PsyRhovFnTdbRh(state, state.dataHeatBalFanSys->MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
             RVSurfaceOld(SurfNum) = rv_air_in_initval;
             RVSurface(SurfNum) = rv_air_in_initval;
             RVSurfLayer(SurfNum) = rv_air_in_initval;
@@ -372,11 +368,11 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         GetMoistureBalanceEMPDInput(state);
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) continue;
             EMPDReportVarsData &rvd = state.dataMoistureBalEMPD->EMPDReportVars(SurfNum);
-            const std::string surf_name = Surface(SurfNum).Name;
+            const std::string surf_name = state.dataSurface->Surface(SurfNum).Name;
             SetupOutputVariable(state,
                 "EMPD Surface Inside Face Water Vapor Density", OutputProcessor::Unit::kg_m3, rvd.rv_surface, "Zone", "State", surf_name);
             SetupOutputVariable(state, "EMPD Surface Layer Moisture Content", OutputProcessor::Unit::kg_m3, rvd.u_surface_layer, "Zone", "State", surf_name);
@@ -466,7 +462,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
             OneTimeFlag = true;
         }
 
-        auto const &surface(Surface(SurfNum));                 // input
+        auto const &surface(state.dataSurface->Surface(SurfNum));                 // input
         auto &rv_surface(RVSurface(SurfNum));                  // output
         auto const &rv_surface_old(RVSurfaceOld(SurfNum));     // input
         auto const &h_mass_conv_in_fd(HMassConvInFD(SurfNum)); // input
@@ -497,7 +493,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         auto const &material(state.dataMaterial->Material(MatNum));
         if (material.EMPDmu <= 0.0) {
-            rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
+            rv_surface = PsyRhovFnTdbWPb(TempZone, state.dataHeatBalFanSys->ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
             return;
         }
 
@@ -576,7 +572,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         RH_surf_layer_tmp =
             RH_surf_layer_old + state.dataGlobal->TimeStepZone * 3600.0 * (-mass_flux_surf_layer / (material.Density * material.EMPDSurfaceDepth * dU_dRH));
 
-        //	RH_surf_layer = RH_surf_layer_tmp;
+        //    RH_surf_layer = RH_surf_layer_tmp;
 
         if (RH_surf_layer_old < RH_deep_layer_old && RH_surf_layer_old < RHZone) {
             if (RHZone > RH_deep_layer_old) {

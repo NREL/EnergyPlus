@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     auto numZones = inputProcessor->getNumObjectsFound(*state, "Zone");
-    ZoneReOrder.allocate(numZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(numZones);
     GetZoneData(*state, ErrorsFound);
     GetAirFlowFlag(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     // setup mixing and infiltration objects
     state->dataGlobal->NumOfZones = 2;
-    ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -568,7 +568,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_EQ(Node(8).MassFlowRate,
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
-    ZoneReOrder.deallocate();
+    state->dataHeatBalFanSys->ZoneReOrder.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Node.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     state->dataGlobal->NumOfZones = 2;
-    ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1246,7 +1246,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataHeatBal->HConvIn(6) = 0.5;
 
     state->dataGlobal->KickOffSimulation = true;
-    DataHeatBalFanSys::ZoneLatentGain.allocate(1);
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);
@@ -1255,10 +1255,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     // Set up
     OutAirNodeManager::GetOutAirNodesInput(*state);
     state->dataEnvrn->OutBaroPress = 101325;
-    ScheduleManager::Schedule(1).CurrentValue = 25.0;
-    ScheduleManager::Schedule(2).CurrentValue = 20.0;
-    ScheduleManager::Schedule(3).CurrentValue = 1.5;
-    ScheduleManager::Schedule(4).CurrentValue = 90.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 25.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 20.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 1.5;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 90.0;
 
     OutAirNodeManager::InitOutAirNodes(*state);
 
@@ -1575,10 +1575,10 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
     // Find the fenestration surface
-    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", state->dataConstruction->Construct);
-    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
-    Real64 transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
+    EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win1ConstNum);
+    Real64 transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
     Real64 refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
@@ -1592,8 +1592,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
     HeatBalanceManager::ManageHeatBalance(*state);
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", state->dataConstruction->Construct);
-    EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
-    transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
+    EXPECT_EQ(state->dataSurface->Surface(winSurfNum).Construction, win2ConstNum);
+    transSol = state->dataSurface->SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
     refPtIllum = state->dataDaylightingData->ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
@@ -1875,17 +1875,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
 TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
 {
 
-    DataSurfaces::TotSurfaces = 3;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 3;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
     state->dataHeatBal->TotConstructs = 3;
     state->dataConstruction->Construct.allocate( state->dataHeatBal->TotConstructs);
 
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::Window;
-    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::Window;
-    DataSurfaces::Surface(1).Construction = 1;
-    DataSurfaces::Surface(2).Construction = 2;
-    DataSurfaces::Surface(3).Construction = 3;
+    state->dataSurface->Surface(1).Class = DataSurfaces::SurfaceClass::Wall;
+    state->dataSurface->Surface(2).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(3).Class = DataSurfaces::SurfaceClass::Window;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 2;
+    state->dataSurface->Surface(3).Construction = 3;
     state->dataConstruction->Construct(1).WindowTypeBSDF = false;
     state->dataConstruction->Construct(2).WindowTypeBSDF = false;
     state->dataConstruction->Construct(3).WindowTypeBSDF = true;
@@ -1894,9 +1894,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     state->dataConstruction->Construct(2).TotLayers = SurfsForRegWindow;
     state->dataConstruction->Construct(3).TotLayers = 1;
 
-    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, DataSurfaces::TotSurfaces, 0.0);
-    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, DataSurfaces::TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempFront.dimension(10, state->dataSurface->TotSurfaces, 0.0);
+    state->dataHeatBal->SurfWinFenLaySurfTempBack.dimension(10, state->dataSurface->TotSurfaces, 0.0);
+    DataHeatBalSurface::TH.dimension(2, Construction::MaxCTFTerms, state->dataSurface->TotSurfaces, 0.0);
 
     DataHeatBalSurface::TH(1,1,1) = 21.0;
     DataHeatBalSurface::TH(1,1,2) = 22.0;
@@ -2154,9 +2154,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionSwitchTest)
 
     SimulationManager::ManageSimulation(*state);
 
-    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
-    EXPECT_EQ(DataSurfaces::Surface(surfNum).Construction, DataSurfaces::Surface(surfNum).EMSConstructionOverrideValue);
-    EXPECT_TRUE(DataSurfaces::Surface(surfNum).EMSConstructionOverrideON);
+    int surfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", state->dataSurface->Surface);
+    EXPECT_EQ(state->dataSurface->Surface(surfNum).Construction, state->dataSurface->Surface(surfNum).EMSConstructionOverrideValue);
+    EXPECT_TRUE(state->dataSurface->Surface(surfNum).EMSConstructionOverrideON);
 }
 
 } // namespace EnergyPlus

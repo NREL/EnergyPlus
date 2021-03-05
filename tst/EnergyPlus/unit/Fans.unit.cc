@@ -65,9 +65,9 @@ using namespace EnergyPlus::Fans;
 
 TEST_F(EnergyPlusFixture, Fans_FanSizing)
 {
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
     state->dataFans->NumFans = 1;
     Fan.allocate(state->dataFans->NumFans);
     FanNumericFields.allocate(state->dataFans->NumFans);
@@ -85,15 +85,15 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 
     FanNumericFields(FanNum).FieldNames(3) = "Maximum Flow Rate";
 
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
 
     // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-    DataNonZoneNonAirloopValue = 1.00635;
+    state->dataSize->DataNonZoneNonAirloopValue = 1.00635;
     SizeFan(*state, FanNum);
     EXPECT_DOUBLE_EQ(1.00635, Fan(FanNum).MaxAirFlowRate);
-    DataNonZoneNonAirloopValue = 0.0;
+    state->dataSize->DataNonZoneNonAirloopValue = 0.0;
     EXPECT_NEAR(1.0371, Fan(FanNum).DesignPointFEI, 0.0001);
 }
 

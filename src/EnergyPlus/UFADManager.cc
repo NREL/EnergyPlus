@@ -112,9 +112,6 @@ namespace EnergyPlus::UFADManager {
     using DataHVACGlobals::SysTimeElapsed;
     using namespace DataUCSDSharedData;
 
-    // Data
-    // MODULE VARIABLE DECLARATIONS:
-
     void ManageUCSDUFModels(EnergyPlusData &state,
                             int const ZoneNum,      // index number for the specified zone
                             DataRoomAirModel::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
@@ -207,9 +204,9 @@ namespace EnergyPlus::UFADManager {
         for (int Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
             int SurfNum = APos_Window(Ctd);
             if (SurfNum == 0) continue;
-            if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
-                Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+            if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment || state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
+                state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     ++NumShadesDown;
                 }
             }
@@ -423,9 +420,9 @@ namespace EnergyPlus::UFADManager {
             for (int Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
                 int SurfNum = APos_Window(Ctd);
                 if (SurfNum == 0) continue;
-                if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
-                    Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
-                    state.dataRoomAirMod->ZoneUCSDUE(UINum).WinWidth += Surface(SurfNum).Width;
+                if (state.dataSurface->Surface(SurfNum).ExtBoundCond == ExternalEnvironment || state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt ||
+                    state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCoefCalcExt || state.dataSurface->Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
+                    state.dataRoomAirMod->ZoneUCSDUE(UINum).WinWidth += state.dataSurface->Surface(SurfNum).Width;
                     ++state.dataRoomAirMod->ZoneUCSDUE(UINum).NumExtWin;
                 }
             }
@@ -645,10 +642,10 @@ namespace EnergyPlus::UFADManager {
             // WALL Hc, HA and HAT calculation
             for (Ctd = PosZ_Wall((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Wall((ZoneNum - 1) * 2 + 2); ++Ctd) {
                 SurfNum = APos_Wall(Ctd);
-                Surface(SurfNum).TAirRef = AdjacentAirTemp;
+                state.dataSurface->Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
-                Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
-                Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                 ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
                 ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
 
@@ -657,8 +654,8 @@ namespace EnergyPlus::UFADManager {
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HWall(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
-                    state.dataUFADManager->HA_MX += Surface(SurfNum).Area * HWall(Ctd);
+                    state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
+                    state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * HWall(Ctd);
                 }
 
                 // The Wall surface is in the lower subzone
@@ -666,13 +663,13 @@ namespace EnergyPlus::UFADManager {
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HWall(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * HWall(Ctd);
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * HWall(Ctd);
                 }
 
                 if (std::abs(ZInfSurf - ZSupSurf) < 1.e-10) {
                     ShowSevereError(state, "RoomAirModelUFAD:HcUCSDUF: Surface values will cause divide by zero.");
-                    ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(Surface(SurfNum).Zone).Name + "\", Surface=\"" + Surface(SurfNum).Name + "\".");
+                    ShowContinueError(state, "Zone=\"" + state.dataHeatBal->Zone(state.dataSurface->Surface(SurfNum).Zone).Name + "\", Surface=\"" + state.dataSurface->Surface(SurfNum).Name + "\".");
                     ShowContinueError(state, format("ZInfSurf=[{:.4R}], LayH=[{:.4R}].", ZInfSurf, LayH));
                     ShowContinueError(state, format("ZSupSurf=[{:.4R}], LayH=[{:.4R}].", ZSupSurf, LayH));
                     ShowFatalError(state, "...Previous condition causes termination.");
@@ -688,10 +685,10 @@ namespace EnergyPlus::UFADManager {
                     HLD = state.dataRoomAirMod->UFHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HWall(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                    state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
-                    state.dataUFADManager->HA_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
+                    state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = TmedDV;
                 }
 
@@ -702,11 +699,11 @@ namespace EnergyPlus::UFADManager {
             // WINDOW Hc, HA and HAT CALCULATION
             for (Ctd = PosZ_Window((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Window((ZoneNum - 1) * 2 + 2); ++Ctd) {
                 SurfNum = APos_Window(Ctd);
-                Surface(SurfNum).TAirRef = AdjacentAirTemp;
+                state.dataSurface->Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
-                if (Surface(SurfNum).Tilt > 10.0 && Surface(SurfNum).Tilt < 170.0) { // Window Wall
-                    Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
-                    Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
+                if (state.dataSurface->Surface(SurfNum).Tilt > 10.0 && state.dataSurface->Surface(SurfNum).Tilt < 170.0) { // Window Wall
+                    Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                    Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                     ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
                     ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
 
@@ -714,20 +711,20 @@ namespace EnergyPlus::UFADManager {
                         state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
                         CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                         HWindow(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                        state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
-                        state.dataUFADManager->HA_MX += Surface(SurfNum).Area * HWindow(Ctd);
-                        state.dataUFADManager->HAT_MXWin += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
-                        state.dataUFADManager->HA_MXWin += Surface(SurfNum).Area * HWindow(Ctd);
+                        state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
+                        state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * HWindow(Ctd);
+                        state.dataUFADManager->HAT_MXWin += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
+                        state.dataUFADManager->HA_MXWin += state.dataSurface->Surface(SurfNum).Area * HWindow(Ctd);
                     }
 
                     if (ZSupSurf < LayH) {
                         state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
                         CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                         HWindow(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                        state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
-                        state.dataUFADManager->HA_OC += Surface(SurfNum).Area * HWindow(Ctd);
-                        state.dataUFADManager->HAT_OCWin += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
-                        state.dataUFADManager->HA_OCWin += Surface(SurfNum).Area * HWindow(Ctd);
+                        state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
+                        state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * HWindow(Ctd);
+                        state.dataUFADManager->HAT_OCWin += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
+                        state.dataUFADManager->HA_OCWin += state.dataSurface->Surface(SurfNum).Area * HWindow(Ctd);
                     }
 
                     if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
@@ -739,32 +736,32 @@ namespace EnergyPlus::UFADManager {
                         HLD = state.dataRoomAirMod->UFHcIn(SurfNum);
                         TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                         HWindow(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                        state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
-                        state.dataUFADManager->HA_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                        state.dataUFADManager->HAT_MXWin += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
-                        state.dataUFADManager->HA_MXWin += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                        state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
-                        state.dataUFADManager->HA_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
-                        state.dataUFADManager->HAT_OCWin += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
-                        state.dataUFADManager->HA_OCWin += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                        state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
+                        state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                        state.dataUFADManager->HAT_MXWin += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
+                        state.dataUFADManager->HA_MXWin += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                        state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
+                        state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                        state.dataUFADManager->HAT_OCWin += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
+                        state.dataUFADManager->HA_OCWin += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                         state.dataHeatBal->TempEffBulkAir(SurfNum) = TmedDV;
                     }
                 }
 
-                if (Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
+                if (state.dataSurface->Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HWindow(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
-                    state.dataUFADManager->HA_MX += Surface(SurfNum).Area * HWindow(Ctd);
+                    state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
+                    state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * HWindow(Ctd);
                 }
 
-                if (Surface(SurfNum).Tilt >= 170.0) { // Window Floor
+                if (state.dataSurface->Surface(SurfNum).Tilt >= 170.0) { // Window Floor
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HWindow(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * HWindow(Ctd);
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * HWindow(Ctd);
                 }
 
                 state.dataRoomAirMod->UFHcIn(SurfNum) = HWindow(Ctd);
@@ -774,10 +771,10 @@ namespace EnergyPlus::UFADManager {
             // DOOR Hc, HA and HAT CALCULATION
             for (Ctd = PosZ_Door((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Door((ZoneNum - 1) * 2 + 2); ++Ctd) { // DOOR
                 SurfNum = APos_Door(Ctd);
-                Surface(SurfNum).TAirRef = AdjacentAirTemp;
+                state.dataSurface->Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
-                Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
-                Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
+                Z1 = minval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
+                Z2 = maxval(state.dataSurface->Surface(SurfNum).Vertex({1, state.dataSurface->Surface(SurfNum).Sides}), &Vector::z);
                 ZSupSurf = Z2 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
                 ZInfSurf = Z1 - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1);
 
@@ -785,16 +782,16 @@ namespace EnergyPlus::UFADManager {
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HDoor(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
-                    state.dataUFADManager->HA_MX += Surface(SurfNum).Area * HDoor(Ctd);
+                    state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
+                    state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * HDoor(Ctd);
                 }
 
                 if (ZSupSurf < LayH) {
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HDoor(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * HDoor(Ctd);
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * HDoor(Ctd);
                 }
 
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
@@ -806,10 +803,10 @@ namespace EnergyPlus::UFADManager {
                     HLD = state.dataRoomAirMod->UFHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HDoor(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                    state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
-                    state.dataUFADManager->HA_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
+                    state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = TmedDV;
                 }
 
@@ -821,7 +818,7 @@ namespace EnergyPlus::UFADManager {
             state.dataUFADManager->HeightIntMass = min(state.dataUFADManager->HeightIntMassDefault, (state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 2) - state.dataRoomAirMod->ZoneCeilingHeight((ZoneNum - 1) * 2 + 1)));
             for (Ctd = PosZ_Internal((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Internal((ZoneNum - 1) * 2 + 2); ++Ctd) {
                 SurfNum = APos_Internal(Ctd);
-                Surface(SurfNum).TAirRef = AdjacentAirTemp;
+                state.dataSurface->Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 ZSupSurf = state.dataUFADManager->HeightIntMass;
                 ZInfSurf = 0.0;
@@ -830,8 +827,8 @@ namespace EnergyPlus::UFADManager {
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
                     CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                     HInternal(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HInternal(Ctd);
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * HInternal(Ctd);
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HInternal(Ctd);
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * HInternal(Ctd);
                 }
 
                 if (ZInfSurf <= LayH && ZSupSurf >= LayH) {
@@ -843,10 +840,10 @@ namespace EnergyPlus::UFADManager {
                     HLD = state.dataRoomAirMod->UFHcIn(SurfNum);
                     TmedDV = ((ZSupSurf - LayH) * state.dataRoomAirMod->ZTMX(ZoneNum) + (LayH - ZInfSurf) * state.dataRoomAirMod->ZTOC(ZoneNum)) / (ZSupSurf - ZInfSurf);
                     HInternal(Ctd) = ((LayH - ZInfSurf) * HLD + (ZSupSurf - LayH) * HLU) / (ZSupSurf - ZInfSurf);
-                    state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
-                    state.dataUFADManager->HA_MX += Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
-                    state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
-                    state.dataUFADManager->HA_OC += Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
+                    state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLU;
+                    state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * (ZSupSurf - LayH) / (ZSupSurf - ZInfSurf) * HLU;
+                    state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * TempSurfIn(SurfNum) * HLD;
+                    state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * (LayH - ZInfSurf) / (ZSupSurf - ZInfSurf) * HLD;
                     state.dataHeatBal->TempEffBulkAir(SurfNum) = TmedDV;
                 }
 
@@ -856,26 +853,26 @@ namespace EnergyPlus::UFADManager {
             // CEILING Hc, HA and HAT CALCULATION
             for (Ctd = PosZ_Ceiling((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Ceiling((ZoneNum - 1) * 2 + 2); ++Ctd) {
                 SurfNum = APos_Ceiling(Ctd);
-                Surface(SurfNum).TAirRef = AdjacentAirTemp;
+                state.dataSurface->Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                 HCeiling(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                state.dataUFADManager->HAT_MX += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HCeiling(Ctd);
-                state.dataUFADManager->HA_MX += Surface(SurfNum).Area * HCeiling(Ctd);
+                state.dataUFADManager->HAT_MX += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HCeiling(Ctd);
+                state.dataUFADManager->HA_MX += state.dataSurface->Surface(SurfNum).Area * HCeiling(Ctd);
                 state.dataRoomAirMod->UFHcIn(SurfNum) = HCeiling(Ctd);
             } // END CEILING
 
             // FLOOR Hc, HA and HAT CALCULATION
             for (Ctd = PosZ_Floor((ZoneNum - 1) * 2 + 1); Ctd <= PosZ_Floor((ZoneNum - 1) * 2 + 2); ++Ctd) {
                 SurfNum = APos_Floor(Ctd);
-                Surface(SurfNum).TAirRef = AdjacentAirTemp;
+                state.dataSurface->Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
                 CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, state.dataRoomAirMod->UFHcIn);
                 HFloor(Ctd) = state.dataRoomAirMod->UFHcIn(SurfNum);
-                state.dataUFADManager->HAT_OC += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HFloor(Ctd);
-                state.dataUFADManager->HA_OC += Surface(SurfNum).Area * HFloor(Ctd);
+                state.dataUFADManager->HAT_OC += state.dataSurface->Surface(SurfNum).Area * TempSurfIn(SurfNum) * HFloor(Ctd);
+                state.dataUFADManager->HA_OC += state.dataSurface->Surface(SurfNum).Area * HFloor(Ctd);
                 state.dataHeatBal->TempEffBulkAir(SurfNum) = state.dataRoomAirMod->ZTFloor(ZoneNum);
                 state.dataRoomAirMod->UFHcIn(SurfNum) = HFloor(Ctd);
             } // END FLOOR
@@ -1049,26 +1046,26 @@ namespace EnergyPlus::UFADManager {
         }
 
         // Add convection from pool cover to occupied region
-        ConvGainsOccSubzone += SumConvPool(ZoneNum);
+        ConvGainsOccSubzone += state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
         // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
         SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone);
-        ConvGainsUpSubzone += SumConvHTRadSys(ZoneNum);
+        ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
             SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, RetAirGains);
             ConvGainsUpSubzone += RetAirGains;
         }
-        ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + SysDepZoneLoadsLagged(ZoneNum);
+        ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
         ZoneEquipConfigNum = state.dataRoomAirMod->ZoneUCSDUI(UINum).ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
             for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
                 NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
                 MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, ZoneAirHumRat(ZoneNum));
+                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 TSupK += MassFlowRate * NodeTemp;
                 SumSysM += MassFlowRate;
             }
@@ -1079,10 +1076,10 @@ namespace EnergyPlus::UFADManager {
             }
         }
         // mass flow times specific heat for infiltration, ventilation, mixing, earth tube
-        SumMCp = MCPI(ZoneNum) + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
+        SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
         // mass flow times specific heat times temperature for infiltration, ventilation, mixing, earth tube
         SumMCpT =
-            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+                state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
         MCp_Total = SumMCp + SumSysMCp;
         MCpT_Total = SumMCpT + SumSysMCpT;
         // For the York MIT diffusers (variable area) the area varies with the flow rate. Assume 400 ft/min velocity
@@ -1102,7 +1099,7 @@ namespace EnergyPlus::UFADManager {
             NumberOfPlumes = 1.0;
             NumDiffusersPerPlume = 1.0;
         }
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > MAT(ZoneNum)) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > state.dataHeatBalFanSys->MAT(ZoneNum)) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1138,11 +1135,11 @@ namespace EnergyPlus::UFADManager {
                             state.dataRoomAirMod->ZoneUCSDUI(UINum).D_Kc * Gamma + state.dataRoomAirMod->ZoneUCSDUI(UINum).E_Kc * pow_2(Gamma);
                 GainsFrac = max(0.6, min(GainsFrac, 1.0));
                 state.dataRoomAirMod->AIRRATOC(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
-                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) *
+                                    PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataRoomAirMod->AIRRATMX(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
-                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) *
+                                    PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
                 if (UseZoneTimeStepHistory) {
                     state.dataRoomAirMod->ZTM3OC(ZoneNum) = state.dataRoomAirMod->XM3TOC(ZoneNum);
@@ -1168,12 +1165,12 @@ namespace EnergyPlus::UFADManager {
                 // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
                 Real64 TempDepCoef = GainsFrac * state.dataUFADManager->HA_OC + MCp_Total;
                 Real64 TempIndCoef =
-                    GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + NonAirSystemResponse(ZoneNum) / ZoneMult;
+                    GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTOC(ZoneNum) = (TempHistTerm + GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total +
-                                         NonAirSystemResponse(ZoneNum) / ZoneMult) /
+                                state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult) /
                                         ((11.0 / 6.0) * AirCap + GainsFrac * state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
@@ -1228,8 +1225,8 @@ namespace EnergyPlus::UFADManager {
             state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
             state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-            AirCap = AIRRAT(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+            AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
+            TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
 
             for (Ctd = 1; Ctd <= 3; ++Ctd) {
                 Real64 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
@@ -1241,13 +1238,13 @@ namespace EnergyPlus::UFADManager {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
-                            ZTAveraged = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                            ZTAveraged = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZTAveraged = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            ZTAveraged = (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
                                          TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
-                        ZTAveraged = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        ZTAveraged = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                     }
                 }
                 state.dataRoomAirMod->ZTOC(ZoneNum) = ZTAveraged;
@@ -1262,13 +1259,13 @@ namespace EnergyPlus::UFADManager {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
-                            ZTAveraged = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                            ZTAveraged = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZTAveraged = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            ZTAveraged = (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
                                          TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
-                        ZTAveraged = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        ZTAveraged = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                     }
                 }
                 state.dataRoomAirMod->ZTOC(ZoneNum) = ZTAveraged;
@@ -1303,16 +1300,16 @@ namespace EnergyPlus::UFADManager {
         // Temperature at the thermostat/temperature control sensor
 
         if (MIXFLAG) {
-            TempTstatAir(ZoneNum) = ZTAveraged;
+            state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = ZTAveraged;
         } else {
             if (HeightThermostat < HeightOccupiedSubzoneAve) {
-                TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
             } else if (HeightThermostat >= HeightOccupiedSubzoneAve && HeightThermostat < HeightUpSubzoneAve) {
-                TempTstatAir(ZoneNum) =
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) =
                     (state.dataRoomAirMod->ZTOC(ZoneNum) * (HeightUpSubzoneAve - HeightThermostat) + state.dataRoomAirMod->ZTMX(ZoneNum) * (HeightThermostat - HeightOccupiedSubzoneAve)) /
                     (HeightUpSubzoneAve - HeightOccupiedSubzoneAve);
             } else if (HeightThermostat >= HeightUpSubzoneAve && HeightThermostat <= CeilingHeight) {
-                TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             } else {
                 ShowFatalError(state, "Underfloor air distribution thermostat height is above ceiling or below floor in Zone: " + state.dataHeatBal->Zone(ZoneNum).Name);
             }
@@ -1528,25 +1525,25 @@ namespace EnergyPlus::UFADManager {
         }
 
         // Add convection from pool cover to occupied region
-        ConvGainsOccSubzone += SumConvPool(ZoneNum);
+        ConvGainsOccSubzone += state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
         // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
         SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone);
-        ConvGainsUpSubzone += SumConvHTRadSys(ZoneNum);
+        ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
             SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone, RetAirGains);
             ConvGainsUpSubzone += RetAirGains;
         }
-        ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + SysDepZoneLoadsLagged(ZoneNum);
+        ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
         ZoneEquipConfigNum = state.dataRoomAirMod->ZoneUCSDUE(UINum).ZoneEquipPtr;
         if (ZoneEquipConfigNum > 0) {
             for (InNodeIndex = 1; InNodeIndex <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++InNodeIndex) {
                 NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).Temp;
                 MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(InNodeIndex)).MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
-                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, ZoneAirHumRat(ZoneNum));
+                TotSysFlow += MassFlowRate / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, NodeTemp, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 TSupK += MassFlowRate * NodeTemp;
                 SumSysM += MassFlowRate;
             }
@@ -1557,9 +1554,9 @@ namespace EnergyPlus::UFADManager {
             }
         }
         // mass flow times specific heat for infiltration, ventilation, mixing
-        SumMCp = MCPI(ZoneNum) + MCPV(ZoneNum) + MCPM(ZoneNum) + MDotCPOA(ZoneNum);
+        SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
         // mass flow times specific heat times temperature for infiltration, ventilation, mixing
-        SumMCpT = MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+        SumMCpT = state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
 
         MCp_Total = SumMCp + SumSysMCp;
         MCpT_Total = SumMCpT + SumSysMCpT;
@@ -1583,7 +1580,7 @@ namespace EnergyPlus::UFADManager {
             NumberOfPlumes = 1.0;
             NumDiffusersPerPlume = 1.0;
         }
-        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > MAT(ZoneNum)) {
+        if ((PowerInPlumes <= 0.0) || (TotSysFlow == 0.0) || (TSupK - DataGlobalConstants::KelvinConv) > state.dataHeatBalFanSys->MAT(ZoneNum)) {
             // The system will mix
             HeightFrac = 0.0;
         } else {
@@ -1651,11 +1648,11 @@ namespace EnergyPlus::UFADManager {
                     GainsFrac -= 0.2;
                 }
                 state.dataRoomAirMod->AIRRATOC(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * (state.dataRoomAirMod->HeightTransition(ZoneNum) - min(state.dataRoomAirMod->HeightTransition(ZoneNum), 0.2)) / CeilingHeight *
-                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATOC(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) *
+                                    PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
                 state.dataRoomAirMod->AIRRATMX(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * (CeilingHeight - state.dataRoomAirMod->HeightTransition(ZoneNum)) / CeilingHeight *
-                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                                    PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
+                                    state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAirMod->MATMX(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) *
+                                    PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
                 if (UseZoneTimeStepHistory) {
                     state.dataRoomAirMod->ZTM3OC(ZoneNum) = state.dataRoomAirMod->XM3TOC(ZoneNum);
@@ -1680,12 +1677,12 @@ namespace EnergyPlus::UFADManager {
                 TempHistTerm = AirCap * (3.0 * state.dataRoomAirMod->ZTM1OC(ZoneNum) - (3.0 / 2.0) * state.dataRoomAirMod->ZTM2OC(ZoneNum) + (1.0 / 3.0) * state.dataRoomAirMod->ZTM3OC(ZoneNum));
                 TempDepCoef = GainsFrac * state.dataUFADManager->HA_OC + MCp_Total;
                 TempIndCoef =
-                    GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + NonAirSystemResponse(ZoneNum) / ZoneMult;
+                    GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total + state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult;
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
                         state.dataRoomAirMod->ZTOC(ZoneNum) = (TempHistTerm + GainsFrac * (ConvGains + state.dataUFADManager->HAT_OC + state.dataUFADManager->HAT_MX - state.dataUFADManager->HA_MX * state.dataRoomAirMod->ZTMX(ZoneNum)) + MCpT_Total +
-                                         NonAirSystemResponse(ZoneNum) / ZoneMult) /
+                                state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult) /
                                         ((11.0 / 6.0) * AirCap + GainsFrac * state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
@@ -1743,8 +1740,8 @@ namespace EnergyPlus::UFADManager {
             state.dataRoomAirMod->AvgTempGrad(ZoneNum) = 0.0;
             state.dataRoomAirMod->MaxTempGrad(ZoneNum) = 0.0;
             state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel = false;
-            AirCap = AIRRAT(ZoneNum);
-            TempHistTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+            AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
+            TempHistTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
 
             for (Ctd = 1; Ctd <= 3; ++Ctd) {
                 TempDepCoef = state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total;
@@ -1755,13 +1752,13 @@ namespace EnergyPlus::UFADManager {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
-                            ZTAveraged = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                            ZTAveraged = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZTAveraged = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            ZTAveraged = (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
                                          TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
-                        ZTAveraged = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        ZTAveraged = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                     }
                 }
                 state.dataRoomAirMod->ZTOC(ZoneNum) = ZTAveraged;
@@ -1776,13 +1773,13 @@ namespace EnergyPlus::UFADManager {
                         ZTAveraged = (TempHistTerm + ConvGains + state.dataUFADManager->HAT_MX + state.dataUFADManager->HAT_OC + MCpT_Total) / ((11.0 / 6.0) * AirCap + state.dataUFADManager->HA_MX + state.dataUFADManager->HA_OC + MCp_Total);
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
-                            ZTAveraged = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                            ZTAveraged = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZTAveraged = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            ZTAveraged = (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
                                          TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
-                        ZTAveraged = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        ZTAveraged = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                     }
                 }
                 state.dataRoomAirMod->ZTOC(ZoneNum) = ZTAveraged;
@@ -1816,16 +1813,16 @@ namespace EnergyPlus::UFADManager {
         // Temperature at the thermostat/temperature control sensor
 
         if (MIXFLAG) {
-            TempTstatAir(ZoneNum) = ZTAveraged;
+            state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = ZTAveraged;
         } else {
             if (HeightThermostat < HeightOccupiedSubzoneAve) {
-                TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTOC(ZoneNum);
             } else if (HeightThermostat >= HeightOccupiedSubzoneAve && HeightThermostat < HeightUpSubzoneAve) {
-                TempTstatAir(ZoneNum) =
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) =
                     (state.dataRoomAirMod->ZTOC(ZoneNum) * (HeightUpSubzoneAve - HeightThermostat) + state.dataRoomAirMod->ZTMX(ZoneNum) * (HeightThermostat - HeightOccupiedSubzoneAve)) /
                     (HeightUpSubzoneAve - HeightOccupiedSubzoneAve);
             } else if (HeightThermostat >= HeightUpSubzoneAve && HeightThermostat <= CeilingHeight) {
-                TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
+                state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataRoomAirMod->ZTMX(ZoneNum);
             } else {
                 ShowFatalError(state, "Underfloor air distribution thermostat height is above ceiling or below floor in Zone: " + state.dataHeatBal->Zone(ZoneNum).Name);
             }

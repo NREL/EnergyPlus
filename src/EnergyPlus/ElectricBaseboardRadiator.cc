@@ -233,8 +233,6 @@ namespace ElectricBaseboardRadiator {
         // This subroutine gets the input for the Baseboard units.
 
         // Using/Aliasing
-        using DataSurfaces::Surface;
-
         using GlobalNames::VerifyUniqueBaseboardName;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
@@ -484,7 +482,7 @@ namespace ElectricBaseboardRadiator {
                     ElecBaseboard(BaseboardNum).TotSurfToDistrib = MinFraction;
                 }
                 if (ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) != 0) {
-                    Surface(ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    state.dataSurface->Surface(ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
                 }
 
                 AllFracsSummed += ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum);
@@ -713,43 +711,45 @@ namespace ElectricBaseboardRadiator {
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
-        DataScalableCapSizingON = false;
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
-        if (CurZoneEqNum > 0) {
+        state.dataSize->DataScalableCapSizingON = false;
+
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             CompType = cCMO_BBRadiator_Electric;
             CompName = ElecBaseboard(BaseboardNum).EquipName;
-            DataFracOfAutosizedHeatingCapacity = 1.0;
-            DataZoneNumber = ElecBaseboard(BaseboardNum).ZonePtr;
+            state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+            state.dataSize->DataZoneNumber = ElecBaseboard(BaseboardNum).ZonePtr;
             SizingMethod = HeatingCapacitySizing;
             FieldNum = 1;
             PrintFlag = true;
             SizingString = ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = ElecBaseboard(BaseboardNum).HeatingCapMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (ElecBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     } else {
-                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     }
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
-                    if (ZoneSizingRunDone) {
-                        ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                    if (state.dataSize->ZoneSizingRunDone) {
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
-                    TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    DataScalableCapSizingON = true;
+                    TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     FracOfAutoSzCap = AutoSize;
                     bool ErrorsFound = false;
                     HeatingCapacitySizer sizerHeatingCapacity;
@@ -757,8 +757,8 @@ namespace ElectricBaseboardRadiator {
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     FracOfAutoSzCap = sizerHeatingCapacity.size(state, FracOfAutoSzCap, ErrorsFound);
                     TempSize = FracOfAutoSzCap;
-                    DataFracOfAutosizedHeatingCapacity = 1.0;
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else {
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
@@ -767,7 +767,7 @@ namespace ElectricBaseboardRadiator {
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 ElecBaseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                DataScalableCapSizingON = false;
+                state.dataSize->DataScalableCapSizingON = false;
             }
         }
     }
@@ -1044,9 +1044,6 @@ namespace ElectricBaseboardRadiator {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MaxRadHeatFlux;
-        using DataHeatBalFanSys::QElecBaseboardSurf;
-        using DataHeatBalFanSys::QElecBaseboardToPerson;
-        using DataSurfaces::Surface;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1059,26 +1056,26 @@ namespace ElectricBaseboardRadiator {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
-        QElecBaseboardSurf = 0.0;
-        QElecBaseboardToPerson = 0.0;
+        state.dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
+        state.dataHeatBalFanSys->QElecBaseboardToPerson = 0.0;
 
         for (BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum) {
 
             if (ElecBaseboard(BaseboardNum).ZonePtr >
                 0) { // issue 5806 can be zero during first calls to baseboards, will be set after all are modeled
                 ZoneNum = ElecBaseboard(BaseboardNum).ZonePtr;
-                QElecBaseboardToPerson(ZoneNum) += QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribPerson;
+                state.dataHeatBalFanSys->QElecBaseboardToPerson(ZoneNum) += QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribPerson;
 
                 for (RadSurfNum = 1; RadSurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++RadSurfNum) {
                     SurfNum = ElecBaseboard(BaseboardNum).SurfacePtr(RadSurfNum);
-                    if (Surface(SurfNum).Area > SmallestArea) {
+                    if (state.dataSurface->Surface(SurfNum).Area > SmallestArea) {
                         ThisSurfIntensity =
-                            (QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) / Surface(SurfNum).Area);
-                        QElecBaseboardSurf(SurfNum) += ThisSurfIntensity;
+                            (QBBElecRadSource(BaseboardNum) * ElecBaseboard(BaseboardNum).FracDistribToSurf(RadSurfNum) / state.dataSurface->Surface(SurfNum).Area);
+                        state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) += ThisSurfIntensity;
                         if (ThisSurfIntensity > MaxRadHeatFlux) {
                             ShowSevereError(state, "DistributeBBElecRadGains:  excessive thermal radiation heat flux intensity detected");
-                            ShowContinueError(state, "Surface = " + Surface(SurfNum).Name);
-                            ShowContinueError(state, format("Surface area = {:.3R} [m2]", Surface(SurfNum).Area));
+                            ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
+                            ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
                             ShowContinueError(state, "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard(BaseboardNum).EquipName);
                             ShowContinueError(state, format("Radiation intensity = {:.2R} [W/m2]", ThisSurfIntensity));
                             ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric);
@@ -1086,8 +1083,8 @@ namespace ElectricBaseboardRadiator {
                         }
                     } else {
                         ShowSevereError(state, "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux");
-                        ShowContinueError(state, "Surface = " + Surface(SurfNum).Name);
-                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", Surface(SurfNum).Area));
+                        ShowContinueError(state, "Surface = " + state.dataSurface->Surface(SurfNum).Name);
+                        ShowContinueError(state, format("Surface area = {:.3R} [m2]", state.dataSurface->Surface(SurfNum).Area));
                         ShowContinueError(state, "Occurs in " + cCMO_BBRadiator_Electric + " = " + ElecBaseboard(BaseboardNum).EquipName);
                         ShowContinueError(state, "Assign a larger surface area or more surfaces in " + cCMO_BBRadiator_Electric);
                         ShowFatalError(state, "DistributeBBElecRadGains:  surface not large enough to receive thermal radiation heat flux");
@@ -1140,27 +1137,25 @@ namespace ElectricBaseboardRadiator {
 
         SumHATsurf = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            Area = state.dataSurface->Surface(SurfNum).Area;
 
-            Area = Surface(SurfNum).Area;
-
-            if (Surface(SurfNum).Class == SurfaceClass::Window) {
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfWinDividerArea(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
-                                  SurfWinFrameTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
+                                  state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
-                                  SurfWinDividerTempSurfIn(SurfNum);
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
+                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

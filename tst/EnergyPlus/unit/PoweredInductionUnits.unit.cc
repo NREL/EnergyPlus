@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -184,8 +184,8 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   SPACE2-1 Air Node
@@ -304,7 +304,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     EXPECT_EQ(1.0, state->dataPowerInductionUnits->PIU(SysNum).PriDamperPosition);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
@@ -392,7 +392,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -413,8 +413,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   SPACE2-1 Air Node
@@ -538,7 +538,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     EXPECT_EQ(1.0, state->dataPowerInductionUnits->PIU(SysNum).PriDamperPosition);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.deallocate();
 }
@@ -564,29 +564,29 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds) {
     state->dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow = AutoSize;
     state->dataPowerInductionUnits->PIU(PIUNum).MaxVolHotSteamFlow = AutoSize;
 
-    DataSizing::CurSysNum = 0;
-    DataSizing::SysSizingRunDone = false;
-    DataSizing::ZoneSizingRunDone = true;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->SysSizingRunDone = false;
+    state->dataSize->ZoneSizingRunDone = true;
 
     // Test array out of bounds error. Notice that CurZoneEqNum is 2, while CurTermUnitSizingNum is 1
     // CurZoneEqNum = Current Zone Equipment index (0 if not simulating ZoneEq)
     // CurTermUnitSizingNum = Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
-    DataSizing::CurZoneEqNum = 2;
-    DataSizing::FinalZoneSizing.allocate(2);
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 2.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 1.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTempTU = 10.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
-    DataSizing::FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
+    state->dataSize->CurZoneEqNum = 2;
+    state->dataSize->FinalZoneSizing.allocate(2);
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 2.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 1.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTempTU = 10.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneTempAtHeatPeak = 21.0;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRatTU = 0.006;
+    state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).ZoneHumRatAtHeatPeak = 0.008;
 
-    DataSizing::CurTermUnitSizingNum = 1;
-    DataSizing::TermUnitSizing.allocate(1);
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
-    DataSizing::TermUnitSizing(CurTermUnitSizingNum).AirVolFlow = 1.0;
-    DataSizing::TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = 0.5;
-    DataSizing::TermUnitSingDuct = true;
-    DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
+    state->dataSize->CurTermUnitSizingNum = 1;
+    state->dataSize->TermUnitSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 1.0;
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
+    state->dataSize->TermUnitSingDuct = true;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum) = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum);
 
     // Call the sizing routine now
     PoweredInductionUnits::SizePIU(*state, PIUNum);
@@ -673,7 +673,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -694,8 +694,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;

@@ -275,7 +275,7 @@ namespace ICEngineElectricGenerator {
                 }
                 BranchNodeConnections::TestCompSet(state,
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
-                PlantUtilities::RegisterPlantCompDesignFlow(ICEngineGenerator(genNum).HeatRecInletNodeNum,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, ICEngineGenerator(genNum).HeatRecInletNodeNum,
                                                             ICEngineGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
                 ICEngineGenerator(genNum).HeatRecActive = false;

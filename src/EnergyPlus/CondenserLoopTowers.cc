@@ -2219,6 +2219,8 @@ namespace CondenserLoopTowers {
         Real64 tmpHighSpeedAirFlowRate = this->HighSpeedAirFlowRate;
         Real64 tmpLowSpeedAirFlowRate = this->LowSpeedAirFlowRate;
 
+        auto &PlantSizData(state.dataSize->PlantSizData);
+
         // Find the appropriate Plant Sizing object
         int PltSizCondNum = state.dataPlnt->PlantLoop(this->LoopNum).PlantSizNum;
 
@@ -2226,9 +2228,9 @@ namespace CondenserLoopTowers {
             if (this->TowerInletCondsAutoSize) {
                 if (PltSizCondNum > 0) {
                     // use plant sizing data
-                    DesTowerExitWaterTemp = DataSizing::PlantSizData(PltSizCondNum).ExitTemp;
-                    DesTowerInletWaterTemp = DesTowerExitWaterTemp + DataSizing::PlantSizData(PltSizCondNum).DeltaT;
-                    DesTowerWaterDeltaT = DataSizing::PlantSizData(PltSizCondNum).DeltaT;
+                    DesTowerExitWaterTemp = PlantSizData(PltSizCondNum).ExitTemp;
+                    DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData(PltSizCondNum).DeltaT;
+                    DesTowerWaterDeltaT = PlantSizData(PltSizCondNum).DeltaT;
                 } else {
                     // set hard wired input assumptions
                     // AssumedDeltaT = 11.0;
@@ -2244,24 +2246,24 @@ namespace CondenserLoopTowers {
                 DesTowerWaterDeltaT = this->DesRange;
                 if (PltSizCondNum > 0) {
                     // check the tower range against the plant sizing data
-                    if (std::abs(DesTowerWaterDeltaT - DataSizing::PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
+                    if (std::abs(DesTowerWaterDeltaT - PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
                         ShowWarningError(state, "Error when autosizing the load for cooling tower = " + this->Name +
                                          ". Tower Design Range Temperature is different from the Design Loop Delta Temperature.");
                         ShowContinueError(state, "Tower Design Range Temperature specified in tower = " + this->Name);
                         ShowContinueError(state, "is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = " +
-                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + ".");
+                                          PlantSizData(PltSizCondNum).PlantLoopName + ".");
                         ShowContinueError(state, format("..The Design Range Temperature specified in tower is = {:.2T}", this->DesRange));
                         ShowContinueError(state,
                                           format("..The Design Loop Delta Temperature specified in plant sizing data is = {:.2T}",
-                                                 DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                                                 PlantSizData(PltSizCondNum).DeltaT));
                     }
                     // check if the tower approach is different from plant sizing data
-                    DesTowerApproachFromPlant = DataSizing::PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
+                    DesTowerApproachFromPlant = PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
                     if (std::abs(DesTowerApproachFromPlant - this->DesApproach) > TolTemp) {
                         ShowWarningError(state, "Error when autosizing the UA for cooling tower = " + this->Name +
                                          ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data.");
                         ShowContinueError(state, "The Design Approach Temperature from inputs specified in Sizing:Plant object = " +
-                                          DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
+                                          PlantSizData(PltSizCondNum).PlantLoopName);
                         ShowContinueError(state, "is inconsistent with Design Approach Temperature specified in tower = " + this->Name + ".");
                         ShowContinueError(state,
                                           format("..The Design Approach Temperature from inputs specified is = {:.2T}", DesTowerApproachFromPlant));
@@ -2272,9 +2274,9 @@ namespace CondenserLoopTowers {
         } else { // CoolingTower_VariableSpeed
             if (PltSizCondNum > 0) {
                 // use plant sizing data
-                DesTowerExitWaterTemp = DataSizing::PlantSizData(PltSizCondNum).ExitTemp;
-                DesTowerInletWaterTemp = DesTowerExitWaterTemp + DataSizing::PlantSizData(PltSizCondNum).DeltaT;
-                DesTowerWaterDeltaT = DataSizing::PlantSizData(PltSizCondNum).DeltaT;
+                DesTowerExitWaterTemp = PlantSizData(PltSizCondNum).ExitTemp;
+                DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData(PltSizCondNum).DeltaT;
+                DesTowerWaterDeltaT = PlantSizData(PltSizCondNum).DeltaT;
             } else {
                 // set hard wired input assumptions
                 DesTowerWaterDeltaT = 11.0;
@@ -2314,8 +2316,8 @@ namespace CondenserLoopTowers {
 
         if (this->DesignWaterFlowRateWasAutoSized) {
             if (PltSizCondNum > 0) {
-                if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                    tmpDesignWaterFlowRate = DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    tmpDesignWaterFlowRate = PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                 } else {
                     tmpDesignWaterFlowRate = 0.0;
@@ -2367,7 +2369,7 @@ namespace CondenserLoopTowers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNodeNum, tmpDesignWaterFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNodeNum, tmpDesignWaterFlowRate);
 
         if (this->HighSpeedFanPowerWasAutoSized) {
             // We assume the nominal fan power is 0.0105 times the design load
@@ -2376,7 +2378,7 @@ namespace CondenserLoopTowers {
                 tmpHighSpeedFanPower = this->HighSpeedFanPower;
             } else {
                 if (PltSizCondNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                              DataGlobalConstants::InitConvTemp,
@@ -2448,7 +2450,7 @@ namespace CondenserLoopTowers {
 
         if (this->HighSpeedTowerUAWasAutoSized) {
             if (PltSizCondNum > 0) {
-                if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                          DataGlobalConstants::InitConvTemp,
@@ -2462,7 +2464,7 @@ namespace CondenserLoopTowers {
                     DesTowerLoad = rho * Cp * tmpDesignWaterFlowRate * DesTowerWaterDeltaT;
                     // This conditional statement is to trap when the user specified condenser/tower water design setpoint
                     //  temperature is less than design inlet air wet bulb temperature
-                    if (DataSizing::PlantSizData(PltSizCondNum).ExitTemp <= this->DesInletAirWBTemp) {
+                    if (PlantSizData(PltSizCondNum).ExitTemp <= this->DesInletAirWBTemp) {
                         ShowSevereError(state,
                                         format("Error when autosizing the UA value for cooling tower = {}. Design Loop Exit Temperature must be "
                                                "greater than {:.2T} C when autosizing the tower UA.",
@@ -2470,8 +2472,8 @@ namespace CondenserLoopTowers {
                                                this->DesInletAirWBTemp));
                         ShowContinueError(state,
                                           format("The Design Loop Exit Temperature specified in Sizing:Plant object = {} ({:.2T} C)",
-                                                 DataSizing::PlantSizData(PltSizCondNum).PlantLoopName,
-                                                 DataSizing::PlantSizData(PltSizCondNum).ExitTemp));
+                                                 PlantSizData(PltSizCondNum).PlantLoopName,
+                                                 PlantSizData(PltSizCondNum).ExitTemp));
                         ShowContinueError(
                             state,
                             format("is less than or equal to the design inlet air wet-bulb temperature of {:.2T} C.", this->DesInletAirWBTemp));
@@ -3136,12 +3138,14 @@ namespace CondenserLoopTowers {
         Real64 DesTowerInletAirWBTemp = this->DesInletAirWBTemp;
         Real64 DesTowerInletAirDBTemp = this->DesInletAirDBTemp;
 
+        auto &PlantSizData(state.dataSize->PlantSizData);
+
         if (this->TowerInletCondsAutoSize) {
             if (PltSizCondNum > 0) {
                 // use plant sizing data
-                DesTowerExitWaterTemp = DataSizing::PlantSizData(PltSizCondNum).ExitTemp;
-                DesTowerInletWaterTemp = DesTowerExitWaterTemp + DataSizing::PlantSizData(PltSizCondNum).DeltaT;
-                DesTowerWaterDeltaT = DataSizing::PlantSizData(PltSizCondNum).DeltaT;
+                DesTowerExitWaterTemp = PlantSizData(PltSizCondNum).ExitTemp;
+                DesTowerInletWaterTemp = DesTowerExitWaterTemp + PlantSizData(PltSizCondNum).DeltaT;
+                DesTowerWaterDeltaT = PlantSizData(PltSizCondNum).DeltaT;
             } else {
                 // set default values to replace hard wired input assumptions
                 DesTowerExitWaterTemp = this->DesOutletWaterTemp;
@@ -3155,24 +3159,24 @@ namespace CondenserLoopTowers {
             DesTowerWaterDeltaT = this->DesRange;
             if (PltSizCondNum > 0) {
                 // check the tower range against the plant sizing data
-                if (std::abs(DesTowerWaterDeltaT - DataSizing::PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
+                if (std::abs(DesTowerWaterDeltaT - PlantSizData(PltSizCondNum).DeltaT) > TolTemp) {
                     ShowWarningError(state, "Error when autosizing the load for cooling tower = " + this->Name +
                                      ". Tower Design Range Temperature is different from the Design Loop Delta Temperature.");
                     ShowContinueError(state, "Tower Design Range Temperature specified in tower = " + this->Name);
                     ShowContinueError(state, "is inconsistent with Design Loop Delta Temperature specified in Sizing:Plant object = " +
-                                      DataSizing::PlantSizData(PltSizCondNum).PlantLoopName + ".");
+                                      PlantSizData(PltSizCondNum).PlantLoopName + ".");
                     ShowContinueError(state, format("..The Design Range Temperature specified in tower is = {:.2T}", this->DesRange));
                     ShowContinueError(state,
                                       format("..The Design Loop Delta Temperature specified iin plant sizing data is = {:.2T}",
-                                             DataSizing::PlantSizData(PltSizCondNum).DeltaT));
+                                             PlantSizData(PltSizCondNum).DeltaT));
                 }
                 // check if the tower approach is different from plant sizing data
-                DesTowerApproachFromPlant = DataSizing::PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
+                DesTowerApproachFromPlant = PlantSizData(PltSizCondNum).ExitTemp - this->DesInletAirWBTemp;
                 if (std::abs(DesTowerApproachFromPlant - this->DesApproach) > TolTemp) {
                     ShowWarningError(state, "Error when autosizing the UA for cooling tower = " + this->Name +
                                      ". Tower Design Approach Temperature is inconsistent with Approach from Plant Sizing Data.");
                     ShowContinueError(state, "The Design Approach Temperature from inputs specified in Sizing:Plant object = " +
-                                      DataSizing::PlantSizData(PltSizCondNum).PlantLoopName);
+                                      PlantSizData(PltSizCondNum).PlantLoopName);
                     ShowContinueError(state, "is inconsistent with Design Approach Temperature specified in tower = " + this->Name + ".");
                     ShowContinueError(state,
                                       format("..The Design Approach Temperature from inputs specified is = {:.2T}", DesTowerApproachFromPlant));
@@ -3184,7 +3188,7 @@ namespace CondenserLoopTowers {
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
 
             if (PltSizCondNum > 0) { // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
-                if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                             DesTowerExitWaterTemp,
@@ -3195,7 +3199,7 @@ namespace CondenserLoopTowers {
                                                                 DesTowerExitWaterTemp,
                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                 RoutineName);
-                    DesTowerLoad = rho * Cp * DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT * this->SizFac;
+                    DesTowerLoad = rho * Cp * PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT * this->SizFac;
                     tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                 } else {
                     if (this->TowerNominalCapacityWasAutoSized) tmpNomTowerCap = 0.0;
@@ -3247,7 +3251,7 @@ namespace CondenserLoopTowers {
                                                                     "User-Specified Nominal Capacity [W]",
                                                                     NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomTowerCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomTowerCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomTowerCap));
@@ -3285,7 +3289,7 @@ namespace CondenserLoopTowers {
                                                                     "User-Specified Free Convection Nominal Capacity [W]",
                                                                     NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpTowerFreeConvNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpTowerFreeConvNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Free Convection Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(
@@ -3329,7 +3333,7 @@ namespace CondenserLoopTowers {
                                                                     NomDesWaterFlowUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpDesignWaterFlowRate - NomDesWaterFlowUser) / NomDesWaterFlowUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Design Water Flow Rate of {:.2R} [m3/s]", NomDesWaterFlowUser));
                                     ShowContinueError(state, format("differs from Design Water Flow Rate of {:.2R} [m3/s]", tmpDesignWaterFlowRate));
@@ -3343,7 +3347,7 @@ namespace CondenserLoopTowers {
                 }
             }
 
-            PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNodeNum, tmpDesignWaterFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNodeNum, tmpDesignWaterFlowRate);
 
             if (this->DefaultedDesignAirFlowScalingFactor) {
                 tmpDesignAirFlowRate = tmpNomTowerCap * this->DesignAirFlowPerUnitNomCap * (101325.0 / state.dataEnvrn->StdBaroPress);
@@ -3373,7 +3377,7 @@ namespace CondenserLoopTowers {
                                                                 DesignAirFlowRateUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpDesignAirFlowRate - DesignAirFlowRateUser) / DesignAirFlowRateUser) >
-                                DataSizing::AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(state, format("User-Specified Design Air Flow Rate of {:.2R} [m3/s]", DesignAirFlowRateUser));
                                 ShowContinueError(state, format("differs from Design Air Flow Rate of {:.2R} [m3/s]", tmpDesignAirFlowRate));
@@ -3410,7 +3414,7 @@ namespace CondenserLoopTowers {
                                                                 FreeConvAirFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(tmpFreeConvAirFlowRate - FreeConvAirFlowUser) / FreeConvAirFlowUser) >
-                                DataSizing::AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                                 ShowContinueError(
                                     state,
@@ -3522,8 +3526,8 @@ namespace CondenserLoopTowers {
             if (this->DesignWaterFlowRateWasAutoSized) { // get from plant sizing
                 // UA input method using plant sizing for flow rate, whereas Nominal capacity method uses scalable sizing factor per cap
                 if (PltSizCondNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                        tmpDesignWaterFlowRate = DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        tmpDesignWaterFlowRate = PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                             if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -3564,12 +3568,12 @@ namespace CondenserLoopTowers {
                     }
                 }
             }
-            PlantUtilities::RegisterPlantCompDesignFlow(this->WaterInletNodeNum, tmpDesignWaterFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNodeNum, tmpDesignWaterFlowRate);
 
             if (this->HighSpeedTowerUAWasAutoSized) {
                 // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                 if (PltSizCondNum > 0) {
-                    if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                 DesTowerExitWaterTemp,
@@ -3580,7 +3584,7 @@ namespace CondenserLoopTowers {
                                                                     DesTowerExitWaterTemp,
                                                                     state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                     RoutineName);
-                        DesTowerLoad = rho * Cp * DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT * this->SizFac;
+                        DesTowerLoad = rho * Cp * PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT * this->SizFac;
                         tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             this->TowerNominalCapacity = tmpNomTowerCap;
@@ -3804,7 +3808,7 @@ namespace CondenserLoopTowers {
                     // need an air flow rate to find capacity from UA but flow rate is scaled off capacity
                     // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                     if (PltSizCondNum > 0) {
-                        if (DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->LoopNum).FluidName,
                                                                     DesTowerExitWaterTemp,
@@ -3815,7 +3819,7 @@ namespace CondenserLoopTowers {
                                                                         DesTowerExitWaterTemp,
                                                                         state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                         RoutineName);
-                            DesTowerLoad = rho * Cp * DataSizing::PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT;
+                            DesTowerLoad = rho * Cp * PlantSizData(PltSizCondNum).DesVolFlowRate * DesTowerWaterDeltaT;
                             tmpNomTowerCap = DesTowerLoad / this->HeatRejectCapNomCapSizingRatio;
                             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                                 this->TowerNominalCapacity = tmpNomTowerCap;
@@ -3958,7 +3962,7 @@ namespace CondenserLoopTowers {
                                                             HighSpeedFanPowerUser);
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpHighSpeedFanPower - HighSpeedFanPowerUser) / HighSpeedFanPowerUser) >
-                            DataSizing::AutoVsHardSizingThreshold) {
+                            state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeVSMerkelTower: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, format("User-Specified Design Fan Power of {:.2R} [W]", HighSpeedFanPowerUser));
                             ShowContinueError(state, format("differs from Design Fan Power of {:.2R} [W]", tmpHighSpeedFanPower));

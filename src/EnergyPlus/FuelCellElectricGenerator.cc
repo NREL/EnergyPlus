@@ -837,7 +837,7 @@ namespace FuelCellElectricGenerator {
                 state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.CondensationThresholdTemp = NumArray(19);
 
                 // store cooling water volume flow rate for autosizing system
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterInNode,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterInNode,
                                                             state.dataFuelCellElectGen->FuelCell(thisFuelCell).ExhaustHX.WaterVolumeFlowMax);
             } else {
                 ShowSevereError(state, "Invalid, " + DataIPShortCuts::cAlphaFieldNames(1) + " = " + AlphArray(1));
@@ -1788,7 +1788,7 @@ namespace FuelCellElectricGenerator {
 
                 // get zone air temp
                 if (this->FCPM.ZoneID > 0) {
-                    this->FCPM.QdotSkin = this->FCPM.UAskin * (this->FCPM.TprodGasLeavingFCPM - DataHeatBalFanSys::ZT(this->FCPM.ZoneID));
+                    this->FCPM.QdotSkin = this->FCPM.UAskin * (this->FCPM.TprodGasLeavingFCPM - state.dataHeatBalFanSys->ZT(this->FCPM.ZoneID));
                 }
 
             } else if (this->FCPM.SkinLossMode == DataGenerators::SkinLoss::QuadraticFuelNdot) {

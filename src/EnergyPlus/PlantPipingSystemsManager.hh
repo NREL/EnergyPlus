@@ -972,11 +972,11 @@ namespace PlantPipingSystemsManager {
                                     std::string const &Condition,
                                     bool &ErrorsFound);
 
-    int GetSurfaceCountForOSCM(int OSCMIndex);
+    int GetSurfaceCountForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    std::vector<int> GetSurfaceIndecesForOSCM(int OSCMIndex);
+    std::vector<int> GetSurfaceIndecesForOSCM(EnergyPlusData &state, int OSCMIndex);
 
-    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(int OSCMIndex);
+    std::vector<ZoneCoupledSurfaceData> GetSurfaceDataForOSCM(EnergyPlusData &state, int OSCMIndex);
 
     bool inline IsInRangeReal(Real64 const r, Real64 const lower, Real64 const upper) {
         return ((r >= lower) && (r <= upper));

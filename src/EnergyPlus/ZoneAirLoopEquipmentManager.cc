@@ -135,7 +135,7 @@ namespace ZoneAirLoopEquipmentManager {
                                       state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name));
             }
         }
-        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
         InitZoneAirLoopEquipment(state, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
         InitZoneAirLoopEquipmentTimeStep(state, AirDistUnitNum);
 
@@ -272,7 +272,7 @@ namespace ZoneAirLoopEquipmentManager {
                 state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).AirTerminalSizingSpecIndex = 0;
                 if (!lAlphaBlanks(5)) {
                     state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).AirTerminalSizingSpecIndex =
-                        UtilityRoutines::FindItemInList(AlphArray(5), DataSizing::AirTerminalSizingSpec);
+                        UtilityRoutines::FindItemInList(AlphArray(5), state.dataSize->AirTerminalSizingSpec);
                     if (state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).AirTerminalSizingSpecIndex == 0) {
                         ShowSevereError(state, cAlphaFields(5) + " = " + AlphArray(5) + " not found.");
                         ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataDefineEquipment->AirDistUnit(AirDistUnitNum).Name);
@@ -503,11 +503,11 @@ namespace ZoneAirLoopEquipmentManager {
 
                 // Fill TermUnitSizing with specs from DesignSpecification:AirTerminal:Sizing
                 {
-                    auto &thisTermUnitSizingData(DataSizing::TermUnitSizing(thisADU.TermUnitSizingNum));
+                    auto &thisTermUnitSizingData(state.dataSize->TermUnitSizing(thisADU.TermUnitSizingNum));
                     thisTermUnitSizingData.ADUName = thisADU.Name;
                     if (thisADU.AirTerminalSizingSpecIndex > 0) {
                         {
-                            auto const &thisAirTermSizingSpec(DataSizing::AirTerminalSizingSpec(thisADU.AirTerminalSizingSpecIndex));
+                            auto const &thisAirTermSizingSpec(state.dataSize->AirTerminalSizingSpec(thisADU.AirTerminalSizingSpecIndex));
                             thisTermUnitSizingData.SpecDesCoolSATRatio = thisAirTermSizingSpec.DesCoolSATRatio;
                             thisTermUnitSizingData.SpecDesHeatSATRatio = thisAirTermSizingSpec.DesHeatSATRatio;
                             thisTermUnitSizingData.SpecDesSensCoolingFrac = thisAirTermSizingSpec.DesSensCoolingFrac;

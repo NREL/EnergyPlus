@@ -553,7 +553,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
             if (state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate > 0.0) {
                 this->PlantMassFlowRateMax = state.dataPlnt->PlantLoop(this->CWLoopNum).MaxMassFlowRate;
             } else if (state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum > 0) {
-                this->PlantMassFlowRateMax = DataSizing::PlantSizData(this->CWLoopNum).DesVolFlowRate * rho;
+                this->PlantMassFlowRateMax = state.dataSize->PlantSizData(this->CWLoopNum).DesVolFlowRate * rho;
             } else {
                 this->PlantMassFlowRateMax = 2.0;
             }
@@ -562,7 +562,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
             this->PlantMassFlowRateMax = 2.0; // would like to use plant loop max but not ready yet
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->PlantInletNodeID, this->PlantMassFlowRateMax / rho);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->PlantInletNodeID, this->PlantMassFlowRateMax / rho);
 
         this->A42Model.ElecEff = CurveManager::CurveValue(state,
             this->A42Model.ElecEffCurveID, this->A42Model.MaxElecPower, this->PlantMassFlowRateMax, DataLoopNode::Node(this->PlantInletNodeID).Temp);
@@ -755,7 +755,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
 
         Real64 thisAmbientTemp;
         if (this->ZoneID > 0) {
-            thisAmbientTemp = DataHeatBalFanSys::MAT(this->ZoneID);
+            thisAmbientTemp = state.dataHeatBalFanSys->MAT(this->ZoneID);
         } else { // outdoor location, no zone
             thisAmbientTemp = state.dataEnvrn->OutDryBulbTemp;
         }

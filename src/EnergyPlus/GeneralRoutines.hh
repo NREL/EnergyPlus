@@ -92,14 +92,15 @@ void CheckSysSizing(EnergyPlusData &state,
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized);
+void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
                      std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
+void CheckThisZoneForSizing(EnergyPlusData &state,
+                            int const ZoneNum, // zone index to be checked
                             bool &ZoneWasSized);
 
 void ValidateComponent(EnergyPlusData &state,

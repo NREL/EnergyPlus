@@ -468,42 +468,44 @@ namespace BaseboardElectric {
         int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                              // FractionOfAutosizedHeatingCapacity )
 
-        DataScalableCapSizingON = false;
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
-        if (CurZoneEqNum > 0) {
+        state.dataSize->DataScalableCapSizingON = false;
+
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             CompType = baseboard->Baseboard(BaseboardNum).EquipType;
             CompName = baseboard->Baseboard(BaseboardNum).EquipName;
-            DataFracOfAutosizedHeatingCapacity = 1.0;
-            DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
+            state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+            state.dataSize->DataZoneNumber = baseboard->Baseboard(BaseboardNum).ZonePtr;
             SizingMethod = HeatingCapacitySizing;
             FieldNum = 1;
             PrintFlag = true;
             SizingString = baseboard->BaseboardNumericFields(BaseboardNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = baseboard->Baseboard(BaseboardNum).HeatingCapMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
             if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                 CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                 if (CapSizingMethod == HeatingDesignCapacity) {
                     if (baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     }
                     TempSize = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                        baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                    TempSize = ZoneEqSizing(CurZoneEqNum).DesHeatingLoad;
-                    DataScalableCapSizingON = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                        baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                    TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     CheckZoneSizing(state, CompType, CompName);
-                    ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                    DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
-                    ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                    state.dataSize->DataFracOfAutosizedHeatingCapacity = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesHeatLoad;
                     TempSize = AutoSize;
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataScalableCapSizingON = true;
                 } else {
                     TempSize = baseboard->Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
@@ -512,7 +514,7 @@ namespace BaseboardElectric {
                 sizerHeatingCapacity.overrideSizingString(SizingString);
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 baseboard->Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                DataScalableCapSizingON = false;
+                state.dataSize->DataScalableCapSizingON = false;
             }
         }
     }
