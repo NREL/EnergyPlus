@@ -832,7 +832,6 @@ namespace Photovoltaics {
         // collect statements that assign to variables tied to output variables
 
         // Using/Aliasing
-        using DataHeatBalFanSys::QPVSysSource;
         using TranspiredCollector::SetUTSCQdotSource;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -853,7 +852,7 @@ namespace Photovoltaics {
             auto const SELECT_CASE_var(PVarray(PVnum).CellIntegrationMode);
             // SurfaceSink is not multiplied...
             if (SELECT_CASE_var == iSurfaceOutsideFaceCellIntegration) {
-                QPVSysSource(PVarray(PVnum).SurfacePtr) = -1.0 * PVarray(PVnum).SurfaceSink;
+                state.dataHeatBalFanSys->QPVSysSource(PVarray(PVnum).SurfacePtr) = -1.0 * PVarray(PVnum).SurfaceSink;
 
             } else if (SELECT_CASE_var == iTranspiredCollectorCellIntegration) {
                 SetUTSCQdotSource(state, PVarray(PVnum).UTSCPtr, -1.0 * PVarray(PVnum).SurfaceSink);

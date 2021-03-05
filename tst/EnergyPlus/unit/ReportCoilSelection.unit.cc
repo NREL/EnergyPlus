@@ -137,9 +137,9 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     EXPECT_EQ("No", c2->coilWaterFlowAutoMsg);
 
     // Now add a plant sizing object
-    DataSizing::NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).PlantLoopName = "Chilled Water Loop";
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).PlantLoopName = "Chilled Water Loop";
     isAutoSized = true; // true if autosized
     coilSelectionReportObj->setCoilWaterFlowNodeNums(*state, coil1Name, coil1Type, waterVdot, isAutoSized, chWInletNodeNum, chWOutletNodeNum, loopNum);
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
@@ -271,10 +271,10 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     EXPECT_EQ("No", c1->coilWaterFlowAutoMsg);
 
     // Now add a plant sizing object
-    DataSizing::NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).PlantLoopName = "Steam Loop";
-    DataSizing::PlantSizData(1).LoopType = DataSizing::SteamLoop;
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).PlantLoopName = "Steam Loop";
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::SteamLoop;
     isAutoSized = true; // true if autosized
     coilSelectionReportObj->setCoilWaterFlowNodeNums(*state, coil1Name, coil1Type, waterVdot, isAutoSized, wInletNodeNum, wOutletNodeNum, loopNum);
     auto &c1b(coilSelectionReportObj->coilSelectionDataObjs[0]);
@@ -449,31 +449,31 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
 
     // Test coil reporting
     curZoneEqNum = 1;
-    DataSizing::ZoneEqSizing.allocate(1);
-    DataSizing::TermUnitFinalZoneSizing.allocate(1);
-    DataSizing::CurTermUnitSizingNum = curZoneEqNum;
-    DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
-    DataSizing::TermUnitFinalZoneSizing(DataSizing::CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->TermUnitFinalZoneSizing.allocate(1);
+    state->dataSize->CurTermUnitSizingNum = curZoneEqNum;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU = RatedCoilInDb;
+    state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum).DesHeatCoilInHumRatTU = RatedCoilInHumRat;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ActualZoneNum = 1;
     state->dataZoneEquip->ZoneEquipConfig(curZoneEqNum).ZoneName = state->dataHeatBal->Zone(1).Name;
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
-    DataSizing::FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;
-    DataSizing::FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak = RatedCoilOutDb;
-    DataSizing::FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak = RatedCoilOutHumRat;
-    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak = 21.6;
-    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak = 0.007;
-    DataSizing::FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak = 21.0;
-    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp = 30.0;
-    DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat = 0.007;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesDay = "Heat Design Day";
+    state->dataSize->FinalZoneSizing(curZoneEqNum).DesHeatLoad = RatedCoilSensCap;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).OutTempAtHeatPeak = RatedCoilOutDb;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).OutHumRatAtHeatPeak = RatedCoilOutHumRat;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).ZoneRetTempAtHeatPeak = 21.6;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).ZoneHumRatAtHeatPeak = 0.007;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).ZoneTempAtHeatPeak = 21.0;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesTemp = 30.0;
+    state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesHumRat = 0.007;
 
     Real64 fanHeatGain = 1.3;
     Real64 coilCapFunTempFac = 1.0;
     Real64 DXFlowPerCapMinRatio = 0.00004;
     Real64 DXFlowPerCapMaxRatio = 0.00006;
     state->dataEnvrn->StdRhoAir = 1.2;
-    DataSizing::DataFlowUsedForSizing = airFlowRate / state->dataEnvrn->StdRhoAir;
+    state->dataSize->DataFlowUsedForSizing = airFlowRate / state->dataEnvrn->StdRhoAir;
 
     // setCoilHeatingCapacity will not overwrite previously set temperature data
     coilSelectionReportObj->setCoilHeatingCapacity(*state,
@@ -497,7 +497,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     EXPECT_EQ(entAirDryBulbTemp, c1->coilDesEntTemp);
     EXPECT_EQ(lvgAirDryBulbTemp, c1->coilDesLvgTemp);
 
-    DataSizing::TermUnitSingDuct = true;
+    state->dataSize->TermUnitSingDuct = true;
     // now reset entering/leaving air temps so that setCoilHeatingCapacity will initialize any uninitialized temperature data
     // for example if a non-water coil is used in a terminal unit and setCoilEntAirTemp is not called
     c1->coilDesEntTemp = -999.0;
@@ -518,6 +518,6 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
                                                    DXFlowPerCapMaxRatio);
     EXPECT_EQ(RatedCoilInDb, c1->coilDesEntTemp);
     EXPECT_EQ(RatedCoilInHumRat, c1->coilDesEntHumRat);
-    EXPECT_EQ(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesTemp, c1->coilDesLvgTemp);
-    EXPECT_EQ(DataSizing::FinalZoneSizing(curZoneEqNum).HeatDesHumRat, c1->coilDesLvgHumRat);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesTemp, c1->coilDesLvgTemp);
+    EXPECT_EQ(state->dataSize->FinalZoneSizing(curZoneEqNum).HeatDesHumRat, c1->coilDesLvgHumRat);
 }

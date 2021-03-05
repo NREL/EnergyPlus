@@ -729,7 +729,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
             {
                 auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
                     RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
@@ -744,7 +744,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -752,11 +752,11 @@ namespace EnergyPlus::WindowEquivalentLayer {
                     if (SumSysMCp > 0.0) {
                         RefAirTemp = SumSysMCpT / SumSysMCp;
                     } else {
-                        RefAirTemp = MAT(ZoneNum);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     }
                 } else {
                     // currently set to mean air temp but should add error warning here
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 }
             }
             TaIn = RefAirTemp;
@@ -772,7 +772,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                 {
                     auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                        RefAirTemp = MAT(ZoneNumAdj);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
                         RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
@@ -788,7 +788,7 @@ namespace EnergyPlus::WindowEquivalentLayer {
                         for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
+                            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -796,11 +796,11 @@ namespace EnergyPlus::WindowEquivalentLayer {
                         if (SumSysMCp > 0.0) {
                             RefAirTemp = SumSysMCpT / SumSysMCp;
                         } else {
-                            RefAirTemp = MAT(ZoneNumAdj);
+                            RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                         }
                     } else {
                         // currently set to mean air temp but should add error warning here
-                        RefAirTemp = MAT(ZoneNumAdj);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     }
                 }
 
@@ -809,8 +809,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
-                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
-                        QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
+                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNumAdj) +
+                        state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj) + state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
                      // Calculate LWR from surrounding surfaces if defined for an exterior window
@@ -857,8 +857,8 @@ namespace EnergyPlus::WindowEquivalentLayer {
         SurfOutsideEmiss = LWAbsOut;
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
-        rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
-               QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+        rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
+                state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
         NL = CFS(EQLNum).NL;

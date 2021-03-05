@@ -311,7 +311,7 @@ namespace EnergyPlus::DataSurfaces {
         {
             const auto SELECT_CASE_var(TAirRef);
             if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                RefAirTemp = MAT(Zone);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
             } else if (SELECT_CASE_var == AdjacentAirTemp) {
                 RefAirTemp = state.dataHeatBal->TempEffBulkAir(t_SurfNum);
             } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
@@ -330,7 +330,7 @@ namespace EnergyPlus::DataSurfaces {
                 for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
                     Real64 NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
                     Real64 MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-                    Real64 CpAir = PsyCpAirFnW(ZoneAirHumRat(Zone));
+                    Real64 CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(Zone));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -338,7 +338,7 @@ namespace EnergyPlus::DataSurfaces {
                 RefAirTemp = SumSysMCpT / SumSysMCp;
             } else {
                 // currently set to mean air temp but should add error warning here
-                RefAirTemp = MAT(Zone);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(Zone);
             }
         }
 
@@ -348,8 +348,8 @@ namespace EnergyPlus::DataSurfaces {
     Real64 SurfaceData::getInsideIR(EnergyPlusData &state, const int t_SurfNum)
     {
 
-        const Real64 value = state.dataSurface->SurfWinIRfromParentZone(t_SurfNum) + QHTRadSysSurf(t_SurfNum) + QHWBaseboardSurf(t_SurfNum) + QSteamBaseboardSurf(t_SurfNum) +
-                             QElecBaseboardSurf(t_SurfNum);
+        const Real64 value = state.dataSurface->SurfWinIRfromParentZone(t_SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(t_SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(t_SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(t_SurfNum) +
+                state.dataHeatBalFanSys->QElecBaseboardSurf(t_SurfNum);
         return value;
     }
 
@@ -403,8 +403,8 @@ namespace EnergyPlus::DataSurfaces {
         // Calculates outside infrared radiation
         Real64 value = 0;
         if (ExtBoundCond > 0) {
-            value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + QHTRadSysSurf(ExtBoundCond) + QHWBaseboardSurf(ExtBoundCond) +
-                    QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
+            value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalFanSys->QHTRadSysSurf(ExtBoundCond) + state.dataHeatBalFanSys->QHWBaseboardSurf(ExtBoundCond) +
+                    state.dataHeatBalFanSys->QSteamBaseboardSurf(ExtBoundCond) + state.dataHeatBalFanSys->QElecBaseboardSurf(ExtBoundCond);
         } else {
             Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + DataGlobalConstants::KelvinConv;
             value = state.dataWindowManager->sigma * pow_4(tout);

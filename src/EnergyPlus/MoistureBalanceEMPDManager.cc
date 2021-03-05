@@ -105,7 +105,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
     // Using/Aliasing
     using namespace DataHeatBalance;
-    using DataHeatBalFanSys::ZoneAirHumRat;
     using namespace DataMoistureBalanceEMPD;
     using DataMoistureBalance::HConvInFD;
     using DataMoistureBalance::HMassConvInFD;
@@ -332,7 +331,6 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         // Create dynamic array for surface moisture calculation
 
         // USE STATEMENTS:
-        using DataHeatBalFanSys::MAT;
         using Psychrometrics::PsyRhovFnTdbRh;
         using Psychrometrics::PsyRhovFnTdbWPb_fast;
 
@@ -355,8 +353,8 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
         for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
             if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
-            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(MAT(ZoneNum), max(ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
-                                                 PsyRhovFnTdbRh(state, MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
+            Real64 const rv_air_in_initval = min(PsyRhovFnTdbWPb_fast(state.dataHeatBalFanSys->MAT(ZoneNum), max(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), 1.0e-5), state.dataEnvrn->OutBaroPress),
+                                                 PsyRhovFnTdbRh(state, state.dataHeatBalFanSys->MAT(ZoneNum), 1.0, "InitMoistureBalanceEMPD"));
             RVSurfaceOld(SurfNum) = rv_air_in_initval;
             RVSurface(SurfNum) = rv_air_in_initval;
             RVSurfLayer(SurfNum) = rv_air_in_initval;
@@ -495,7 +493,7 @@ namespace EnergyPlus::MoistureBalanceEMPDManager {
 
         auto const &material(state.dataMaterial->Material(MatNum));
         if (material.EMPDmu <= 0.0) {
-            rv_surface = PsyRhovFnTdbWPb(TempZone, ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
+            rv_surface = PsyRhovFnTdbWPb(TempZone, state.dataHeatBalFanSys->ZoneAirHumRat(surface.Zone), state.dataEnvrn->OutBaroPress);
             return;
         }
 

@@ -881,22 +881,11 @@ namespace EnergyPlus::CoolingPanelSimple {
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::SmallLoad;
         using DataSizing::AutoSize;
-        using DataSizing::AutoVsHardSizingThreshold;
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::CoolingDesignCapacity;
-        using DataSizing::CurZoneEqNum;
-        using DataSizing::DataConstantUsedForSizing;
-        using DataSizing::DataFractionUsedForSizing;
-        using DataSizing::DataScalableCapSizingON;
-        using DataSizing::FinalZoneSizing;
         using DataSizing::FractionOfAutosizedCoolingCapacity;
-        using DataSizing::PlantSizData;
-        using DataSizing::ZoneEqSizing;
-        using DataSizing::ZoneSizingRunDone;
-
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -923,9 +912,10 @@ namespace EnergyPlus::CoolingPanelSimple {
         Real64 WaterVolFlowMaxCoolUser(0.0); // User hard-sized chilled water flow for reporting
 
         DesCoilLoad = 0.0;
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
 
         auto &ThisCP(state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum));
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         CompType = "ZoneHVAC:CoolingPanel:RadiantConvective:Water";
         CompName = ThisCP.EquipID;
@@ -935,7 +925,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             IsAutoSize = true;
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             SizingMethod = CoolingCapacitySizing;
             FieldNum = 4;
@@ -943,21 +933,21 @@ namespace EnergyPlus::CoolingPanelSimple {
             bool errorsFound = false;
             SizingString = state.dataChilledCeilingPanelSimple->CoolingPanelSysNumericFields(CoolingPanelNum).FieldNames(FieldNum) + " [W]";
             CapSizingMethod = ThisCP.CoolingCapMethod;
-            ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 
-            if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
                 if (CapSizingMethod == CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
                     TempSize = ThisCP.ScaledCoolingCapacity;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
-                    DataScalableCapSizingON = true;
+                    state.dataSize->DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataScalableCapSizingON = false;
+                    state.dataSize->DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (ThisCP.WaterVolFlowRateMax == AutoSize) {
                         ShowSevereError(state, RoutineName + ": auto-sizing cannot be done for " + CompType + " = " + ThisCP.EquipID + "\".");
@@ -970,11 +960,11 @@ namespace EnergyPlus::CoolingPanelSimple {
                 if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (CapSizingMethod == CoolingDesignCapacity) {
-                        if (ZoneSizingRunDone) {
+                        if (state.dataSize->ZoneSizingRunDone) {
                             CheckZoneSizing(state, CompType, CompName);
                             SizingMethod = AutoCalculateSizing;
-                            DataConstantUsedForSizing = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
-                            DataFractionUsedForSizing = 1.0;
+                            state.dataSize->DataConstantUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                            state.dataSize->DataFractionUsedForSizing = 1.0;
                         }
                         if (ThisCP.ScaledCoolingCapacity == AutoSize) {
                             TempSize = AutoSize;
@@ -982,19 +972,19 @@ namespace EnergyPlus::CoolingPanelSimple {
                             TempSize = ThisCP.ScaledCoolingCapacity;
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
-                        if (ZoneSizingRunDone) {
+                        if (state.dataSize->ZoneSizingRunDone) {
                             CheckZoneSizing(state, CompType, CompName);
-                            ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
                         }
                         TempSize = ThisCP.ScaledCoolingCapacity * state.dataHeatBal->Zone(ThisCP.ZonePtr).FloorArea;
-                        DataScalableCapSizingON = true;
+                        state.dataSize->DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         CheckZoneSizing(state, CompType, CompName);
-                        ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesCoolLoad;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
-                        DataScalableCapSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).NonAirSysDesCoolLoad;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad * ThisCP.ScaledCoolingCapacity;
+                        state.dataSize->DataScalableCapSizingON = true;
 
                     } else {
                         TempSize = ThisCP.ScaledCoolingCapacity;
@@ -1002,9 +992,9 @@ namespace EnergyPlus::CoolingPanelSimple {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     DesCoilLoad = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataConstantUsedForSizing = 0.0;
-                    DataFractionUsedForSizing = 0.0;
-                    DataScalableCapSizingON = false;
+                    state.dataSize->DataConstantUsedForSizing = 0.0;
+                    state.dataSize->DataFractionUsedForSizing = 0.0;
+                    state.dataSize->DataScalableCapSizingON = false;
                 } else {
                     DesCoilLoad = 0.0;
                 }
@@ -1017,8 +1007,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         if (ThisCP.WaterVolFlowRateMax == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // simulation continue
                 if (ThisCP.WaterVolFlowRateMax > 0.0) {
                     BaseSizer::reportSizerOutput(state, CompType, ThisCP.EquipID, "User-Specified Maximum Cold Water Flow [m3/s]", ThisCP.WaterVolFlowRateMax);
                 }
@@ -1029,7 +1019,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                         if (DesCoilLoad >= SmallLoad) {
                             rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5., state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                             Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, 5.0, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
-                            WaterVolFlowMaxCoolDes = DesCoilLoad / (PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
+                            WaterVolFlowMaxCoolDes = DesCoilLoad / (state.dataSize->PlantSizData(PltSizCoolNum).DeltaT * Cp * rho);
                         } else {
                             WaterVolFlowMaxCoolDes = 0.0;
                         }
@@ -1053,7 +1043,7 @@ namespace EnergyPlus::CoolingPanelSimple {
                                            "User-Specified Maximum Cold Water Flow [m3/s]",
                                            WaterVolFlowMaxCoolUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(WaterVolFlowMaxCoolDes - WaterVolFlowMaxCoolUser) / WaterVolFlowMaxCoolUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state,
                                     "SizeCoolingPanel: Potential issue with equipment sizing for ZoneHVAC:CoolingPanel:RadiantConvective:Water = \"" +
                                     ThisCP.EquipID + "\".");
@@ -1069,7 +1059,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             }
         }
 
-        RegisterPlantCompDesignFlow(ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax);
+        RegisterPlantCompDesignFlow(state, ThisCP.WaterInletNode, ThisCP.WaterVolFlowRateMax);
 
         bool SizeCoolingPanelUASuccess;
         SizeCoolingPanelUASuccess = ThisCP.SizeCoolingPanelUA(state);
@@ -1164,8 +1154,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1228,7 +1216,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             CoolingPanelOn = false;
         }
         // Calculate the "zone" temperature for determining the output of the cooling panel
-        Tzone = Xr * state.dataHeatBal->MRT(ZoneNum) + ((1.0 - Xr) * MAT(ZoneNum));
+        Tzone = Xr * state.dataHeatBal->MRT(ZoneNum) + ((1.0 - Xr) * state.dataHeatBalFanSys->MAT(ZoneNum));
 
         // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
         if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1243,7 +1231,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // iterate like in the low temperature radiant systems because the inlet water condition is known
         // not calculated.  So, we can deal with this upfront rather than after calculation and then more
         // iteration.
-        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+        DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
 
         if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
@@ -1444,22 +1432,21 @@ namespace EnergyPlus::CoolingPanelSimple {
         // This subroutine sets the control temperature for the simple cooling panel.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
 
         {
             auto const SELECT_CASE_var(this->ControlType);
             if (SELECT_CASE_var == Control::MAT) {
-                ControlTemp = MAT(ZoneNum);
+                ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
             } else if (SELECT_CASE_var == Control::MRT) {
                 ControlTemp = state.dataHeatBal->MRT(ZoneNum);
             } else if (SELECT_CASE_var == Control::Operative) {
-                ControlTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
             } else if (SELECT_CASE_var == Control::ODB) {
                 ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
             } else if (SELECT_CASE_var == Control::OWB) {
                 ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
             } else { // Should never get here
-                ControlTemp = MAT(ZoneNum);
+                ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
@@ -1586,8 +1573,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MaxRadHeatFlux;
-        using DataHeatBalFanSys::QCoolingPanelSurf;
-        using DataHeatBalFanSys::QCoolingPanelToPerson;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1600,8 +1585,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
-        QCoolingPanelSurf = 0.0;
-        QCoolingPanelToPerson = 0.0;
+        state.dataHeatBalFanSys->QCoolingPanelSurf = 0.0;
+        state.dataHeatBalFanSys->QCoolingPanelToPerson = 0.0;
 
         for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
@@ -1609,14 +1594,14 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             ZoneNum = ThisCP.ZonePtr;
             if (ZoneNum <= 0) continue;
-            QCoolingPanelToPerson(ZoneNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
+            state.dataHeatBalFanSys->QCoolingPanelToPerson(ZoneNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = ThisCP.SurfacePtr(RadSurfNum);
                 auto &ThisSurf(state.dataSurface->Surface(SurfNum));
                 if (ThisSurf.Area > SmallestArea) {
                     ThisSurfIntensity = (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
-                    QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");

@@ -2666,18 +2666,18 @@ namespace HVACMultiSpeedHeatPump {
         int NumOfSpeedHeating; // Number of speeds for heating
         int i;                 // Index to speed
 
-        if (CurSysNum > 0 && CurOASysNum == 0) {
+        if (state.dataSize->CurSysNum > 0 && state.dataSize->CurOASysNum == 0) {
             if (MSHeatPump(MSHeatPumpNum).FanType == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanVecIndex = MSHeatPump(MSHeatPumpNum).FanNum;
-                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = MSHeatPump(MSHeatPumpNum).FanNum;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::objectVectorOOFanSystemModel;
             } else {
-                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
-                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = MSHeatPump(MSHeatPumpNum).FanNum;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
             }
             if (MSHeatPump(MSHeatPumpNum).FanPlaceType == BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::BlowThru;
             } else if (MSHeatPump(MSHeatPumpNum).FanPlaceType == DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
+                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::fanPlacement::DrawThru;
             }
         }
 
@@ -2688,10 +2688,10 @@ namespace HVACMultiSpeedHeatPump {
         for (i = NumOfSpeedCooling; i >= 1; --i) {
 
             if (MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) == AutoSize) {
-                if (CurSysNum > 0) {
+                if (state.dataSize->CurSysNum > 0) {
                     if (i == NumOfSpeedCooling) {
                         CheckSysSizing(state, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name);
-                        MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                        MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) &&
                             MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                             MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).FanVolFlow;
@@ -2725,10 +2725,10 @@ namespace HVACMultiSpeedHeatPump {
 
         for (i = NumOfSpeedHeating; i >= 1; --i) {
             if (MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) == AutoSize) {
-                if (CurSysNum > 0) {
+                if (state.dataSize->CurSysNum > 0) {
                     if (i == NumOfSpeedHeating) {
                         CheckSysSizing(state, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name);
-                        MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                        MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                         if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) &&
                             MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                             MSHeatPump(MSHeatPumpNum).HeatVolumeFlowRate(i) = MSHeatPump(MSHeatPumpNum).FanVolFlow;
@@ -2761,9 +2761,9 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate == AutoSize) {
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
                 CheckSysSizing(state, CurrentModuleObject, MSHeatPump(MSHeatPumpNum).Name);
-                MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = FinalSysSizing(CurSysNum).DesMainVolFlow;
+                MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate &&
                     MSHeatPump(MSHeatPumpNum).FanVolFlow != AutoSize) {
                     MSHeatPump(MSHeatPumpNum).IdleVolumeAirRate = MSHeatPump(MSHeatPumpNum).FanVolFlow;
@@ -2785,13 +2785,13 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp == AutoSize) {
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
                 if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == 1) { // Gas
                     CheckZoneSizing(state, "Coil:Heating:Fuel", MSHeatPump(MSHeatPumpNum).Name);
                 } else {
                     CheckZoneSizing(state, "Coil:Heating:Electric", MSHeatPump(MSHeatPumpNum).Name);
                 }
-                MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp = FinalSysSizing(CurSysNum).HeatSupTemp;
+                MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatSupTemp;
                 BaseSizer::reportSizerOutput(state, CurrentModuleObject,
                                              MSHeatPump(MSHeatPumpNum).Name,
                                              "Maximum Supply Air Temperature from Supplemental Heater [C]",
@@ -2800,13 +2800,13 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity == AutoSize) {
-            if (CurSysNum > 0) {
+            if (state.dataSize->CurSysNum > 0) {
                 if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == 1) { // Gas
                     CheckSysSizing(state, "Coil:Heating:Fuel", MSHeatPump(MSHeatPumpNum).Name);
                 } else {
                     CheckSysSizing(state, "Coil:Heating:Electric", MSHeatPump(MSHeatPumpNum).Name);
                 }
-                MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = FinalSysSizing(CurSysNum).HeatCap;
+                MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).HeatCap;
             } else {
                 MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = 0.0;
             }
@@ -2815,10 +2815,10 @@ namespace HVACMultiSpeedHeatPump {
                                          "Supplemental Heating Coil Nominal Capacity [W]",
                                          MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity);
         }
-        SuppHeatCap = MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity;
+        state.dataSize->SuppHeatCap = MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity;
 
         if (MSHeatPump(MSHeatPumpNum).HeatRecActive) {
-            RegisterPlantCompDesignFlow(MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum, MSHeatPump(MSHeatPumpNum).DesignHeatRecFlowRate);
+            RegisterPlantCompDesignFlow(state, MSHeatPump(MSHeatPumpNum).HeatRecInletNodeNum, MSHeatPump(MSHeatPumpNum).DesignHeatRecFlowRate);
         }
     }
 
@@ -3417,7 +3417,6 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZT;
         using DXCoils::SimDXCoilMultiSpeed;
         using Fans::SimulateFanComponents;
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -3453,13 +3452,13 @@ namespace HVACMultiSpeedHeatPump {
         InletNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
         if (MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0) {
             if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
+                OutsideDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else if (MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex > 0) {
             if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
+                OutsideDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
@@ -4053,7 +4052,7 @@ namespace HVACMultiSpeedHeatPump {
 
         if (MSHeatPump(MSHeatPumpNum).FirstPass) {
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, DataSizing::CurSysNum, MSHeatPump(MSHeatPumpNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, MSHeatPump(MSHeatPumpNum).FirstPass);
             }
         }
 

@@ -59,19 +59,6 @@ struct EnergyPlusData;
 
 namespace EcoRoofManager {
 
-    extern Real64 CumRunoff; // Cumulative runoff, updated each time step (m) mult by roof area to get volume
-    extern Real64 CumET;     // Cumulative evapotranspiration from soil and plants (m)
-    extern Real64 CumPrecip;
-    extern Real64 CumIrrigation; // Cumulative irrigation, updated each time step (m) mult by roof area to get volume
-    extern Real64 CurrentRunoff;
-    extern Real64 CurrentET;
-    extern Real64 CurrentPrecipitation; // units of (m) per timestep
-    extern Real64 CurrentIrrigation;    // units of (m) per timestep
-
-    extern Real64 Tfold; // leaf temperature from the previous time step
-    extern Real64 Tgold; // ground temperature from the previous time step
-    extern bool EcoRoofbeginFlag;
-
     // Functions
 
     void CalcEcoRoof(EnergyPlusData &state,
@@ -101,9 +88,24 @@ namespace EcoRoofManager {
 
 struct EcoRoofManagerData : BaseGlobalStruct {
 
+    Real64 CumRunoff; // Cumulative runoff, updated each time step (m) mult by roof area to get volume
+    Real64 CumET;     // Cumulative evapotranspiration from soil and plants (m)
+    Real64 CumPrecip;
+    Real64 CumIrrigation; // Cumulative irrigation, updated each time step (m) mult by roof area to get volume
+    Real64 CurrentRunoff;
+    Real64 CurrentET;
+    Real64 CurrentPrecipitation; // units of (m) per timestep
+    Real64 CurrentIrrigation;    // units of (m) per timestep
+
+    Real64 Tfold; // leaf temperature from the previous time step
+    Real64 Tgold; // ground temperature from the previous time step
+    bool EcoRoofbeginFlag = true;
+    bool CalcEcoRoofMyEnvrnFlag = true;
+
     void clear_state() override
     {
-
+        this->EcoRoofbeginFlag = true;
+        this->CalcEcoRoofMyEnvrnFlag = true;
     }
 };
 

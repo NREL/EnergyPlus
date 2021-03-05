@@ -87,12 +87,12 @@ TEST_F(EnergyPlusFixture, EarthTube_CalcEarthTubeHumRatTest)
     state->dataEarthTube->EarthTubeSys(ETnum).FanPower = 0.05;
 
     // Allocate and set any zone variables necessary to run the tests
-    MCPE.allocate(ZNnum);
-    MCPTE.allocate(ZNnum);
-    EAMFL.allocate(ZNnum);
-    EAMFLxHumRat.allocate(ZNnum);
-    MCPE(ZNnum) = 0.05;
-    EAMFL(ZNnum) = 0.05;
+    state->dataHeatBalFanSys->MCPE.allocate(ZNnum);
+    state->dataHeatBalFanSys->MCPTE.allocate(ZNnum);
+    state->dataHeatBalFanSys->EAMFL.allocate(ZNnum);
+    state->dataHeatBalFanSys->EAMFLxHumRat.allocate(ZNnum);
+    state->dataHeatBalFanSys->MCPE(ZNnum) = 0.05;
+    state->dataHeatBalFanSys->EAMFL(ZNnum) = 0.05;
 
     // First case--no condensation so inside humidity ratio should be the same as the outdoor humidity ratio
     CalcEarthTubeHumRat(*state, ETnum, ZNnum);

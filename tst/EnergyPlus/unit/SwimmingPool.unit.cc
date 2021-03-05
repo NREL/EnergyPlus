@@ -216,26 +216,26 @@ TEST_F(EnergyPlusFixture, SwimmingPool_InitSwimmingPoolPlantNodeFlow)
     state->dataSwimmingPools->Pool(1).WaterMassFlowRateMax = 0.75;
     state->dataSwimmingPools->Pool(1).WaterVolFlowMax = 0.00075;
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = false;
-    DataSizing::SaveNumPlantComps = 0;
-    DataSizing::CompDesWaterFlow.deallocate();
+    state->dataSize->SaveNumPlantComps = 0;
+    state->dataSize->CompDesWaterFlow.deallocate();
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(1).MassFlowRateMax = 0.0;
-    thisPool.initSwimmingPoolPlantNodeFlow();
-    EXPECT_EQ(DataSizing::CompDesWaterFlow(1).SupNode, 1);
-    EXPECT_EQ(DataSizing::CompDesWaterFlow(1).DesVolFlowRate, 0.00075);
+    thisPool.initSwimmingPoolPlantNodeFlow(*state);
+    EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).SupNode, 1);
+    EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).DesVolFlowRate, 0.00075);
 
     // Test 2
     state->dataSwimmingPools->Pool(1).WaterMassFlowRate = 0.5;
     state->dataSwimmingPools->Pool(1).WaterMassFlowRateMax = 2.0;
     state->dataSwimmingPools->Pool(1).WaterVolFlowMax = 0.002;
     state->dataSwimmingPools->Pool(1).MyPlantScanFlagPool = false;
-    DataSizing::SaveNumPlantComps = 0;
-    DataSizing::CompDesWaterFlow.deallocate();
+    state->dataSize->SaveNumPlantComps = 0;
+    state->dataSize->CompDesWaterFlow.deallocate();
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(1).MassFlowRateMax = 0.0;
-    thisPool.initSwimmingPoolPlantNodeFlow();
-    EXPECT_EQ(DataSizing::CompDesWaterFlow(1).SupNode, 1);
-    EXPECT_EQ(DataSizing::CompDesWaterFlow(1).DesVolFlowRate, 0.002);
+    thisPool.initSwimmingPoolPlantNodeFlow(*state);
+    EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).SupNode, 1);
+    EXPECT_EQ(state->dataSize->CompDesWaterFlow(1).DesVolFlowRate, 0.002);
 
 }
 
