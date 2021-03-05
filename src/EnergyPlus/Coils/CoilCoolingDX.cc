@@ -461,10 +461,10 @@ void CoilCoolingDX::simulate(EnergyPlus::EnergyPlusData &state, int useAlternate
     }
 
     // get node references
-    auto &evapInletNode = DataLoopNode::Node(this->evapInletNodeIndex);
-    auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
-    auto &condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
-    auto &condOutletNode = DataLoopNode::Node(this->condOutletNodeIndex);
+    auto &evapInletNode = state.dataLoopNodes->Node(this->evapInletNodeIndex);
+    auto &evapOutletNode = state.dataLoopNodes->Node(this->evapOutletNodeIndex);
+    auto &condInletNode = state.dataLoopNodes->Node(this->condInletNodeIndex);
+    auto &condOutletNode = state.dataLoopNodes->Node(this->condOutletNodeIndex);
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
