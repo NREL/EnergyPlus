@@ -817,8 +817,8 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
         Real64 tmpSupSideDesignVolFlowRate = this->SupplySideLoop.DesignVolumeFlowRate;
         if (this->SupplySideLoop.DesignVolumeFlowRateWasAutoSized) {
             if (PltSizNumSupSide > 0) {
-                if (DataSizing::PlantSizData(PltSizNumSupSide).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                    tmpSupSideDesignVolFlowRate = DataSizing::PlantSizData(PltSizNumSupSide).DesVolFlowRate * this->SizingFactor;
+                if (state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    tmpSupSideDesignVolFlowRate = state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate * this->SizingFactor;
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
                 } else {
                     tmpSupSideDesignVolFlowRate = 0.0;
@@ -843,7 +843,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                 }
             }
         }
-        PlantUtilities::RegisterPlantCompDesignFlow(this->SupplySideLoop.inletNodeNum, tmpSupSideDesignVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->SupplySideLoop.inletNodeNum, tmpSupSideDesignVolFlowRate);
 
         // second deal with Loop Demand Side
         Real64 tmpDmdSideDesignVolFlowRate = this->DemandSideLoop.DesignVolumeFlowRate;
@@ -868,7 +868,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                              this->DemandSideLoop.DesignVolumeFlowRate);
             }
         }
-        PlantUtilities::RegisterPlantCompDesignFlow(this->DemandSideLoop.inletNodeNum, tmpDmdSideDesignVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->DemandSideLoop.inletNodeNum, tmpDmdSideDesignVolFlowRate);
 
         // size UA if needed
         if (this->UAWasAutoSized) {
@@ -878,23 +878,23 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                 Real64 tmpDeltaTloopToLoop(0.0);
 
                 {
-                    auto const SELECT_CASE_var(DataSizing::PlantSizData(PltSizNumSupSide).LoopType);
+                    auto const SELECT_CASE_var(state.dataSize->PlantSizData(PltSizNumSupSide).LoopType);
 
                     if ((SELECT_CASE_var == DataSizing::HeatingLoop) || (SELECT_CASE_var == DataSizing::SteamLoop)) {
                         tmpDeltaTloopToLoop =
-                            std::abs((DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp - DataSizing::PlantSizData(PltSizNumSupSide).DeltaT) -
-                                     DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp);
+                            std::abs((state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp - state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT) -
+                                     state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp);
                     } else if ((SELECT_CASE_var == DataSizing::CoolingLoop) || (SELECT_CASE_var == DataSizing::CondenserLoop)) {
                         tmpDeltaTloopToLoop =
-                            std::abs((DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp + DataSizing::PlantSizData(PltSizNumSupSide).DeltaT) -
-                                     DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp);
+                            std::abs((state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp + state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT) -
+                                     state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp);
                     } else {
                         assert(false);
                     }
                 }
 
                 tmpDeltaTloopToLoop = max(2.0, tmpDeltaTloopToLoop);
-                Real64 tmpDeltaTSupLoop = DataSizing::PlantSizData(PltSizNumSupSide).DeltaT;
+                Real64 tmpDeltaTSupLoop = state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT;
                 if (tmpSupSideDesignVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
 
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -944,13 +944,13 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
 
             if (PltSizNumSupSide > 0) {
                 {
-                    auto const SELECT_CASE_var(DataSizing::PlantSizData(PltSizNumSupSide).LoopType);
+                    auto const SELECT_CASE_var(state.dataSize->PlantSizData(PltSizNumSupSide).LoopType);
                     if ((SELECT_CASE_var == DataSizing::HeatingLoop) || (SELECT_CASE_var == DataSizing::SteamLoop)) {
                         DataLoopNode::Node(this->SupplySideLoop.inletNodeNum).Temp =
-                            (DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp - DataSizing::PlantSizData(PltSizNumSupSide).DeltaT);
+                            (state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp - state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT);
                     } else if ((SELECT_CASE_var == DataSizing::CoolingLoop) || (SELECT_CASE_var == DataSizing::CondenserLoop)) {
                         DataLoopNode::Node(this->SupplySideLoop.inletNodeNum).Temp =
-                            (DataSizing::PlantSizData(PltSizNumSupSide).ExitTemp + DataSizing::PlantSizData(PltSizNumSupSide).DeltaT);
+                            (state.dataSize->PlantSizData(PltSizNumSupSide).ExitTemp + state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT);
                     }
                 }
 
@@ -968,7 +968,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
             }
 
             if (PltSizNumDmdSide > 0) {
-                DataLoopNode::Node(this->DemandSideLoop.inletNodeNum).Temp = DataSizing::PlantSizData(PltSizNumDmdSide).ExitTemp;
+                DataLoopNode::Node(this->DemandSideLoop.inletNodeNum).Temp = state.dataSize->PlantSizData(PltSizNumDmdSide).ExitTemp;
             } else { // don't rely on sizing, use loop setpoints
                 // loop demand side
                 if (state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {

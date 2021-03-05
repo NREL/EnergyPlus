@@ -784,7 +784,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         // Check flags and update data structure
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataLoopNode::Node;
@@ -898,7 +897,7 @@ namespace EnergyPlus::PipeHeatTransfer {
                 } else if (SELECT_CASE_var == iEnvrnPtr::OutsideAirEnv) {
                     state.dataPipeHT->nsvEnvironmentTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == iEnvrnPtr::ZoneEnv) {
-                    state.dataPipeHT->nsvEnvironmentTemp = MAT(this->EnvrZonePtr);
+                    state.dataPipeHT->nsvEnvironmentTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
                 } else if (SELECT_CASE_var == iEnvrnPtr::ScheduleEnv) {
                     state.dataPipeHT->nsvEnvironmentTemp = GetCurrentScheduleValue(state, this->EnvrSchedPtr);
                 } else if (SELECT_CASE_var == iEnvrnPtr::None) { // default to outside temp
@@ -1683,7 +1682,6 @@ namespace EnergyPlus::PipeHeatTransfer {
         // p. 369-370 (Eq. 7:55b)
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT; // average (mean) zone air temperature [C]
         using DataLoopNode::Node;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -1750,7 +1748,7 @@ namespace EnergyPlus::PipeHeatTransfer {
                         AirVel = GetCurrentScheduleValue(state, this->EnvrVelSchedPtr);
 
                     } else if (SELECT_CASE_var1 == iEnvrnPtr::ZoneEnv) {
-                        AirTemp = MAT(this->EnvrZonePtr);
+                        AirTemp = state.dataHeatBalFanSys->MAT(this->EnvrZonePtr);
                         AirVel = RoomAirVel;
                     }
                 }

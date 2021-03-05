@@ -841,7 +841,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->PreviousHour = 1;
@@ -854,7 +854,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput(*state);
     compare_err_stream("");
@@ -896,9 +896,9 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
 {
 
-    Surface.allocate(1);
-    Surface(1).Tilt = 90.0;
-    Surface(1).Azimuth = 180.0;
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Tilt = 90.0;
+    state->dataSurface->Surface(1).Azimuth = 180.0;
     int horiz = 1;
     int vert = 2;
     Real64 ProfAng;
@@ -908,20 +908,20 @@ TEST_F(EnergyPlusFixture, DaylightingManager_ProfileAngle_Test)
     CosDirSun(2) = 0.470492;
     CosDirSun(3) = 0.003513;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.00747, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(2.06065, ProfAng, 0.00001);
 
     CosDirSun(1) = 0.92318;
     CosDirSun(2) = 0.36483;
     CosDirSun(3) = 0.12094;
 
-    ProfileAngle(1, CosDirSun, horiz, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, horiz, ProfAng);
     EXPECT_NEAR(0.32010, ProfAng, 0.00001);
 
-    ProfileAngle(1, CosDirSun, vert, ProfAng);
+    ProfileAngle(*state, 1, CosDirSun, vert, ProfAng);
     EXPECT_NEAR(1.94715, ProfAng, 0.00001);
 }
 
@@ -934,60 +934,60 @@ TEST_F(EnergyPlusFixture, AssociateWindowShadingControlWithDaylighting_Test)
     state->dataDaylightingData->ZoneDaylight(3).Name = "ZD3";
     state->dataDaylightingData->ZoneDaylight(4).Name = "ZD4";
 
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).DaylightingControlName = "ZD3";
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).DaylightingControlName = "ZD3";
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).DaylightingControlName = "ZD1";
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).DaylightingControlName = "ZD1";
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).DaylightingControlName = "ZD-NONE";
 
     AssociateWindowShadingControlWithDaylighting(*state);
 
-    EXPECT_EQ(WindowShadingControl(1).DaylightControlIndex, 3);
-    EXPECT_EQ(WindowShadingControl(2).DaylightControlIndex, 1);
-    EXPECT_EQ(WindowShadingControl(3).DaylightControlIndex, 0);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(1).DaylightControlIndex, 3);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(2).DaylightControlIndex, 1);
+    EXPECT_EQ(state->dataSurface->WindowShadingControl(3).DaylightControlIndex, 0);
 }
 
 TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
@@ -1026,39 +1026,39 @@ TEST_F(EnergyPlusFixture, CreateShadeDeploymentOrder_test)
 
 TEST_F(EnergyPlusFixture, MapShadeDeploymentOrderToLoopNumber_Test)
 {
-    TotWinShadingControl = 3;
-    WindowShadingControl.allocate(TotWinShadingControl);
+    state->dataSurface->TotWinShadingControl = 3;
+    state->dataSurface->WindowShadingControl.allocate(state->dataSurface->TotWinShadingControl);
     int zn = 1;
 
-    WindowShadingControl(1).Name = "WSC1";
-    WindowShadingControl(1).ZoneIndex = zn;
-    WindowShadingControl(1).SequenceNumber = 2;
-    WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(1).FenestrationCount = 3;
-    WindowShadingControl(1).FenestrationIndex.allocate(WindowShadingControl(1).FenestrationCount);
-    WindowShadingControl(1).FenestrationIndex(1) = 1;
-    WindowShadingControl(1).FenestrationIndex(2) = 2;
-    WindowShadingControl(1).FenestrationIndex(3) = 3;
+    state->dataSurface->WindowShadingControl(1).Name = "WSC1";
+    state->dataSurface->WindowShadingControl(1).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(1).SequenceNumber = 2;
+    state->dataSurface->WindowShadingControl(1).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(1).FenestrationCount = 3;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(1).FenestrationCount);
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(1) = 1;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(2) = 2;
+    state->dataSurface->WindowShadingControl(1).FenestrationIndex(3) = 3;
 
-    WindowShadingControl(2).Name = "WSC2";
-    WindowShadingControl(2).ZoneIndex = zn;
-    WindowShadingControl(2).SequenceNumber = 3;
-    WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
-    WindowShadingControl(2).FenestrationCount = 4;
-    WindowShadingControl(2).FenestrationIndex.allocate(WindowShadingControl(2).FenestrationCount);
-    WindowShadingControl(2).FenestrationIndex(1) = 4;
-    WindowShadingControl(2).FenestrationIndex(2) = 5;
-    WindowShadingControl(2).FenestrationIndex(3) = 6;
-    WindowShadingControl(2).FenestrationIndex(4) = 7;
+    state->dataSurface->WindowShadingControl(2).Name = "WSC2";
+    state->dataSurface->WindowShadingControl(2).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(2).SequenceNumber = 3;
+    state->dataSurface->WindowShadingControl(2).MultiSurfaceCtrlIsGroup = false;
+    state->dataSurface->WindowShadingControl(2).FenestrationCount = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(2).FenestrationCount);
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(1) = 4;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(2) = 5;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(3) = 6;
+    state->dataSurface->WindowShadingControl(2).FenestrationIndex(4) = 7;
 
-    WindowShadingControl(3).Name = "WSC3";
-    WindowShadingControl(3).ZoneIndex = zn;
-    WindowShadingControl(3).SequenceNumber = 1;
-    WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
-    WindowShadingControl(3).FenestrationCount = 2;
-    WindowShadingControl(3).FenestrationIndex.allocate(WindowShadingControl(3).FenestrationCount);
-    WindowShadingControl(3).FenestrationIndex(1) = 8;
-    WindowShadingControl(3).FenestrationIndex(2) = 9;
+    state->dataSurface->WindowShadingControl(3).Name = "WSC3";
+    state->dataSurface->WindowShadingControl(3).ZoneIndex = zn;
+    state->dataSurface->WindowShadingControl(3).SequenceNumber = 1;
+    state->dataSurface->WindowShadingControl(3).MultiSurfaceCtrlIsGroup = true;
+    state->dataSurface->WindowShadingControl(3).FenestrationCount = 2;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex.allocate(state->dataSurface->WindowShadingControl(3).FenestrationCount);
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(1) = 8;
+    state->dataSurface->WindowShadingControl(3).FenestrationIndex(2) = 9;
 
     state->dataGlobal->NumOfZones = zn;
     state->dataDaylightingData->ZoneDaylight.allocate(state->dataGlobal->NumOfZones);
@@ -1310,7 +1310,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataGlobal->NumOfTimeStepInHour = 1;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 10;
     state->dataGlobal->PreviousHour = 10;
@@ -1340,7 +1340,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", state->dataHeatBal->Zone);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(*state, foundErrors);
     DaylightingManager::GetDaylightingParametersInput(*state);
     state->dataDaylightingManager->GILSK = 100.0;
@@ -1366,7 +1366,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     int DayltgExtWin = 1;
     int Shaded = 2;
     int Unshaded = 1;
-    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+    int IWin = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", state->dataSurface->Surface);
     EXPECT_GT(IWin, 0);
 
     // Set un-shaded surface illuminance factor to 1.0 for RefPt1, 0.1 for RefPt2
@@ -1379,26 +1379,26 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     state->dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky(state->dataGlobal->HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    SurfWinWindowModelType(IWin) = Window5DetailedModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
+    state->dataSurface->SurfWinWindowModelType(IWin) = Window5DetailedModel;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 5.0, 0.001);
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    SurfWinWindowModelType(IWin) = WindowBSDFModel;
-    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
+    state->dataSurface->SurfWinWindowModelType(IWin) = WindowBSDFModel;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::NoShade;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
 
-    SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
+    state->dataSurface->SurfWinShadingFlag(IWin) = DataSurfaces::WinShadingType::ExtBlind;
     DaylightingManager::DayltgInteriorIllum(*state, ZoneNum);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(state->dataDaylightingManager->DaylIllum(2), 10.0, 0.001);
@@ -2114,7 +2114,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
     state->dataGlobal->PreviousHour = 1;
@@ -2128,7 +2128,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues(*state);
     InternalHeatGains::GetInternalHeatGainsInput(*state);
-    InternalHeatGains::GetInternalHeatGainsInputFlag = false;
+    state->dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput(*state);
     compare_err_stream("");
@@ -2856,7 +2856,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_TDD_NoDaylightingControls)
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(*state);
 
-    state->dataConstruction->Construct(Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
+    state->dataConstruction->Construct(state->dataSurface->Surface(7).Construction).TransDiff = 0.001;  // required for GetTDDInput function to work.
     DaylightingDevices::GetTDDInput(*state);
     CalcDayltgCoefficients(*state);
 

@@ -204,7 +204,7 @@ namespace HVACCooledBeam {
             ShowFatalError(state, "Cool Beam Unit not found = " + CompName);
         }
 
-        DataSizing::CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
+        state.dataSize->CurTermUnitSizingNum = state.dataDefineEquipment->AirDistUnit(CoolBeam(CBNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
         InitCoolBeam(state, CBNum, FirstHVACIteration);
 
@@ -734,11 +734,11 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).MaxAirVolFlow == AutoSize) {
 
-            if (CurTermUnitSizingNum > 0) {
+            if (state.dataSize->CurTermUnitSizingNum > 0) {
 
                 CheckZoneSizing(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name);
                 CoolBeam(CBNum).MaxAirVolFlow =
-                    max(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolVolFlow, TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatVolFlow);
+                    max(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolVolFlow, state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatVolFlow);
                 if (CoolBeam(CBNum).MaxAirVolFlow < SmallAirVolFlow) {
                     CoolBeam(CBNum).MaxAirVolFlow = 0.0;
                 }
@@ -749,25 +749,25 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).MaxCoolWaterVolFlow == AutoSize) {
 
-            if ((CurZoneEqNum > 0) && (CurTermUnitSizingNum > 0)) {
+            if ((state.dataSize->CurZoneEqNum > 0) && (state.dataSize->CurTermUnitSizingNum > 0)) {
 
                 CheckZoneSizing(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name);
 
                 if (PltSizCoolNum > 0) {
 
-                    if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
+                    if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
                         DesAirVolFlow = CoolBeam(CBNum).MaxAirVolFlow;
-                        CpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat);
+                        CpAir = PsyCpAirFnW(state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).CoolDesHumRat);
                         // the design cooling coil load is the zone load minus whatever the central system does. Note that
                         // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
-                        if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
-                            DesCoilLoad = TermUnitFinalZoneSizing(CurTermUnitSizingNum).NonAirSysDesCoolLoad -
+                        if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
+                            DesCoilLoad = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).NonAirSysDesCoolLoad -
                                           CpAir * RhoAir * DesAirVolFlow *
-                                              (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak -
-                                               TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInTempTU);
+                                              (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak -
+                                               state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU);
                         } else {
                             DesCoilLoad = CpAir * RhoAir * DesAirVolFlow *
-                                          (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInTempTU - ZoneSizThermSetPtHi(CurZoneEqNum));
+                                          (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolCoilInTempTU - state.dataSize->ZoneSizThermSetPtHi(state.dataSize->CurZoneEqNum));
                         }
 
                         rho = GetDensityGlycol(state,
@@ -818,7 +818,7 @@ namespace HVACCooledBeam {
 
         if (CoolBeam(CBNum).BeamLength == AutoSize) {
 
-            if (CurTermUnitSizingNum > 0) {
+            if (state.dataSize->CurTermUnitSizingNum > 0) {
 
                 CheckZoneSizing(state, CoolBeam(CBNum).UnitType, CoolBeam(CBNum).Name);
 
@@ -841,8 +841,8 @@ namespace HVACCooledBeam {
                         DesAirFlowPerBeam = CoolBeam(CBNum).MaxAirVolFlow / NumBeams;
                         WaterVolFlowPerBeam = CoolBeam(CBNum).MaxCoolWaterVolFlow / NumBeams;
                         WaterVel = WaterVolFlowPerBeam / (DataGlobalConstants::Pi * pow_2(CoolBeam(CBNum).InDiam) / 4.0);
-                        if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
-                            DT = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak -
+                        if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
+                            DT = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneTempAtCoolPeak -
                                  0.5 * (CoolBeam(CBNum).DesInletWaterTemp + CoolBeam(CBNum).DesOutletWaterTemp);
                             if (DT <= 0.0) {
                                 DT = 7.8;
@@ -888,7 +888,7 @@ namespace HVACCooledBeam {
 
         // save the design water volumetric flow rate for use by the water loop sizing algorithms
         if (CoolBeam(CBNum).MaxCoolWaterVolFlow > 0.0) {
-            RegisterPlantCompDesignFlow(CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).MaxCoolWaterVolFlow);
+            RegisterPlantCompDesignFlow(state, CoolBeam(CBNum).CWInNode, CoolBeam(CBNum).MaxCoolWaterVolFlow);
         }
 
         if (ErrorsFound) {

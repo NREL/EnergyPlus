@@ -3857,7 +3857,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
         // If in a zone, use the zone temperature
-        battState.thermal->T_room = DataHeatBalFanSys::ZT(zoneNum_);
+        battState.thermal->T_room = state.dataHeatBalFanSys->ZT(zoneNum_);
     } else {
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;

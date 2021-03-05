@@ -173,7 +173,7 @@ namespace SwimmingPool {
 
         void initSwimmingPoolPlantLoopIndex(EnergyPlusData &state);
 
-        void initSwimmingPoolPlantNodeFlow() const;
+        void initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) const;
 
         void calculate(EnergyPlusData &state);
 

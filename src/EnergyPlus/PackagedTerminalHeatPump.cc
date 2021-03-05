@@ -156,7 +156,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Using/Aliasing
 
         using namespace DataZoneEnergyDemands;
-        using DataHeatBalFanSys::TempControlType;
         using DataZoneEquipment::PkgTermACAirToAir_Num;
         using DataZoneEquipment::PkgTermHPAirToAir_Num;
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
@@ -221,15 +220,15 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         RemainingOutputToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
-        if (RemainingOutputToCoolingSP < 0.0 && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
             QZnReq = RemainingOutputToCoolingSP;
-        } else if (RemainingOutputToHeatingSP > 0.0 && TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+        } else if (RemainingOutputToHeatingSP > 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
             QZnReq = RemainingOutputToHeatingSP;
         } else {
             QZnReq = 0.0;
         }
 
-        ZoneEqDXCoil = true;
+        state.dataSize->ZoneEqDXCoil = true;
 
         // Initialize the packaged terminal heat pump
         InitPTUnit(state, PTUnitNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
@@ -239,7 +238,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Report the result of the simulation
         ReportPTUnit(state, PTUnitNum);
 
-        ZoneEqDXCoil = false;
+        state.dataSize->ZoneEqDXCoil = false;
     }
 
     void SimPTUnit(EnergyPlusData &state,
@@ -466,7 +465,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         using DataHVACGlobals::WaterConstant;
         using DataHVACGlobals::WaterConstantOnDemand;
         using DataHVACGlobals::WaterCycling;
-        using DataSizing::ZoneHVACSizing;
         using DataZoneEquipment::PkgTermACAirToAir_Num;
         using DataZoneEquipment::PkgTermHPAirToAir_Num;
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
@@ -1220,7 +1218,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(18)) {
-                state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(18), ZoneHVACSizing);
+                state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(18), state.dataSize->ZoneHVACSizing);
                 if (state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, cAlphaFields(18) + " = " + Alphas(18) + " not found.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
@@ -1263,13 +1261,13 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 state.dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp = AutoSize; // what should happen here
             }
 
-            //			if ( PTUnit( PTUnitNum ).MaxOATSupHeat > 21.0 ) {
-            //				ShowWarningError(state,  CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) +
+            //            if ( PTUnit( PTUnitNum ).MaxOATSupHeat > 21.0 ) {
+            //                ShowWarningError(state,  CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name + ": " + cNumericFields( 11 ) +
             //"
             // should  be
             //<=  to 21."
-            //); 				ShowContinueError(state,  format("...{} = {:.1T}", cNumericFields( 11 ),  Numbers( 11 )) );
-            //			}
+            //);                 ShowContinueError(state,  format("...{} = {:.1T}", cNumericFields( 11 ),  Numbers( 11 )) );
+            //            }
 
             //   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
             //                              UseCompressorOffFlow = operate at value specified by user
@@ -1366,7 +1364,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowContinueError(state, "... when " + cAlphaFields(19) + " = " + Alphas(19) +
                                       " the minimum operating air flow rate should be autosized or > 0.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
-                    //					ErrorsFound = true;
+                    //                    ErrorsFound = true;
                 }
 
                 // only allowed for DX cooling coils at this time
@@ -2047,7 +2045,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(16)) {
-                state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(16), ZoneHVACSizing);
+                state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(16), state.dataSize->ZoneHVACSizing);
                 if (state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, cAlphaFields(16) + " = " + Alphas(16) + " not found.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
@@ -2175,7 +2173,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     ShowContinueError(state, "... when " + cAlphaFields(17) + " = " + Alphas(17) +
                                       " the minimum operating air flow rate should be autosized or > 0.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
-                    //					ErrorsFound = true;
+                    //                    ErrorsFound = true;
                 }
 
                 // only allowed for DX cooling coils at this time
@@ -2692,7 +2690,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
             state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(20)) {
-                state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(20), ZoneHVACSizing);
+                state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(20), state.dataSize->ZoneHVACSizing);
                 if (state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, cAlphaFields(20) + " = " + Alphas(20) + " not found.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataPTHP->PTUnit(PTUnitNum).Name);
@@ -3641,7 +3639,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         using SteamCoils::SimulateSteamCoilComponents;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
         auto &GetSteamCoilCapacity(SteamCoils::GetCoilCapacity);
-        using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using Fans::GetFanVolFlow;
@@ -4327,7 +4324,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     QZnReq = QToHeatSetPt;
                     state.dataPTHP->CoolingLoad = false;
                     //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                    if (TempControlType(ZoneNum) == SingleCoolingSetPoint || TempControlType(ZoneNum) == 0) {
+                    if (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint || state.dataHeatBalFanSys->TempControlType(ZoneNum) == 0) {
                         state.dataPTHP->HeatingLoad = false;
                     } else {
                         state.dataPTHP->HeatingLoad = true;
@@ -4382,7 +4379,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 if (NoCompOutput > QToCoolSetPt) {
                     QZnReq = QToCoolSetPt;
                     //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                    if (TempControlType(ZoneNum) == SingleHeatingSetPoint || TempControlType(ZoneNum) == 0) {
+                    if (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleHeatingSetPoint || state.dataHeatBalFanSys->TempControlType(ZoneNum) == 0) {
                         state.dataPTHP->CoolingLoad = false;
                     } else {
                         state.dataPTHP->CoolingLoad = true;
@@ -4544,7 +4541,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         }     // from IF(FirstHVACIteration .AND. PartLoadFrac > 0.0) THEN
 
         // Initialize each time step
-        //		PTUnit( PTUnitNum ).CoolCoilWaterFlowRatio = 0.0; // water cooling coils are not allowed in PTUnit model
+        //        PTUnit( PTUnitNum ).CoolCoilWaterFlowRatio = 0.0; // water cooling coils are not allowed in PTUnit model
         state.dataPTHP->PTUnit(PTUnitNum).HeatCoilWaterFlowRatio = 0.0;
 
         SetAverageAirFlow(state, PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
@@ -4700,22 +4697,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         Real64 MaxSATSupHeatDes;            // Autosized supply air temperature of supplemental heater for reporting
         Real64 MaxSATSupHeatUser;           // Hardsized supply air temperature of supplemental heater for reporting
 
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound;
         bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
-
         std::string CompName;     // component name
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
@@ -4730,6 +4717,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         int CapSizingMethod(0);  // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                  // FractionOfAutosizedHeatingCapacity )
         Real64 minNoLoadFlow(0); // used for sizing MaxNoCoolHeatVolFlow for SingleZoneVAV method
+
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
 
         ErrorsFound = false;
         IsAutoSize = false;
@@ -4748,69 +4737,69 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         MaxSATSupHeatDes = 0.0;
         MaxSATSupHeatUser = 0.0;
 
-        DataFracOfAutosizedCoolingAirflow = 1.0;
-        DataFracOfAutosizedHeatingAirflow = 1.0;
-        DataFracOfAutosizedCoolingCapacity = 1.0;
-        DataFracOfAutosizedHeatingCapacity = 1.0;
+        state.dataSize->DataFracOfAutosizedCoolingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
 
-        DataScalableSizingON = false;
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
         CompType = state.dataPTHP->PTUnit(PTUnitNum).UnitType;
         CompName = state.dataPTHP->PTUnit(PTUnitNum).Name;
-        DataZoneNumber = state.dataPTHP->PTUnit(PTUnitNum).ZonePtr;
+        state.dataSize->DataZoneNumber = state.dataPTHP->PTUnit(PTUnitNum).ZonePtr;
         if (state.dataPTHP->PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
         } else {
-            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
-        DataSizing::DataFanIndex = state.dataPTHP->PTUnit(PTUnitNum).FanIndex;
+        state.dataSize->DataFanIndex = state.dataPTHP->PTUnit(PTUnitNum).FanIndex;
         if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == BlowThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
         } else if (state.dataPTHP->PTUnit(PTUnitNum).FanPlace == DrawThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
             if (state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex > 0) {
                 // initialize OA flow for sizing other inputs (e.g., capacity)
                 if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 } else {
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow);
                 }
 
                 if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for scalable capacity sizing
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-                    SingleDuct::setATMixerSizingProperties(state, state.dataPTHP->PTUnit(PTUnitNum).ATMixerIndex, state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+                    SingleDuct::setATMixerSizingProperties(state, state.dataPTHP->PTUnit(PTUnitNum).ATMixerIndex, state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum, state.dataSize->CurZoneEqNum);
                 }
 
                 zoneHVACIndex = state.dataPTHP->PTUnit(PTUnitNum).HVACSizingIndex;
                 SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
                 PrintFlag = true;
-                SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+                SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                     SAFMethod == FractionOfAutosizedCoolingAirflow) {
                     if (SAFMethod == SupplyAirFlowRate) {
-                        if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                            ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         }
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                        DataScalableSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                        DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        state.dataSize->DataFracOfAutosizedCoolingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         TempSize = AutoSize;
-                        DataScalableSizingON = true;
+                        state.dataSize->DataScalableSizingON = true;
                     } else {
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
                     bool errorsFound = false;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -4824,16 +4813,16 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     SizingMethod = CoolingCapacitySizing;
                     TempSize = AutoSize;
                     PrintFlag = false;
-                    DataScalableSizingON = true;
-                    DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                    if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                        DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                    state.dataSize->DataScalableSizingON = true;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
+                        state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
-                    DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                    state.dataSize->DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
+                    state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
                     bool errorsFound = false;
@@ -4850,27 +4839,27 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 FieldNum = 2; // N2, \field Supply Air Flow Rate During Heating Operation
                 PrintFlag = true;
                 SizingString = state.dataPTHP->PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
-                SAFMethod = ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+                SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                     SAFMethod == FractionOfAutosizedHeatingAirflow) {
                     if (SAFMethod == SupplyAirFlowRate) {
-                        if (ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-                            ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         }
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                        DataScalableSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
-                        DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                        state.dataSize->DataFracOfAutosizedHeatingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         TempSize = AutoSize;
-                        DataScalableSizingON = true;
+                        state.dataSize->DataScalableSizingON = true;
                     } else {
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     }
                     bool errorsFound = false;
                     HeatingAirFlowSizer sizingHeatingAirFlow;
@@ -4882,18 +4871,18 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     SizingMethod = HeatingCapacitySizing;
                     TempSize = AutoSize;
                     PrintFlag = false;
-                    DataScalableSizingON = true;
-                    DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
+                    state.dataSize->DataScalableSizingON = true;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
                     bool errorsFound = false;
                     HeatingCapacitySizer sizerHeatingCapacity;
                     sizerHeatingCapacity.overrideSizingString(SizingString);
                     sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     TempSize = sizerHeatingCapacity.size(state, TempSize, errorsFound);
-                    if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
-                        DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+                        state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
-                    DataAutosizedHeatingCapacity = TempSize;
-                    DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+                    state.dataSize->DataAutosizedHeatingCapacity = TempSize;
+                    state.dataSize->DataFlowPerHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     SizingMethod = HeatingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
@@ -4908,32 +4897,32 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 FieldNum = 3; // N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
                 PrintFlag = true;
                 SizingString = state.dataPTHP->PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
-                SAFMethod = ZoneHVACSizing(zoneHVACIndex).NoCoolHeatSAFMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+                SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).NoCoolHeatSAFMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                     SAFMethod == FractionOfAutosizedCoolingAirflow || SAFMethod == FractionOfAutosizedHeatingAirflow) {
                     if (SAFMethod == SupplyAirFlowRate) {
-                        if (ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-                            ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         }
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow =
-                            ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                        DataScalableSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow =
+                            state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                        DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                        state.dataSize->DataFracOfAutosizedCoolingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                         TempSize = AutoSize;
-                        DataScalableSizingON = true;
+                        state.dataSize->DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedHeatingAirflow) {
-                        DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                        state.dataSize->DataFracOfAutosizedHeatingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                         TempSize = AutoSize;
-                        DataScalableSizingON = true;
+                        state.dataSize->DataScalableSizingON = true;
                     } else {
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     }
                     bool errorsFound = false;
                     SystemAirFlowSizer sizerSystemAirFlow;
@@ -4945,43 +4934,43 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
                 // initialize capacity sizing variables: cooling
                 SizingMethod = CoolingCapacitySizing;
-                CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+                CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                 if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (CapSizingMethod == CoolingDesignCapacity) {
-                        if (ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesCoolingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        DataScalableCapSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =
+                            state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        state.dataSize->DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                        DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                        DataScalableCapSizingON = true;
+                        state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                        state.dataSize->DataScalableCapSizingON = true;
                     }
                 }
 
                 // initialize capacity sizing variables: heating
                 SizingMethod = HeatingCapacitySizing;
-                CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+                CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                 if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                     CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                     if (CapSizingMethod == HeatingDesignCapacity) {
-                        if (ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesHeatingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesHeatingLoad =
+                            state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-                        DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+                        state.dataSize->DataFracOfAutosizedHeatingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
                 }
             } else {
@@ -4990,12 +4979,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
                 // initialize OA flow for sizing other inputs (e.g., capacity)
                 if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 } else {
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow;
                 }
                 if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow != AutoSize) {
-                    ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(CurZoneEqNum).OAVolFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow);
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = max(ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow);
                 }
 
                 PrintFlag = false;
@@ -5015,11 +5004,11 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                           0.0,
                                           0.0,
                                           1.0);
-                    ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow =
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirFlow = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirVolFlow =
                         GetCoilAirFlowRateVariableSpeed(state, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXCoolCoilName, ErrorsFound);
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirVolFlow;
                     TempSize = state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow;
                 }
                 PrintFlag = true;
@@ -5032,7 +5021,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
 
-                ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = false;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirFlow = false;
 
                 PrintFlag = false;
                 SizingMethod = HeatingAirflowSizing;
@@ -5054,12 +5043,12 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                           0.0,
                                           0.0,
                                           1.0);
-                    ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow =
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirFlow = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirVolFlow =
                         GetCoilAirFlowRateVariableSpeed(state, state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilType, state.dataPTHP->PTUnit(PTUnitNum).DXHeatCoilName, ErrorsFound);
-                    ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                    ZoneEqSizing(CurZoneEqNum).AirVolFlow =
-                        max(ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                    ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow =
+                        max(ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirVolFlow);
                     TempSize = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow;
                 }
                 PrintFlag = true;
@@ -5069,18 +5058,18 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
-                ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirFlow = false;
 
                 if (state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num || state.dataPTHP->PTUnit(PTUnitNum).ZoneEquipType == PkgTermACAirToAir_Num) {
                     if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow == AutoSize && state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
                         SizingMethod = AutoCalculateSizing;
-                        DataConstantUsedForSizing = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
+                        state.dataSize->DataConstantUsedForSizing = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
                         minNoLoadFlow = 0.6667;
                         if (state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow >= state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow) {
-                            DataFractionUsedForSizing =
+                            state.dataSize->DataFractionUsedForSizing =
                                 min(minNoLoadFlow, (state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow / state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow) - 0.01);
                         } else {
-                            DataFractionUsedForSizing =
+                            state.dataSize->DataFractionUsedForSizing =
                                 min(minNoLoadFlow, (state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow / state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow) - 0.01);
                         }
                     }
@@ -5094,14 +5083,14 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
-                DataConstantUsedForSizing = 0.0;
-                DataFractionUsedForSizing = 0.0;
+                state.dataSize->DataConstantUsedForSizing = 0.0;
+                state.dataSize->DataFractionUsedForSizing = 0.0;
             }
         }
 
         if (state.dataPTHP->PTUnit(PTUnitNum).ATMixerExists) {          // set up ATMixer conditions for use in component sizing
-            ZoneEqSizing(CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
-            SingleDuct::setATMixerSizingProperties(state, state.dataPTHP->PTUnit(PTUnitNum).ATMixerIndex, state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum, CurZoneEqNum);
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = 0.0; // Equipment OA flow should always be 0 when ATMixer is used
+            SingleDuct::setATMixerSizingProperties(state, state.dataPTHP->PTUnit(PTUnitNum).ATMixerIndex, state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum, state.dataSize->CurZoneEqNum);
         }
 
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow > 0.0) {
@@ -5115,8 +5104,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -5126,7 +5115,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                CoolOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow);
+                CoolOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow);
                 if (CoolOutAirVolFlowDes < SmallAirVolFlow) {
                     CoolOutAirVolFlowDes = 0.0;
                 }
@@ -5146,7 +5135,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                      "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                      CoolOutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(CoolOutAirVolFlowDes - CoolOutAirVolFlowUser) / CoolOutAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + ' ' +
                                             state.dataPTHP->PTUnit(PTUnitNum).Name);
                                 ShowContinueError(
@@ -5168,8 +5157,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -5179,7 +5168,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                HeatOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
+                HeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
                 if (HeatOutAirVolFlowDes < SmallAirVolFlow) {
                     HeatOutAirVolFlowDes = 0.0;
                 }
@@ -5199,7 +5188,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                      "User-Specified Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                      HeatOutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(HeatOutAirVolFlowDes - HeatOutAirVolFlowUser) / HeatOutAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + ' ' +
                                             state.dataPTHP->PTUnit(PTUnitNum).Name);
                                 ShowContinueError(
@@ -5221,8 +5210,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (state.dataPTHP->PTUnit(PTUnitNum).NoCoolHeatOutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -5232,7 +5221,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                NoCoolHeatOutAirVolFlowDes = min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow);
+                NoCoolHeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow);
                 if (NoCoolHeatOutAirVolFlowDes < SmallAirVolFlow) {
                     NoCoolHeatOutAirVolFlowDes = 0.0;
                 }
@@ -5253,7 +5242,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                      NoCoolHeatOutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
                             if ((std::abs(NoCoolHeatOutAirVolFlowDes - NoCoolHeatOutAirVolFlowUser) / NoCoolHeatOutAirVolFlowUser) >
-                                AutoVsHardSizingThreshold) {
+                                state.dataSize->AutoVsHardSizingThreshold) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + ' ' +
                                             state.dataPTHP->PTUnit(PTUnitNum).Name);
                                 ShowContinueError(state,
@@ -5276,8 +5265,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            CheckThisZoneForSizing(CurZoneEqNum, SizingDesRunThisZone);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            CheckThisZoneForSizing(state, state.dataSize->CurZoneEqNum, SizingDesRunThisZone);
             if (!IsAutoSize && !SizingDesRunThisZone) { // Simulation continue
                 if (state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat > 0.0) {
                     BaseSizer::reportSizerOutput(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -5287,7 +5276,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 }
             } else {
                 CheckZoneSizing(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType, state.dataPTHP->PTUnit(PTUnitNum).Name);
-                MaxSATSupHeatDes = FinalZoneSizing(CurZoneEqNum).HeatDesTemp;
+                MaxSATSupHeatDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).HeatDesTemp;
                 if (IsAutoSize) {
                     state.dataPTHP->PTUnit(PTUnitNum).MaxSATSupHeat = MaxSATSupHeatDes;
                     BaseSizer::reportSizerOutput(state, state.dataPTHP->PTUnit(PTUnitNum).UnitType,
@@ -5304,7 +5293,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                                                      "User-Specified Maximum Supply Air Temperature from Supplemental Heater [C]",
                                                      MaxSATSupHeatUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if (std::abs(MaxSATSupHeatDes - MaxSATSupHeatUser) > (4.0 * AutoVsHardSizingDeltaTempThreshold)) {
+                            if (std::abs(MaxSATSupHeatDes - MaxSATSupHeatUser) > (4.0 * state.dataSize->AutoVsHardSizingDeltaTempThreshold)) {
                                 ShowMessage(state, "SizePTUnit: Potential issue with equipment sizing for " + state.dataPTHP->PTUnit(PTUnitNum).UnitType + ' ' +
                                             state.dataPTHP->PTUnit(PTUnitNum).Name);
                                 ShowContinueError(state,
@@ -5325,53 +5314,53 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         SetCoilDesFlow(state, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilType, state.dataPTHP->PTUnit(PTUnitNum).ACHeatCoilName, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow, ErrorsFound);
 
-        if (CurZoneEqNum > 0) {
-            ZoneEqSizing(CurZoneEqNum).OAVolFlow = max(state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow);
-            ZoneEqSizing(CurZoneEqNum).AirVolFlow = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
+        if (state.dataSize->CurZoneEqNum > 0) {
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = max(state.dataPTHP->PTUnit(PTUnitNum).CoolOutAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).HeatOutAirVolFlow);
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = max(state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow, state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow);
             // save air flow rates for child object sizing
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow > 0.0) {
-                ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
-                ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirFlow = true;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirVolFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow;
             }
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow > 0.0) {
-                ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
-                ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirFlow = true;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirVolFlow = state.dataPTHP->PTUnit(PTUnitNum).MaxHeatAirVolFlow;
             }
         }
 
         if (state.dataPTHP->PTUnit(PTUnitNum).ControlType == iCtrlType::CCM_ASHRAE) {
 
             SizingDesRunThisZone = false;
-            DataZoneUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum;
-            CheckThisZoneForSizing(DataZoneUsedForSizing, SizingDesRunThisZone);
+            state.dataSize->DataZoneUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum;
+            CheckThisZoneForSizing(state, state.dataSize->DataZoneUsedForSizing, SizingDesRunThisZone);
 
             Real64 capacityMultiplier = 0.5; // one-half of design zone load
             if (SizingDesRunThisZone) {
-                DataCapacityUsedForSizing = FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesCoolLoad * capacityMultiplier;
             } else {
-                DataCapacityUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).DesignCoolingCapacity * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).DesignCoolingCapacity * capacityMultiplier;
             }
-            DataCapacityUsedForSizing /= state.dataPTHP->PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
-            DataFlowUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
+            state.dataSize->DataCapacityUsedForSizing /= state.dataPTHP->PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
+            state.dataSize->DataFlowUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
             PrintFlag = true;
             ASHRAEMinSATCoolingSizer sizerASHRAEMinSATCooling;
             sizerASHRAEMinSATCooling.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataPTHP->PTUnit(PTUnitNum).DesignMinOutletTemp = sizerASHRAEMinSATCooling.size(state, state.dataPTHP->PTUnit(PTUnitNum).DesignMinOutletTemp, ErrorsFound);
 
             if (SizingDesRunThisZone) {
-                DataCapacityUsedForSizing = FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataSize->FinalZoneSizing(state.dataPTHP->PTUnit(PTUnitNum).ControlZoneNum).DesHeatLoad * capacityMultiplier;
             } else {
-                DataCapacityUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).DesignHeatingCapacity * capacityMultiplier;
+                state.dataSize->DataCapacityUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).DesignHeatingCapacity * capacityMultiplier;
             }
-            DataCapacityUsedForSizing /= state.dataPTHP->PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
-            DataFlowUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
+            state.dataSize->DataCapacityUsedForSizing /= state.dataPTHP->PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
+            state.dataSize->DataFlowUsedForSizing = state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
             ASHRAEMaxSATHeatingSizer sizerASHRAEMaxSATHeating;
             sizerASHRAEMaxSATHeating.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             state.dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp = sizerASHRAEMaxSATHeating.size(state, state.dataPTHP->PTUnit(PTUnitNum).DesignMaxOutletTemp, ErrorsFound);
 
-            DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
-            DataFlowUsedForSizing = 0.0;
-            DataZoneUsedForSizing = 0;
+            state.dataSize->DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
+            state.dataSize->DataFlowUsedForSizing = 0.0;
+            state.dataSize->DataZoneUsedForSizing = 0;
 
             // check that MaxNoCoolHeatAirVolFlow is less than both MaxCoolAirVolFlow and MaxHeatAirVolFlow
             if (state.dataPTHP->PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow >= state.dataPTHP->PTUnit(PTUnitNum).MaxCoolAirVolFlow ||
@@ -5390,7 +5379,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
         }
 
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
     }
 
     void ControlPTUnitOutput(EnergyPlusData &state,
@@ -6745,7 +6734,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
 
         if (state.dataPTHP->PTUnit(PTUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataPTHP->PTUnit(PTUnitNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataPTHP->PTUnit(PTUnitNum).FirstPass);
             }
         }
 
@@ -8818,7 +8807,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
             // FanPartLoadRatio is used to pass info over to function SetAverageAirFlow since air and coil PLR are disassociated in the SZVAV model
             // FanPartLoadRatio is a report variable that is updated (overwritten) in ReportUnitarySystem
             state.dataPTHP->PTUnit(UnitarySysNum).FanPartLoadRatio = PartLoadRatio;
-            //			if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
+            //            if( WaterControlNode > 0 ) Node( WaterControlNode ).MassFlowRate = highWaterMdot;
 
         } else {
 
@@ -8838,19 +8827,19 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySysNum).CoolCoilFluidInletNode) {
             // cooling load using water cooling coil
             coolingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).CoolingPartLoadFrac = PartLoadRatio;
+            //            PTUnit( UnitarySysNum ).CoolingPartLoadFrac = PartLoadRatio;
             state.dataPTHP->PTUnit(UnitarySysNum).CoolCoilWaterFlowRatio = Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxCoolCoilFluidFlow;
         } else if (WaterControlNode > 0 && WaterControlNode == state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilFluidInletNode) {
             // heating load using water heating coil
             heatingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).HeatingPartLoadFrac = PartLoadRatio;
+            //            PTUnit( UnitarySysNum ).HeatingPartLoadFrac = PartLoadRatio;
             state.dataPTHP->PTUnit(UnitarySysNum).HeatCoilWaterFlowRatio = Node(WaterControlNode).MassFlowRate / state.dataPTHP->PTUnit(UnitarySysNum).MaxHeatCoilFluidFlow;
         } else if (coolingLoad) { // non-water coil with cooling load
             coolingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;
+            //            PTUnit( UnitarySysNum ).CoolingPartLoadFrac = coolingPLR;
         } else { // must be non-water coil with heating load
             heatingPLR = PartLoadRatio;
-            //			PTUnit( UnitarySysNum ).HeatingPartLoadFrac = heatingPLR;
+            //            PTUnit( UnitarySysNum ).HeatingPartLoadFrac = heatingPLR;
         }
 
         SensOutput = 0.0;

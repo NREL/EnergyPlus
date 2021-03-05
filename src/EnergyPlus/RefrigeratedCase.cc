@@ -1168,7 +1168,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
 
             } // Individual refrigerated cases
-        }     //(state.dataRefrigCase->NumSimulationCases > 0 )
+        }     //(NumSimulationCases > 0 )
 
         //************ START WALK IN COOLER INPUT **************
 
@@ -1614,7 +1614,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     NStart += NumWINumberFieldsPerZone;
                 } // Zones for Walk Ins
             }     // Individual Walk Ins
-        }         //(state.dataRefrigCase->NumSimulationWalkIns > 0 )
+        }         //(NumSimulationWalkIns > 0 )
 
         //************* Start Indiv Refrig Air Chillers
 
@@ -2379,8 +2379,8 @@ namespace EnergyPlus::RefrigeratedCase {
                 CaseAndWalkInList(ListNum).NumCases = NumCasesOnList;
                 CaseAndWalkInList(ListNum).NumCoils = NumCoilsOnList;
                 CaseAndWalkInList(ListNum).NumWalkIns = NumWalkInsOnList;
-            } // ListNum=1,state.dataRefrigCase->NumSimulationCaseAndWalkInLists
-        }     //(state.dataRefrigCase->NumSimulationCaseAndWalkInLists > 0)
+            } // ListNum=1,NumSimulationCaseAndWalkInLists
+        }     //(NumSimulationCaseAndWalkInLists > 0)
 
         //**** End read CaseAndWalkIn Lists **********************************************************
 
@@ -2551,7 +2551,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     RefrigRack(RackNum).OutletTempMax = Numbers(5);
                     RefrigRack(RackNum).InletTempMin = Numbers(6);
                     // set flow request for plant sizing.
-                    PlantUtilities::RegisterPlantCompDesignFlow(RefrigRack(RackNum).InletNode, RefrigRack(RackNum).VolFlowRateMax);
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, RefrigRack(RackNum).InletNode, RefrigRack(RackNum).VolFlowRateMax);
                 } // Water cooled condenser data
 
                 // Get evaporative cooled condenser input
@@ -2874,7 +2874,7 @@ namespace EnergyPlus::RefrigeratedCase {
                         Real64 Capmax = CurveManager::CurveValue(state, Condenser(CondNum).CapCurvePtr, DelTempMax) *
                                         (1.0 - 7.17e-5 * state.dataEnvrn->Elevation); // Mar 2011 bug
                         Condenser(CondNum).TempSlope =
-                            (DelTempMax - DelTempMin) / ((Capmax - Capmin)); // * ( 1.0 - 7.17e-5 * state.dataEnvrn->Elevation ) ) //Mar 2011 bug fix
+                            (DelTempMax - DelTempMin) / ((Capmax - Capmin)); // * ( 1.0 - 7.17e-5 * Elevation ) ) //Mar 2011 bug fix
                         Condenser(CondNum).MinCondLoad = Capmax - DelTempMax / Condenser(CondNum).TempSlope;
                     } else {
                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + Condenser(CondNum).Name +
@@ -3301,7 +3301,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             ShowContinueError(state, "Revise flow rates.");
                             ErrorsFound = true;
                         }
-                        PlantUtilities::RegisterPlantCompDesignFlow(Condenser(CondNum).InletNode, Condenser(CondNum).DesVolFlowRate);
+                        PlantUtilities::RegisterPlantCompDesignFlow(state, Condenser(CondNum).InletNode, Condenser(CondNum).DesVolFlowRate);
                     }
 
                     // Get maximum flow rates
@@ -4206,7 +4206,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
 
                 } // Secondary Loops
-            }     //(  IF (state.dataRefrigCase->NumSimulationSecondarySystems > 0)
+            }     //(  IF (NumSimulationSecondarySystems > 0)
 
             //************ END SECONDARY SYSTEM INPUT  **************
 
@@ -4457,8 +4457,8 @@ namespace EnergyPlus::RefrigeratedCase {
                         TransferLoadList(ListNum).NumSecondarys = NumSecondarysOnList;
                         TransferLoadList(ListNum).NumCascadeLoads = NumCascadeLoadsOnList;
                     } // Num Total Loads on List
-                }     // ListNum=1,state.dataRefrigCase->NumSimulationTransferLoadLists
-            }         //(state.dataRefrigCase->NumSimulationTransferLoadLists > 0)
+                }     // ListNum=1,NumSimulationTransferLoadLists
+            }         //(NumSimulationTransferLoadLists > 0)
 
             //**** End read transfer load Lists **********************************************************
 
@@ -5313,7 +5313,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     if (!allocated(System(RefrigSysNum).MechSCLoad)) System(RefrigSysNum).MechSCLoad.allocate(state.dataRefrigCase->NumSimulationSubcoolers);
                 }
             }
-        } // state.dataRefrigCase->NumSimulationSubcoolers > 0
+        } // NumSimulationSubcoolers > 0
 
         // **********  READ TRANSCRITICAL REFRIGERATION SYSTEMS  **********
 
@@ -5917,7 +5917,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Want to delete portion from unused cases (numsysattach = 0)that will never be simulated
                     if (RefrigCase(CaseNum).ActualZoneNum != ZoneIndex || RefrigCase(CaseNum).NumSysAttach > 0) continue;
                     TempRAFraction -= RefrigCase(CaseNum).RAFrac;
-                } // state.dataRefrigCase->NumSimulationCases
+                } // NumSimulationCases
                 if (TempRAFraction > 1.0) {
                     ShowSevereError(state, RoutineName + ": Refrigeration:Case, Refrigerated case return air fraction for all cases in zone=\"" +
                                     CaseRAFraction(ZoneIndex).ZoneName + "\" is greater than 1.0.");
@@ -5946,7 +5946,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                     "\", Same refrigerated case name referenced ");
                     ShowContinueError(state, " by more than one refrigeration system and/or compressor rack.");
                 } // if looking for same case attached to multiple systems/racks
-            }     // state.dataRefrigCase->NumSimulationCases
+            }     // NumSimulationCases
 
             if ((state.dataRefrigCase->NumUnusedRefrigCases > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
@@ -5957,7 +5957,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowContinueError(state, "  Refrigeration:CompressorRack, Refrigeration:System, or Refrigeration:SecondarySystem object.");
                 ShowContinueError(state, "  These unused refrigeration cases will not be simulated.");
                 ShowContinueError(state, "  Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
-            } // state.dataRefrigCase->NumUnusedRefrigCases
+            } // NumUnusedRefrigCases
         }     // numsimulation cases > 0
 
         if (state.dataRefrigCase->NumSimulationCompressors > 0) {
@@ -5979,7 +5979,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                     "\", Same refrigeration compressor name referenced");
                     ShowContinueError(state, " by more than one refrigeration system.");
                 } // looking for same compressor attached to multiple systems/racks
-            }     // state.dataRefrigCase->NumSimulationCompressors
+            }     // NumSimulationCompressors
 
             if ((state.dataRefrigCase->NumUnusedCompressors > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
@@ -5990,8 +5990,8 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowContinueError(state, "  Those refrigeration compressors are in the input file but are not connected to a Refrigeration:System object.");
                 ShowContinueError(state, "   These unused refrigeration compressors will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
-            } // state.dataRefrigCase->NumUnusedCompressors
-        }     // state.dataRefrigCase->NumSimulationCompressors > 0
+            } // NumUnusedCompressors
+        }     // NumSimulationCompressors > 0
 
         int NumUnusedWalkIns = 0;
         if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
@@ -6012,7 +6012,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                     "\", Same Refrigeration WalkIn name referenced");
                     ShowContinueError(state, " by more than one refrigeration system and/or compressor rack.");
                 } // if looking for same walk in attached to multiple systems/racks
-            }     // state.dataRefrigCase->NumSimulationWalkIns
+            }     // NumSimulationWalkIns
 
             if ((NumUnusedWalkIns > 0) && (!state.dataGlobal->DisplayExtraWarnings)) {
                 //  write to error file,
@@ -6026,7 +6026,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowContinueError(state, "   These unused refrigeration WalkIns will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
             } // NumUnusedWalkIns
-        }     // state.dataRefrigCase->NumSimulationWalkIns > 0
+        }     // NumSimulationWalkIns > 0
 
         if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) {
             // check for air chillers not connected to any systems and
@@ -6094,8 +6094,8 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowContinueError(state, "  Those refrigeration Secondary Loops are in the input file but are not connected to a refrigeration system.");
                 ShowContinueError(state, "   These unused refrigeration secondaries will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
-            } // state.dataRefrigCase->NumUnusedSecondarys
-        }     // state.dataRefrigCase->NumSimulationSecondarySystems > 0
+            } // NumUnusedSecondarys
+        }     // NumSimulationSecondarySystems > 0
 
         if (state.dataRefrigCase->NumRefrigCondensers > 0) {
             // Check for presence of shared condensers and for unused condensers
@@ -6127,7 +6127,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowContinueError(state, "  Those refrigeration condensers are in the input file but are not connected to a refrigeration system.");
                 ShowContinueError(state, "   These unused refrigeration condensers will not be simulated.");
                 ShowContinueError(state, "   Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
-            } // state.dataRefrigCase->NumUnusedCondensers and displayextra warnings
+            } // NumUnusedCondensers and displayextra warnings
         }     // DataHeatBalance::NumRefrigCondensers > 0
 
         if (state.dataRefrigCase->NumSimulationGasCooler > 0) {
@@ -6158,7 +6158,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 ShowContinueError(state, "  These refrigeration gas coolers are in the input file but are not connected to a refrigeration system.");
                 ShowContinueError(state, "  These unused refrigeration gas coolers will not be simulated.");
                 ShowContinueError(state, "  Use Output:Diagnostics,DisplayUnusedObjects; to see them. ");
-            } // state.dataRefrigCase->NumUnusedGasCoolers and displayextra warnings
+            } // NumUnusedGasCoolers and displayextra warnings
         }     // NumSimulationGasCooler > 0
 
         // echo input to eio file.
@@ -6438,7 +6438,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     }
                 } // END IF (.NOT. RefrigCase(CaseNum)%unusedCase)
             }
-        } // state.dataRefrigCase->NumSimulationCases > 0
+        } // NumSimulationCases > 0
 
         if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
             // Setup Report Variables for simulated  Walk In (do not report unused WalkIns)
@@ -6623,8 +6623,8 @@ namespace EnergyPlus::RefrigeratedCase {
 
                     } // ZoneID
                 }     //(.NOT.  WalkIn( WalkInNum)%unusedWalkIn)
-            }         // state.dataRefrigCase->NumSimulationWalkIns
-        }             // state.dataRefrigCase->NumSimulationWalkIns > 0
+            }         // NumSimulationWalkIns
+        }             // NumSimulationWalkIns > 0
 
         if (state.dataRefrigCase->NumSimulationRefrigAirChillers > 0) {
             // Setup Report Variables for simulated Warehouse coils (do not report unused warehouse coils)
@@ -6790,7 +6790,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     } // electric defrost coil
                 }     //(.NOT.  WarehouseCoil(CoilNum)%unusedWarehouseCoil)
             }         // NumSimulationWarehouseCoils
-        }             // state.dataRefrigCase->NumSimulationRefrigAirChillers > 0
+        }             // NumSimulationRefrigAirChillers > 0
 
         // There are no report variables for Chiller sets because they are
         // used to pass the demand to the coils, but are NOT used to provide the
@@ -7122,8 +7122,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                               &Secondary(secondNum).DistPipeZoneHeatGain);
                     }
                 } // not an unused
-            }     // state.dataRefrigCase->NumSimulationSecondarySystems
-        }         // state.dataRefrigCase->NumSimulationSecondarySystems > 0
+            }     // NumSimulationSecondarySystems
+        }         // NumSimulationSecondarySystems > 0
 
         // Setup Report Variables for Refrigeration Compressor Rack
         if (state.dataRefrigCase->NumRefrigeratedRacks > 0) {
@@ -7991,7 +7991,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                             Compressor(compNum).Name);
                     } // Serve coils on HVAC time step or cases/walkins on Zone time step
                 }     // NumSysAttach
-            }         // CompNum on state.dataRefrigCase->NumSimulationCompressors
+            }         // CompNum on NumSimulationCompressors
 
             // Report Variables for Refrigeration Condensers
             for (int condNum = 1; condNum <= state.dataRefrigCase->NumRefrigCondensers; ++condNum) {
@@ -8341,8 +8341,8 @@ namespace EnergyPlus::RefrigeratedCase {
                                                 Subcooler(subcoolNum).Name);
                         }
                     } // Subcoolers on system serving chillers
-                }     // Subcoolnum on state.dataRefrigCase->NumSimulationSubcoolers
-            }         // state.dataRefrigCase->NumSimulationSubcoolers > 0
+                }     // Subcoolnum on NumSimulationSubcoolers
+            }         // NumSimulationSubcoolers > 0
 
         } // NumRefrigSystems > 0
 
@@ -8764,22 +8764,22 @@ namespace EnergyPlus::RefrigeratedCase {
         }
 
         if (state.dataRefrigCase->NumSimulationCases > 0) {
-            // RefrigCase ALLOCATED to state.dataRefrigCase->NumSimulationCases
+            // RefrigCase ALLOCATED to NumSimulationCases
             for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
                 RefrigCase(i).reset_init();
             }
-        } // state.dataRefrigCase->NumSimulationCases
+        } // NumSimulationCases
 
         if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
-            // WalkIn ALLOCATED to state.dataRefrigCase->NumSimulationWalkIns
+            // WalkIn ALLOCATED to NumSimulationWalkIns
             for (int i = WalkIn.l(), e = WalkIn.u(); i <= e; ++i) {
                 WalkIn(i).reset_init();
             }
         }
 
         if (state.dataRefrigCase->HaveChillers) {
-            // HaveChillers is TRUE when state.dataRefrigCase->NumSimulationRefrigAirChillers > 0
-            // WarehouseCoil ALLOCATED to state.dataRefrigCase->NumSimulationRefrigAirChillers
+            // HaveChillers is TRUE when NumSimulationRefrigAirChillers > 0
+            // WarehouseCoil ALLOCATED to NumSimulationRefrigAirChillers
             for (int i = WarehouseCoil.l(), e = WarehouseCoil.u(); i <= e; ++i) {
                 WarehouseCoil(i).reset_init();
             }
@@ -8818,7 +8818,7 @@ namespace EnergyPlus::RefrigeratedCase {
         }
 
         if (state.dataRefrigCase->NumSimulationCompressors > 0) {
-            // Compressor ALLOCATED to state.dataRefrigCase->NumSimulationCompressors
+            // Compressor ALLOCATED to NumSimulationCompressors
             for (int i = Compressor.l(), e = Compressor.u(); i <= e; ++i) {
                 Compressor(i).reset_init();
             }
@@ -8841,7 +8841,7 @@ namespace EnergyPlus::RefrigeratedCase {
         }
 
         if (state.dataRefrigCase->NumSimulationSecondarySystems > 0) {
-            // Secondary is ALLOCATED to state.dataRefrigCase->NumSimulationSecondarySystems
+            // Secondary is ALLOCATED to NumSimulationSecondarySystems
             for (int i = Secondary.l(), e = Secondary.u(); i <= e; ++i) {
                 Secondary(i).reset_init();
             }
@@ -8930,7 +8930,7 @@ namespace EnergyPlus::RefrigeratedCase {
                             RefrigCase(caseID).KgFrost = RefrigCase(caseID).KgFrostSaved;
                             RefrigCase(caseID).StoredEnergy = RefrigCase(caseID).StoredEnergySaved;
                         } // CaseID
-                    }     // state.dataRefrigCase->NumSimulationCases
+                    }     // NumSimulationCases
                     if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
                         for (int walkInID = 1; walkInID <= state.dataRefrigCase->NumSimulationWalkIns; ++walkInID) {
                             WalkIn(walkInID).KgFrost = WalkIn(walkInID).KgFrostSaved;
@@ -9447,7 +9447,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                        " - Evap cooling of condenser underway with no basin heater power ... continues",
                                                    this->EvapFreezeWarnIndex);
                     // END IF
-                } // state.dataRefrigCase->TotalBasinHeatPower == 0 when at outdoor freezing conditions
+                } // TotalBasinHeatPower == 0 when at outdoor freezing conditions
             }     // cap
         }         // evap condenser type
 
@@ -9459,7 +9459,7 @@ namespace EnergyPlus::RefrigeratedCase {
             if (HeatRejectZoneNum > 0 && state.dataRefrigCase->TotalRackDeliveredCapacity > 0.0) {
                 if (this->NumWalkIns == 0) {
                     //       rack report variables for condenser heat to Zone and/or HVAC
-                    //       The difference between TotalHeatRejectedToZone and state.dataRefrigCase->TotalRackDeliveredCapacity is the heat sent to return air
+                    //       The difference between TotalHeatRejectedToZone and TotalRackDeliveredCapacity is the heat sent to return air
                     state.dataRefrigCase->RackSenCreditToZone = state.dataRefrigCase->TotalCondenserHeat * (TotalHeatRejectedToZone / state.dataRefrigCase->TotalRackDeliveredCapacity);
                     state.dataRefrigCase->RackSenCreditToHVAC = state.dataRefrigCase->TotalCondenserHeat - state.dataRefrigCase->RackSenCreditToZone;
                 } else { // walkins present and no rack heat rejection goes to return air
@@ -10564,7 +10564,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                 System(SysNum).SumMechSCBenefit = Subcooler(SubcoolID).MechSCTransLoad;
                             } // subcoolerindex
                         }     // System(sysid)%numsubcoolers > 0
-                    }         // state.dataRefrigCase->NumSimulationMechSubcoolers > 0 and not first loop
+                    }         // NumSimulationMechSubcoolers > 0 and not first loop
 
                     // This loop places load on system absorbing heat from cascade condenser and &
                     //     condenser heat reclaim credits from hot gas/brine defrosts
@@ -11355,7 +11355,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 // Apply ARI490 elevation correction factor here for evap condenser, then apply hrcf limits
                 if (CapFac > 0.0) {
                     HRCF = condenser.EvapElevFact / CapFac;
-                    // Condenser(CondNum)%EvapElevFact=1.0d0-3.074D-5*state.dataEnvrn->Elevation
+                    // Condenser(CondNum)%EvapElevFact=1.0d0-3.074D-5*Elevation
                 } else {
                     HRCF = MyLargeNumber;
                 }
@@ -11878,11 +11878,11 @@ namespace EnergyPlus::RefrigeratedCase {
                 TsatforPsuct = this->TIntercooler;
                 HsatVaporforTevapneeded =
                     FluidProperties::GetSatEnthalpyRefrig(state, this->RefrigerantName, this->TIntercooler, 1.0, this->RefIndex, RoutineName);
-                //				HSatLiqCond = FluidProperties::GetSatEnthalpyRefrig(state, RefrigerantName, TCondense, 0.0, RefIndex,
+                //                HSatLiqCond = FluidProperties::GetSatEnthalpyRefrig(state, RefrigerantName, TCondense, 0.0, RefIndex,
                 // RoutineName
                 //);
                 ////Autodesk:Tuned These don't change for 2nd stage
-                //				CpSatLiqCond = FluidProperties::GetSatSpecificHeatRefrig(RefrigerantName, TCondense, 0.0, RefIndex,
+                //                CpSatLiqCond = FluidProperties::GetSatSpecificHeatRefrig(RefrigerantName, TCondense, 0.0, RefIndex,
                 //RoutineName );
                 ////Autodesk:Tuned These don't change for 2nd stage
                 this->HCaseIn = this->HSatLiqCond - this->CpSatLiqCond * Condenser1.RatedSubcool;
@@ -12746,7 +12746,7 @@ namespace EnergyPlus::RefrigeratedCase {
                 }
             }
             print(state.files.eio, "{}\n", Format_123); //  Secondary system load header
-        }                                            //(state.dataRefrigCase->NumSimulationSecondarySystems > 0)
+        }                                            //(NumSimulationSecondarySystems > 0)
         if (state.dataRefrigCase->NumRefrigChillerSets > 0) {
             print(state.files.eio, "{}\n", Format_148); // Intro to Chiller set
             print(state.files.eio, "{}\n", Format_149); // Chiller set header
@@ -12755,11 +12755,11 @@ namespace EnergyPlus::RefrigeratedCase {
         }                                            //(NumRefrigSystems > 0)
         if (state.dataRefrigCase->NumSimulationCases > 0) {
             print(state.files.eio, "{}\n", Format_105); //  Case header
-        }                                            //(state.dataRefrigCase->NumSimulationCases > 0)
+        }                                            //(NumSimulationCases > 0)
         if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
             print(state.files.eio, "{}\n", Format_119); //  Walk-in header
             print(state.files.eio, "{}\n", Format_134); //  Walk-in zone-specific header
-        }                                            //(state.dataRefrigCase->NumSimulationWalkIns > 0)
+        }                                            //(NumSimulationWalkIns > 0)
         if (state.dataRefrigCase->NumSimulationCondAir > 0) {
             print(state.files.eio, "{}\n", Format_129); //  Condenser, Air-Cooled header
         }                                            //(NumSimulationCondAir > 0)
@@ -12776,21 +12776,21 @@ namespace EnergyPlus::RefrigeratedCase {
         if (state.dataRefrigCase->NumSimulationMechSubcoolers > 0) {
             print(state.files.eio, "{}\n", Format_141); //  Mech subcooler loads served header
             print(state.files.eio, "{}\n", Format_126); //  Mechanical Subcooler header
-        }                                            //(state.dataRefrigCase->NumSimulationMechSubcoolers > 0)
+        }                                            //(NumSimulationMechSubcoolers > 0)
         if ((state.dataRefrigCase->NumSimulationSubcoolers - state.dataRefrigCase->NumSimulationMechSubcoolers) > 0) {
             print(state.files.eio, "{}\n", Format_127); //  LSHX Subcooler header
-        }                                            //((state.dataRefrigCase->NumSimulationSubcoolers - state.dataRefrigCase->NumSimulationMechSubcoolers) > 0)
+        }                                            //((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0)
 
         if (state.dataRefrigCase->NumTransRefrigSystems > 0) {
             print(state.files.eio, "{}\n", Format_120); // Intro to detailed transcriticial refrigeration system
             print(state.files.eio, "{}\n", Format_121); // Detailed system header
             if (state.dataRefrigCase->NumSimulationCases > 0) {
                 print(state.files.eio, "{}\n", Format_105); //  Case header
-            }                                            //(state.dataRefrigCase->NumSimulationCases > 0)
+            }                                            //(NumSimulationCases > 0)
             if (state.dataRefrigCase->NumSimulationWalkIns > 0) {
                 print(state.files.eio, "{}\n", Format_119); //  Walk-in header
                 print(state.files.eio, "{}\n", Format_134); //  Walk-in zone-specific header
-            }                                            //(state.dataRefrigCase->NumSimulationWalkIns > 0)
+            }                                            //(NumSimulationWalkIns > 0)
             print(state.files.eio, "{}\n", Format_108);     // Compressor header (Always have compressor if have detailed system)
             if (state.dataRefrigCase->NumSimulationGasCooler > 0) {
                 print(state.files.eio, "{}\n", Format_160); //  Gas Cooler, Air-Cooled header
@@ -14196,7 +14196,7 @@ namespace EnergyPlus::RefrigeratedCase {
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         // RemainingOutputToCoolingSP in Watts, < 0 for cooling demand
 
-        if (RemainingOutputToCoolingSP < 0.0 && DataHeatBalFanSys::TempControlType(ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
             AirChillerSet(AirChillerSetPtr).QZnReqSens = RemainingOutputToCoolingSP;
         } else {
             AirChillerSet(AirChillerSetPtr).QZnReqSens = 0.0;

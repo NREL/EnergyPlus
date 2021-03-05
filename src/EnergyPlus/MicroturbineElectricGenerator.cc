@@ -620,7 +620,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefHeatRecVolFlowRate = state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate;
                 }
 
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum,
                                                             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate);
 
                 state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxWaterTemp = NumArray(17);

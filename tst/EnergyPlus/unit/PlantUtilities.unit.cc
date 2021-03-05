@@ -70,22 +70,22 @@ TEST_F(EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1)
     // first call just puts first value in array
     int TestNodeNum1 = 123;
     Real64 TestFlowRate1 = 45.6;
-    SaveNumPlantComps = 0;
-    RegisterPlantCompDesignFlow(TestNodeNum1, TestFlowRate1);
-    EXPECT_EQ(TestNodeNum1, CompDesWaterFlow(1).SupNode);
-    EXPECT_EQ(TestFlowRate1, CompDesWaterFlow(1).DesVolFlowRate);
+    state->dataSize->SaveNumPlantComps = 0;
+    RegisterPlantCompDesignFlow(*state, TestNodeNum1, TestFlowRate1);
+    EXPECT_EQ(TestNodeNum1, state->dataSize->CompDesWaterFlow(1).SupNode);
+    EXPECT_EQ(TestFlowRate1, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
 
     // second call searches array and since node not found adds an entry to array
     int TestNodeNum2 = 234;
     Real64 TestFlowRate2 = 56.7;
-    RegisterPlantCompDesignFlow(TestNodeNum2, TestFlowRate2);
-    EXPECT_EQ(TestNodeNum2, CompDesWaterFlow(2).SupNode);
-    EXPECT_EQ(TestFlowRate2, CompDesWaterFlow(2).DesVolFlowRate);
+    RegisterPlantCompDesignFlow(*state, TestNodeNum2, TestFlowRate2);
+    EXPECT_EQ(TestNodeNum2, state->dataSize->CompDesWaterFlow(2).SupNode);
+    EXPECT_EQ(TestFlowRate2, state->dataSize->CompDesWaterFlow(2).DesVolFlowRate);
 
     // third call searches array and since node was found adds an entry to array
     Real64 TestFlowRate3 = 67.8;
-    RegisterPlantCompDesignFlow(TestNodeNum1, TestFlowRate3);
-    EXPECT_EQ(TestFlowRate3, CompDesWaterFlow(1).DesVolFlowRate);
+    RegisterPlantCompDesignFlow(*state, TestNodeNum1, TestFlowRate3);
+    EXPECT_EQ(TestFlowRate3, state->dataSize->CompDesWaterFlow(1).DesVolFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)

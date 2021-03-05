@@ -208,7 +208,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
         Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     std::string SizingString = "Rated Gross Total Cooling Capacity [W]";
-    DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate;
+    state.dataSize->DataFlowUsedForSizing = this->ratedEvapAirFlowRate;
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);
@@ -216,8 +216,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     this->ratedGrossTotalCap = sizerCoolingCapacity.size(state, TempSize, errorsFound);
 
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
-    DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
-    DataSizing::DataFractionUsedForSizing = 0.000114;
+    state.dataSize->DataConstantUsedForSizing = this->ratedGrossTotalCap;
+    state.dataSize->DataFractionUsedForSizing = 0.000114;
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
 
     AutoCalculateSizer sizerCondAirFlow;
@@ -231,8 +231,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlus::EnergyPlusData &state)
     if (this->condenserType != CondenserType::AIRCOOLED) {
         // Auto size Nominal Evaporative Condenser Pump Power to Total Capacity * 0.004266 w/w (15 W/ton)
         AutoCalculateSizer sizerCondEvapPumpPower;
-        DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
-        DataSizing::DataFractionUsedForSizing = 0.004266;
+        state.dataSize->DataConstantUsedForSizing = this->ratedGrossTotalCap;
+        state.dataSize->DataFractionUsedForSizing = 0.004266;
         stringOverride = "Nominal Evaporative Condenser Pump Power [W]";
         sizerCondEvapPumpPower.overrideSizingString(stringOverride);
         TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;

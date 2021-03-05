@@ -95,7 +95,7 @@ namespace FourPipeBeam {
         {
         }
 
-    public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
+    public: // Methods        MARK ANY THAT DON'T ALTER STATE const !!!
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         static std::shared_ptr<AirTerminalUnit> fourPipeBeamFactory(EnergyPlusData &state, std::string objectName);
         void simulate(EnergyPlusData &state,

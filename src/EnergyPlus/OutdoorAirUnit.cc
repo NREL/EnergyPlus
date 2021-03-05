@@ -120,7 +120,6 @@ namespace OutdoorAirUnit {
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
-    using DataSizing::ZoneEqOutdoorAirUnit;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace FluidProperties;
@@ -201,7 +200,7 @@ namespace OutdoorAirUnit {
             }
         }
 
-        ZoneEqOutdoorAirUnit = true;
+        state.dataSize->ZoneEqOutdoorAirUnit = true;
 
         if (state.dataGlobal->ZoneSizingCalc || state.dataGlobal->SysSizingCalc) return;
 
@@ -211,7 +210,7 @@ namespace OutdoorAirUnit {
 
         ReportOutdoorAirUnit(state, OAUnitNum);
 
-        ZoneEqOutdoorAirUnit = false;
+        state.dataSize->ZoneEqOutdoorAirUnit = false;
     }
 
     void GetOutdoorAirUnitInputs(EnergyPlusData &state)
@@ -1042,8 +1041,6 @@ namespace OutdoorAirUnit {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ShortenTimeStepSys;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -1419,26 +1416,28 @@ namespace OutdoorAirUnit {
         MaxVolWaterFlowDes = 0.0;
         MaxVolWaterFlowUser = 0.0;
 
-        auto & OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
+        auto &OutAirUnit(state.dataOutdoorAirUnit->OutAirUnit);
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+        auto &DataFanEnumType(state.dataSize->DataFanEnumType);
 
         if (OutAirUnit(OAUnitNum).SFanType == DataHVACGlobals::FanType_SystemModelObject) {
-            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
         } else {
-            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
-        DataSizing::DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
+        state.dataSize->DataFanIndex = OutAirUnit(OAUnitNum).SFan_Index;
         if (OutAirUnit(OAUnitNum).FanPlace == BlowThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
         } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 
         if (OutAirUnit(OAUnitNum).OutAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
 
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (OutAirUnit(OAUnitNum).OutAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, CurrentModuleObjects(CurrentObject::OAUnit),
                                                  OutAirUnit(OAUnitNum).Name,
@@ -1447,7 +1446,7 @@ namespace OutdoorAirUnit {
                 }
             } else {
                 CheckZoneSizing(state, CurrentModuleObjects(CurrentObject::OAUnit), OutAirUnit(OAUnitNum).Name);
-                OutAirVolFlowDes = FinalZoneSizing(CurZoneEqNum).MinOA;
+                OutAirVolFlowDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA;
                 if (OutAirVolFlowDes < SmallAirVolFlow) {
                     OutAirVolFlowDes = 0.0;
                 }
@@ -1461,7 +1460,7 @@ namespace OutdoorAirUnit {
                         BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(CurrentObject::OAUnit), OutAirUnit(OAUnitNum).Name, "User-Specified Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state, CurrentModuleObjects(CurrentObject::OAUnit),
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Outdoor Air Flow Rate [m3/s]",
@@ -1483,8 +1482,8 @@ namespace OutdoorAirUnit {
         if (OutAirUnit(OAUnitNum).ExtAirVolFlow == AutoSize) {
             IsAutoSize = true;
         }
-        if (CurZoneEqNum > 0) {
-            if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
+        if (state.dataSize->CurZoneEqNum > 0) {
+            if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
                 if (OutAirUnit(OAUnitNum).ExtAirVolFlow > 0.0) {
                     BaseSizer::reportSizerOutput(state, CurrentModuleObjects(CurrentObject::OAUnit),
                                                  OutAirUnit(OAUnitNum).Name,
@@ -1504,7 +1503,7 @@ namespace OutdoorAirUnit {
                         BaseSizer::reportSizerOutput(state,
                             CurrentModuleObjects(CurrentObject::OAUnit), OutAirUnit(OAUnitNum).Name, "User-Specified Exhaust Air Flow Rate [m3/s]", ExtAirVolFlowUser);
                         if (state.dataGlobal->DisplayExtraWarnings) {
-                            if ((std::abs(ExtAirVolFlowDes - ExtAirVolFlowUser) / ExtAirVolFlowUser) > AutoVsHardSizingThreshold) {
+                            if ((std::abs(ExtAirVolFlowDes - ExtAirVolFlowUser) / ExtAirVolFlowUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                 BaseSizer::reportSizerOutput(state, CurrentModuleObjects(CurrentObject::OAUnit),
                                                              OutAirUnit(OAUnitNum).Name,
                                                              "Design Size Exhaust Air Flow Rate [m3/s]",
@@ -1522,11 +1521,11 @@ namespace OutdoorAirUnit {
             }
         }
 
-        ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
-        ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = true;
-        ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
-        ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
-        ZoneEqSizing(CurZoneEqNum).OAVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirFlow = true;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirFlow = true;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).HeatingAirVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = OutAirUnit(OAUnitNum).OutAirVolFlow;
 
         if (OutAirUnit(OAUnitNum).SFanMaxAirVolFlow == AutoSize) {
             if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
@@ -1635,8 +1634,6 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
         using DataLoopNode::Node;
@@ -1717,10 +1714,10 @@ namespace OutdoorAirUnit {
 
             // Node condition
             if (OutAirUnit(OAUnitNum).ExtFan) {
-                Node(InletNode).Temp = MAT(ZoneNum);
+                Node(InletNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 Node(SFanOutletNode).Temp = Node(InletNode).Temp;
             } else {
-                Node(SFanOutletNode).Temp = MAT(ZoneNum);
+                Node(SFanOutletNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
             }
             Node(OutletNode).Temp = Node(SFanOutletNode).Temp;
 
@@ -1830,7 +1827,7 @@ namespace OutdoorAirUnit {
             {
                 auto const SELECT_CASE_var(UnitControlType);
                 if (SELECT_CASE_var == Control::Neutral) {
-                    SetPointTemp = MAT(ZoneNum);
+                    SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     // Neutral Control Condition
                     if (DesOATemp == SetPointTemp) {
                         OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
@@ -2053,8 +2050,6 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
@@ -2065,7 +2060,7 @@ namespace OutdoorAirUnit {
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetCurrentScheduleValue;
         using WaterCoils::SimulateWaterCoilComponents;
-        //		using SteamCoils::SimulateSteamCoilComponents;
+        //        using SteamCoils::SimulateSteamCoilComponents;
         //  Use TranspiredCollector, Only:SimTranspiredCollector
         //  Use EvaporativeCoolers, Only:SimEvapCooler
         //  USE PhotovoltaicThermalCollectors, ONLY:SimPVTcollectors, CalledFromOutsideAirSystem
@@ -2606,7 +2601,7 @@ namespace OutdoorAirUnit {
 
         if (OutAirUnit(OAUnitNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, OutAirUnit(OAUnitNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, OutAirUnit(OAUnitNum).FirstPass);
             }
         }
     }

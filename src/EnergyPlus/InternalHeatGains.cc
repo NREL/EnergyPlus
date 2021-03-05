@@ -140,17 +140,7 @@ namespace InternalHeatGains {
     int const ITEInletZoneAirNode(1);
     int const ITEInletRoomAirModel(2);
 
-    bool GetInternalHeatGainsInputFlag(true); // Controls the GET routine calling (limited to first time)
-    bool ErrorsFound(false);                  // if errors were found in the input
-
     static std::string const BlankString;
-
-    // Functions
-    void clear_state()
-    {
-        GetInternalHeatGainsInputFlag = true;
-        ErrorsFound = false;
-    }
 
     void ManageInternalHeatGains(EnergyPlusData &state, Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
@@ -165,9 +155,9 @@ namespace InternalHeatGains {
         // This is the main driver subroutine for the internal heat gains.
 
 
-        if (GetInternalHeatGainsInputFlag) {
+        if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
             GetInternalHeatGainsInput(state);
-            GetInternalHeatGainsInputFlag = false;
+            state.dataInternalHeatGains->GetInternalHeatGainsInputFlag = false;
         }
 
         if (present(InitOnly)) {
@@ -279,6 +269,7 @@ namespace InternalHeatGains {
             }
         };
 
+        auto &ErrorsFound(state.dataInternalHeatGains->ErrorsFound);
 
         state.dataHeatBal->ZoneIntGain.allocate(state.dataGlobal->NumOfZones);
         state.dataHeatBal->ZnRpt.allocate(state.dataGlobal->NumOfZones);
@@ -786,17 +777,17 @@ namespace InternalHeatGains {
 
                                 } else if (mrtType == "SURFACEWEIGHTED") {
                                     state.dataHeatBal->People(Loop).MRTCalcType = SurfaceWeighted;
-                                    state.dataHeatBal->People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), Surface);
+                                    state.dataHeatBal->People(Loop).SurfacePtr = UtilityRoutines::FindItemInList(AlphaName(8), state.dataSurface->Surface);
                                     if (state.dataHeatBal->People(Loop).SurfacePtr == 0 && ModelWithAdditionalInputs) {
                                         if (Item1 == 1) {
                                             ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", " + cAlphaFieldNames(7) +
                                                             '=' + AlphaName(7) + " invalid Surface Name=" + AlphaName(8));
                                             ErrorsFound = true;
                                         }
-                                    } else if (Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone != state.dataHeatBal->People(Loop).ZonePtr && ModelWithAdditionalInputs) {
+                                    } else if (state.dataSurface->Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone != state.dataHeatBal->People(Loop).ZonePtr && ModelWithAdditionalInputs) {
                                         ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphaName(1) + "\", Surface referenced in " +
                                                         cAlphaFieldNames(7) + '=' + AlphaName(7) + " in different zone.");
-                                        ShowContinueError(state, "Surface is in Zone=" + state.dataHeatBal->Zone(Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone).Name + " and " +
+                                        ShowContinueError(state, "Surface is in Zone=" + state.dataHeatBal->Zone(state.dataSurface->Surface(state.dataHeatBal->People(Loop).SurfacePtr).Zone).Name + " and " +
                                                           CurrentModuleObject + " is in Zone=" + AlphaName(2));
                                         ErrorsFound = true;
                                     }
@@ -5289,11 +5280,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::SumConvHTRadSys;
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalFanSys::ZoneLatentGainExceptPeople;
-        using DataSizing::CurOverallSimDay;
         using DaylightingDevices::FigureTDDZoneGains;
         using FuelCellElectricGenerator::FigureFuelCellZoneGains;
         using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
@@ -5302,22 +5288,11 @@ namespace InternalHeatGains {
         using RefrigeratedCase::FigureRefrigerationZoneGains;
         using WaterThermalTanks::CalcWaterThermalTankZoneGains;
         using WaterUse::CalcWaterUseZoneGains;
-        //using ZonePlenum::ZoneRetPlenCond;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D<Real64> const C(
             9, {6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532});
         static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActivityLevel_WperPerson; // Units on Activity Level (Schedule)
@@ -5423,8 +5398,8 @@ namespace InternalHeatGains {
                     if (!(state.dataRoomAirMod->IsZoneDV(NZ) || state.dataRoomAirMod->IsZoneUI(NZ))) {
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
-                                               MAT(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
-                                                          MAT(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
+                                    state.dataHeatBalFanSys->MAT(NZ) * ((C(4) + ActivityLevel_WperPerson * (C(5) + ActivityLevel_WperPerson * C(6))) +
+                                            state.dataHeatBalFanSys->MAT(NZ) * (C(7) + ActivityLevel_WperPerson * (C(8) + ActivityLevel_WperPerson * C(9)))));
                     } else { // UCSD - DV or UI
                         SensiblePeopleGain =
                             NumberOccupants * (C(1) + ActivityLevel_WperPerson * (C(2) + ActivityLevel_WperPerson * C(3)) +
@@ -5680,10 +5655,10 @@ namespace InternalHeatGains {
 
         for (int NZ = 1; NZ <= state.dataGlobal->NumOfZones; ++NZ) {
 
-            SumAllInternalLatentGains(state, NZ, ZoneLatentGain(NZ));
+            SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
             // Added for hybrid model
             if (HybridModel::FlagHybridModel_PC) {
-                SumAllInternalLatentGainsExceptPeople(state, NZ, ZoneLatentGainExceptPeople(NZ));
+                SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
             }
         }
 
@@ -5698,18 +5673,17 @@ namespace InternalHeatGains {
             }
         }
 
-        SumConvHTRadSys = 0.0;
+        state.dataHeatBalFanSys->SumConvHTRadSys = 0.0;
 
         pulseMultipler = 0.01; // the W/sqft pulse for the zone
         if (state.dataGlobal->CompLoadReportIsReq) {
             AllocateLoadComponentArrays(state);
         }
         for (int zoneNum = 1; zoneNum <= state.dataGlobal->NumOfZones; ++zoneNum) {// Loop through all surfaces...
-            int const firstSurf = state.dataHeatBal->Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = state.dataHeatBal->Zone(zoneNum).SurfaceLast;
+            int const firstSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceFirst;
+            int const lastSurf = state.dataHeatBal->Zone(zoneNum).HTSurfaceLast;
             if (firstSurf <= 0) continue;
             for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
                 int const radEnclosureNum = state.dataHeatBal->Zone(zoneNum).RadiantEnclosureNum;
                 if (!state.dataGlobal->doLoadComponentPulseNow) {
                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
@@ -5724,9 +5698,9 @@ namespace InternalHeatGains {
                     // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
                     state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     // store the magnitude and time of the pulse
-                    state.dataOutRptTab->radiantPulseTimestep(CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
-                    state.dataOutRptTab->radiantPulseReceived(CurOverallSimDay, SurfNum) =
-                            (adjQL - curQL) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum) * Surface(SurfNum).Area;
+                    state.dataOutRptTab->radiantPulseTimestep(state.dataSize->CurOverallSimDay, zoneNum) = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
+                    state.dataOutRptTab->radiantPulseReceived(state.dataSize->CurOverallSimDay, SurfNum) =
+                            (adjQL - curQL) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum) * state.dataSurface->Surface(SurfNum).Area;
                 }
             }
         }
@@ -5768,8 +5742,6 @@ namespace InternalHeatGains {
         // This broken into a separate subroutine, because the calculations are more detailed than the other
         // types of internal gains.
 
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using CurveManager::CurveValue;
@@ -5922,21 +5894,21 @@ namespace InternalHeatGains {
                     } else {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac;
                     }
-                    TRecirc = MAT(NZ);
-                    WRecirc = ZoneAirHumRat(NZ);
+                    TRecirc = state.dataHeatBalFanSys->MAT(NZ);
+                    WRecirc = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                     TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac);
                     WAirIn = WRecirc * RecircFrac + WSupply * (1.0 - RecircFrac);
                 } else if (AirConnection == ITEInletRoomAirModel) {
                     // Room air model option: TAirIn=TAirZone, according to EngineeringRef 17.1.4
-                    TAirIn = MAT(NZ);
+                    TAirIn = state.dataHeatBalFanSys->MAT(NZ);
                     TSupply = TAirIn;
-                    WAirIn = ZoneAirHumRat(NZ);
+                    WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
                     int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
                     TSupply = Node(ZoneAirInletNode).Temp;
-                    TAirIn = MAT(NZ);
-                    WAirIn = ZoneAirHumRat(NZ);
+                    TAirIn = state.dataHeatBalFanSys->MAT(NZ);
+                    WAirIn = state.dataHeatBalFanSys->ZoneAirHumRat(NZ);
                 }
             }
             TDPAirIn = PsyTdpFnWPb(state, WAirIn, state.dataEnvrn->StdBaroPress, RoutineName);
@@ -6419,7 +6391,7 @@ namespace InternalHeatGains {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int Loop;
 
-        if (GetInternalHeatGainsInputFlag) {
+        if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
             ShowFatalError(state, "GetDesignLightingLevelForZone: Function called prior to Getting Lights Input.");
         }
 
@@ -6473,7 +6445,7 @@ namespace InternalHeatGains {
         Real64 LightsRepMax; // Maximum Lighting replacement fraction for any lights statement for this zone
         int NumLights;       // Number of Lights statement for that zone.
 
-        if (GetInternalHeatGainsInputFlag) {
+        if (state.dataInternalHeatGains->GetInternalHeatGainsInputFlag) {
             ShowFatalError(state, "CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input.");
         }
 
@@ -6531,8 +6503,6 @@ namespace InternalHeatGains {
         //       RE-ENGINEERED  na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneLatentGain;
-        using DataHeatBalFanSys::ZoneLatentGainExceptPeople; // Added for hybrid model
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
@@ -6563,10 +6533,10 @@ namespace InternalHeatGains {
                 state.dataHeatBal->ZoneIntGain(NZ).Device(Loop).GenericContamGainRate = *state.dataHeatBal->ZoneIntGain(NZ).Device(Loop).PtrGenericContamGainRate;
             }
             if (ReSumLatentGains) {
-                SumAllInternalLatentGains(state, NZ, ZoneLatentGain(NZ));
+                SumAllInternalLatentGains(state, NZ, state.dataHeatBalFanSys->ZoneLatentGain(NZ));
                 // Added for the hybrid model
                 if (HybridModel::FlagHybridModel_PC) {
-                    SumAllInternalLatentGainsExceptPeople(state, NZ, ZoneLatentGainExceptPeople(NZ));
+                    SumAllInternalLatentGainsExceptPeople(state, NZ, state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(NZ));
                 }
             }
         }
@@ -7085,7 +7055,6 @@ namespace InternalHeatGains {
 
         // Using/Aliasing
         using namespace DataHeatBalance;
-        using DataSizing::CurOverallSimDay;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
@@ -7148,30 +7117,30 @@ namespace InternalHeatGains {
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPeople, state.dataOutRptTab->peopleRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesLight, state.dataOutRptTab->lightInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesLight, state.dataOutRptTab->lightRetAirSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesLight, state.dataOutRptTab->lightLWRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesLight, state.dataOutRptTab->lightInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesLight, state.dataOutRptTab->lightRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesLight, state.dataOutRptTab->lightLWRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesEquip, state.dataOutRptTab->equipRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigRetAirSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumReturnAirConvectionGainsByTypes(state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigRetAirSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesRefrig, state.dataOutRptTab->refrigLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesWaterUse, state.dataOutRptTab->waterUseInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesWaterUse, state.dataOutRptTab->waterUseLatentSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesWaterUse, state.dataOutRptTab->waterUseInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalLatentGainsByTypes(state, iZone, IntGainTypesWaterUse, state.dataOutRptTab->waterUseLatentSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesHvacLoss, state.dataOutRptTab->hvacLossRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
 
-                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenInstantSeq(CurOverallSimDay, TimeStepInDay, iZone));
-                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenRadSeq(CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalConvectionGainsByTypes(state, iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenInstantSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
+                SumInternalRadiationGainsByTypes(state, iZone, IntGainTypesPowerGen, state.dataOutRptTab->powerGenRadSeq(state.dataSize->CurOverallSimDay, TimeStepInDay, iZone));
             }
         }
     }

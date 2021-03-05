@@ -56,7 +56,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -65,10 +64,8 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -77,7 +74,6 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -90,7 +86,6 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
-#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -98,7 +93,6 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -110,7 +104,6 @@
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -125,7 +118,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
-#include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -140,7 +132,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     autosizing_clear_state();
     CoilCoolingDX::clear_state();
     AirflowNetwork::clear_state();
-    DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
     DataHVACGlobals::clear_state();
     DataIPShortCuts::clear_state();
@@ -150,10 +141,8 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
     DataReportingFlags::clear_state();
-    DataSizing::clear_state();
     DataStringGlobals::clear_state();
     DataSurfaceLists::clear_state();
-    DataSurfaces::clear_state();
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
@@ -162,7 +151,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DualDuct::clear_state();
     clearFacilityElectricPowerServiceObject();
     ElectricBaseboardRadiator::clear_state();
-    EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
     ExternalInterface::clear_state();
     FanCoilUnits::clear_state();
@@ -184,17 +172,14 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HVACControllers::clear_state();
     HVACCooledBeam::clear_state();
     HVACDuct::clear_state();
-    HVACDXHeatPumpSystem::clear_state();
     HVACDXSystem::clear_state();
     HVACHXAssistedCoolingCoil::clear_state();
     HVACFan::clearHVACFanObjects();
     HVACManager::clear_state();
     HVACMultiSpeedHeatPump::clear_state();
     HVACSingleDuctInduc::clear_state();
-    HVACUnitaryBypassVAV::clear_state();
     HybridModel::clear_state();
     HysteresisPhaseChange::clear_state();
-    InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
     OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
@@ -206,7 +191,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
-    RoomAirModelManager::clear_state();
     RoomAirModelUserTempPattern::clear_state();
     RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
