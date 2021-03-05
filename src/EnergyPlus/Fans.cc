@@ -1016,7 +1016,6 @@ namespace Fans {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataSizing::CurSysNum;
         using DataZoneEquipment::CheckZoneEquipmentList;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1050,8 +1049,8 @@ namespace Fans {
             SizeFan(state, FanNum);
             // Set the loop cycling flag
             if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-                if (CurSysNum > 0) {
-                    state.dataAirLoop->AirLoopControlInfo(CurSysNum).CyclingFan = true;
+                if (state.dataSize->CurSysNum > 0) {
+                    state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).CyclingFan = true;
                 }
             }
 
@@ -1220,11 +1219,11 @@ namespace Fans {
         SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
 
         TempFlow = Fan(FanNum).MaxAirFlowRate;
-        DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
+        state.dataSize->DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
         CompType = Fan(FanNum).FanType;
         CompName = Fan(FanNum).FanName;
-        DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
-        DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
+        state.dataSize->DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
+        state.dataSize->DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
@@ -1232,9 +1231,9 @@ namespace Fans {
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
         Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(state, TempFlow, errorsFound);
 
-        DataAutosizable = true;
-        DataEMSOverrideON = false;
-        DataEMSOverride = 0.0;
+        state.dataSize->DataAutosizable = true;
+        state.dataSize->DataEMSOverrideON = false;
+        state.dataSize->DataEMSOverride = 0.0;
 
         FanVolFlow = Fan(FanNum).MaxAirFlowRate; // Maximum volumetric airflow through fan [m3/s at standard conditions]
         if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
@@ -3160,9 +3159,6 @@ namespace Fans {
         //              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
 
         // REFERENCES: EnergyPlus Engineering Reference
-
-        // Using/Aliasing
-        using DataSizing::CurSysNum;
 
         // Return value
         Real64 DesignHeatGain; // returned heat gain of matched fan [W]

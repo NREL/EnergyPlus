@@ -300,19 +300,10 @@ namespace EnergyPlus::HeatBalanceAirManager {
         // PURPOSE OF THIS SUBROUTINE :
         // This subroutine sets the zone mass conservation flag to true.
 
-        // Using/Aliasing
-        using DataHeatBalFanSys::MixingMassFlowZone;
-        using DataHeatBalFanSys::ZoneMassBalanceFlag;
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS :
-        int Loop;
-
-        // flow
-
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance && state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::NoAdjustReturnAndMixing) {
-            for (Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
-                ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).ZonePtr) = true;
-                ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).FromZone) = true;
+            for (int Loop = 1; Loop <= state.dataHeatBal->TotMixing; ++Loop) {
+                state.dataHeatBalFanSys->ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).ZonePtr) = true;
+                state.dataHeatBalFanSys->ZoneMassBalanceFlag(state.dataHeatBal->Mixing(Loop).FromZone) = true;
             }
         }
     }
@@ -2825,13 +2816,13 @@ namespace EnergyPlus::HeatBalanceAirManager {
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (!state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) {
                 Loop += 1;
-                ZoneReOrder(Loop) = ZoneNum;
+                state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
         }
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
             if (state.dataHeatBal->MassConservation(ZoneNum).IsOnlySourceZone) {
                 Loop += 1;
-                ZoneReOrder(Loop) = ZoneNum;
+                state.dataHeatBalFanSys->ZoneReOrder(Loop) = ZoneNum;
             }
         }
 
@@ -4332,9 +4323,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
         }
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
-        SumHmAW = 0.0;
-        SumHmARa = 0.0;
-        SumHmARaW = 0.0;
+        state.dataHeatBalFanSys->SumHmAW = 0.0;
+        state.dataHeatBalFanSys->SumHmARa = 0.0;
+        state.dataHeatBalFanSys->SumHmARaW = 0.0;
     }
 
     // END Algorithm Section of the Module
@@ -4373,9 +4364,9 @@ namespace EnergyPlus::HeatBalanceAirManager {
             // The mean air temperature is actually ZTAV which is the average
             // temperature of the air temperatures at the system time step for the
             // entire zone time step.
-            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = ZTAV(ZoneLoop);
-            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = ZoneAirHumRatAvg(ZoneLoop);
-            state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirTemp = state.dataHeatBalFanSys->ZTAV(ZoneLoop);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneLoop);
+            state.dataHeatBal->ZnAirRpt(ZoneLoop).OperativeTemp = 0.5 * (state.dataHeatBalFanSys->ZTAV(ZoneLoop) + state.dataHeatBal->MRT(ZoneLoop));
             state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirDewPointTemp = PsyTdpFnWPb(state, state.dataHeatBal->ZnAirRpt(ZoneLoop).MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
             // if operative temperature control is being used, then radiative fraction/weighting
@@ -4391,7 +4382,7 @@ namespace EnergyPlus::HeatBalanceAirManager {
                         } else {
                             thisMRTFraction = state.dataZoneCtrls->TempControlledZone(TempControlledZoneID).FixedRadiativeFraction;
                         }
-                        state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
+                        state.dataHeatBal->ZnAirRpt(ZoneLoop).ThermOperativeTemp = (1.0 - thisMRTFraction) * state.dataHeatBalFanSys->ZTAV(ZoneLoop) + thisMRTFraction * state.dataHeatBal->MRT(ZoneLoop);
                     }
                 }
             }

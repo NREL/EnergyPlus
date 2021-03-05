@@ -491,7 +491,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_AllocateLoadComponentArraysTes
     state->dataEnvrn->TotDesDays = 2;
     state->dataEnvrn->TotRunDesPersDays = 3;
     state->dataGlobal->NumOfZones = 4;
-    TotSurfaces = 7;
+    state->dataSurface->TotSurfaces = 7;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
     AllocateLoadComponentArrays(*state);
@@ -2469,7 +2469,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
     state->dataGlobal->KindOfSim = DataGlobalConstants::KindOfSim::RunPeriodWeather; // fake a weather run since a weather file can't be used (could it?)
     UpdateTabularReports(*state, OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_NEAR(1.86168, DataSizing::FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
+    EXPECT_NEAR(1.86168, state->dataSize->FinalSysSizing(1).DesOutAirVolFlow, 0.0001);
 }
 
 // TEST_F( EnergyPlusFixture, AirloopHVAC_VentilationRateProcedure )
@@ -6053,56 +6053,56 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).FrameDivider = 0;
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).FrameDivider = 0;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).FrameDivider = 0;
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).FrameDivider = 0;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 1;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).FrameDivider = 1;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).FrameDivider = 1;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).FrameDivider = 2;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).FrameDivider = 2;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 1;
 
     // frames
     state->dataHeatBal->TotFrameDivider = 2;
-    FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
-    FrameDivider(1).FrameWidth = 0.3;
-    FrameDivider(2).FrameWidth = 0.2;
+    state->dataSurface->FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
+    state->dataSurface->FrameDivider(1).FrameWidth = 0.3;
+    state->dataSurface->FrameDivider(2).FrameWidth = 0.2;
 
     // zone
     state->dataGlobal->NumOfZones = 1;
@@ -6115,7 +6115,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest)
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).ExtGrossWallArea = 500.;
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
-    state->dataHeatBal->Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     WriteVeriSumTable(*state);
 
@@ -6163,46 +6163,46 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
     state->dataHeatBal->TotLights = 3;
@@ -6248,7 +6248,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal)
     state->dataHeatBal->Zone(1).Volume = 2000.;
     state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
-    state->dataHeatBal->Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
@@ -6466,24 +6466,24 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
 
-    CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    CalcFinalZoneSizing.allocate(1);
-    CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
-    CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolOutHumRatSeq(63) = 0.01459;
-    CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolZoneTempSeq(63) = 24.;
-    CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(96);
-    CalcFinalZoneSizing(1).CoolZoneHumRatSeq(63) = 0.00979;
-    CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
+    state->dataSize->CalcFinalZoneSizing.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(63) = 38.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(63) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(63) = 24.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(96);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(63) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
-    FinalZoneSizing.allocate(1);
-    FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     CollectPeakZoneConditions(*state, compLoad, 1, timeOfMax, zoneIndex, isCooling);
 
@@ -6529,85 +6529,85 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetZoneComponentAreas_test)
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone(1).FloorArea = 12.;
 
-    Surface.allocate(13);
+    state->dataSurface->Surface.allocate(13);
 
-    Surface(1).GrossArea = 5.; // extWall
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Zone = 1;
-    Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).GrossArea = 5.; // extWall
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
 
-    Surface(2).GrossArea = 6.; // grdCntWall
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).ExtBoundCond = GroundFCfactorMethod;
-    Surface(2).Zone = 1;
-    Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).GrossArea = 6.; // grdCntWall
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).ExtBoundCond = GroundFCfactorMethod;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
 
-    Surface(3).GrossArea = 7.; // intZoneWall
-    Surface(3).Class = SurfaceClass::Wall;
-    Surface(3).ExtBoundCond = 2;
-    Surface(3).Zone = 1;
-    Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).GrossArea = 7.; // intZoneWall
+    state->dataSurface->Surface(3).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).ExtBoundCond = 2;
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
 
-    Surface(4).GrossArea = 8.; // roof
-    Surface(4).Class = SurfaceClass::Roof;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Zone = 1;
-    Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).GrossArea = 8.; // roof
+    state->dataSurface->Surface(4).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
 
-    Surface(5).GrossArea = 9.; // ceiling
-    Surface(5).Class = SurfaceClass::Roof;
-    Surface(5).ExtBoundCond = 5;
-    Surface(5).Zone = 1;
-    Surface(5).HeatTransSurf = true;
+    state->dataSurface->Surface(5).GrossArea = 9.; // ceiling
+    state->dataSurface->Surface(5).Class = SurfaceClass::Roof;
+    state->dataSurface->Surface(5).ExtBoundCond = 5;
+    state->dataSurface->Surface(5).Zone = 1;
+    state->dataSurface->Surface(5).HeatTransSurf = true;
 
-    Surface(6).GrossArea = 10.; // extFloor
-    Surface(6).Class = SurfaceClass::Floor;
-    Surface(6).ExtBoundCond = ExternalEnvironment;
-    Surface(6).Zone = 1;
-    Surface(6).HeatTransSurf = true;
+    state->dataSurface->Surface(6).GrossArea = 10.; // extFloor
+    state->dataSurface->Surface(6).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(6).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(6).Zone = 1;
+    state->dataSurface->Surface(6).HeatTransSurf = true;
 
-    Surface(7).GrossArea = 11.; // grndCntFloor
-    Surface(7).Class = SurfaceClass::Floor;
-    Surface(7).ExtBoundCond = Ground;
-    Surface(7).Zone = 1;
-    Surface(7).HeatTransSurf = true;
+    state->dataSurface->Surface(7).GrossArea = 11.; // grndCntFloor
+    state->dataSurface->Surface(7).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(7).ExtBoundCond = Ground;
+    state->dataSurface->Surface(7).Zone = 1;
+    state->dataSurface->Surface(7).HeatTransSurf = true;
 
-    Surface(8).GrossArea = 12.; // intZoneFloor
-    Surface(8).Class = SurfaceClass::Floor;
-    Surface(8).ExtBoundCond = 3;
-    Surface(8).Zone = 1;
-    Surface(8).HeatTransSurf = true;
+    state->dataSurface->Surface(8).GrossArea = 12.; // intZoneFloor
+    state->dataSurface->Surface(8).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(8).ExtBoundCond = 3;
+    state->dataSurface->Surface(8).Zone = 1;
+    state->dataSurface->Surface(8).HeatTransSurf = true;
 
-    Surface(9).GrossArea = 13.; // fenestration
-    Surface(9).Class = SurfaceClass::Window;
-    Surface(9).ExtBoundCond = ExternalEnvironment;
-    Surface(9).Zone = 1;
-    Surface(9).HeatTransSurf = true;
+    state->dataSurface->Surface(9).GrossArea = 13.; // fenestration
+    state->dataSurface->Surface(9).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(9).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(9).Zone = 1;
+    state->dataSurface->Surface(9).HeatTransSurf = true;
 
-    Surface(10).GrossArea = 14.; // door
-    Surface(10).Class = SurfaceClass::Door;
-    Surface(10).ExtBoundCond = ExternalEnvironment;
-    Surface(10).Zone = 1;
-    Surface(10).HeatTransSurf = true;
+    state->dataSurface->Surface(10).GrossArea = 14.; // door
+    state->dataSurface->Surface(10).Class = SurfaceClass::Door;
+    state->dataSurface->Surface(10).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(10).Zone = 1;
+    state->dataSurface->Surface(10).HeatTransSurf = true;
 
-    Surface(11).GrossArea = 15.; // door (again)
-    Surface(11).Class = SurfaceClass::GlassDoor;
-    Surface(11).ExtBoundCond = ExternalEnvironment;
-    Surface(11).Zone = 1;
-    Surface(11).HeatTransSurf = true;
+    state->dataSurface->Surface(11).GrossArea = 15.; // door (again)
+    state->dataSurface->Surface(11).Class = SurfaceClass::GlassDoor;
+    state->dataSurface->Surface(11).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(11).Zone = 1;
+    state->dataSurface->Surface(11).HeatTransSurf = true;
 
-    Surface(12).GrossArea = 16.; // fenestration (again)
-    Surface(12).Class = SurfaceClass::TDD_Dome;
-    Surface(12).ExtBoundCond = ExternalEnvironment;
-    Surface(12).Zone = 1;
-    Surface(12).HeatTransSurf = true;
+    state->dataSurface->Surface(12).GrossArea = 16.; // fenestration (again)
+    state->dataSurface->Surface(12).Class = SurfaceClass::TDD_Dome;
+    state->dataSurface->Surface(12).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(12).Zone = 1;
+    state->dataSurface->Surface(12).HeatTransSurf = true;
 
-    Surface(13).GrossArea = 17.; // grndCntFloor (again)
-    Surface(13).Class = SurfaceClass::Floor;
-    Surface(13).ExtBoundCond = KivaFoundation;
-    Surface(13).Zone = 1;
-    Surface(13).HeatTransSurf = true;
+    state->dataSurface->Surface(13).GrossArea = 17.; // grndCntFloor (again)
+    state->dataSurface->Surface(13).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(13).ExtBoundCond = KivaFoundation;
+    state->dataSurface->Surface(13).Zone = 1;
+    state->dataSurface->Surface(13).HeatTransSurf = true;
 
     GetZoneComponentAreas(*state, areas);
 
@@ -6794,14 +6794,14 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     state->dataGlobal->NumOfZones = 4;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBal->Zone(iZone).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).SurfaceLast = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 1;
     state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
-    Surface(1).HeatTransSurf = true;
-    Surface(1).Class = SurfaceClass::Window;
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Window;
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -6836,7 +6836,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesTwice_test)
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
 
     AllocateLoadComponentArrays(*state);
@@ -6886,18 +6886,18 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataGlobal->NumOfZones = 0;
     state->dataOutRptTab->displayAirLoopComponentLoadSummary = true;
     state->dataGlobal->CompLoadReportIsReq = true;
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
 
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
-    SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = 0; // set to zero to indicate no design day chosen
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = 0;    // set to zero to indicate no design day chosen
 
     WriteLoadComponentSummaryTables(*state);
 
@@ -6944,11 +6944,9 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataWeatherManager->DesDayInput(2).Month = 1;
     state->dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
-
     state->dataGlobal->NumOfTimeStepInHour = 4;
     state->dataGlobal->MinutesPerTimeStep = 15;
     int numTimeStepInDay = 96;
-
 
     // One Zone
     state->dataGlobal->NumOfZones = 1;
@@ -6957,72 +6955,69 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     state->dataHeatBal->Zone(1).ListMultiplier = 1;
     state->dataHeatBal->Zone(1).FloorArea = 100.;
     // Trick E+ into not iterating on Surfaces
-    state->dataHeatBal->Zone(1).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(1).SurfaceLast = 0;
-
-
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 0;
 
     // Cool Peak on 1st DD at 16:00 and Heat Peak on 2nd DD at 1:00
-    DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     int coolDDNum = 1;
     int coolTimeOfMax = 64;
-    DataSizing::CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CoolPeakDateHrMin.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CoolPeakDateHrMin.allocate(1);
 
-    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
-    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
-    DataSizing::CalcFinalZoneSizing(1).DesCoolLoad = 500.;
-    DataSizing::CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
-    DataSizing::CalcFinalZoneSizing(1).CoolDesTemp = 13.;
-    DataSizing::CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
-
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutTempSeq(coolTimeOfMax) = 38.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolOutHumRatSeq(coolTimeOfMax) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneTempSeq(coolTimeOfMax) = 24.;
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).CoolZoneHumRatSeq(coolTimeOfMax) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolLoad = 500.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnCoolDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).CoolDesTemp = 13.;
+    state->dataSize->CalcFinalZoneSizing(1).DesCoolVolFlow = 3.3;
 
     int heatDDNum = 2;
     int heatTimeOfMax = 4;
-    DataSizing::CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
-    DataSizing::HeatPeakDateHrMin.allocate(1);
+    state->dataSize->CalcFinalZoneSizing(1).HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalZoneSizing(1).TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->HeatPeakDateHrMin.allocate(1);
 
-    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
-    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutTempSeq(heatTimeOfMax) = -17.4;
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatOutHumRatSeq(heatTimeOfMax) = 0.01459;
 
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(1).DesCoolLoad = 600.;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(1).DesCoolLoad = 600.;
 
     // One airloop, that serves this zone.
     DataHVACGlobals::NumPrimaryAirSys = 1;
-    DataSizing::SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->SysSizPeakDDNum.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    state->dataSize->CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
 
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
 
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
-    DataSizing::CalcFinalZoneSizing(1).DesHeatLoad = 750.;
-    DataSizing::CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
-    DataSizing::CalcFinalZoneSizing(1).HeatDesTemp = 35.;
-    DataSizing::CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneTempSeq(heatTimeOfMax) = 20.;
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcFinalZoneSizing(1).HeatZoneHumRatSeq(heatTimeOfMax) = 0.00979;
+    state->dataSize->CalcFinalZoneSizing(1).DesHeatLoad = 750.;
+    state->dataSize->CalcFinalZoneSizing(1).ZnHeatDgnSAMethod = SupplyAirTemperature;
+    state->dataSize->CalcFinalZoneSizing(1).HeatDesTemp = 35.;
+    state->dataSize->CalcFinalZoneSizing(1).DesHeatVolFlow = 3.3;
 
 
-    DataSizing::CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
-    DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing.allocate(numDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing(1, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(1, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
+    state->dataSize->CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
     state->dataAirLoop->AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     state->dataAirLoop->AirToZoneNodeInfo(1).NumZonesCooled = 1;
@@ -7034,21 +7029,21 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
 
 
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test
-    DataSizing::FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
+    state->dataSize->FinalSysSizing(1).CoolingPeakLoadType = DataSizing::TotalCoolingLoad;
 
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
-    DataSizing::SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TotCoolPeakDD = coolDDNum;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).HeatPeakDD = heatDDNum;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtTotCoolPk(1) = coolTimeOfMax;
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk.allocate(numDesDays);
+    state->dataSize->SysSizPeakDDNum(DataHVACGlobals::NumPrimaryAirSys).TimeStepAtHeatPk(2) = heatTimeOfMax;
 
 
     // Set up Facility to peak like the zone too
-    DataSizing::CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
-    DataSizing::CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
-    DataSizing::CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.CoolDDNum = coolDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtCoolMax = coolTimeOfMax;
+    state->dataSize->CalcFinalFacilitySizing.HeatDDNum = heatDDNum;
+    state->dataSize->CalcFinalFacilitySizing.TimeStepNumAtHeatMax = heatTimeOfMax;
 
 
     AllocateLoadComponentArrays(*state);
@@ -7392,36 +7387,36 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     // Azimuth & Cardinal entries happen in two separate blocks,
     // so test both to increase coverage and make sure both are correct
 
-    DataSurfaces::TotSurfaces = 2 * nTests ;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
-    DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
-    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 2 * nTests ;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataSurface->SurfaceWindow.allocate(state->dataSurface->TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(*state, state->dataSurface->TotSurfaces);
 
     for (int i = 1; i <= nTests * 2; ++i) {
 
-        DataSurfaces::Surface(i).HeatTransSurf = true;
-        DataSurfaces::Surface(i).ExtBoundCond = ExternalEnvironment;
-        DataSurfaces::Surface(i).GrossArea = 200.;
-        DataSurfaces::Surface(i).Tilt = 90.;
-        DataSurfaces::Surface(i).Zone = 1;
-        DataSurfaces::Surface(i).Construction = 1;
-        DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        state->dataSurface->Surface(i).HeatTransSurf = true;
+        state->dataSurface->Surface(i).ExtBoundCond = ExternalEnvironment;
+        state->dataSurface->Surface(i).GrossArea = 200.;
+        state->dataSurface->Surface(i).Tilt = 90.;
+        state->dataSurface->Surface(i).Zone = 1;
+        state->dataSurface->Surface(i).Construction = 1;
+        state->dataSurface->AllSurfaceListReportOrder.push_back(i);
 
         // Actual interesting stuff
         int entryIndex = (i-1) / 2;
         double azimuth = expectedAzimuthToCards[entryIndex].first;
-        DataSurfaces::Surface(i).Azimuth = azimuth;
+        state->dataSurface->Surface(i).Azimuth = azimuth;
 
         if (i % 2 == 1) {
             // It's a wall
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
-            DataSurfaces::Surface(i).Name = format("ExtWall_{}_{}", i, entryIndex);
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
+            state->dataSurface->Surface(i).Name = format("ExtWall_{}_{}", i, entryIndex);
         } else {
             // It's a window
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Window;
-            DataSurfaces::Surface(i).Name = format("ExtWindow_{}_{}", i, entryIndex);
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Window;
+            state->dataSurface->Surface(i).Name = format("ExtWindow_{}_{}", i, entryIndex);
             // Window references the previous wall
-            DataSurfaces::Surface(i).BaseSurf = i - 1;
+            state->dataSurface->Surface(i).BaseSurf = i - 1;
         }
 
     }
@@ -7460,34 +7455,34 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
         *****************************************************************************/
 
         // Internal: Dumb check to ensure we didn't mess up in the indexation
-        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i).Name;
+        EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpAzimuth, DataSurfaces::Surface(i).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpAzimuth, state->dataSurface->Surface(i).Name),
                   format("{:.2R}", expectedAzimuthToCard.first))
-            << "Surface Name = " << DataSurfaces::Surface(i).Name;
+            << "Surface Name = " << state->dataSurface->Surface(i).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchOpDir,
-                                                                   DataSurfaces::Surface(i).Name),
+                                                                   state->dataSurface->Surface(i).Name),
                   cardinalDir)
-            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i).Name << "'.";
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << state->dataSurface->Surface(i).Name << "'.";
 
 
         /****************************************************************************
         *                           Window (even entries)                           *
         *****************************************************************************/
 
-        EXPECT_EQ(oriAzimuth, DataSurfaces::Surface(i+1).Azimuth) << "Surface Name = " << DataSurfaces::Surface(i+1).Name;
+        EXPECT_EQ(oriAzimuth, state->dataSurface->Surface(i+1).Azimuth) << "Surface Name = " << state->dataSurface->Surface(i+1).Name;
 
         // Check that the azimuth entry is the rounded version indeed
-        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenAzimuth, DataSurfaces::Surface(i + 1).Name),
+        EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenAzimuth, state->dataSurface->Surface(i + 1).Name),
                   format("{:.2R}", expectedAzimuthToCard.first))
-            << "Surface Name = " << DataSurfaces::Surface(i + 1).Name;
+            << "Surface Name = " << state->dataSurface->Surface(i + 1).Name;
         // Check that we do get the expected cardinal direction
         EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchFenDir,
-                                                                   DataSurfaces::Surface(i+1).Name),
+                                                                   state->dataSurface->Surface(i+1).Name),
                   cardinalDir)
-            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << DataSurfaces::Surface(i+1).Name << "'.";
+            << "Azimuth was " << expectedAzimuthToCard.first  << "for Surface '" << state->dataSurface->Surface(i+1).Name << "'.";
 
         // Increment twice
         i = i + 2;
@@ -7509,43 +7504,43 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     state->dataHeatBal->NominalU.allocate(1);
     state->dataHeatBal->NominalU(1) = 0.2;
 
-    DataSurfaces::TotSurfaces = 4 ;
-    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+    state->dataSurface->TotSurfaces = 4 ;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // first surface, interzonal walls and doors
-    for (int i = 1; i <= TotSurfaces; i++){
-        DataSurfaces::Surface(i).HeatTransSurf = true;
-        DataSurfaces::Surface(i).Azimuth = 180.;
-        DataSurfaces::Surface(i).Tilt = 90.;
-        DataSurfaces::Surface(i).Construction = 1;
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; i++){
+        state->dataSurface->Surface(i).HeatTransSurf = true;
+        state->dataSurface->Surface(i).Azimuth = 180.;
+        state->dataSurface->Surface(i).Tilt = 90.;
+        state->dataSurface->Surface(i).Construction = 1;
         // odd number - wall, even number - door
         if (i % 2 == 1) {
-            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + fmt::to_string((i + 1) / 2);
-            DataSurfaces::Surface(i).GrossArea = 200.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
-            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+            state->dataSurface->Surface(i).Name = "Interzonal_Wall_" + fmt::to_string((i + 1) / 2);
+            state->dataSurface->Surface(i).GrossArea = 200.;
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Wall;
+            state->dataSurface->AllSurfaceListReportOrder.push_back(i);
         }else{
-            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + fmt::to_string((i + 1) / 2);
-            DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
-            DataSurfaces::Surface(i).BaseSurf = i - 1;
-            DataSurfaces::Surface(i).GrossArea = 50.;
-            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass::Door;
-            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+            state->dataSurface->Surface(i).Name = "Interzonal_Door_" + fmt::to_string((i + 1) / 2);
+            state->dataSurface->Surface(i).BaseSurfName = state->dataSurface->Surface(i - 1).Name;
+            state->dataSurface->Surface(i).BaseSurf = i - 1;
+            state->dataSurface->Surface(i).GrossArea = 50.;
+            state->dataSurface->Surface(i).Class = DataSurfaces::SurfaceClass::Door;
+            state->dataSurface->AllSurfaceListReportOrder.push_back(i);
         }
         if ((i + 1) / 2 == 1) {
             // first pair of wall and door
-            DataSurfaces::Surface(i).Zone = 1;
-            DataSurfaces::Surface(i).ExtBoundCond = i + 2;
+            state->dataSurface->Surface(i).Zone = 1;
+            state->dataSurface->Surface(i).ExtBoundCond = i + 2;
         }else{
             // second pair of wall and door
-            DataSurfaces::Surface(i).Zone = 2;
-            DataSurfaces::Surface(i).ExtBoundCond = i - 2;
+            state->dataSurface->Surface(i).Zone = 2;
+            state->dataSurface->Surface(i).ExtBoundCond = i - 2;
         }
     }
-    DataSurfaces::Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
-    DataSurfaces::Surface(2).ExtBoundCondName = "Interzonal_Door_2";
-    DataSurfaces::Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
-    DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
+    state->dataSurface->Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
+    state->dataSurface->Surface(2).ExtBoundCondName = "Interzonal_Door_2";
+    state->dataSurface->Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
+    state->dataSurface->Surface(4).ExtBoundCondName = "Interzonal_Door_1";
 
     // Setup pre def tables
     OutputReportPredefined::SetPredefinedTables(*state);
@@ -7557,7 +7552,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
     // SubTable 'Opaque Interior' (pdstIntOpaque)
 
-    for (int i = 1; i <= TotSurfaces; i++){
+    for (int i = 1; i <= state->dataSurface->TotSurfaces; i++){
         if (i % 2 == 1){
 
             /****************************************************************************
@@ -7566,35 +7561,35 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
             // Check the wall gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpGrArea,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "200.00");
             // Check the wall net area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpNetArea,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "150.00");
             // Check the wall u value
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpUfactNoFilm,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "0.200");
             // Check the wall construction
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpCons,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "A Construction");
             // Check the wall reflectance
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpRefl,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "0.60");
             // Check the tilt
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpTilt,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "90.00");
             // Check the azimuth
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpAzimuth,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "180.00");
             // Check cardinal direction
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntOpDir,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "S");
         }else{
 
@@ -7604,20 +7599,20 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
 
             // Check the door gross area
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrGrArea,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "50.00");
             // Check the wall u value
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrUfactNoFilm,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "0.200");
             // Check the door construction
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrCons,
-                                                                       DataSurfaces::Surface(i).Name),
+                                                                       state->dataSurface->Surface(i).Name),
                                                                        "A Construction");
             // Check the door parant surface name
             EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchIntDrParent,
-                                                                       DataSurfaces::Surface(i).Name),
-                                                                       DataSurfaces::Surface(i-1).Name);
+                                                                       state->dataSurface->Surface(i).Name),
+                                                                       state->dataSurface->Surface(i-1).Name);
         }
     }
 }
@@ -7636,46 +7631,46 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
     state->dataHeatBal->TotLights = 3;
@@ -7720,7 +7715,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
     state->dataHeatBal->Zone(1).Volume = 2000.;
     state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
-    state->dataHeatBal->Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
@@ -8131,13 +8126,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     state->dataGlobal->NumOfZones = 1;
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
-    state->dataHeatBal->Zone(iZone).SurfaceFirst = 1;
-    state->dataHeatBal->Zone(iZone).SurfaceLast = 4;
+    state->dataHeatBal->Zone(iZone).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(iZone).HTSurfaceLast = 4;
     state->dataHeatBal->Zone(iZone).RadiantEnclosureNum = 1;
     int radEnclosureNum = 1;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     Array1D<Real64> peopleDelaySeq;
     peopleDelaySeq.allocate(state->dataGlobal->NumOfTimeStepInHour * 24);
@@ -8172,25 +8167,25 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     feneCondInstantSeq = 0.0;
 
     Array2D<Real64> surfDelaySeqCool;
-    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, TotSurfaces);
+    surfDelaySeqCool.allocate(state->dataGlobal->NumOfTimeStepInHour * 24, state->dataSurface->TotSurfaces);
     surfDelaySeqCool = 0.0;
 
     AllocateLoadComponentArrays(*state);
 
     // Set surface values
     std::vector<Real64> surfBaseValue{100.0, 200.0, 300.0, 400.0};
-    Surface(1).Area = 10;
-    Surface(2).Area = 20;
-    Surface(3).Area = 30;
-    Surface(4).Area = 40;
-    Surface(1).HeatTransSurf = true;
-    Surface(2).HeatTransSurf = true;
-    Surface(3).HeatTransSurf = true;
-    Surface(4).HeatTransSurf = false;
-    Surface(1).Class = SurfaceClass::Window;
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(3).Class = SurfaceClass::Floor;
-    Surface(4).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(1).Area = 10;
+    state->dataSurface->Surface(2).Area = 20;
+    state->dataSurface->Surface(3).Area = 30;
+    state->dataSurface->Surface(4).Area = 40;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(4).HeatTransSurf = false;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8228,18 +8223,18 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 
     // Rearrange surface values
     surfBaseValue = {300.0, 100.0, 400.0, 200.0};
-    Surface(2).Area = 10;
-    Surface(4).Area = 20;
-    Surface(1).Area = 30;
-    Surface(3).Area = 40;
-    Surface(2).HeatTransSurf = true;
-    Surface(4).HeatTransSurf = true;
-    Surface(1).HeatTransSurf = true;
-    Surface(3).HeatTransSurf = false;
-    Surface(2).Class = SurfaceClass::Window;
-    Surface(4).Class = SurfaceClass::Wall;
-    Surface(1).Class = SurfaceClass::Floor;
-    Surface(3).Class = SurfaceClass::Shading;
+    state->dataSurface->Surface(2).Area = 10;
+    state->dataSurface->Surface(4).Area = 20;
+    state->dataSurface->Surface(1).Area = 30;
+    state->dataSurface->Surface(3).Area = 40;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = false;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Floor;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Shading;
 
     for (int jSurf = 1; jSurf <= 4; ++jSurf) {
         for (int step = 1; step <= 10; ++step) {
@@ -8750,46 +8745,46 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
     state->dataHeatBal->TotLights = 3;
@@ -8834,7 +8829,7 @@ TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_DualUnits)
     state->dataHeatBal->Zone(1).Volume = 2000.;
     state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
-    state->dataHeatBal->Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned
@@ -8979,56 +8974,56 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).FrameDivider = 0;
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).FrameDivider = 0;
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).FrameDivider = 0;
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 1;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).FrameDivider = 0;
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 1;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).FrameDivider = 1;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).FrameDivider = 1;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).FrameDivider = 2;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 1;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).FrameDivider = 2;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 1;
 
     // frames
     state->dataHeatBal->TotFrameDivider = 2;
-    FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
-    FrameDivider(1).FrameWidth = 0.3;
-    FrameDivider(2).FrameWidth = 0.2;
+    state->dataSurface->FrameDivider.allocate(state->dataHeatBal->TotFrameDivider);
+    state->dataSurface->FrameDivider(1).FrameWidth = 0.3;
+    state->dataSurface->FrameDivider(2).FrameWidth = 0.2;
 
     // zone
     state->dataGlobal->NumOfZones = 1;
@@ -9041,7 +9036,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTableAreasTest_DualUnits)
     state->dataHeatBal->Zone(1).isPartOfTotalArea = true;
     state->dataHeatBal->Zone(1).ExtGrossWallArea = 500.;
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
-    state->dataHeatBal->Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataOutRptTab->unitsStyle = OutputReportTabular::iUnitsStyle::None;
     state->dataOutRptTab->unitsStyle_SQLite = OutputReportTabular::iUnitsStyle::InchPound;
@@ -9096,46 +9091,46 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataEnvrn->Latitude = 12.3;
     state->dataEnvrn->Longitude = 45.6;
 
-    TotSurfaces = 4;
-    Surface.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = 4;
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
 
     // walls
-    Surface(1).Class = SurfaceClass::Wall;
-    Surface(1).HeatTransSurf = true;
-    Surface(1).ExtBoundCond = ExternalEnvironment;
-    Surface(1).Azimuth = 0.;
-    Surface(1).GrossArea = 200.; // 20 x 10
-    Surface(1).Tilt = 90.;
-    Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(1).Azimuth = 0.;
+    state->dataSurface->Surface(1).GrossArea = 200.; // 20 x 10
+    state->dataSurface->Surface(1).Tilt = 90.;
+    state->dataSurface->Surface(1).Zone = 1;
 
-    Surface(2).Class = SurfaceClass::Wall;
-    Surface(2).HeatTransSurf = true;
-    Surface(2).ExtBoundCond = ExternalEnvironment;
-    Surface(2).Azimuth = 90.;
-    Surface(2).GrossArea = 300.; // 30 x 10
-    Surface(2).Tilt = 90.;
-    Surface(2).Zone = 2;
+    state->dataSurface->Surface(2).Class = SurfaceClass::Wall;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(2).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(2).Azimuth = 90.;
+    state->dataSurface->Surface(2).GrossArea = 300.; // 30 x 10
+    state->dataSurface->Surface(2).Tilt = 90.;
+    state->dataSurface->Surface(2).Zone = 2;
 
     // windows
-    Surface(3).Class = SurfaceClass::Window;
-    Surface(3).HeatTransSurf = true;
-    Surface(3).ExtBoundCond = ExternalEnvironment;
-    Surface(3).Azimuth = 0.;
-    Surface(3).GrossArea = 40.;
-    Surface(3).Height = 5;
-    Surface(3).Width = 8;
-    Surface(3).Tilt = 90.;
-    Surface(3).Zone = 1;
+    state->dataSurface->Surface(3).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(3).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(3).Azimuth = 0.;
+    state->dataSurface->Surface(3).GrossArea = 40.;
+    state->dataSurface->Surface(3).Height = 5;
+    state->dataSurface->Surface(3).Width = 8;
+    state->dataSurface->Surface(3).Tilt = 90.;
+    state->dataSurface->Surface(3).Zone = 1;
 
-    Surface(4).Class = SurfaceClass::Window;
-    Surface(4).HeatTransSurf = true;
-    Surface(4).ExtBoundCond = ExternalEnvironment;
-    Surface(4).Azimuth = 90.;
-    Surface(4).GrossArea = 60.;
-    Surface(4).Height = 6;
-    Surface(4).Width = 10;
-    Surface(4).Tilt = 90.;
-    Surface(4).Zone = 2;
+    state->dataSurface->Surface(4).Class = SurfaceClass::Window;
+    state->dataSurface->Surface(4).HeatTransSurf = true;
+    state->dataSurface->Surface(4).ExtBoundCond = ExternalEnvironment;
+    state->dataSurface->Surface(4).Azimuth = 90.;
+    state->dataSurface->Surface(4).GrossArea = 60.;
+    state->dataSurface->Surface(4).Height = 6;
+    state->dataSurface->Surface(4).Width = 10;
+    state->dataSurface->Surface(4).Tilt = 90.;
+    state->dataSurface->Surface(4).Zone = 2;
 
     // Loads
     state->dataHeatBal->TotLights = 3;
@@ -9181,7 +9176,7 @@ TEST_F(SQLiteFixture, WriteVeriSumTable_TestNotPartOfTotal_DualUnits)
     state->dataHeatBal->Zone(1).Volume = 2000.;
     state->dataHeatBal->Zone(1).ExtGrossWallArea = 800.;
     state->dataHeatBal->Zone(1).ExteriorTotalGroundSurfArea = 0;
-    state->dataHeatBal->Zone(1).ExtWindowArea = Surface(3).GrossArea + Surface(4).GrossArea;
+    state->dataHeatBal->Zone(1).ExtWindowArea = state->dataSurface->Surface(3).GrossArea + state->dataSurface->Surface(4).GrossArea;
 
     state->dataHeatBal->Zone(2).Name = "PartofTot Unconditioned Zone";
     state->dataHeatBal->Zone(2).SystemZoneNodeNumber = 0; // Unconditioned

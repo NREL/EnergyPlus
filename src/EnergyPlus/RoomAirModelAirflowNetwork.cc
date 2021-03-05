@@ -261,10 +261,6 @@ namespace RoomAirModelAirflowNetwork {
         // Perform one-time checking and term calculations
 
         // Using/Aliasing
-        using DataHeatBalFanSys::NonAirSystemResponse;
-        using DataHeatBalFanSys::SumLatentHTRadSys;
-        using DataHeatBalFanSys::SysDepZoneLoadsLagged;
-        using DataHeatBalFanSys::ZoneLatentGain;
         using DataLoopNode::NodeID;
         using DataLoopNode::NumOfNodes;
 
@@ -311,7 +307,7 @@ namespace RoomAirModelAirflowNetwork {
             // loop over all zones with RoomAirflowNetwork model
             for (LoopZone = 1; LoopZone <= state.dataGlobal->NumOfZones; ++LoopZone) {
                 if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).IsUsed) continue;
-                NumSurfs = state.dataHeatBal->Zone(LoopZone).SurfaceLast - state.dataHeatBal->Zone(LoopZone).SurfaceFirst + 1;
+                NumSurfs = state.dataHeatBal->Zone(LoopZone).HTSurfaceLast - state.dataHeatBal->Zone(LoopZone).HTSurfaceFirst + 1;
                 for (LoopAirNode = 1; LoopAirNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(LoopZone).NumOfAirNodes;
                      ++LoopAirNode) { // loop over all the modeled room air nodes
                     // calculate volume of air in node's control volume
@@ -642,8 +638,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::UseZoneTimeStepHistory;
         using Psychrometrics::PsyHgAirFnWTdb;
@@ -760,7 +754,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::TempTstatAir;
         using DataLoopNode::Node;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -833,28 +826,14 @@ namespace RoomAirModelAirflowNetwork {
         // If Tref is not used at all, SumHATref = 0, and SumHA /= 0.
         //
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // USE STATEMENTS:
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataLoopNode::Node;
-        using DataSurfaces::Surface;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
-        //using InternalHeatGains::SumInternalConvectionGainsByTypes;
         using InternalHeatGains::SumInternalLatentGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        //using ZonePlenum::NumZoneReturnPlenums;
-        //using ZonePlenum::NumZoneSupplyPlenums;
-        //using ZonePlenum::ZoneRetPlenCond;
-        //using ZonePlenum::ZoneSupPlenCond;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;         // System node number
@@ -967,7 +946,7 @@ namespace RoomAirModelAirflowNetwork {
                         NodeW = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat;
                         MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         SumSysM += MassFlowRate;
@@ -980,7 +959,7 @@ namespace RoomAirModelAirflowNetwork {
                 // Get node conditions
                 NodeTemp = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
@@ -991,7 +970,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -999,7 +978,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -1008,7 +987,7 @@ namespace RoomAirModelAirflowNetwork {
             // Get node conditions
             NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
@@ -1024,14 +1003,13 @@ namespace RoomAirModelAirflowNetwork {
         // Modified by Gu to include assigned surfaces only shown in the surface lsit
         if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HasSurfacesAssigned) return;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNodeNum) {
                 Found = false;
                 for (Loop = 1; Loop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
                     if (Loop != RoomAirNodeNum) {
-                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1)) {
+                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) {
                             Found = true;
                             break;
                         }
@@ -1039,57 +1017,57 @@ namespace RoomAirModelAirflowNetwork {
                 }
                 if (Found) continue;
             } else {
-                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1)) continue;
+                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) continue;
             }
 
             HA = 0.0;
-            Area = Surface(SurfNum).Area; // For windows, this is the glazing area
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == DataSurfaces::SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfWinDividerArea(SurfNum);
-                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
+                    SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum)))
-                    SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)))
+                    SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
-                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
-                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
+                            state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                         } else {
-                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
-                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                            state.dataSurface->SurfWinHeatLossRep(SurfNum) = - state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                         }
-                        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
-                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
+                        state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                        state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum) * state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour;
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
-                                  SurfWinFrameTempSurfIn(SurfNum);
-                    HA += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
+                                  state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
+                    HA += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
-                                  SurfWinDividerTempSurfIn(SurfNum);
-                    HA += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
+                    SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
+                                  state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
+                    HA += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum));
                 }
 
             } // End of check if window
@@ -1097,14 +1075,14 @@ namespace RoomAirModelAirflowNetwork {
             HA = HA + state.dataHeatBal->HConvIn(SurfNum) * Area;
             SumHATsurf += state.dataHeatBal->HConvIn(SurfNum) * Area * TempSurfInTmp(SurfNum);
 
-            if (Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
+            if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneMeanAirTemp) {
                 // The zone air is the reference temperature(which is to be solved for in CorrectZoneAirTemp).
-                RefAirTemp = MAT(ZoneNum);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA += HA;
-            } else if (Surface(SurfNum).TAirRef == AdjacentAirTemp) {
+            } else if (state.dataSurface->Surface(SurfNum).TAirRef == AdjacentAirTemp) {
                 RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 SumHATref += HA * RefAirTemp;
-            } else if (Surface(SurfNum).TAirRef == ZoneSupplyAirTemp) {
+            } else if (state.dataSurface->Surface(SurfNum).TAirRef == ZoneSupplyAirTemp) {
                 // check whether this zone is a controlled zone or not
                 if (!ControlledZoneAirFlag) {
                     ShowFatalError(state, "Zones must be controlled for Ceiling-Diffuser Convection model. No system serves zone " + state.dataHeatBal->Zone(ZoneNum).Name);
@@ -1114,7 +1092,7 @@ namespace RoomAirModelAirflowNetwork {
                 RefAirTemp = SumSysMCpT / SumSysMCp;
                 SumHATref += HA * RefAirTemp;
             } else {
-                RefAirTemp = MAT(ZoneNum);
+                RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 SumHA = SumHA + HA;
             }
 
@@ -1156,7 +1134,6 @@ namespace RoomAirModelAirflowNetwork {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TempSurfInTmp;
         using DataMoistureBalanceEMPD::RVSurface;
         using HeatBalanceHAMTManager::UpdateHeatBalHAMT;
@@ -1177,16 +1154,15 @@ namespace RoomAirModelAirflowNetwork {
         SumHmARa = 0.0;
         SumHmARaW = 0.0;
 
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non - heat transfer surfaces
-            if (Surface(SurfNum).Class == SurfaceClass::Window) continue;
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) continue;
 
             if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID == RoomAirNode) {
                 Found = false;
                 for (Loop = 1; Loop <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++Loop) {
                     // None - assigned surfaces belong to the zone node
                     if (Loop != RoomAirNode) {
-                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1)) {
+                        if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(Loop).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) {
                             Found = true;
                             break;
                         }
@@ -1194,37 +1170,37 @@ namespace RoomAirModelAirflowNetwork {
                 }
                 if (Found) continue;
             } else {
-                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).SurfaceFirst + 1)) continue;
+                if (!state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SurfMask(SurfNum - state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst + 1)) continue;
             }
 
-            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_HAMT) {
                 UpdateHeatBalHAMT(state, SurfNum);
 
-                SumHmAW += HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
+                SumHmAW += HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
 
                 RhoAirZone = PsyRhoAirFnPbTdbW(state,
-                    state.dataEnvrn->OutBaroPress, MAT(Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, MAT(Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
+                    state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), PsyRhFnTdbRhov(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(SurfNum).Zone), RhoVaporAirIn(SurfNum), "RhoAirZone"));
 
                 Wsurf = PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum), PsyRhFnTdbRhov(state, TempSurfInTmp(SurfNum), RhoVaporSurfIn(SurfNum), "Wsurf"), state.dataEnvrn->OutBaroPress);
 
-                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoAirZone;
+                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone;
 
-                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoAirZone * Wsurf;
+                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoAirZone * Wsurf;
             }
 
-            if (Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == HeatTransferModel_EMPD) {
 
                 UpdateMoistureBalanceEMPD(SurfNum);
                 RhoVaporSurfIn(SurfNum) = RVSurface(SurfNum);
 
-                SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
-                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * Surface(SurfNum).Area *
+                SumHmAW = SumHmAW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * (RhoVaporSurfIn(SurfNum) - RhoVaporAirIn(SurfNum));
+                SumHmARa = SumHmARa + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area *
                                           PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress,
                                                             TempSurfInTmp(SurfNum),
                                                             PsyWFnTdbRhPb(state, TempSurfInTmp(SurfNum),
                                                                           PsyRhFnTdbRhovLBnd0C(state, TempSurfInTmp(SurfNum), RhoVaporAirIn(SurfNum)),
                                                                           state.dataEnvrn->OutBaroPress));
-                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
+                SumHmARaW = SumHmARaW + HMassConvInFD(SurfNum) * state.dataSurface->Surface(SurfNum).Area * RhoVaporSurfIn(SurfNum);
             }
         }
 

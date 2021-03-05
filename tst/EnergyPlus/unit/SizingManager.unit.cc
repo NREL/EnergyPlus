@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     std::string CurrentModuleObject = "DesignSpecification:OutdoorAir";
     int NumOARequirements = 6;
-    OARequirements.allocate(NumOARequirements);
+    state->dataSize->OARequirements.allocate(NumOARequirements);
 
     Array1D_string Alphas;         // Alpha input items for object
     Array1D_string cAlphaFields;   // Alpha field names
@@ -108,11 +108,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPerArea, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPerArea, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Person
     OAIndex = 2;
@@ -129,11 +129,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowPPer, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowPPer, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Zone
     OAIndex = 3;
@@ -150,11 +150,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlow, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlow, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Flow/Zone
     OAIndex = 4;
@@ -171,11 +171,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowACH, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.0, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowACH, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.0, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Sum
     OAIndex = 5;
@@ -192,11 +192,11 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowSum, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowSum, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Maximum
     OAIndex = 6;
@@ -213,14 +213,14 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
 
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(OAFlowMax, OARequirements(OAIndex).OAFlowMethod);
-    EXPECT_EQ(0.1, OARequirements(OAIndex).OAFlowPerPerson);
-    EXPECT_EQ(0.2, OARequirements(OAIndex).OAFlowPerArea);
-    EXPECT_EQ(0.3, OARequirements(OAIndex).OAFlowPerZone);
-    EXPECT_EQ(0.4, OARequirements(OAIndex).OAFlowACH);
+    EXPECT_EQ(OAFlowMax, state->dataSize->OARequirements(OAIndex).OAFlowMethod);
+    EXPECT_EQ(0.1, state->dataSize->OARequirements(OAIndex).OAFlowPerPerson);
+    EXPECT_EQ(0.2, state->dataSize->OARequirements(OAIndex).OAFlowPerArea);
+    EXPECT_EQ(0.3, state->dataSize->OARequirements(OAIndex).OAFlowPerZone);
+    EXPECT_EQ(0.4, state->dataSize->OARequirements(OAIndex).OAFlowACH);
 
     // Clean up
-    OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     Alphas.deallocate();
     cAlphaFields.deallocate();
     cNumericFields.deallocate();
@@ -309,15 +309,15 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    ASSERT_EQ(1, NumZoneSizingInput);
-    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
     ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
     // check default low and high set point values
-    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(21.1, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
 }
 
 TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest2)
@@ -378,15 +378,15 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_FALSE(ErrorsFound);
     SizingManager::GetOARequirements(*state);
     SizingManager::GetZoneSizingInput(*state);
-    ASSERT_EQ(1, NumZoneSizingInput);
-    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(1, state->dataSize->NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, state->dataSize->ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
     ZoneEquipmentManager::AutoCalcDOASControlStrategy(*state);
     // check default low and high set point values
-    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
-    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+    ASSERT_EQ(21.1, state->dataSize->ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, state->dataSize->ZoneSizingInput(1).DOASHighSetpoint);
 }
 
 TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)

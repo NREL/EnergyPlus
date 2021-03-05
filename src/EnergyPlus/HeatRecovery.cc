@@ -1622,7 +1622,9 @@ namespace HeatRecovery {
         std::string CompType;     // component type
         std::string SizingString; // input field sizing description
 
-        HRFlowSizingFlag = true;
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
+        state.dataSize->HRFlowSizingFlag = true;
         PrintFlag = true;
         FieldNum = 0;
         if (ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED) {
@@ -1642,27 +1644,27 @@ namespace HeatRecovery {
         } else {
             SizingString = "Nominal Supply Air Flow Rate [m3/s]"; // desiccant balanced flow does not have an input for air volume flow rate
         }
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
             if (ExchCond(ExchNum).NomSupAirVolFlow == AutoSize) {
                 SizingMethod = AutoCalculateSizing;
-                if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
                     // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
-                    DataConstantUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                    state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
                 } else {
-                    DataConstantUsedForSizing = std::max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                    state.dataSize->DataConstantUsedForSizing = std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                 }
-                DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
             } else {
-                if (ZoneSizingRunDone) {
+                if (state.dataSize->ZoneSizingRunDone) {
                     SizingMethod = AutoCalculateSizing;
-                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                    if (ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent) {
                         // Heat recovery heat exchanger in zoneHVAC equipment should have been sized to OA flow in the parent equipment
-                        DataConstantUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataConstantUsedForSizing = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
                     } else {
-                        DataConstantUsedForSizing =
-                            std::max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+                        state.dataSize->DataConstantUsedForSizing =
+                            std::max(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow, state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                     }
-                    DataFractionUsedForSizing = 1.0;
+                    state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
             }
         }
@@ -1673,8 +1675,8 @@ namespace HeatRecovery {
         // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
-        DataConstantUsedForSizing = 0.0;
-        DataFractionUsedForSizing = 0.0;
+        state.dataSize->DataConstantUsedForSizing = 0.0;
+        state.dataSize->DataFractionUsedForSizing = 0.0;
         if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
             PrintFlag = true;
             FieldNum = 5;
@@ -1682,12 +1684,12 @@ namespace HeatRecovery {
             CompType = cHXTypes(ExchCond(ExchNum).ExchTypeNum);
             SizingString = HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
             if (ExchCond(ExchNum).NomSecAirVolFlow == AutoSize) {
-                DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
-                DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
             } else {
-                if (ZoneSizingRunDone || SysSizingRunDone) {
-                    DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
-                    DataFractionUsedForSizing = 1.0;
+                if (state.dataSize->ZoneSizingRunDone || state.dataSize->SysSizingRunDone) {
+                    state.dataSize->DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
+                    state.dataSize->DataFractionUsedForSizing = 1.0;
                 }
             }
             TempSize = ExchCond(ExchNum).NomSecAirVolFlow;
@@ -1697,10 +1699,10 @@ namespace HeatRecovery {
             // sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(state, TempSize, errorsFound);
-            DataConstantUsedForSizing = 0.0;
-            DataFractionUsedForSizing = 0.0;
+            state.dataSize->DataConstantUsedForSizing = 0.0;
+            state.dataSize->DataFractionUsedForSizing = 0.0;
         }
-        HRFlowSizingFlag = false;
+        state.dataSize->HRFlowSizingFlag = false;
         if (ExchCond(ExchNum).ExchTypeNum == HX_DESICCANT_BALANCED && ExchCond(ExchNum).HeatExchPerfTypeNum == BALANCEDHX_PERFDATATYPE1) {
 
             BalDesDehumPerfIndex = ExchCond(ExchNum).PerfDataIndex;
@@ -1718,14 +1720,14 @@ namespace HeatRecovery {
             sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(state, TempSize, errorsFound);
 
-            DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
+            state.dataSize->DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;
             bool ErrorsFound = false;
             DesiccantDehumidifierBFPerfDataFaceVelocitySizer sizerDesDehumBFFaceVel;
             sizerDesDehumBFFaceVel.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel = sizerDesDehumBFFaceVel.size(state, TempSize, ErrorsFound);
 
-            DataAirFlowUsedForSizing = 0.0;
+            state.dataSize->DataAirFlowUsedForSizing = 0.0;
         }
     }
 

@@ -71,9 +71,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 
-namespace EnergyPlus {
-
-namespace WindowEquivalentLayer {
+namespace EnergyPlus::WindowEquivalentLayer {
 
     // MODULE INFORMATION
     //       AUTHOR         Bereket A. Nigusse, FSEC/UCF
@@ -157,11 +155,11 @@ namespace WindowEquivalentLayer {
 
         } //  end do for TotConstructs
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
-            SurfWinWindowModelType(SurfNum) = WindowEQLModel;
+            state.dataSurface->SurfWinWindowModelType(SurfNum) = WindowEQLModel;
 
         } //  end do for SurfNum
     }
@@ -716,7 +714,7 @@ namespace WindowEquivalentLayer {
 
         if (CalcCondition != DataBSDFWindow::noCondition) return;
 
-        ConstrNum = Surface(SurfNum).Construction;
+        ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
         QXConv = 0.0;
         ConvHeatFlowNatural = 0.0;
 
@@ -724,14 +722,14 @@ namespace WindowEquivalentLayer {
         HcIn = state.dataHeatBal->HConvIn(SurfNum); // windows inside surface convective film conductance
 
         if (CalcCondition == DataBSDFWindow::noCondition) {
-            ZoneNum = Surface(SurfNum).Zone;
-            SurfNumAdj = Surface(SurfNum).ExtBoundCond;
+            ZoneNum = state.dataSurface->Surface(SurfNum).Zone;
+            SurfNumAdj = state.dataSurface->Surface(SurfNum).ExtBoundCond;
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
                     RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
@@ -746,7 +744,7 @@ namespace WindowEquivalentLayer {
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -754,11 +752,11 @@ namespace WindowEquivalentLayer {
                     if (SumSysMCp > 0.0) {
                         RefAirTemp = SumSysMCpT / SumSysMCp;
                     } else {
-                        RefAirTemp = MAT(ZoneNum);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     }
                 } else {
                     // currently set to mean air temp but should add error warning here
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 }
             }
             TaIn = RefAirTemp;
@@ -768,13 +766,13 @@ namespace WindowEquivalentLayer {
             if (SurfNumAdj > 0) {
                 // this is interzone window. the outside condition is determined from the adjacent zone
                 // condition
-                ZoneNumAdj = Surface(SurfNumAdj).Zone;
+                ZoneNumAdj = state.dataSurface->Surface(SurfNumAdj).Zone;
 
                 // determine reference air temperature for this surface
                 {
-                    auto const SELECT_CASE_var(Surface(SurfNumAdj).TAirRef);
+                    auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNumAdj).TAirRef);
                     if (SELECT_CASE_var == ZoneMeanAirTemp) {
-                        RefAirTemp = MAT(ZoneNumAdj);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     } else if (SELECT_CASE_var == AdjacentAirTemp) {
                         RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNumAdj);
                     } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
@@ -790,7 +788,7 @@ namespace WindowEquivalentLayer {
                         for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
+                            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -798,11 +796,11 @@ namespace WindowEquivalentLayer {
                         if (SumSysMCp > 0.0) {
                             RefAirTemp = SumSysMCpT / SumSysMCp;
                         } else {
-                            RefAirTemp = MAT(ZoneNumAdj);
+                            RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                         }
                     } else {
                         // currently set to mean air temp but should add error warning here
-                        RefAirTemp = MAT(ZoneNumAdj);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNumAdj);
                     }
                 }
 
@@ -811,44 +809,44 @@ namespace WindowEquivalentLayer {
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
-                outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
-                        QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
+                outir = state.dataSurface->SurfWinIRfromParentZone(SurfNumAdj) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNumAdj) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNumAdj) +
+                        state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNumAdj) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNumAdj) + state.dataHeatBal->SurfQRadThermInAbs(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
                      // Calculate LWR from surrounding surfaces if defined for an exterior window
                 OutSrdIR = 0;
                 if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
-                    if (Surface(SurfNum).HasSurroundingSurfProperties) {
-                        SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
-                        if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            Surface(SurfNum).ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
+                    if (state.dataSurface->Surface(SurfNum).HasSurroundingSurfProperties) {
+                        SrdSurfsNum = state.dataSurface->Surface(SurfNum).SurroundingSurfacesNum;
+                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
+                            state.dataSurface->Surface(SurfNum).ViewFactorSkyIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         }
-                        if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
-                            Surface(SurfNum).ViewFactorGroundIR = SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
+                        if (state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
+                            state.dataSurface->Surface(SurfNum).ViewFactorGroundIR = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).GroundViewFactor;
                         }
-                        for (SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
-                            SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                        for (SrdSurfNum = 1; SrdSurfNum <= state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+                            SrdSurfViewFac = state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
-                                GetCurrentScheduleValue(state, SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
+                                GetCurrentScheduleValue(state, state.dataSurface->SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + DataGlobalConstants::KelvinConv;
                             OutSrdIR += DataGlobalConstants::StefanBoltzmann * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
                         }
                     }
                 }
-                if (Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
+                if (state.dataSurface->Surface(SurfNum).ExtWind) { // Window is exposed to wind (and possibly rain)
                     if (state.dataEnvrn->IsRain) {               // Raining: since wind exposed, outside window surface gets wet
-                        Tout = Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv;
+                        Tout = state.dataSurface->Surface(SurfNum).OutWetBulbTemp + DataGlobalConstants::KelvinConv;
                     } else { // Dry
-                        Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                        Tout = state.dataSurface->Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
                     }
                 } else { // Window not exposed to wind
-                    Tout = Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
+                    Tout = state.dataSurface->Surface(SurfNum).OutDryBulbTemp + DataGlobalConstants::KelvinConv;
                 }
                 tsky = state.dataEnvrn->SkyTempKelvin;
                 Ebout = DataGlobalConstants::StefanBoltzmann * pow_4(Tout);
                 // ASHWAT model may be slightly different
-                outir = Surface(SurfNum).ViewFactorSkyIR *
-                            (AirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) + (1.0 - AirSkyRadSplit(SurfNum)) * Ebout) +
-                        Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
+                outir = state.dataSurface->Surface(SurfNum).ViewFactorSkyIR *
+                            (state.dataSurface->AirSkyRadSplit(SurfNum) * DataGlobalConstants::StefanBoltzmann * pow_4(tsky) + (1.0 - state.dataSurface->AirSkyRadSplit(SurfNum)) * Ebout) +
+                        state.dataSurface->Surface(SurfNum).ViewFactorGroundIR * Ebout + OutSrdIR;
             }
         }
         // Outdoor conditions
@@ -859,8 +857,8 @@ namespace WindowEquivalentLayer {
         SurfOutsideEmiss = LWAbsOut;
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
-        rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
-               QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
+        rmir = state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) + state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) + state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) +
+                state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum) + state.dataHeatBal->SurfQRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / DataGlobalConstants::StefanBoltzmann); // TODO check model equation.
 
         NL = CFS(EQLNum).NL;
@@ -878,36 +876,36 @@ namespace WindowEquivalentLayer {
         QXConv = QCONV - HcIn * (SurfInsideTemp - TaIn);
         // Save the extra convection term. This term is added to the zone air heat
         // balance equation
-        SurfWinOtherConvHeatGain(SurfNum) = Surface(SurfNum).Area * QXConv;
+        state.dataSurface->SurfWinOtherConvHeatGain(SurfNum) = state.dataSurface->Surface(SurfNum).Area * QXConv;
         SurfOutsideTemp = T(1) - DataGlobalConstants::KelvinConv;
         // Various reporting calculations
         InSideLayerType = CFS(EQLNum).L(NL).LTYPE;
         if (InSideLayerType == ltyGLAZE) {
             ConvHeatFlowNatural = 0.0;
         } else {
-            ConvHeatFlowNatural = Surface(SurfNum).Area * QOCFRoom;
+            ConvHeatFlowNatural = state.dataSurface->Surface(SurfNum).Area * QOCFRoom;
         }
-        SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
-        NetIRHeatGainWindow = Surface(SurfNum).Area * LWAbsIn * (DataGlobalConstants::StefanBoltzmann * pow_4(SurfInsideTemp + DataGlobalConstants::KelvinConv) - rmir);
-        ConvHeatGainWindow = Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
+        state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
+        NetIRHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * LWAbsIn * (DataGlobalConstants::StefanBoltzmann * pow_4(SurfInsideTemp + DataGlobalConstants::KelvinConv) - rmir);
+        ConvHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
         // Window heat gain (or loss) is calculated here
-        SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
-        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
-        SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
+        state.dataSurface->SurfWinHeatGain(SurfNum) = state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+        state.dataSurface->SurfWinHeatTransfer(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+        state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
         // store for component reporting
-        SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
-        SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
-        SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
-        SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        state.dataSurface->SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
+        state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
+        state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
         if (InSideLayerType == ltyGLAZE) {
             // no interior sade
-            SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
+            state.dataSurface->SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
         } else {
             // Interior shade exists
-            SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
+            state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
         }
         // Advanced report variable (DisplayAdvancedReportVariables)
-        SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
+        state.dataSurface->SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
     }
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)
@@ -8128,17 +8126,17 @@ namespace WindowEquivalentLayer {
         CFSAbs = 0.0;
         ProfAngHor = 0.0;
         ProfAngVer = 0.0;
-        ConstrNum = Surface(SurfNum).Construction;
-        EQLNum = state.dataConstruction->Construct(Surface(SurfNum).Construction).EQLConsPtr;
+        ConstrNum = state.dataSurface->Surface(SurfNum).Construction;
+        EQLNum = state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).EQLConsPtr;
         if (BeamDIffFlag != isDIFF) {
             if (state.dataHeatBal->CosIncAng(state.dataGlobal->TimeStep, state.dataGlobal->HourOfDay, SurfNum) <= 0.0) return;
 
             for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                 if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                     if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
+                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                     } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                        ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
+                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                     }
                 }
             }
@@ -8152,9 +8150,9 @@ namespace WindowEquivalentLayer {
                 for (Lay = 1; Lay <= CFS(EQLNum).NL; ++Lay) {
                     if (IsVBLayer(CFS(EQLNum).L(Lay))) {
                         if (CFS(EQLNum).L(Lay).LTYPE == ltyVBHOR) {
-                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
+                            ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Horizontal, ProfAngVer);
                         } else if (CFS(EQLNum).L(Lay).LTYPE == ltyVBVER) {
-                            ProfileAngle(SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
+                            ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, Vertical, ProfAngHor);
                         }
                     }
                 }
@@ -8176,7 +8174,7 @@ namespace WindowEquivalentLayer {
             }
         }
         if (CFS(EQLNum).VBLayerPtr > 0) {
-            SurfWinSlatAngThisTSDeg(SurfNum) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+            state.dataSurface->SurfWinSlatAngThisTSDeg(SurfNum) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
         }
     }
 
@@ -8316,5 +8314,3 @@ namespace WindowEquivalentLayer {
     }
 
 } // namespace WindowEquivalentLayer
-
-} // namespace EnergyPlus

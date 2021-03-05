@@ -456,7 +456,7 @@ namespace SurfaceGroundHeatExchanger {
                                this->LoopSideNum,
                                this->BranchNum,
                                this->CompNum);
-            RegisterPlantCompDesignFlow(this->InletNodeNum, this->DesignMassFlowRate / rho);
+            RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
 
             this->MyFlag = false;
         }

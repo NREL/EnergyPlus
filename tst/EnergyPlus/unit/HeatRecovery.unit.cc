@@ -86,9 +86,9 @@ using namespace EnergyPlus::SimulationManager;
 
 TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
 {
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
     NumHeatExchangers = 1;
     ExchCond.allocate(NumHeatExchangers);
     Node.allocate(4);
@@ -107,9 +107,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     Real64 PartLoadRatio = 0.25;
     int BalDesDehumPerfDataIndex = 1;
 
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
 
     ExchCond(ExchNum).NomSupAirVolFlow = 1.0;
     ExchCond(ExchNum).SupInMassFlow = 1.0;
@@ -3838,13 +3838,13 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     Real64 FaceVelocity;
     Real64 SysVolFlow;
 
-    SysSizingRunDone = true;
-    DataSizing::NumSysSizInput = 1;
-    DataSizing::SysSizInput.allocate(NumSysSizInput);
-    DataSizing::CurSysNum = 1;    // primary air system
-    DataSizing::CurOASysNum = 0;  // no OA system
-    DataSizing::CurZoneEqNum = 0; // size it based on system
-    DataSizing::SysSizInput(CurSysNum).AirLoopNum = 1;
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->NumSysSizInput = 1;
+    state->dataSize->SysSizInput.allocate(state->dataSize->NumSysSizInput);
+    state->dataSize->CurSysNum = 1;    // primary air system
+    state->dataSize->CurOASysNum = 0;  // no OA system
+    state->dataSize->CurZoneEqNum = 0; // size it based on system
+    state->dataSize->SysSizInput(state->dataSize->CurSysNum).AirLoopNum = 1;
 
     // initialize sizing required variables
     ExchCond.allocate(ExchNum);
@@ -3865,14 +3865,14 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
 
     // initialize sizing variables
-    DataSizing::CurDuctType = DataHVACGlobals::Main;
-    FinalSysSizing.allocate(CurSysNum);
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->CurDuctType = DataHVACGlobals::Main;
+    state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
 
     // initialize UnitarySysEqSizing capacity flag to false; not unitary system
-    UnitarySysEqSizing.allocate(CurSysNum);
-    UnitarySysEqSizing(CurSysNum).CoolingCapacity = false;
-    UnitarySysEqSizing(CurSysNum).HeatingCapacity = false;
+    state->dataSize->UnitarySysEqSizing.allocate(state->dataSize->CurSysNum);
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(state->dataSize->CurSysNum).HeatingCapacity = false;
 
     // calc heat recovery sizing
     SizeHeatRecovery(*state, ExchNum);
@@ -3924,14 +3924,14 @@ TEST_F(EnergyPlusFixture, HeatRecovery_AirFlowSizing)
     GetHeatRecoveryInput(*state);
 
     // initialize
-    DataSizing::CurZoneEqNum = 1;
-    DataSizing::CurSysNum = 0;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 1;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
 
     // the HR HX is in Zone Equipment ERV
-    ZoneEqSizing.allocate(CurZoneEqNum);
-    ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = true;
-    ZoneEqSizing(CurZoneEqNum).AirVolFlow = 1.0;
+    state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = true;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirVolFlow = 1.0;
 
     // size the HX nominal supply air volume flow rate
     SizeHeatRecovery(*state, ExchNum);
@@ -4064,8 +4064,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     EXPECT_EQ(1, HeatRecovery::NumAirToAirGenericExchs);
     EXPECT_EQ(thisHX.Name, "HEATRECOVERY HX GENERIC");
     // initialize
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 1;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 1;
     // check user-inputs
     EXPECT_EQ(thisOAController.Econo, MixedAir::iEconoOp::NoEconomizer);
     EXPECT_EQ(thisOAController.Lockout, MixedAir::iLockoutType::NoLockoutPossible); // no lockout
@@ -4172,9 +4172,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     EXPECT_EQ(thisHX.NomSupAirVolFlow, DataSizing::AutoSize);
 
     // set up sizing parameters
-    DataSizing::SysSizingRunDone = true;
-    DataSizing::ZoneSizingRunDone = true;
-    FinalSysSizing.allocate(1);
+    state->dataSize->SysSizingRunDone = true;
+    state->dataSize->ZoneSizingRunDone = true;
+    state->dataSize->FinalSysSizing.allocate(1);
 
     int OAContrllerNum = 1;
     state->dataMixedAir->OAController.allocate(OAContrllerNum);
@@ -4187,11 +4187,11 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     auto &thisOASys = state->dataAirLoop->OutsideAirSys(OASysNum);
     thisOASys.OAControllerIndex = 1;
 
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 1;
-    FinalSysSizing(CurSysNum).DesMainVolFlow = 1.0;
-    FinalSysSizing(CurSysNum).DesOutAirVolFlow = 0.20;
-    DataSizing::CurDuctType = Main;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 1;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
+    state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.20;
+    state->dataSize->CurDuctType = Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass
     thisOAController.Econo = MixedAir::iEconoOp::NoEconomizer;
@@ -4249,8 +4249,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
 
     // test 7: the HX is on main air loop
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
-    DataSizing::CurSysNum = 1;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurSysNum = 1;
+    state->dataSize->CurOASysNum = 0;
     // run HX sizing calculation
     SizeHeatRecovery(*state, ExchNum);
     // check autosized nominal supply flow

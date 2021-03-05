@@ -1935,11 +1935,6 @@ namespace SystemAvailabilityManager {
         // zone where component is located.
 
         using namespace DataAirLoop;
-        using DataHeatBalFanSys::TempControlType;
-        using DataHeatBalFanSys::TempTstatAir;
-        using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 
         int StartTime;
         int StopTime;
@@ -2008,33 +2003,33 @@ namespace SystemAvailabilityManager {
                         ZoneNum = state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs(1);
 
                         {
-                            auto const SELECT_CASE_var1(TempControlType(ZoneNum)); // select on thermostat control
+                            auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
 
                             if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
-                                if (TempTstatAir(ZoneNum) < TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
+                                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
                                     AvailStatus = CycleOn;
                                 } else {
                                     AvailStatus = NoAction;
                                 }
 
                             } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
-                                if (TempTstatAir(ZoneNum) > TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
+                                if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
                                     AvailStatus = CycleOn;
                                 } else {
                                     AvailStatus = NoAction;
                                 }
 
                             } else if (SELECT_CASE_var1 == SingleHeatCoolSetPoint) {
-                                if ((TempTstatAir(ZoneNum) < TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
-                                    (TempTstatAir(ZoneNum) > TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
+                                if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
+                                    (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
                                     AvailStatus = CycleOn;
                                 } else {
                                     AvailStatus = NoAction;
                                 }
 
                             } else if (SELECT_CASE_var1 == DualSetPointWithDeadBand) {
-                                if ((TempTstatAir(ZoneNum) < ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
-                                    (TempTstatAir(ZoneNum) > ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
+                                if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
+                                    (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
                                     AvailStatus = CycleOn;
                                 } else {
                                     AvailStatus = NoAction;
@@ -2098,10 +2093,10 @@ namespace SystemAvailabilityManager {
                             ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
 
                             {
-                                auto const SELECT_CASE_var1(TempControlType(ZoneNum)); // select on thermostat control
+                                auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
 
                                 if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
-                                    if (TempTstatAir(ZoneNum) < TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
+                                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) {
                                         AvailStatus = CycleOn;
                                         break;
                                     } else {
@@ -2109,7 +2104,7 @@ namespace SystemAvailabilityManager {
                                     }
 
                                 } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
-                                    if (TempTstatAir(ZoneNum) > TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
+                                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol) {
                                         AvailStatus = CycleOn;
                                         break;
                                     } else {
@@ -2117,8 +2112,8 @@ namespace SystemAvailabilityManager {
                                     }
 
                                 } else if (SELECT_CASE_var1 == SingleHeatCoolSetPoint) {
-                                    if ((TempTstatAir(ZoneNum) < TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
-                                        (TempTstatAir(ZoneNum) > TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
+                                    if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTol) ||
+                                        (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTol)) {
                                         AvailStatus = CycleOn;
                                         break;
                                     } else {
@@ -2126,8 +2121,8 @@ namespace SystemAvailabilityManager {
                                     }
 
                                 } else if (SELECT_CASE_var1 == DualSetPointWithDeadBand) {
-                                    if ((TempTstatAir(ZoneNum) < ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
-                                        (TempTstatAir(ZoneNum) > ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
+                                    if ((state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTol) ||
+                                        (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTol)) {
                                         AvailStatus = CycleOn;
                                         break;
                                     } else {
@@ -2143,21 +2138,21 @@ namespace SystemAvailabilityManager {
 
                     } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->CycleOnControlZone) {
                         AvailStatus = NoAction;
-                        if (CoolingZoneOutOfTolerance(
+                        if (CoolingZoneOutOfTolerance(state,
                                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones, TempTol))
                             AvailStatus = CycleOn;
-                        if (HeatingZoneOutOfTolerance(
+                        if (HeatingZoneOutOfTolerance(state,
                                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CtrlZonePtrs, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCtrlZones, TempTol))
                             AvailStatus = CycleOn;
                     } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->CycleOnAnyCoolingOrHeatingZone) {
-                        if (CoolingZoneOutOfTolerance(
+                        if (CoolingZoneOutOfTolerance(state,
                                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones, TempTol)) {
                             AvailStatus = CycleOn;
-                        } else if (HeatingZoneOutOfTolerance(state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs,
+                        } else if (HeatingZoneOutOfTolerance(state, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs,
                                                              state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones,
                                                              TempTol)) {
                             AvailStatus = CycleOn;
-                        } else if (HeatingZoneOutOfTolerance(state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
+                        } else if (HeatingZoneOutOfTolerance(state, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
                                                              state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones,
                                                              TempTol)) {
                             AvailStatus = CycleOnZoneFansOnly;
@@ -2165,17 +2160,17 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                         }
                     } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->CycleOnAnyCoolingZone) {
-                        if (CoolingZoneOutOfTolerance(
+                        if (CoolingZoneOutOfTolerance(state,
                                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).CoolingZonePtrs, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfCoolingZones, TempTol)) {
                             AvailStatus = CycleOn;
                         } else {
                             AvailStatus = NoAction;
                         }
                     } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->CycleOnAnyHeatingZone) {
-                        if (HeatingZoneOutOfTolerance(
+                        if (HeatingZoneOutOfTolerance(state,
                                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatingZonePtrs, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatingZones, TempTol)) {
                             AvailStatus = CycleOn;
-                        } else if (HeatingZoneOutOfTolerance(state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
+                        } else if (HeatingZoneOutOfTolerance(state, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs,
                                                              state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones,
                                                              TempTol)) {
                             AvailStatus = CycleOnZoneFansOnly;
@@ -2183,7 +2178,7 @@ namespace SystemAvailabilityManager {
                             AvailStatus = NoAction;
                         }
                     } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->CycleOnControlZone) {
-                        if (HeatingZoneOutOfTolerance(
+                        if (HeatingZoneOutOfTolerance(state,
                                 state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).HeatZnFanZonePtrs, state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).NumOfHeatZnFanZones, TempTol)) {
                             AvailStatus = CycleOnZoneFansOnly;
                         } else {
@@ -2211,7 +2206,7 @@ namespace SystemAvailabilityManager {
         state.dataSystemAvailabilityManager->NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus = AvailStatus;
     }
 
-    bool CoolingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool CoolingZoneOutOfTolerance(EnergyPlusData &state, Array1D_int const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     )
@@ -2220,14 +2215,14 @@ namespace SystemAvailabilityManager {
         for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
             int ZoneNum = ZonePtrList(Index);
             {
-                auto const tstatType(DataHeatBalFanSys::TempControlType(ZoneNum));
+                auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                 if ((tstatType == SingleCoolingSetPoint) || (tstatType == SingleHeatCoolSetPoint)) {
-                    if (DataHeatBalFanSys::TempTstatAir(ZoneNum) > DataHeatBalFanSys::TempZoneThermostatSetPoint(ZoneNum) + TempTolerance) {
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) + TempTolerance) {
                         return true; // return on the first zone found
                     }
                 } else if (tstatType == DualSetPointWithDeadBand) {
-                    if (DataHeatBalFanSys::TempTstatAir(ZoneNum) > DataHeatBalFanSys::ZoneThermostatSetPointHi(ZoneNum) + TempTolerance) {
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) + TempTolerance) {
                         return true; // return on the first zone found
                     }
                 }
@@ -2236,7 +2231,7 @@ namespace SystemAvailabilityManager {
         return false;
     }
 
-    bool HeatingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool HeatingZoneOutOfTolerance(EnergyPlusData &state, Array1D_int const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     )
@@ -2245,14 +2240,14 @@ namespace SystemAvailabilityManager {
         for (int Index = 1; Index <= NumZones; ++Index) { // loop over zones in list
             int ZoneNum = ZonePtrList(Index);
             {
-                auto const tstatType(DataHeatBalFanSys::TempControlType(ZoneNum));
+                auto const tstatType(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                 if ((tstatType == SingleHeatingSetPoint) || (tstatType == SingleHeatCoolSetPoint)) {
-                    if (DataHeatBalFanSys::TempTstatAir(ZoneNum) < DataHeatBalFanSys::TempZoneThermostatSetPoint(ZoneNum) - TempTolerance) {
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempTolerance) {
                         return true; // return on the first zone found
                     }
                 } else if (tstatType == DualSetPointWithDeadBand) {
-                    if (DataHeatBalFanSys::TempTstatAir(ZoneNum) < DataHeatBalFanSys::ZoneThermostatSetPointLo(ZoneNum) - TempTolerance) {
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - TempTolerance) {
                         return true; // return on the first zone found
                     }
                 }
@@ -2285,11 +2280,6 @@ namespace SystemAvailabilityManager {
 
         // Using/Aliasing
         using namespace DataAirLoop;
-        using DataHeatBalFanSys::TempControlType;
-        using DataHeatBalFanSys::TempTstatAir;
-        using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -2503,13 +2493,13 @@ namespace SystemAvailabilityManager {
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->ConstantTemperatureGradient) {
                     if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->ControlZone) {
                         ZoneNum = OptStartMgr.ZoneNum;
-                        if ((!allocated(TempTstatAir)) || (!allocated(ZoneThermostatSetPointLo)) || (!allocated(ZoneThermostatSetPointHi))) {
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
                                 if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
-                                    TempDiffHi = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
-                                    TempDiffLo = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
+                                    TempDiffHi = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
+                                    TempDiffLo = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
                                 } else {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
@@ -2647,7 +2637,7 @@ namespace SystemAvailabilityManager {
                     } else if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->MaximumOfZoneList) {
 
                         NumOfZonesInList = OptStartMgr.NumOfZones;
-                        if ((!allocated(TempTstatAir)) || (!allocated(ZoneThermostatSetPointLo)) || (!allocated(ZoneThermostatSetPointHi))) {
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
@@ -2655,9 +2645,9 @@ namespace SystemAvailabilityManager {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
                                     for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffHi = max(TempDiffHi, TempDiff);
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffLo = min(TempDiffLo, TempDiff);
                                     }
                                 } else {
@@ -2803,13 +2793,13 @@ namespace SystemAvailabilityManager {
 
                     if (OptStartMgr.CtrlType == state.dataSystemAvailabilityManager->ControlZone) {
                         ZoneNum = OptStartMgr.ZoneNum;
-                        if ((!allocated(TempTstatAir)) || (!allocated(ZoneThermostatSetPointLo)) || (!allocated(ZoneThermostatSetPointHi))) {
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
                                 if (allocated(state.dataZoneCtrls->OccRoomTSetPointHeat) && allocated(state.dataZoneCtrls->OccRoomTSetPointCool)) {
-                                    TempDiffHi = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
-                                    TempDiffLo = TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
+                                    TempDiffHi = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum);
+                                    TempDiffLo = state.dataHeatBalFanSys->TempTstatAir(ZoneNum) - state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum);
                                 } else {
                                     TempDiffHi = 0.0;
                                     TempDiffLo = 0.0;
@@ -2873,12 +2863,12 @@ namespace SystemAvailabilityManager {
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (ATGUpdateFlag1) {
                                                 ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp1 = TempTstatAir(ZoneNum);
+                                                ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag1 = false;
                                             }
-                                            if (TempTstatAir(ZoneNum) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
+                                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
                                                 ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp2 = TempTstatAir(ZoneNum);
+                                                ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag2 = false;
                                                 if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
                                                     state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
@@ -2917,12 +2907,12 @@ namespace SystemAvailabilityManager {
                                         if (!state.dataGlobal->WarmupFlag) {
                                             if (ATGUpdateFlag1) {
                                                 ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp1 = TempTstatAir(ZoneNum);
+                                                ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag1 = false;
                                             }
-                                            if (TempTstatAir(ZoneNum) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
+                                            if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ZoneNum) && ATGUpdateFlag2) {
                                                 ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                                ATGUpdateTemp2 = TempTstatAir(ZoneNum);
+                                                ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                                 ATGUpdateFlag2 = false;
                                                 if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
                                                     state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
@@ -2983,12 +2973,12 @@ namespace SystemAvailabilityManager {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = TempTstatAir(ZoneNum);
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = TempTstatAir(ZoneNum);
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                             ATGUpdateFlag2 = false;
                                             if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
@@ -3019,12 +3009,12 @@ namespace SystemAvailabilityManager {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = TempTstatAir(ZoneNum);
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) <= state.dataZoneCtrls->OccRoomTSetPointCool(ZoneNum) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = TempTstatAir(ZoneNum);
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ZoneNum);
                                             ATGUpdateFlag2 = false;
                                             if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
@@ -3060,7 +3050,7 @@ namespace SystemAvailabilityManager {
                         NumOfZonesInList = OptStartMgr.NumOfZones;
                         ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
                         ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
-                        if ((!allocated(TempTstatAir)) || (!allocated(ZoneThermostatSetPointLo)) || (!allocated(ZoneThermostatSetPointHi))) {
+                        if ((!allocated(state.dataHeatBalFanSys->TempTstatAir)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointLo)) || (!allocated(state.dataHeatBalFanSys->ZoneThermostatSetPointHi))) {
                             TempDiff = 0.0;
                         } else {
                             if (!CycleOnFlag) {
@@ -3070,13 +3060,13 @@ namespace SystemAvailabilityManager {
                                     ATGWCZoneNumHi = OptStartMgr.ZonePtrs(1);
                                     ATGWCZoneNumLo = OptStartMgr.ZonePtrs(1);
                                     for (ZoneNum = 1; ZoneNum <= NumOfZonesInList; ++ZoneNum) {
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointCool(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffHi = max(TempDiffHi, TempDiff);
                                         // Store the worse case zone number for actual temperature gradient calculation
                                         if (TempDiff == TempDiffHi) {
                                             ATGWCZoneNumHi = OptStartMgr.ZonePtrs(ZoneNum);
                                         }
-                                        TempDiff = TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
+                                        TempDiff = state.dataHeatBalFanSys->TempTstatAir(OptStartMgr.ZonePtrs(ZoneNum)) - state.dataZoneCtrls->OccRoomTSetPointHeat(OptStartMgr.ZonePtrs(ZoneNum));
                                         TempDiffLo = min(TempDiffLo, TempDiff);
                                         if (TempDiff == TempDiffLo) {
                                             ATGWCZoneNumLo = OptStartMgr.ZonePtrs(ZoneNum);
@@ -3145,12 +3135,12 @@ namespace SystemAvailabilityManager {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumLo) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag2 = false;
                                             if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
@@ -3187,12 +3177,12 @@ namespace SystemAvailabilityManager {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumLo) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo) >= state.dataZoneCtrls->OccRoomTSetPointHeat(ATGWCZoneNumLo) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumLo);
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumLo);
                                             ATGUpdateFlag2 = false;
                                             if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdHeat(NumPreDays) =
@@ -3252,12 +3242,12 @@ namespace SystemAvailabilityManager {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumHi) <= state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi) <= state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag2 = false;
                                             if (std::abs(ATGUpdateTime2 - ATGUpdateTime1) > 1.e-10) {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
@@ -3295,12 +3285,12 @@ namespace SystemAvailabilityManager {
                                     if (!state.dataGlobal->WarmupFlag) {
                                         if (ATGUpdateFlag1) {
                                             ATGUpdateTime1 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp1 = TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateTemp1 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag1 = false;
                                         }
-                                        if (TempTstatAir(ATGWCZoneNumHi) <= state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
+                                        if (state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi) <= state.dataZoneCtrls->OccRoomTSetPointCool(ATGWCZoneNumHi) && ATGUpdateFlag2) {
                                             ATGUpdateTime2 = state.dataGlobal->CurrentTime;
-                                            ATGUpdateTemp2 = TempTstatAir(ATGWCZoneNumHi);
+                                            ATGUpdateTemp2 = state.dataHeatBalFanSys->TempTstatAir(ATGWCZoneNumHi);
                                             ATGUpdateFlag2 = false;
                                             if (std::abs(ATGUpdateTime2 - ATGUpdateTime1 + 24.0) > 1.e-10) {
                                                 state.dataSystemAvailabilityManager->OptStart_AdaTempGradTrdCool(NumPreDays) =
@@ -3405,11 +3395,6 @@ namespace SystemAvailabilityManager {
         // value.
 
         using namespace DataAirLoop;
-        using DataHeatBalFanSys::TempControlType;
-        using DataHeatBalFanSys::TempTstatAir;
-        using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 
         int ZoneInSysNum;
         int CtrldZoneNum;
@@ -3435,11 +3420,11 @@ namespace SystemAvailabilityManager {
 
             if (present(ZoneEquipType)) {
                 // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
-                if (TempTstatAir(ControlZoneNum) > VentTemp) {
+                if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) > VentTemp) {
                     TempCheck = true;
                 }
                 // if the room temperature is less than the low limit set the low limit check to TRUE
-                if (TempTstatAir(ControlZoneNum) < state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
+                if (state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) < state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
                     LowLimCheck = true;
                 }
             } else {
@@ -3448,18 +3433,18 @@ namespace SystemAvailabilityManager {
                     CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
                     ZoneNum = state.dataZoneEquip->ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
                     // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
-                    if (TempTstatAir(ZoneNum) > VentTemp) {
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) > VentTemp) {
                         TempCheck = true;
                     }
                     // if the room temperature is less than the low limit set the low limit check to TRUE
-                    if (TempTstatAir(ZoneNum) < state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
+                    if (state.dataHeatBalFanSys->TempTstatAir(ZoneNum) < state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentTempLowLim) {
                         LowLimCheck = true;
                     }
                 }
             }
             // If the difference between the control zone temperature and the outside temperature is greater than
             // the specified night venting delta T then set the delta T check to TRUE
-            if ((TempTstatAir(ControlZoneNum) - state.dataEnvrn->OutDryBulbTemp) > state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
+            if ((state.dataHeatBalFanSys->TempTstatAir(ControlZoneNum) - state.dataEnvrn->OutDryBulbTemp) > state.dataSystemAvailabilityManager->NVentSysAvailMgrData(SysAvailNum).VentDelT) {
                 DelTCheck = true;
             }
             // If the limit requirements are met turn on night ventilation
@@ -4356,9 +4341,13 @@ namespace SystemAvailabilityManager {
                     if (!state.dataHeatBal->AdaptiveComfortRequested_ASH55) {
                         ShowSevereError(state, "GetHybridVentilationInputs: AvailabilityManager:HybridVentilation =\"" +
                                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).Name + "\"");
-                        ShowContinueError(state, "Ventilation Control Mode Schedule Name =\"" +
-                                          Schedule(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr).Name +
-                                          "\", When the schedule value is 5 or 6, operative temperature control is requested. ");
+                        ShowContinueError(
+                            state,
+                            "Ventilation Control Mode Schedule Name =\"" +
+                                state.dataScheduleMgr
+                                    ->Schedule(state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlModeSchedPtr)
+                                    .Name +
+                                "\", When the schedule value is 5 or 6, operative temperature control is requested. ");
                         ShowContinueError(state, "However, AdaptiveASH55 is not entered in the Thermal Comfort Model Type fields in the People object.");
                         ErrorsFound = true;
                     }
@@ -4475,12 +4464,6 @@ namespace SystemAvailabilityManager {
         using DataHeatBalance::HybridControlTypeClose;
         using DataHeatBalance::HybridControlTypeGlobal;
         using DataHeatBalance::HybridControlTypeIndiv;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::TempControlType;
-        using DataHeatBalFanSys::TempZoneThermostatSetPoint;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -4552,7 +4535,7 @@ namespace SystemAvailabilityManager {
 
                     // Enthalpy control
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_Enth) {
-                    ZoneAirEnthalpy = PsyHFnTdbW(MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
+                    ZoneAirEnthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                     if (state.dataEnvrn->OutEnthalpy >= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MinOutdoorEnth &&
                         state.dataEnvrn->OutEnthalpy <= state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).MaxOutdoorEnth) {
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Open;
@@ -4591,7 +4574,7 @@ namespace SystemAvailabilityManager {
 
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_OperT80) {
                     if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                         minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 14.3;
                         maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 21.3;
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).minAdaTem = minAdaTem;
@@ -4608,7 +4591,7 @@ namespace SystemAvailabilityManager {
 
                 } else if (SELECT_CASE_var == state.dataSystemAvailabilityManager->HybridVentMode_OperT90) {
                     if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
-                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                        state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).OperativeTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                         minAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 15.3;
                         maxAdaTem = 0.31 * state.dataThermalComforts->runningAverageASH + 20.3;
                         state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).minAdaTem = minAdaTem;
@@ -4671,15 +4654,15 @@ namespace SystemAvailabilityManager {
                     state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode == state.dataSystemAvailabilityManager->HybridVentMode_Enth) {
 
                     {
-                        auto const SELECT_CASE_var(TempControlType(ZoneNum)); // select on thermostat control
+                        auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum)); // select on thermostat control
 
                         if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                            if (MAT(ZoneNum) < TempZoneThermostatSetPoint(ZoneNum)) {
+                            if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             }
 
                         } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                            if (MAT(ZoneNum) > TempZoneThermostatSetPoint(ZoneNum)) {
+                            if (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             }
 
@@ -4701,7 +4684,7 @@ namespace SystemAvailabilityManager {
                             }
 
                         } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                            if ((MAT(ZoneNum) < ZoneThermostatSetPointLo(ZoneNum)) || (MAT(ZoneNum) > ZoneThermostatSetPointHi(ZoneNum))) {
+                            if ((state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) || (state.dataHeatBalFanSys->MAT(ZoneNum) > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum))) {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             }
 
@@ -4712,8 +4695,8 @@ namespace SystemAvailabilityManager {
 
                 // Dew point control mode
                 if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).ControlMode == state.dataSystemAvailabilityManager->HybridVentMode_DewPoint) {
-                    ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
-                    ZoneAirDewPoint = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+                    ZoneAirRH = PsyRhFnTdbWPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
+                    ZoneAirDewPoint = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
                     if (state.dataZoneCtrls->NumHumidityControlZones == 0) {
                         ++state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount;
                         if (state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).DewPointNoRHErrCount < 2) {
@@ -4737,10 +4720,10 @@ namespace SystemAvailabilityManager {
                             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).HumidifyingSchedIndex);
                             ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->HumidityControlZone(HStatZoneNum).DehumidifyingSchedIndex);
                             if (ZoneAirRH > ZoneRHDehumidifyingSetPoint) { // Need dehumidification
-                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                WSetPoint = PsyWFnTdbRhPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 if (WSetPoint < state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else if (ZoneAirRH < ZoneRHHumidifyingSetPoint) { // Need humidification
-                                WSetPoint = PsyWFnTdbRhPb(state, MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                WSetPoint = PsyWFnTdbRhPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 if (WSetPoint > state.dataEnvrn->OutHumRat) state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;
                             } else {
                                 state.dataSystemAvailabilityManager->HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl = state.dataSystemAvailabilityManager->HybridVentCtrl_Close;

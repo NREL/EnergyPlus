@@ -95,9 +95,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-namespace EnergyPlus {
-
-namespace ZoneTempPredictorCorrector {
+namespace EnergyPlus::ZoneTempPredictorCorrector {
 
     // MODULE INFORMATION:
     //       AUTHOR         Russell D. Taylor
@@ -2627,9 +2625,6 @@ namespace ZoneTempPredictorCorrector {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto RoutineName("InitZoneAirSetpoints: ");
 
@@ -2642,18 +2637,18 @@ namespace ZoneTempPredictorCorrector {
 
 
         if (state.dataZoneTempPredictorCorrector->InitZoneAirSetPointsOneTimeFlag) {
-            TempZoneThermostatSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
-            AdapComfortCoolingSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneThermostatSetPointHi.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneThermostatSetPointLo.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneThermostatSetPointHiAver.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneThermostatSetPointLoAver.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->TempZoneThermostatSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->AdapComfortCoolingSetPoint.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneThermostatSetPointHi.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneThermostatSetPointLo.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneThermostatSetPointHiAver.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneThermostatSetPointLoAver.dimension(state.dataGlobal->NumOfZones, 0.0);
 
-            LoadCorrectionFactor.dimension(state.dataGlobal->NumOfZones, 0.0); // PH 3/3/04
-            TempControlType.dimension(state.dataGlobal->NumOfZones, 0);
+            state.dataHeatBalFanSys->LoadCorrectionFactor.dimension(state.dataGlobal->NumOfZones, 0.0); // PH 3/3/04
+            state.dataHeatBalFanSys->TempControlType.dimension(state.dataGlobal->NumOfZones, 0);
             if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
-                ComfortControlType.dimension(state.dataGlobal->NumOfZones, 0);
-                ZoneComfortControlsFanger.allocate(state.dataGlobal->NumOfZones);
+                state.dataHeatBalFanSys->ComfortControlType.dimension(state.dataGlobal->NumOfZones, 0);
+                state.dataHeatBalFanSys->ZoneComfortControlsFanger.allocate(state.dataGlobal->NumOfZones);
             }
             state.dataZoneTempPredictorCorrector->ZoneSetPointLast.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataZoneEnergyDemand->Setback.dimension(state.dataGlobal->NumOfZones, false);
@@ -2669,29 +2664,29 @@ namespace ZoneTempPredictorCorrector {
             state.dataHeatBal->MoisturePredictedRate.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataHeatBal->MoisturePredictedHumSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataHeatBal->MoisturePredictedDehumSPRate.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
-            DSWZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
-            DSWZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
-            DSWZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
-            DSWZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneAirHumRatTemp.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus1Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus2Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinus3Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
-            WZoneTimeMinusP.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus2.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus3.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus4.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneAirHumRatTemp.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus1Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus2Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinus3Temp.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->WZoneTimeMinusP.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataZoneTempPredictorCorrector->TempIndZnLd.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataZoneTempPredictorCorrector->TempDepZnLd.dimension(state.dataGlobal->NumOfZones, 0.0);
-            NonAirSystemResponse.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SysDepZoneLoads.dimension(state.dataGlobal->NumOfZones, 0.0);
-            SysDepZoneLoadsLagged.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->NonAirSystemResponse.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->SysDepZoneLoads.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->SysDepZoneLoadsLagged.dimension(state.dataGlobal->NumOfZones, 0.0);
             state.dataZoneTempPredictorCorrector->ZoneAirRelHum.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneWMX.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneWM2.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneT1.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZoneW1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneWMX.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneWM2.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneT1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZoneW1.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             state.dataHeatBal->ListSNLoadHeatEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
             state.dataHeatBal->ListSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneLists, 0.0);
@@ -2702,18 +2697,18 @@ namespace ZoneTempPredictorCorrector {
             state.dataHeatBal->GroupSNLoadCoolEnergy.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
             state.dataHeatBal->GroupSNLoadHeatRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
             state.dataHeatBal->GroupSNLoadCoolRate.dimension(state.dataHeatBal->NumOfZoneGroups, 0.0);
-            AIRRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZTM1.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZTM2.dimension(state.dataGlobal->NumOfZones, 0.0);
-            ZTM3.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->AIRRAT.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZTM1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZTM2.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->ZTM3.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             // Hybrid modeling
-            PreviousMeasuredZT1.dimension(state.dataGlobal->NumOfZones, 0.0);
-            PreviousMeasuredZT2.dimension(state.dataGlobal->NumOfZones, 0.0);
-            PreviousMeasuredZT3.dimension(state.dataGlobal->NumOfZones, 0.0);
-            PreviousMeasuredHumRat1.dimension(state.dataGlobal->NumOfZones, 0.0);
-            PreviousMeasuredHumRat2.dimension(state.dataGlobal->NumOfZones, 0.0);
-            PreviousMeasuredHumRat3.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->PreviousMeasuredZT1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->PreviousMeasuredZT2.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->PreviousMeasuredZT3.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->PreviousMeasuredHumRat1.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->PreviousMeasuredHumRat2.dimension(state.dataGlobal->NumOfZones, 0.0);
+            state.dataHeatBalFanSys->PreviousMeasuredHumRat3.dimension(state.dataGlobal->NumOfZones, 0.0);
 
             // Allocate Derived Types
             state.dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state.dataGlobal->NumOfZones);
@@ -2721,19 +2716,15 @@ namespace ZoneTempPredictorCorrector {
 
             for (Loop = 1; Loop <= state.dataGlobal->NumOfZones; ++Loop) {
                 FirstSurfFlag = true;
-                if (state.dataHeatBal->Zone(Loop).SurfaceFirst > 0) {
-                    for (SurfNum = state.dataHeatBal->Zone(Loop).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(Loop).SurfaceLast; ++SurfNum) {
-                        if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
-                        if (FirstSurfFlag) {
-                            TRefFlag = Surface(SurfNum).TAirRef;
-                            FirstSurfFlag = false;
-                        }
-                        // for each particular zone, the reference air temperature(s) should be the same
-                        // (either mean air, bulk air, or supply air temp).
-                        if (Surface(SurfNum).TAirRef != TRefFlag) {
-                            ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + state.dataHeatBal->Zone(Loop).Name);
-                        }
+                for (SurfNum = state.dataHeatBal->Zone(Loop).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(Loop).HTSurfaceLast; ++SurfNum) {
+                    if (FirstSurfFlag) {
+                        TRefFlag = state.dataSurface->Surface(SurfNum).TAirRef;
+                        FirstSurfFlag = false;
+                    }
+                    // for each particular zone, the reference air temperature(s) should be the same
+                    // (either mean air, bulk air, or supply air temp).
+                    if (state.dataSurface->Surface(SurfNum).TAirRef != TRefFlag) {
+                        ShowWarningError(state, "Different reference air temperatures for difference surfaces encountered in zone " + state.dataHeatBal->Zone(Loop).Name);
                     }
                 }
             }
@@ -2772,11 +2763,11 @@ namespace ZoneTempPredictorCorrector {
                     "Zone Air System Sensible Heating Rate", OutputProcessor::Unit::W, state.dataHeatBal->SNLoadHeatRate(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                     "Zone Air System Sensible Cooling Rate", OutputProcessor::Unit::W, state.dataHeatBal->SNLoadCoolRate(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
-                SetupOutputVariable(state, "Zone Air Temperature", OutputProcessor::Unit::C, ZT(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
+                SetupOutputVariable(state, "Zone Air Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->ZT(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone Thermostat Air Temperature", OutputProcessor::Unit::C, TempTstatAir(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
+                    "Zone Thermostat Air Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->TempTstatAir(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
-                    "Zone Air Humidity Ratio", OutputProcessor::Unit::None, ZoneAirHumRat(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
+                    "Zone Air Humidity Ratio", OutputProcessor::Unit::None, state.dataHeatBalFanSys->ZoneAirHumRat(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state,
                     "Zone Air Relative Humidity", OutputProcessor::Unit::Perc, state.dataZoneTempPredictorCorrector->ZoneAirRelHum(Loop), "System", "Average", state.dataHeatBal->Zone(Loop).Name);
 
@@ -2863,28 +2854,28 @@ namespace ZoneTempPredictorCorrector {
                                     state.dataHeatBal->Zone(Loop).Name);
 
                 SetupOutputVariable(state,
-                    "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType(Loop), "Zone", "Average", state.dataHeatBal->Zone(Loop).Name);
+                    "Zone Thermostat Control Type", OutputProcessor::Unit::None, state.dataHeatBalFanSys->TempControlType(Loop), "Zone", "Average", state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Thermostat Heating Setpoint Temperature",
                                     OutputProcessor::Unit::C,
-                                    ZoneThermostatSetPointLo(Loop),
+                                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(Loop),
                                     "System",
                                     "Average",
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Thermostat Cooling Setpoint Temperature",
                                     OutputProcessor::Unit::C,
-                                    ZoneThermostatSetPointHi(Loop),
+                                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(Loop),
                                     "System",
                                     "Average",
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Adaptive Comfort Operative Temperature Set Point",
                                     OutputProcessor::Unit::C,
-                                    AdapComfortCoolingSetPoint(Loop),
+                                    state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(Loop),
                                     "Zone",
                                     "Average",
                                     state.dataHeatBal->Zone(Loop).Name);
                 SetupOutputVariable(state, "Zone Predicted Sensible Load Room Air Correction Factor",
                                     OutputProcessor::Unit::None,
-                                    LoadCorrectionFactor(Loop),
+                                    state.dataHeatBalFanSys->LoadCorrectionFactor(Loop),
                                     "System",
                                     "Average",
                                     state.dataHeatBal->Zone(Loop).Name);
@@ -2909,19 +2900,19 @@ namespace ZoneTempPredictorCorrector {
                     ZoneNum = state.dataZoneCtrls->ComfortControlledZone(Loop).ActualZoneNum;
                     SetupOutputVariable(state, "Zone Thermal Comfort Control Type",
                                         OutputProcessor::Unit::None,
-                                        ComfortControlType(ZoneNum),
+                                        state.dataHeatBalFanSys->ComfortControlType(ZoneNum),
                                         "Zone",
                                         "Average",
                                         state.dataHeatBal->Zone(ZoneNum).Name);
                     SetupOutputVariable(state, "Zone Thermal Comfort Control Fanger Low Setpoint PMV",
                                         OutputProcessor::Unit::None,
-                                        ZoneComfortControlsFanger(ZoneNum).LowPMV,
+                                        state.dataHeatBalFanSys->ZoneComfortControlsFanger(ZoneNum).LowPMV,
                                         "Zone",
                                         "Average",
                                         state.dataHeatBal->Zone(ZoneNum).Name);
                     SetupOutputVariable(state, "Zone Thermal Comfort Control Fanger High Setpoint PMV",
                                         OutputProcessor::Unit::None,
-                                        ZoneComfortControlsFanger(ZoneNum).HighPMV,
+                                        state.dataHeatBalFanSys->ZoneComfortControlsFanger(ZoneNum).HighPMV,
                                         "Zone",
                                         "Average",
                                         state.dataHeatBal->Zone(ZoneNum).Name);
@@ -2973,30 +2964,30 @@ namespace ZoneTempPredictorCorrector {
 
         // Do the Begin Environment initializations
         if (state.dataZoneTempPredictorCorrector->MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
-            AIRRAT = 0.0;
-            ZTM1 = 0.0;
-            ZTM2 = 0.0;
-            ZTM3 = 0.0;
-            WZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
-            WZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
-            WZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
-            WZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
-            WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
-            DSWZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
-            DSWZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
-            DSWZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
-            DSWZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
-            WZoneTimeMinus1Temp = 0.0;
-            WZoneTimeMinus2Temp = 0.0;
-            WZoneTimeMinus3Temp = 0.0;
-            ZoneAirHumRatTemp = 0.0;
-            TempZoneThermostatSetPoint = 0.0;
-            AdapComfortCoolingSetPoint = 0.0;
-            ZoneThermostatSetPointHi = 0.0;
-            ZoneThermostatSetPointLo = 0.0;
+            state.dataHeatBalFanSys->AIRRAT = 0.0;
+            state.dataHeatBalFanSys->ZTM1 = 0.0;
+            state.dataHeatBalFanSys->ZTM2 = 0.0;
+            state.dataHeatBalFanSys->ZTM3 = 0.0;
+            state.dataHeatBalFanSys->WZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->WZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->WZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->WZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->WZoneTimeMinusP = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->DSWZoneTimeMinus1 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->DSWZoneTimeMinus2 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->DSWZoneTimeMinus3 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->DSWZoneTimeMinus4 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->WZoneTimeMinus1Temp = 0.0;
+            state.dataHeatBalFanSys->WZoneTimeMinus2Temp = 0.0;
+            state.dataHeatBalFanSys->WZoneTimeMinus3Temp = 0.0;
+            state.dataHeatBalFanSys->ZoneAirHumRatTemp = 0.0;
+            state.dataHeatBalFanSys->TempZoneThermostatSetPoint = 0.0;
+            state.dataHeatBalFanSys->AdapComfortCoolingSetPoint = 0.0;
+            state.dataHeatBalFanSys->ZoneThermostatSetPointHi = 0.0;
+            state.dataHeatBalFanSys->ZoneThermostatSetPointLo = 0.0;
 
-            LoadCorrectionFactor = 1.0; // PH 3/3/04
-            TempControlType = 0;
+            state.dataHeatBalFanSys->LoadCorrectionFactor = 1.0; // PH 3/3/04
+            state.dataHeatBalFanSys->TempControlType = 0;
             for (auto &e : state.dataZoneEnergyDemand->ZoneSysEnergyDemand) {
                 e.RemainingOutputRequired = 0.0;
                 e.TotalOutputRequired = 0.0;
@@ -3032,22 +3023,22 @@ namespace ZoneTempPredictorCorrector {
 
             state.dataZoneTempPredictorCorrector->TempIndZnLd = 0.0;
             state.dataZoneTempPredictorCorrector->TempDepZnLd = 0.0;
-            NonAirSystemResponse = 0.0;
-            SysDepZoneLoads = 0.0;
-            SysDepZoneLoadsLagged = 0.0;
+            state.dataHeatBalFanSys->NonAirSystemResponse = 0.0;
+            state.dataHeatBalFanSys->SysDepZoneLoads = 0.0;
+            state.dataHeatBalFanSys->SysDepZoneLoadsLagged = 0.0;
             state.dataZoneTempPredictorCorrector->ZoneAirRelHum = 0.0;
             for (auto &e : state.dataHeatBal->Zone)
                 e.NoHeatToReturnAir = false;
-            ZoneT1 = 0.0;
-            ZoneW1 = state.dataEnvrn->OutHumRat;
-            ZoneWMX = state.dataEnvrn->OutHumRat;
-            ZoneWM2 = state.dataEnvrn->OutHumRat;
-            PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
-            PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
-            PreviousMeasuredZT3 = 0.0;     // Hybrid modeling
-            PreviousMeasuredHumRat1 = 0.0; // Hybrid modeling
-            PreviousMeasuredHumRat2 = 0.0; // Hybrid modeling
-            PreviousMeasuredHumRat3 = 0.0; // Hybrid modeling
+            state.dataHeatBalFanSys->ZoneT1 = 0.0;
+            state.dataHeatBalFanSys->ZoneW1 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->ZoneWMX = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->ZoneWM2 = state.dataEnvrn->OutHumRat;
+            state.dataHeatBalFanSys->PreviousMeasuredZT1 = 0.0;     // Hybrid modeling
+            state.dataHeatBalFanSys->PreviousMeasuredZT2 = 0.0;     // Hybrid modeling
+            state.dataHeatBalFanSys->PreviousMeasuredZT3 = 0.0;     // Hybrid modeling
+            state.dataHeatBalFanSys->PreviousMeasuredHumRat1 = 0.0; // Hybrid modeling
+            state.dataHeatBalFanSys->PreviousMeasuredHumRat2 = 0.0; // Hybrid modeling
+            state.dataHeatBalFanSys->PreviousMeasuredHumRat3 = 0.0; // Hybrid modeling
 
             state.dataZoneTempPredictorCorrector->MyEnvrnFlag = false;
         }
@@ -3078,41 +3069,41 @@ namespace ZoneTempPredictorCorrector {
                 ZoneNum = state.dataZoneCtrls->TempControlledZone(Loop).ActualZoneNum;
 
                 {
-                    auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                    auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                     if (SELECT_CASE_var == 0) { // Uncontrolled
 
                     } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                        if (TempZoneThermostatSetPoint(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit) {
-                            TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit;
-                            ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                        if (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit) {
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                         }
 
                     } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                        if (TempZoneThermostatSetPoint(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit) {
-                            TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit;
-                            ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                        if (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit) {
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                         }
 
                     } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
-                        if ((TempZoneThermostatSetPoint(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit) ||
-                            (TempZoneThermostatSetPoint(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit)) {
+                        if ((state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit) ||
+                            (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit)) {
 
-                            TempControlType(ZoneNum) = DualSetPointWithDeadBand;
-                            ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                            ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                            state.dataHeatBalFanSys->TempControlType(ZoneNum) = DualSetPointWithDeadBand;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
 
-                            if (ZoneThermostatSetPointLo(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit)
-                                ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit;
-                            if (ZoneThermostatSetPointHi(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit)
-                                ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit;
+                            if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit)
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit;
+                            if (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit)
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit;
                         }
 
                     } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                        if (ZoneThermostatSetPointLo(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit)
-                            ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit;
-                        if (ZoneThermostatSetPointHi(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit)
-                            ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit;
+                        if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) > state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit)
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).HeatingResetLimit;
+                        if (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) < state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit)
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).CoolingResetLimit;
 
                     } else {
                         // Do nothing
@@ -3133,44 +3124,44 @@ namespace ZoneTempPredictorCorrector {
                 ZoneNum = state.dataZoneCtrls->ComfortControlledZone(Loop).ActualZoneNum;
 
                 {
-                    auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
+                    auto const SELECT_CASE_var(state.dataHeatBalFanSys->ComfortControlType(ZoneNum));
 
                     if (SELECT_CASE_var == 0) { // Uncontrolled
 
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-                        if (TempZoneThermostatSetPoint(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit) {
-                            TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit;
-                            ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                            TempControlType(ZoneNum) = SingleHeatingSetPoint;
+                        if (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit) {
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
+                            state.dataHeatBalFanSys->TempControlType(ZoneNum) = SingleHeatingSetPoint;
                         }
 
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        if (TempZoneThermostatSetPoint(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit) {
-                            TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit;
-                            ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                            TempControlType(ZoneNum) = SingleCoolingSetPoint;
+                        if (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit) {
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
+                            state.dataHeatBalFanSys->TempControlType(ZoneNum) = SingleCoolingSetPoint;
                         }
 
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                        if ((TempZoneThermostatSetPoint(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit) ||
-                            (TempZoneThermostatSetPoint(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit)) {
+                        if ((state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit) ||
+                            (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit)) {
 
-                            TempControlType(ZoneNum) = DualSetPointWithDeadBand;
-                            ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
-                            ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                            state.dataHeatBalFanSys->TempControlType(ZoneNum) = DualSetPointWithDeadBand;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
 
-                            if (ZoneThermostatSetPointLo(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit)
-                                ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit;
-                            if (ZoneThermostatSetPointHi(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit)
-                                ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit;
+                            if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit)
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit;
+                            if (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit)
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit;
                         }
 
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                        TempControlType(ZoneNum) = DualSetPointWithDeadBand;
-                        if (ZoneThermostatSetPointLo(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit)
-                            ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit;
-                        if (ZoneThermostatSetPointHi(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit)
-                            ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit;
+                        state.dataHeatBalFanSys->TempControlType(ZoneNum) = DualSetPointWithDeadBand;
+                        if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) >= state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit)
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).HeatingResetLimit;
+                        if (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) <= state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit)
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).CoolingResetLimit;
 
                     } else {
                         // Do nothing
@@ -3266,8 +3257,8 @@ namespace ZoneTempPredictorCorrector {
         if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
             for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneTempPredictorCorrector->NumStageCtrZone; ++RelativeZoneNum) {
                 ActualZoneNum = state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).ActualZoneNum;
-                ZoneT = MAT(ActualZoneNum);
-                if (ShortenTimeStepSys) ZoneT = XMPT(ActualZoneNum);
+                ZoneT = state.dataHeatBalFanSys->MAT(ActualZoneNum);
+                if (ShortenTimeStepSys) ZoneT = state.dataHeatBalFanSys->XMPT(ActualZoneNum);
                 state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HSBchedIndex);
                 state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CSBchedIndex);
                 if (state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint >= state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint) {
@@ -3297,13 +3288,13 @@ namespace ZoneTempPredictorCorrector {
                     }
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
                     if (SetpointOffset >= 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange) {
-                        ZoneThermostatSetPointHi(ActualZoneNum) =
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) =
                             state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
                     } else {
-                        ZoneThermostatSetPointHi(ActualZoneNum) =
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) =
                             state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
                     }
-                    ZoneThermostatSetPointLo(ActualZoneNum) = ZoneThermostatSetPointHi(ActualZoneNum);
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
                 } else if (state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint > ZoneT) { // heating
                     SetpointOffset = ZoneT - state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint;
                     Itemp = 0;
@@ -3314,17 +3305,17 @@ namespace ZoneTempPredictorCorrector {
                     }
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).StageNum = Itemp;
                     if (std::abs(SetpointOffset) >= 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange) {
-                        ZoneThermostatSetPointLo(ActualZoneNum) =
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) =
                             state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
                     } else {
-                        ZoneThermostatSetPointLo(ActualZoneNum) =
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) =
                             state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
                     }
-                    ZoneThermostatSetPointHi(ActualZoneNum) = ZoneThermostatSetPointLo(ActualZoneNum);
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
                 } else {
-                    ZoneThermostatSetPointHi(ActualZoneNum) =
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) =
                         state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolSetPoint + 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).CoolThroRange;
-                    ZoneThermostatSetPointLo(ActualZoneNum) =
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) =
                         state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatSetPoint - 0.5 * state.dataZoneCtrls->StageControlledZone(RelativeZoneNum).HeatThroRange;
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ActualZoneNum).StageNum = 0;
                 }
@@ -3346,105 +3337,105 @@ namespace ZoneTempPredictorCorrector {
                     }
                     ZoneNum = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ActualZoneNum;
                     {
-                        auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                        auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag = false;
                         state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag = false;
                         if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                            Tprev = MAT(ZoneNum);
-                            if (ShortenTimeStepSys) Tprev = XMPT(ZoneNum);
+                            Tprev = state.dataHeatBalFanSys->MAT(ZoneNum);
+                            if (ShortenTimeStepSys) Tprev = state.dataHeatBalFanSys->XMPT(ZoneNum);
                         } else {
-                            Tprev = ZoneT1(ZoneNum);
+                            Tprev = state.dataHeatBalFanSys->ZoneT1(ZoneNum);
                         }
 
                         if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                            TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
-                            ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
                             if (Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempTole) {
-                                TempZoneThermostatSetPoint(ZoneNum) =
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
-                                ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                             } else if (Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo &&
                                        (Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo +
                                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet - TempTole)) {
-                                TempZoneThermostatSetPoint(ZoneNum) =
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
-                                ZoneThermostatSetPointLo(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                             } else {
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
                             }
                             if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatModeLast &&
                                 Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo) {
-                                TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
-                                ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
                             }
                         } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                            TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
-                            ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                             if (Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
-                                TempZoneThermostatSetPoint(ZoneNum) =
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
-                                ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                             } else if (Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi &&
                                        Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi -
                                                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet + TempTole) {
-                                TempZoneThermostatSetPoint(ZoneNum) =
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
-                                ZoneThermostatSetPointHi(ZoneNum) = TempZoneThermostatSetPoint(ZoneNum);
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                             } else {
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
                             }
                             if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolModeLast &&
                                 Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi) {
-                                TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
-                                ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                                state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
                             }
 
                         } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                            ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
-                            ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
                             if (Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - TempTole) {
-                                ZoneThermostatSetPointHi(ZoneNum) =
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
                             } else if (Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi &&
                                        Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi -
                                                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet + TempTole) {
-                                ZoneThermostatSetPointHi(ZoneNum) =
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi - state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
                             } else {
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
                             }
                             if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolModeLast &&
                                 Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi) {
-                                ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi;
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CoolOffFlag = true;
                             }
 
                             if (Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + TempTole) {
-                                ZoneThermostatSetPointLo(ZoneNum) =
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
                             } else if (Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo &&
                                        (Tprev < state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo +
                                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet - TempTole)) {
-                                ZoneThermostatSetPointLo(ZoneNum) =
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) =
                                     state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo + state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).DeltaTCutSet;
                             } else {
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
                             }
                             if (state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatModeLast &&
                                 Tprev > state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo) {
-                                ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
+                                state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo;
                                 state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).HeatOffFlag = true;
                             }
                             // check setpoint for both and provde an error message
-                            if (ZoneThermostatSetPointLo(ZoneNum) >= ZoneThermostatSetPointHi(ZoneNum)) {
+                            if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                                 ShowSevereError(state,
                                     "DualSetPointWithDeadBand: When Temperature Difference Between Cutout And Setpoint is applied, the heating "
                                     "setpoint is greater than the cooling setpoint. ");
                                 ShowContinueErrorTimeStamp(state, "occurs in Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
-                                ShowContinueError(state, format("Zone Heating ThermostatSetPoint={:.2R}", ZoneThermostatSetPointLo(ZoneNum)));
-                                ShowContinueError(state, format("Zone Cooling ThermostatSetPoint={:.2R}", ZoneThermostatSetPointHi(ZoneNum)));
+                                ShowContinueError(state, format("Zone Heating ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)));
+                                ShowContinueError(state, format("Zone Cooling ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)));
                                 ShowFatalError(state, "Program terminates due to above conditions.");
                             }
                         }
@@ -3460,41 +3451,41 @@ namespace ZoneTempPredictorCorrector {
                 // timestep has just shifted from full zone timestep to a new shorter system timestep
                 // throw away last updates in corrector and rewind for resimulating smaller timestep
                 if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) { // roll back result for zone air node,
-                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp = XMAT(ZoneNum);
-                    TempTstatAir(ZoneNum) = XMAT(ZoneNum);
-                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).HumRat = WZoneTimeMinus1(ZoneNum);
-                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(XMAT(ZoneNum), WZoneTimeMinus1(ZoneNum));
+                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp = state.dataHeatBalFanSys->XMAT(ZoneNum);
+                    state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->XMAT(ZoneNum);
+                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).HumRat = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
+                    Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->XMAT(ZoneNum), state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum));
                 }
 
                 if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
 
-                    //  MAT(ZoneNum),   XMAT(ZoneNum),   XM2T(ZoneNum),   XM3T(ZoneNum),   XM4T(ZoneNum), &
+                    //  state.dataHeatBalFanSys->MAT(ZoneNum),   state.dataHeatBalFanSys->XMAT(ZoneNum),   state.dataHeatBalFanSys->XM2T(ZoneNum),   state.dataHeatBalFanSys->XM3T(ZoneNum),   state.dataHeatBalFanSys->XM4T(ZoneNum), &
                     DownInterpolate4HistoryValues(PriorTimeStep,
                                                   TimeStepSys,
-                                                  XMAT(ZoneNum),
-                                                  XM2T(ZoneNum),
-                                                  XM3T(ZoneNum),
-                                                  XM4T(ZoneNum),
-                                                  XM4T(ZoneNum),
-                                                  MAT(ZoneNum),
-                                                  DSXMAT(ZoneNum),
-                                                  DSXM2T(ZoneNum),
-                                                  DSXM3T(ZoneNum),
-                                                  DSXM4T(ZoneNum));
+                                                  state.dataHeatBalFanSys->XMAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM2T(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM3T(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM4T(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM4T(ZoneNum),
+                                                  state.dataHeatBalFanSys->MAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXMAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXM2T(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXM3T(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXM4T(ZoneNum));
                     //     ZoneAirHumRat(ZoneNum),   WZoneTimeMinus1(ZoneNum),   WZoneTimeMinus2(ZoneNum),   &
                     //                                 WZoneTimeMinus3(ZoneNum),   WZoneTimeMinus4(ZoneNum), &
                     DownInterpolate4HistoryValues(PriorTimeStep,
                                                   TimeStepSys,
-                                                  WZoneTimeMinus1(ZoneNum),
-                                                  WZoneTimeMinus2(ZoneNum),
-                                                  WZoneTimeMinus3(ZoneNum),
-                                                  WZoneTimeMinus4(ZoneNum),
-                                                  WZoneTimeMinus4(ZoneNum),
-                                                  ZoneAirHumRat(ZoneNum),
-                                                  DSWZoneTimeMinus1(ZoneNum),
-                                                  DSWZoneTimeMinus2(ZoneNum),
-                                                  DSWZoneTimeMinus3(ZoneNum),
-                                                  DSWZoneTimeMinus4(ZoneNum));
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum),
+                                                  state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus4(ZoneNum));
 
                     if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
 
@@ -3576,28 +3567,28 @@ namespace ZoneTempPredictorCorrector {
             }
             // now update the variables actually used in the balance equations.
             if (UseZoneTimeStepHistory) {
-                ZTM1(ZoneNum) = XMAT(ZoneNum);
-                ZTM2(ZoneNum) = XM2T(ZoneNum);
-                ZTM3(ZoneNum) = XM3T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM1(ZoneNum) = state.dataHeatBalFanSys->XMAT(ZoneNum);
+                state.dataHeatBalFanSys->ZTM2(ZoneNum) = state.dataHeatBalFanSys->XM2T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM3(ZoneNum) = state.dataHeatBalFanSys->XM3T(ZoneNum);
 
-                WZoneTimeMinus1Temp(ZoneNum) = WZoneTimeMinus1(ZoneNum);
-                WZoneTimeMinus2Temp(ZoneNum) = WZoneTimeMinus2(ZoneNum);
-                WZoneTimeMinus3Temp(ZoneNum) = WZoneTimeMinus3(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
 
             } else { // use down-stepped history
-                ZTM1(ZoneNum) = DSXMAT(ZoneNum);
-                ZTM2(ZoneNum) = DSXM2T(ZoneNum);
-                ZTM3(ZoneNum) = DSXM3T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM1(ZoneNum) = state.dataHeatBalFanSys->DSXMAT(ZoneNum);
+                state.dataHeatBalFanSys->ZTM2(ZoneNum) = state.dataHeatBalFanSys->DSXM2T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM3(ZoneNum) = state.dataHeatBalFanSys->DSXM3T(ZoneNum);
 
-                WZoneTimeMinus1Temp(ZoneNum) = DSWZoneTimeMinus1(ZoneNum);
-                WZoneTimeMinus2Temp(ZoneNum) = DSWZoneTimeMinus2(ZoneNum);
-                WZoneTimeMinus3Temp(ZoneNum) = DSWZoneTimeMinus3(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum);
             }
 
-            AIRRAT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
-                              PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) /
+            state.dataHeatBalFanSys->AIRRAT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
+                              PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) /
                               (TimeStepSys * DataGlobalConstants::SecInHour);
-            AirCap = AIRRAT(ZoneNum);
+            AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
             RAFNFrac = 0.0;
 
             // Calculate the various heat balance sums
@@ -3611,19 +3602,19 @@ namespace ZoneTempPredictorCorrector {
             }
 
             TempDepCoef = SumHA + SumMCp;
-            TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SysDepZoneLoadsLagged(ZoneNum);
+            TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) {
-                TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+                TempHistoryTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
             } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
                 // UCSD displacement ventilation model - make dynamic term independent of TimeStepSys
-                TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+                TempHistoryTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
             } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                 // UCSD UFAD model - make dynamic term independent of TimeStepSys
-                TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+                TempHistoryTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
             } else if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
@@ -3641,15 +3632,15 @@ namespace ZoneTempPredictorCorrector {
                     AirCap = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).AirVolume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
                              state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RhoAir *
                              state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).CpAir / (TimeStepSys * DataGlobalConstants::SecInHour);
-                    AIRRAT(ZoneNum) = AirCap;
-                    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+                    state.dataHeatBalFanSys->AIRRAT(ZoneNum) = AirCap;
+                    TempHistoryTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
                     state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                     state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
                     if (state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HasHVACAssigned)
                         RAFNFrac = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HVAC(1).SupplyFraction;
                 }
             } else { // other imperfectly mixed room models
-                TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum));
+                TempHistoryTerm = AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum));
                 state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) = (11.0 / 6.0) * AirCap + TempDepCoef;
                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum) = TempHistoryTerm + TempIndCoef;
             }
@@ -3659,8 +3650,8 @@ namespace ZoneTempPredictorCorrector {
             if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
                 if (ShortenTimeStepSys && TimeStepSys < state.dataGlobal->TimeStepZone) {
                     if (PreviousTimeStep < state.dataGlobal->TimeStepZone) {
-                        ZoneT1(ZoneNum) = ZoneTM2(ZoneNum);
-                        ZoneW1(ZoneNum) = ZoneWM2(ZoneNum);
+                        state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZoneTM2(ZoneNum);
+                        state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneWM2(ZoneNum);
                         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                             for (LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
@@ -3670,8 +3661,8 @@ namespace ZoneTempPredictorCorrector {
                             }
                         }
                     } else {
-                        ZoneT1(ZoneNum) = ZoneTMX(ZoneNum);
-                        ZoneW1(ZoneNum) = ZoneWMX(ZoneNum);
+                        state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZoneTMX(ZoneNum);
+                        state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
                         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                             for (LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                                 state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 =
@@ -3683,8 +3674,8 @@ namespace ZoneTempPredictorCorrector {
                     }
                     ShortenTimeStepSysRoomAir = true;
                 } else {
-                    ZoneT1(ZoneNum) = ZT(ZoneNum);
-                    ZoneW1(ZoneNum) = ZoneAirHumRat(ZoneNum);
+                    state.dataHeatBalFanSys->ZoneT1(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->ZoneW1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
                     if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                         for (LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                             state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempT1 = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
@@ -3753,7 +3744,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 DeltaT;               // Temperature difference between cutout and setpoint
 
 
-        TempControlType = 0; // Default
+        state.dataHeatBalFanSys->TempControlType = 0; // Default
 
         // Place holder for occupied heating and cooling set points - for optimum start
         if (!allocated(state.dataZoneCtrls->OccRoomTSetPointHeat)) {
@@ -3771,12 +3762,12 @@ namespace ZoneTempPredictorCorrector {
             // What if this zone not controlled???
             ActualZoneNum = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ActualZoneNum;
             TempControlSchedIndex = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).CTSchedIndex;
-            TempControlType(ActualZoneNum) = GetCurrentScheduleValue(state, TempControlSchedIndex);
+            state.dataHeatBalFanSys->TempControlType(ActualZoneNum) = GetCurrentScheduleValue(state, TempControlSchedIndex);
             // Error detection for these values is done in the Get routine
 
             {
                 auto const SELECT_CASE_var(
-                    TempControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
+                        state.dataHeatBalFanSys->TempControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
                 // during the simulation?
                 if (SELECT_CASE_var == 0) { // Uncontrolled
 
@@ -3787,12 +3778,12 @@ namespace ZoneTempPredictorCorrector {
                     SchedTypeIndex = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
                     SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SchedTypeIndex).TempSchedIndex;
-                    TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndex);
-                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndex);
+                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
 
-                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
-                    ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    //        ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
+                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum));
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    //        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum)
 
                 } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
 
@@ -3801,19 +3792,19 @@ namespace ZoneTempPredictorCorrector {
                     SchedTypeIndex = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
                     SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SchedTypeIndex).TempSchedIndex;
-                    TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndex);
-                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndex);
+                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
 
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(state, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
-                        AdapComfortCoolingSetPoint(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
+                        AdjustOperativeSetPointsforAdapComfort(state, RelativeZoneNum, state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum));
+                        state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                     }
 
-                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
-                    ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    //        ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
+                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum));
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    //        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum)
 
                     AdjustCoolingSetPointforTempAndHumidityControl(state, RelativeZoneNum, ActualZoneNum);
 
@@ -3824,19 +3815,19 @@ namespace ZoneTempPredictorCorrector {
                     SchedTypeIndex = state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
                     SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SchedTypeIndex).TempSchedIndex;
-                    TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndex);
+                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndex);
 
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(state, RelativeZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
-                        AdapComfortCoolingSetPoint(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
+                        AdjustOperativeSetPointsforAdapComfort(state, RelativeZoneNum, state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum));
+                        state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                     }
 
-                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, TempZoneThermostatSetPoint(ActualZoneNum));
+                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum));
 
-                    ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
 
                     // Change the room set point to occupied set point during optimum start period--------------
 
@@ -3847,12 +3838,12 @@ namespace ZoneTempPredictorCorrector {
                         if (OptStartData.ActualZoneNum(ActualZoneNum) == ActualZoneNum) {
                             GetScheduleValuesForDay(state, SetPointTempSchedIndexCold, DaySPValues);
                             OccStartTime = CEILING(OptStartData.OccStartTime(ActualZoneNum)) + 1;
-                            TempZoneThermostatSetPoint(ActualZoneNum) = DaySPValues(1, OccStartTime);
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = DaySPValues(1, OccStartTime);
                         }
 
                         if (OptStartData.OptStartFlag(ActualZoneNum)) {
-                            ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                            ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
                         }
                     }
                     //--------------------------------------------------------------------------------------------
@@ -3865,21 +3856,21 @@ namespace ZoneTempPredictorCorrector {
 
                     SetPointTempSchedIndexHot = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(SchedTypeIndex).HeatTempSchedIndex;
                     SetPointTempSchedIndexCold = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(SchedTypeIndex).CoolTempSchedIndex;
-                    ZoneThermostatSetPointHi(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndexCold);
-                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = ZoneThermostatSetPointHi(ActualZoneNum);
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndexCold);
+                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
 
                     // Added Jan 17 (X. Luo)
                     // Adjust operative temperature based on adaptive comfort model
                     if ((state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).AdaptiveComfortTempControl)) {
-                        AdjustOperativeSetPointsforAdapComfort(state, RelativeZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
-                        AdapComfortCoolingSetPoint(ActualZoneNum) = ZoneThermostatSetPointHi(ActualZoneNum);
+                        AdjustOperativeSetPointsforAdapComfort(state, RelativeZoneNum, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum));
+                        state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(ActualZoneNum) = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum);
                     }
 
-                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointHi(ActualZoneNum));
+                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum));
 
-                    ZoneThermostatSetPointLo(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndexHot);
-                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = ZoneThermostatSetPointLo(ActualZoneNum);
-                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, ZoneThermostatSetPointLo(ActualZoneNum));
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = GetCurrentScheduleValue(state, SetPointTempSchedIndexHot);
+                    state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
+                    AdjustAirSetPointsforOpTempCntrl(state, RelativeZoneNum, ActualZoneNum, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum));
 
                     // Change the room set point to occupied set point during optimum start period--------------
 
@@ -3896,8 +3887,8 @@ namespace ZoneTempPredictorCorrector {
                         }
 
                         if (OptStartData.OptStartFlag(ActualZoneNum)) {
-                            ZoneThermostatSetPointHi(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum);
-                            ZoneThermostatSetPointLo(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum);
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointCool(ActualZoneNum);
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataZoneCtrls->OccRoomTSetPointHeat(ActualZoneNum);
                         }
                     }
                     //--------------------------------------------------------------------------------------------
@@ -3908,7 +3899,7 @@ namespace ZoneTempPredictorCorrector {
                     ShowSevereError(state,
                                     format("CalcZoneAirTempSetpoints: Illegal control type for Zone={}, Found value={}, in Schedule={}",
                                            state.dataHeatBal->Zone(ActualZoneNum).Name,
-                                           TempControlType(ActualZoneNum),
+                                           state.dataHeatBalFanSys->TempControlType(ActualZoneNum),
                                            state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).ControlTypeSchedName));
                 }
             }
@@ -3933,9 +3924,9 @@ namespace ZoneTempPredictorCorrector {
                             offsetUpdated = rSchVal * FaultsThermostatOffset(iFault).Offset;
 
                             // Positive offset means the sensor reading is higher than the actual value
-                            TempZoneThermostatSetPoint(ActualZoneNum) -= offsetUpdated;
-                            ZoneThermostatSetPointLo(ActualZoneNum) -= offsetUpdated;
-                            ZoneThermostatSetPointHi(ActualZoneNum) -= offsetUpdated;
+                            state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) -= offsetUpdated;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) -= offsetUpdated;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) -= offsetUpdated;
                         }
 
                         // Stop searching the FaultsThermostatOffset object for the zone
@@ -3978,7 +3969,7 @@ namespace ZoneTempPredictorCorrector {
         LoadToCoolingSetPoint = 0.0;
 
         {
-            auto const SELECT_CASE_var(TempControlType(ZoneNum));
+            auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
             if (SELECT_CASE_var == 0) {
                 // Uncontrolled Zone
@@ -3988,26 +3979,26 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
-                // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
+                // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
                 if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                    LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     // Exact solution
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
-                        LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     } else {
-                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / AIRRAT(ZoneNum))));
+                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / state.dataHeatBalFanSys->AIRRAT(ZoneNum))));
                         LoadToHeatingSetPoint =
-                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                    LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
-                        state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                        state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
-                ZoneSetPoint = TempZoneThermostatSetPoint(ZoneNum);
+                ZoneSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                 LoadToCoolingSetPoint = LoadToHeatingSetPoint;
                 // for consistency with the other cases, use LE instead of LT and don't subtract 1.0 Watt as a way of pushing the zero load
                 // case over the threshold
@@ -4015,28 +4006,28 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
 
-                // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
-                        LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     } else {
-                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / AIRRAT(ZoneNum))));
+                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / state.dataHeatBalFanSys->AIRRAT(ZoneNum))));
                         LoadToCoolingSetPoint =
-                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                    LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
-                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (state.dataHeatBal->Zone(ZoneNum).HasAdjustedReturnTempByITE && !(state.dataGlobal->BeginSimFlag)) {
                     LoadToCoolingSetPoint = state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).AdjustedReturnTempByITE - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
-                ZoneSetPoint = TempZoneThermostatSetPoint(ZoneNum);
+                ZoneSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                 LoadToHeatingSetPoint = LoadToCoolingSetPoint;
                 // for consistency with the other cases, use GE instead of GT and don't add 1.0 Watt as a way of pushing the zero load
                 // case over the threshold
@@ -4044,32 +4035,32 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
 
-                // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-                // PH 3/2/04      !LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      !LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
-                    LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                    LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                    LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     // Exact solution
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
-                        LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
-                        LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     } else {
-                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / AIRRAT(ZoneNum))));
+                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / state.dataHeatBalFanSys->AIRRAT(ZoneNum))));
                         LoadToHeatingSetPoint =
-                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         LoadToCoolingSetPoint =
-                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                    LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
-                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
-                    LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) +
-                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
-                ZoneSetPoint = TempZoneThermostatSetPoint(ZoneNum);
+                ZoneSetPoint = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum);
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
 
@@ -4097,7 +4088,7 @@ namespace ZoneTempPredictorCorrector {
                         state, format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
                     ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum)));
                     ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum)));
-                    ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", TempZoneThermostatSetPoint(ZoneNum)));
+                    ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)));
                     ShowFatalError(state, "Program terminates due to above conditions.");
                 }
 
@@ -4109,8 +4100,8 @@ namespace ZoneTempPredictorCorrector {
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
                         ZoneSetPoint = Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
-                        ZoneSetPoint = max(ZoneSetPoint, ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
-                        ZoneSetPoint = min(ZoneSetPoint, ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
+                        ZoneSetPoint = max(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
+                        ZoneSetPoint = min(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
                     state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // this should never occur!
@@ -4121,34 +4112,34 @@ namespace ZoneTempPredictorCorrector {
                         state, format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
                     ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum)));
                     ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum)));
-                    ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", TempZoneThermostatSetPoint(ZoneNum)));
+                    ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)));
                     ShowFatalError(state, "Program terminates due to above conditions.");
                 }
 
             } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
 
                 if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
-                    LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                    LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                    LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     // Exact solution
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
-                        LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
-                        LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     } else {
-                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / AIRRAT(ZoneNum))));
+                        Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / state.dataHeatBalFanSys->AIRRAT(ZoneNum))));
                         LoadToHeatingSetPoint =
-                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         LoadToCoolingSetPoint =
-                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                             state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
                 } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                    LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
-                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
-                    LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
-                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                    LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                            state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                 }
                 if (RAFNFrac > 0.0) LoadToHeatingSetPoint = LoadToHeatingSetPoint / RAFNFrac;
                 if (RAFNFrac > 0.0) LoadToCoolingSetPoint = LoadToCoolingSetPoint / RAFNFrac;
@@ -4172,24 +4163,24 @@ namespace ZoneTempPredictorCorrector {
                         state, format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
                     ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum)));
                     ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum)));
-                    ShowContinueError(state, format("Zone Heating ThermostatSetPoint={:.2R}", ZoneThermostatSetPointLo(ZoneNum)));
-                    ShowContinueError(state, format("Zone Cooling ThermostatSetPoint={:.2R}", ZoneThermostatSetPointHi(ZoneNum)));
+                    ShowContinueError(state, format("Zone Heating ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)));
+                    ShowContinueError(state, format("Zone Cooling ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)));
                     ShowFatalError(state, "Program terminates due to above conditions.");
                 }
 
                 if (LoadToHeatingSetPoint > 0.0 && LoadToCoolingSetPoint > 0.0) {
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
-                    ZoneSetPoint = ZoneThermostatSetPointLo(ZoneNum);
+                    ZoneSetPoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
                 } else if (LoadToHeatingSetPoint < 0.0 && LoadToCoolingSetPoint < 0.0) {
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
-                    ZoneSetPoint = ZoneThermostatSetPointHi(ZoneNum);
+                    ZoneSetPoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
                 } else if (LoadToHeatingSetPoint <= 0.0 && LoadToCoolingSetPoint >= 0.0) { // deadband includes zero loads
                     // this turns out to cause instabilities sometimes? that lead to setpoint errors if predictor is off.
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
                         ZoneSetPoint = Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
-                        ZoneSetPoint = max(ZoneSetPoint, ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
-                        ZoneSetPoint = min(ZoneSetPoint, ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
+                        ZoneSetPoint = max(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
+                        ZoneSetPoint = min(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
                     state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // this should never occur!
@@ -4198,11 +4189,11 @@ namespace ZoneTempPredictorCorrector {
                     ShowContinueErrorTimeStamp(state, "occurs in Zone=" + state.dataHeatBal->Zone(ZoneNum).Name);
                     ShowContinueError(
                         state, format("LoadToHeatingSetPoint={:.3R}, LoadToCoolingSetPoint={:.3R}", LoadToHeatingSetPoint, LoadToCoolingSetPoint));
-                    ShowContinueError(state, format("Zone Heating Set-point={:.2R}", ZoneThermostatSetPointLo(ZoneNum)));
-                    ShowContinueError(state, format("Zone Cooling Set-point={:.2R}", ZoneThermostatSetPointHi(ZoneNum)));
+                    ShowContinueError(state, format("Zone Heating Set-point={:.2R}", state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)));
+                    ShowContinueError(state, format("Zone Cooling Set-point={:.2R}", state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)));
                     ShowContinueError(state, format("Zone TempDepZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum)));
                     ShowContinueError(state, format("Zone TempIndZnLd={:.2R}", state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum)));
-                    ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", TempZoneThermostatSetPoint(ZoneNum)));
+                    ShowContinueError(state, format("Zone ThermostatSetPoint={:.2R}", state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum)));
 
                     ShowFatalError(state, "Program terminates due to above conditions.");
                 }
@@ -4218,49 +4209,49 @@ namespace ZoneTempPredictorCorrector {
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = 0.0;
                     if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
                         ZoneSetPoint = Node(state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber).Temp;
-                        ZoneSetPoint = max(ZoneSetPoint, ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
-                        ZoneSetPoint = min(ZoneSetPoint, ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
+                        ZoneSetPoint = max(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)); // trap out of deadband
+                        ZoneSetPoint = min(ZoneSetPoint, state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)); // trap out of deadband
                     }
                     state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else if (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).StageNum < 0) { // Cooling load
                     if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                        LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                        LoadToCoolingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                     } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                         if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
-                            LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                            LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         } else {
-                            Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / AIRRAT(ZoneNum))));
+                            Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / state.dataHeatBalFanSys->AIRRAT(ZoneNum))));
                             LoadToCoolingSetPoint =
-                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         }
                     } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                        LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointHi(ZoneNum) - ZoneT1(ZoneNum)) +
-                                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointHi(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToCoolingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToCoolingSetPoint;
-                    ZoneSetPoint = ZoneThermostatSetPointHi(ZoneNum);
+                    ZoneSetPoint = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum);
                     LoadToHeatingSetPoint = LoadToCoolingSetPoint;
                     if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) >= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 } else { // Heating load
                     if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
-                        LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
+                        LoadToHeatingSetPoint = (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum));
                         // Exact solution
                     } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                         if (state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) == 0.0) { // B=0
-                            LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                            LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         } else {
-                            Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / AIRRAT(ZoneNum))));
+                            Real64 const exp_700_TA(std::exp(min(700.0, -state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) / state.dataHeatBalFanSys->AIRRAT(ZoneNum))));
                             LoadToHeatingSetPoint =
-                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
+                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum) * exp_700_TA) / (1.0 - exp_700_TA) -
                                 state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                         }
                     } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                        LoadToHeatingSetPoint = AIRRAT(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum) - ZoneT1(ZoneNum)) +
-                                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
+                        LoadToHeatingSetPoint = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)) +
+                                                state.dataZoneTempPredictorCorrector->TempDepZnLd(ZoneNum) * (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) - state.dataZoneTempPredictorCorrector->TempIndZnLd(ZoneNum);
                     }
                     state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired = LoadToHeatingSetPoint;
-                    ZoneSetPoint = ZoneThermostatSetPointLo(ZoneNum);
+                    ZoneSetPoint = state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum);
                     LoadToCoolingSetPoint = LoadToHeatingSetPoint;
                     if ((state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired) <= 0.0) state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum) = true;
                 }
@@ -4279,7 +4270,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         state.dataZoneTempPredictorCorrector->ZoneSetPointLast(ZoneNum) = ZoneSetPoint;
-        TempZoneThermostatSetPoint(ZoneNum) = ZoneSetPoint; // needed to fix Issue # 5048
+        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = ZoneSetPoint; // needed to fix Issue # 5048
         state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
 
         // Apply the Zone Multiplier and Load Correction factor as needed
@@ -4288,7 +4279,7 @@ namespace ZoneTempPredictorCorrector {
                                           state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP,
                                           state.dataHeatBal->SNLoadPredictedRate(ZoneNum),state.dataHeatBal->SNLoadPredictedHSPRate(ZoneNum),state.dataHeatBal->SNLoadPredictedCSPRate(ZoneNum),
                                           LoadToHeatingSetPoint,LoadToCoolingSetPoint,
-                                          LoadCorrectionFactor(ZoneNum),state.dataHeatBal->Zone(ZoneNum).Multiplier,state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
+                                          state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum),state.dataHeatBal->Zone(ZoneNum).Multiplier,state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
         if (allocated(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).SequencedOutputRequired))
@@ -4349,8 +4340,6 @@ namespace ZoneTempPredictorCorrector {
         // Using/Aliasing
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
-        using DataSurfaces::Surface;
-
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -4389,7 +4378,7 @@ namespace ZoneTempPredictorCorrector {
         // Check all the controlled zones to see if it matches the zone simulated
         for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= state.dataZoneCtrls->NumHumidityControlZones; ++HumidControlledZoneNum) {
             if (state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ActualZoneNum != ZoneNum) continue;
-            ZoneAirRH = PsyRhFnTdbWPb(state, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
+            ZoneAirRH = PsyRhFnTdbWPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress) * 100.0;
             ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).HumidifyingSchedIndex);
             ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue(state, state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).DehumidifyingSchedIndex);
 
@@ -4458,13 +4447,13 @@ namespace ZoneTempPredictorCorrector {
                             if (offsetThermostat != 0.0) {
                                 // Calculate the humidistat offset value from the thermostat offset value
                                 faultZoneWHumidifyingSetPoint =
-                                    PsyWFnTdbRhPb(state, (MAT(ZoneNum) + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                    PsyWFnTdbRhPb(state, (state.dataHeatBalFanSys->MAT(ZoneNum) + offsetThermostat), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 faultZoneWDehumidifyingSetPoint =
-                                    PsyWFnTdbRhPb(state, (MAT(ZoneNum) + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
+                                    PsyWFnTdbRhPb(state, (state.dataHeatBalFanSys->MAT(ZoneNum) + offsetThermostat), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress);
                                 offsetZoneRHHumidifyingSetPoint =
-                                    ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb(state, MAT(ZoneNum), faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
+                                    ZoneRHHumidifyingSetPoint - PsyRhFnTdbWPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), faultZoneWHumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
                                 offsetZoneRHDehumidifyingSetPoint =
-                                    ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb(state, MAT(ZoneNum), faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
+                                    ZoneRHDehumidifyingSetPoint - PsyRhFnTdbWPb(state, state.dataHeatBalFanSys->MAT(ZoneNum), faultZoneWDehumidifyingSetPoint, state.dataEnvrn->OutBaroPress) * 100.0;
 
                                 // Apply the calculated humidistat offset value
                                 // Positive offset means the sensor reading is higher than the actual value
@@ -4531,7 +4520,7 @@ namespace ZoneTempPredictorCorrector {
 
             // Calculate hourly humidity ratio from infiltration + humidity added from latent load
             // to determine system added/subtracted moisture.
-            LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
+            LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
             SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
 
@@ -4542,21 +4531,21 @@ namespace ZoneTempPredictorCorrector {
 
             // if no surface in the zone uses EMPD or HAMT then zero
             bool no_ht_EMPD_or_HAMT(true);
-            for (int i = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).SurfaceLast; i <= e; ++i) {
-                auto const &htAlgo(Surface(i).HeatTransferAlgorithm);
+            for (int i = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
+                auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
                 if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
                     no_ht_EMPD_or_HAMT = false;
                     break;
                 }
             }
             if (no_ht_EMPD_or_HAMT) {
-                SumHmARaW(ZoneNum) = 0.0;
-                SumHmARa(ZoneNum) = 0.0;
+                state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
+                state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
             }
 
             // The density of air and latent heat of vaporization are calculated as functions.
-            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
-            H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
+            RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
+            H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->ZT(ZoneNum));
 
             // Assume that the system will have flow
             if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
@@ -4565,14 +4554,14 @@ namespace ZoneTempPredictorCorrector {
                  AirflowNetwork::AirflowNetworkFanActivated)) {
                 // Multizone airflow calculated in AirflowNetwork
                 B = (LatentGain / H2OHtOfVap) + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW +
-                    state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW + SumHmARaW(ZoneNum);
+                    state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW + state.dataHeatBalFanSys->SumHmARaW(ZoneNum);
                 A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr +
-                    SumHmARa(ZoneNum);
+                        state.dataHeatBalFanSys->SumHmARa(ZoneNum);
             } else {
-                B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
-                    SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
-                A = OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
-                    MDotOA(ZoneNum);
+                B = (LatentGain / H2OHtOfVap) + ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) +
+                        state.dataHeatBalFanSys->SumHmARaW(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                A = state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
+                        state.dataHeatBalFanSys->MDotOA(ZoneNum);
             }
             C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
@@ -4592,39 +4581,39 @@ namespace ZoneTempPredictorCorrector {
             // this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
             // the amount of moisture that must be removed by the system.
             // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
-            WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+            WZoneSetPoint = PsyWFnTdbRhPb(state, state.dataHeatBalFanSys->ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
             Real64 exp_700_A_C(0.0);
             if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToHumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
-                                         (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
-                                                   (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum)));
+                                         (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
+                                                   (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum)));
                 // Exact solution
             } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                 if (A == 0.0) { // B=0
-                    LoadToHumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) - B;
+                    LoadToHumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) - B;
                 } else {
                     exp_700_A_C = std::exp(min(700.0, -A / C)); // Tuned Save expensive value
-                    LoadToHumidifySetPoint = A * (WZoneSetPoint - ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
+                    LoadToHumidifySetPoint = A * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B;
                 }
             } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                LoadToHumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
+                LoadToHumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
             }
             if (RAFNFrac > 0.0) LoadToHumidifySetPoint = LoadToHumidifySetPoint / RAFNFrac;
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
-            WZoneSetPoint = PsyWFnTdbRhPb(state, ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
+            WZoneSetPoint = PsyWFnTdbRhPb(state, state.dataHeatBalFanSys->ZT(ZoneNum), (ZoneRHDehumidifyingSetPoint / 100.0), state.dataEnvrn->OutBaroPress, RoutineName);
             if (state.dataHeatBal->ZoneAirSolutionAlgo == Use3rdOrder) {
                 LoadToDehumidifySetPoint = ((11.0 / 6.0) * C + A) * WZoneSetPoint -
-                                           (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
-                                                     (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum)));
+                                           (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
+                                                     (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum)));
                 // Exact solution
             } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                 if (A == 0.0) { // B=0
-                    LoadToDehumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) - B;
+                    LoadToDehumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) - B;
                 } else {
-                    LoadToDehumidifySetPoint = A * (WZoneSetPoint - ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
+                    LoadToDehumidifySetPoint = A * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum) * exp_700_A_C) / (1.0 - exp_700_A_C) - B; // exp_700_A_C set above
                 }
             } else if (state.dataHeatBal->ZoneAirSolutionAlgo == UseEulerMethod) {
-                LoadToDehumidifySetPoint = C * (WZoneSetPoint - ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
+                LoadToDehumidifySetPoint = C * (WZoneSetPoint - state.dataHeatBalFanSys->ZoneW1(ZoneNum)) + A * WZoneSetPoint - B;
             }
             if (RAFNFrac > 0.0) LoadToDehumidifySetPoint = LoadToDehumidifySetPoint / RAFNFrac;
             state.dataZoneEnergyDemand->ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
@@ -4761,28 +4750,28 @@ namespace ZoneTempPredictorCorrector {
                 if (NumOfSysTimeSteps != NumOfSysTimeStepsLastZoneTimeStep) { // cannot reuse existing DS data, interpolate from zone time
                     DownInterpolate4HistoryValues(PriorTimeStep,
                                                   TimeStepSys,
-                                                  MAT(ZoneNum),
-                                                  XMAT(ZoneNum),
-                                                  XM2T(ZoneNum),
-                                                  XM3T(ZoneNum),
-                                                  XM4T(ZoneNum),
-                                                  MAT(ZoneNum),
-                                                  DSXMAT(ZoneNum),
-                                                  DSXM2T(ZoneNum),
-                                                  DSXM3T(ZoneNum),
-                                                  DSXM4T(ZoneNum));
+                                                  state.dataHeatBalFanSys->MAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->XMAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM2T(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM3T(ZoneNum),
+                                                  state.dataHeatBalFanSys->XM4T(ZoneNum),
+                                                  state.dataHeatBalFanSys->MAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXMAT(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXM2T(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXM3T(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSXM4T(ZoneNum));
                     DownInterpolate4HistoryValues(PriorTimeStep,
                                                   TimeStepSys,
-                                                  ZoneAirHumRat(ZoneNum),
-                                                  WZoneTimeMinus1(ZoneNum),
-                                                  WZoneTimeMinus2(ZoneNum),
-                                                  WZoneTimeMinus3(ZoneNum),
-                                                  WZoneTimeMinus4(ZoneNum),
-                                                  ZoneAirHumRat(ZoneNum),
-                                                  DSWZoneTimeMinus1(ZoneNum),
-                                                  DSWZoneTimeMinus2(ZoneNum),
-                                                  DSWZoneTimeMinus3(ZoneNum),
-                                                  DSWZoneTimeMinus4(ZoneNum));
+                                                  state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum),
+                                                  state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum),
+                                                  state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum),
+                                                  state.dataHeatBalFanSys->DSWZoneTimeMinus4(ZoneNum));
                     if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                         DownInterpolate4HistoryValues(PriorTimeStep,
                                                       TimeStepSys,
@@ -4857,28 +4846,28 @@ namespace ZoneTempPredictorCorrector {
 
             // now update the variables actually used in the balance equations.
             if (!UseZoneTimeStepHistory) {
-                ZTM1(ZoneNum) = DSXMAT(ZoneNum);
-                ZTM2(ZoneNum) = DSXM2T(ZoneNum);
-                ZTM3(ZoneNum) = DSXM3T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM1(ZoneNum) = state.dataHeatBalFanSys->DSXMAT(ZoneNum);
+                state.dataHeatBalFanSys->ZTM2(ZoneNum) = state.dataHeatBalFanSys->DSXM2T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM3(ZoneNum) = state.dataHeatBalFanSys->DSXM3T(ZoneNum);
 
-                WZoneTimeMinus1Temp(ZoneNum) = DSWZoneTimeMinus1(ZoneNum);
-                WZoneTimeMinus2Temp(ZoneNum) = DSWZoneTimeMinus2(ZoneNum);
-                WZoneTimeMinus3Temp(ZoneNum) = DSWZoneTimeMinus3(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum);
             } else {
-                ZTM1(ZoneNum) = XMAT(ZoneNum);
-                ZTM2(ZoneNum) = XM2T(ZoneNum);
-                ZTM3(ZoneNum) = XM3T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM1(ZoneNum) = state.dataHeatBalFanSys->XMAT(ZoneNum);
+                state.dataHeatBalFanSys->ZTM2(ZoneNum) = state.dataHeatBalFanSys->XM2T(ZoneNum);
+                state.dataHeatBalFanSys->ZTM3(ZoneNum) = state.dataHeatBalFanSys->XM3T(ZoneNum);
 
-                WZoneTimeMinus1Temp(ZoneNum) = WZoneTimeMinus1(ZoneNum);
-                WZoneTimeMinus2Temp(ZoneNum) = WZoneTimeMinus2(ZoneNum);
-                WZoneTimeMinus3Temp(ZoneNum) = WZoneTimeMinus3(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
+                state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
             }
 
-            AIRRAT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
-                              PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
-                              PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
+            state.dataHeatBalFanSys->AIRRAT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens *
+                              PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName) *
+                              PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) / (TimeStepSys * DataGlobalConstants::SecInHour);
 
-            AirCap = AIRRAT(ZoneNum);
+            AirCap = state.dataHeatBalFanSys->AIRRAT(ZoneNum);
 
             ManageAirModel(state, ZoneNum);
 
@@ -4900,7 +4889,7 @@ namespace ZoneTempPredictorCorrector {
                 // Heat balance coefficients for controlled zone, i.e. with system air flow
                 TempDepCoef = SumHA + SumMCp + SumSysMCp;
                 TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
-                              (NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum));
+                              (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
                 //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
@@ -4912,80 +4901,80 @@ namespace ZoneTempPredictorCorrector {
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
-                        ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum))) /
+                        state.dataHeatBalFanSys->ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
                                       ((11.0 / 6.0) * AirCap + TempDepCoef);
                         // Exact solution
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
-                            ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                            state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZT(ZoneNum) = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            state.dataHeatBalFanSys->ZT(ZoneNum) = (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
                                           TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
-                        ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        state.dataHeatBalFanSys->ZT(ZoneNum) = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                     }
                 }
                 // Update zone node temperature and thermostat temperature unless already updated in Room Air Model,
                 // calculate load correction factor
                 if ((state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mixing) || (!state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel)) {
                     // Fully mixed
-                    Node(ZoneNodeNum).Temp = ZT(ZoneNum);
-                    TempTstatAir(ZoneNum) = ZT(ZoneNum);
-                    LoadCorrectionFactor(ZoneNum) = 1.0;
+                    Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                 } else if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                     // UCSDDV: Not fully mixed - calculate factor to correct load for fully mixed assumption
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
-                        if (std::abs(TempSupplyAir - ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
-                            LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - ZT(ZoneNum));
+                        if (std::abs(TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum));
                             // constrain value to something reasonable
-                            LoadCorrectionFactor(ZoneNum) = max(-3.0, LoadCorrectionFactor(ZoneNum));
-                            LoadCorrectionFactor(ZoneNum) = min(3.0, LoadCorrectionFactor(ZoneNum));
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = max(-3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = min(3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
 
                         } else {
-                            LoadCorrectionFactor(ZoneNum) = 1.0; // Indeterminate
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0; // Indeterminate
                         }
                     } else {
                         // Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
-                        LoadCorrectionFactor(ZoneNum) = 1.0;
+                        state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                     }
                 } else if (state.dataRoomAirMod->AirModel(ZoneNum).SimAirModel &&
                            ((state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UserDefined) || (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::Mundt))) {
                     if (SumSysMCp > SmallMassFlow) {
                         TempSupplyAir = SumSysMCpT / SumSysMCp; // Non-negligible flow, calculate supply air temperature
-                        if (std::abs(TempSupplyAir - ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
-                            LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - ZT(ZoneNum));
+                        if (std::abs(TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum)) > state.dataHeatBal->TempConvergTol) {
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = (TempSupplyAir - Node(ZoneNodeNum).Temp) / (TempSupplyAir - state.dataHeatBalFanSys->ZT(ZoneNum));
                             // constrain value
-                            LoadCorrectionFactor(ZoneNum) = max(-3.0, LoadCorrectionFactor(ZoneNum));
-                            LoadCorrectionFactor(ZoneNum) = min(3.0, LoadCorrectionFactor(ZoneNum));
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = max(-3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = min(3.0, state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum));
 
                         } else {
-                            LoadCorrectionFactor(ZoneNum) = 1.0; // Indeterminate
+                            state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0; // Indeterminate
                         }
                     } else {
                         // Negligible flow, assume mixed - reasonable lagged starting value for first step time with significant flow
-                        LoadCorrectionFactor(ZoneNum) = 1.0;
+                        state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                     }
                 } else if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
                     // Zone node used in the RoomAirflowNetwork model
-                    ZT(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
-                    Node(ZoneNodeNum).Temp = ZT(ZoneNum);
-                    TempTstatAir(ZoneNum) = ZT(ZoneNum);
-                    LoadCorrectionFactor(ZoneNum) = 1.0;
+                    state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
+                    Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                 } else {
-                    Node(ZoneNodeNum).Temp = ZT(ZoneNum);
-                    TempTstatAir(ZoneNum) = ZT(ZoneNum);
-                    LoadCorrectionFactor(ZoneNum) = 1.0;
+                    Node(ZoneNodeNum).Temp = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->TempTstatAir(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
+                    state.dataHeatBalFanSys->LoadCorrectionFactor(ZoneNum) = 1.0;
                 }
 
                 // Sensible load is the enthalpy into the zone minus the enthalpy that leaves the zone.
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 ZoneEnthalpyIn = SumSysMCpT;
 
                 // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
                 SNLoad = ZoneEnthalpyIn - (Node(ZoneNodeNum).MassFlowRate / ZoneMult) * CpAir * Node(ZoneNodeNum).Temp +
-                         NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum);
+                        state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum);
 
             } else {
 
@@ -5005,23 +4994,23 @@ namespace ZoneTempPredictorCorrector {
                 {
                     auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
                     if (SELECT_CASE_var == Use3rdOrder) {
-                        ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * ZTM1(ZoneNum) - (3.0 / 2.0) * ZTM2(ZoneNum) + (1.0 / 3.0) * ZTM3(ZoneNum))) /
+                        state.dataHeatBalFanSys->ZT(ZoneNum) = (TempIndCoef + AirCap * (3.0 * state.dataHeatBalFanSys->ZTM1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->ZTM2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->ZTM3(ZoneNum))) /
                                       ((11.0 / 6.0) * AirCap + TempDepCoef);
                         // Exact solution
                     } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                         if (TempDepCoef == 0.0) { // B=0
-                            ZT(ZoneNum) = ZoneT1(ZoneNum) + TempIndCoef / AirCap;
+                            state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef / AirCap;
                         } else {
-                            ZT(ZoneNum) = (ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
+                            state.dataHeatBalFanSys->ZT(ZoneNum) = (state.dataHeatBalFanSys->ZoneT1(ZoneNum) - TempIndCoef / TempDepCoef) * std::exp(min(700.0, -TempDepCoef / AirCap)) +
                                           TempIndCoef / TempDepCoef;
                         }
                     } else if (SELECT_CASE_var == UseEulerMethod) {
-                        ZT(ZoneNum) = (AirCap * ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
+                        state.dataHeatBalFanSys->ZT(ZoneNum) = (AirCap * state.dataHeatBalFanSys->ZoneT1(ZoneNum) + TempIndCoef) / (AirCap + TempDepCoef);
                     }
                 }
 
                 if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-                    ZT(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
+                    state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).AirTemp;
                 }
 
                 // No sensible load
@@ -5036,7 +5025,7 @@ namespace ZoneTempPredictorCorrector {
                     state, ZoneNum, SumIntGain, SumIntGainExceptPeople, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, AirCap);
             }
 
-            MAT(ZoneNum) = ZT(ZoneNum);
+            state.dataHeatBalFanSys->MAT(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
 
             // Determine sensible load heating/cooling rate and energy
             state.dataHeatBal->SNLoadHeatRate(ZoneNum) = max(SNLoad, 0.0);
@@ -5047,8 +5036,8 @@ namespace ZoneTempPredictorCorrector {
             // Final humidity calcs
             CorrectZoneHumRat(state, ZoneNum);
 
-            ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, RoutineName);
+            state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, RoutineName);
 
             // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
             {
@@ -5059,17 +5048,17 @@ namespace ZoneTempPredictorCorrector {
                             ZoneTempChange =
                                 max(ZoneTempChange, max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->ZTM1OC(ZoneNum)), std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->ZTM1MX(ZoneNum))));
                         } else {
-                            ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZTM1(ZoneNum)));
+                            ZoneTempChange = max(ZoneTempChange, std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
                         }
                     } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                         if (state.dataRoomAirMod->ZoneUFMixedFlag(ZoneNum) == 0) {
                             ZoneTempChange =
                                 max(ZoneTempChange, max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->ZTM1OC(ZoneNum)), std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->ZTM1MX(ZoneNum))));
                         } else {
-                            ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZTM1(ZoneNum)));
+                            ZoneTempChange = max(ZoneTempChange, std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
                         }
                     } else {
-                        ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZTM1(ZoneNum)));
+                        ZoneTempChange = max(ZoneTempChange, std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)));
                     }
                 } else if ((SELECT_CASE_var == UseAnalyticalSolution) || (SELECT_CASE_var == UseEulerMethod)) {
                     if (state.dataRoomAirMod->IsZoneDV(ZoneNum)) {
@@ -5077,17 +5066,17 @@ namespace ZoneTempPredictorCorrector {
                             ZoneTempChange =
                                 max(ZoneTempChange, max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->Zone1OC(ZoneNum)), std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->Zone1MX(ZoneNum))));
                         } else {
-                            ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
+                            ZoneTempChange = max(ZoneTempChange, std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)));
                         }
                     } else if (state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                         if (state.dataRoomAirMod->ZoneUFMixedFlag(ZoneNum) == 0) {
                             ZoneTempChange =
                                 max(ZoneTempChange, max(std::abs(state.dataRoomAirMod->ZTOC(ZoneNum) - state.dataRoomAirMod->Zone1OC(ZoneNum)), std::abs(state.dataRoomAirMod->ZTMX(ZoneNum) - state.dataRoomAirMod->Zone1MX(ZoneNum))));
                         } else {
-                            ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
+                            ZoneTempChange = max(ZoneTempChange, std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)));
                         }
                     } else {
-                        ZoneTempChange = max(ZoneTempChange, std::abs(ZT(ZoneNum) - ZoneT1(ZoneNum)));
+                        ZoneTempChange = max(ZoneTempChange, std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum)));
                     }
                 }
             }
@@ -5132,20 +5121,20 @@ namespace ZoneTempPredictorCorrector {
         // Push the temperature and humidity ratio histories
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            XM4T(ZoneNum) = XM3T(ZoneNum);
-            XM3T(ZoneNum) = XM2T(ZoneNum);
-            XM2T(ZoneNum) = XMAT(ZoneNum);
-            XMAT(ZoneNum) = ZTAV(ZoneNum); // using average for whole zone time step.
-            XMPT(ZoneNum) = ZT(ZoneNum);
-            //      MAT(ZoneNum)  = ZT(ZoneNum)
+            state.dataHeatBalFanSys->XM4T(ZoneNum) = state.dataHeatBalFanSys->XM3T(ZoneNum);
+            state.dataHeatBalFanSys->XM3T(ZoneNum) = state.dataHeatBalFanSys->XM2T(ZoneNum);
+            state.dataHeatBalFanSys->XM2T(ZoneNum) = state.dataHeatBalFanSys->XMAT(ZoneNum);
+            state.dataHeatBalFanSys->XMAT(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum); // using average for whole zone time step.
+            state.dataHeatBalFanSys->XMPT(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
+            //      state.dataHeatBalFanSys->MAT(ZoneNum)  = ZT(ZoneNum)
 
-            WZoneTimeMinus4(ZoneNum) = WZoneTimeMinus3(ZoneNum);
-            WZoneTimeMinus3(ZoneNum) = WZoneTimeMinus2(ZoneNum);
-            WZoneTimeMinus2(ZoneNum) = WZoneTimeMinus1(ZoneNum);
-            WZoneTimeMinus1(ZoneNum) = ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
-            ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            WZoneTimeMinusP(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
+            state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
+            state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinusP(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(state, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress, CorrectZoneAirTemp);
 
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
                 state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
@@ -5184,10 +5173,10 @@ namespace ZoneTempPredictorCorrector {
             }
 
             if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
-                ZoneTM2(ZoneNum) = ZoneTMX(ZoneNum);
-                ZoneTMX(ZoneNum) = ZTAV(ZoneNum); // using average for whole zone time step.
-                ZoneWM2(ZoneNum) = ZoneWMX(ZoneNum);
-                ZoneWMX(ZoneNum) = ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
+                state.dataHeatBalFanSys->ZoneTM2(ZoneNum) = state.dataHeatBalFanSys->ZoneTMX(ZoneNum);
+                state.dataHeatBalFanSys->ZoneTMX(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum); // using average for whole zone time step.
+                state.dataHeatBalFanSys->ZoneWM2(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
+                state.dataHeatBalFanSys->ZoneWMX(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum); // using average for whole zone time step.
                 if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
                     state.dataRoomAirMod->ZoneM2Floor(ZoneNum) = state.dataRoomAirMod->ZoneMXFloor(ZoneNum);
@@ -5202,11 +5191,11 @@ namespace ZoneTempPredictorCorrector {
                     for (LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2 = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
-                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX =
+                        //                        RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX =
                         // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWM2 = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWMX;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWMX = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRat;
-                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX =
+                        //                        RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX =
                         // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
                     }
                 }
@@ -5233,15 +5222,15 @@ namespace ZoneTempPredictorCorrector {
         // Push the temperature and humidity ratio histories back in time
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            DSXM4T(ZoneNum) = DSXM3T(ZoneNum);
-            DSXM3T(ZoneNum) = DSXM2T(ZoneNum);
-            DSXM2T(ZoneNum) = DSXMAT(ZoneNum);
-            DSXMAT(ZoneNum) = MAT(ZoneNum);
+            state.dataHeatBalFanSys->DSXM4T(ZoneNum) = state.dataHeatBalFanSys->DSXM3T(ZoneNum);
+            state.dataHeatBalFanSys->DSXM3T(ZoneNum) = state.dataHeatBalFanSys->DSXM2T(ZoneNum);
+            state.dataHeatBalFanSys->DSXM2T(ZoneNum) = state.dataHeatBalFanSys->DSXMAT(ZoneNum);
+            state.dataHeatBalFanSys->DSXMAT(ZoneNum) = state.dataHeatBalFanSys->MAT(ZoneNum);
 
-            DSWZoneTimeMinus4(ZoneNum) = DSWZoneTimeMinus3(ZoneNum);
-            DSWZoneTimeMinus3(ZoneNum) = DSWZoneTimeMinus2(ZoneNum);
-            DSWZoneTimeMinus2(ZoneNum) = DSWZoneTimeMinus1(ZoneNum);
-            DSWZoneTimeMinus1(ZoneNum) = ZoneAirHumRat(ZoneNum);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus4(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus3(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus2(ZoneNum) = state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum);
+            state.dataHeatBalFanSys->DSWZoneTimeMinus1(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum);
 
             if (state.dataRoomAirMod->IsZoneDV(ZoneNum) || state.dataRoomAirMod->IsZoneUI(ZoneNum)) {
                 state.dataRoomAirMod->DSXM4TFloor(ZoneNum) = state.dataRoomAirMod->DSXM3TFloor(ZoneNum);
@@ -5276,10 +5265,10 @@ namespace ZoneTempPredictorCorrector {
 
         if (state.dataHeatBal->ZoneAirSolutionAlgo != Use3rdOrder) {
             for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                ZoneTM2(ZoneNum) = ZoneTMX(ZoneNum);
-                ZoneTMX(ZoneNum) = MAT(ZoneNum); // using average for whole zone time step.
-                ZoneWM2(ZoneNum) = ZoneWMX(ZoneNum);
-                ZoneWMX(ZoneNum) = ZoneAirHumRatTemp(ZoneNum); // using average for whole zone time step.
+                state.dataHeatBalFanSys->ZoneTM2(ZoneNum) = state.dataHeatBalFanSys->ZoneTMX(ZoneNum);
+                state.dataHeatBalFanSys->ZoneTMX(ZoneNum) = state.dataHeatBalFanSys->MAT(ZoneNum); // using average for whole zone time step.
+                state.dataHeatBalFanSys->ZoneWM2(ZoneNum) = state.dataHeatBalFanSys->ZoneWMX(ZoneNum);
+                state.dataHeatBalFanSys->ZoneWMX(ZoneNum) = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum); // using average for whole zone time step.
 
                 if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
                         state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
@@ -5294,11 +5283,11 @@ namespace ZoneTempPredictorCorrector {
                     for (LoopNode = 1; LoopNode <= state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).NumOfAirNodes; ++LoopNode) {
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTM2 = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTempTMX = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).AirTemp;
-                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX =
+                        //                        RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempTMX =
                         // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).AirTempT1;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWM2 = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWMX;
                         state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRatWMX = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(LoopNode).HumRat;
-                        //						RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX =
+                        //                        RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatWMX =
                         // RoomAirflowNetworkZoneInfo( ZoneNum ).Node( LoopNode ).HumRatW1;
                     }
                 }
@@ -5324,15 +5313,15 @@ namespace ZoneTempPredictorCorrector {
         // REvert the temperature and humidity ratio histories
 
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            //  MAT(ZoneNum)  = XMAT(ZoneNum)
-            XMAT(ZoneNum) = XM2T(ZoneNum);
-            XM2T(ZoneNum) = XM3T(ZoneNum);
-            XM3T(ZoneNum) = XM4T(ZoneNum);
+            //  state.dataHeatBalFanSys->MAT(ZoneNum)  = state.dataHeatBalFanSys->XMAT(ZoneNum)
+            state.dataHeatBalFanSys->XMAT(ZoneNum) = state.dataHeatBalFanSys->XM2T(ZoneNum);
+            state.dataHeatBalFanSys->XM2T(ZoneNum) = state.dataHeatBalFanSys->XM3T(ZoneNum);
+            state.dataHeatBalFanSys->XM3T(ZoneNum) = state.dataHeatBalFanSys->XM4T(ZoneNum);
 
             //   ZoneAirHumRat(ZoneNum)  = WZoneTimeMinus1(ZoneNum)
-            WZoneTimeMinus1(ZoneNum) = WZoneTimeMinus2(ZoneNum);
-            WZoneTimeMinus2(ZoneNum) = WZoneTimeMinus3(ZoneNum);
-            WZoneTimeMinus3(ZoneNum) = WZoneTimeMinus4(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus1(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus2(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum);
+            state.dataHeatBalFanSys->WZoneTimeMinus3(ZoneNum) = state.dataHeatBalFanSys->WZoneTimeMinus4(ZoneNum);
 
             if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDDV || state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFI ||
                     state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::UCSDUFE) {
@@ -5386,8 +5375,6 @@ namespace ZoneTempPredictorCorrector {
         using DataLoopNode::Node;
         using DataSurfaces::HeatTransferModel_EMPD;
         using DataSurfaces::HeatTransferModel_HAMT;
-        using DataSurfaces::Surface;
-
         using InternalHeatGains::SumAllInternalConvectionGainsExceptPeople;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5476,10 +5463,10 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
-        LatentGain = ZoneLatentGain(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
+        LatentGain = state.dataHeatBalFanSys->ZoneLatentGain(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
 
         if (HybridModelZone(ZoneNum).PeopleCountCalc_H) {
-            LatentGainExceptPeople = ZoneLatentGainExceptPeople(ZoneNum) + SumLatentHTRadSys(ZoneNum) + SumLatentPool(ZoneNum);
+            LatentGainExceptPeople = state.dataHeatBalFanSys->ZoneLatentGainExceptPeople(ZoneNum) + state.dataHeatBalFanSys->SumLatentHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumLatentPool(ZoneNum);
         }
 
         SysTimeStepInSeconds = DataGlobalConstants::SecInHour * TimeStepSys;
@@ -5491,25 +5478,25 @@ namespace ZoneTempPredictorCorrector {
         // SumHmARaW and SumHmARa will be used with the moisture balance on the building elements and
         // are currently set to zero to remind us where they need to be in the future
         bool no_ht_EMPD_or_HAMT(true);
-        for (int i = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).SurfaceLast; i <= e; ++i) {
-            auto const &htAlgo(Surface(i).HeatTransferAlgorithm);
+        for (int i = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst, e = state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; i <= e; ++i) {
+            auto const &htAlgo(state.dataSurface->Surface(i).HeatTransferAlgorithm);
             if ((htAlgo == HeatTransferModel_EMPD) || (htAlgo == HeatTransferModel_HAMT)) {
                 no_ht_EMPD_or_HAMT = false;
                 break;
             }
         }
         if (no_ht_EMPD_or_HAMT) {
-            SumHmARaW(ZoneNum) = 0.0;
-            SumHmARa(ZoneNum) = 0.0;
+            state.dataHeatBalFanSys->SumHmARaW(ZoneNum) = 0.0;
+            state.dataHeatBalFanSys->SumHmARa(ZoneNum) = 0.0;
         }
 
-        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName);
-        H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum));
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), RoutineName);
+        H2OHtOfVap = PsyHgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->ZT(ZoneNum));
 
-        B = (LatentGain / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
-            (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
-        A = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
-            MDotOA(ZoneNum);
+        B = (LatentGain / H2OHtOfVap) + ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) +
+            (MoistureMassFlowRate) + state.dataHeatBalFanSys->SumHmARaW(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+        A = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
+                state.dataHeatBalFanSys->MDotOA(ZoneNum);
 
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
             AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
@@ -5518,9 +5505,9 @@ namespace ZoneTempPredictorCorrector {
             // Multizone airflow calculated in AirflowNetwork
             B = (LatentGain / H2OHtOfVap) +
                 (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrW + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrW) +
-                (MoistureMassFlowRate) + SumHmARaW(ZoneNum);
+                (MoistureMassFlowRate) + state.dataHeatBalFanSys->SumHmARaW(ZoneNum);
             A = ZoneMassFlowRate + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr +
-                state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr + SumHmARa(ZoneNum);
+                state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr + state.dataHeatBalFanSys->SumHmARa(ZoneNum);
         }
         C = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
 
@@ -5533,32 +5520,32 @@ namespace ZoneTempPredictorCorrector {
         {
             auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
-                ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * WZoneTimeMinus2Temp(ZoneNum) +
-                                                       (1.0 / 3.0) * WZoneTimeMinus3Temp(ZoneNum))) /
+                state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (B + C * (3.0 * state.dataHeatBalFanSys->WZoneTimeMinus1Temp(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->WZoneTimeMinus2Temp(ZoneNum) +
+                                                       (1.0 / 3.0) * state.dataHeatBalFanSys->WZoneTimeMinus3Temp(ZoneNum))) /
                                              ((11.0 / 6.0) * C + A);
                 // Exact solution
             } else if (SELECT_CASE_var == UseAnalyticalSolution) {
                 if (A == 0.0) { // B=0
-                    ZoneAirHumRatTemp(ZoneNum) = ZoneW1(ZoneNum) + B / C;
+                    state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B / C;
                 } else {
-                    ZoneAirHumRatTemp(ZoneNum) = (ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
+                    state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (state.dataHeatBalFanSys->ZoneW1(ZoneNum) - B / A) * std::exp(min(700.0, -A / C)) + B / A;
                 }
             } else if (SELECT_CASE_var == UseEulerMethod) {
-                ZoneAirHumRatTemp(ZoneNum) = (C * ZoneW1(ZoneNum) + B) / (C + A);
+                state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = (C * state.dataHeatBalFanSys->ZoneW1(ZoneNum) + B) / (C + A);
             }
         }
 
         // Set the humidity ratio to zero if the zone has been dried out
-        if (ZoneAirHumRatTemp(ZoneNum) < 0.0) ZoneAirHumRatTemp(ZoneNum) = 0.0;
+        if (state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) < 0.0) state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = 0.0;
 
         // Check to make sure that is saturated there is condensation in the zone
         // by resetting to saturation conditions.
-        WZSat = PsyWFnTdbRhPb(state, ZT(ZoneNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
+        WZSat = PsyWFnTdbRhPb(state, state.dataHeatBalFanSys->ZT(ZoneNum), 1.0, state.dataEnvrn->OutBaroPress, RoutineName);
 
-        if (ZoneAirHumRatTemp(ZoneNum) > WZSat) ZoneAirHumRatTemp(ZoneNum) = WZSat;
+        if (state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) > WZSat) state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = WZSat;
 
         if (state.dataRoomAirMod->AirModel(ZoneNum).AirModelType == DataRoomAirModel::RoomAirModel::AirflowNetwork) {
-            ZoneAirHumRatTemp(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).HumRat;
+            state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum) = state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).Node(state.dataRoomAirMod->RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID).HumRat;
         }
 
         // HybridModel with measured humidity ratio begins
@@ -5569,8 +5556,8 @@ namespace ZoneTempPredictorCorrector {
         // Now put the calculated info into the actual zone nodes; ONLY if there is zone air flow, i.e. controlled zone or plenum zone
         ZoneNodeNum = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
         if (ZoneNodeNum > 0) {
-            Node(ZoneNodeNum).HumRat = ZoneAirHumRatTemp(ZoneNum);
-            Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(ZT(ZoneNum), ZoneAirHumRatTemp(ZoneNum));
+            Node(ZoneNodeNum).HumRat = state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum);
+            Node(ZoneNodeNum).Enthalpy = PsyHFnTdbW(state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRatTemp(ZoneNum));
         }
     }
 
@@ -5716,7 +5703,7 @@ namespace ZoneTempPredictorCorrector {
             Real64 HMMultiplierAverage(1.0);
             Real64 MultpHM(1.0);
 
-            ZT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone
+            state.dataHeatBalFanSys->ZT(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature; // Array1D<Real64> ZT -- Zone
                                                                  // Air Temperature Averaged over
                                                                  // the System Time Increment
             if (HybridModelZone(ZoneNum).InfiltrationCalc_T && UseZoneTimeStepHistory) {
@@ -5737,17 +5724,17 @@ namespace ZoneTempPredictorCorrector {
                     SumSysMCp_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * CpAirInlet;
                     SumSysMCpT_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * CpAirInlet * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature;
 
-                    AA = SumSysMCp_HM + SumHA + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
-                    BB = SumSysMCpT_HM + SumIntGain + SumHATsurf - SumHATref + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) +
-                         MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp +
-                         (NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum));
+                    AA = SumSysMCp_HM + SumHA + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
+                    BB = SumSysMCpT_HM + SumIntGain + SumHATsurf - SumHATref + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
+                            state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp +
+                         (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
                 } else {
-                    AA = SumHA + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
-                    BB = SumIntGain + SumHATsurf - SumHATref + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) +
-                         MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+                    AA = SumHA + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
+                    BB = SumIntGain + SumHATsurf - SumHATref + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) +
+                            state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
                 }
                 CC = AirCap;
-                DD = (3.0 * PreviousMeasuredZT1(ZoneNum) - (3.0 / 2.0) * PreviousMeasuredZT2(ZoneNum) + (1.0 / 3.0) * PreviousMeasuredZT3(ZoneNum));
+                DD = (3.0 * state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->PreviousMeasuredZT2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredZT3(ZoneNum));
 
                 zone_M_T = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature;
                 delta_T = (state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature - state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp);
@@ -5771,12 +5758,12 @@ namespace ZoneTempPredictorCorrector {
             } // Hybrid model infiltration calcualtion end
 
             // Hybrid modeling internal thermal mass calcualtion start
-            if (HybridModelZone(ZoneNum).InternalThermalMassCalc_T && SumSysMCpT == 0 && ZT(ZoneNum) != PreviousMeasuredZT1(ZoneNum) &&
+            if (HybridModelZone(ZoneNum).InternalThermalMassCalc_T && SumSysMCpT == 0 && state.dataHeatBalFanSys->ZT(ZoneNum) != state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) &&
                 UseZoneTimeStepHistory) { // HM calculation only when SumSysMCpT =0,
                                           // TimeStepZone (not @ TimeStepSys)
                 TempDepCoef = SumHA + SumMCp + SumSysMCp;
                 TempIndCoef = SumIntGain + SumHATsurf - SumHATref + SumMCpT + SumSysMCpT +
-                              (NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum));
+                              (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
                 //    TempHistoryTerm = AirCap * (3.0 * ZTM1(ZoneNum) - (3.0/2.0) * ZTM2(ZoneNum) + (1.0/3.0) * ZTM3(ZoneNum)) !debug only
 
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
@@ -5786,27 +5773,27 @@ namespace ZoneTempPredictorCorrector {
                 if (TempDepCoef == 0.0) {
                     // Is this correct? Shouldn't we use log?? What if ZT(ZoneNum) ==
                     // PreviousMeasuredZT1(ZoneNum)??
-                    AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)); // Inverse equation
+                    AirCapHM = TempIndCoef / (state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum)); // Inverse equation
                 } else {
                     Real64 AirCapHM_temp = 0.0;
-                    if (TempIndCoef == TempDepCoef * ZT(ZoneNum)) {
+                    if (TempIndCoef == TempDepCoef * state.dataHeatBalFanSys->ZT(ZoneNum)) {
                         AirCapHM_temp = 0.0; //  This is the denominator.
                     } else {
-                        AirCapHM_temp = (TempIndCoef - TempDepCoef * PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * ZT(ZoneNum));
+                        AirCapHM_temp = (TempIndCoef - TempDepCoef * state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum)) / (TempIndCoef - TempDepCoef * state.dataHeatBalFanSys->ZT(ZoneNum));
                     }
 
                     if ((AirCapHM_temp > 0) && (AirCapHM_temp != 1)) {    // Avoide IND
                         AirCapHM = TempDepCoef / std::log(AirCapHM_temp); // Inverse equation
                     } else {
-                        AirCapHM = TempIndCoef / (ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum));
+                        AirCapHM = TempIndCoef / (state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum));
                     }
                 }
 
                 // Calculate multiplier
-                if (std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
+                if (std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                     MultpHM = AirCapHM /
-                              (state.dataHeatBal->Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                               PsyCpAirFnW(ZoneAirHumRat(ZoneNum))) *
+                              (state.dataHeatBal->Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->ZT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum)) *
+                               PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum))) *
                               (state.dataGlobal->TimeStepZone * DataGlobalConstants::SecInHour);      // Inverse equation
                     if ((MultpHM < 1.0) || (MultpHM > 30.0)) { // Temperature capacity multiplier greater than
                                                                // 1 and less than 30
@@ -5881,14 +5868,14 @@ namespace ZoneTempPredictorCorrector {
 
                     AA = SumSysMCp_HM + SumHA + SumMCp;
                     BB = SumSysMCpT_HM + SumIntGainExceptPeople + SumHATsurf - SumHATref + SumMCpT +
-                         (NonAirSystemResponse(ZoneNum) / ZoneMult + SysDepZoneLoadsLagged(ZoneNum));
+                         (state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) / ZoneMult + state.dataHeatBalFanSys->SysDepZoneLoadsLagged(ZoneNum));
                 } else {
                     AA = SumHA + SumMCp;
                     BB = SumIntGainExceptPeople + SumHATsurf - SumHATref + SumMCpT;
                 }
 
                 CC = AirCap;
-                DD = (3.0 * PreviousMeasuredZT1(ZoneNum) - (3.0 / 2.0) * PreviousMeasuredZT2(ZoneNum) + (1.0 / 3.0) * PreviousMeasuredZT3(ZoneNum));
+                DD = (3.0 * state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->PreviousMeasuredZT2(ZoneNum) + (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredZT3(ZoneNum));
 
                 SumIntGainPeople = ((11.0 / 6.0) * CC + AA) * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredTemperature - BB - CC * DD;
                 UpperBound = max(0.0, SumIntGain / (ActivityLevel * FractionSensible * FractionConvection));
@@ -5902,9 +5889,9 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Update zone temperatures in the previous steps
-        PreviousMeasuredZT3(ZoneNum) = PreviousMeasuredZT2(ZoneNum);
-        PreviousMeasuredZT2(ZoneNum) = PreviousMeasuredZT1(ZoneNum);
-        PreviousMeasuredZT1(ZoneNum) = ZT(ZoneNum);
+        state.dataHeatBalFanSys->PreviousMeasuredZT3(ZoneNum) = state.dataHeatBalFanSys->PreviousMeasuredZT2(ZoneNum);
+        state.dataHeatBalFanSys->PreviousMeasuredZT2(ZoneNum) = state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum);
+        state.dataHeatBalFanSys->PreviousMeasuredZT1(ZoneNum) = state.dataHeatBalFanSys->ZT(ZoneNum);
     }
 
     void InverseModelHumidity(EnergyPlusData &state, int const ZoneNum,              // Zone number
@@ -5953,7 +5940,7 @@ namespace ZoneTempPredictorCorrector {
         state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio = GetCurrentScheduleValue(state, HybridModelZone(ZoneNum).ZoneMeasuredHumidityRatioSchedulePtr);
 
         if (state.dataEnvrn->DayOfYear >= HybridModelZone(ZoneNum).HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= HybridModelZone(ZoneNum).HybridEndDayOfYear) {
-            ZoneAirHumRat(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
+            state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
 
             // Hybrid Model calculate air infiltration rate
             if (HybridModelZone(ZoneNum).InfiltrationCalc_H && UseZoneTimeStepHistory) {
@@ -5967,19 +5954,19 @@ namespace ZoneTempPredictorCorrector {
                     SumSysM_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMHumRat_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio;
 
-                    AA = SumSysM_HM + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) +
-                         MDotOA(ZoneNum);
-                    BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) +
-                         SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                    AA = SumSysM_HM + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) +
+                            state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                    BB = SumSysMHumRat_HM + (LatentGain / H2OHtOfVap) + ((state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) +
+                            state.dataHeatBalFanSys->SumHmARaW(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 } else {
-                    AA = VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) + MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = (LatentGain / H2OHtOfVap) + ((VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) +
-                         MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                    AA = state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                    BB = (LatentGain / H2OHtOfVap) + ((state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) + state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + state.dataHeatBalFanSys->SumHmARaW(ZoneNum) +
+                            state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 }
 
                 CC = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-                DD = (3.0 * PreviousMeasuredHumRat1(ZoneNum) - (3.0 / 2.0) * PreviousMeasuredHumRat2(ZoneNum) +
-                      (1.0 / 3.0) * PreviousMeasuredHumRat3(ZoneNum));
+                DD = (3.0 * state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat2(ZoneNum) +
+                      (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat3(ZoneNum));
 
                 zone_M_HR = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
                 delta_HR = (state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio - state.dataEnvrn->OutHumRat);
@@ -6029,21 +6016,21 @@ namespace ZoneTempPredictorCorrector {
                     SumSysM_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate;
                     SumSysMHumRat_HM = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio;
 
-                    AA = SumSysM_HM + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) +
-                         MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
-                         EAMFLxHumRat(ZoneNum) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) + MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                    AA = SumSysM_HM + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) +
+                            state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                    BB = SumSysMHumRat_HM + (LatentGainExceptPeople / H2OHtOfVap) + ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
+                            state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + state.dataHeatBalFanSys->SumHmARaW(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 } else {
-                    AA = ZoneMassFlowRate + OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum) + SumHmARa(ZoneNum) +
-                         MixingMassFlowZone(ZoneNum) + MDotOA(ZoneNum);
-                    BB = (LatentGainExceptPeople / H2OHtOfVap) + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
-                         EAMFLxHumRat(ZoneNum) + (MoistureMassFlowRate) + SumHmARaW(ZoneNum) + MixingMassFlowXHumRat(ZoneNum) +
-                         MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
+                    AA = ZoneMassFlowRate + state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->EAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum) + state.dataHeatBalFanSys->SumHmARa(ZoneNum) +
+                            state.dataHeatBalFanSys->MixingMassFlowZone(ZoneNum) + state.dataHeatBalFanSys->MDotOA(ZoneNum);
+                    BB = (LatentGainExceptPeople / H2OHtOfVap) + ((state.dataHeatBalFanSys->OAMFL(ZoneNum) + state.dataHeatBalFanSys->VAMFL(ZoneNum) + state.dataHeatBalFanSys->CTMFL(ZoneNum)) * state.dataEnvrn->OutHumRat) +
+                            state.dataHeatBalFanSys->EAMFLxHumRat(ZoneNum) + (MoistureMassFlowRate) + state.dataHeatBalFanSys->SumHmARaW(ZoneNum) + state.dataHeatBalFanSys->MixingMassFlowXHumRat(ZoneNum) +
+                            state.dataHeatBalFanSys->MDotOA(ZoneNum) * state.dataEnvrn->OutHumRat;
                 }
 
                 CC = RhoAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpMoist / SysTimeStepInSeconds;
-                DD = (3.0 * PreviousMeasuredHumRat1(ZoneNum) - (3.0 / 2.0) * PreviousMeasuredHumRat2(ZoneNum) +
-                      (1.0 / 3.0) * PreviousMeasuredHumRat3(ZoneNum));
+                DD = (3.0 * state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum) - (3.0 / 2.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat2(ZoneNum) +
+                      (1.0 / 3.0) * state.dataHeatBalFanSys->PreviousMeasuredHumRat3(ZoneNum));
 
                 LatentGainPeople = (((11.0 / 6.0) * CC + AA) * state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio - BB - CC * DD) * H2OHtOfVap;
                 UpperBound = max(0.0, LatentGain / (ActivityLevel * (1.0 - FractionSensible)));
@@ -6057,9 +6044,9 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Update zone humidity ratio in the previous steps
-        PreviousMeasuredHumRat3(ZoneNum) = PreviousMeasuredHumRat2(ZoneNum);
-        PreviousMeasuredHumRat2(ZoneNum) = PreviousMeasuredHumRat1(ZoneNum);
-        PreviousMeasuredHumRat1(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
+        state.dataHeatBalFanSys->PreviousMeasuredHumRat3(ZoneNum) = state.dataHeatBalFanSys->PreviousMeasuredHumRat2(ZoneNum);
+        state.dataHeatBalFanSys->PreviousMeasuredHumRat2(ZoneNum) = state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum);
+        state.dataHeatBalFanSys->PreviousMeasuredHumRat1(ZoneNum) = state.dataHeatBal->Zone(ZoneNum).ZoneMeasuredHumidityRatio;
     }
 
     void CalcZoneSums(EnergyPlusData &state,
@@ -6139,7 +6126,7 @@ namespace ZoneTempPredictorCorrector {
 
         // Sum all convective internal gains: SumIntGain
         SumAllInternalConvectionGains(state, ZoneNum, SumIntGain);
-        SumIntGain += SumConvHTRadSys(ZoneNum) + SumConvPool(ZoneNum);
+        SumIntGain += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
@@ -6149,9 +6136,9 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Sum all non-system air flow, i.e. infiltration, simple ventilation, mixing, earth tube: SumMCp, SumMCpT
-        SumMCp = MCPI(ZoneNum) + MCPV(ZoneNum) + MCPM(ZoneNum) + MCPE(ZoneNum) + MCPC(ZoneNum) + MDotCPOA(ZoneNum);
+        SumMCp = state.dataHeatBalFanSys->MCPI(ZoneNum) + state.dataHeatBalFanSys->MCPV(ZoneNum) + state.dataHeatBalFanSys->MCPM(ZoneNum) + state.dataHeatBalFanSys->MCPE(ZoneNum) + state.dataHeatBalFanSys->MCPC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum);
         SumMCpT =
-            MCPTI(ZoneNum) + MCPTV(ZoneNum) + MCPTM(ZoneNum) + MCPTE(ZoneNum) + MCPTC(ZoneNum) + MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
+                state.dataHeatBalFanSys->MCPTI(ZoneNum) + state.dataHeatBalFanSys->MCPTV(ZoneNum) + state.dataHeatBalFanSys->MCPTM(ZoneNum) + state.dataHeatBalFanSys->MCPTE(ZoneNum) + state.dataHeatBalFanSys->MCPTC(ZoneNum) + state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
 
         // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
@@ -6182,7 +6169,7 @@ namespace ZoneTempPredictorCorrector {
                     auto const &node(Node(zec.InletNode(NodeNum)));
                     NodeTemp = node.Temp;
                     MassFlowRate = node.MassFlowRate;
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
 
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
@@ -6192,7 +6179,7 @@ namespace ZoneTempPredictorCorrector {
             } else if (ZoneRetPlenumAirFlag) {
                 ZoneRetPlenumNum = state.dataHeatBal->Zone(ZoneNum).PlenumCondNum;
                 auto const &zrpc(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum));
-                Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
+                Real64 const air_hum_rat(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
                 for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
                     // Get node conditions
                     auto const &node(Node(zrpc.InletNode(NodeNum)));
@@ -6234,7 +6221,7 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
                 MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
 
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -6246,63 +6233,60 @@ namespace ZoneTempPredictorCorrector {
             SumSysMCpT /= ZoneMult;
         }
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
             HA = 0.0;
-            Area = Surface(SurfNum).Area; // For windows, this is the glazing area
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
 
-            if (Surface(SurfNum).Class == SurfaceClass::Window) {
-                auto const shading_flag(SurfWinShadingFlag(SurfNum));
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
+                auto const shading_flag(state.dataSurface->SurfWinShadingFlag(SurfNum));
 
                 // Add to the convective internal gains
                 if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfWinDividerArea(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
                     // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
                     // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
                     // at the same time that the interaction between glass and shade is calculated.
-                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
+                    SumIntGain += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
+                if (ANY_INTERIOR_SHADE_BLIND(shading_flag)) SumIntGain += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
-                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
-                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        SumIntGain += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatGain(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        state.dataSurface->SurfWinHeatTransfer(SurfNum) += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (state.dataSurface->SurfWinHeatGain(SurfNum) >= 0.0) {
+                            state.dataSurface->SurfWinHeatGainRep(SurfNum) = state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatGainRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatGainRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         } else {
-                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
-                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                            state.dataSurface->SurfWinHeatLossRep(SurfNum) = - state.dataSurface->SurfWinHeatGain(SurfNum);
+                            state.dataSurface->SurfWinHeatLossRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatLossRep(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                         }
-                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatTransfer(SurfNum) * state.dataGlobal->TimeStepZoneSec;
+                        state.dataSurface->SurfWinHeatTransferRepEnergy(SurfNum) = state.dataSurface->SurfWinHeatTransfer(SurfNum) * state.dataGlobal->TimeStepZoneSec;
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)));
-                    SumHATsurf += HA_surf * SurfWinFrameTempSurfIn(SurfNum);
+                    Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)));
+                    SumHATsurf += HA_surf * state.dataSurface->SurfWinFrameTempSurfIn(SurfNum);
                     HA += HA_surf;
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(shading_flag)) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)));
-                    SumHATsurf += HA_surf * SurfWinDividerTempSurfIn(SurfNum);
+                    Real64 const HA_surf(state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)));
+                    SumHATsurf += HA_surf * state.dataSurface->SurfWinDividerTempSurfIn(SurfNum);
                     HA += HA_surf;
                 }
 
@@ -6313,10 +6297,10 @@ namespace ZoneTempPredictorCorrector {
 
             // determine reference air temperature for this surface
             {
-                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     // The zone air is the reference temperature (which is to be solved for in CorrectZoneAirTemp).
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     SumHA += HA;
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
                     RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
@@ -6338,7 +6322,7 @@ namespace ZoneTempPredictorCorrector {
                     }
                 } else {
                     // currently set to mean air temp but should add error warning here
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     SumHA += HA;
                 }
             }
@@ -6447,14 +6431,14 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // sum non-system air flow transfers between zones
-        SumMCpDTzones = MCPTM(ZoneNum) - MCPM(ZoneNum) * MAT(ZoneNum); // but maybe it should be ZTAV(ZoneNum)
+        SumMCpDTzones = state.dataHeatBalFanSys->MCPTM(ZoneNum) - state.dataHeatBalFanSys->MCPM(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum); // but maybe it should be ZTAV(ZoneNum)
 
         // Sum non-system air flow, i.e. infiltration, simple ventilation, earth tube
         //  reuse SumMCp, SumMCpT from CalcZoneSum but use MAT (or maybe ZTAV?) to complete
-        SumMCpDtInfil = (MCPTI(ZoneNum) - MCPI(ZoneNum) * MAT(ZoneNum)) + (MCPTV(ZoneNum) - MCPV(ZoneNum) * MAT(ZoneNum)) +
-                        (MCPTE(ZoneNum) - MCPE(ZoneNum) * MAT(ZoneNum)) + (MCPTC(ZoneNum) - MCPC(ZoneNum) * MAT(ZoneNum)) +
-                        (MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp -
-                         MDotCPOA(ZoneNum) * MAT(ZoneNum)); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
+        SumMCpDtInfil = (state.dataHeatBalFanSys->MCPTI(ZoneNum) - state.dataHeatBalFanSys->MCPI(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum)) + (state.dataHeatBalFanSys->MCPTV(ZoneNum) - state.dataHeatBalFanSys->MCPV(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum)) +
+                        (state.dataHeatBalFanSys->MCPTE(ZoneNum) - state.dataHeatBalFanSys->MCPE(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum)) + (state.dataHeatBalFanSys->MCPTC(ZoneNum) - state.dataHeatBalFanSys->MCPC(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum)) +
+                        (state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp -
+                                state.dataHeatBalFanSys->MDotCPOA(ZoneNum) * state.dataHeatBalFanSys->MAT(ZoneNum)); // infiltration | Ventilation (simple) | Earth tube. | Cooltower | combined OA flow
 
         // Sum all multizone air flow calculated from AirflowNetwork by assuming no simple air infiltration model (if used)
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultizone ||
@@ -6463,9 +6447,9 @@ namespace ZoneTempPredictorCorrector {
              AirflowNetwork::AirflowNetworkFanActivated)) {
             // Multizone airflow calculated in AirflowNetwork
             SumMCpDtInfil = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCpT -
-                            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp * MAT(ZoneNum);
+                            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMCp * state.dataHeatBalFanSys->MAT(ZoneNum);
             SumMCpDTzones = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCpT -
-                            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp * MAT(ZoneNum);
+                            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMCp * state.dataHeatBalFanSys->MAT(ZoneNum);
         }
 
         // Sum all system air flow: reusing how SumSysMCp, SumSysMCpT are calculated in CalcZoneSums
@@ -6484,14 +6468,14 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
+                CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                 SumMCpDTsystem += QSensRate;
 
                 ADUNum = state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNodeADUNum(NodeNum);
                 if (ADUNum > 0) {
                     NodeTemp = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).Temp;
                     MassFlowRate = Node(state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
-                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
+                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), ADUHeatAddRate);
                     state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     state.dataDefineEquipment->AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
                     state.dataDefineEquipment->AirDistUnit(ADUNum).HeatGain = state.dataDefineEquipment->AirDistUnit(ADUNum).HeatRate * TimeStepSys * DataGlobalConstants::SecInHour;
@@ -6506,7 +6490,7 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(state.dataZonePlenum->ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
+                CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                 SumMCpDTsystem += QSensRate;
 
             } // NodeNum
@@ -6517,14 +6501,14 @@ namespace ZoneTempPredictorCorrector {
                     ADUInNode = state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
+                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }
                 if (state.dataDefineEquipment->AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = state.dataDefineEquipment->AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
+                    CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
                     SumMCpDTsystem += QSensRate;
                 }
             }
@@ -6534,25 +6518,23 @@ namespace ZoneTempPredictorCorrector {
             // Get node conditions
             NodeTemp = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(state.dataZonePlenum->ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CalcZoneSensibleOutput(MassFlowRate, NodeTemp, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), QSensRate);
+            CalcZoneSensibleOutput(MassFlowRate, NodeTemp, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), QSensRate);
             SumMCpDTsystem += QSensRate;
         }
 
         // non air system response.
-        SumNonAirSystem = NonAirSystemResponse(ZoneNum) + SumConvHTRadSys(ZoneNum) + SumConvPool(ZoneNum);
+        SumNonAirSystem = state.dataHeatBalFanSys->NonAirSystemResponse(ZoneNum) + state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum);
 
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
-        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+        for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
-
-            Area = Surface(SurfNum).Area; // For windows, this is the glazing area
+            Area = state.dataSurface->Surface(SurfNum).Area; // For windows, this is the glazing area
             // determine reference air temperature for this surface's convective heat transfer model
             {
-                auto const SELECT_CASE_var(Surface(SurfNum).TAirRef);
+                auto const SELECT_CASE_var(state.dataSurface->Surface(SurfNum).TAirRef);
                 if (SELECT_CASE_var == ZoneMeanAirTemp) {
                     // The zone air is the reference temperature
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 } else if (SELECT_CASE_var == AdjacentAirTemp) {
                     RefAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else if (SELECT_CASE_var == ZoneSupplyAirTemp) {
@@ -6566,7 +6548,7 @@ namespace ZoneTempPredictorCorrector {
                         // Get node conditions
                         NodeTemp = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
 
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -6576,55 +6558,55 @@ namespace ZoneTempPredictorCorrector {
                         RefAirTemp = SumSysMCpT / SumSysMCp;
                     } else {
                         // no system flow (yet) so just use last value for zone air temp
-                        RefAirTemp = MAT(ZoneNum);
+                        RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     }
 
                 } else {
                     // currently set to mean air temp but should add error warning here
-                    RefAirTemp = MAT(ZoneNum);
+                    RefAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 }
             }
 
-            if (Surface(SurfNum).Class == SurfaceClass::Window) {
+            if (state.dataSurface->Surface(SurfNum).Class == SurfaceClass::Window) {
 
                 // Add to the convective internal gains
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfWinDividerArea(SurfNum);
+                    Area += state.dataSurface->SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
                     // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
                     // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
                     // at the same time that the interaction between glass and shade is calculated.
-                    SumIntGains += SurfWinDividerHeatGain(SurfNum);
+                    SumIntGains += state.dataSurface->SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
+                if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += state.dataSurface->SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum)))
-                    SumIntGains += SurfWinConvHeatFlowNatural(SurfNum);
+                if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum)))
+                    SumIntGains += state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                    SumIntGains += SurfWinConvHeatGainToZoneAir(SurfNum);
+                if (state.dataSurface->SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGains += state.dataSurface->SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGains += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SumIntGains += state.dataSurface->SurfWinRetHeatGainToZoneAir(SurfNum);
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfWinFrameArea(SurfNum) > 0.0) {
+                if (state.dataSurface->SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
 
-                    SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
-                                    (SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
+                    SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinFrameArea(SurfNum) * (1.0 + state.dataSurface->SurfWinProjCorrFrIn(SurfNum)) *
+                                    (state.dataSurface->SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
-                if (SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
+                if (state.dataSurface->SurfWinDividerArea(SurfNum) > 0.0 && !ANY_INTERIOR_SHADE_BLIND(state.dataSurface->SurfWinShadingFlag(SurfNum))) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
-                                    (SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
+                    SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * state.dataSurface->SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * state.dataSurface->SurfWinProjCorrDivIn(SurfNum)) *
+                                    (state.dataSurface->SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
             } // End of check if window
@@ -6632,7 +6614,7 @@ namespace ZoneTempPredictorCorrector {
             SumHADTsurfs += state.dataHeatBal->HConvIn(SurfNum) * Area * (TempSurfInTmp(SurfNum) - RefAirTemp);
 
             // Accumulate Zone Phase Change Material Melting/Freezing Enthalpy output variables
-            if (DataSurfaces::Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
+            if (state.dataSurface->Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel_CondFD) {
                 state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyM += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyM;
                 state.dataHeatBal->ZnAirRpt(ZoneNum).SumEnthalpyH += HeatBalFiniteDiffManager::SurfaceFD(SurfNum).EnthalpyF;
             }
@@ -6640,19 +6622,19 @@ namespace ZoneTempPredictorCorrector {
 
         // now calculate air energy storage source term.
         // capacitance is volume * density * heat capacity
-        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
+        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
+        RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
 
         {
             auto const SELECT_CASE_var(state.dataHeatBal->ZoneAirSolutionAlgo);
             if (SELECT_CASE_var == Use3rdOrder) {
-                CzdTdt = RhoAir * CpAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * (MAT(ZoneNum) - ZTM1(ZoneNum)) /
+                CzdTdt = RhoAir * CpAir * state.dataHeatBal->Zone(ZoneNum).Volume * state.dataHeatBal->Zone(ZoneNum).ZoneVolCapMultpSens * (state.dataHeatBalFanSys->MAT(ZoneNum) - state.dataHeatBalFanSys->ZTM1(ZoneNum)) /
                          (TimeStepSys * DataGlobalConstants::SecInHour);
                 // Exact solution
             } else if (SELECT_CASE_var == UseAnalyticalSolution) {
-                CzdTdt = TempIndCoef - TempDepCoef * MAT(ZoneNum);
+                CzdTdt = TempIndCoef - TempDepCoef * state.dataHeatBalFanSys->MAT(ZoneNum);
             } else if (SELECT_CASE_var == UseEulerMethod) {
-                CzdTdt = AIRRAT(ZoneNum) * (MAT(ZoneNum) - ZoneT1(ZoneNum));
+                CzdTdt = state.dataHeatBalFanSys->AIRRAT(ZoneNum) * (state.dataHeatBalFanSys->MAT(ZoneNum) - state.dataHeatBalFanSys->ZoneT1(ZoneNum));
             }
         }
 
@@ -6812,7 +6794,7 @@ namespace ZoneTempPredictorCorrector {
                 state.dataZoneTempPredictorCorrector->ZoneTempHist(4, iZone) = state.dataZoneTempPredictorCorrector->ZoneTempHist(3, iZone);
                 state.dataZoneTempPredictorCorrector->ZoneTempHist(3, iZone) = state.dataZoneTempPredictorCorrector->ZoneTempHist(2, iZone);
                 state.dataZoneTempPredictorCorrector->ZoneTempHist(2, iZone) = state.dataZoneTempPredictorCorrector->ZoneTempHist(1, iZone);
-                state.dataZoneTempPredictorCorrector->ZoneTempHist(1, iZone) = ZT(iZone);
+                state.dataZoneTempPredictorCorrector->ZoneTempHist(1, iZone) = state.dataHeatBalFanSys->ZT(iZone);
                 Diff34 = state.dataZoneTempPredictorCorrector->ZoneTempHist(3, iZone) - state.dataZoneTempPredictorCorrector->ZoneTempHist(4, iZone);
                 Diff23 = state.dataZoneTempPredictorCorrector->ZoneTempHist(2, iZone) - state.dataZoneTempPredictorCorrector->ZoneTempHist(3, iZone);
                 Diff12 = state.dataZoneTempPredictorCorrector->ZoneTempHist(1, iZone) - state.dataZoneTempPredictorCorrector->ZoneTempHist(2, iZone);
@@ -7020,50 +7002,50 @@ namespace ZoneTempPredictorCorrector {
             state.dataZoneTempPredictorCorrector->CalcZoneAirComfortSetPointsFirstTimeFlag = false;
         }
 
-        ComfortControlType = 0; // Default
+        state.dataHeatBalFanSys->ComfortControlType = 0; // Default
 
         for (RelativeZoneNum = 1; RelativeZoneNum <= state.dataZoneCtrls->NumComfortControlledZones; ++RelativeZoneNum) {
 
             ActualZoneNum = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ActualZoneNum;
             ComfortControlSchedIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ComfortSchedIndex;
-            ComfortControlType(ActualZoneNum) = GetCurrentScheduleValue(state, ComfortControlSchedIndex);
+            state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) = GetCurrentScheduleValue(state, ComfortControlSchedIndex);
 
             // Get PMV values
 
             {
                 auto const SELECT_CASE_var(
-                    ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
+                        state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
                 // during the simulation?
                 if (SELECT_CASE_var == 0) { // Uncontrolled for thermal comfort
-                    ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
-                    ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
 
                     SchedNameIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).SchIndx_SglHeatSetPointFanger;
                     SchedTypeIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
                     SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SchedTypeIndex).PMVSchedIndex;
-                    ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHeatSetPointFanger);
-                    ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
-                    ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHeatSetPointFanger);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV = -999.0;
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
 
                     SchedNameIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).SchIndx_SglCoolSetPointFanger;
                     SchedTypeIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
                     SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SchedTypeIndex).PMVSchedIndex;
-                    ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglCoolSetPointFanger);
-                    ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
-                    ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglCoolSetPointFanger);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV = -999.0;
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
 
                     SchedNameIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).SchIndx_SglHCSetPointFanger;
                     SchedTypeIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
                     SetPointComfortSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SchedTypeIndex).PMVSchedIndex;
-                    ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHCSetPointFanger);
-                    ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
-                    ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::SglHCSetPointFanger);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndex);
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
 
@@ -7071,12 +7053,12 @@ namespace ZoneTempPredictorCorrector {
                     SchedTypeIndex = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
                     SetPointComfortSchedIndexHot = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).HeatPMVSchedIndex;
                     SetPointComfortSchedIndexCold = state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).CoolPMVSchedIndex;
-                    ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::DualSetPointFanger);
-                    ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexHot);
-                    ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexCold);
-                    if (ZoneComfortControlsFanger(ActualZoneNum).LowPMV > ZoneComfortControlsFanger(ActualZoneNum).HighPMV) {
-                        ++ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount;
-                        if (ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount < 2) {
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).FangerType = static_cast<int>(ComfortControl::DualSetPointFanger);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexHot);
+                    state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV = GetCurrentScheduleValue(state, SetPointComfortSchedIndexCold);
+                    if (state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV > state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV) {
+                        ++state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount;
+                        if (state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrCount < 2) {
                             ShowWarningError(state, "ThermostatSetpoint:ThermalComfort:Fanger:DualSetpoint: The heating PMV setpoint is above the cooling "
                                              "PMV setpoint in " +
                                              state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(SchedTypeIndex).Name);
@@ -7084,11 +7066,11 @@ namespace ZoneTempPredictorCorrector {
                             ShowContinueErrorTimeStamp(state, "Occurrence info:");
                         } else {
                             ShowRecurringWarningErrorAtEnd(state, "The heating PMV setpoint is still above the cooling PMV setpoint",
-                                                           ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrIndex,
-                                                           ZoneComfortControlsFanger(ActualZoneNum).LowPMV,
-                                                           ZoneComfortControlsFanger(ActualZoneNum).LowPMV);
+                                                           state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).DualPMVErrIndex,
+                                                           state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV,
+                                                           state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV);
                         }
-                        ZoneComfortControlsFanger(ActualZoneNum).LowPMV = ZoneComfortControlsFanger(ActualZoneNum).HighPMV;
+                        state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV = state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV;
                     }
 
                 } else {
@@ -7096,7 +7078,7 @@ namespace ZoneTempPredictorCorrector {
                         state,
                         format("CalcZoneAirTempSetpoints: Illegal thermal control control type for Zone={}, Found value={}, in Schedule={}",
                                state.dataHeatBal->Zone(ActualZoneNum).Name,
-                               ComfortControlType(ActualZoneNum),
+                               state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum),
                                state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).ControlTypeSchedName));
                 }
             }
@@ -7106,22 +7088,22 @@ namespace ZoneTempPredictorCorrector {
                 auto const SELECT_CASE_var(state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).AverageMethodNum);
                 if (SELECT_CASE_var == static_cast<int>(AverageMethod::NO)) {
                     PeopleNum = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+                    if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
                     } else {
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
                     }
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+                    if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::SPE)) {
                     PeopleNum = state.dataZoneCtrls->ComfortControlledZone(RelativeZoneNum).SpecificObjectNum;
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
+                    if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointLo);
                     } else {
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV, SetPointLo);
                     }
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
-                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
+                    if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger))
+                        GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, SetPointHi);
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::OBJ)) {
                     ObjectCount = 0;
                     SetPointLo = 0.0;
@@ -7129,16 +7111,16 @@ namespace ZoneTempPredictorCorrector {
                     for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                         if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
                             ++ObjectCount;
-                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                             SetPointLo += Tset;
-                            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                            if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                 SetPointHi += Tset;
                             }
                         }
                     }
                     SetPointLo /= ObjectCount;
-                    if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
+                    if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
                 } else if (SELECT_CASE_var == static_cast<int>(AverageMethod::PEO)) {
                     PeopleCount = 0.0;
                     SetPointLo = 0.0;
@@ -7147,17 +7129,17 @@ namespace ZoneTempPredictorCorrector {
                         if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
                             NumberOccupants = state.dataHeatBal->People(PeopleNum).NumberOfPeople * GetCurrentScheduleValue(state, state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr);
                             PeopleCount += NumberOccupants;
-                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                            GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                             SetPointLo += Tset * NumberOccupants;
-                            if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                            if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                 SetPointHi += Tset * NumberOccupants;
                             }
                         }
                     }
                     if (PeopleCount > 0) {
                         SetPointLo /= PeopleCount;
-                        if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= PeopleCount;
+                        if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= PeopleCount;
                     } else {
                         // recurring warnings
                         //          ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount = &
@@ -7179,16 +7161,16 @@ namespace ZoneTempPredictorCorrector {
                         for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
                             if (ActualZoneNum == state.dataHeatBal->People(PeopleNum).ZonePtr) {
                                 ++ObjectCount;
-                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
+                                GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).LowPMV, Tset);
                                 SetPointLo += Tset;
-                                if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
+                                if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) {
+                                    GetComfortSetPoints(state, PeopleNum, RelativeZoneNum, state.dataHeatBalFanSys->ZoneComfortControlsFanger(ActualZoneNum).HighPMV, Tset);
                                     SetPointHi += Tset;
                                 }
                             }
                         }
                         SetPointLo /= ObjectCount;
-                        if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
+                        if (state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= ObjectCount;
                     }
                 }
             }
@@ -7196,15 +7178,15 @@ namespace ZoneTempPredictorCorrector {
             // Assign setpoint
             {
                 auto const SELECT_CASE_var(
-                    ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
+                        state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum)); // Is this missing the possibility of sometimes having no control on a zone
                 // during the simulation?
                 if (SELECT_CASE_var == 0) { // Uncontrolled for thermal comfort
                     {
-                        auto const SELECT_CASE_var1(TempControlType(ActualZoneNum));
+                        auto const SELECT_CASE_var1(state.dataHeatBalFanSys->TempControlType(ActualZoneNum));
                         if (SELECT_CASE_var1 == SingleHeatingSetPoint) {
-                            ZoneThermostatSetPointHi(ActualZoneNum) = 0.0;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = 0.0;
                         } else if (SELECT_CASE_var1 == SingleCoolingSetPoint) {
-                            ZoneThermostatSetPointLo(ActualZoneNum) = 0.0;
+                            state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = 0.0;
                         }
                     }
 
@@ -7225,9 +7207,9 @@ namespace ZoneTempPredictorCorrector {
                                                        SetPointLo,
                                                        SetPointLo);
                     }
-                    TempZoneThermostatSetPoint(ActualZoneNum) = SetPointLo;
-                    ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    TempControlType(ActualZoneNum) = SingleHeatingSetPoint;
+                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = SetPointLo;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->TempControlType(ActualZoneNum) = SingleHeatingSetPoint;
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
 
@@ -7247,9 +7229,9 @@ namespace ZoneTempPredictorCorrector {
                                                        SetPointLo,
                                                        SetPointLo);
                     }
-                    TempZoneThermostatSetPoint(ActualZoneNum) = SetPointLo;
-                    ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    TempControlType(ActualZoneNum) = SingleCoolingSetPoint;
+                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = SetPointLo;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->TempControlType(ActualZoneNum) = SingleCoolingSetPoint;
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
 
@@ -7277,10 +7259,10 @@ namespace ZoneTempPredictorCorrector {
                                                        SetPointLo,
                                                        SetPointLo);
                     }
-                    TempZoneThermostatSetPoint(ActualZoneNum) = SetPointLo;
-                    ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
-                    TempControlType(ActualZoneNum) = SingleHeatCoolSetPoint;
+                    state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) = SetPointLo;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum);
+                    state.dataHeatBalFanSys->TempControlType(ActualZoneNum) = SingleHeatCoolSetPoint;
 
                 } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
 
@@ -7319,16 +7301,16 @@ namespace ZoneTempPredictorCorrector {
                                                        SetPointLo);
                     }
 
-                    ZoneThermostatSetPointLo(ActualZoneNum) = SetPointLo;
-                    ZoneThermostatSetPointHi(ActualZoneNum) = SetPointHi;
-                    TempControlType(ActualZoneNum) = DualSetPointWithDeadBand;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) = SetPointLo;
+                    state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) = SetPointHi;
+                    state.dataHeatBalFanSys->TempControlType(ActualZoneNum) = DualSetPointWithDeadBand;
 
                 } else {
                     ShowSevereError(
                         state,
                         format("CalcZoneAirComfortSetpoints: Illegal thermal control control type for Zone={}, Found value={}, in Schedule={}",
                                state.dataHeatBal->Zone(ActualZoneNum).Name,
-                               ComfortControlType(ActualZoneNum),
+                               state.dataHeatBalFanSys->ComfortControlType(ActualZoneNum),
                                state.dataZoneCtrls->ComfortControlledZone(ActualZoneNum).ControlTypeSchedName));
                 }
             }
@@ -7499,7 +7481,7 @@ namespace ZoneTempPredictorCorrector {
 
         // For Dual Setpoint thermostat the overcool range is limited by the temperature difference between cooling
         // and heating setpoints
-        MaxAllowedOvercoolRange = ZoneThermostatSetPointHi(ActualZoneNum) - ZoneThermostatSetPointLo(ActualZoneNum);
+        MaxAllowedOvercoolRange = state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) - state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum);
         if (MaxAllowedOvercoolRange > 0.0) {
             ZoneOvercoolRange = min(ZoneOvercoolRange, MaxAllowedOvercoolRange);
         }
@@ -7509,7 +7491,7 @@ namespace ZoneTempPredictorCorrector {
         if (RelativeHumidityDiff > 0.0 && ZoneOvercoolControlRatio > 0.0) {
             // proportionally reset the cooling setpoint temperature downward (zone Overcool)
             ZoneOvercoolRange = min(ZoneOvercoolRange, RelativeHumidityDiff / ZoneOvercoolControlRatio);
-            ZoneThermostatSetPointHi(ActualZoneNum) -= ZoneOvercoolRange;
+            state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) -= ZoneOvercoolRange;
         }
     }
 
@@ -7530,20 +7512,20 @@ namespace ZoneTempPredictorCorrector {
                 int ZoneNum = state.dataZoneCtrls->TempControlledZone(Loop).ActualZoneNum;
 
                 {
-                    auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                    auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                     if (SELECT_CASE_var == 0) { // Uncontrolled
 
                     } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                        ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
                     } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
                         // do nothing
                     } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                        ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
                     } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                        ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideHeatingSetPointValue;
                     } else {
                         // Do nothing
                     }
@@ -7553,20 +7535,20 @@ namespace ZoneTempPredictorCorrector {
                 int ZoneNum = state.dataZoneCtrls->TempControlledZone(Loop).ActualZoneNum;
 
                 {
-                    auto const SELECT_CASE_var(TempControlType(ZoneNum));
+                    auto const SELECT_CASE_var(state.dataHeatBalFanSys->TempControlType(ZoneNum));
 
                     if (SELECT_CASE_var == 0) { // Uncontrolled
 
                     } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
                         // do nothing
                     } else if (SELECT_CASE_var == SingleCoolingSetPoint) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                        ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
                     } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                        ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
                     } else if (SELECT_CASE_var == DualSetPointWithDeadBand) {
-                        ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->TempControlledZone(Loop).EMSOverrideCoolingSetPointValue;
                     } else {
                         // Do nothing
                     }
@@ -7578,20 +7560,20 @@ namespace ZoneTempPredictorCorrector {
             if (state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointOn) {
                 int ZoneNum = state.dataZoneCtrls->ComfortControlledZone(Loop).ActualZoneNum;
                 {
-                    auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
+                    auto const SELECT_CASE_var(state.dataHeatBalFanSys->ComfortControlType(ZoneNum));
 
                     if (SELECT_CASE_var == 0) { // Uncontrolled
 
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                        ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
                         // do nothing
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
-                        ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                        ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideHeatingSetPointValue;
                     } else {
                         // Do nothing
                     }
@@ -7600,20 +7582,20 @@ namespace ZoneTempPredictorCorrector {
             if (state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointOn) {
                 int ZoneNum = state.dataZoneCtrls->ComfortControlledZone(Loop).ActualZoneNum;
                 {
-                    auto const SELECT_CASE_var(ComfortControlType(ZoneNum));
+                    auto const SELECT_CASE_var(state.dataHeatBalFanSys->ComfortControlType(ZoneNum));
 
                     if (SELECT_CASE_var == 0) { // Uncontrolled
 
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHeatSetPointFanger)) {
                         // do nothing
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglCoolSetPointFanger)) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                        ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::SglHCSetPointFanger)) {
-                        TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
-                        ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
                     } else if (SELECT_CASE_var == static_cast<int>(ComfortControl::DualSetPointFanger)) {
-                        ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
+                        state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum) = state.dataZoneCtrls->ComfortControlledZone(Loop).EMSOverrideCoolingSetPointValue;
                     } else {
                         // Do nothing
                     }
@@ -7796,22 +7778,22 @@ namespace ZoneTempPredictorCorrector {
 
         // get the value at the selected time
         int const firstTimeStep = 1;
-        int weekSchIndexSelect = ScheduleManager::Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
-        int daySchIndexSelect = ScheduleManager::WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
-        Real64 valueAtSelectTime = ScheduleManager::DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);
+        int weekSchIndexSelect = state.dataScheduleMgr->Schedule(scheduleIndex).WeekSchedulePointer(jdateSelect);
+        int daySchIndexSelect = state.dataScheduleMgr->WeekSchedule(weekSchIndexSelect).DaySchedulePointer(dayOfWeek);
+        Real64 valueAtSelectTime = state.dataScheduleMgr->DaySchedule(daySchIndexSelect).TSValue(firstTimeStep, hourSelect);
         int countOfSame = 0;
 
         // count the number of times with that same value
         for (int jdateOfYear = 1; jdateOfYear <= DaysInYear; ++jdateOfYear) {
-            int wkSch = ScheduleManager::Schedule(scheduleIndex).WeekSchedulePointer(jdateOfYear);
+            int wkSch = state.dataScheduleMgr->Schedule(scheduleIndex).WeekSchedulePointer(jdateOfYear);
             if (wkSch == weekSchIndexSelect) { // if same week schedule can short circuit rest of testing and increment counter
                 ++countOfSame;
             } else {
-                int daySch = ScheduleManager::WeekSchedule(wkSch).DaySchedulePointer(dayOfWeek);
+                int daySch = state.dataScheduleMgr->WeekSchedule(wkSch).DaySchedulePointer(dayOfWeek);
                 if (daySch == daySchIndexSelect) { // if same day schedule can short circuit rest of testing and increment counter
                     ++countOfSame;
                 } else {
-                    Real64 valueAt = ScheduleManager::DaySchedule(daySch).TSValue(firstTimeStep, hourSelect);
+                    Real64 valueAt = state.dataScheduleMgr->DaySchedule(daySch).TSValue(firstTimeStep, hourSelect);
                     if (valueAt == valueAtSelectTime) {
                         ++countOfSame;
                     }
@@ -7823,5 +7805,3 @@ namespace ZoneTempPredictorCorrector {
     }
 
 } // namespace ZoneTempPredictorCorrector
-
-} // namespace EnergyPlus
