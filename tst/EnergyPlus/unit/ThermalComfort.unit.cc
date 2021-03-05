@@ -1568,5 +1568,9 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger_Correct_TimeSt
 
     EXPECT_NEAR(state->dataHeatBalFanSys->ZTAVComf(1), 14.863733439268286, 0.001);
 
+    EXPECT_NEAR(state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1), 0.010564839505489259, 0.0001);
+
     EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -5.5896341565108720, 0.001);
+
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 100.0, 0.001);
 }
