@@ -130,14 +130,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
 
     void GasAbsorberSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        enum brLoopType
-        {
-            CHILLER,
-            HEATER,
-            CONDENSER,
-            NOMATCH
-        };
-        brLoopType brIdentity(NOMATCH);
+        DataPlant::BrLoopType brIdentity(DataPlant::BrLoopType::NoMatch);
 
         int branchTotalComp = state.dataPlnt->PlantLoop(calledFromLocation.loopNum)
                                   .LoopSide(calledFromLocation.loopSideNum)
@@ -153,34 +146,34 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                        .NodeNumIn;
             // Match inlet node name of calling branch to determine if this call is for heating or cooling
             if (compInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
-                brIdentity = CHILLER;
+                brIdentity = DataPlant::BrLoopType::Chiller;
                 break;
             } else if (compInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
-                brIdentity = HEATER;
+                brIdentity = DataPlant::BrLoopType::Heater;
                 break;
             } else if (compInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
-                brIdentity = CONDENSER;
+                brIdentity = DataPlant::BrLoopType::Condenser;
                 break;
             } else {
-                brIdentity = NOMATCH;
+                brIdentity = DataPlant::BrLoopType::NoMatch;
             }
         }
 
-        if (brIdentity == CHILLER) {
+        if (brIdentity == DataPlant::BrLoopType::Chiller) {
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InCoolingMode = RunFlag != 0;
             this->initialize(state);
             this->calculateChiller(state, CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
-        } else if(brIdentity == HEATER) {
+        } else if (brIdentity == DataPlant::BrLoopType::Heater) {
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InHeatingMode = RunFlag != 0;
             this->initialize(state);
             this->calculateHeater(state, CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
-        } else if (brIdentity == CONDENSER) {
+        } else if (brIdentity == DataPlant::BrLoopType::Condenser) {
             if (this->CDLoopNum > 0) {
                 PlantUtilities::UpdateChillerComponentCondenserSide(state,
                                                                     this->CDLoopNum,
