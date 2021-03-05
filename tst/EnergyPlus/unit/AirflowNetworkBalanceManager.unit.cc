@@ -2351,19 +2351,19 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_EQ(0.0, state->dataSurface->SurfWinVentingOpenFactorMultRep(14));
 
     // Test for #7162
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
-    DataHeatBalFanSys::MAT.allocate(4);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(4);
+     state->dataHeatBalFanSys->MAT.allocate(4);
+     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalFanSys::MAT(2) = 23.0;
-    DataHeatBalFanSys::MAT(3) = 23.0;
-    DataHeatBalFanSys::MAT(4) = 5.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0007;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
-    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.0012;
-    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.0008;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+     state->dataHeatBalFanSys->MAT(1) = 23.0;
+     state->dataHeatBalFanSys->MAT(2) = 23.0;
+     state->dataHeatBalFanSys->MAT(3) = 23.0;
+     state->dataHeatBalFanSys->MAT(4) = 5.0;
+     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.0007;
+     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
+     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.0012;
+     state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.0008;
+     state->dataHeatBalFanSys->ZoneAirHumRatAvg =  state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataZoneEquip->ZoneEquipConfig.allocate(4);
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = false;
     state->dataZoneEquip->ZoneEquipConfig(2).IsControlled = false;
@@ -2386,15 +2386,15 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_NEAR(38.1554377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
     EXPECT_NEAR(91.8528571, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
 
-    Real64 hg = Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(1), DataHeatBalFanSys::MAT(1));
-    Real64 hzone = Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1));
+    Real64 hg = Psychrometrics::PsyHgAirFnWTdb( state->dataHeatBalFanSys->ZoneAirHumRat(1),  state->dataHeatBalFanSys->MAT(1));
+    Real64 hzone = Psychrometrics::PsyHFnTdbW( state->dataHeatBalFanSys->MAT(1),  state->dataHeatBalFanSys->ZoneAirHumRat(1));
     Real64 hamb = Psychrometrics::PsyHFnTdbW(0.0, state->dataEnvrn->OutHumRat);
     Real64 hdiff = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * (hzone - hamb);
     Real64 sum =
         AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW - AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW;
     // Existing code uses T_average to calculate hg, get close results
     EXPECT_NEAR(hdiff, sum, 0.4);
-    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * (DataHeatBalFanSys::ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
+    Real64 dhlatent = AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 * hg * ( state->dataHeatBalFanSys->ZoneAirHumRat(1) - state->dataEnvrn->OutHumRat);
     // when hg is calculated with indoor temperature, get exact results
     sum = AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiSenLossW + dhlatent;
     EXPECT_NEAR(hdiff, sum, 0.001);
@@ -13186,13 +13186,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     AirflowNetwork::AirflowNetworkFanActivated = false;
     // #7977
     CalcAirflowNetworkAirBalance(*state);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
-    DataHeatBalFanSys::MAT.allocate(5);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(5);
+     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
+     state->dataHeatBalFanSys->MAT.allocate(5);
+     state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(5);
     state->dataZoneEquip->ZoneEquipConfig.allocate(5);
-    DataHeatBalFanSys::MAT = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+     state->dataHeatBalFanSys->MAT = 23.0;
+     state->dataHeatBalFanSys->ZoneAirHumRat = 0.001;
+     state->dataHeatBalFanSys->ZoneAirHumRatAvg =  state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
     state->dataHeatBal->Zone(3).OutDryBulbTemp = state->dataEnvrn->OutDryBulbTemp;
@@ -13662,10 +13662,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_BasicAdvancedSingleSidedAvoidCrashTest)
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     // #6912
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
+     state->dataHeatBalFanSys->MAT.allocate(1);
+     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+     state->dataHeatBalFanSys->MAT(1) = 23.0;
+     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
     state->dataEnvrn->OutDryBulbTemp = -17.29025;
     state->dataEnvrn->OutHumRat = 0.0008389;
     state->dataEnvrn->OutBaroPress = 99063.0;
@@ -19982,18 +19982,18 @@ std::string const idf_objects = delimited_string({
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
 
-    DataHeatBalFanSys::MAT.allocate(5);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(5);
-    DataHeatBalFanSys::MAT(1) = 23.0;
-    DataHeatBalFanSys::MAT(2) = 23.0;
-    DataHeatBalFanSys::MAT(3) = 23.0;
-    DataHeatBalFanSys::MAT(4) = 23.0;
-    DataHeatBalFanSys::MAT(5) = 23.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
+     state->dataHeatBalFanSys->MAT.allocate(5);
+     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(5);
+     state->dataHeatBalFanSys->MAT(1) = 23.0;
+     state->dataHeatBalFanSys->MAT(2) = 23.0;
+     state->dataHeatBalFanSys->MAT(3) = 23.0;
+     state->dataHeatBalFanSys->MAT(4) = 23.0;
+     state->dataHeatBalFanSys->MAT(5) = 23.0;
+     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+     state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
+     state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
+     state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.001;
+     state->dataHeatBalFanSys->ZoneAirHumRat(5) = 0.001;
 
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);

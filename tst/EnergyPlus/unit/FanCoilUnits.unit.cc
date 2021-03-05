@@ -100,8 +100,6 @@ using namespace EnergyPlus::Psychrometrics;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::WaterCoils;
 
-using DataHeatBalFanSys::TempControlType;
-
 namespace EnergyPlus {
     TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     {
@@ -974,8 +972,8 @@ namespace EnergyPlus {
             loopsidebranch.Comp.allocate(1);
         }
 
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
 
         state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
         state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
@@ -1342,8 +1340,8 @@ namespace EnergyPlus {
             loopsidebranch.Comp.allocate(1);
         }
 
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
 
         state->dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
         state->dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
@@ -1671,8 +1669,8 @@ namespace EnergyPlus {
             loopsidebranch.Comp.allocate(1);
         }
 
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
 
         state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
         state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;
@@ -2080,8 +2078,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
@@ -2789,8 +2787,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
@@ -3202,8 +3200,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->FinalZoneSizing.allocate(1);
         state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
@@ -3564,8 +3562,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->FinalZoneSizing.allocate(1);
         auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
@@ -3931,8 +3929,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->FinalZoneSizing.allocate(1);
         auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
@@ -4298,8 +4296,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataSize->FinalZoneSizing.allocate(1);
         auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
@@ -4607,8 +4605,8 @@ namespace EnergyPlus {
         state->dataSize->ZoneEqSizing.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-        TempControlType.allocate(1);
-        TempControlType(1) = 4;
+        state->dataHeatBalFanSys->TempControlType.allocate(1);
+        state->dataHeatBalFanSys->TempControlType(1) = 4;
         state->dataSize->ZoneSizingRunDone = true;
         state->dataGlobal->SysSizingCalc = true;
         thisFanCoil.DesignHeatingCapacity = 6000.0;

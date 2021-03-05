@@ -1041,8 +1041,6 @@ namespace OutdoorAirUnit {
         // na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ShortenTimeStepSys;
         using DataHVACGlobals::ZoneComp;
         using DataHVACGlobals::ZoneCompTurnFansOff;
@@ -1636,8 +1634,6 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::ZoneCompTurnFansOff;
         using DataHVACGlobals::ZoneCompTurnFansOn;
         using DataLoopNode::Node;
@@ -1718,10 +1714,10 @@ namespace OutdoorAirUnit {
 
             // Node condition
             if (OutAirUnit(OAUnitNum).ExtFan) {
-                Node(InletNode).Temp = MAT(ZoneNum);
+                Node(InletNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 Node(SFanOutletNode).Temp = Node(InletNode).Temp;
             } else {
-                Node(SFanOutletNode).Temp = MAT(ZoneNum);
+                Node(SFanOutletNode).Temp = state.dataHeatBalFanSys->MAT(ZoneNum);
             }
             Node(OutletNode).Temp = Node(SFanOutletNode).Temp;
 
@@ -1831,7 +1827,7 @@ namespace OutdoorAirUnit {
             {
                 auto const SELECT_CASE_var(UnitControlType);
                 if (SELECT_CASE_var == Control::Neutral) {
-                    SetPointTemp = MAT(ZoneNum);
+                    SetPointTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                     // Neutral Control Condition
                     if (DesOATemp == SetPointTemp) {
                         OutAirUnit(OAUnitNum).OperatingMode = Operation::NeutralMode;
@@ -2054,8 +2050,6 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;

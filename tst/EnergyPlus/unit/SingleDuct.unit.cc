@@ -144,8 +144,8 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
 }
 
@@ -315,8 +315,8 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     // node number table
     //  1   Zone 1 Air Node
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
     EXPECT_EQ(SysMaxMassFlow, state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Cleanup
-    DataHeatBalFanSys::TempControlType.deallocate();
+    state->dataHeatBalFanSys->TempControlType.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
 }
 

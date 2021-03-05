@@ -1154,8 +1154,6 @@ namespace EnergyPlus::CoolingPanelSimple {
         // Incropera and DeWitt, Fundamentals of Heat and Mass Transfer
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHVACGlobals::SmallLoad;
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1218,7 +1216,7 @@ namespace EnergyPlus::CoolingPanelSimple {
             CoolingPanelOn = false;
         }
         // Calculate the "zone" temperature for determining the output of the cooling panel
-        Tzone = Xr * state.dataHeatBal->MRT(ZoneNum) + ((1.0 - Xr) * MAT(ZoneNum));
+        Tzone = Xr * state.dataHeatBal->MRT(ZoneNum) + ((1.0 - Xr) * state.dataHeatBalFanSys->MAT(ZoneNum));
 
         // Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
         if (waterInletTemp >= Tzone) CoolingPanelOn = false;
@@ -1233,7 +1231,7 @@ namespace EnergyPlus::CoolingPanelSimple {
         // iterate like in the low temperature radiant systems because the inlet water condition is known
         // not calculated.  So, we can deal with this upfront rather than after calculation and then more
         // iteration.
-        DewPointTemp = PsyTdpFnWPb(state, ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
+        DewPointTemp = PsyTdpFnWPb(state, state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataEnvrn->OutBaroPress);
 
         if (waterInletTemp < (DewPointTemp + this->CondDewPtDeltaT) && (CoolingPanelOn)) {
 
@@ -1434,22 +1432,21 @@ namespace EnergyPlus::CoolingPanelSimple {
         // This subroutine sets the control temperature for the simple cooling panel.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
 
         {
             auto const SELECT_CASE_var(this->ControlType);
             if (SELECT_CASE_var == Control::MAT) {
-                ControlTemp = MAT(ZoneNum);
+                ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
             } else if (SELECT_CASE_var == Control::MRT) {
                 ControlTemp = state.dataHeatBal->MRT(ZoneNum);
             } else if (SELECT_CASE_var == Control::Operative) {
-                ControlTemp = 0.5 * (MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
+                ControlTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
             } else if (SELECT_CASE_var == Control::ODB) {
                 ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp;
             } else if (SELECT_CASE_var == Control::OWB) {
                 ControlTemp = state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp;
             } else { // Should never get here
-                ControlTemp = MAT(ZoneNum);
+                ControlTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 ShowSevereError(state, "Illegal control type in cooling panel system: " + this->EquipID);
                 ShowFatalError(state, "Preceding condition causes termination.");
             }
@@ -1576,8 +1573,6 @@ namespace EnergyPlus::CoolingPanelSimple {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MaxRadHeatFlux;
-        using DataHeatBalFanSys::QCoolingPanelSurf;
-        using DataHeatBalFanSys::QCoolingPanelToPerson;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const SmallestArea(0.001); // Smallest area in meters squared (to avoid a divide by zero)
@@ -1590,8 +1585,8 @@ namespace EnergyPlus::CoolingPanelSimple {
         Real64 ThisSurfIntensity; // temporary for W/m2 term for rad on a surface
 
         // Initialize arrays
-        QCoolingPanelSurf = 0.0;
-        QCoolingPanelToPerson = 0.0;
+        state.dataHeatBalFanSys->QCoolingPanelSurf = 0.0;
+        state.dataHeatBalFanSys->QCoolingPanelToPerson = 0.0;
 
         for (CoolingPanelNum = 1; CoolingPanelNum <= state.dataChilledCeilingPanelSimple->NumCoolingPanels; ++CoolingPanelNum) {
 
@@ -1599,14 +1594,14 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             ZoneNum = ThisCP.ZonePtr;
             if (ZoneNum <= 0) continue;
-            QCoolingPanelToPerson(ZoneNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
+            state.dataHeatBalFanSys->QCoolingPanelToPerson(ZoneNum) += state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribPerson;
 
             for (RadSurfNum = 1; RadSurfNum <= ThisCP.TotSurfToDistrib; ++RadSurfNum) {
                 SurfNum = ThisCP.SurfacePtr(RadSurfNum);
                 auto &ThisSurf(state.dataSurface->Surface(SurfNum));
                 if (ThisSurf.Area > SmallestArea) {
                     ThisSurfIntensity = (state.dataChilledCeilingPanelSimple->CoolingPanelSource(CoolingPanelNum) * ThisCP.FracDistribToSurf(RadSurfNum) / ThisSurf.Area);
-                    QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
+                    state.dataHeatBalFanSys->QCoolingPanelSurf(SurfNum) += ThisSurfIntensity;
                     // CR 8074, trap for excessive intensity (throws off surface balance )
                     if (ThisSurfIntensity > MaxRadHeatFlux) {
                         ShowSevereError(state, "DistributeCoolingPanelRadGains:  excessive thermal radiation heat flux intensity detected");

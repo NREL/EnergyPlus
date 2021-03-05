@@ -4694,8 +4694,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     // UnitarySystem does not care (or look at) if Tstat is in deadband
     // This line tests case where other zone equipment changes deadband status
@@ -5579,8 +5579,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // FanAndCoilAvailSchedule
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // ContinuousFanSchedule
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -6039,8 +6039,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
@@ -8152,8 +8152,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0); // initialize RhoAir
@@ -8487,8 +8487,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).SequencedOutputRequiredToDehumidSP(1) =
         state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlZoneNum).OutputRequiredToDehumidifyingSP;
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     // fill the schedule values
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // availability
     state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0; // constant fan
@@ -10234,8 +10234,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
 
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(thisSys->ControlZoneNum).SequencedOutputRequiredToDehumidSP.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -14433,16 +14433,16 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     DataLoopNode::Node(1).Temp = 24.0;      // 24C db
     DataLoopNode::Node(1).HumRat = 0.01522; // 17C wb
     DataLoopNode::Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(1).Temp, DataLoopNode::Node(1).HumRat);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
+    state->dataHeatBalFanSys->MAT(1) = DataLoopNode::Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
     DataLoopNode::Node(8).Temp = 23.822;        // 24C db
     DataLoopNode::Node(8).HumRat = 0.0145946;   // 17C wb
     DataLoopNode::Node(8).Enthalpy = 61084.266; // www.sugartech.com/psychro/index.php
@@ -14481,8 +14481,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     DataLoopNode::Node(8).Temp = 24.18496;      // 24C db
     DataLoopNode::Node(8).HumRat = 0.0121542;   // 17C wb
     DataLoopNode::Node(8).Enthalpy = 55245.434; // www.sugartech.com/psychro/index.php
-    DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
+    state->dataHeatBalFanSys->MAT(1) = DataLoopNode::Node(1).Temp;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
@@ -15635,16 +15635,16 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     DataLoopNode::Node(1).Temp = 24.0;      // 24C db
     DataLoopNode::Node(1).HumRat = 0.01522; // 17C wb
     DataLoopNode::Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(1).Temp, DataLoopNode::Node(1).HumRat);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
+    state->dataHeatBalFanSys->MAT(1) = DataLoopNode::Node(1).Temp;
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
     DataLoopNode::Node(7).FluidType = 1;
     DataLoopNode::Node(7).Temp = 24.0;                               // 24C db
     DataLoopNode::Node(7).HumRat = 0.01522;                          // 17C wb

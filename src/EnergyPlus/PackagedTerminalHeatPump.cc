@@ -156,7 +156,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         // Using/Aliasing
 
         using namespace DataZoneEnergyDemands;
-        using DataHeatBalFanSys::TempControlType;
         using DataZoneEquipment::PkgTermACAirToAir_Num;
         using DataZoneEquipment::PkgTermHPAirToAir_Num;
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
@@ -221,9 +220,9 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         RemainingOutputToHeatingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
-        if (RemainingOutputToCoolingSP < 0.0 && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
             QZnReq = RemainingOutputToCoolingSP;
-        } else if (RemainingOutputToHeatingSP > 0.0 && TempControlType(ZoneNum) != SingleCoolingSetPoint) {
+        } else if (RemainingOutputToHeatingSP > 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleCoolingSetPoint) {
             QZnReq = RemainingOutputToHeatingSP;
         } else {
             QZnReq = 0.0;
@@ -3640,7 +3639,6 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
         using SteamCoils::SimulateSteamCoilComponents;
         auto &GetCoilMaxSteamFlowRate(SteamCoils::GetCoilMaxSteamFlowRate);
         auto &GetSteamCoilCapacity(SteamCoils::GetCoilCapacity);
-        using DataHeatBalFanSys::TempControlType;
         using DataPlant::TypeOf_CoilSteamAirHeating;
         using DataPlant::TypeOf_CoilWaterSimpleHeating;
         using Fans::GetFanVolFlow;
@@ -4326,7 +4324,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                     QZnReq = QToHeatSetPt;
                     state.dataPTHP->CoolingLoad = false;
                     //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                    if (TempControlType(ZoneNum) == SingleCoolingSetPoint || TempControlType(ZoneNum) == 0) {
+                    if (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleCoolingSetPoint || state.dataHeatBalFanSys->TempControlType(ZoneNum) == 0) {
                         state.dataPTHP->HeatingLoad = false;
                     } else {
                         state.dataPTHP->HeatingLoad = true;
@@ -4381,7 +4379,7 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                 if (NoCompOutput > QToCoolSetPt) {
                     QZnReq = QToCoolSetPt;
                     //       Don't set mode TRUE unless mode is allowed. Also check for floating zone.
-                    if (TempControlType(ZoneNum) == SingleHeatingSetPoint || TempControlType(ZoneNum) == 0) {
+                    if (state.dataHeatBalFanSys->TempControlType(ZoneNum) == SingleHeatingSetPoint || state.dataHeatBalFanSys->TempControlType(ZoneNum) == 0) {
                         state.dataPTHP->CoolingLoad = false;
                     } else {
                         state.dataPTHP->CoolingLoad = true;

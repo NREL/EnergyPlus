@@ -1569,8 +1569,6 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
-        using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-        using DataHeatBalFanSys::ZoneThermostatSetPointLo;
         using DataHVACGlobals::SmallTempDiff;
 
         // Locals
@@ -1640,9 +1638,9 @@ namespace DualDuct {
                 this->dd_airterminalOAInlet.AirMassFlowRate * (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * Node(ZoneNodeNum).Temp);
 
             QOALoadToHeatSP = this->dd_airterminalOAInlet.AirMassFlowRate *
-                              (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * ZoneThermostatSetPointLo(ZoneNum));
+                              (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum));
             QOALoadToCoolSP = this->dd_airterminalOAInlet.AirMassFlowRate *
-                              (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * ZoneThermostatSetPointHi(ZoneNum));
+                              (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum));
 
         } else {
             QOALoad = 0.0;

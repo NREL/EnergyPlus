@@ -472,11 +472,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
@@ -884,13 +884,13 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBal->ZnRpt.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
@@ -1039,11 +1039,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     InternalHeatGains::CalcZoneITEq(*state);
@@ -1561,11 +1561,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyGoodInletNode)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -1784,11 +1784,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     EXPECT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
 }
@@ -2010,11 +2010,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesG
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);
@@ -2237,11 +2237,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     ASSERT_ANY_THROW(InternalHeatGains::GetInternalHeatGainsInput(*state));
 }
@@ -2463,11 +2463,11 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_WarnMissingInletNode)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
 
-    DataHeatBalFanSys::MAT(1) = 24.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
+    state->dataHeatBalFanSys->MAT(1) = 24.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.008;
 
     InternalHeatGains::GetInternalHeatGainsInput(*state);
     ASSERT_FALSE(ErrorsFound);

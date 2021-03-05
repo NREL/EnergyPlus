@@ -644,16 +644,16 @@ namespace EnergyPlus::WaterThermalTanks {
                     auto const SELECT_CASE_var(Tank.TypeNum);
                     if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterMixed) {
                         QLossToZone = max(Tank.OnCycLossCoeff * Tank.OnCycLossFracToZone, Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone) *
-                                      (TankTemp - DataHeatBalFanSys::MAT(Tank.AmbientTempZone));
+                                      (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
                         QLossToZone =
                             max(Tank.Node(1).OnCycLossCoeff * Tank.SkinLossFracToZone, Tank.Node(1).OffCycLossCoeff * Tank.SkinLossFracToZone) *
-                            (TankTemp - DataHeatBalFanSys::MAT(Tank.AmbientTempZone));
+                            (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
-                        QLossToZone = Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone * (TankTemp - DataHeatBalFanSys::MAT(Tank.AmbientTempZone));
+                        QLossToZone = Tank.OffCycLossCoeff * Tank.OffCycLossFracToZone * (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
                     } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
                         QLossToZone =
-                            Tank.Node(1).OffCycLossCoeff * Tank.SkinLossFracToZone * (TankTemp - DataHeatBalFanSys::MAT(Tank.AmbientTempZone));
+                            Tank.Node(1).OffCycLossCoeff * Tank.SkinLossFracToZone * (TankTemp - state.dataHeatBalFanSys->MAT(Tank.AmbientTempZone));
                     }
                 }
                 Tank.AmbientZoneGain = QLossToZone;
@@ -5785,7 +5785,7 @@ namespace EnergyPlus::WaterThermalTanks {
                     this->AmbientTemp = ScheduleManager::GetCurrentScheduleValue(state, SchIndex);
 
                 } else if (SELECT_CASE_var == AmbientTempEnum::TempZone) {
-                    this->AmbientTemp = DataHeatBalFanSys::MAT(this->AmbientTempZone);
+                    this->AmbientTemp = state.dataHeatBalFanSys->MAT(this->AmbientTempZone);
 
                 } else if (SELECT_CASE_var == AmbientTempEnum::OutsideAir) {
                     this->AmbientTemp = DataLoopNode::Node(this->AmbientTempOutsideAirNode).Temp;
@@ -5954,7 +5954,7 @@ namespace EnergyPlus::WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(state.dataWaterThermalTanks->HPWaterHeater(HPNum).CrankcaseTempIndicator);
                 if (SELECT_CASE_var == CrankTempEnum::Zone) {
-                    DataHVACGlobals::HPWHCrankcaseDBTemp = DataHeatBalFanSys::MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
+                    DataHVACGlobals::HPWHCrankcaseDBTemp = state.dataHeatBalFanSys->MAT(state.dataWaterThermalTanks->HPWaterHeater(HPNum).AmbientTempZone);
                 } else if (SELECT_CASE_var == CrankTempEnum::Exterior) {
                     DataHVACGlobals::HPWHCrankcaseDBTemp = state.dataEnvrn->OutDryBulbTemp;
                 } else if (SELECT_CASE_var == CrankTempEnum::Schedule) {

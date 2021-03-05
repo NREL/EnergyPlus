@@ -1788,7 +1788,7 @@ namespace FuelCellElectricGenerator {
 
                 // get zone air temp
                 if (this->FCPM.ZoneID > 0) {
-                    this->FCPM.QdotSkin = this->FCPM.UAskin * (this->FCPM.TprodGasLeavingFCPM - DataHeatBalFanSys::ZT(this->FCPM.ZoneID));
+                    this->FCPM.QdotSkin = this->FCPM.UAskin * (this->FCPM.TprodGasLeavingFCPM - state.dataHeatBalFanSys->ZT(this->FCPM.ZoneID));
                 }
 
             } else if (this->FCPM.SkinLossMode == DataGenerators::SkinLoss::QuadraticFuelNdot) {

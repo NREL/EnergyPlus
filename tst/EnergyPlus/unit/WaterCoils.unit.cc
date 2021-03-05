@@ -1683,8 +1683,8 @@ TEST_F(WaterCoilsTest, FanCoilCoolingWaterFlowTest)
         loopsidebranch.Comp.allocate(1);
     }
 
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = 4;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = 4;
 
     state->dataWaterCoils->WaterCoil(2).WaterLoopNum = 1;
     state->dataWaterCoils->WaterCoil(2).WaterLoopSide = 1;

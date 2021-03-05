@@ -80,27 +80,27 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     int NumOfCrossMixing = 1;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->CrossMixing.allocate(NumOfCrossMixing);
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
     state->dataZoneEquip->CrossMixingReportFlag.allocate(NumOfCrossMixing);
-    DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPV.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPV.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     state->dataHeatBal->TotCrossMixing = NumOfCrossMixing;
     state->dataZoneEquip->CrossMixingReportFlag(1) = true;
     DataHVACGlobals::TimeStepSys = 1.0;
-    DataHeatBalFanSys::MCPI = 0.0;
-    DataHeatBalFanSys::MCPV = 0.0;
+    state->dataHeatBalFanSys->MCPI = 0.0;
+    state->dataHeatBalFanSys->MCPV = 0.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
-    DataHeatBalFanSys::MAT(1) = 22.0;
-    DataHeatBalFanSys::MAT(2) = 25.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    state->dataHeatBalFanSys->MAT(1) = 22.0;
+    state->dataHeatBalFanSys->MAT(2) = 25.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataEnvrn->StdRhoAir = 1.20;
 
     state->dataHeatBal->CrossMixing(1).ZonePtr = 1;
@@ -131,14 +131,14 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
 
     // Cleanup
     state->dataHeatBal->Zone.deallocate();
-    DataHeatBalFanSys::MAT.deallocate();
-    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
+    state->dataHeatBalFanSys->MAT.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
     state->dataHeatBal->CrossMixing.deallocate();
     state->dataHeatBal->ZnAirRpt.deallocate();
     state->dataZoneEquip->CrossMixingReportFlag.deallocate();
-    DataHeatBalFanSys::MCPI.deallocate();
-    DataHeatBalFanSys::MCPV.deallocate();
-    DataHeatBalFanSys::ZoneAirHumRatAvg.deallocate();
+    state->dataHeatBalFanSys->MCPI.deallocate();
+    state->dataHeatBalFanSys->MCPV.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, InfiltrationReportTest)
@@ -147,29 +147,29 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataGlobal->NumOfZones = 2;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPV.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPV.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->TotVentilation = 1;
     state->dataHeatBal->Ventilation.allocate(state->dataHeatBal->TotVentilation);
     state->dataZoneEquip->VentMCP.allocate(1);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     DataHVACGlobals::TimeStepSys = 1.0;
-    DataHeatBalFanSys::MCPI(1) = 1.0;
-    DataHeatBalFanSys::MCPI(2) = 1.5;
-    DataHeatBalFanSys::MCPV(1) = 2.0;
-    DataHeatBalFanSys::MCPV(2) = 2.5;
+    state->dataHeatBalFanSys->MCPI(1) = 1.0;
+    state->dataHeatBalFanSys->MCPI(2) = 1.5;
+    state->dataHeatBalFanSys->MCPV(1) = 2.0;
+    state->dataHeatBalFanSys->MCPV(2) = 2.5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat = 0.0005;
-    DataHeatBalFanSys::MAT(1) = 22.0;
-    DataHeatBalFanSys::MAT(2) = 25.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    state->dataHeatBalFanSys->MAT(1) = 22.0;
+    state->dataHeatBalFanSys->MAT(2) = 25.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = 20.0;
@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     state->dataZoneEquip->ZoneEquipConfig(2).NumReturnNodes = 0;
     state->dataHeatBal->Ventilation(1).ZonePtr = 1;
     state->dataHeatBal->Ventilation(1).AirTemp = state->dataHeatBal->Zone(1).OutDryBulbTemp;
-    state->dataZoneEquip->VentMCP(1) = DataHeatBalFanSys::MCPV(1);
+    state->dataZoneEquip->VentMCP(1) = state->dataHeatBalFanSys->MCPV(1);
     // Call HVACManager
     ReportAirHeatBalance(*state);
 
@@ -196,13 +196,13 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.4569771, state->dataHeatBal->ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
 
     // #8068
-    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
+    Real64 deltah = state->dataHeatBalFanSys->MCPI(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
                     (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
-                     Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
+                     Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).InfilTotalLoss, 0.0001);
-    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
+    deltah = state->dataHeatBalFanSys->MCPV(1) / (Psychrometrics::PsyCpAirFnW(state->dataEnvrn->OutHumRat)) * 3600.0 *
                     (Psychrometrics::PsyHFnTdbW(state->dataHeatBal->Zone(1).OutDryBulbTemp, state->dataEnvrn->OutHumRat) -
-                     Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
+                     Psychrometrics::PsyHFnTdbW(state->dataHeatBalFanSys->MAT(1), state->dataHeatBalFanSys->ZoneAirHumRat(1)));
     EXPECT_NEAR(-deltah, state->dataHeatBal->ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
@@ -212,26 +212,26 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataGlobal->NumOfZones = 2;
 
     state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPV.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPV.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
 
     state->dataGlobal->NumOfZones = state->dataGlobal->NumOfZones;
     DataHVACGlobals::TimeStepSys = 1.0;
-    DataHeatBalFanSys::MCPI(1) = 1.0;
-    DataHeatBalFanSys::MCPI(2) = 1.5;
-    DataHeatBalFanSys::MCPV(1) = 2.0;
-    DataHeatBalFanSys::MCPV(2) = 2.5;
+    state->dataHeatBalFanSys->MCPI(1) = 1.0;
+    state->dataHeatBalFanSys->MCPI(2) = 1.5;
+    state->dataHeatBalFanSys->MCPV(1) = 2.0;
+    state->dataHeatBalFanSys->MCPV(2) = 2.5;
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutHumRat = 0.0005;
-    DataHeatBalFanSys::MAT(1) = 22.0;
-    DataHeatBalFanSys::MAT(2) = 25.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
-    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    state->dataHeatBalFanSys->MAT(1) = 22.0;
+    state->dataHeatBalFanSys->MAT(2) = 25.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.0011;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg = state->dataHeatBalFanSys->ZoneAirHumRat;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->Zone(1).OutDryBulbTemp = 20.0;
     state->dataHeatBal->Zone(2).OutDryBulbTemp = 20.0;

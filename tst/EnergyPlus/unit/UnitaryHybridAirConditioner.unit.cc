@@ -405,8 +405,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     DataZoneEquipment::GetZoneEquipmentData(*state);    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataHeatBal->ZnAirRpt.allocate(state->dataGlobal->NumOfZones);
-    MAT.allocate(state->dataGlobal->NumOfZones);
-    ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(state->dataGlobal->NumOfZones);
     SystemReports::AllocateAndSetUpVentReports(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
