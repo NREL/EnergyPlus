@@ -151,8 +151,6 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // Using/Aliasing
         using DataHeatBalFanSys::MAT;
-        using DataLoopNode::Node;
-        using DataLoopNode::NumOfNodes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;                          // DO loop counter for zones
@@ -167,7 +165,8 @@ namespace EnergyPlus::ConvectionCoefficients {
         }
 
         if (state.dataConvectionCoefficient->NodeCheck) { // done once when conditions are ready...
-            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled && allocated(Node)) {
+            if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled &&
+                allocated(state.dataLoopNodes->Node)) {
                 state.dataConvectionCoefficient->NodeCheck = false;
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                     if (Zone(ZoneNum).InsideConvectionAlgo != CeilingDiffuser) continue;
@@ -194,33 +193,33 @@ namespace EnergyPlus::ConvectionCoefficients {
                     return e.InsideConvectionAlgo == DataHeatBalance::AdaptiveConvectionAlgorithm;
                 })) {
                 // need to clear out node conditions because dynamic assignments will be affected
-                if (NumOfNodes > 0 && allocated(Node)) {
-                    for (auto &e : Node) {
-                        e.Temp = DefaultNodeValues.Temp;
-                        e.TempMin = DefaultNodeValues.TempMin;
-                        e.TempMax = DefaultNodeValues.TempMax;
-                        e.TempSetPoint = DefaultNodeValues.TempSetPoint;
-                        e.MassFlowRate = DefaultNodeValues.MassFlowRate;
-                        e.MassFlowRateMin = DefaultNodeValues.MassFlowRateMin;
-                        e.MassFlowRateMax = DefaultNodeValues.MassFlowRateMax;
-                        e.MassFlowRateMinAvail = DefaultNodeValues.MassFlowRateMinAvail;
-                        e.MassFlowRateMaxAvail = DefaultNodeValues.MassFlowRateMaxAvail;
-                        e.MassFlowRateSetPoint = DefaultNodeValues.MassFlowRateSetPoint;
-                        e.Quality = DefaultNodeValues.Quality;
-                        e.Press = DefaultNodeValues.Press;
-                        e.Enthalpy = DefaultNodeValues.Enthalpy;
-                        e.HumRat = DefaultNodeValues.HumRat;
-                        e.HumRatMin = DefaultNodeValues.HumRatMin;
-                        e.HumRatMax = DefaultNodeValues.HumRatMax;
-                        e.HumRatSetPoint = DefaultNodeValues.HumRatSetPoint;
-                        e.TempSetPointHi = DefaultNodeValues.TempSetPointHi;
-                        e.TempSetPointLo = DefaultNodeValues.TempSetPointLo;
+                if (state.dataLoopNodes->NumOfNodes > 0 && allocated(state.dataLoopNodes->Node)) {
+                    for (auto &e : state.dataLoopNodes->Node) {
+                        e.Temp = state.dataLoopNodes->DefaultNodeValues.Temp;
+                        e.TempMin = state.dataLoopNodes->DefaultNodeValues.TempMin;
+                        e.TempMax = state.dataLoopNodes->DefaultNodeValues.TempMax;
+                        e.TempSetPoint = state.dataLoopNodes->DefaultNodeValues.TempSetPoint;
+                        e.MassFlowRate = state.dataLoopNodes->DefaultNodeValues.MassFlowRate;
+                        e.MassFlowRateMin = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMin;
+                        e.MassFlowRateMax = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMax;
+                        e.MassFlowRateMinAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMinAvail;
+                        e.MassFlowRateMaxAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMaxAvail;
+                        e.MassFlowRateSetPoint = state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint;
+                        e.Quality = state.dataLoopNodes->DefaultNodeValues.Quality;
+                        e.Press = state.dataLoopNodes->DefaultNodeValues.Press;
+                        e.Enthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
+                        e.HumRat = state.dataLoopNodes->DefaultNodeValues.HumRat;
+                        e.HumRatMin = state.dataLoopNodes->DefaultNodeValues.HumRatMin;
+                        e.HumRatMax = state.dataLoopNodes->DefaultNodeValues.HumRatMax;
+                        e.HumRatSetPoint = state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint;
+                        e.TempSetPointHi = state.dataLoopNodes->DefaultNodeValues.TempSetPointHi;
+                        e.TempSetPointLo = state.dataLoopNodes->DefaultNodeValues.TempSetPointLo;
                     }
-                    if (allocated(MoreNodeInfo)) {
-                        for (auto &e : MoreNodeInfo) {
-                            e.WetBulbTemp = DefaultNodeValues.Temp;
+                    if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
+                        for (auto &e : state.dataLoopNodes->MoreNodeInfo) {
+                            e.WetBulbTemp = state.dataLoopNodes->DefaultNodeValues.Temp;
                             e.RelHumidity = 0.0;
-                            e.ReportEnthalpy = DefaultNodeValues.Enthalpy;
+                            e.ReportEnthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
                             e.VolFlowRateStdRho = 0.0;
                             e.VolFlowRateCrntRho = 0.0;
                             e.Density = 0.0;
@@ -2597,7 +2596,7 @@ namespace EnergyPlus::ConvectionCoefficients {
     Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
     {
 
-        if (!allocated(Node)) {
+        if (!allocated(state.dataLoopNodes->Node)) {
             return 0.0;
         } else {
             // Set local variables
@@ -2621,9 +2620,9 @@ namespace EnergyPlus::ConvectionCoefficients {
             for (int EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                 if (state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).NumOutlets > 0) {
                     thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                    if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                        SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
-                        SumMdot += Node(thisZoneInletNode).MassFlowRate;
+                    if ((thisZoneInletNode > 0) && (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0)) {
+                        SumMdotTemp += state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate * state.dataLoopNodes->Node(thisZoneInletNode).Temp;
+                        SumMdot += state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate;
                     }
                 }
             }
@@ -2631,13 +2630,13 @@ namespace EnergyPlus::ConvectionCoefficients {
                 return SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
             } else {
                 if (thisZoneInletNode > 0) {
-                    return Node(thisZoneInletNode).Temp;
+                    return state.dataLoopNodes->Node(thisZoneInletNode).Temp;
                 } else {
-                    return Node(ZoneNode).Temp;
+                    return state.dataLoopNodes->Node(ZoneNode).Temp;
                 }
             }
         } else {
-            return Node(ZoneNode).Temp;
+            return state.dataLoopNodes->Node(ZoneNode).Temp;
         }
     }
 
@@ -2651,8 +2650,11 @@ namespace EnergyPlus::ConvectionCoefficients {
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
             int ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            Real64 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            return Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
+            Real64 AirDensity = PsyRhoAirFnPbTdbW(state,
+                                                  state.dataEnvrn->OutBaroPress,
+                                                  state.dataLoopNodes->Node(ZoneNode).Temp,
+                                                  PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            return state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (AirDensity * ZoneMult);
         } else {
             return 0.0;
         }
@@ -2671,7 +2673,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         Real64 ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber; // Zone node as defined in system simulation
         if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
-            ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
+            ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / ZoneMult;
         } else { // because these are not updated yet for new environment
             ZoneMassFlowRate = 0.0;
         }
@@ -2813,15 +2815,18 @@ namespace EnergyPlus::ConvectionCoefficients {
         auto &Zone(state.dataHeatBal->Zone);
         auto &Surface(state.dataSurface->Surface);
 
-        if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(Node)) {
+        if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(state.dataLoopNodes->Node)) {
             ACH = 0.0;
         } else {
             // Set local variables
             ZoneVolume = Zone(ZoneNum).Volume;
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            ZoneMassFlowRate = Node(ZoneNode).MassFlowRate / ZoneMult;
+            AirDensity = PsyRhoAirFnPbTdbW(state,
+                                           state.dataEnvrn->OutBaroPress,
+                                           state.dataLoopNodes->Node(ZoneNode).Temp,
+                                           PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / ZoneMult;
 
             if (ZoneMassFlowRate < MinFlow) {
                 ACH = 0.0;
@@ -5131,7 +5136,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                             // get inlet node, not zone node if possible
                             thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                             if (thisZoneInletNode > 0) {
-                                if (Node(thisZoneInletNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5140,7 +5145,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             } else {
-                                if (Node(ZoneNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_C;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5157,7 +5162,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                             if (!(allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums))) continue;
                             thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
                             if (thisZoneInletNode > 0) {
-                                if (Node(thisZoneInletNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5166,7 +5171,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                         state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).CoolingPriority(EquipNum);
                                 }
                             } else {
-                                if (Node(ZoneNode).MassFlowRate > 0.0) {
+                                if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
                                     EquipOnCount = min(EquipOnCount + 1, 10);
                                     FlowRegimeStack(EquipOnCount) = InConvFlowRegime_D;
                                     HeatingPriorityStack(EquipOnCount) =
@@ -5297,9 +5302,12 @@ namespace EnergyPlus::ConvectionCoefficients {
             GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
             // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
-            if (Node(ZoneNode).MassFlowRate > 0.0) {
-                AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-                Re = Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
+            if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
+                AirDensity = PsyRhoAirFnPbTdbW(state,
+                                               state.dataEnvrn->OutBaroPress,
+                                               state.dataLoopNodes->Node(ZoneNode).Temp,
+                                               PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+                Re = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / (v * AirDensity * std::pow(Zone(ZoneNum).Volume, OneThird));
             } else {
                 Re = 0.0;
             }
@@ -6094,14 +6102,18 @@ namespace EnergyPlus::ConvectionCoefficients {
         SupplyAirTemp = MAT(ZoneNum);
         if (Zone(ZoneNum).IsControlled) {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-            AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, Node(ZoneNode).Temp, PsyWFnTdpPb(state, Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
-            AirChangeRate = (Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
+            AirDensity = PsyRhoAirFnPbTdbW(state,
+                                           state.dataEnvrn->OutBaroPress,
+                                           state.dataLoopNodes->Node(ZoneNode).Temp,
+                                           PsyWFnTdpPb(state, state.dataLoopNodes->Node(ZoneNode).Temp, state.dataEnvrn->OutBaroPress));
+            AirChangeRate = (state.dataLoopNodes->Node(ZoneNode).MassFlowRate * DataGlobalConstants::SecInHour) / (AirDensity * Zone(ZoneNum).Volume);
             if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex > 0) {
                 for (EquipNum = 1; EquipNum <= state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).NumOfEquipTypes; ++EquipNum) {
                     if (allocated(state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums)) {
                         thisZoneInletNode = state.dataZoneEquip->ZoneEquipList(state.dataZoneEquip->ZoneEquipConfig(ZoneNum).EquipListIndex).EquipData(EquipNum).OutletNodeNums(1);
-                        if ((thisZoneInletNode > 0) && (Node(thisZoneInletNode).MassFlowRate > 0.0)) {
-                            SumMdotTemp += Node(thisZoneInletNode).MassFlowRate * Node(thisZoneInletNode).Temp;
+                        if ((thisZoneInletNode > 0) && (state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate > 0.0)) {
+                            SumMdotTemp +=
+                                state.dataLoopNodes->Node(thisZoneInletNode).MassFlowRate * state.dataLoopNodes->Node(thisZoneInletNode).Temp;
                         }
                     }
                 }

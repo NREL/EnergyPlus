@@ -1218,7 +1218,7 @@ namespace EnergyPlus::DataZoneEquipment {
                     } else {
                         for (int nodeCount = 1; nodeCount <= thisZoneEquip.NumReturnNodes; ++nodeCount) {
                             int curNodeNum = thisZoneEquip.ReturnNode(nodeCount);
-                            if (NodeName == DataLoopNode::NodeID(curNodeNum)) {
+                            if (NodeName == state.dataLoopNodes->NodeID(curNodeNum)) {
                                 ReturnAirNodeNumber = curNodeNum;
                             }
                         }
@@ -1261,7 +1261,7 @@ namespace EnergyPlus::DataZoneEquipment {
                 } else {
                     for (int nodeCount = 1; nodeCount <= state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).NumReturnNodes; ++nodeCount) {
                         int curNodeNum = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneIndex).ReturnNode(nodeCount);
-                        if (NodeName == DataLoopNode::NodeID(curNodeNum)) {
+                        if (NodeName == state.dataLoopNodes->NodeID(curNodeNum)) {
                             ReturnIndex = nodeCount;
                         }
                     }
