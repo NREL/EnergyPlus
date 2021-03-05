@@ -4640,7 +4640,7 @@
     17.5,                    !- Precool Design Temperature {C}
     0.012,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}
     5,                       !- Number of AirLoopHVAC
-    PSZ-AC:1,                !- AirLoopHVAC 1 Name
+    PSZ-Ac:1,                !- AirLoopHVAC 1 Name
     PSZ-AC:2,                !- AirLoopHVAC 2 Name
     PSZ-AC:3,                !- AirLoopHVAC 3 Name
     PSZ-AC:4,                !- AirLoopHVAC 4 Name
