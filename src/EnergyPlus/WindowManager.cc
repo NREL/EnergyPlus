@@ -2035,7 +2035,6 @@ namespace WindowManager {
         using DataHeatBalSurface::SurfQRadLWOutSrdSurfs;
         using DataHeatBalSurface::QRadOutReport;
         using DataLoopNode::Node;
-        using General::InterpSlatAng; // Function for slat angle interpolation
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         // unused0909  USE DataEnvironment, ONLY: CurMnDyHr
@@ -2385,10 +2384,25 @@ namespace WindowManager {
                         BlNum = SurfWinBlindNumber(SurfNum);
                         state.dataWindowManager->thick(TotGlassLay + 1) = state.dataHeatBal->Blind(BlNum).SlatThickness;
                         state.dataWindowManager->scon(TotGlassLay + 1) = state.dataHeatBal->Blind(BlNum).SlatConductivity / state.dataHeatBal->Blind(BlNum).SlatThickness;
-                        state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRFrontEmiss);
-                        state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRBackEmiss);
-                        state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRFrontTrans);
-                        state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataHeatBal->Blind(BlNum).IRBackTrans);
+                        if (SurfWinMovableSlats(SurfNum)) {
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRFrontEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                                                                                         state.dataHeatBal->Blind(BlNum).IRFrontEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                                                                         SurfWinSlatsAngInterpFac(SurfNum));
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRBackEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                                                                                         state.dataHeatBal->Blind(BlNum).IRBackEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                                                                         SurfWinSlatsAngInterpFac(SurfNum));
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRFrontTrans(SurfWinSlatsAngIndex(SurfNum)),
+                                                                                                                        state.dataHeatBal->Blind(BlNum).IRFrontTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                                                                        SurfWinSlatsAngInterpFac(SurfNum));
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = General::InterpGeneral(state.dataHeatBal->Blind(BlNum).IRBackTrans(SurfWinSlatsAngIndex(SurfNum)),
+                                                                                                                        state.dataHeatBal->Blind(BlNum).IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                                                                        SurfWinSlatsAngInterpFac(SurfNum));
+                        } else {
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 1) = state.dataHeatBal->Blind(BlNum).IRFrontEmiss(1);
+                            state.dataWindowManager->emis(state.dataWindowManager->nglface + 2) = state.dataHeatBal->Blind(BlNum).IRBackEmiss(1);
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 1) = state.dataHeatBal->Blind(BlNum).IRFrontTrans(1);
+                            state.dataWindowManager->tir(state.dataWindowManager->nglface + 2) = state.dataHeatBal->Blind(BlNum).IRBackTrans(1);
+                        }
                     }
                 }
 
@@ -2562,8 +2576,17 @@ namespace WindowManager {
 
             if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
                 SurfInsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer + 2) - state.dataWindowManager->TKelvin;
-                EffShBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
-                EffGlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
+                if (SurfWinMovableSlats(SurfNum)) {
+                    EffShBlEmiss = General::InterpGeneral(window.EffShBlindEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                          window.EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                        SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss = General::InterpGeneral(window.EffGlassEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                        window.EffGlassEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                        SurfWinSlatsAngInterpFac(SurfNum));
+                } else {
+                    EffShBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                    EffGlEmiss = SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                }
                 SurfWinEffInsSurfTemp(SurfNum) = (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin)) / (EffShBlEmiss + EffGlEmiss);
             } else {
                 SurfInsideTemp = state.dataWindowManager->thetas(2 * state.dataWindowManager->ngllayer) - state.dataWindowManager->TKelvin;
@@ -2824,7 +2847,6 @@ namespace WindowManager {
 
         // Using/Aliasing
         using ConvectionCoefficients::CalcISO15099WindowIntConvCoeff;
-        using General::InterpSlatAng;
         using General::InterpSw;
 
         using Psychrometrics::PsyCpAirFnW;
@@ -3503,8 +3525,13 @@ namespace WindowManager {
             } else if (ANY_SHADE_SCREEN(ShadeFlag)) {
                 TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
             } else if (ANY_BLIND(ShadeFlag)) {
-                TransDiff =
-                    InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataConstruction->Construct(ConstrNumSh).BlTransDiff);
+                if (SurfWinMovableSlats(SurfNum)) {
+                    TransDiff = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(SurfWinSlatsAngIndex(SurfNum)),
+                                                       state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                       SurfWinSlatsAngInterpFac(SurfNum));
+                } else {
+                    TransDiff = state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
+                }
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
                 TransDiff = InterpSw(SurfWinSwitchingFactor(SurfNum), state.dataConstruction->Construct(ConstrNum).TransDiff, state.dataConstruction->Construct(ConstrNumSh).TransDiff);
             }
@@ -6202,6 +6229,7 @@ namespace WindowManager {
                 TVisNorm = TScBmBmVis * (TBmBmVis + TDifVis * RGlFrontVis * RScBackVis / (1 - RGlDiffFrontVis * RScDifBackVis)) +
                            TScBmDifVis * TDifVis / (1 - RGlDiffFrontVis * RScDifBackVis);
             } else {
+                // TODO - NOT USING SurfWinSlatAngThisTS
                 VarSlats = false;
                 if (state.dataHeatBal->Blind(BlNum).SlatAngleType == VariableSlats) VarSlats = true;
                 SlatAng = state.dataHeatBal->Blind(BlNum).SlatAngle * DataGlobalConstants::DegToRadians;

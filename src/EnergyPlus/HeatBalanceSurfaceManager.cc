@@ -2244,9 +2244,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine QSUN
 
-        // TODO: InterpSlatAng (XL)
-        // TODO: TDD in Zone
-
         // Using/Aliasing
         using SolarShading::CalcInteriorSolarDistribution;
         using namespace HeatBalanceMovableInsulation;
@@ -3555,27 +3552,25 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         if (ShadeFlag == WinShadingType::IntShade) {
                             SurfWinIntLWAbsByShade(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).ShadeAbsorpThermal * state.dataHeatBal->TMULT(radEnclosureNum);
                         } else if (ShadeFlag == WinShadingType::IntBlind) {
-                            Real64 EffBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1); // Blind emissivity (thermal absorptance) as part of glazing system
+                            Real64 EffBlEmiss; // Blind emissivity (thermal absorptance) as part of glazing system
                             if (SurfWinMovableSlats(SurfNum)) {
                                 EffBlEmiss = General::InterpGeneral(SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex(SurfNum)),
                                                                     SurfaceWindow(SurfNum).EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
                                                                     SurfWinSlatsAngInterpFac(SurfNum));
+                            } else {
+                                EffBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                             }
                             SurfWinIntLWAbsByShade(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * EffBlEmiss * state.dataHeatBal->TMULT(radEnclosureNum);
                         }
                         if (ANY_SHADE_SCREEN(ShadeFlag)){
                             SurfWinIntSWAbsByShade(SurfNum) = state.dataHeatBal->QS(solEnclosureNum) * state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
                         } else if (ANY_BLIND(ShadeFlag)) {
-//                            Real64 AbsDiffBkBl_old = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum),
-//                                    state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind); // Blind diffuse back solar absorptance as part of glazing system
-
                             Real64 AbsDiffBkBl = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(1);
                             if (SurfWinMovableSlats(SurfNum)) {
                                 AbsDiffBkBl = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(SurfWinSlatsAngIndex(SurfNum)),
                                                                state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
                                                                SurfWinSlatsAngInterpFac(SurfNum));
                             }
-//                            assert(abs(AbsDiffBkBl_old - AbsDiffBkBl) < 0.001);
                             SurfWinIntSWAbsByShade(SurfNum) = state.dataHeatBal->QS(solEnclosureNum) * AbsDiffBkBl;
 
                         }
@@ -3833,7 +3828,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // BLAST Routine: CITAF - Compute Interior Thermal Absorption Factors
 
         using namespace HeatBalanceMovableInsulation;
-        using General::InterpSlatAng;
         using General::InterpSw;
         using HeatBalanceMovableInsulation::EvalInsideMovableInsulation;
 
@@ -3861,14 +3855,12 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             }
             int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
                 WinShadingType ShadeFlag = SurfWinShadingFlag(SurfNum);
                 if (ANY_INTERIOR_SHADE_BLIND(ShadeFlag)) {
-
-                    Real64 BlindEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
-                    Real64 GlassEmiss = SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                    Real64 BlindEmiss;
+                    Real64 GlassEmiss;
                     if (SurfWinMovableSlats(SurfNum)) {
                         BlindEmiss = General::InterpGeneral(SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex(SurfNum)),
                                                             SurfaceWindow(SurfNum).EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
@@ -3876,6 +3868,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                         GlassEmiss = General::InterpGeneral(SurfaceWindow(SurfNum).EffGlassEmiss(SurfWinSlatsAngIndex(SurfNum)),
                                                             SurfaceWindow(SurfNum).EffGlassEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
                                                             SurfWinSlatsAngInterpFac(SurfNum));
+                    } else {
+                        BlindEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                        GlassEmiss = SurfaceWindow(SurfNum).EffGlassEmiss(1);
                     }
                     state.dataHeatBal->ITABSF(SurfNum) = BlindEmiss + GlassEmiss;
                     // For shades, following interpolation just returns value of first element in array
@@ -3919,12 +3914,15 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             // Effective emissivity of shade or blind
                             Real64 EffShDevEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                             if (ShadeFlag == WinShadingType::IntBlind) {
-                                TauShIR = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
-                                                        SurfWinMovableSlats(SurfNum),
-                                                        state.dataHeatBal->Blind(SurfWinBlindNumber(SurfNum)).IRBackTrans);
-                                EffShDevEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
-                                                              SurfWinMovableSlats(SurfNum),
-                                                              SurfaceWindow(SurfNum).EffShBlindEmiss);
+                                TauShIR = state.dataHeatBal->Blind(SurfWinBlindNumber(SurfNum)).IRBackTrans(1);
+                                if (SurfWinMovableSlats(SurfNum)) {
+                                    TauShIR = General::InterpGeneral(state.dataHeatBal->Blind(SurfWinBlindNumber(SurfNum)).IRBackTrans(SurfWinSlatsAngIndex(SurfNum)),
+                                                                     state.dataHeatBal->Blind(SurfWinBlindNumber(SurfNum)).IRBackTrans(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                     SurfWinSlatsAngInterpFac(SurfNum));
+                                    EffShDevEmiss = General::InterpGeneral(SurfaceWindow(SurfNum).EffShBlindEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                                           SurfaceWindow(SurfNum).EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                           SurfWinSlatsAngInterpFac(SurfNum));
+                                }
                             }
                             SUM1 += SurfWinDividerArea(SurfNum) * (EffShDevEmiss + DividerThermAbs * TauShIR);
                         } else {
@@ -3977,7 +3975,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         //                         From Zone Lights And Diffuse Solar.
         // Using/Aliasing
         using namespace HeatBalanceMovableInsulation;
-        using General::InterpSlatAng;
         using General::InterpSw;
         using namespace DataWindowEquivalentLayer;
 
@@ -4029,9 +4026,13 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 if (ANY_SHADE_SCREEN(ShadeFlag)) {
                                     AbsDiffLayWin = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBack(Lay);
                                 } else if (ANY_BLIND(ShadeFlag)) {
-                                    AbsDiffLayWin = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
-                                                                  SurfWinMovableSlats(SurfNum),
-                                                                  state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(_, Lay));
+                                    if (SurfWinMovableSlats(SurfNum)) {
+                                        AbsDiffLayWin = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(SurfWinSlatsAngIndex(SurfNum), Lay),
+                                                                                 state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1), Lay),
+                                                                                 SurfWinSlatsAngInterpFac(SurfNum));
+                                    } else {
+                                        AbsDiffLayWin = state.dataConstruction->Construct(ConstrNumSh).BlAbsDiffBack(1, Lay);
+                                    }
                                 }
                             }
 
@@ -4052,11 +4053,17 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                 TransDiffWin = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
                                 DiffAbsShade = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackShade;
                             } else if (ANY_BLIND(ShadeFlag)) {
-                                TransDiffWin = InterpSlatAng(
-                                    SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), state.dataConstruction->Construct(ConstrNumSh).BlTransDiff);
-                                DiffAbsShade = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
-                                                             SurfWinMovableSlats(SurfNum),
-                                                             state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind);
+                                if (SurfWinMovableSlats(SurfNum)) {
+                                    TransDiffWin = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(SurfWinSlatsAngIndex(SurfNum)),
+                                                                           state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                           SurfWinSlatsAngInterpFac(SurfNum));
+                                    DiffAbsShade = General::InterpGeneral(state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(SurfWinSlatsAngIndex(SurfNum)),
+                                                                          state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                                          SurfWinSlatsAngInterpFac(SurfNum));
+                                } else {
+                                    TransDiffWin =  state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
+                                    DiffAbsShade = state.dataConstruction->Construct(ConstrNumSh).AbsDiffBackBlind(1);
+                                }
                             }
                         }
 

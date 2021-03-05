@@ -140,8 +140,19 @@ namespace WindowManager {
             }
             SurfInsideTemp = aTemp - DataGlobalConstants::KelvinConv;
             if (ANY_INTERIOR_SHADE_BLIND(SurfWinShadingFlag(SurfNum))) {
-                auto EffShBlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffShBlindEmiss);
-                auto EffGlEmiss = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum), SurfWinMovableSlats(SurfNum), window.EffGlassEmiss);
+                Real64 EffShBlEmiss;
+                Real64 EffGlEmiss;
+                if (SurfWinMovableSlats(SurfNum)) {
+                    EffShBlEmiss = General::InterpGeneral(window.EffShBlindEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                          window.EffShBlindEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                          SurfWinSlatsAngInterpFac(SurfNum));
+                    EffGlEmiss = General::InterpGeneral(window.EffGlassEmiss(SurfWinSlatsAngIndex(SurfNum)),
+                                                        window.EffGlassEmiss(std::min(MaxSlatAngs, SurfWinSlatsAngIndex(SurfNum) + 1)),
+                                                        SurfWinSlatsAngInterpFac(SurfNum));
+                } else {
+                    EffShBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
+                    EffGlEmiss = SurfaceWindow(SurfNum).EffGlassEmiss(1);
+                }
                 SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (state.dataWindowManager->thetas(2 * totSolidLayers - 2) - state.dataWindowManager->TKelvin)) / (EffShBlEmiss + EffGlEmiss);
             }
