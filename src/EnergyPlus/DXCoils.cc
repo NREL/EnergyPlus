@@ -11822,7 +11822,6 @@ namespace EnergyPlus::DXCoils {
         Real64 LSElecCoolingPower;       // low speed power [W]
         Real64 HSElecCoolingPower;       // high speed power [W]
         Real64 CrankcaseHeatingPower;    // Power due to crank case heater
-        Real64 Hfg;
         Real64 AirVolumeFlowRate;     // Air volume flow rate across the heating coil
         Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
 
