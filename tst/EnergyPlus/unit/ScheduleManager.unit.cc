@@ -91,22 +91,22 @@ TEST_F(EnergyPlusFixture, ScheduleManager_isMinuteMultipleOfTimestep)
 TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
 {
 
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->DSTIndicator = 0;
-    ScheduleManager::NumSchedules = 1;
-    ScheduleManager::Schedule.allocate(1);
-    Schedule(1).WeekSchedulePointer.allocate(367);
-    WeekSchedule.allocate(3);
-    WeekSchedule(1).DaySchedulePointer.allocate(12);
-    WeekSchedule(2).DaySchedulePointer.allocate(12);
-    WeekSchedule(3).DaySchedulePointer.allocate(12);
+    state->dataScheduleMgr->NumSchedules = 1;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).WeekSchedulePointer.allocate(367);
+    state->dataScheduleMgr->WeekSchedule.allocate(3);
+    state->dataScheduleMgr->WeekSchedule(1).DaySchedulePointer.allocate(12);
+    state->dataScheduleMgr->WeekSchedule(2).DaySchedulePointer.allocate(12);
+    state->dataScheduleMgr->WeekSchedule(3).DaySchedulePointer.allocate(12);
     state->dataGlobal->NumOfTimeStepInHour = 1;
-    DaySchedule.allocate(3);
-    DaySchedule(1).TSValue.allocate(1, 24);
-    DaySchedule(2).TSValue.allocate(1, 24);
-    DaySchedule(3).TSValue.allocate(1, 24);
+    state->dataScheduleMgr->DaySchedule.allocate(3);
+    state->dataScheduleMgr->DaySchedule(1).TSValue.allocate(1, 24);
+    state->dataScheduleMgr->DaySchedule(2).TSValue.allocate(1, 24);
+    state->dataScheduleMgr->DaySchedule(3).TSValue.allocate(1, 24);
 
-    for (int ScheduleIndex = 1; ScheduleIndex <= ScheduleManager::NumSchedules; ScheduleIndex++) {
+    for (int ScheduleIndex = 1; ScheduleIndex <= state->dataScheduleMgr->NumSchedules; ScheduleIndex++) {
         for (int i = 1; i <= 366; i++) {
             int x = 1;
             if (i > 250) {
@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
             } else if (i > 249) {
                 x = 2;
             }
-            Schedule(ScheduleIndex).WeekSchedulePointer(i) = x;
+            state->dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(i) = x;
         }
     }
     for (int WeekSchedulePointer = 1; WeekSchedulePointer <= 3; WeekSchedulePointer++) {
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
             int y = 1;
             if (WeekSchedulePointer == 2) y = 2;
             if (WeekSchedulePointer == 3) y = 3;
-            WeekSchedule(WeekSchedulePointer).DaySchedulePointer(dayOfWeek) = y;
+            state->dataScheduleMgr->WeekSchedule(WeekSchedulePointer).DaySchedulePointer(dayOfWeek) = y;
         }
     }
     for (int daySchedulePointer = 1; daySchedulePointer <= 3; daySchedulePointer++) {
@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
             Real64 schVal = 1.0;
             if (daySchedulePointer == 2) schVal = 2.0;
             if (daySchedulePointer == 3) schVal = 3.0;
-            DaySchedule(daySchedulePointer).TSValue(1, whichHour) = schVal;
+            state->dataScheduleMgr->DaySchedule(daySchedulePointer).TSValue(1, whichHour) = schVal;
         }
     }
 
@@ -141,43 +141,43 @@ TEST_F(EnergyPlusFixture, ScheduleManager_UpdateScheduleValues)
     state->dataGlobal->HourOfDay = 1;
 
     // check day schedules
-    EXPECT_EQ(DaySchedule(1).TSValue(1, 1), 1.0); // day < 250 points to this schedule
-    EXPECT_EQ(DaySchedule(1).TSValue(1, 24), 1.0);
+    EXPECT_EQ(state->dataScheduleMgr->DaySchedule(1).TSValue(1, 1), 1.0); // day < 250 points to this schedule
+    EXPECT_EQ(state->dataScheduleMgr->DaySchedule(1).TSValue(1, 24), 1.0);
 
-    EXPECT_EQ(DaySchedule(2).TSValue(1, 1), 2.0); // day = 250 points to this schedule
-    EXPECT_EQ(DaySchedule(2).TSValue(1, 24), 2.0);
+    EXPECT_EQ(state->dataScheduleMgr->DaySchedule(2).TSValue(1, 1), 2.0); // day = 250 points to this schedule
+    EXPECT_EQ(state->dataScheduleMgr->DaySchedule(2).TSValue(1, 24), 2.0);
 
-    EXPECT_EQ(DaySchedule(3).TSValue(1, 1), 3.0); // day > 250 points to this schedule
-    EXPECT_EQ(DaySchedule(3).TSValue(1, 24), 3.0);
+    EXPECT_EQ(state->dataScheduleMgr->DaySchedule(3).TSValue(1, 1), 3.0); // day > 250 points to this schedule
+    EXPECT_EQ(state->dataScheduleMgr->DaySchedule(3).TSValue(1, 24), 3.0);
 
     // schedule values are 1 through day 249, 2 for day 250, and 3 for remainder of year
     state->dataEnvrn->DayOfYear_Schedule = 1;
     UpdateScheduleValues(*state);
     // expect 1.0 on day 1
-    EXPECT_EQ(Schedule(1).CurrentValue, 1.0);
+    EXPECT_EQ(state->dataScheduleMgr->Schedule(1).CurrentValue, 1.0);
 
     state->dataEnvrn->DayOfYear_Schedule = 250;
     UpdateScheduleValues(*state);
     // expect 2.0 on day 250
-    EXPECT_EQ(Schedule(1).CurrentValue, 2.0);
+    EXPECT_EQ(state->dataScheduleMgr->Schedule(1).CurrentValue, 2.0);
 
     // test end of day 250 with daylight savings time active
     state->dataGlobal->HourOfDay = 24;
     state->dataEnvrn->DSTIndicator = 1;
     UpdateScheduleValues(*state);
     // expect a 3 on day 251, which on day 250 at midnight with DST of hour 1 of day 251
-    EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
+    EXPECT_EQ(state->dataScheduleMgr->Schedule(1).CurrentValue, 3.0);
 
     state->dataGlobal->HourOfDay = 2;
     state->dataEnvrn->DSTIndicator = 0;
     state->dataEnvrn->DayOfYear_Schedule = 251;
     UpdateScheduleValues(*state);
     // expect 3.0 for remainder of year regardless of DST
-    EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
+    EXPECT_EQ(state->dataScheduleMgr->Schedule(1).CurrentValue, 3.0);
     state->dataGlobal->HourOfDay = 24;
     state->dataEnvrn->DSTIndicator = 1;
     UpdateScheduleValues(*state);
-    EXPECT_EQ(Schedule(1).CurrentValue, 3.0);
+    EXPECT_EQ(state->dataScheduleMgr->Schedule(1).CurrentValue, 3.0);
 }
 
 TEST_F(EnergyPlusFixture, ScheduleAnnualFullLoadHours_test)
@@ -880,14 +880,14 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST)
     state->dataEnvrn->DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
 
     state->dataEnvrn->DSTIndicator = 1; // DST IS ON
     ScheduleManager::UpdateScheduleValues(*state);
     // Since DST is on, you're actually on the next day, on 6/1 at 1:00
     // so it **should** return 3.0
-    EXPECT_EQ(3.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(3.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
     EXPECT_EQ(3.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
 }
@@ -929,14 +929,14 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_SouthernHemispher
     state->dataEnvrn->DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(2.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ(2.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(2.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(2.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
 
     state->dataEnvrn->DSTIndicator = 1; // DST IS ON
     ScheduleManager::UpdateScheduleValues(*state);
     // Since DST is on, you're actually on the next day, which in this specific case should be 1/1 at 0:15
     // so it **should** return 1.0
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
 }
@@ -977,35 +977,35 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     int nDays = 366;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
-    ScheduleManager::ScheduleInputProcessed = true;
-    EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
-    ScheduleManager::NumSchedules = 1;
-    ScheduleManager::Schedule.allocate(ScheduleManager::NumSchedules);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    EXPECT_TRUE(state->dataScheduleMgr->ScheduleInputProcessed);
+    state->dataScheduleMgr->NumSchedules = 1;
+    state->dataScheduleMgr->Schedule.allocate(state->dataScheduleMgr->NumSchedules);
 
-    ScheduleManager::Schedule(1).WeekSchedulePointer.allocate(nDays);
-    ScheduleManager::WeekSchedule.allocate(nDays);
-    ScheduleManager::DaySchedule.allocate(nDays);
+    state->dataScheduleMgr->Schedule(1).WeekSchedulePointer.allocate(nDays);
+    state->dataScheduleMgr->WeekSchedule.allocate(nDays);
+    state->dataScheduleMgr->DaySchedule.allocate(nDays);
 
-    for (int ScheduleIndex = 1; ScheduleIndex <= ScheduleManager::NumSchedules; ScheduleIndex++) {
+    for (int ScheduleIndex = 1; ScheduleIndex <= state->dataScheduleMgr->NumSchedules; ScheduleIndex++) {
         for (int day = 1; day <= nDays; ++day) {
             // int DayOfWeek = ((day-1) % 7) + 1;
-            ScheduleManager::Schedule(ScheduleIndex).WeekSchedulePointer(day) = day;
-            ScheduleManager::WeekSchedule(day).DaySchedulePointer.allocate(7);
+            state->dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(day) = day;
+            state->dataScheduleMgr->WeekSchedule(day).DaySchedulePointer.allocate(7);
             for (int d = 1; d <= 7; ++d) {
-                ScheduleManager::WeekSchedule(day).DaySchedulePointer(d) = day;
+                state->dataScheduleMgr->WeekSchedule(day).DaySchedulePointer(d) = day;
             }
-            ScheduleManager::DaySchedule(day).TSValue.allocate(4, 24);
+            state->dataScheduleMgr->DaySchedule(day).TSValue.allocate(4, 24);
             for (int whichHour = 1; whichHour <= 24; whichHour++) {
                 for (int TS = 1; TS <= state->dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    ScheduleManager::DaySchedule(day).TSValue(TS, whichHour) = whichHour + (day-1) * 24;
+                    state->dataScheduleMgr->DaySchedule(day).TSValue(TS, whichHour) = whichHour + (day-1) * 24;
                 }
             }
         }
     }
 
-    EXPECT_EQ(366, ScheduleManager::Schedule(1).WeekSchedulePointer(366));
-    EXPECT_EQ(366, ScheduleManager::WeekSchedule(366).DaySchedulePointer(2));
-    EXPECT_EQ(8784.0, ScheduleManager::DaySchedule(366).TSValue(4, 24));
+    EXPECT_EQ(366, state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(366));
+    EXPECT_EQ(366, state->dataScheduleMgr->WeekSchedule(366).DaySchedulePointer(2));
+    EXPECT_EQ(8784.0, state->dataScheduleMgr->DaySchedule(366).TSValue(4, 24));
 
     state->dataGlobal->NumOfTimeStepInHour = state->dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
@@ -1025,14 +1025,14 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
     state->dataEnvrn->DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(8784.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ(8784.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(8784.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(8784.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
 
     state->dataEnvrn->DSTIndicator = 1; // DST IS ON
     ScheduleManager::UpdateScheduleValues(*state);
     // Since DST is on, you're actually on the next day, which in this specific case should be 1/1 at 0:15
     // so it **should** return 1.0
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
 
@@ -1069,7 +1069,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
 
                         ScheduleManager::UpdateScheduleValues(*state);
                         EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-                        EXPECT_EQ(HourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(HourOfYear, state->dataScheduleMgr->Schedule(1).CurrentValue);
                         EXPECT_EQ(HourOfYear, ScheduleManager::GetCurrentScheduleValue(*state, 1));
                     }
                 }
@@ -1112,7 +1112,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_Leap) {
                             thisHourOfYear = 1;
                         }
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-                        EXPECT_EQ(thisHourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(thisHourOfYear, state->dataScheduleMgr->Schedule(1).CurrentValue);
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::GetCurrentScheduleValue(*state, 1));
                     }
                 }
@@ -1159,15 +1159,15 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     int nDays = 365;
     state->dataGlobal->NumOfTimeStepInHour = 4;
 
-    ScheduleManager::ScheduleInputProcessed = true;
-    EXPECT_TRUE(ScheduleManager::ScheduleInputProcessed);
-    ScheduleManager::NumSchedules = 1;
-    ScheduleManager::Schedule.allocate(ScheduleManager::NumSchedules);
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    EXPECT_TRUE(state->dataScheduleMgr->ScheduleInputProcessed);
+    state->dataScheduleMgr->NumSchedules = 1;
+    state->dataScheduleMgr->Schedule.allocate(state->dataScheduleMgr->NumSchedules);
 
-    ScheduleManager::Schedule(1).WeekSchedulePointer.allocate(366);
-    ScheduleManager::Schedule(1).WeekSchedulePointer = -1;
-    ScheduleManager::WeekSchedule.allocate(366);
-    ScheduleManager::DaySchedule.allocate(nDays); // Here only creating 365 ScheduleDays
+    state->dataScheduleMgr->Schedule(1).WeekSchedulePointer.allocate(366);
+    state->dataScheduleMgr->Schedule(1).WeekSchedulePointer = -1;
+    state->dataScheduleMgr->WeekSchedule.allocate(366);
+    state->dataScheduleMgr->DaySchedule.allocate(nDays); // Here only creating 365 ScheduleDays
 
     Array1D_int EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
 
@@ -1182,39 +1182,39 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
                 EXPECT_EQ(dayOfYear+1, DayOfYear_Schedule);
             }
 
-            ScheduleManager::Schedule(1).WeekSchedulePointer(DayOfYear_Schedule) = DayOfYear_Schedule;
-            ScheduleManager::WeekSchedule(DayOfYear_Schedule).DaySchedulePointer.allocate(7);
+            state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(DayOfYear_Schedule) = DayOfYear_Schedule;
+            state->dataScheduleMgr->WeekSchedule(DayOfYear_Schedule).DaySchedulePointer.allocate(7);
             for (int d = 1; d <= 7; ++d) {
-                ScheduleManager::WeekSchedule(DayOfYear_Schedule).DaySchedulePointer(d) = dayOfYear;
+                state->dataScheduleMgr->WeekSchedule(DayOfYear_Schedule).DaySchedulePointer(d) = dayOfYear;
             }
-            ScheduleManager::DaySchedule(dayOfYear).TSValue.allocate(4, 24);
+            state->dataScheduleMgr->DaySchedule(dayOfYear).TSValue.allocate(4, 24);
             for (int whichHour = 1; whichHour <= 24; whichHour++) {
                 for (int TS = 1; TS <= state->dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    ScheduleManager::DaySchedule(dayOfYear).TSValue(TS, whichHour) = whichHour + (dayOfYear-1) * 24;
+                    state->dataScheduleMgr->DaySchedule(dayOfYear).TSValue(TS, whichHour) = whichHour + (dayOfYear-1) * 24;
                 }
             }
         }
     }
 
     // Feb 28
-    EXPECT_EQ(59, ScheduleManager::Schedule(1).WeekSchedulePointer(59));
-    EXPECT_EQ(59, ScheduleManager::WeekSchedule(59).DaySchedulePointer(1));
-    EXPECT_EQ(59*24.0, ScheduleManager::DaySchedule(59).TSValue(4, 24));
+    EXPECT_EQ(59, state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(59));
+    EXPECT_EQ(59, state->dataScheduleMgr->WeekSchedule(59).DaySchedulePointer(1));
+    EXPECT_EQ(59*24.0, state->dataScheduleMgr->DaySchedule(59).TSValue(4, 24));
 
     // Feb 29: doesn't exist, and I default initialized everything above to -1
-    EXPECT_EQ(-1, ScheduleManager::Schedule(1).WeekSchedulePointer(60));
+    EXPECT_EQ(-1, state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(60));
     // ProcessSchedule would have treated the "Until: 3/1" to include the 2/29, so do that too.
-    ScheduleManager::Schedule(1).WeekSchedulePointer(60) = 61;
+    state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(60) = 61;
 
     // March 1
-    EXPECT_EQ(61, ScheduleManager::Schedule(1).WeekSchedulePointer(61));
-    EXPECT_EQ(60, ScheduleManager::WeekSchedule(61).DaySchedulePointer(1));
-    EXPECT_EQ(60*24.0, ScheduleManager::DaySchedule(60).TSValue(4, 24));
+    EXPECT_EQ(61, state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(61));
+    EXPECT_EQ(60, state->dataScheduleMgr->WeekSchedule(61).DaySchedulePointer(1));
+    EXPECT_EQ(60*24.0, state->dataScheduleMgr->DaySchedule(60).TSValue(4, 24));
 
 
-    EXPECT_EQ(366, ScheduleManager::Schedule(1).WeekSchedulePointer(366));
-    EXPECT_EQ(365, ScheduleManager::WeekSchedule(366).DaySchedulePointer(1));
-    EXPECT_EQ(8760.0, ScheduleManager::DaySchedule(365).TSValue(4, 24));
+    EXPECT_EQ(366, state->dataScheduleMgr->Schedule(1).WeekSchedulePointer(366));
+    EXPECT_EQ(365, state->dataScheduleMgr->WeekSchedule(366).DaySchedulePointer(1));
+    EXPECT_EQ(8760.0, state->dataScheduleMgr->DaySchedule(365).TSValue(4, 24));
 
     state->dataGlobal->NumOfTimeStepInHour = state->dataGlobal->NumOfTimeStepInHour;    // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 15;    // must initialize this to get schedules initialized
@@ -1234,14 +1234,14 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
     state->dataEnvrn->DSTIndicator = 0; // DST IS OFF
     ScheduleManager::UpdateScheduleValues(*state);
     EXPECT_EQ(8760.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-    EXPECT_EQ(8760.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(8760.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(8760.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
 
     state->dataEnvrn->DSTIndicator = 1; // DST IS ON
     ScheduleManager::UpdateScheduleValues(*state);
     // Since DST is on, you're actually on the next day, which in this specific case should be 1/1 at 0:15
     // so it **should** return 1.0
-    EXPECT_EQ(1.0, ScheduleManager::Schedule(1).CurrentValue);
+    EXPECT_EQ(1.0, state->dataScheduleMgr->Schedule(1).CurrentValue);
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(*state, 1));
     EXPECT_EQ(1.0, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
 
@@ -1274,7 +1274,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
 
                         ScheduleManager::UpdateScheduleValues(*state);
                         EXPECT_EQ(HourOfYear, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-                        EXPECT_EQ(HourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(HourOfYear, state->dataScheduleMgr->Schedule(1).CurrentValue);
                         EXPECT_EQ(HourOfYear, ScheduleManager::GetCurrentScheduleValue(*state, 1));
                     }
                 }
@@ -1317,7 +1317,7 @@ TEST_F(EnergyPlusFixture, Schedule_GetCurrentScheduleValue_DST_RampUp_NoLeap) {
                             thisHourOfYear = 1;
                         }
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::LookUpScheduleValue(*state, 1, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep));
-                        EXPECT_EQ(thisHourOfYear, ScheduleManager::Schedule(1).CurrentValue);
+                        EXPECT_EQ(thisHourOfYear, state->dataScheduleMgr->Schedule(1).CurrentValue);
                         EXPECT_EQ(thisHourOfYear, ScheduleManager::GetCurrentScheduleValue(*state, 1));
                     }
                 }

@@ -1625,7 +1625,7 @@ namespace UtilityRoutines {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
         // std::string tmp = "  " + ErrorMessage + '\n';
-        // if (state.dataGlobal->errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // if (errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors(EnergyPlusData &state)

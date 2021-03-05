@@ -293,13 +293,14 @@ namespace Photovoltaics {
                      Real64 const mBVoc        // change in BVoc with irradiance
     );
 
-    void SetVentedModuleQdotSource(int const VentModNum,
+    void SetVentedModuleQdotSource(EnergyPlusData &state,
+                                   int const VentModNum,
                                    Real64 const QSource // source term in Watts
     );
 
     void GetExtVentedCavityIndex(EnergyPlusData &state, int const SurfacePtr, int &VentCavIndex);
 
-    void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
+    void GetExtVentedCavityTsColl(EnergyPlusData &state, int const VentModNum, Real64 &TsColl);
 
     // -------------------------------------------------------------------------------
 

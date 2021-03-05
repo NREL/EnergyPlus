@@ -801,7 +801,7 @@ namespace EnergyPlus::Pumps {
                 state.dataPumps->PumpEquip(PumpNum).SequencingScheme = PumpBankControlSeq::SequentialScheme;
             }
 
-            //    state.dataPumps->PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(5)
+            //    PumpEquip(PumpNum)%PumpControlType = cAlphaArgs(5)
             if (UtilityRoutines::SameString(cAlphaArgs(5), "Continuous")) {
                 state.dataPumps->PumpEquip(PumpNum).PumpControl = PumpControlType::Continuous;
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Intermittent")) {
@@ -1379,7 +1379,7 @@ namespace EnergyPlus::Pumps {
 
                 // set the maximum flow rate on the outlet node
                 mdotMax = state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity;
-                // mdotMin = state.dataPumps->PumpEquip(PumpNum)%MinVolFlowRate      * SteamDensity
+                // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate      * SteamDensity
                 // On a pump the 'hardware min' (MassFlowRateMin) must be defined as zero and not
                 // confused with the desired pump operating scheme or the user specified
                 //'minimum flow rate'.  The user specified 'minimum flow rate' determines the minimum
@@ -1405,7 +1405,7 @@ namespace EnergyPlus::Pumps {
                                                     state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).FluidIndex,
                                                     RoutineName);
                 mdotMax = state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate * TempWaterDensity;
-                // mdotMin = state.dataPumps->PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
+                // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
                 // see note above
                 mdotMin = 0.0;
                 InitComponentNodes(mdotMin,
@@ -1911,7 +1911,6 @@ namespace EnergyPlus::Pumps {
         // Obtains flow rates from the plant sizing array.
 
         // Using/Aliasing
-        using DataSizing::PlantSizData;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSatDensityRefrig;
 
@@ -1953,7 +1952,7 @@ namespace EnergyPlus::Pumps {
         }
         // use pump sizing factor stored in plant sizing data structure
         if (PlantSizNum > 0) {
-            PumpSizFac = PlantSizData(PlantSizNum).PlantSizFac;
+            PumpSizFac = state.dataSize->PlantSizData(PlantSizNum).PlantSizFac;
         } else {
             // might be able to remove this next block
             if (state.dataPumps->PumpEquip(PumpNum).LoopNum > 0) {
@@ -1982,20 +1981,20 @@ namespace EnergyPlus::Pumps {
         if (state.dataPumps->PumpEquip(PumpNum).NomVolFlowRateWasAutoSized) {
 
             if (PlantSizNum > 0) {
-                if (PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+                if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
                     if (!state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).BranchPumpsExist) {
                         // size pump to full flow of plant loop
                         if (state.dataPumps->PumpEquip(PumpNum).PumpType == Pump_Cond) {
                             TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, StartTemp, 1.0, state.dataPumps->PumpEquip(PumpNum).FluidIndex, RoutineNameSizePumps);
-                            state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
+                            state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
                             state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = state.dataPumps->PumpEquip(PumpNum).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
                         } else {
-                            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
+                            state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PumpSizFac;
                         }
                     } else {
                         // Distribute sizes evenly across all branch pumps
-                        DesVolFlowRatePerBranch = PlantSizData(PlantSizNum).DesVolFlowRate /
+                        DesVolFlowRatePerBranch = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate /
                                                   state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).LoopSide(state.dataPumps->PumpEquip(PumpNum).LoopSideNum).TotalPumps;
                         if (state.dataPumps->PumpEquip(PumpNum).PumpType == Pump_Cond) {
                             TempWaterDensity = GetDensityGlycol(state, fluidNameWater, DataGlobalConstants::InitConvTemp, DummyWaterIndex, RoutineName);
@@ -2012,7 +2011,7 @@ namespace EnergyPlus::Pumps {
                         state.dataPumps->PumpEquip(PumpNum).NomVolFlowRate = 0.0;
                         ShowWarningError(state,
                                          format("SizePump: Calculated Pump Nominal Volume Flow Rate=[{:.2R}] is too small. Set to 0.0",
-                                                PlantSizData(PlantSizNum).DesVolFlowRate));
+                                                state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate));
                         ShowContinueError(state, "..occurs for Pump=" + state.dataPumps->PumpEquip(PumpNum).Name);
                     }
                 }

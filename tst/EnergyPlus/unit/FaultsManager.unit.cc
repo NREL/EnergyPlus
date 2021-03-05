@@ -222,12 +222,12 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     EXPECT_NO_THROW(CheckAndReadFaults(*state));
     compare_err_stream("", true);
 
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurSysNum = 0;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
 
     // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-    DataSizing::DataNonZoneNonAirloopValue = 0.114;
+    state->dataSize->DataNonZoneNonAirloopValue = 0.114;
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_NO_THROW(Fans::SizeFan(*state, FanNum));
@@ -311,12 +311,12 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     EXPECT_NO_THROW(CheckAndReadFaults(*state));
     compare_err_stream("", true);
 
-    DataSizing::CurZoneEqNum = 0;
-    DataSizing::CurSysNum = 0;
-    DataSizing::CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
 
     // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
-    DataSizing::DataNonZoneNonAirloopValue = 0.15;
+    state->dataSize->DataNonZoneNonAirloopValue = 0.15;
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_ANY_THROW(Fans::SizeFan(*state, FanNum));

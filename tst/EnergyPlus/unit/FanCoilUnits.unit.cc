@@ -256,7 +256,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -568,7 +568,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -878,7 +878,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -1256,7 +1256,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -1574,7 +1574,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -1794,7 +1794,7 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
 
         InitializePsychRoutines();
 
@@ -1930,7 +1930,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -2075,23 +2075,23 @@ namespace EnergyPlus {
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
-        ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
-        FinalZoneSizing.allocate(1);
-        FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
-        FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
-        FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-        FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-        FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 20.0;
-        FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-        FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
-        FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->FinalZoneSizing.allocate(1);
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
         state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
@@ -2265,7 +2265,7 @@ namespace EnergyPlus {
         GetZoneData(*state, ErrorsFound);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         SetPredefinedTables(*state);
         GetFanInput(*state);
         GetFanCoilUnits(*state);
@@ -2496,7 +2496,7 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
 
         InitializePsychRoutines();
 
@@ -2639,7 +2639,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanInput(*state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
@@ -2784,23 +2784,23 @@ namespace EnergyPlus {
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
-        ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
-        FinalZoneSizing.allocate(1);
-        FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
-        FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
-        FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-        FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-        FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 20.0;
-        FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-        FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
-        FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->FinalZoneSizing.allocate(1);
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
         state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
@@ -2901,7 +2901,7 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
 
         InitializePsychRoutines();
 
@@ -3057,7 +3057,7 @@ namespace EnergyPlus {
 
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
 
         GetFanCoilUnits(*state);
 
@@ -3197,23 +3197,23 @@ namespace EnergyPlus {
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
 
-        ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
-        FinalZoneSizing.allocate(1);
-        FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.5;
-        FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.5;
-        FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp = 30.0;
-        FinalZoneSizing(CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
-        FinalZoneSizing(CurZoneEqNum).DesHeatCoilInTemp = 20.0;
-        FinalZoneSizing(CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
-        FinalZoneSizing(CurZoneEqNum).DesCoolLoad = 4000.0;
-        FinalZoneSizing(CurZoneEqNum).DesHeatLoad = 4000.0;
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->FinalZoneSizing.allocate(1);
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.5;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.5;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolCoilInHumRat = 0.01;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInTemp = 20.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatCoilInHumRat = 0.005;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolLoad = 4000.0;
+        state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatLoad = 4000.0;
         state->dataEnvrn->StdRhoAir = 1.2;
 
         state->dataGlobal->BeginEnvrnFlag = true;
@@ -3305,7 +3305,7 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
 
         InitializePsychRoutines();
 
@@ -3459,7 +3459,7 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
         auto &thisFanCoil(FanCoil(1));
         EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
@@ -3559,16 +3559,16 @@ namespace EnergyPlus {
         state->dataEnvrn->HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
-        ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
-        FinalZoneSizing.allocate(1);
-        auto &fZoneSizing(FinalZoneSizing(1));
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->FinalZoneSizing.allocate(1);
+        auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
         fZoneSizing.DesCoolVolFlow = 0.5;
         fZoneSizing.DesHeatVolFlow = 0.5;
         fZoneSizing.DesCoolCoilInTemp = 30.0;
@@ -3672,7 +3672,7 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
 
         InitializePsychRoutines();
 
@@ -3826,7 +3826,7 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
         auto &thisFanCoil(FanCoil(1));
         EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
@@ -3926,16 +3926,16 @@ namespace EnergyPlus {
         state->dataEnvrn->HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
-        ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
-        FinalZoneSizing.allocate(1);
-        auto &fZoneSizing(FinalZoneSizing(1));
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->FinalZoneSizing.allocate(1);
+        auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
         fZoneSizing.DesCoolVolFlow = 0.5;
         fZoneSizing.DesHeatVolFlow = 0.5;
         fZoneSizing.DesCoolCoilInTemp = 30.0;
@@ -4039,7 +4039,7 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
 
         InitializePsychRoutines();
 
@@ -4193,7 +4193,7 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
         auto &thisFanCoil(FanCoil(1));
         EXPECT_EQ("MULTISPEEDFAN", thisFanCoil.CapCtrlMeth);
@@ -4293,16 +4293,16 @@ namespace EnergyPlus {
         state->dataEnvrn->HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
-        ZoneEqSizing.allocate(1);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-        ZoneEqSizing(CurZoneEqNum).SizingMethod = 0;
+        state->dataSize->ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+        state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod = 0;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
-        FinalZoneSizing.allocate(1);
-        auto &fZoneSizing(FinalZoneSizing(1));
+        state->dataSize->ZoneSizingRunDone = true;
+        state->dataSize->FinalZoneSizing.allocate(1);
+        auto &fZoneSizing(state->dataSize->FinalZoneSizing(1));
         fZoneSizing.DesCoolVolFlow = 0.5;
         fZoneSizing.DesHeatVolFlow = 0.5;
         fZoneSizing.DesCoolCoilInTemp = 30.0;
@@ -4508,14 +4508,14 @@ namespace EnergyPlus {
         state->dataGlobal->NumOfTimeStepInHour = 1;
         state->dataGlobal->TimeStep = 1;
         state->dataGlobal->MinutesPerTimeStep = 60;
-        DataSizing::CurZoneEqNum = 1;
+        state->dataSize->CurZoneEqNum = 1;
         InitializePsychRoutines();
 
         GetZoneData(*state, ErrorsFound);
         EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
         GetZoneEquipmentData(*state);
         ProcessScheduleInput(*state);
-        ScheduleInputProcessed = true;
+        state->dataScheduleMgr->ScheduleInputProcessed = true;
         GetFanCoilUnits(*state);
         auto &thisFanCoil(FanCoil(1));
         EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
@@ -4604,12 +4604,12 @@ namespace EnergyPlus {
         state->dataEnvrn->HolidayIndex = 0;
         state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
         UpdateScheduleValues(*state);
-        ZoneEqSizing.allocate(1);
+        state->dataSize->ZoneEqSizing.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
         TempControlType.allocate(1);
         TempControlType(1) = 4;
-        ZoneSizingRunDone = true;
+        state->dataSize->ZoneSizingRunDone = true;
         state->dataGlobal->SysSizingCalc = true;
         thisFanCoil.DesignHeatingCapacity = 6000.0;
 

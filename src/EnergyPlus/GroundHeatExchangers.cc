@@ -155,7 +155,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // load data
         this->designFlow = j["design_flow_rate"];
-        PlantUtilities::RegisterPlantCompDesignFlow(this->inletNodeNum, this->designFlow);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
         this->soil.k = j["soil_thermal_conductivity"];
         this->soil.rho = j["soil_density"];
@@ -293,7 +293,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         BranchNodeConnections::TestCompSet(state, this->moduleName, objName, inletNodeName, outletNodeName, "Condenser Water Nodes");
 
         this->designFlow = j["design_flow_rate"];
-        PlantUtilities::RegisterPlantCompDesignFlow(this->inletNodeNum, this->designFlow);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->inletNodeNum, this->designFlow);
 
         this->soil.k = j["ground_thermal_conductivity"];
         this->soil.rhoCp = j["ground_thermal_heat_capacity"];
@@ -2136,7 +2136,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             return;
         }
 
-        // Store state.dataGroundHeatExchanger->currentSimTime in prevTimeSteps only if a time step occurs
+        // Store currentSimTime in prevTimeSteps only if a time step occurs
         if (state.dataGroundHeatExchanger->prevTimeSteps(1) != state.dataGroundHeatExchanger->currentSimTime) {
             state.dataGroundHeatExchanger->prevTimeSteps =
                 eoshift(state.dataGroundHeatExchanger->prevTimeSteps, -1, state.dataGroundHeatExchanger->currentSimTime);

@@ -2667,7 +2667,7 @@ namespace EnergyPlus::HVACManager {
         // to tell ManageZoneAirUpdates (predict and correct) what to do with the heat to return air.
 
         // METHODOLOGY EMPLOYED:
-        // Uses program data structures state.dataAirLoop->AirLoopControlInfo and ZoneEquipInfo
+        // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
@@ -2750,8 +2750,8 @@ namespace EnergyPlus::HVACManager {
                             break;
                         }
                     }
-                    for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                        if (DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                    for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
+                        if (state.dataSurface->SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             ShowWarningError(state, "For zone=" + Zone(ZoneNum).Name +
                                              " return air heat gain from air flow windows will be applied to the zone air.");
                             ShowContinueError(state, "  This zone has no return air or is served by an on/off HVAC system.");

@@ -1122,7 +1122,7 @@ namespace DataPlant {
                     // 3. step through and find out needed information
                     // 3a.  search the loop side with branch pumps and find the steps available with non-zero Myloads
                     // 3b.  search the loop side with branch pumps and find the steps available with zero Myloads
-                    //					LoadedConstantSpeedBranchFlowRateSteps = 0.0;
+                    //                    LoadedConstantSpeedBranchFlowRateSteps = 0.0;
                     Real64 LoadedConstantSpeedBranchFlowRateSteps_sum = 0.0;
                     this_loop_side.noLoadConstantSpeedBranchFlowRateSteps = 0.0;
                     Real64 NoLoadConstantSpeedBranchFlowRateSteps_sum = 0.0;

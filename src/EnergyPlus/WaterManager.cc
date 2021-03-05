@@ -159,9 +159,6 @@ namespace WaterManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -456,7 +453,7 @@ namespace WaterManager {
                     state.dataWaterData->RainCollector(Item).SurfID.allocate(state.dataWaterData->RainCollector(Item).NumCollectSurfs);
                     for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         state.dataWaterData->RainCollector(Item).SurfName(SurfNum) = cAlphaArgs(SurfNum + alphaOffset);
-                        state.dataWaterData->RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), Surface);
+                        state.dataWaterData->RainCollector(Item).SurfID(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + alphaOffset), state.dataSurface->Surface);
                         if (state.dataWaterData->RainCollector(Item).SurfID(SurfNum) == 0) {
                             ShowSevereError(state, "Invalid " + cAlphaFieldNames(SurfNum + alphaOffset) + '=' + cAlphaArgs(SurfNum + alphaOffset));
                             ShowContinueError(state, "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs(1));
@@ -470,9 +467,9 @@ namespace WaterManager {
                     Real64 tmpDenominator = 0.0;
                     for (int SurfNum = 1; SurfNum <= state.dataWaterData->RainCollector(Item).NumCollectSurfs; ++SurfNum) {
                         int ThisSurf = state.dataWaterData->RainCollector(Item).SurfID(SurfNum);
-                        tmpArea += Surface(ThisSurf).GrossArea * Surface(ThisSurf).CosTilt;
-                        tmpNumerator += Surface(ThisSurf).Centroid.z * Surface(ThisSurf).GrossArea;
-                        tmpDenominator += Surface(ThisSurf).GrossArea;
+                        tmpArea += state.dataSurface->Surface(ThisSurf).GrossArea * state.dataSurface->Surface(ThisSurf).CosTilt;
+                        tmpNumerator += state.dataSurface->Surface(ThisSurf).Centroid.z * state.dataSurface->Surface(ThisSurf).GrossArea;
+                        tmpDenominator += state.dataSurface->Surface(ThisSurf).GrossArea;
                     }
                     state.dataWaterData->RainCollector(Item).HorizArea = tmpArea;
                     // now setup vertical hieght above ground for height dependent outdoor temps
