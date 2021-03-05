@@ -184,9 +184,9 @@ protected:
         DataLoopNode::Node.allocate(50);
 
         // note no fan used for these tests
-        HVACUnitaryBypassVAV::NumCBVAV = 1;
-        HVACUnitaryBypassVAV::CBVAV.allocate(1);
-        auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
+        state->dataHVACUnitaryBypassVAV->NumCBVAV = 1;
+        state->dataHVACUnitaryBypassVAV->CBVAV.allocate(1);
+        auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(1));
         cbvav.Name = "CBVAVAirLoop";
         cbvav.UnitType = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
         cbvav.SchedPtr = -1;
@@ -685,7 +685,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
 
     int CBVAVNum = 1;
     int zoneIndex = 1;
-    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(CBVAVNum));
+    auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum));
     // should be the second zone in the zone list as well as actual zone number
     EXPECT_EQ(2, cbvav.ControlledZoneNum(CBVAVNum));
     EXPECT_EQ(2, cbvav.ActualZoneNum(CBVAVNum));
@@ -719,7 +719,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
 {
 
     //  reference CBVAV and FinalSysSizing data
-    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
+    auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(1));
     auto &finalSysSizing(state->dataSize->FinalSysSizing(state->dataSize->CurSysNum));
 
     state->dataSize->SysSizingRunDone = true; // inform sizing that system sizing run is done
@@ -761,7 +761,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
 {
 
     //  reference CBVAV data
-    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
+    auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(1));
     cbvav.FanVolFlow = 0.5;
     cbvav.MaxCoolAirVolFlow = 0.5;
     cbvav.MaxHeatAirVolFlow = 0.5;
@@ -800,7 +800,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     EXPECT_EQ(cbvav.changeOverTimer, -1.0); // expect no change in timer, remains at default value
 
     // initialize priority control
-    cbvav.PriorityControl = HVACUnitaryBypassVAV::CoolingPriority;
+    cbvav.PriorityControl = HVACUnitaryBypassVAV::PriorityCtrlMode::CoolingPriority;
 
     // initialize cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
@@ -856,7 +856,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
 {
 
     //  reference CBVAV data
-    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
+    auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(1));
     cbvav.FanVolFlow = 0.5;
     cbvav.MaxCoolAirVolFlow = 0.5;
     cbvav.MaxHeatAirVolFlow = 0.5;
@@ -892,7 +892,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     EXPECT_NE(DataLoopNode::Node(cbvav.AirInNode).Enthalpy, DataLoopNode::Node(cbvav.AirOutNode).Enthalpy);
 
     // initialize priority control
-    cbvav.PriorityControl = HVACUnitaryBypassVAV::CoolingPriority;
+    cbvav.PriorityControl = HVACUnitaryBypassVAV::PriorityCtrlMode::CoolingPriority;
 
     // initialize cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
@@ -942,7 +942,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
 {
 
     //  reference CBVAV data
-    auto &cbvav(HVACUnitaryBypassVAV::CBVAV(1));
+    auto &cbvav(state->dataHVACUnitaryBypassVAV->CBVAV(1));
     cbvav.FanVolFlow = 0.5;
     cbvav.MaxCoolAirVolFlow = 0.5;
     cbvav.MaxHeatAirVolFlow = 0.5;
@@ -978,7 +978,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     EXPECT_NEAR(DataLoopNode::Node(cbvav.AirInNode).Enthalpy, DataLoopNode::Node(cbvav.AirOutNode).Enthalpy, 0.1);
 
     // initialize priority control
-    cbvav.PriorityControl = HVACUnitaryBypassVAV::CoolingPriority;
+    cbvav.PriorityControl = HVACUnitaryBypassVAV::PriorityCtrlMode::CoolingPriority;
 
     // initialize cooling load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point

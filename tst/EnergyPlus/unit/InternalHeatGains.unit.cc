@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     state->dataScheduleMgr->Schedule(2).MaxMinSet = true;
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
-    EXPECT_FALSE(InternalHeatGains::ErrorsFound);
+    EXPECT_FALSE(state->dataInternalHeatGains->ErrorsFound);
 }
 
 TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentReset)

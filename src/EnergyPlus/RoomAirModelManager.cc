@@ -103,17 +103,6 @@ namespace RoomAirModelManager {
     // Using/Aliasing
     using namespace DataRoomAirModel;
 
-    bool GetUCSDDVDataFlag(true); // UCSD
-    bool GetAirModelData(true);   // Used to "get" all air model data
-    bool MyOneTimeFlag(true);
-
-    void clear_state()
-    {
-        GetUCSDDVDataFlag = true;
-        GetAirModelData = true;
-        MyOneTimeFlag = true;
-    }
-
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
     {
 
@@ -136,9 +125,9 @@ namespace RoomAirModelManager {
         using UFADManager::ManageUCSDUFModels;
 
 
-        if (GetAirModelData) {
+        if (state.dataRoomAirModelMgr->GetAirModelData) {
             GetAirModelDatas(state);
-            GetAirModelData = false;
+            state.dataRoomAirModelMgr->GetAirModelData = false;
         }
 
         if (state.dataRoomAirMod->UCSDModelUsed) {
@@ -1863,7 +1852,7 @@ namespace RoomAirModelManager {
         static int NodeNum2(0); // The Second node number in an AirflowNetwork linkage data
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (state.dataRoomAirModelMgr->MyOneTimeFlag) {
 
             MyEnvrnFlag.allocate(state.dataGlobal->NumOfZones);
 
@@ -2532,7 +2521,7 @@ namespace RoomAirModelManager {
 
             MyEnvrnFlag = true;
 
-            MyOneTimeFlag = false;
+            state.dataRoomAirModelMgr->MyOneTimeFlag = false;
         }
 
         // Do the Begin Environment initializations
@@ -2677,9 +2666,9 @@ namespace RoomAirModelManager {
         int I; // Zone index
 
         // Obtains and Allocates RoomAirSettings : AirflowNetwork
-        if (GetAirModelData) {
+        if (state.dataRoomAirModelMgr->GetAirModelData) {
             GetAirModelDatas(state);
-            GetAirModelData = false;
+            state.dataRoomAirModelMgr->GetAirModelData = false;
         }
 
         Errorfound = false;

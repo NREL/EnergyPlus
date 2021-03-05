@@ -973,22 +973,22 @@ namespace FaultsManager {
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
-                    if (HVACDXHeatPumpSystem::GetInputFlag) {
+                    if (state.dataHVACDXHeatPumpSys->GetInputFlag) {
                         HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput(state);
-                        HVACDXHeatPumpSystem::GetInputFlag = false;
+                        state.dataHVACDXHeatPumpSys->GetInputFlag = false;
                     }
 
                     // Check the coil name and coil type
                     int CoilSysNum =
-                        UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, HVACDXHeatPumpSystem::DXHeatPumpSystem);
+                        UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
                     if (CoilSysNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
                         ErrorsFound = true;
                     } else {
                         // Link the coil system with the fault model
-                        HVACDXHeatPumpSystem::DXHeatPumpSystem(CoilSysNum).FaultyCoilSATFlag = true;
-                        HVACDXHeatPumpSystem::DXHeatPumpSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                        state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(CoilSysNum).FaultyCoilSATFlag = true;
+                        state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(CoilSysNum).FaultyCoilSATIndex = jFault_CoilSAT;
                     }
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "AirLoopHVAC:UnitarySystem")) {
                     // UnitarySystem model connects to FaultManager via function call to FaultsManager::SetFaultyCoilSATSensor
