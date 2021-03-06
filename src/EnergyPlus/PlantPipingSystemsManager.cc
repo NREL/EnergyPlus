@@ -172,7 +172,7 @@ namespace EnergyPlus {
             thisDomain.PerformIterationLoop(state, this);
 
             // Update outlet nodes, etc.
-            thisDomain.UpdatePipingSystems(this);
+            thisDomain.UpdatePipingSystems(state, this);
         }
 
         void SimulateGroundDomains(EnergyPlusData &state, bool initOnly)
@@ -2210,7 +2210,7 @@ namespace EnergyPlus {
                                                  thisCircuit->CompNum);
         }
 
-        void Domain::UpdatePipingSystems(Circuit * thisCircuit) {
+        void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
