@@ -8298,7 +8298,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
     thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
     Real64 ExpectedResult = 1.0 * 1017.8526499999862 * 30.0; // m_dot * Cp_avg * DeltaT
 
-    Real64 SuppHeatCoilCapMax = thisVRFTU.HeatingCoilCapacityLimit(thisVRFTU.SuppHeatCoilAirInletNode, thisVRFTU.MaxSATFromSuppHeatCoil);
+    Real64 SuppHeatCoilCapMax = thisVRFTU.HeatingCoilCapacityLimit(*state, thisVRFTU.SuppHeatCoilAirInletNode, thisVRFTU.MaxSATFromSuppHeatCoil);
 
     EXPECT_NEAR(ExpectedResult, SuppHeatCoilCapMax, 0.0001);
 }
