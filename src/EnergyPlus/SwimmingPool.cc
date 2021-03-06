@@ -113,8 +113,8 @@ namespace EnergyPlus::SwimmingPool {
         }
 
         // System wide (for all pools) inits
-        DataHeatBalFanSys::SumConvPool = 0.0;
-        DataHeatBalFanSys::SumLatentPool = 0.0;
+        state.dataHeatBalFanSys->SumConvPool = 0.0;
+        state.dataHeatBalFanSys->SumLatentPool = 0.0;
 
         PlantLocation A(0, 0, 0, 0);
         Real64 CurLoad = 0.0;
@@ -793,20 +793,20 @@ namespace EnergyPlus::SwimmingPool {
         int ZoneNum = state.dataSurface->Surface(SurfNum).Zone; // index to zone array
 
         // Convection coefficient calculation
-        Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - DataHeatBalFanSys::MAT(ZoneNum)), 1.0 / 3.0) *
+        Real64 HConvIn = 0.22 * std::pow(std::abs(this->PoolWaterTemp - state.dataHeatBalFanSys->MAT(ZoneNum)), 1.0 / 3.0) *
                          this->CurCoverConvFac; // convection coefficient for pool
-        calcSwimmingPoolEvap(state, EvapRate, SurfNum, DataHeatBalFanSys::MAT(ZoneNum), DataHeatBalFanSys::ZoneAirHumRat(ZoneNum));
+        calcSwimmingPoolEvap(state, EvapRate, SurfNum, state.dataHeatBalFanSys->MAT(ZoneNum), state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum));
         this->MakeUpWaterMassFlowRate = EvapRate;
         Real64 EvapEnergyLossPerArea = -EvapRate *
-                                       Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum)) /
+                                       Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->MAT(ZoneNum)) /
                                        state.dataSurface->Surface(SurfNum).Area; // energy effect of evaporation rate per unit area in W/m2
         this->EvapHeatLossRate = EvapEnergyLossPerArea * state.dataSurface->Surface(SurfNum).Area;
         // LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
         // to the air directly and added to the zone air heat balance
         Real64 LWsum =
-            (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + DataHeatBalFanSys::QHTRadSysSurf(SurfNum) +
-             DataHeatBalFanSys::QHWBaseboardSurf(SurfNum) + DataHeatBalFanSys::QSteamBaseboardSurf(SurfNum) +
-             DataHeatBalFanSys::QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
+            (state.dataHeatBal->SurfQRadThermInAbs(SurfNum) + DataHeatBalSurface::SurfNetLWRadToSurf(SurfNum) + state.dataHeatBalFanSys->QHTRadSysSurf(SurfNum) +
+             state.dataHeatBalFanSys->QHWBaseboardSurf(SurfNum) + state.dataHeatBalFanSys->QSteamBaseboardSurf(SurfNum) +
+             state.dataHeatBalFanSys->QElecBaseboardSurf(SurfNum)); // summation of all long-wavelenth radiation going to surface
         Real64 LWtotal = this->CurCoverLWRadFac * LWsum;      // total flux from long-wavelength radiation to surface
         Real64 SWtotal = this->CurCoverSWRadFac * DataHeatBalSurface::SurfOpaqQRadSWInAbs(SurfNum); // total flux from short-wavelength radiation to surface
         this->RadConvertToConvect =
@@ -843,17 +843,17 @@ namespace EnergyPlus::SwimmingPool {
         this->WaterMassFlowRate = MassFlowRate;
 
         // We now have a flow rate so we can assemble the terms needed for the surface heat balance that is solved for the inside face temperature
-        DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
-            SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * DataHeatBalFanSys::MAT(ZoneNum) +
+        state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) =
+            SWtotal + LWtotal + PeopleGain + EvapEnergyLossPerArea + HConvIn * state.dataHeatBalFanSys->MAT(ZoneNum) +
             (EvapRate * Tmuw + MassFlowRate * TLoopInletTemp + (this->WaterMass * TH22 / state.dataGlobal->TimeStepZoneSec)) * Cp /
                 state.dataSurface->Surface(SurfNum).Area;
-        DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
+        state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) =
             HConvIn + (EvapRate + MassFlowRate + (this->WaterMass / state.dataGlobal->TimeStepZoneSec)) * Cp / state.dataSurface->Surface(SurfNum).Area;
 
         // Finally take care of the latent and convective gains resulting from the pool
-        DataHeatBalFanSys::SumConvPool(ZoneNum) += this->RadConvertToConvect;
-        DataHeatBalFanSys::SumLatentPool(ZoneNum) +=
-            EvapRate * Psychrometrics::PsyHfgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(ZoneNum), DataHeatBalFanSys::MAT(ZoneNum));
+        state.dataHeatBalFanSys->SumConvPool(ZoneNum) += this->RadConvertToConvect;
+        state.dataHeatBalFanSys->SumLatentPool(ZoneNum) +=
+            EvapRate * Psychrometrics::PsyHfgAirFnWTdb(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum), state.dataHeatBalFanSys->MAT(ZoneNum));
     }
 
     void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state, Real64 &EvapRate,   // evaporation rate of pool
@@ -901,11 +901,11 @@ namespace EnergyPlus::SwimmingPool {
         }
 
         // Update the running average and the "last" values with the current values of the appropriate variables
-        this->QPoolSrcAvg(SurfNum) += DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
-        this->HeatTransCoefsAvg(SurfNum) += DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
+        this->QPoolSrcAvg(SurfNum) += state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
+        this->HeatTransCoefsAvg(SurfNum) += state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) * DataHVACGlobals::TimeStepSys / state.dataGlobal->TimeStepZone;
 
-        this->LastQPoolSrc(SurfNum) = DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
-        this->LastHeatTransCoefs(SurfNum) = DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
+        this->LastQPoolSrc(SurfNum) = state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
+        this->LastHeatTransCoefs(SurfNum) = state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
         this->LastSysTimeElapsed(SurfNum) = DataHVACGlobals::SysTimeElapsed;
         this->LastTimeStepSys(SurfNum) = DataHVACGlobals::TimeStepSys;
 
@@ -949,23 +949,23 @@ namespace EnergyPlus::SwimmingPool {
                 }
             }
 
-            DataHeatBalFanSys::QPoolSurfNumerator = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg;
-            DataHeatBalFanSys::PoolHeatTransCoefs = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg;
+            state.dataHeatBalFanSys->QPoolSurfNumerator = state.dataSwimmingPools->Pool(PoolNum).QPoolSrcAvg;
+            state.dataHeatBalFanSys->PoolHeatTransCoefs = state.dataSwimmingPools->Pool(PoolNum).HeatTransCoefsAvg;
         }
 
         // For interzone surfaces, modQPoolSrcAvg was only updated for the "active" side.  The active side
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
-                if (std::abs(DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) -
-                             DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
-                    if (std::abs(DataHeatBalFanSys::QPoolSurfNumerator(SurfNum)) >
-                        std::abs(DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
-                        DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond) =
-                            DataHeatBalFanSys::QPoolSurfNumerator(SurfNum);
+                if (std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) -
+                             state.dataHeatBalFanSys->QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
+                    if (std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum)) >
+                        std::abs(state.dataHeatBalFanSys->QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
+                        state.dataHeatBalFanSys->QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond) =
+                            state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum);
                     } else {
-                        DataHeatBalFanSys::QPoolSurfNumerator(SurfNum) =
-                            DataHeatBalFanSys::QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond);
+                        state.dataHeatBalFanSys->QPoolSurfNumerator(SurfNum) =
+                            state.dataHeatBalFanSys->QPoolSurfNumerator(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                     }
                 }
             }
@@ -974,15 +974,15 @@ namespace EnergyPlus::SwimmingPool {
         // would have a non-zero value at this point.  If the numbers differ, then we have to manually update.
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
             if (state.dataSurface->Surface(SurfNum).ExtBoundCond > 0 && state.dataSurface->Surface(SurfNum).ExtBoundCond != SurfNum) {
-                if (std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) -
-                             DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
-                    if (std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum)) >
-                        std::abs(DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
-                        DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond) =
-                            DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum);
+                if (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) -
+                             state.dataHeatBalFanSys->PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond)) > CloseEnough) { // numbers differ
+                    if (std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum)) >
+                        std::abs(state.dataHeatBalFanSys->PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond))) {
+                        state.dataHeatBalFanSys->PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond) =
+                            state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum);
                     } else {
-                        DataHeatBalFanSys::PoolHeatTransCoefs(SurfNum) =
-                            DataHeatBalFanSys::PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond);
+                        state.dataHeatBalFanSys->PoolHeatTransCoefs(SurfNum) =
+                            state.dataHeatBalFanSys->PoolHeatTransCoefs(state.dataSurface->Surface(SurfNum).ExtBoundCond);
                     }
                 }
             }

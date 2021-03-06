@@ -124,7 +124,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     auto numZones = inputProcessor->getNumObjectsFound(*state, "Zone");
-    ZoneReOrder.allocate(numZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(numZones);
     GetZoneData(*state, ErrorsFound);
     GetAirFlowFlag(*state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
@@ -463,7 +463,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     // setup mixing and infiltration objects
     state->dataGlobal->NumOfZones = 2;
-    ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -568,7 +568,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_EQ(Node(8).MassFlowRate,
               2.0); // Zone 2 return node (should be 2 now, because this has zone mass conservation active, so return should equal supply)
 
-    ZoneReOrder.deallocate();
+    state->dataHeatBalFanSys->ZoneReOrder.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Node.deallocate();
     state->dataAirSystemsData->PrimaryAirSystems.deallocate();
@@ -664,7 +664,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     GetProjectControlData(*state, ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     state->dataGlobal->NumOfZones = 2;
-    ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
     ErrorsFound = false;
     GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1246,7 +1246,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     state->dataHeatBal->HConvIn(6) = 0.5;
 
     state->dataGlobal->KickOffSimulation = true;
-    DataHeatBalFanSys::ZoneLatentGain.allocate(1);
+    state->dataHeatBalFanSys->ZoneLatentGain.allocate(1);
     state->dataGlobal->TimeStepZoneSec = 900;
     state->dataHeatBal->ZoneWinHeatGain.allocate(1);
     state->dataHeatBal->ZoneWinHeatGainRep.allocate(1);

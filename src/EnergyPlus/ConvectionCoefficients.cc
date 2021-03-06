@@ -149,8 +149,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         //       Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.137
         // 5.  ISO Standard 15099:2003e
 
-        // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;                          // DO loop counter for zones
@@ -273,15 +271,15 @@ namespace EnergyPlus::ConvectionCoefficients {
                     auto const SELECT_CASE_var1(algoNum);
 
                     if (SELECT_CASE_var1 == ASHRAESimple) {
-                        CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                        CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
                         if (state.dataHeatBal->HConvIn(SurfNum) < state.dataHeatBal->LowHConvLimit) state.dataHeatBal->HConvIn(SurfNum) = state.dataHeatBal->LowHConvLimit;
 
                     } else if (SELECT_CASE_var1 == ASHRAETARP) {
                         if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                            CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                            CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                         } else {
-                            CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                            CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                         }
 
                         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
@@ -295,7 +293,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                         // Already done above and can't be at individual surface
 
                     } else if (SELECT_CASE_var1 == ASTMC1340) {
-                        CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                        CalcASTMC1340ConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
 
                     } else {
 
@@ -2536,7 +2534,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // This subroutine calculates the interior convection coefficient for a surface.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TAirConv;
@@ -2552,7 +2549,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                     TAirConv = state.dataHeatBal->TempEffBulkAir(SurfNum);
                 } else {
                     // currently set to mean air temp but should add error warning here
-                    TAirConv = MAT(Surface(SurfNum).Zone);
+                    TAirConv = state.dataHeatBalFanSys->MAT(Surface(SurfNum).Zone);
                 }
             }
 
@@ -2748,7 +2745,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         Real64 ACH = CalcCeilingDiffuserACH(state, ZoneNum);
 
-        Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
+        Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
 
         for (auto SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -2760,7 +2757,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                 state.dataHeatBal->HConvIn(SurfNum) = CalcCeilingDiffuserIntConvCoeff(state,
                                                                    ACH,
                                                                    SurfaceTemperatures(SurfNum),
-                                                                   DataHeatBalFanSys::MAT(ZoneNum),
+                                                                                      state.dataHeatBalFanSys->MAT(ZoneNum),
                                                                    Surface(SurfNum).CosTilt,
                                                                    AirHumRat,
                                                                    Surface(SurfNum).Height,
@@ -2796,7 +2793,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         //   Thermal Load Calculations, ASHRAE Transactions, vol. 103, Pt. 2, 1997, p.137
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
 
@@ -2842,9 +2838,9 @@ namespace EnergyPlus::ConvectionCoefficients {
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
             if (ACH <= 3.0) { // Use the other convection algorithm
                 if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) {
-                    CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                    CalcASHRAEDetailedIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                 } else {
-                    CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+                    CalcISO15099WindowIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
                 }
             } else { // Use forced convection correlations
                 Tilt = Surface(SurfNum).Tilt;
@@ -2886,7 +2882,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // using the Trombe Wall correlation ?????
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr Real64 g(9.81);     // gravity constant (m/s**2)
@@ -2993,7 +2988,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         // Assign convection coefficients
         for (SurfNum = Zone(ZoneNum).HTSurfaceFirst; SurfNum <= Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
             // Use ASHRAESimple correlation to give values for all the minor surfaces
-            CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), MAT(ZoneNum));
+            CalcASHRAESimpleIntConvCoeff(state, SurfNum, SurfaceTemperatures(SurfNum), state.dataHeatBalFanSys->MAT(ZoneNum));
 
             // assign the convection coefficent to the major surfaces and any subsurfaces on them
             if ((Surface(SurfNum).BaseSurf == Surf1) || (Surface(SurfNum).BaseSurf == Surf2)) {
@@ -3368,7 +3363,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         // Get humidity ratio
         Real64 AirHumRat;
         if (Surface(SurfNum).Zone > 0) {
-            AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(Surface(SurfNum).Zone);
+            AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(Surface(SurfNum).Zone);
         } else {
             AirHumRat = state.dataEnvrn->OutHumRat;
         }
@@ -4315,7 +4310,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         //  - also updates the reference air temperature type for use in the surface heat balance calcs
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::QdotConvInRepPerArea;
         using DataHeatBalSurface::TH;
 
@@ -4326,7 +4320,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         int const ZoneNum = Surface(SurfNum).Zone;
         Real64 &Tsurface = TH(2, 1, SurfNum);
-        Real64 &Tzone = MAT(ZoneNum);
+        Real64 &Tzone = state.dataHeatBalFanSys->MAT(ZoneNum);
 
         auto &HnFn = state.dataSurfaceGeometry->kivaManager.surfaceConvMap[SurfNum].in;
         // now call appropriate function to calculate Hc
@@ -4362,7 +4356,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserFloor) {
                 Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-                Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
+                Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
                     HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -4380,7 +4374,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserCeiling) {
                 Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-                Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
+                Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
                     HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -4398,7 +4392,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == HcInt_FisherPedersenCeilDiffuserWalls) {
                 Real64 AirChangeRate = CalcCeilingDiffuserACH(state, ZoneNum);
-                Real64 AirHumRat = DataHeatBalFanSys::ZoneAirHumRatAvg(ZoneNum);
+                Real64 AirHumRat = state.dataHeatBalFanSys->ZoneAirHumRatAvg(ZoneNum);
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
 
                     HnFn = [=, &state](double Tsurf, double Tamb, double, double, double cosTilt) -> double {
@@ -5078,7 +5072,6 @@ namespace EnergyPlus::ConvectionCoefficients {
 
         // Using/Aliasing
         using namespace DataZoneEquipment;
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
@@ -5203,7 +5196,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Floor) {
-                                        DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
+                                        DeltaTemp = TH(2, 1, SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
                                         if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with floor
                                             // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
                                             EquipOnCount = min(EquipOnCount + 1, 10);
@@ -5222,7 +5215,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Roof) {
-                                        DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
+                                        DeltaTemp = TH(2, 1, SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
                                         if (DeltaTemp < ActiveDelTempThreshold) { // assume cooling with ceiling
                                             // system ON is not enough because  surfaces can continue to cool because of thermal capacity
                                             EquipOnCount = min(EquipOnCount + 1, 10);
@@ -5241,7 +5234,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                                 for (SurfLoop = Zone(ZoneNum).HTSurfaceFirst; SurfLoop <= Zone(ZoneNum).HTSurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
                                     if (Surface(SurfLoop).Class == SurfaceClass::Wall || Surface(SurfLoop).Class == SurfaceClass::Door) {
-                                        DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
+                                        DeltaTemp = TH(2, 1, SurfLoop) - state.dataHeatBalFanSys->MAT(ZoneNum);
                                         if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with wall panel
                                             // system ON is not enough because  surfaces can continue to heat because of thermal capacity
                                             EquipOnCount = min(EquipOnCount + 1, 10);
@@ -5299,7 +5292,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             // Grashof for zone air based on largest delta T between surfaces and zone height
             Tmin = minval(TH(2, 1, {Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
             Tmax = maxval(TH(2, 1, {Zone(ZoneNum).HTSurfaceFirst, Zone(ZoneNum).HTSurfaceLast}));
-            GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
+            GrH = (g * (Tmax - Tmin) * pow_3(Zone(ZoneNum).CeilingHeight)) / ((state.dataHeatBalFanSys->MAT(ZoneNum) + DataGlobalConstants::KelvinConv) * pow_2(v));
 
             // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
             if (state.dataLoopNodes->Node(ZoneNode).MassFlowRate > 0.0) {
@@ -5332,7 +5325,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             auto const SELECT_CASE_var(FinalFlowRegime);
 
             if (SELECT_CASE_var == InConvFlowRegime_A1) {
-                DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
+                DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5409,7 +5402,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                 }
 
             } else if (SELECT_CASE_var == InConvFlowRegime_A2) {
-                DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
+                DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                     if (Surface(SurfNum).IntConvSurfHasActiveInIt) {
@@ -5483,7 +5476,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                     ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A2 surface named" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == InConvFlowRegime_A3) {
-                DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
+                DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5555,7 +5548,7 @@ namespace EnergyPlus::ConvectionCoefficients {
                     ShowSevereError(state, "DynamicIntConvSurfaceClassification: failed to resolve Hc model for A3 surface named" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == InConvFlowRegime_B) {
-                DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
+                DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5654,7 +5647,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
             } else if (SELECT_CASE_var == InConvFlowRegime_D) {
 
-                DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
+                DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
@@ -5732,7 +5725,7 @@ namespace EnergyPlus::ConvectionCoefficients {
 
             } else if (SELECT_CASE_var == InConvFlowRegime_E) {
 
-                DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
+                DeltaTemp = TH(2, 1, SurfNum) - state.dataHeatBalFanSys->MAT(ZoneNum);
                 if (Surface(SurfNum).Class == SurfaceClass::Wall || Surface(SurfNum).Class == SurfaceClass::Door) {
 
                     // mixed regime, but need to know what regime it was before it was mixed
@@ -6076,7 +6069,6 @@ namespace EnergyPlus::ConvectionCoefficients {
         // Using/Aliasing
         using namespace DataZoneEquipment;
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::MAT;
         using DataHeatBalSurface::TH;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdpPb;
@@ -6099,7 +6091,7 @@ namespace EnergyPlus::ConvectionCoefficients {
         ZoneNum = Surface(SurfNum).Zone;
         SumMdotTemp = 0.0;
         SumMdot = 0.0;
-        SupplyAirTemp = MAT(ZoneNum);
+        SupplyAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
         if (Zone(ZoneNum).IsControlled) {
             ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
             AirDensity = PsyRhoAirFnPbTdbW(state,
@@ -6129,7 +6121,7 @@ namespace EnergyPlus::ConvectionCoefficients {
             auto const SELECT_CASE_var(UserCurve.ReferenceTempType);
 
             if (SELECT_CASE_var == RefTempMeanAirTemp) {
-                tmpAirTemp = MAT(ZoneNum);
+                tmpAirTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
                 Surface(SurfNum).TAirRef = ZoneMeanAirTemp;
             } else if (SELECT_CASE_var == RefTempAdjacentAirTemp) {
                 tmpAirTemp = state.dataHeatBal->TempEffBulkAir(SurfNum);

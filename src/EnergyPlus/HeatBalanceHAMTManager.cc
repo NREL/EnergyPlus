@@ -122,12 +122,6 @@ namespace HeatBalanceHAMTManager {
     using DataHeatBalSurface::SurfOpaqQRadSWOutAbs;
     using namespace DataHeatBalance;
     using namespace Psychrometrics;
-    using DataHeatBalFanSys::MAT;
-    using DataHeatBalFanSys::QCoolingPanelSurf;
-    using DataHeatBalFanSys::QElecBaseboardSurf;
-    using DataHeatBalFanSys::QHTRadSysSurf;
-    using DataHeatBalFanSys::QHWBaseboardSurf;
-    using DataHeatBalFanSys::QSteamBaseboardSurf;
 
     void ManageHeatBalHAMT(EnergyPlusData &state, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp)
     {
@@ -1089,7 +1083,7 @@ namespace HeatBalanceHAMTManager {
         cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = TempOutsideAirFD(sid);
         if (state.dataSurface->Surface(sid).ExtBoundCond == OtherSideCondModeledExt) {
             // CR8046 switch modeled rad temp for sky temp.
-            cells(Estate.dataHeatBalHAMTMgr->xtSkycell(sid)).temp = state.dataSurface->OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
+            cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = state.dataSurface->OSCM(state.dataSurface->Surface(sid).OSCMPtr).TRad;
             cells(Extcell(sid)).Qadds = 0.0; // eliminate incident shortwave on underlying surface
         } else {
             cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).temp = state.dataEnvrn->SkyTemp;
@@ -1102,7 +1096,7 @@ namespace HeatBalanceHAMTManager {
 
         // Special case when the surface is an internal mass
         if (state.dataSurface->Surface(sid).ExtBoundCond == sid) {
-            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = MAT(state.dataSurface->Surface(sid).Zone);
+            cells(state.dataHeatBalHAMTMgr->ExtConcell(sid)).temp = state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone);
             RhoOut = RhoVaporAirIn(sid);
         }
 
@@ -1113,13 +1107,13 @@ namespace HeatBalanceHAMTManager {
         cells(state.dataHeatBalHAMTMgr->ExtSkycell(sid)).htc = HSkyFD(sid);
         cells(state.dataHeatBalHAMTMgr->ExtGrncell(sid)).htc = HGrndFD(sid);
 
-        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).temp = MAT(state.dataSurface->Surface(sid).Zone);
+        cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).temp = state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone);
 
         cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).htc = HConvInFD(sid);
 
         cells(Intcell(sid)).Qadds =
-            state.dataSurface->Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + QHTRadSysSurf(sid) + QCoolingPanelSurf(sid) + QHWBaseboardSurf(sid) +
-                                 QSteamBaseboardSurf(sid) + QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) + SurfQAdditionalHeatSourceInside(sid));
+            state.dataSurface->Surface(sid).Area * (SurfOpaqQRadSWInAbs(sid) + SurfNetLWRadToSurf(sid) + state.dataHeatBalFanSys->QHTRadSysSurf(sid) + state.dataHeatBalFanSys->QCoolingPanelSurf(sid) + state.dataHeatBalFanSys->QHWBaseboardSurf(sid) +
+                    state.dataHeatBalFanSys->QSteamBaseboardSurf(sid) + state.dataHeatBalFanSys->QElecBaseboardSurf(sid) + state.dataHeatBal->SurfQRadThermInAbs(sid) + SurfQAdditionalHeatSourceInside(sid));
         // Check, Is this per unit area or for the whole wall.
         //    cells(Intcell(sid))%Qadds=QRadSWInAbs(sid)+NetLWRadToSurf(sid)+QHtRadSysSurf(sid)+QRadThermInAbs(sid)
 
@@ -1150,10 +1144,10 @@ namespace HeatBalanceHAMTManager {
 
         if (state.dataHeatBalHAMTMgr->intvtcflag(sid)) {
             cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = state.dataHeatBalHAMTMgr->intvtc(sid);
-            HMassConvInFD(sid) = cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc * PsyPsatFnTemp(state, MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh / RhoIn;
+            HMassConvInFD(sid) = cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc * PsyPsatFnTemp(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh / RhoIn;
         } else {
             if (cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh > 0) {
-                cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = HMassConvInFD(sid) * RhoIn / (PsyPsatFnTemp(state, MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh);
+                cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = HMassConvInFD(sid) * RhoIn / (PsyPsatFnTemp(state, state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone)) * cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).rh);
             } else {
                 cells(state.dataHeatBalHAMTMgr->IntConcell(sid)).vtc = 10000.0;
             }
@@ -1421,7 +1415,7 @@ namespace HeatBalanceHAMTManager {
 
         TempSurfInP = cells(Intcell(sid)).rhp1 * PsyPsatFnTemp(state, cells(Intcell(sid)).tempp1);
 
-        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
+        RhoVaporSurfIn(sid) = TempSurfInP / (461.52 * (state.dataHeatBalFanSys->MAT(state.dataSurface->Surface(sid).Zone) + DataGlobalConstants::KelvinConv));
     }
 
     void UpdateHeatBalHAMT(EnergyPlusData &state, int const sid)

@@ -14196,7 +14196,7 @@ namespace EnergyPlus::RefrigeratedCase {
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
         // RemainingOutputToCoolingSP in Watts, < 0 for cooling demand
 
-        if (RemainingOutputToCoolingSP < 0.0 && DataHeatBalFanSys::TempControlType(ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
             AirChillerSet(AirChillerSetPtr).QZnReqSens = RemainingOutputToCoolingSP;
         } else {
             AirChillerSet(AirChillerSetPtr).QZnReqSens = 0.0;

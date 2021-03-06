@@ -3417,7 +3417,6 @@ namespace HVACMultiSpeedHeatPump {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZT;
         using DXCoils::SimDXCoilMultiSpeed;
         using Fans::SimulateFanComponents;
         using HeatingCoils::SimulateHeatingCoilComponents;
@@ -3453,13 +3452,13 @@ namespace HVACMultiSpeedHeatPump {
         InletNode = MSHeatPump(MSHeatPumpNum).AirInletNodeNum;
         if (MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex > 0) {
             if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
+                OutsideDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXHeatCoilIndex).SecZonePtr);
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }
         } else if (MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex > 0) {
             if (state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).IsSecondaryDXCoilInZone) {
-                OutsideDryBulbTemp = ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
+                OutsideDryBulbTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(MSHeatPump(MSHeatPumpNum).DXCoolCoilIndex).SecZonePtr);
             } else {
                 OutsideDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
             }

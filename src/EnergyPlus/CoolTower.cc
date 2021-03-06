@@ -520,12 +520,6 @@ namespace CoolTower {
         //     John Wiley & Sons, Inc.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::CTMFL;
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::MCPC;
-        using DataHeatBalFanSys::MCPTC;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbH;
@@ -554,9 +548,9 @@ namespace CoolTower {
         Real64 OutletTemp;   // Dry bulb temperature of air at the cooltower outlet
         Real64 IntHumRat;    // Humidity ratio of initialized air
 
-        MCPTC = 0.0;
-        MCPC = 0.0;
-        CTMFL = 0.0;
+        state.dataHeatBalFanSys->MCPTC = 0.0;
+        state.dataHeatBalFanSys->MCPC = 0.0;
+        state.dataHeatBalFanSys->CTMFL = 0.0;
 
         auto &Zone(state.dataHeatBal->Zone);
 
@@ -566,7 +560,7 @@ namespace CoolTower {
             if (GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr) > 0.0) {
                 // check component operation
                 if (state.dataEnvrn->WindSpeed < MinWindSpeed || state.dataEnvrn->WindSpeed > MaxWindSpeed) continue;
-                if (MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
+                if (state.dataHeatBalFanSys->MAT(ZoneNum) < state.dataCoolTower->CoolTowerSys(CoolTowerNum).MinZoneTemp) continue;
 
                 // Unit is on and simulate this component
                 // Determine the temperature and air flow rate at the cooltower outlet
@@ -633,21 +627,21 @@ namespace CoolTower {
                 AirSpecHeat = PsyCpAirFnW(OutletHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = state.dataCoolTower->CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(state, state.dataCoolTower->CoolTowerSys(CoolTowerNum).SchedPtr);
-                MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
-                MCPTC(ZoneNum) = MCPC(ZoneNum) * OutletTemp;
-                CTMFL(ZoneNum) = MCPC(ZoneNum) / AirSpecHeat;
+                state.dataHeatBalFanSys->MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;
+                state.dataHeatBalFanSys->MCPTC(ZoneNum) = state.dataHeatBalFanSys->MCPC(ZoneNum) * OutletTemp;
+                state.dataHeatBalFanSys->CTMFL(ZoneNum) = state.dataHeatBalFanSys->MCPC(ZoneNum) / AirSpecHeat;
 
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower = MCPC(ZoneNum) * std::abs(ZT(ZoneNum) - OutletTemp);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(ZoneAirHumRat(ZoneNum) - OutletHumRat);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).SenHeatPower = state.dataHeatBalFanSys->MCPC(ZoneNum) * std::abs(state.dataHeatBalFanSys->ZT(ZoneNum) - OutletTemp);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).LatHeatPower = CVF_ZoneNum * std::abs(state.dataHeatBalFanSys->ZoneAirHumRat(ZoneNum) - OutletHumRat);
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletTemp = OutletTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).OutletHumRat = OutletHumRat;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRate = CVF_ZoneNum;
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = CTMFL(ZoneNum);
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = CTMFL(ZoneNum) / state.dataEnvrn->StdRhoAir;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirMassFlowRate = state.dataHeatBalFanSys->CTMFL(ZoneNum);
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).AirVolFlowRateStd = state.dataHeatBalFanSys->CTMFL(ZoneNum) / state.dataEnvrn->StdRhoAir;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletDBTemp = Zone(ZoneNum).OutDryBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletWBTemp = Zone(ZoneNum).OutWetBulbTemp;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).InletHumRat = state.dataEnvrn->OutHumRat;
-                state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate = (std::abs(InletHumRat - OutletHumRat) * CTMFL(ZoneNum)) / RhoWater;
+                state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterConsumpRate = (std::abs(InletHumRat - OutletHumRat) * state.dataHeatBalFanSys->CTMFL(ZoneNum)) / RhoWater;
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).CoolTWaterStarvMakeupRate = 0.0; // initialize -- calc in update
                 state.dataCoolTower->CoolTowerSys(CoolTowerNum).PumpElecPower = state.dataCoolTower->CoolTowerSys(CoolTowerNum).RatedPumpPower * PumpPartLoadRat;
             } else { // Unit is off

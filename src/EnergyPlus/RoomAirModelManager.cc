@@ -2077,7 +2077,7 @@ namespace RoomAirModelManager {
                                        AirflowNetwork::CompTypeNum_SCR) { // surface type = CRACK
                                 state.dataRoomAirMod->SurfParametersCVDV(Loop2).Width = state.dataSurface->Surface(AirflowNetwork::MultizoneSurfaceData(Loop2).SurfNum).Width / 2;
                                 AinCV = AirflowNetwork::MultizoneSurfaceCrackData(TypeNum).FlowCoef /
-                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, MAT(Loop), ZoneAirHumRat(Loop))));
+                                        (BaseDischargeCoef * std::sqrt(2.0 / PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(Loop), state.dataHeatBalFanSys->ZoneAirHumRat(Loop))));
                                 state.dataRoomAirMod->SurfParametersCVDV(Loop2).Height = AinCV / state.dataRoomAirMod->SurfParametersCVDV(Loop2).Width;
                             }
                             // calculate the surface Zmin and Zmax
@@ -2301,7 +2301,7 @@ namespace RoomAirModelManager {
                                         "State",
                                         state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
-                        "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, TempTstatAir(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
+                        "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->TempTstatAir(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
                 }
             }
 
@@ -2339,7 +2339,7 @@ namespace RoomAirModelManager {
                     SetupOutputVariable(state,
                         "Room Air Zone Effective Comfort Air Temperature", OutputProcessor::Unit::C, state.dataRoomAirMod->TCMF(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
-                        "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, TempTstatAir(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
+                        "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->TempTstatAir(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state, "Room Air Zone Transition Height Gamma Value",
                                         OutputProcessor::Unit::None,
                                         state.dataRoomAirMod->ZoneUFGamma(Loop),
@@ -2387,7 +2387,7 @@ namespace RoomAirModelManager {
                     SetupOutputVariable(state,
                         "Room Air Zone Effective Comfort Air Temperature", OutputProcessor::Unit::C, state.dataRoomAirMod->TCMF(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state,
-                        "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, TempTstatAir(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
+                        "Room Air Zone Thermostat Temperature", OutputProcessor::Unit::C, state.dataHeatBalFanSys->TempTstatAir(Loop), "HVAC", "State", state.dataHeatBal->Zone(Loop).Name);
                     SetupOutputVariable(state, "Room Air Zone Transition Height Gamma Value",
                                         OutputProcessor::Unit::None,
                                         state.dataRoomAirMod->ZoneUFGamma(Loop),

@@ -112,9 +112,6 @@ namespace EnergyPlus::PurchasedAirManager {
 
 // Using/Aliasing
 using namespace DataHVACGlobals;
-using DataHeatBalFanSys::ZoneAirHumRat;
-using DataHeatBalFanSys::ZoneThermostatSetPointHi;
-using DataHeatBalFanSys::ZoneThermostatSetPointLo;
 using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
@@ -1289,7 +1286,7 @@ void InitPurchasedAir(EnergyPlusData &state,
 
     // These initializations are done every iteration
     // check that supply air temps can meet the zone thermostat setpoints
-    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > ZoneThermostatSetPointHi(ActualZoneNum) && ZoneThermostatSetPointHi(ActualZoneNum) != 0 &&
+    if (PurchAir(PurchAirNum).MinCoolSuppAirTemp > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) && state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum) != 0 &&
         PurchAir(PurchAirNum).CoolingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
@@ -1314,7 +1311,7 @@ void InitPurchasedAir(EnergyPlusData &state,
                                   format("..the minimum supply air temperature for cooling [{:.2R}] is greater than the zone cooling mean air "
                                          "temperature (MAT) setpoint [{:.2R}].",
                                          PurchAir(PurchAirNum).MinCoolSuppAirTemp,
-                                         ZoneThermostatSetPointHi(ActualZoneNum)));
+                                         state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ActualZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too warm.");
                 ShowContinueError(state, "Unit availability is nominally ON and Cooling availability is nominally ON.");
@@ -1334,7 +1331,7 @@ void InitPurchasedAir(EnergyPlusData &state,
                                           "C");
         }
     }
-    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < ZoneThermostatSetPointLo(ActualZoneNum) && ZoneThermostatSetPointLo(ActualZoneNum) != 0 &&
+    if (PurchAir(PurchAirNum).MaxHeatSuppAirTemp < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) && state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum) != 0 &&
         PurchAir(PurchAirNum).HeatingLimit == LimitType::NoLimit) {
         // Check if the unit is scheduled off
         UnitOn = true;
@@ -1359,7 +1356,7 @@ void InitPurchasedAir(EnergyPlusData &state,
                                   format("..the maximum supply air temperature for heating [{:.2R}] is less than the zone mean air temperature "
                                          "heating setpoint [{:.2R}].",
                                          PurchAir(PurchAirNum).MaxHeatSuppAirTemp,
-                                         ZoneThermostatSetPointLo(ActualZoneNum)));
+                                         state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ActualZoneNum)));
                 ShowContinueError(state, "..For operative and comfort thermostat controls, the MAT setpoint is computed.");
                 ShowContinueError(state, "..This error may indicate that the mean radiant temperature or another comfort factor is too cold.");
                 ShowContinueError(state, "Unit availability is nominally ON and Heating availability is nominally ON.");
@@ -2027,7 +2024,6 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using DataHeatBalFanSys::TempControlType;
     using DataHVACGlobals::ForceOff;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::ZoneComp;
@@ -2159,7 +2155,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         // Check if cooling of the supply air stream is required
 
         // Cooling operation
-        if ((MinOASensOutput >= QZnCoolSP) && (TempControlType(ActualZoneNum) != SingleHeatingSetPoint)) {
+        if ((MinOASensOutput >= QZnCoolSP) && (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != SingleHeatingSetPoint)) {
             OperatingMode = OpMode::Cool;
             // Calculate supply mass flow, temp and humidity with the following constraints:
             //  Min cooling supply temp
@@ -2203,7 +2199,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                          (Node(OANodeNum).Enthalpy < Node(PurchAir(PurchAirNum).ZoneRecircAirNodeNum).Enthalpy))) {
 
                         // Calculate supply MassFlowRate based on sensible load but limit to Max Cooling Supply Air Flow Rate if specified
-                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+                        CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
                         DeltaT = (Node(OANodeNum).Temp - Node(ZoneNodeNum).Temp);
                         if (DeltaT < -SmallTempDiff) {
                             SupplyMassFlowRate = QZnCoolSP / CpAir / DeltaT;
@@ -2226,7 +2222,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForCool = 0.0;
             if (CoolOn) {
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
                 DeltaT = (PurchAir(PurchAirNum).MinCoolSuppAirTemp - Node(ZoneNodeNum).Temp);
                 if (DeltaT < -SmallTempDiff) {
                     SupplyMassFlowRateForCool = QZnCoolSP / CpAir / DeltaT;
@@ -2301,7 +2297,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // In general, in the cooling section, don't let SupplyTemp be set to something that results in heating
             if (SupplyMassFlowRate > 0.0) {
                 // Calculate supply temp at SupplyMassFlowRate and recheck limit on Minimum Cooling Supply Air Temperature
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
                 PurchAir(PurchAirNum).SupplyTemp = QZnCoolSP / (CpAir * SupplyMassFlowRate) + Node(ZoneNodeNum).Temp;
                 PurchAir(PurchAirNum).SupplyTemp = max(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MinCoolSuppAirTemp);
                 // This is the cooling mode, so SupplyTemp can't be more than MixedAirTemp
@@ -2466,7 +2462,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             }
             // Heating or no-load operation
         } else { // Heating or no-load case
-            if ((MinOASensOutput < QZnHeatSP) && (TempControlType(ActualZoneNum) != SingleCoolingSetPoint)) {
+            if ((MinOASensOutput < QZnHeatSP) && (state.dataHeatBalFanSys->TempControlType(ActualZoneNum) != SingleCoolingSetPoint)) {
                 OperatingMode = OpMode::Heat;
             } else { // DeadBand mode shuts off heat recovery and economizer
                 OperatingMode = OpMode::DeadBand;
@@ -2511,7 +2507,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Mass flow rate to meet sensible load, at Minimum Cooling Supply Air Temperature
             SupplyMassFlowRateForHeat = 0.0;
             if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+                CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
                 DeltaT = (PurchAir(PurchAirNum).MaxHeatSuppAirTemp - Node(ZoneNodeNum).Temp);
                 if (DeltaT > SmallTempDiff) {
                     SupplyMassFlowRateForHeat = QZnHeatSP / CpAir / DeltaT;
@@ -2587,7 +2583,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             if (SupplyMassFlowRate > 0.0) {
                 if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
                     // Calculate supply temp at SupplyMassFlowRate and check limit on Maximum Heating Supply Air Temperature
-                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+                    CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
                     PurchAir(PurchAirNum).SupplyTemp = QZnHeatSP / (CpAir * SupplyMassFlowRate) + Node(ZoneNodeNum).Temp;
                     PurchAir(PurchAirNum).SupplyTemp = min(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).MaxHeatSuppAirTemp);
                     // This is the heating mode, so SupplyTemp can't be less than MixedAirTemp
@@ -2702,15 +2698,16 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
         } // Cooling or heating required
 
-        // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
-        if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-            PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
-        }
-        if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
-            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
-        }
-
         if (SupplyMassFlowRate > 0.0) {
+            // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
+                PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
+            }
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
+                PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
+            }
+            SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
+
             // compute coil loads
             if ((PurchAir(PurchAirNum).SupplyHumRat == PurchAir(PurchAirNum).MixedAirHumRat) &&
                 (PurchAir(PurchAirNum).SupplyTemp == PurchAir(PurchAirNum).MixedAirTemp)) {
@@ -2773,7 +2770,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
             SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
 
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
             SysOutputProvided = SupplyMassFlowRate * CpAir * (PurchAir(PurchAirNum).SupplyTemp - Node(ZoneNodeNum).Temp);
             MoistOutputProvided = SupplyMassFlowRate * (PurchAir(PurchAirNum).SupplyHumRat - Node(ZoneNodeNum).HumRat); // Latent rate, kg/s
 
@@ -2781,7 +2778,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             PurchAir(PurchAirNum).LatOutputToZone =
                 SupplyMassFlowRate * (SupplyEnthalpy - Node(ZoneNodeNum).Enthalpy) - PurchAir(PurchAirNum).SenOutputToZone;
 
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ActualZoneNum));
+            CpAir = PsyCpAirFnW(state.dataHeatBalFanSys->ZoneAirHumRat(ActualZoneNum));
             if (PurchAir(PurchAirNum).OutdoorAir) {
                 PurchAir(PurchAirNum).OASenOutput = OAMassFlowRate * CpAir * (Node(OANodeNum).Temp - Node(ZoneNodeNum).Temp);
                 PurchAir(PurchAirNum).OALatOutput =
@@ -2865,6 +2862,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         PurchAir(PurchAirNum).OALatOutput = 0.0;
         PurchAir(PurchAirNum).MixedAirTemp = Node(RecircNodeNum).Temp;
         PurchAir(PurchAirNum).MixedAirHumRat = Node(RecircNodeNum).HumRat;
+        PurchAir(PurchAirNum).SupplyTemp = Node(InNodeNum).Temp;
+        PurchAir(PurchAirNum).SupplyHumRat = Node(InNodeNum).HumRat;
     }
 
     PurchAir(PurchAirNum).OutdoorAirMassFlowRate = OAMassFlowRate;

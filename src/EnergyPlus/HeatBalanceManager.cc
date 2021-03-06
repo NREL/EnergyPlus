@@ -5551,64 +5551,64 @@ namespace HeatBalanceManager {
         // Allocate real Variables
         // Following used for Calculations
         //  Allocate variables in DataHeatBalSys
-        SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTV.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPM.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTM.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MixingMassFlowZone.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MixingMassFlowXHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
-        ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
-        ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
-        ZoneReOrder = 0;
-        ZoneLatentGain.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneLatentGainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
-        OAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        VAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZTAV.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZTAVComf.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
-        MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTV.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPM.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTM.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MixingMassFlowZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MixingMassFlowXHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataHeatBalFanSys->ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataHeatBalFanSys->ZoneReOrder = 0;
+        state.dataHeatBalFanSys->ZoneLatentGain.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneLatentGainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
+        state.dataHeatBalFanSys->OAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->VAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZTAV.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZTAVComf.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
         // Allocate this zone air humidity ratio
-        ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
-        ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);
-        ZoneAirHumRat.dimension(state.dataGlobal->NumOfZones, 0.01);
-        ZoneAirHumRatOld.dimension(state.dataGlobal->NumOfZones, 0.01);
-        SumHmAW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumHmARa.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumHmARaW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTE.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPE.dimension(state.dataGlobal->NumOfZones, 0.0);
-        EAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        EAMFLxHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTC.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPC.dimension(state.dataGlobal->NumOfZones, 0.0);
-        CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->ZoneAirHumRat.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->ZoneAirHumRatOld.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->SumHmAW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumHmARa.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumHmARaW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTE.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPE.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->EAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->EAMFLxHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTC.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPC.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
@@ -5646,22 +5646,22 @@ namespace HeatBalanceManager {
         LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
-        ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneHumidex.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
-        ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneHumidex.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneOccPierceSET.dimension(state.dataGlobal->NumOfZones, 0);
-        ZoneOccPierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
-        ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
-        ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneOccPierceSET.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataHeatBalFanSys->ZoneOccPierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataHeatBalFanSys->ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         CountWarmupDayPoints = 0;
     }
@@ -5696,11 +5696,11 @@ namespace HeatBalanceManager {
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (ZTAV(ZoneNum) > MaxTempZone(ZoneNum)) {
-                MaxTempZone(ZoneNum) = ZTAV(ZoneNum);
+            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) > MaxTempZone(ZoneNum)) {
+                MaxTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (ZTAV(ZoneNum) < MinTempZone(ZoneNum)) {
-                MinTempZone(ZoneNum) = ZTAV(ZoneNum);
+            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < MinTempZone(ZoneNum)) {
+                MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
             if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > MaxHeatLoadZone(ZoneNum)) {
                 MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
@@ -5714,7 +5714,7 @@ namespace HeatBalanceManager {
             LoadZoneSecPrevDay(ZoneNum) = LoadZonePrevDay(ZoneNum);
             TempZonePrevDay(ZoneNum) = TempZone(ZoneNum);
             LoadZonePrevDay(ZoneNum) = LoadZone(ZoneNum);
-            TempZone(ZoneNum) = ZTAV(ZoneNum);
+            TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             LoadZone(ZoneNum) = max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days

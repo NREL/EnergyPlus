@@ -100,13 +100,6 @@ namespace HeatBalFiniteDiffManager {
     using namespace DataMoistureBalance;
     using DataHeatBalance::Air;
     using DataHeatBalance::RegularMaterial;
-        using DataHeatBalFanSys::MAT;
-    using DataHeatBalFanSys::QCoolingPanelSurf;
-    using DataHeatBalFanSys::QElecBaseboardSurf;
-    using DataHeatBalFanSys::QHTRadSysSurf;
-    using DataHeatBalFanSys::QHWBaseboardSurf;
-    using DataHeatBalFanSys::QSteamBaseboardSurf;
-    using DataHeatBalFanSys::ZoneAirHumRat;
     using DataHeatBalSurface::MaxSurfaceTempLimit;
     using DataHeatBalSurface::MinSurfaceTempLimit;
     using DataHeatBalSurface::SurfNetLWRadToSurf;
@@ -125,9 +118,6 @@ namespace HeatBalFiniteDiffManager {
     using DataSurfaces::Ground;
     using DataSurfaces::HeatTransferModel_CondFD;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
-    using DataHeatBalFanSys::QPVSysSource;
-    using DataHeatBalFanSys::QRadSysSource;
-    using DataHeatBalFanSys::TCondFDSourceNode;
     using HeatBalanceMovableInsulation::EvalOutsideMovableInsulation;
 
     // MODULE PARAMETER DEFINITIONS:
@@ -1950,7 +1940,7 @@ namespace HeatBalFiniteDiffManager {
                 // Source/Sink Flux Capability ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
                 Real64 const QSSFlux((surface.Area > 0.0) && (construct.SourceSinkPresent && Lay == construct.SourceAfterLayer)
-                                         ? (QRadSysSource(Surf) + QPVSysSource(Surf)) / surface.Area
+                                         ? (state.dataHeatBalFanSys->QRadSysSource(Surf) + state.dataHeatBalFanSys->QPVSysSource(Surf)) / surface.Area
                                          : 0.0); // Source/Sink flux value at a layer interface // Includes QPV Source
 
                 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2173,7 +2163,7 @@ namespace HeatBalFiniteDiffManager {
                     SurfaceFD(Surf).CpDelXRhoS2(i) = (Cp2 * Delx2 * RhoS2) / 2.0; // Save this for computing node flux values
 
                     if (construct.SourceSinkPresent && (Lay == construct.SourceAfterLayer)) {
-                        TCondFDSourceNode(Surf) = TDT_i; // Transfer node temp to Radiant System
+                        state.dataHeatBalFanSys->TCondFDSourceNode(Surf) = TDT_i; // Transfer node temp to Radiant System
                         TempSource(Surf) = TDT_i;        // Transfer node temp to DataHeatBalSurface module
                         SurfaceFD(Surf).QSource = QSSFlux;
                         SurfaceFD(Surf).SourceNodeNum = i;
@@ -2220,13 +2210,6 @@ namespace HeatBalFiniteDiffManager {
         // Calculate the heat transfer at the node on the surfaces inside face (facing zone)
 
         // Using/Aliasing
-        using DataHeatBalFanSys::MAT;
-        using DataHeatBalFanSys::QCoolingPanelSurf;
-        using DataHeatBalFanSys::QElecBaseboardSurf;
-        using DataHeatBalFanSys::QHTRadSysSurf;
-        using DataHeatBalFanSys::QHWBaseboardSurf;
-        using DataHeatBalFanSys::QSteamBaseboardSurf;
-        using DataHeatBalFanSys::ZoneAirHumRat;
         using DataSurfaces::HeatTransferModel_CondFD;
 
         auto const &surface(state.dataSurface->Surface(Surf));
@@ -2237,21 +2220,21 @@ namespace HeatBalFiniteDiffManager {
         Real64 const NetLWRadToSurfFD(SurfNetLWRadToSurf(Surf)); // Net interior long wavelength radiation to surface from other surfaces
         Real64 const QRadSWInFD(SurfOpaqQRadSWInAbs(Surf));          // Short wave radiation absorbed on inside of opaque surface
         Real64 const QHtRadSysSurfFD(
-            QHTRadSysSurf(Surf)); // Current radiant heat flux at a surface due to the presence of high temperature radiant heaters
+                state.dataHeatBalFanSys->QHTRadSysSurf(Surf)); // Current radiant heat flux at a surface due to the presence of high temperature radiant heaters
         Real64 const QHWBaseboardSurfFD(
-            QHWBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of hot water baseboard heaters
+                state.dataHeatBalFanSys->QHWBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of hot water baseboard heaters
         Real64 const QSteamBaseboardSurfFD(
-            QSteamBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of steam baseboard heaters
+                state.dataHeatBalFanSys->QSteamBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of steam baseboard heaters
         Real64 const QElecBaseboardSurfFD(
-            QElecBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
+                state.dataHeatBalFanSys->QElecBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
         Real64 const QCoolingPanelSurfFD(
-            QCoolingPanelSurf(Surf));                     // Current radiant heat flux at a surface due to the presence of simple cooling panels
+                state.dataHeatBalFanSys->QCoolingPanelSurf(Surf));                     // Current radiant heat flux at a surface due to the presence of simple cooling panels
         Real64 const QRadThermInFD(state.dataHeatBal->SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(HConvInFD(Surf));
 
-        Real64 const Tia(MAT(surface.Zone));
+        Real64 const Tia(state.dataHeatBalFanSys->MAT(surface.Zone));
 
         //++++++++++++++++++++++++++++++++++++++++++++++++++++++
         //    Do all the nodes in the surface   Else will switch to SigmaR,SigmaC

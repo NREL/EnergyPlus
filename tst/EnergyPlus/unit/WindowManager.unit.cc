@@ -204,15 +204,15 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataEnvrn->OutBaroPress = 100000;
 
-    DataHeatBalFanSys::ZTAV.allocate(1);
-    DataHeatBalFanSys::ZT.allocate(1);
+    state->dataHeatBalFanSys->ZTAV.allocate(1);
+    state->dataHeatBalFanSys->ZT.allocate(1);
     state->dataHeatBal->MRT.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
 
-    DataHeatBalFanSys::ZT(1) = 0.0;
-    DataHeatBalFanSys::ZTAV(1) = 0.0;
+    state->dataHeatBalFanSys->ZT(1) = 0.0;
+    state->dataHeatBalFanSys->ZTAV(1) = 0.0;
     state->dataHeatBal->MRT(1) = 0.0;
-    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = 0.0;
 
     HeatBalanceManager::ManageHeatBalance(*state);
 
@@ -246,9 +246,9 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     state->dataSurface->Surface(winNum).OutDryBulbTemp = T_out;
     state->dataHeatBal->TempEffBulkAir(winNum) = T_in;
     state->dataSurface->SurfWinIRfromParentZone(winNum) = DataGlobalConstants::StefanBoltzmann * std::pow(T_in + DataGlobalConstants::KelvinConv, 4);
-    DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(1, 0.01);
-    DataHeatBalFanSys::ZoneAirHumRat.dimension(1, 0.01);
-    DataHeatBalFanSys::MAT.dimension(1, T_in);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(1, 0.01);
+    state->dataHeatBalFanSys->ZoneAirHumRat.dimension(1, 0.01);
+    state->dataHeatBalFanSys->MAT.dimension(1, T_in);
 
     // initial guess temperatures
     int numTemps = 2 + 2 * state->dataConstruction->Construct(cNum).TotGlassLayers;
@@ -540,17 +540,17 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->HConvIn(surfNum2) = 0.5;
     state->dataHeatBal->HConvIn(surfNum3) = 0.5;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 25.0;
-    DataHeatBalFanSys::QHTRadSysSurf.allocate(3);
-    DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
-    DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
-    DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 25.0;
+    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
+    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
+    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
+    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -588,10 +588,10 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
-    DataHeatBalFanSys::QHTRadSysSurf = 0.0;
-    DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
-    DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
-    DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
+    state->dataHeatBalFanSys->QHTRadSysSurf = 0.0;
+    state->dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
+    state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
+    state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
 
@@ -2767,17 +2767,17 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->HConvIn(surfNum2) = 0.5;
     state->dataHeatBal->HConvIn(surfNum3) = 0.5;
     state->dataHeatBal->Zone(1).IsControlled = true;
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
-    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(1);
-    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvg(1) = state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.011;
 
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 25.0;
-    DataHeatBalFanSys::QHTRadSysSurf.allocate(3);
-    DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
-    DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
-    DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 25.0;
+    state->dataHeatBalFanSys->QHTRadSysSurf.allocate(3);
+    state->dataHeatBalFanSys->QHWBaseboardSurf.allocate(3);
+    state->dataHeatBalFanSys->QSteamBaseboardSurf.allocate(3);
+    state->dataHeatBalFanSys->QElecBaseboardSurf.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(1, 3);
     state->dataHeatBal->SurfQRadThermInAbs.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -2815,10 +2815,10 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
     state->dataHeatBal->SurfQRadThermInAbs = 0.0;
 
-    DataHeatBalFanSys::QHTRadSysSurf = 0.0;
-    DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
-    DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
-    DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
+    state->dataHeatBalFanSys->QHTRadSysSurf = 0.0;
+    state->dataHeatBalFanSys->QHWBaseboardSurf = 0.0;
+    state->dataHeatBalFanSys->QSteamBaseboardSurf = 0.0;
+    state->dataHeatBalFanSys->QElecBaseboardSurf = 0.0;
     state->dataSurface->SurfWinTransSolar = 0.0;
     state->dataHeatBal->QS = 0.0;
 

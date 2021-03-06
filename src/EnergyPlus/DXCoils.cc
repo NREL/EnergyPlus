@@ -5931,8 +5931,6 @@ namespace EnergyPlus::DXCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 SmallDifferenceTest(0.00000001);
@@ -6512,7 +6510,7 @@ namespace EnergyPlus::DXCoils {
         if (state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical || state.dataDXCoils->DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
                 state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb =
-                    PsyTwbFnTdbWPb(state, ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr), ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr), state.dataEnvrn->OutBaroPress, RoutineName);
+                    PsyTwbFnTdbWPb(state, state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr), state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr), state.dataEnvrn->OutBaroPress, RoutineName);
             }
         }
 
@@ -8377,8 +8375,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::HPWHCrankcaseDBTemp;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
@@ -8520,8 +8516,8 @@ namespace EnergyPlus::DXCoils {
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-                OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
             }
@@ -8540,10 +8536,10 @@ namespace EnergyPlus::DXCoils {
             CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
             CompAmbTemp = OutdoorDryBulb;
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-                CondInletTemp = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                CondInletTemp = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 CompAmbTemp = CondInletTemp; // assumes compressor is in same location as secondary coil
                 OutdoorDryBulb = CondInletTemp;
-                OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
             }
@@ -10067,8 +10063,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CalcDXHeatingCoil");
@@ -10148,16 +10142,16 @@ namespace EnergyPlus::DXCoils {
                     OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).OutAirWetBulb;
                 }
                 if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-                    OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                    OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                    OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                    OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                     OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     CompAmbTemp = OutdoorDryBulb;
                 }
             }
         } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-            OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             CompAmbTemp = OutdoorDryBulb;
@@ -10532,8 +10526,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
@@ -10623,15 +10615,15 @@ namespace EnergyPlus::DXCoils {
             }
             CompAmbTemp = OutdoorDryBulb;
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-                OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 CompAmbTemp = OutdoorDryBulb;
             }
         } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-            OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             CompAmbTemp = OutdoorDryBulb;
@@ -11749,8 +11741,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
         using DataHVACGlobals::MSHPWasteHeat;
@@ -11852,14 +11842,14 @@ namespace EnergyPlus::DXCoils {
                 OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName);
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-                OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
             }
         } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-            OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             OutdoorWetBulb = state.dataDXCoils->DXCoil(DXCoilNum).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         } else {
@@ -12600,8 +12590,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::MSHPMassFlowRateHigh;
         using DataHVACGlobals::MSHPMassFlowRateLow;
         using DataHVACGlobals::MSHPWasteHeat;
@@ -12739,14 +12727,14 @@ namespace EnergyPlus::DXCoils {
                 OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(1)).HumRat;
             }
             if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-                OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                 // OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
             }
         } else if (state.dataDXCoils->DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            OutdoorDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-            OutdoorHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+            OutdoorHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
             // OutdoorWetBulb = DXCoil( DXCoilNum ).EvapInletWetBulb;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         } else {
@@ -15372,8 +15360,6 @@ namespace EnergyPlus::DXCoils {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using DataHeatBalFanSys::ZoneAirHumRat;
-        using DataHeatBalFanSys::ZT;
         using DataHVACGlobals::TimeStepSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -15432,8 +15418,8 @@ namespace EnergyPlus::DXCoils {
                         return;
                     }
                     state.dataDXCoils->DXCoil(DXCoilNum).SecCoilTotalHeatRemovalRate = -TotalHeatRemovalRate; // +DXCoil( DXCoilNum ).DefrostPower;
-                    EvapInletDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                    EvapInletHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                    EvapInletDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                    EvapInletHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                     RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapInletDryBulb, EvapInletHumRat);
                     EvapAirMassFlow = RhoAir * state.dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow;
                     ;
@@ -15490,8 +15476,8 @@ namespace EnergyPlus::DXCoils {
                     state.dataDXCoils->DXCoil(DXCoilNum).SecCoilSHR = SHR;
 
                 } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) {
-                    EvapInletDryBulb = ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
-                    EvapInletHumRat = ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                    EvapInletDryBulb = state.dataHeatBalFanSys->ZT(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
+                    EvapInletHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(state.dataDXCoils->DXCoil(DXCoilNum).SecZonePtr);
                     RhoAir = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, EvapInletDryBulb, EvapInletHumRat);
                     MSSpeedRatio = state.dataDXCoils->DXCoil(DXCoilNum).MSSpeedRatio;
                     MSCycRatio = state.dataDXCoils->DXCoil(DXCoilNum).MSCycRatio;
