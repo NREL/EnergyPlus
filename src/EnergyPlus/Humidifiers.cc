@@ -644,12 +644,12 @@ namespace Humidifiers {
 
         if (!state.dataGlobal->SysSizingCalc && MySetPointCheckFlag && DoSetPointTest) {
             if (AirOutNode > 0) {
-                if (Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
+                if (state.dataLoopNodes->Node(AirOutNode).HumRatMin == SensedNodeFlagValue) {
                     if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                         ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(HumType_Code) + " = " + Name);
                         ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the "
                                           "humidifier outlet node.");
-                        ShowContinueError(state, "  expecting it on Node=\"" + NodeID(AirOutNode) + "\".");
+                        ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
                         SetPointErrorFlag = true;
                     } else {
                         CheckIfNodeSetPointManagedByEMS(state, AirOutNode, EMSManager::SPControlType::iHumidityRatioMinSetPoint, SetPointErrorFlag);
@@ -657,7 +657,7 @@ namespace Humidifiers {
                             ShowSevereError(state, "Humidifiers: Missing humidity setpoint for " + HumidifierType(HumType_Code) + " = " + Name);
                             ShowContinueError(state, "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at "
                                               "the humidifier outlet node.");
-                            ShowContinueError(state, "  expecting it on Node=\"" + NodeID(AirOutNode) + "\".");
+                            ShowContinueError(state, "  expecting it on Node=\"" + state.dataLoopNodes->NodeID(AirOutNode) + "\".");
                             ShowContinueError(state,
                                 "  or use an EMS actuator to control minimum humidity ratio to establish a setpoint at the humidifier outlet node.");
                         }
@@ -672,11 +672,11 @@ namespace Humidifiers {
         }
 
         // do these initializations every HVAC time step
-        HumRatSet = Node(AirOutNode).HumRatMin;
-        AirInTemp = Node(AirInNode).Temp;
-        AirInHumRat = Node(AirInNode).HumRat;
-        AirInEnthalpy = Node(AirInNode).Enthalpy;
-        AirInMassFlowRate = Node(AirInNode).MassFlowRate;
+        HumRatSet = state.dataLoopNodes->Node(AirOutNode).HumRatMin;
+        AirInTemp = state.dataLoopNodes->Node(AirInNode).Temp;
+        AirInHumRat = state.dataLoopNodes->Node(AirInNode).HumRat;
+        AirInEnthalpy = state.dataLoopNodes->Node(AirInNode).Enthalpy;
+        AirInMassFlowRate = state.dataLoopNodes->Node(AirInNode).MassFlowRate;
 
         WaterAdd = 0.0;
         ElecUseEnergy = 0.0;
@@ -1338,24 +1338,24 @@ namespace Humidifiers {
         // Moves humidifier output to the outlet nodes.
 
         // Set the outlet air node of the humidifier
-        Node(AirOutNode).MassFlowRate = AirOutMassFlowRate;
-        Node(AirOutNode).Temp = AirOutTemp;
-        Node(AirOutNode).HumRat = AirOutHumRat;
-        Node(AirOutNode).Enthalpy = AirOutEnthalpy;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRate = AirOutMassFlowRate;
+        state.dataLoopNodes->Node(AirOutNode).Temp = AirOutTemp;
+        state.dataLoopNodes->Node(AirOutNode).HumRat = AirOutHumRat;
+        state.dataLoopNodes->Node(AirOutNode).Enthalpy = AirOutEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(AirOutNode).Quality = Node(AirInNode).Quality;
-        Node(AirOutNode).Press = Node(AirInNode).Press;
-        Node(AirOutNode).MassFlowRateMin = Node(AirInNode).MassFlowRateMin;
-        Node(AirOutNode).MassFlowRateMax = Node(AirInNode).MassFlowRateMax;
-        Node(AirOutNode).MassFlowRateMinAvail = Node(AirInNode).MassFlowRateMinAvail;
-        Node(AirOutNode).MassFlowRateMaxAvail = Node(AirInNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutNode).Quality = state.dataLoopNodes->Node(AirInNode).Quality;
+        state.dataLoopNodes->Node(AirOutNode).Press = state.dataLoopNodes->Node(AirInNode).Press;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutNode).CO2 = Node(AirInNode).CO2;
+            state.dataLoopNodes->Node(AirOutNode).CO2 = state.dataLoopNodes->Node(AirInNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutNode).GenContam = Node(AirInNode).GenContam;
+            state.dataLoopNodes->Node(AirOutNode).GenContam = state.dataLoopNodes->Node(AirInNode).GenContam;
         }
     }
 

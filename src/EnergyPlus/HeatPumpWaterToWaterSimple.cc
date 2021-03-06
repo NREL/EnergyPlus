@@ -136,7 +136,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
                 this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPCooling(state, CurLoad);
-                this->UpdateGSHPRecords();
+                this->UpdateGSHPRecords(state);
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
                 PlantUtilities::UpdateChillerComponentCondenserSide(state, this->SourceLoopNum,
                                                                     this->SourceLoopSideNum,
@@ -155,7 +155,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
                 this->InitWatertoWaterHP(state, this->WWHPPlantTypeOfNum, this->Name, FirstHVACIteration, CurLoad);
                 this->CalcWatertoWaterHPHeating(state, CurLoad);
-                this->UpdateGSHPRecords();
+                this->UpdateGSHPRecords(state);
             } else if (calledFromLocation.loopNum == this->SourceLoopNum) { // condenser loop
                 PlantUtilities::UpdateChillerComponentCondenserSide(state, this->SourceLoopNum,
                                                                     this->SourceLoopSideNum,
@@ -797,8 +797,9 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                this->SourceBranchNum,
                                this->SourceCompNum);
 
-            if (Node(this->SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue) Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;
-            Node(this->SourceSideInletNodeNum).Temp = Node(this->SourceSideOutletNodeNum).TempSetPoint + 30;
+            if (state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint == SensedNodeFlagValue)
+                state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint = 0.0;
+            state.dataLoopNodes->Node(this->SourceSideInletNodeNum).Temp = state.dataLoopNodes->Node(this->SourceSideOutletNodeNum).TempSetPoint + 30;
 
             this->MyEnvrnFlag = false;
         }
@@ -919,8 +920,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         }
 
         // Get inlet temps
-        this->reportLoadSideInletTemp = Node(LoadSideInletNode).Temp;
-        this->reportSourceSideInletTemp = Node(SourceSideInletNode).Temp;
+        this->reportLoadSideInletTemp = state.dataLoopNodes->Node(LoadSideInletNode).Temp;
+        this->reportSourceSideInletTemp = state.dataLoopNodes->Node(SourceSideInletNode).Temp;
 
         // Outlet variables
         this->reportPower = 0.0;
@@ -1920,7 +1921,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
         this->reportSourceSideOutletTemp = SourceSideOutletTemp;
     }
 
-    void GshpSpecs::UpdateGSHPRecords()
+    void GshpSpecs::UpdateGSHPRecords(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Kenneth Tang
@@ -1941,8 +1942,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
             this->reportSourceSideOutletTemp = this->reportSourceSideInletTemp;
         }
 
-        Node(SourceSideOutletNode).Temp = this->reportSourceSideOutletTemp;
-        Node(LoadSideOutletNode).Temp = this->reportLoadSideOutletTemp;
+        state.dataLoopNodes->Node(SourceSideOutletNode).Temp = this->reportSourceSideOutletTemp;
+        state.dataLoopNodes->Node(LoadSideOutletNode).Temp = this->reportLoadSideOutletTemp;
     }
 
 } // namespace EnergyPlus
