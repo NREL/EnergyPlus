@@ -486,7 +486,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     InternalHeatGains::CalcZoneITEq(*state);
     Real64 NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;
     ASSERT_NE(InitialPower, NewPower);
-    HVACManager::ResetNodeData();
+    HVACManager::ResetNodeData(state);
 
     InternalHeatGains::CalcZoneITEq(*state);
     NewPower = state->dataHeatBal->ZoneITEq(1).CPUPower + state->dataHeatBal->ZoneITEq(1).FanPower + state->dataHeatBal->ZoneITEq(1).UPSPower;

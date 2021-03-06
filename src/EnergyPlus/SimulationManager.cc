@@ -490,7 +490,7 @@ namespace SimulationManager {
                 }
             }
 
-            HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
+            HVACManager::ResetNodeData(state); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
             ManageEMS(state, EMSManager::EMSCallFrom::BeginNewEnvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
