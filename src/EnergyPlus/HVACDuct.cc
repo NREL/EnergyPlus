@@ -354,23 +354,23 @@ namespace HVACDuct {
         InNode = Duct(DuctNum).InletNodeNum;
         OutNode = Duct(DuctNum).OutletNodeNum;
         // Set the outlet air node conditions of the duct
-        Node(OutNode).MassFlowRate = Node(InNode).MassFlowRate;
-        Node(OutNode).Temp = Node(InNode).Temp;
-        Node(OutNode).HumRat = Node(InNode).HumRat;
-        Node(OutNode).Enthalpy = Node(InNode).Enthalpy;
-        Node(OutNode).Quality = Node(InNode).Quality;
-        Node(OutNode).Press = Node(InNode).Press;
-        Node(OutNode).MassFlowRateMin = Node(InNode).MassFlowRateMin;
-        Node(OutNode).MassFlowRateMax = Node(InNode).MassFlowRateMax;
-        Node(OutNode).MassFlowRateMinAvail = Node(InNode).MassFlowRateMinAvail;
-        Node(OutNode).MassFlowRateMaxAvail = Node(InNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(OutNode).MassFlowRate = state.dataLoopNodes->Node(InNode).MassFlowRate;
+        state.dataLoopNodes->Node(OutNode).Temp = state.dataLoopNodes->Node(InNode).Temp;
+        state.dataLoopNodes->Node(OutNode).HumRat = state.dataLoopNodes->Node(InNode).HumRat;
+        state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
+        state.dataLoopNodes->Node(OutNode).Quality = state.dataLoopNodes->Node(InNode).Quality;
+        state.dataLoopNodes->Node(OutNode).Press = state.dataLoopNodes->Node(InNode).Press;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMin = state.dataLoopNodes->Node(InNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMax = state.dataLoopNodes->Node(InNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(OutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(OutNode).CO2 = Node(InNode).CO2;
+            state.dataLoopNodes->Node(OutNode).CO2 = state.dataLoopNodes->Node(InNode).CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(OutNode).GenContam = Node(InNode).GenContam;
+            state.dataLoopNodes->Node(OutNode).GenContam = state.dataLoopNodes->Node(InNode).GenContam;
         }
     }
 
