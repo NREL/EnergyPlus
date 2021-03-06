@@ -118,7 +118,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
 
 void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
 {
-    using DataLoopNode::Node;
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;
     using DataSizing::HeatingLoop;
@@ -126,8 +125,10 @@ void HVACSizingSimulationManager::SetupSizingAnalyses(EnergyPlusData &state)
 
     for (auto &P : plantCoincAnalyObjs) {
         // call setup log routine for each coincident plant analysis object
-        P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
-        P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(state, Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
+        P.supplyInletNodeFlow_LogIndex =
+            sizingLogger.SetupVariableSizingLog(state, state.dataLoopNodes->Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
+        P.supplyInletNodeTemp_LogIndex =
+            sizingLogger.SetupVariableSizingLog(state, state.dataLoopNodes->Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
         if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
             P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(state, state.dataPlnt->PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
         } else if (state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || state.dataSize->PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
