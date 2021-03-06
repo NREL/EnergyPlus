@@ -779,7 +779,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                 this->SourceSideDesignMassFlow = this->RatedSourceVolFlowCool * rho;
             }
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->LoadSideDesignMassFlow,
                                this->LoadSideInletNodeNum,
                                this->LoadSideOutletNodeNum,
@@ -788,7 +789,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterSimple {
                                this->LoadBranchNum,
                                this->LoadCompNum);
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->SourceSideDesignMassFlow,
                                this->SourceSideInletNodeNum,
                                this->SourceSideOutletNodeNum,

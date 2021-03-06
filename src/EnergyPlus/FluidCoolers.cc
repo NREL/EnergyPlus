@@ -701,7 +701,8 @@ namespace EnergyPlus::FluidCoolers {
                                                              state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                              RoutineName);
         this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-        PlantUtilities::InitComponentNodes(0.0,
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
                                            this->DesWaterMassFlowRate,
                                            this->WaterInletNodeNum,
                                            this->WaterOutletNodeNum,

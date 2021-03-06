@@ -1586,7 +1586,8 @@ namespace HVACUnitaryBypassVAV {
                     }
                 } // end of IF(CBVAV(CBVAVNum)%MaxHeatCoilFluidFlow .EQ. DataSizing::AutoSize)THEN
 
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    CBVAV(CBVAVNum).MaxHeatCoilFluidFlow,
                                                    CBVAV(CBVAVNum).CoilControlNode,
                                                    CBVAV(CBVAVNum).CoilOutletNode,

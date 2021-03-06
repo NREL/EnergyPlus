@@ -216,7 +216,8 @@ namespace EnergyPlus::PlantLoadProfile {
 
             Real64 MaxFlowMultiplier = GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier,
                                this->InletNode,
                                this->OutletNode,

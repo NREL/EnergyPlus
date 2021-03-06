@@ -490,7 +490,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                            state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum).FluidIndex,
                                                            routineName);
             this->loadSideDesignMassFlowRate = rho * this->loadSideDesignVolFlowRate;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->loadSideDesignMassFlowRate,
                                                this->loadSideNodes.inlet,
                                                this->loadSideNodes.outlet,
@@ -506,7 +507,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                         state.dataPlnt->PlantLoop(this->sourceSideLocation.loopNum).FluidIndex,
                                                         routineName);
                 this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->sourceSideDesignMassFlowRate,
                                                    this->sourceSideNodes.inlet,
                                                    this->sourceSideNodes.outlet,

@@ -448,7 +448,8 @@ namespace SurfaceGroundHeatExchanger {
             }
             rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->LoopNum).FluidName, DataPrecisionGlobals::constant_zero, state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex, RoutineName);
             this->DesignMassFlowRate = DataGlobalConstants::Pi / 4.0 * pow_2(this->TubeDiameter) * DesignVelocity * rho * this->TubeCircuits;
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                this->DesignMassFlowRate,
                                this->InletNodeNum,
                                this->OutletNodeNum,

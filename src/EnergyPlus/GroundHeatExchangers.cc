@@ -3190,7 +3190,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 fluidDensity = FluidProperties::GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
-        PlantUtilities::InitComponentNodes(
+        PlantUtilities::InitComponentNodes(state, 
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
@@ -3280,7 +3280,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         Real64 fluidDensity = FluidProperties::GetDensityGlycol(
             state, state.dataPlnt->PlantLoop(this->loopNum).FluidName, 20.0, state.dataPlnt->PlantLoop(this->loopNum).FluidIndex, RoutineName);
         this->designMassFlow = this->designFlow * fluidDensity;
-        PlantUtilities::InitComponentNodes(
+        PlantUtilities::InitComponentNodes(state, 
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;

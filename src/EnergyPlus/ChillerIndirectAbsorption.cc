@@ -822,7 +822,8 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 
             this->EvapMassFlowRateMax = this->EvapVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->EvapMassFlowRateMax,
                                                this->EvapInletNodeNum,
                                                this->EvapOutletNodeNum,
@@ -839,7 +840,8 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
 
             this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->CondMassFlowRateMax,
                                                this->CondInletNodeNum,
                                                this->CondOutletNodeNum,
@@ -871,7 +873,8 @@ namespace EnergyPlus::ChillerIndirectAbsorption {
                     this->GenMassFlowRateMax = SteamDensity * this->GeneratorVolFlowRate;
                 }
 
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->GenMassFlowRateMax,
                                                    this->GeneratorInletNodeNum,
                                                    this->GeneratorOutletNodeNum,

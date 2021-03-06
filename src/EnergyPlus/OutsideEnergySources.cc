@@ -342,7 +342,8 @@ namespace EnergyPlus::OutsideEnergySources {
         // begin environment inits
         if (state.dataGlobal->BeginEnvrnFlag && this->BeginEnvrnInitFlag) {
             // component model has not design flow rates, using data for overall plant loop
-            PlantUtilities::InitComponentNodes(state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
+            PlantUtilities::InitComponentNodes(state,
+                                               state.dataPlnt->PlantLoop(this->LoopNum).MinMassFlowRate,
                                                state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
                                                this->InletNodeNum,
                                                this->OutletNodeNum,

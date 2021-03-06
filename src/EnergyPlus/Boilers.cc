@@ -439,7 +439,8 @@ namespace EnergyPlus::Boilers {
                                                              RoutineName);
         this->DesMassFlowRate = this->VolFlowRate * rho;
 
-        PlantUtilities::InitComponentNodes(0.0,
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
                                            this->DesMassFlowRate,
                                            this->BoilerInletNodeNum,
                                            this->BoilerOutletNodeNum,

@@ -664,7 +664,8 @@ namespace HVACSingleDuctInduc {
                                    .Branch(IndUnit(IUNum).HWBranchNum)
                                    .Comp(IndUnit(IUNum).HWCompNum)
                                    .NodeNumOut;
-                InitComponentNodes(IndUnit(IUNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   IndUnit(IUNum).MinHotWaterFlow,
                                    IndUnit(IUNum).MaxHotWaterFlow,
                                    HotConNode,
                                    HWOutletNode,
@@ -689,7 +690,8 @@ namespace HVACSingleDuctInduc {
                                    .Branch(IndUnit(IUNum).CWBranchNum)
                                    .Comp(IndUnit(IUNum).CWCompNum)
                                    .NodeNumOut;
-                InitComponentNodes(IndUnit(IUNum).MinColdWaterFlow,
+                InitComponentNodes(state,
+                                   IndUnit(IUNum).MinColdWaterFlow,
                                    IndUnit(IUNum).MaxColdWaterFlow,
                                    ColdConNode,
                                    CWOutletNode,

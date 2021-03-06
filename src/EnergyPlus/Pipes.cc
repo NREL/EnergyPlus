@@ -133,7 +133,8 @@ namespace EnergyPlus::Pipes {
     }
 
     void LocalPipeData::initEachEnvironment(EnergyPlusData &state) const {
-        PlantUtilities::InitComponentNodes(0.0,
+        PlantUtilities::InitComponentNodes(state,
+                                           0.0,
                                            state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate,
                                            this->InletNodeNum,
                                            this->OutletNodeNum,

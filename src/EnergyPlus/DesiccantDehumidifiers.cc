@@ -1951,7 +1951,8 @@ namespace DesiccantDehumidifiers {
                                 }
                             }
                         }
-                        InitComponentNodes(0.0,
+                        InitComponentNodes(state,
+                                           0.0,
                                            DesicDehum(DesicDehumNum).MaxCoilFluidFlow,
                                            DesicDehum(DesicDehumNum).CoilControlNode,
                                            DesicDehum(DesicDehumNum).CoilOutletNode,

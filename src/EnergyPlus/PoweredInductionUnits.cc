@@ -807,7 +807,8 @@ namespace EnergyPlus::PoweredInductionUnits {
 
                 state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow = rho * state.dataPowerInductionUnits->PIU(PIUNum).MaxVolHotWaterFlow;
                 state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow = rho * state.dataPowerInductionUnits->PIU(PIUNum).MinVolHotWaterFlow;
-                InitComponentNodes(state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,
@@ -848,7 +849,8 @@ namespace EnergyPlus::PoweredInductionUnits {
 
             if (((state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) || (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SteamAirHeating)) &&
                 !MyPlantScanFlag(PIUNum)) {
-                InitComponentNodes(state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   state.dataPowerInductionUnits->PIU(PIUNum).MinHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).MaxHotWaterFlow,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode,
                                    state.dataPowerInductionUnits->PIU(PIUNum).HotCoilOutNodeNum,

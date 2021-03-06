@@ -485,7 +485,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
                                                            RoutineName);
             this->LoadSideDesignMassFlow = this->LoadSideVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->LoadSideDesignMassFlow,
                                                this->LoadSideInletNodeNum,
                                                this->LoadSideOutletNodeNum,
@@ -501,7 +502,8 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
                                                     RoutineName);
             this->SourceSideDesignMassFlow = this->SourceSideVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->SourceSideDesignMassFlow,
                                                this->SourceSideInletNodeNum,
                                                this->SourceSideOutletNodeNum,

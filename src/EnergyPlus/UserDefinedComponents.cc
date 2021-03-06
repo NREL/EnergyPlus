@@ -132,7 +132,8 @@ namespace UserDefinedComponents {
                 state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
             }
 
-            PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
+            PlantUtilities::InitComponentNodes(state,
+                                               this->Loop(thisLoop).MassFlowRateMin,
                                                this->Loop(thisLoop).MassFlowRateMax,
                                                this->Loop(thisLoop).InletNodeNum,
                                                this->Loop(thisLoop).OutletNodeNum,
@@ -276,7 +277,8 @@ namespace UserDefinedComponents {
 
             if (state.dataUserDefinedComponents->UserCoil(CompNum).PlantIsConnected) {
 
-                PlantUtilities::InitComponentNodes(state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMin,
+                PlantUtilities::InitComponentNodes(state,
+                                                   state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMin,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.MassFlowRateMax,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.InletNodeNum,
                                                    state.dataUserDefinedComponents->UserCoil(CompNum).Loop.OutletNodeNum,
@@ -375,7 +377,8 @@ namespace UserDefinedComponents {
             if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
 
-                    PlantUtilities::InitComponentNodes(state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMin,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMin,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).MassFlowRateMax,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).InletNodeNum,
                                                        state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).Loop(Loop).OutletNodeNum,
@@ -482,7 +485,8 @@ namespace UserDefinedComponents {
             if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
 
-                    PlantUtilities::InitComponentNodes(state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMin,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMin,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).MassFlowRateMax,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).InletNodeNum,
                                                        state.dataUserDefinedComponents->UserAirTerminal(CompNum).Loop(Loop).OutletNodeNum,

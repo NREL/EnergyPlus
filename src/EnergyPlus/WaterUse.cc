@@ -1024,7 +1024,8 @@ namespace WaterUse {
             if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
                 // Clear node initial conditions
                 if (this->InletNode > 0 && this->OutletNode > 0) {
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->PeakMassFlowRate,
                                                        this->InletNode,
                                                        this->OutletNode,

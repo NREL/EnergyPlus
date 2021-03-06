@@ -1173,7 +1173,8 @@ namespace IceThermalStorage {
             this->ChargeIterErrors = 0;
             this->DesignMassFlowRate = state.dataPlnt->PlantLoop(this->PlantLoopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesignMassFlowRate,
                                                this->PlantInNodeNum,
                                                this->PlantOutNodeNum,
@@ -1233,7 +1234,8 @@ namespace IceThermalStorage {
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) {
             this->DesignMassFlowRate = state.dataPlnt->PlantLoop(this->LoopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesignMassFlowRate,
                                                this->PltInletNodeNum,
                                                this->PltOutletNodeNum,

@@ -64,9 +64,8 @@ struct EnergyPlusData;
 namespace PlantUtilities {
 
     // Functions
-    void clear_state();
-
-    void InitComponentNodes(Real64 MinCompMdot,
+    void InitComponentNodes(EnergyPlusData &state,
+                            Real64 MinCompMdot,
                             Real64 MaxCompMdot,
                             int InletNode,   // component's inlet node index in node structure
                             int OutletNode,  // component's outlet node index in node structure
@@ -177,9 +176,9 @@ namespace PlantUtilities {
                            Optional<Real64 const> OutletTemp = _ // set on outlet node if present and water.
     );
 
-    Real64 BoundValueToNodeMinMaxAvail(Real64 ValueToBound, int NodeNumToBoundWith);
+    Real64 BoundValueToNodeMinMaxAvail(EnergyPlusData &state, Real64 ValueToBound, int NodeNumToBoundWith);
 
-    void TightenNodeMinMaxAvails(int NodeNum, Real64 NewMinAvail, Real64 NewMaxAvail);
+    void TightenNodeMinMaxAvails(EnergyPlusData &state, int NodeNum, Real64 NewMinAvail, Real64 NewMaxAvail);
 
     Real64 BoundValueToWithinTwoValues(Real64 ValueToBound, Real64 LowerBound, Real64 UpperBound);
 

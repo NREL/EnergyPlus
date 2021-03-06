@@ -91,7 +91,7 @@ namespace DataPlant {
         }
 
         //~ Now use a worker to bound the value to outlet min/max avail
-        OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(OverallFlowRequest, BranchOutletNodeNum);
+        OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(state, OverallFlowRequest, BranchOutletNodeNum);
 
         return OverallFlowRequest;
 

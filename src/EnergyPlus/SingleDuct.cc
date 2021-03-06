@@ -2169,7 +2169,8 @@ namespace EnergyPlus::SingleDuct {
             }
             if ((this->ReheatControlNode > 0) && !this->PlantLoopScanFlag) {
                 if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
-                    InitComponentNodes(this->MinReheatSteamFlow,
+                    InitComponentNodes(state,
+                                       this->MinReheatSteamFlow,
                                        this->MaxReheatSteamFlow,
                                        this->ReheatControlNode,
                                        this->ReheatCoilOutletNode,
@@ -2178,7 +2179,8 @@ namespace EnergyPlus::SingleDuct {
                                        this->HWBranchIndex,
                                        this->HWCompIndex);
                 } else {
-                    InitComponentNodes(this->MinReheatWaterFlow,
+                    InitComponentNodes(state,
+                                       this->MinReheatWaterFlow,
                                        this->MaxReheatWaterFlow,
                                        this->ReheatControlNode,
                                        this->ReheatCoilOutletNode,

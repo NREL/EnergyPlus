@@ -1484,7 +1484,8 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolHotWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolHotWaterFlow;
 
-                    InitComponentNodes(state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow,
+                    InitComponentNodes(state,
+                                       state.dataVentilatedSlab->VentSlab(Item).MinHotWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxHotWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode,
                                        state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum,
@@ -1499,7 +1500,8 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->VentSlab(Item).MaxHotSteamFlow = SteamDensity * state.dataVentilatedSlab->VentSlab(Item).MaxVolHotSteamFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinHotSteamFlow = SteamDensity * state.dataVentilatedSlab->VentSlab(Item).MinVolHotSteamFlow;
 
-                    InitComponentNodes(state.dataVentilatedSlab->VentSlab(Item).MinHotSteamFlow,
+                    InitComponentNodes(state,
+                                       state.dataVentilatedSlab->VentSlab(Item).MinHotSteamFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxHotSteamFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).HotControlNode,
                                        state.dataVentilatedSlab->VentSlab(Item).HotCoilOutNodeNum,
@@ -1520,7 +1522,8 @@ namespace VentilatedSlab {
                                            RoutineName);
                     state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MaxVolColdWaterFlow;
                     state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow = rho * state.dataVentilatedSlab->VentSlab(Item).MinVolColdWaterFlow;
-                    InitComponentNodes(state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow,
+                    InitComponentNodes(state,
+                                       state.dataVentilatedSlab->VentSlab(Item).MinColdWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).MaxColdWaterFlow,
                                        state.dataVentilatedSlab->VentSlab(Item).ColdControlNode,
                                        state.dataVentilatedSlab->VentSlab(Item).ColdCoilOutNodeNum,

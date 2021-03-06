@@ -4210,7 +4210,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         }
                     }
                 }
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataPTHP->PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
                                    state.dataPTHP->PTUnit(PTUnitNum).HeatCoilFluidInletNode,
                                    state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,
@@ -4249,7 +4250,8 @@ namespace EnergyPlus::PackagedTerminalHeatPump {
                         }
                     }
                 }
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataPTHP->PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
                                    state.dataPTHP->PTUnit(PTUnitNum).SuppCoilFluidInletNode,
                                    state.dataPTHP->PTUnit(PTUnitNum).PlantCoilOutletNode,

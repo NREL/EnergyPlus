@@ -592,7 +592,8 @@ namespace FourPipeBeam {
             state.dataDefineEquipment->AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);               // calculate autosize values (in any) and convert volume flow rates to mass flow rates
             if (this->beamCoolingPresent) { // initialize chilled water design mass flow rate in plant routines
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    this->mDotDesignCW,
                                    this->cWInNodeNum,
                                    this->cWOutNodeNum,
@@ -602,7 +603,8 @@ namespace FourPipeBeam {
                                    this->cWLocation.compNum);
             }
             if (this->beamHeatingPresent) { // initialize hot water design mass flow rate in plant routines
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    this->mDotDesignHW,
                                    this->hWInNodeNum,
                                    this->hWOutNodeNum,
@@ -623,7 +625,8 @@ namespace FourPipeBeam {
             state.dataLoopNodes->Node(this->airOutNodeNum).MassFlowRateMin = 0.0;
 
             if (this->beamCoolingPresent) { // initialize chilled water design mass flow rate in plant routines
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    this->mDotDesignCW,
                                    this->cWInNodeNum,
                                    this->cWOutNodeNum,
@@ -633,7 +636,8 @@ namespace FourPipeBeam {
                                    this->cWLocation.compNum);
             }
             if (this->beamHeatingPresent) { // initialize hot water design mass flow rate in plant routines
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    this->mDotDesignHW,
                                    this->hWInNodeNum,
                                    this->hWOutNodeNum,
@@ -949,7 +953,8 @@ namespace FourPipeBeam {
                                                     routineName);
             this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
             this->mDotDesignCW = this->vDotDesignCW * rho;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->mDotDesignCW,
                                                this->cWInNodeNum,
                                                this->cWOutNodeNum,
@@ -966,7 +971,8 @@ namespace FourPipeBeam {
                                                     routineName);
             this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
             this->mDotDesignHW = this->vDotDesignHW * rho;
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->mDotDesignHW,
                                                this->hWInNodeNum,
                                                this->hWOutNodeNum,
@@ -1025,7 +1031,8 @@ namespace FourPipeBeam {
             this->mDotNormRatedCW = this->vDotNormRatedCW * rho;
             this->mDotCW = this->vDotDesignCW * rho;
             if (this->beamCoolingPresent) {
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->mDotCW,
                                                    this->cWInNodeNum,
                                                    this->cWOutNodeNum,
@@ -1045,7 +1052,8 @@ namespace FourPipeBeam {
             this->mDotNormRatedHW = this->vDotNormRatedHW * rho;
             this->mDotHW = this->vDotDesignHW * rho;
             if (this->beamHeatingPresent) {
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->mDotHW,
                                                    this->hWInNodeNum,
                                                    this->hWOutNodeNum,

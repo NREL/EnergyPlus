@@ -1130,7 +1130,8 @@ namespace WaterCoils {
 
             state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate = rho * state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                state.dataWaterCoils->WaterCoil(CoilNum).MaxWaterMassFlowRate,
                                state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum,
                                state.dataWaterCoils->WaterCoil(CoilNum).WaterOutletNodeNum,

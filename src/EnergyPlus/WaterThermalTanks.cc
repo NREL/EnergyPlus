@@ -5567,7 +5567,8 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                GetWaterThermalTankInput);
                 this->MassFlowRateMin = this->VolFlowRateMin * rho;
                 this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
-                PlantUtilities::InitComponentNodes(this->MassFlowRateMin,
+                PlantUtilities::InitComponentNodes(state,
+                                                   this->MassFlowRateMin,
                                                    this->PlantUseMassFlowRateMax,
                                                    this->UseInletNode,
                                                    this->UseOutletNode,
@@ -5593,7 +5594,8 @@ namespace EnergyPlus::WaterThermalTanks {
                                                                state.dataPlnt->PlantLoop(this->SrcSide.loopNum).FluidIndex,
                                                                GetWaterThermalTankInput);
                 this->PlantSourceMassFlowRateMax = this->SourceDesignVolFlowRate * rho;
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->PlantSourceMassFlowRateMax,
                                                    this->SourceInletNode,
                                                    this->SourceOutletNode,

@@ -2156,7 +2156,7 @@ namespace DataPlant {
 
         // Now we check flow restriction from the other side, both min and max avail.
         // Doing this last basically means it wins, so the pump should pull down to meet the flow restriction
-        ThisLoopSideFlow = PlantUtilities::BoundValueToNodeMinMaxAvail(ThisLoopSideFlow, ThisSideInletNode);
+        ThisLoopSideFlow = PlantUtilities::BoundValueToNodeMinMaxAvail(state, ThisLoopSideFlow, ThisSideInletNode);
 
         // Final preparation of loop inlet min/max avail if pumps exist
         if (allocated(this->Pumps)) {
@@ -2164,7 +2164,7 @@ namespace DataPlant {
             // The pump may, however, have even tighter constraints than the other side
             // At this point, the inlet node doesn't know anything about those limits
             // Since we have already honored the other side flow restriction, try to honor the pump limits here
-            PlantUtilities::TightenNodeMinMaxAvails(ThisSideInletNode, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow);
+            PlantUtilities::TightenNodeMinMaxAvails(state. ThisSideInletNode, TotalPumpMinAvailFlow, TotalPumpMaxAvailFlow);
         }
 
         // Now reset the entering mass flow rate to the decided-upon flow rate

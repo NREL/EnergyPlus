@@ -1269,7 +1269,8 @@ namespace FanCoilUnits {
 
             // set the node max and min mass flow rates
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
-                InitComponentNodes(FanCoil(FanCoilNum).MinHotWaterFlow,
+                InitComponentNodes(state,
+                                   FanCoil(FanCoilNum).MinHotWaterFlow,
                                    FanCoil(FanCoilNum).MaxHeatCoilFluidFlow,
                                    FanCoil(FanCoilNum).HeatCoilFluidInletNode,
                                    FanCoil(FanCoilNum).HeatCoilFluidOutletNodeNum,
@@ -1279,7 +1280,8 @@ namespace FanCoilUnits {
                                    FanCoil(FanCoilNum).HeatCoilCompNum);
             }
 
-            InitComponentNodes(FanCoil(FanCoilNum).MinColdWaterFlow,
+            InitComponentNodes(state,
+                               FanCoil(FanCoilNum).MinColdWaterFlow,
                                FanCoil(FanCoilNum).MaxCoolCoilFluidFlow,
                                FanCoil(FanCoilNum).CoolCoilFluidInletNode,
                                FanCoil(FanCoilNum).CoolCoilFluidOutletNodeNum,

@@ -1555,7 +1555,8 @@ namespace EnergyPlus::PlantCentralGSHP {
                 this->HWMassFlowRateMax = this->HWVolFlowRate * rho;
                 this->GLHEMassFlowRateMax = this->GLHEVolFlowRate * rho;
 
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->CHWMassFlowRateMax,
                                                    this->CHWInletNodeNum,
                                                    this->CHWOutletNodeNum,
@@ -1563,7 +1564,8 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                    this->CWLoopSideNum,
                                                    this->CWBranchNum,
                                                    this->CWCompNum);
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->HWMassFlowRateMax,
                                                    this->HWInletNodeNum,
                                                    this->HWOutletNodeNum,
@@ -1571,7 +1573,8 @@ namespace EnergyPlus::PlantCentralGSHP {
                                                    this->HWLoopSideNum,
                                                    this->HWBranchNum,
                                                    this->HWCompNum);
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->GLHEMassFlowRateMax,
                                                    this->GLHEInletNodeNum,
                                                    this->GLHEOutletNodeNum,

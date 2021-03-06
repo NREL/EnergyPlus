@@ -954,7 +954,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
             this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
             this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
 
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->HeatRecMaxMassFlowRate,
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,
@@ -972,7 +973,8 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             // set the node max and min mass flow rates
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->HeatRecMaxMassFlowRate,
                                                this->HeatRecInletNodeNum,
                                                this->HeatRecOutletNodeNum,

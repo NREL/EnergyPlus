@@ -6052,7 +6052,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                        RoutineName);
                 state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow = state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondVolFlowRate * rho;
 
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataHVACVarRefFlow->VRF(VRFCond).WaterCondenserDesignMassFlow,
                                    state.dataHVACVarRefFlow->VRF(VRFCond).CondenserNodeNum,
                                    state.dataHVACVarRefFlow->VRF(VRFCond).CondenserOutletNodeNum,
@@ -6103,7 +6104,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                     }
                 }
                 // init water/steam coils min and max flow rates
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow,
                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode,
                                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilFluidOutletNode,
@@ -8330,7 +8332,8 @@ namespace EnergyPlus::HVACVariableRefrigerantFlow {
                                                             state.dataPlnt->PlantLoop(this->SourceLoopNum).FluidIndex,
                                                             RoutineName);
                     this->WaterCondenserDesignMassFlow = this->WaterCondVolFlowRate * rho;
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                                        this->WaterCondenserDesignMassFlow,
                                                        this->CondenserNodeNum,
                                                        this->CondenserOutletNodeNum,

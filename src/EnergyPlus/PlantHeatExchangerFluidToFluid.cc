@@ -747,7 +747,8 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                            state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
                                                            RoutineNameNoColon);
             this->DemandSideLoop.MassFlowRateMax = rho * this->DemandSideLoop.DesignVolumeFlowRate;
-            PlantUtilities::InitComponentNodes(this->DemandSideLoop.MassFlowRateMin,
+            PlantUtilities::InitComponentNodes(state,
+                                               this->DemandSideLoop.MassFlowRateMin,
                                                this->DemandSideLoop.MassFlowRateMax,
                                                this->DemandSideLoop.inletNodeNum,
                                                this->DemandSideLoop.outletNodeNum,
@@ -762,7 +763,8 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                     state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                     RoutineNameNoColon);
             this->SupplySideLoop.MassFlowRateMax = rho * this->SupplySideLoop.DesignVolumeFlowRate;
-            PlantUtilities::InitComponentNodes(this->SupplySideLoop.MassFlowRateMin,
+            PlantUtilities::InitComponentNodes(state,
+                                               this->SupplySideLoop.MassFlowRateMin,
                                                this->SupplySideLoop.MassFlowRateMax,
                                                this->SupplySideLoop.inletNodeNum,
                                                this->SupplySideLoop.outletNodeNum,

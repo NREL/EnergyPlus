@@ -9173,7 +9173,8 @@ namespace EnergyPlus::RefrigeratedCase {
                         Condenser(RefCondLoop).MassFlowRateMax = Condenser(RefCondLoop).VolFlowRateMax * rho;
                     }
 
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                        Condenser(RefCondLoop).MassFlowRateMax,
                                        Condenser(RefCondLoop).InletNode,
                                        Condenser(RefCondLoop).OutletNode,
@@ -9197,7 +9198,8 @@ namespace EnergyPlus::RefrigeratedCase {
                         RefrigRack(RefCompRackLoop).MassFlowRateMax = RefrigRack(RefCompRackLoop).VolFlowRateMax * rho;
                     }
 
-                    PlantUtilities::InitComponentNodes(0.0,
+                    PlantUtilities::InitComponentNodes(state,
+                                                       0.0,
                                        RefrigRack(RefCompRackLoop).MassFlowRateMax,
                                        RefrigRack(RefCompRackLoop).InletNode,
                                        RefrigRack(RefCompRackLoop).OutletNode,

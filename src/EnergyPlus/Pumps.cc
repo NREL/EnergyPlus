@@ -1387,7 +1387,8 @@ namespace EnergyPlus::Pumps {
                 // inlet node actually less than the 'minimum flow rate' specified by the user, than a
                 // loop shutdown must  be triggered.
                 mdotMin = 0.0;
-                InitComponentNodes(mdotMin,
+                InitComponentNodes(state,
+                                   mdotMin,
                                    mdotMax,
                                    InletNode,
                                    OutletNode,
@@ -1408,7 +1409,8 @@ namespace EnergyPlus::Pumps {
                 // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
                 // see note above
                 mdotMin = 0.0;
-                InitComponentNodes(mdotMin,
+                InitComponentNodes(state,
+                                   mdotMin,
                                    mdotMax,
                                    InletNode,
                                    OutletNode,

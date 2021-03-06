@@ -788,7 +788,8 @@ namespace EnergyPlus::CoolingPanelSimple {
                     rho = GetDensityGlycol(
                         state, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidName, DataGlobalConstants::CWInitConvTemp, state.dataPlnt->PlantLoop(ThisCP.LoopNum).FluidIndex, RoutineName);
                     ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        ThisCP.WaterMassFlowRateMax,
                                        ThisCP.WaterInletNode,
                                        ThisCP.WaterOutletNode,
@@ -808,7 +809,8 @@ namespace EnergyPlus::CoolingPanelSimple {
 
             ThisCP.WaterMassFlowRateMax = rho * ThisCP.WaterVolFlowRateMax;
 
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                ThisCP.WaterMassFlowRateMax,
                                ThisCP.WaterInletNode,
                                ThisCP.WaterOutletNode,

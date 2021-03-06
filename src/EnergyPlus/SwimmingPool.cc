@@ -727,7 +727,8 @@ namespace EnergyPlus::SwimmingPool {
 
         if (!this->MyPlantScanFlagPool) {
             if (this->WaterInletNode > 0) {
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->WaterMassFlowRateMax,
                                                    this->WaterInletNode,
                                                    this->WaterOutletNode,

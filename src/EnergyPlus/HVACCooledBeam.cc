@@ -591,7 +591,8 @@ namespace HVACCooledBeam {
                                    state.dataPlnt->PlantLoop(CoolBeam(CBNum).CWLoopNum).FluidIndex,
                                    RoutineName);
             CoolBeam(CBNum).MaxCoolWaterMassFlow = rho * CoolBeam(CBNum).MaxCoolWaterVolFlow;
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                CoolBeam(CBNum).MaxCoolWaterMassFlow,
                                InWaterNode,
                                OutWaterNode,
@@ -616,7 +617,8 @@ namespace HVACCooledBeam {
 
             InWaterNode = CoolBeam(CBNum).CWInNode;
             OutWaterNode = CoolBeam(CBNum).CWOutNode;
-            InitComponentNodes(0.0,
+            InitComponentNodes(state,
+                               0.0,
                                CoolBeam(CBNum).MaxCoolWaterMassFlow,
                                InWaterNode,
                                OutWaterNode,

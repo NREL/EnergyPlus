@@ -5090,7 +5090,8 @@ namespace Furnaces {
                     }
                 }
 
-                InitComponentNodes(0.0,
+                InitComponentNodes(state,
+                                   0.0,
                                    state.dataFurnaces->Furnace(FurnaceNum).MaxHeatCoilFluidFlow,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoilControlNode,
                                    state.dataFurnaces->Furnace(FurnaceNum).CoilOutletNode,
@@ -5128,7 +5129,8 @@ namespace Furnaces {
                             state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
                         }
                     }
-                    InitComponentNodes(0.0,
+                    InitComponentNodes(state,
+                                       0.0,
                                        state.dataFurnaces->Furnace(FurnaceNum).MaxSuppCoilFluidFlow,
                                        state.dataFurnaces->Furnace(FurnaceNum).SuppCoilControlNode,
                                        state.dataFurnaces->Furnace(FurnaceNum).SuppCoilOutletNode,

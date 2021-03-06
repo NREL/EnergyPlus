@@ -796,7 +796,8 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
                 }
 
                 this->DesCondMassFlowRate = rho * this->CondVolFlowRate;
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    this->DesCondMassFlowRate,
                                                    CondInletNode,
                                                    CondOutletNode,
@@ -817,7 +818,8 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
             }
             this->DesHeatMassFlowRate = rho * this->HeatVolFlowRate;
             // init available hot water flow rate
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesHeatMassFlowRate,
                                                HeatInletNode,
                                                HeatOutletNode,
@@ -837,7 +839,8 @@ namespace EnergyPlus::ChillerExhaustAbsorption {
             }
             this->DesEvapMassFlowRate = rho * this->EvapVolFlowRate;
             // init available hot water flow rate
-            PlantUtilities::InitComponentNodes(0.0,
+            PlantUtilities::InitComponentNodes(state,
+                                               0.0,
                                                this->DesEvapMassFlowRate,
                                                this->ChillReturnNodeNum,
                                                this->ChillSupplyNodeNum,

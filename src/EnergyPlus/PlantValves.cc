@@ -394,7 +394,8 @@ namespace PlantValves {
 
             if ((InletNode > 0) && (OutletNode > 0)) {
                 //   Node(InletNode)%Temp = 0.0
-                PlantUtilities::InitComponentNodes(0.0,
+                PlantUtilities::InitComponentNodes(state,
+                                                   0.0,
                                                    Node(PumpOutNode).MassFlowRateMax,
                                                    this->PltInletNodeNum,
                                                    this->PltOutletNodeNum,

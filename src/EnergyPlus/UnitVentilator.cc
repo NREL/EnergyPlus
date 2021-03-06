@@ -1393,7 +1393,8 @@ namespace UnitVentilator {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotWaterFlow = rho * state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotWaterFlow;
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotWaterFlow = rho * state.dataUnitVentilators->UnitVent(UnitVentNum).MinVolHotWaterFlow;
 
-                    InitComponentNodes(state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotWaterFlow,
+                    InitComponentNodes(state,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotWaterFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotWaterFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
@@ -1408,7 +1409,8 @@ namespace UnitVentilator {
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotSteamFlow = SteamDensity * state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolHotSteamFlow;
                     state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotSteamFlow = SteamDensity * state.dataUnitVentilators->UnitVent(UnitVentNum).MinVolHotSteamFlow;
 
-                    InitComponentNodes(state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotSteamFlow,
+                    InitComponentNodes(state,
+                                       state.dataUnitVentilators->UnitVent(UnitVentNum).MinHotSteamFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).MaxHotSteamFlow,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotControlNode,
                                        state.dataUnitVentilators->UnitVent(UnitVentNum).HotCoilOutNodeNum,
@@ -1425,7 +1427,8 @@ namespace UnitVentilator {
 
                 state.dataUnitVentilators->UnitVent(UnitVentNum).MaxColdWaterFlow = rho * state.dataUnitVentilators->UnitVent(UnitVentNum).MaxVolColdWaterFlow;
                 state.dataUnitVentilators->UnitVent(UnitVentNum).MinColdWaterFlow = rho * state.dataUnitVentilators->UnitVent(UnitVentNum).MinVolColdWaterFlow;
-                InitComponentNodes(state.dataUnitVentilators->UnitVent(UnitVentNum).MinColdWaterFlow,
+                InitComponentNodes(state,
+                                   state.dataUnitVentilators->UnitVent(UnitVentNum).MinColdWaterFlow,
                                    state.dataUnitVentilators->UnitVent(UnitVentNum).MaxColdWaterFlow,
                                    state.dataUnitVentilators->UnitVent(UnitVentNum).ColdControlNode,
                                    state.dataUnitVentilators->UnitVent(UnitVentNum).ColdCoilOutNodeNum,
