@@ -1486,7 +1486,7 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<Real64> SurfWinSlatAngThisTSDegEMSValue; // value that EMS sets for slat angle in degrees
     Array1D<bool> SurfWinSlatsBlockBeam;             // True if blind slats block incident beam solar
     Array1D<int> SurfWinSlatsAngIndex;
-    Array1D<bool> SurfWinSlatsAngInterpFac;
+    Array1D<Real64> SurfWinSlatsAngInterpFac;
     Array1D<Real64> SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
     Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
     Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
