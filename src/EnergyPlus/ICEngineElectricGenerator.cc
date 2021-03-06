@@ -465,8 +465,8 @@ namespace ICEngineElectricGenerator {
 
         if (this->HeatRecActive) {
             int HeatRecInNode = this->HeatRecInletNodeNum;
-            HeatRecInTemp = DataLoopNode::Node(HeatRecInNode).Temp;
-            HeatRecMdot = DataLoopNode::Node(HeatRecInNode).MassFlowRate;
+            HeatRecInTemp = state.dataLoopNodes->Node(HeatRecInNode).Temp;
+            HeatRecMdot = state.dataLoopNodes->Node(HeatRecInNode).MassFlowRate;
 
         } else {
             HeatRecInTemp = 0.0;
@@ -671,7 +671,7 @@ namespace ICEngineElectricGenerator {
         // Need to set the HeatRecRatio to 1.0 if it is not modified
         HRecRatio = 1.0;
 
-        Real64 HeatRecInTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
+        Real64 HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
         Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(
             state, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidName, HeatRecInTemp, state.dataPlnt->PlantLoop(this->HRLoopNum).FluidIndex, RoutineName);
 
@@ -789,8 +789,8 @@ namespace ICEngineElectricGenerator {
             int HeatRecInletNode = this->HeatRecInletNodeNum;
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
             // set the node Temperature, assuming freeze control
-            DataLoopNode::Node(HeatRecInletNode).Temp = 20.0;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = 20.0;
+            state.dataLoopNodes->Node(HeatRecInletNode).Temp = 20.0;
+            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = 20.0;
             // set the node max and min mass flow rates
             PlantUtilities::InitComponentNodes(0.0,
                                                this->DesignHeatRecMassFlowRate,
@@ -836,11 +836,11 @@ namespace ICEngineElectricGenerator {
         }
     }
 
-    void ICEngineGeneratorSpecs::update()
+    void ICEngineGeneratorSpecs::update(EnergyPlusData &state)
     {
         if (this->HeatRecActive) {
             int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-            DataLoopNode::Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
         }
     }
 
