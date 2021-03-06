@@ -176,7 +176,7 @@ namespace PlantComponentTemperatureSources {
         }
 
         // OK, so we can set up the inlet and boundary temperatures now
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         if (this->TempSpecType == iTempSpecType::Schedule) {
             this->BoundaryTemp = ScheduleManager::GetCurrentScheduleValue(state, this->TempSpecScheduleNum);
         }
@@ -375,9 +375,9 @@ namespace PlantComponentTemperatureSources {
         }
     }
 
-    void WaterSourceSpecs::update()
+    void WaterSourceSpecs::update(EnergyPlusData &state)
     {
-        DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
     void WaterSourceSpecs::simulate(EnergyPlusData &state,
@@ -388,7 +388,7 @@ namespace PlantComponentTemperatureSources {
     {
         this->initialize(state, CurLoad);
         this->calculate(state);
-        this->update();
+        this->update(state);
     }
 
     void WaterSourceSpecs::getDesignCapacities(
