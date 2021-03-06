@@ -1284,10 +1284,10 @@ namespace HeatingCoils {
         AirInletNode = HeatingCoil(CoilNum).AirInletNodeNum;
         AirOutletNode = HeatingCoil(CoilNum).AirOutletNodeNum;
         ControlNode = HeatingCoil(CoilNum).TempSetPointNodeNum;
-        HeatingCoil(CoilNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
-        HeatingCoil(CoilNum).InletAirTemp = Node(AirInletNode).Temp;
-        HeatingCoil(CoilNum).InletAirHumRat = Node(AirInletNode).HumRat;
-        HeatingCoil(CoilNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+        HeatingCoil(CoilNum).InletAirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
+        HeatingCoil(CoilNum).InletAirTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
+        HeatingCoil(CoilNum).InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
+        HeatingCoil(CoilNum).InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
 
         // Set the reporting variables to zero at each timestep.
         HeatingCoil(CoilNum).HeatingCoilLoad = 0.0;
@@ -1299,9 +1299,9 @@ namespace HeatingCoils {
         if (ControlNode == 0) {
             HeatingCoil(CoilNum).DesiredOutletTemp = 0.0;
         } else if (ControlNode == AirOutletNode) {
-            HeatingCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint;
+            HeatingCoil(CoilNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint;
         } else {
-            HeatingCoil(CoilNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint - (Node(ControlNode).Temp - Node(AirOutletNode).Temp);
+            HeatingCoil(CoilNum).DesiredOutletTemp = state.dataLoopNodes->Node(ControlNode).TempSetPoint - (state.dataLoopNodes->Node(ControlNode).Temp - state.dataLoopNodes->Node(AirOutletNode).Temp);
         }
 
         if (QCoilRequired == SensedLoadFlagValue && MySPTestFlag(CoilNum) && HeatingCoil(CoilNum).HCoilType_Num != Coil_HeatingElectric_MultiStage &&
@@ -1322,7 +1322,7 @@ namespace HeatingCoils {
                     HeatingCoilFatalError = true;
                     //     test 3) here (fatal message)
                 } else { // IF(ControlNode .GT. 0)THEN
-                    if (Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
+                    if (state.dataLoopNodes->Node(ControlNode).TempSetPoint == SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state, cAllCoilTypes(HeatingCoil(CoilNum).HCoilType_Num) + " \"" + HeatingCoil(CoilNum).Name + "\"");
                             ShowContinueError(state, "... Missing temperature setpoint for heating coil.");
@@ -1837,7 +1837,7 @@ namespace HeatingCoils {
         }
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
-        Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
     void CalcMultiStageElectricHeatingCoil(EnergyPlusData &state,
@@ -2053,7 +2053,7 @@ namespace HeatingCoils {
         } // end of on/off if - else
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
-        Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
     void CalcFuelHeatingCoil(EnergyPlusData &state,
@@ -2263,7 +2263,7 @@ namespace HeatingCoils {
         ElecHeatingCoilPower = HeatingCoil(CoilNum).ElecUseLoad;
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
-        Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
     void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
@@ -2539,7 +2539,7 @@ namespace HeatingCoils {
         }
 
         // set outlet node temp so parent objects can call calc directly without have to simulate entire model
-        Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
     void CalcDesuperheaterHeatingCoil(EnergyPlusData &state, int const CoilNum,     // index to desuperheater heating coil
@@ -2793,25 +2793,25 @@ namespace HeatingCoils {
         AirOutletNode = HeatingCoil(CoilNum).AirOutletNodeNum;
 
         // Set the outlet air nodes of the HeatingCoil
-        Node(AirOutletNode).MassFlowRate = HeatingCoil(CoilNum).OutletAirMassFlowRate;
-        Node(AirOutletNode).Temp = HeatingCoil(CoilNum).OutletAirTemp;
-        Node(AirOutletNode).HumRat = HeatingCoil(CoilNum).OutletAirHumRat;
-        Node(AirOutletNode).Enthalpy = HeatingCoil(CoilNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = HeatingCoil(CoilNum).OutletAirMassFlowRate;
+        state.dataLoopNodes->Node(AirOutletNode).Temp = HeatingCoil(CoilNum).OutletAirTemp;
+        state.dataLoopNodes->Node(AirOutletNode).HumRat = HeatingCoil(CoilNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = HeatingCoil(CoilNum).OutletAirEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(AirOutletNode).Quality = Node(AirInletNode).Quality;
-        Node(AirOutletNode).Press = Node(AirInletNode).Press;
-        Node(AirOutletNode).MassFlowRateMin = Node(AirInletNode).MassFlowRateMin;
-        Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
-        Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
-        Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
+        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
+            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
+            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
         }
     }
 
