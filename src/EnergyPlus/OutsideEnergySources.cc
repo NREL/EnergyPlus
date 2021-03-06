@@ -363,7 +363,7 @@ namespace EnergyPlus::OutsideEnergySources {
         PlantUtilities::SetComponentFlowRate(
             state, TempPlantMassFlow, this->InletNodeNum, this->OutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
 
-        this->InletTemp = DataLoopNode::Node(this->InletNodeNum).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNodeNum).Temp;
         this->MassFlowRate = TempPlantMassFlow;
     }
 
@@ -499,7 +499,7 @@ namespace EnergyPlus::OutsideEnergySources {
             MyLoad = 0.0;
         }
         int const OutletNode = this->OutletNodeNum;
-        DataLoopNode::Node(OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(OutletNode).Temp = this->OutletTemp;
         this->EnergyRate = std::abs(MyLoad);
         this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
