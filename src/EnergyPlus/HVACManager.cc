@@ -416,7 +416,7 @@ namespace EnergyPlus::HVACManager {
             facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);
 
             // Update the plant and condenser loop capacitance model temperature history.
-            UpdateNodeThermalHistory();
+            UpdateNodeThermalHistory(state);
 
             if (state.dataOutRptTab->displayHeatEmissionsSummary) {
                 OutputReportTabular::CalcHeatEmissionReport(state);
