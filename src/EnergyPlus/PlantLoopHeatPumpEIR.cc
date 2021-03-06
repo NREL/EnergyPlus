@@ -85,8 +85,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
 
-        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
+        this->loadSideInletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
+        this->sourceSideInletTemp = state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp;
 
         if (this->waterSource) {
             this->setOperatingFlowRatesWSHP(state);
@@ -115,8 +115,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         }
 
         // update nodes
-        DataLoopNode::Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
-        DataLoopNode::Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+        state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
+        state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
     }
 
     Real64 EIRPlantLoopHeatPump::getLoadSideOutletSetPointTemp(EnergyPlusData &state) const
@@ -128,16 +128,16 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::SingleSetPoint) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
-                return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPoint;
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
             } else { // use plant loop overall set-point
-                return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPoint;
             }
         } else if (thisLoadPlantLoop.LoopDemandCalcScheme == DataPlant::iLoopDemandCalcScheme::DualSetPointDeadBand) {
             if (thisLoadComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
                 // there will be a valid set-point on outlet
-                return DataLoopNode::Node(this->loadSideNodes.outlet).TempSetPointHi;
+                return state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPointHi;
             } else { // use plant loop overall set-point
-                return DataLoopNode::Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
+                return state.dataLoopNodes->Node(thisLoadPlantLoop.TempSetPointNodeNum).TempSetPointHi;
             }
         } else {
             // there's no other enums for loop demand calcs, so I don't have a reasonable unit test for these
@@ -307,7 +307,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         // evaluate the actual current operating load side heat transfer rate
         auto &thisLoadPlantLoop = state.dataPlnt->PlantLoop(this->loadSideLocation.loopNum);
         Real64 CpLoad = FluidProperties::GetSpecificHeatGlycol(
-            state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
+            state, thisLoadPlantLoop.FluidName, state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
         this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
@@ -330,7 +330,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         Real64 CpSrc = 0.0;
         if (this->waterSource) {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
-                state, thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
+                state, thisLoadPlantLoop.FluidName, state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
             CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
         }

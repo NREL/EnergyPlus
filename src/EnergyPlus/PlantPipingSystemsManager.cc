@@ -2176,7 +2176,7 @@ namespace EnergyPlus {
 
                 // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
                 // being based on the inlet temperature, which wasn't updated until later
-                thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(thisCircuit->InletNodeNum).Temp;
+                thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(thisCircuit->InletNodeNum).Temp;
                 thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
                 this->DoOneTimeInitializations(state, thisCircuit);
@@ -2197,7 +2197,7 @@ namespace EnergyPlus {
             // Get the mass flow and inlet temperature to use for this time step
             int InletNodeNum = thisCircuit->InletNodeNum;
             int OutletNodeNum = thisCircuit->OutletNodeNum;
-            thisCircuit->CurCircuitInletTemp = DataLoopNode::Node(InletNodeNum).Temp;
+            thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
 
             // request design, set component flow will decide what to give us based on restrictions and flow lock status
             thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
@@ -2220,7 +2220,7 @@ namespace EnergyPlus {
 
             int OutletNodeNum = thisCircuit->OutletNodeNum;
             auto const &out_cell(thisCircuit->CircuitOutletCell);
-            DataLoopNode::Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
+            state.dataLoopNodes->Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y,
                                                                  out_cell.Z).PipeCellData.Fluid.Temperature;
         }
 
