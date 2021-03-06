@@ -106,10 +106,8 @@ namespace EnergyPlus::Pumps {
     using DataHVACGlobals::NumPlantLoops;
     using DataHVACGlobals::SmallWaterVolFlow;
     using DataHVACGlobals::TimeStepSys;
-    using DataLoopNode::Node;
     using DataLoopNode::NodeConnectionType_Inlet;
     using DataLoopNode::NodeConnectionType_Outlet;
-    using DataLoopNode::NodeID;
     using DataLoopNode::NodeType_Steam;
     using DataLoopNode::NodeType_Water;
     using DataLoopNode::ObjectIsNotParent;
@@ -1268,10 +1266,10 @@ namespace EnergyPlus::Pumps {
                     ShowSevereError(state, "InitializePumps: " + cPumpTypes(state.dataPumps->PumpEquip(PumpNum).PumpType) + "=\"" + state.dataPumps->PumpEquip(PumpNum).Name +
                                     "\", non-matching nodes.");
                     ShowContinueError(state, "...in Branch=\"" + state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Name + "\", Component referenced with:");
-                    ShowContinueError(state, "...Inlet Node=\"" + NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
-                    ShowContinueError(state, "...Outlet Node=\"" + NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
-                    ShowContinueError(state, "...Pump Inlet Node=\"" + NodeID(InletNode));
-                    ShowContinueError(state, "...Pump Outlet Node=\"" + NodeID(OutletNode));
+                    ShowContinueError(state, "...Inlet Node=\"" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumIn));
+                    ShowContinueError(state, "...Outlet Node=\"" + state.dataLoopNodes->NodeID(state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum).Comp(cpnum).NodeNumOut));
+                    ShowContinueError(state, "...Pump Inlet Node=\"" + state.dataLoopNodes->NodeID(InletNode));
+                    ShowContinueError(state, "...Pump Outlet Node=\"" + state.dataLoopNodes->NodeID(OutletNode));
                     errFlag = true;
                 }
             } else { // CR9292
@@ -1506,8 +1504,8 @@ namespace EnergyPlus::Pumps {
         OutletNode = state.dataPumps->PumpEquip(PumpNum).OutletNodeNum;
 
         // Inlet node Min/MaxAvail
-        InletNodeMax = Node(InletNode).MassFlowRateMaxAvail;
-        InletNodeMin = Node(InletNode).MassFlowRateMinAvail;
+        InletNodeMax = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
+        InletNodeMin = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
 
         // Retrive the pump speed fraction from the pump schedule
         if (state.dataPumps->PumpEquip(PumpNum).PumpScheduleIndex != 0) {
@@ -1560,7 +1558,7 @@ namespace EnergyPlus::Pumps {
 
                                 state.dataPumps->PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
                                                                              state.dataPumps->PumpEquip(PumpNum).LoopNum,
-                                                                             Node(state.dataPumps->PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
+                                                                             state.dataLoopNodes->Node(state.dataPumps->PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
                                                                              state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
                                                                              state.dataPumps->PumpEquip(PumpNum).RotSpeed,
                                                                              state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
@@ -1580,7 +1578,7 @@ namespace EnergyPlus::Pumps {
                                 GetRequiredMassFlowRate(state,
                                                         LoopNum,
                                                         PumpNum,
-                                                        Node(state.dataPumps->PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
+                                                        state.dataLoopNodes->Node(state.dataPumps->PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
                                                         state.dataPumps->PumpMassFlowRate,
                                                         PumpMassFlowRateMin,
                                                         PumpMassFlowRateMax);
@@ -1590,14 +1588,14 @@ namespace EnergyPlus::Pumps {
                 }
 
                 if (state.dataPumps->PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
-                    Node(InletNode).MassFlowRateRequest = PumpMassFlowRateMin;
+                    state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = PumpMassFlowRateMin;
                 }
 
             } else if (SELECT_CASE_var == Pump_ConSpeed) {
 
                 if (state.dataPumps->PumpEquip(PumpNum).PumpControl == PumpControlType::Continuous) {
                     PumpMassFlowRateMin = PumpMassFlowRateMax;
-                    Node(InletNode).MassFlowRateRequest = PumpMassFlowRateMin;
+                    state.dataLoopNodes->Node(InletNode).MassFlowRateRequest = PumpMassFlowRateMin;
                 }
 
                 // Override (lock down flow) for pressure drop if applicable
@@ -1607,7 +1605,7 @@ namespace EnergyPlus::Pumps {
                         state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).PressureDrop > 0.0) {
                         state.dataPumps->PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
                                                                      state.dataPumps->PumpEquip(PumpNum).LoopNum,
-                                                                     Node(state.dataPumps->PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
+                                                                     state.dataLoopNodes->Node(state.dataPumps->PumpEquip(PumpNum).InletNodeNum).MassFlowRate,
                                                                      state.dataPumps->PumpEquip(PumpNum).PressureCurve_Index,
                                                                      state.dataPumps->PumpEquip(PumpNum).RotSpeed,
                                                                      state.dataPumps->PumpEquip(PumpNum).ImpellerDiameter,
@@ -1636,8 +1634,8 @@ namespace EnergyPlus::Pumps {
 
         // Update outlet node to allow loop solver to get data
         // could avoid this by passing data in/out to avoid putting things on nodes
-        Node(OutletNode).MassFlowRateMinAvail = PumpMassFlowRateMin;
-        Node(OutletNode).MassFlowRateMaxAvail = PumpMassFlowRateMax;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = PumpMassFlowRateMin;
+        state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = PumpMassFlowRateMax;
     }
 
     void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning)
@@ -1786,15 +1784,15 @@ namespace EnergyPlus::Pumps {
         //***** EXIT IF NO FLOW ******!
         //****************************!
         if (state.dataPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-            Node(OutletNode).Temp = Node(InletNode).Temp;
-            Node(OutletNode).Press = Node(InletNode).Press;
-            Node(OutletNode).Quality = Node(InletNode).Quality;
+            state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+            state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+            state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
             return;
         }
 
         // density used for volumetric flow calculations
         LoopDensity = GetDensityGlycol(
-            state, state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).FluidName, Node(InletNode).Temp, state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).FluidIndex, RoutineName);
+            state, state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).FluidName, state.dataLoopNodes->Node(InletNode).Temp, state.dataPlnt->PlantLoop(state.dataPumps->PumpEquip(PumpNum).LoopNum).FluidIndex, RoutineName);
 
         //****************************!
         //***** CALCULATE POWER (1) **!
@@ -1891,9 +1889,9 @@ namespace EnergyPlus::Pumps {
         state.dataPumps->PumpEquip(PumpNum).Power = state.dataPumps->Power;
 
         // Update outlet node conditions
-        Node(OutletNode).Temp = Node(InletNode).Temp;
-        Node(OutletNode).Press = Node(InletNode).Press;
-        Node(OutletNode).Quality = Node(InletNode).Quality;
+        state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(InletNode).Temp;
+        state.dataLoopNodes->Node(OutletNode).Press = state.dataLoopNodes->Node(InletNode).Press;
+        state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
     }
 
     void SizePump(EnergyPlusData &state, int const PumpNum)
@@ -2121,7 +2119,7 @@ namespace EnergyPlus::Pumps {
         if (state.dataPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate = 0.0;
             state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid = 0.0;
-            state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = Node(OutletNode).Temp;
+            state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
             state.dataPumps->PumpEquip(PumpNum).Power = 0.0;
             state.dataPumps->PumpEquip(PumpNum).Energy = 0.0;
             state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = 0.0;
@@ -2134,7 +2132,7 @@ namespace EnergyPlus::Pumps {
         } else {
             state.dataPumps->PumpEquipReport(PumpNum).PumpMassFlowRate = state.dataPumps->PumpMassFlowRate;
             state.dataPumps->PumpEquipReport(PumpNum).PumpHeattoFluid = state.dataPumps->PumpHeattoFluid;
-            state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = Node(OutletNode).Temp;
+            state.dataPumps->PumpEquipReport(PumpNum).OutletTemp = state.dataLoopNodes->Node(OutletNode).Temp;
             state.dataPumps->PumpEquip(PumpNum).Power = state.dataPumps->Power;
             state.dataPumps->PumpEquip(PumpNum).Energy = state.dataPumps->PumpEquip(PumpNum).Power * TimeStepSys * DataGlobalConstants::SecInHour;
             state.dataPumps->PumpEquipReport(PumpNum).ShaftPower = state.dataPumps->ShaftPower;
@@ -2199,7 +2197,6 @@ namespace EnergyPlus::Pumps {
                                  Real64 &PumpMaxMassFlowRateVFDRange)
     {
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
 

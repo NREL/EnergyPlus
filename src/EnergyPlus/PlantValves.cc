@@ -396,7 +396,7 @@ namespace PlantValves {
                 //   Node(InletNode)%Temp = 0.0
                 PlantUtilities::InitComponentNodes(state,
                                                    0.0,
-                                                   Node(PumpOutNode).MassFlowRateMax,
+                                                   state.dataLoopNodes->Node(PumpOutNode).MassFlowRateMax,
                                                    this->PltInletNodeNum,
                                                    this->PltOutletNodeNum,
                                                    this->LoopNum,
@@ -410,16 +410,16 @@ namespace PlantValves {
         if (!state.dataGlobal->BeginEnvrnFlag) this->environmentInit = true;
 
         if (InletNode > 0) {
-            this->InletTemp = Node(InletNode).Temp;
+            this->InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
         }
         if (Strm2Node > 0) {
-            this->Stream2SourceTemp = Node(Strm2Node).Temp;
+            this->Stream2SourceTemp = state.dataLoopNodes->Node(Strm2Node).Temp;
         }
         if (SetPntNode > 0) {
-            this->SetPointTemp = Node(SetPntNode).TempSetPoint;
+            this->SetPointTemp = state.dataLoopNodes->Node(SetPntNode).TempSetPoint;
         }
         if (PumpOutNode > 0) {
-            this->MixedMassFlowRate = Node(PumpOutNode).MassFlowRate;
+            this->MixedMassFlowRate = state.dataLoopNodes->Node(PumpOutNode).MassFlowRate;
         }
 
     }
@@ -464,7 +464,7 @@ namespace PlantValves {
             }
         } else if (state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).FlowLock == DataPlant::iFlowLock::Locked) { // don't recalc diversion, just reuse current flows
             if (this->MixedMassFlowRate > 0.0) {
-                this->FlowDivFract = Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
+                this->FlowDivFract = state.dataLoopNodes->Node(this->PltOutletNodeNum).MassFlowRate / this->MixedMassFlowRate;
             } else {
                 this->FlowDivFract = 0.0;
             }
