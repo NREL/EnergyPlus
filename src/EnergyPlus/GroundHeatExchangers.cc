@@ -2089,7 +2089,7 @@ namespace EnergyPlus::GroundHeatExchangers {
             this->firstTime = false;
         }
 
-        this->inletTemp = Node(this->inletNodeNum).Temp;
+        this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
         Real64 cpFluid = GetSpecificHeatGlycol(state,
                                                state.dataPlnt->PlantLoop(this->loopNum).FluidName,
@@ -2368,8 +2368,9 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
-        Node(this->outletNodeNum).Temp = this->outletTemp;
-        Node(this->outletNodeNum).Enthalpy = this->outletTemp * GetSpecificHeatGlycol(state,
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->outletTemp;
+        state.dataLoopNodes->Node(this->outletNodeNum).Enthalpy =
+            this->outletTemp * GetSpecificHeatGlycol(state,
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidName,
                                                                                       this->outletTemp,
                                                                                       state.dataPlnt->PlantLoop(this->loopNum).FluidIndex,
@@ -2789,7 +2790,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         constexpr const char * RoutineName("calcPipeConvectionResistance");
 
         // Get fluid props
-        this->inletTemp = Node(this->inletNodeNum).Temp;
+        this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
 
         Real64 const cpFluid = GetSpecificHeatGlycol(state,
                                                      state.dataPlnt->PlantLoop(this->loopNum).FluidName,
@@ -3193,8 +3194,8 @@ namespace EnergyPlus::GroundHeatExchangers {
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
-        Node(this->inletNodeNum).Temp = this->tempGround;
-        Node(this->outletNodeNum).Temp = this->tempGround;
+        state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->tempGround;
 
         // zero out all history arrays
         this->QnHr = 0.0;
@@ -3283,8 +3284,8 @@ namespace EnergyPlus::GroundHeatExchangers {
             0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum, this->loopNum, this->loopSideNum, this->branchNum, this->compNum);
 
         this->lastQnSubHr = 0.0;
-        Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-        Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+        state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
         // zero out all history arrays
         this->QnHr = 0.0;
