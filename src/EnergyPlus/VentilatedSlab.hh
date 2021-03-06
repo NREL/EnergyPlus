@@ -391,8 +391,8 @@ struct VentilatedSlabData : BaseGlobalStruct {
     Array1D_bool MySizeFlag;
 
     // Object Data
-    Array1D<VentilatedSlab::VentilatedSlabData> VentSlab;
-    Array1D<VentilatedSlab::VentSlabNumericFieldData> VentSlabNumericFields;
+    SimpleArray1D<VentilatedSlab::VentilatedSlabData> VentSlab;
+    SimpleArray1D<VentilatedSlab::VentSlabNumericFieldData> VentSlabNumericFields;
 
     void clear_state() override
     {

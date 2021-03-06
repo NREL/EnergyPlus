@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -365,8 +366,8 @@ struct SystemReportsData : BaseGlobalStruct {
     Array1D_bool NoLoadFlag;
     Array1D_bool UnmetLoadFlag;
 
-    Array1D<SystemReports::SummarizeLoads> Vent;
-    Array1D<SystemReports::SysPreDefRepType> SysPreDefRep;
+    SimpleArray1D<SystemReports::SummarizeLoads> Vent;
+    SimpleArray1D<SystemReports::SysPreDefRepType> SysPreDefRep;
 
     bool OneTimeFlag_FindFirstLastPtr = true;
     bool OneTimeFlag_InitEnergyReports = true;

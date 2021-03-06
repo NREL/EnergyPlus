@@ -227,7 +227,7 @@ struct MicroturbineElectricGeneratorData : BaseGlobalStruct {
 
     int NumMTGenerators = 0;
     bool GetMTInput = true;
-    Array1D<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
+    SimpleArray1D<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
 
     void clear_state() override
     {

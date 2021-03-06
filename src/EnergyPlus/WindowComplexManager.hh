@@ -262,7 +262,7 @@ namespace WindowComplexManager {
         int NumComplexWind; // Total number of complex windows
 
         Array1D<DataBSDFWindow::BasisStruct> BasisList;
-        Array1D<WindowComplexManager::WindowIndex> WindowList;
+        SimpleArray1D<WindowComplexManager::WindowIndex> WindowList;
         Array2D<WindowComplexManager::WindowStateIndex> WindowStateList;
 
         bool InitComplexWindowsOnce = true; // Flag for insuring things happen once

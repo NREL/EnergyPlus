@@ -118,7 +118,7 @@ struct PlantValvesData : BaseGlobalStruct {
     bool GetTemperingValves = true;
     bool OneTimeInitFlag = true;
     int NumTemperingValves = 0;
-    Array1D<PlantValves::TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
+    SimpleArray1D<PlantValves::TemperValveData> TemperValve; // dimension to No. of TemperingValve objects
 
     void clear_state() override {
         GetTemperingValves = true;

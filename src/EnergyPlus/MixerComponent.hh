@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -157,7 +158,7 @@ struct MixerComponentData : BaseGlobalStruct {
     bool SimAirMixerInputFlag = true;
     bool GetZoneMixerIndexInputFlag = true;
     Array1D_bool CheckEquipName;
-    Array1D<MixerComponent::MixerConditions> MixerCond;
+    SimpleArray1D<MixerComponent::MixerConditions> MixerCond;
 
     void clear_state() override
     {

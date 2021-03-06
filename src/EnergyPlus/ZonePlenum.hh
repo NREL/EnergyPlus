@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -201,8 +202,8 @@ namespace ZonePlenum {
         Array1D_bool CheckSupEquipName;
 
         // Object Data
-        Array1D<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
-        Array1D<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
+        SimpleArray1D<ZonePlenum::ZoneReturnPlenumConditions> ZoneRetPlenCond;
+        SimpleArray1D<ZonePlenum::ZoneSupplyPlenumConditions> ZoneSupPlenCond;
         bool MyEnvrnFlag = true;
 
         void clear_state() override

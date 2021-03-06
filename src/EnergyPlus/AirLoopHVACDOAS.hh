@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 

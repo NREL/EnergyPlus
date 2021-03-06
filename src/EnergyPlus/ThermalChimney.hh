@@ -142,9 +142,9 @@ struct ThermalChimneysData : BaseGlobalStruct {
     bool ThermalChimneyGetInputFlag = true;
     int TotThermalChimney = 0; // Total ThermalChimney Statements in input
 
-    Array1D<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
-    Array1D<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
-    Array1D<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
+    SimpleArray1D<ThermalChimney::ThermalChimneyData> ThermalChimneySys;
+    SimpleArray1D<ThermalChimney::ThermChimZnReportVars> ZnRptThermChim;
+    SimpleArray1D<ThermalChimney::ThermChimReportVars> ThermalChimneyReport;
 
     void clear_state() override
     {

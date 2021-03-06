@@ -340,10 +340,10 @@ struct UserDefinedComponentsData : BaseGlobalStruct {
     Array1D_bool CheckUserAirTerminal;
 
     // Object Data
-    Array1D<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
-    Array1D<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
-    Array1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    Array1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
+    SimpleArray1D<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
+    SimpleArray1D<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
+    SimpleArray1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    SimpleArray1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
 
     void clear_state() override
     {

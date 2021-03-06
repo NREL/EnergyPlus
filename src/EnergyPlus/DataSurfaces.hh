@@ -1526,21 +1526,21 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyHeatBalanceOutsideSourceTerm = false; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
 
     Array1D<DataSurfaces::SurfaceData> Surface;
-    Array1D<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
+    SimpleArray1D<DataSurfaces::SurfaceWindowCalc> SurfaceWindow;
     Array1D<DataSurfaces::FrameDividerProperties> FrameDivider;
-    Array1D<DataSurfaces::StormWindowData> StormWindow;
-    Array1D<DataSurfaces::WindowShadingControlData> WindowShadingControl;
-    Array1D<DataSurfaces::OSCData> OSC;
-    Array1D<DataSurfaces::OSCMData> OSCM;
-    Array1D<DataSurfaces::ConvectionCoefficient> UserIntConvectionCoeffs;
-    Array1D<DataSurfaces::ConvectionCoefficient> UserExtConvectionCoeffs;
-    Array1D<DataSurfaces::ShadingVertexData> ShadeV;
-    Array1D<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
-    Array1D<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
-    Array1D<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
-    Array1D<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
-    Array1D<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
-    Array1D<DataSurfaces::IntMassObject> IntMassObjects;
+    SimpleArray1D<DataSurfaces::StormWindowData> StormWindow;
+    SimpleArray1D<DataSurfaces::WindowShadingControlData> WindowShadingControl;
+    SimpleArray1D<DataSurfaces::OSCData> OSC;
+    SimpleArray1D<DataSurfaces::OSCMData> OSCM;
+    SimpleArray1D<DataSurfaces::ConvectionCoefficient> UserIntConvectionCoeffs;
+    SimpleArray1D<DataSurfaces::ConvectionCoefficient> UserExtConvectionCoeffs;
+    SimpleArray1D<DataSurfaces::ShadingVertexData> ShadeV;
+    SimpleArray1D<DataSurfaces::ExtVentedCavityStruct> ExtVentedCavity;
+    SimpleArray1D<DataSurfaces::SurfaceSolarIncident> SurfIncSolSSG;
+    SimpleArray1D<DataSurfaces::FenestrationSolarAbsorbed> FenLayAbsSSG;
+    SimpleArray1D<DataSurfaces::SurfaceLocalEnvironment> SurfLocalEnvironment;
+    SimpleArray1D<DataSurfaces::SurroundingSurfacesProperty> SurroundingSurfsProperty;
+    SimpleArray1D<DataSurfaces::IntMassObject> IntMassObjects;
 
     void clear_state() override
     {

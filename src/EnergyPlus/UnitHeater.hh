@@ -214,8 +214,8 @@ struct UnitHeatersData : BaseGlobalStruct {
     bool SetMassFlowRateToZero = false;    // TRUE when mass flow rates need to be set to zero
 
     // Object Data
-    Array1D<UnitHeater::UnitHeaterData> UnitHeat;
-    Array1D<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
+    SimpleArray1D<UnitHeater::UnitHeaterData> UnitHeat;
+    SimpleArray1D<UnitHeater::UnitHeatNumericFieldData> UnitHeatNumericFields;
 
     void clear_state() override
     {

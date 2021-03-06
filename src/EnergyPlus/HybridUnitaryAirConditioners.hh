@@ -107,7 +107,7 @@ struct HybridUnitaryAirConditionersData : BaseGlobalStruct {
     bool ZoneEquipmentListChecked = false;
     bool HybridCoolOneTimeFlag = true;
     Array1D_bool CheckZoneHybridEvapName;
-    Array1D<HybridUnitaryAirConditioners::Model> ZoneHybridUnitaryAirConditioner;
+    SimpleArray1D<HybridUnitaryAirConditioners::Model> ZoneHybridUnitaryAirConditioner;
 
     void clear_state() override
     {

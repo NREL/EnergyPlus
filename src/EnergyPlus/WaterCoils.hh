@@ -559,8 +559,8 @@ namespace WaterCoils {
         int const WaterCoil_DetFlatFinCooling;
         int const WaterCoil_Cooling;
 
-        Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
-        Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
+        SimpleArray1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
+        SimpleArray1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
 
         void clear_state() override
         {

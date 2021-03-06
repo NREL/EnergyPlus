@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -119,8 +120,8 @@ namespace BaseboardElectric {
     struct BaseboardElectricData : BaseGlobalStruct {
         int NumBaseboards = 0;
         bool getInputFlag = true;
-        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
+        SimpleArray1D<BaseboardElectric::BaseboardParams> Baseboard;
+        SimpleArray1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
         bool MyOneTimeFlag = true;
         bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 

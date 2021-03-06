@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -1140,30 +1141,30 @@ struct SizingData : BaseGlobalStruct
     int DataFanIndex = -1;                           // Fan index used during sizing
     DataSizing::zoneFanPlacement DataFanPlacement = DataSizing::zoneFanPlacement::zoneFanPlaceNotSet; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
-    Array1D<DataSizing::OARequirementsData> OARequirements;
-    Array1D<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
-    Array1D<DataSizing::ZoneSizingInputData> ZoneSizingInput;    // Input data for zone sizing
+    SimpleArray1D<DataSizing::OARequirementsData> OARequirements;
+    SimpleArray1D<DataSizing::ZoneAirDistributionData> ZoneAirDistribution;
+    SimpleArray1D<DataSizing::ZoneSizingInputData> ZoneSizingInput;    // Input data for zone sizing
     Array2D<DataSizing::ZoneSizingData> ZoneSizing;              // Data for zone sizing (all data, all design)
-    Array1D<DataSizing::ZoneSizingData> FinalZoneSizing;         // Final data for zone sizing including effects
+    SimpleArray1D<DataSizing::ZoneSizingData> FinalZoneSizing;         // Final data for zone sizing including effects
     Array2D<DataSizing::ZoneSizingData> CalcZoneSizing;          // Data for zone sizing (all data)
-    Array1D<DataSizing::ZoneSizingData> CalcFinalZoneSizing;     // Final data for zone sizing (calculated only)
-    Array1D<DataSizing::ZoneSizingData> TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
-    Array1D<DataSizing::SystemSizingInputData> SysSizInput;      // Input data array for system sizing object
+    SimpleArray1D<DataSizing::ZoneSizingData> CalcFinalZoneSizing;     // Final data for zone sizing (calculated only)
+    SimpleArray1D<DataSizing::ZoneSizingData> TermUnitFinalZoneSizing; // Final data for sizing terminal units (indexed per terminal unit)
+    SimpleArray1D<DataSizing::SystemSizingInputData> SysSizInput;      // Input data array for system sizing object
     Array2D<DataSizing::SystemSizingData> SysSizing;             // Data array for system sizing (all data)
-    Array1D<DataSizing::SystemSizingData> FinalSysSizing;        // Data array for system sizing (max heat/cool)
-    Array1D<DataSizing::SystemSizingData> CalcSysSizing;         // Data array for system sizing (max heat/cool)
-    Array1D<DataSizing::SysSizPeakDDNumData> SysSizPeakDDNum;    // data array for peak des day indices
-    Array1D<DataSizing::TermUnitSizingData> TermUnitSizing;      // Data added in sizing routines (indexed per terminal unit)
-    Array1D<DataSizing::ZoneEqSizingData> ZoneEqSizing;          // Data added in zone eq component sizing routines
-    Array1D<DataSizing::ZoneEqSizingData> UnitarySysEqSizing;    // Data added in unitary system sizing routines
-    Array1D<DataSizing::ZoneEqSizingData> OASysEqSizing;         // Data added in unitary system sizing routines
-    Array1D<DataSizing::PlantSizingData> PlantSizData;           // Input data array for plant sizing
-    Array1D<DataSizing::DesDayWeathData> DesDayWeath;            // design day weather saved at major time step
-    Array1D<DataSizing::CompDesWaterFlowData> CompDesWaterFlow;  // array to store components' design water flow
-    Array1D<DataSizing::ZoneHVACSizingData> ZoneHVACSizing;      // Input data for zone HVAC sizing
-    Array1D<DataSizing::AirTerminalSizingSpecData>
+    SimpleArray1D<DataSizing::SystemSizingData> FinalSysSizing;        // Data array for system sizing (max heat/cool)
+    SimpleArray1D<DataSizing::SystemSizingData> CalcSysSizing;         // Data array for system sizing (max heat/cool)
+    SimpleArray1D<DataSizing::SysSizPeakDDNumData> SysSizPeakDDNum;    // data array for peak des day indices
+    SimpleArray1D<DataSizing::TermUnitSizingData> TermUnitSizing;      // Data added in sizing routines (indexed per terminal unit)
+    SimpleArray1D<DataSizing::ZoneEqSizingData> ZoneEqSizing;          // Data added in zone eq component sizing routines
+    SimpleArray1D<DataSizing::ZoneEqSizingData> UnitarySysEqSizing;    // Data added in unitary system sizing routines
+    SimpleArray1D<DataSizing::ZoneEqSizingData> OASysEqSizing;         // Data added in unitary system sizing routines
+    SimpleArray1D<DataSizing::PlantSizingData> PlantSizData;           // Input data array for plant sizing
+    SimpleArray1D<DataSizing::DesDayWeathData> DesDayWeath;            // design day weather saved at major time step
+    SimpleArray1D<DataSizing::CompDesWaterFlowData> CompDesWaterFlow;  // array to store components' design water flow
+    SimpleArray1D<DataSizing::ZoneHVACSizingData> ZoneHVACSizing;      // Input data for zone HVAC sizing
+    SimpleArray1D<DataSizing::AirTerminalSizingSpecData>
         AirTerminalSizingSpec;                                  // Input data for zone HVAC sizing used only for Facility Load Component Summary
-    Array1D<DataSizing::FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
+    SimpleArray1D<DataSizing::FacilitySizingData> CalcFacilitySizing; // Data for zone sizing
     DataSizing::FacilitySizingData CalcFinalFacilitySizing;     // Final data for zone sizing
     Array1D<Real64> VbzByZone;                                  // saved value of ZoneOAUnc which is Vbz used in 62.1 tabular report
     Array1D<Real64> VdzClgByZone;    // saved value of cooling based ZoneSA which is Vdz used in 62.1 tabular report (also used for zone level Vps)

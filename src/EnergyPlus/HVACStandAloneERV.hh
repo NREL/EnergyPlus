@@ -202,7 +202,7 @@ struct HVACStandAloneERVData : BaseGlobalStruct {
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     bool GetERVInputFlag = true;
-    Array1D<HVACStandAloneERV::StandAloneERVData> StandAloneERV;
+    SimpleArray1D<HVACStandAloneERV::StandAloneERVData> StandAloneERV;
     std::unordered_set<std::string> HeatExchangerUniqueNames;
     std::unordered_set<std::string> SupplyAirFanUniqueNames;
     std::unordered_set<std::string> ExhaustAirFanUniqueNames;

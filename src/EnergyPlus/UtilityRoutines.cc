@@ -86,6 +86,7 @@ extern "C" {
 #include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SystemReports.hh>
@@ -151,6 +152,7 @@ namespace UtilityRoutines {
 
         return rProcessNumber;
     }
+
 
     int FindItemInList(std::string const &String, Array1_string const &ListOfItems, int const NumItems)
     {

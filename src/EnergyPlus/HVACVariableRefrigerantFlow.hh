@@ -1009,11 +1009,11 @@ struct HVACVarRefFlowData : BaseGlobalStruct {
     Array1D<Real64> SumHeatingLoads;        // sum of heating loads
 
     // Object Data
-    Array1D<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
+    SimpleArray1D<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
     std::unordered_map<std::string, std::string> VrfUniqueNames;
-    Array1D<HVACVariableRefrigerantFlow::VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
-    Array1D<HVACVariableRefrigerantFlow::TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
-    Array1D<HVACVariableRefrigerantFlow::VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
+    SimpleArray1D<HVACVariableRefrigerantFlow::VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
+    SimpleArray1D<HVACVariableRefrigerantFlow::TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
+    SimpleArray1D<HVACVariableRefrigerantFlow::VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
     void clear_state() override
     {

@@ -60,6 +60,7 @@
 #include "AirflowNetwork/Solver.hpp"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -227,7 +228,7 @@ namespace AirflowNetworkBalanceManager {
         void initialize(EnergyPlusData &state);
         void calculateWindPressureCoeffs(EnergyPlusData &state);
 
-        Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
+        SimpleArray1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
         int AirflowNetworkNumOfExtSurfaces = 0;
         // Inverse matrix
@@ -288,17 +289,17 @@ namespace AirflowNetworkBalanceManager {
         bool UpdateAirflowNetworkMyOneTimeFlag1 = true;
 
         // Object Data
-        Array1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
+        SimpleArray1D<AirflowNetworkBalanceManager::AirflowNetworkReportVars> AirflowNetworkZnRpt;
         std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
         //AirflowNetwork::Solver solver;
 
         // Output and reporting
-        Array1D<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
-        Array1D<AirflowNetwork::AirflowNetworkExchangeProp> multiExchangeData;
-        Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport;
-        Array1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
-        Array1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
+        SimpleArray1D<AirflowNetwork::AirflowNetworkExchangeProp> exchangeData;
+        SimpleArray1D<AirflowNetwork::AirflowNetworkExchangeProp> multiExchangeData;
+        SimpleArray1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport;
+        SimpleArray1D<AirflowNetwork::AirflowNetworkNodeReportData> nodeReport;
+        SimpleArray1D<AirflowNetwork::AirflowNetworkLinkReportData> linkReport1;
 
         void clear_state() override
         {

@@ -241,20 +241,20 @@ struct BaseSizer
 
     bool printWarningFlag = false;
     std::string callingRoutine;
-    Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
-    Array1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
-    Array1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
-    Array1D<DataSizing::ZoneEqSizingData> oaSysEqSizing;
-    Array1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
-    Array1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
-    Array1D<DataSizing::TermUnitSizingData> termUnitSizing;
-    Array1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
-    Array1D<DataSizing::ZoneSizingData> finalZoneSizing;
-    Array1D<DataSizing::SystemSizingData> finalSysSizing;
-    Array1D<DataSizing::PlantSizingData> plantSizData;
-    Array1D<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
+    SimpleArray1D<DataSizing::SystemSizingInputData> sysSizingInputData;
+    SimpleArray1D<DataSizing::ZoneSizingInputData> zoneSizingInput;
+    SimpleArray1D<DataSizing::ZoneEqSizingData> unitarySysEqSizing;
+    SimpleArray1D<DataSizing::ZoneEqSizingData> oaSysEqSizing;
+    SimpleArray1D<DataSizing::ZoneEqSizingData> zoneEqSizing;
+    SimpleArray1D<DataAirLoop::OutsideAirSysProps> outsideAirSys;
+    SimpleArray1D<DataSizing::TermUnitSizingData> termUnitSizing;
+    SimpleArray1D<DataSizing::ZoneSizingData> termUnitFinalZoneSizing;
+    SimpleArray1D<DataSizing::ZoneSizingData> finalZoneSizing;
+    SimpleArray1D<DataSizing::SystemSizingData> finalSysSizing;
+    SimpleArray1D<DataSizing::PlantSizingData> plantSizData;
+    SimpleArray1D<DataAirSystems::DefinePrimaryAirSystem> primaryAirSystem;
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
-    Array1D<DataAirLoop::AirLoopControlData> airLoopControlInfo;
+    SimpleArray1D<DataAirLoop::AirLoopControlData> airLoopControlInfo;
 
     // public methods
 

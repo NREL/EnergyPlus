@@ -494,10 +494,10 @@ namespace PlantChillers {
         bool GetGasTurbineInput = true;
         bool GetConstCOPInput = true;
 
-        Array1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
-        Array1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
-        Array1D<PlantChillers::GTChillerSpecs> GTChiller;
-        Array1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
+        SimpleArray1D<PlantChillers::ElectricChillerSpecs> ElectricChiller;
+        SimpleArray1D<PlantChillers::EngineDrivenChillerSpecs> EngineDrivenChiller;
+        SimpleArray1D<PlantChillers::GTChillerSpecs> GTChiller;
+        SimpleArray1D<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
 
         void clear_state() override
         {

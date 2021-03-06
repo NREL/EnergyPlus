@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -382,11 +383,11 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct {
     Array1D<Real64> EscalatedTotEnergy;
     std::map<int, std::map<DataGlobalConstants::ResourceType, Real64>> EscalatedEnergy;
 
-    Array1D<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
-    Array1D<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
-    Array1D<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
-    Array1D<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
-    Array1D<EconomicLifeCycleCost::CashFlowType> CashFlow;
+    SimpleArray1D<EconomicLifeCycleCost::RecurringCostsType> RecurringCosts;
+    SimpleArray1D<EconomicLifeCycleCost::NonrecurringCostType> NonrecurringCost;
+    SimpleArray1D<EconomicLifeCycleCost::UsePriceEscalationType> UsePriceEscalation;
+    SimpleArray1D<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
+    SimpleArray1D<EconomicLifeCycleCost::CashFlowType> CashFlow;
 
     void clear_state() override
     {

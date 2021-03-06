@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -1107,7 +1108,7 @@ struct OutputProcessorData : BaseGlobalStruct {
     Array1D<OutputProcessor::ReqReportVariables> ReqRepVars;
     Array1D<OutputProcessor::MeterArrayType> VarMeterArrays;
     Array1D<OutputProcessor::MeterType> EnergyMeters;
-    Array1D<OutputProcessor::EndUseCategoryType> EndUseCategory;
+    SimpleArray1D<OutputProcessor::EndUseCategoryType> EndUseCategory;
     std::unordered_map<std::string, std::string> UniqueMeterNames;
 
     void clear_state() override

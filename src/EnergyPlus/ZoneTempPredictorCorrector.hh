@@ -398,14 +398,14 @@ namespace ZoneTempPredictorCorrector {
 
         // Object Data
         std::unordered_set<std::string> HumidityControlZoneUniqueNames;
-        Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeating;
-        Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleCooling;
-        Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeatCool;
-        Array1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointDualHeatCool;
-        Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-        Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-        Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-        Array1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeating;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleCooling;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointSingleHeatCool;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneTempControlType> SetPointDualHeatCool;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
+        SimpleArray1D<ZoneTempPredictorCorrector::ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
         ZoneTempPredictorCorrector::AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
 
         Array1D<Real64> AdapComfortSetPointSummerDesDay;

@@ -262,7 +262,7 @@ namespace WaterUse {
         bool MyEnvrnFlagLocal;
         Array1D_bool CheckEquipName;
         Array1D<WaterUse::WaterEquipmentType> WaterEquipment;
-        Array1D<WaterUse::WaterConnectionsType> WaterConnections;
+        SimpleArray1D<WaterUse::WaterConnectionsType> WaterConnections;
 
         void clear_state() override
         {

@@ -435,8 +435,8 @@ struct PlantCentralGSHPData : BaseGlobalStruct {
     Real64 ChillerPartLoadRatio = 0.0; // Chiller/heater part-load ratio (PLR)
     Real64 ChillerCyclingRatio = 0.0;  // Chiller/heater cycling ratio
     Real64 ChillerFalseLoadRate = 0.0; // Chiller/heater false load over and above the water-side load [W]
-    Array1D<PlantCentralGSHP::WrapperSpecs> Wrapper;
-    Array1D<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
+    SimpleArray1D<PlantCentralGSHP::WrapperSpecs> Wrapper;
+    SimpleArray1D<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
 
     void clear_state() override
     {

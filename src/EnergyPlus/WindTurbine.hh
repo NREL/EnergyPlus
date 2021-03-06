@@ -179,7 +179,7 @@ namespace WindTurbine {
         bool GetInputFlag;
         bool MyOneTimeFlag;
         Real64 AnnualTMYWS = 0.0;   // Annual average wind speed in stat file
-        Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
+        SimpleArray1D<WindTurbine::WindTurbineParams> WindTurbineSys;
 
         void clear_state() override
         {

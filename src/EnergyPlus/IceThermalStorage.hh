@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/SimpleArray1D.hh>
 
 namespace EnergyPlus {
 
@@ -288,8 +289,8 @@ struct IceThermalStorageData : BaseGlobalStruct {
     int NumSimpleIceStorage = 0;
     int NumDetailedIceStorage = 0;
     int TotalNumIceStorage = 0;
-    Array1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
-    Array1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
+    SimpleArray1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    SimpleArray1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
 
     void clear_state() override
     {
