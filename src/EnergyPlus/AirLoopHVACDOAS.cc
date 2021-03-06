@@ -753,8 +753,8 @@ namespace AirLoopHVACDOAS {
                 if (AirLoopNames != fields.end()) {
                     auto AirLoopArray = AirLoopNames.value();
                     int num = 0;
-                    for (auto AirLoopHAVCName : AirLoopArray) {
-                        std::string name = AirLoopHAVCName.at("airloophvac_name");
+                    for (auto AirLoopHVACName : AirLoopArray) {
+                        std::string name = UtilityRoutines::MakeUPPERCase(AirLoopHVACName.at("airloophvac_name"));
                         int LoopNum = UtilityRoutines::FindItemInList(name, state.dataAirSystemsData->PrimaryAirSystems);
                         num += 1;
                         if (LoopNum > 0 && num <= thisDOAS.NumOfAirLoops) {
