@@ -250,7 +250,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilFanOpMode.allocate(1);
 
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
     state->dataDXCoils->DXCoil(CoilIndex).AirOutNode = 1;
 
     Real64 SpeedRatio = 0.0;
@@ -418,7 +418,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostStrategy = Resistive;
     Coil.Name = "DX Heating coil";
     Coil.NumOfSpeeds = 2;
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
 
     Coil.MSRatedTotCap.allocate(Coil.NumOfSpeeds);
@@ -785,7 +785,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
     Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
-    DataLoopNode::Node.allocate(1);
+    state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
 
     Coil.RatedSHR(1) = 1.0;
@@ -3966,7 +3966,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     state->dataDXCoils->NumDXCoils = 1;
     state->dataCurveManager->NumCurves = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(state->dataDXCoils->NumDXCoils).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(state->dataDXCoils->NumDXCoils).PerfMode(1).FieldNames.allocate(20);
@@ -3981,8 +3981,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     auto &Coil = state->dataDXCoils->DXCoil(DXCoilNum);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto &AirInletNode = DataLoopNode::Node(1);
-    auto &AirOutletNode = DataLoopNode::Node(2);
+    auto &AirInletNode = state->dataLoopNodes->Node(1);
+    auto &AirOutletNode = state->dataLoopNodes->Node(2);
     // set coil parameters
     Coil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
     Coil.SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
@@ -4105,7 +4105,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     DataHVACGlobals::MSHPMassFlowRateLow = 0.6;
     DataHVACGlobals::MSHPMassFlowRateHigh = 1.0;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(17);
@@ -4119,8 +4119,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     auto &Coil = state->dataDXCoils->DXCoil(1);
     auto &constantcurve1 = state->dataCurveManager->PerfCurve(1);
     auto &constantcurve2 = state->dataCurveManager->PerfCurve(2);
-    auto &AirInletNode = DataLoopNode::Node(1);
-    auto &AirOutletNode = DataLoopNode::Node(2);
+    auto &AirInletNode = state->dataLoopNodes->Node(1);
+    auto &AirOutletNode = state->dataLoopNodes->Node(2);
 
     Coil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
