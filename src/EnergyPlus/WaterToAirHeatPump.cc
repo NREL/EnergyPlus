@@ -932,17 +932,17 @@ namespace WaterToAirHeatPump {
                                state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
                                state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
 
-            Node(WaterInletNode).Temp = 5.0;
-            Node(WaterInletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(WaterInletNode).Quality = 0.0;
-            Node(WaterInletNode).Press = 0.0;
-            Node(WaterInletNode).HumRat = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).Temp = 5.0;
+            state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
+            state.dataLoopNodes->Node(WaterInletNode).Quality = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).Press = 0.0;
+            state.dataLoopNodes->Node(WaterInletNode).HumRat = 0.0;
 
-            Node(PlantOutletNode).Temp = 5.0;
-            Node(PlantOutletNode).Enthalpy = Cp * Node(WaterInletNode).Temp;
-            Node(PlantOutletNode).Quality = 0.0;
-            Node(PlantOutletNode).Press = 0.0;
-            Node(PlantOutletNode).HumRat = 0.0;
+            state.dataLoopNodes->Node(PlantOutletNode).Temp = 5.0;
+            state.dataLoopNodes->Node(PlantOutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
+            state.dataLoopNodes->Node(PlantOutletNode).Quality = 0.0;
+            state.dataLoopNodes->Node(PlantOutletNode).Press = 0.0;
+            state.dataLoopNodes->Node(PlantOutletNode).HumRat = 0.0;
 
             state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).SimFlag = true;
 
@@ -980,7 +980,7 @@ namespace WaterToAirHeatPump {
         //    WatertoAirHP(HPNum)%SimFlag =.FALSE.
         //  ENDIF
 
-        if (((SensLoad != 0.0 || LatentLoad != 0.0) || (SensLoad == 0.0 && InitFlag)) && Node(AirInletNode).MassFlowRate > 0.0 &&
+        if (((SensLoad != 0.0 || LatentLoad != 0.0) || (SensLoad == 0.0 && InitFlag)) && state.dataLoopNodes->Node(AirInletNode).MassFlowRate > 0.0 &&
             PartLoadRatio > 0.0) {
             // set the water side flow rate to the design flow rate unless constrained by
             // the demand side manager (MIN/MAX available). now done by call to setcomponentFlowRate
@@ -1004,15 +1004,15 @@ namespace WaterToAirHeatPump {
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).BranchNum,
                              state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).CompNum);
 
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = Node(WaterInletNode).Temp;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
         //  IF (WatertoAirHP(HPNum)%InletWaterTemp < 0.0) THEN  ! Debug trap
         //    Temptemp         = Node(WaterInletNode)%Temp
         //  ENDIF
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy = Node(WaterInletNode).Enthalpy;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletWaterEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
 
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirDBTemp = Node(AirInletNode).Temp;
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirHumRat = Node(AirInletNode).HumRat;
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirEnthalpy = Node(AirInletNode).Enthalpy;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirDBTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power = 0.0;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Energy = 0.0;
@@ -2231,27 +2231,27 @@ namespace WaterToAirHeatPump {
         WaterOutletNode = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WaterOutletNodeNum;
 
         // Set the outlet air nodes of the WatertoAirHP
-        Node(AirOutletNode).MassFlowRate = Node(AirInletNode).MassFlowRate;
-        Node(AirOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirDBTemp;
-        Node(AirOutletNode).HumRat = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirHumRat;
-        Node(AirOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirEnthalpy;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
+        state.dataLoopNodes->Node(AirOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirDBTemp;
+        state.dataLoopNodes->Node(AirOutletNode).HumRat = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirHumRat;
+        state.dataLoopNodes->Node(AirOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
         SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
         // Set the outlet water nodes for the heat pump
-        Node(WaterOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterTemp;
-        Node(WaterOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy;
+        state.dataLoopNodes->Node(WaterOutletNode).Temp = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterTemp;
+        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletWaterEnthalpy;
 
         // Set the outlet nodes for properties that just pass through & not used
-        Node(AirOutletNode).Quality = Node(AirInletNode).Quality;
-        Node(AirOutletNode).Press = Node(AirInletNode).Press;
-        Node(AirOutletNode).MassFlowRateMin = Node(AirInletNode).MassFlowRateMin;
-        Node(AirOutletNode).MassFlowRateMax = Node(AirInletNode).MassFlowRateMax;
-        Node(AirOutletNode).MassFlowRateMinAvail = Node(AirInletNode).MassFlowRateMinAvail;
-        Node(AirOutletNode).MassFlowRateMaxAvail = Node(AirInletNode).MassFlowRateMaxAvail;
+        state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
+        state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
+        state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
 
         // Pass through the load side mass flow rates
-        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate = Node(AirInletNode).MassFlowRate;
+        state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).OutletAirMassFlowRate = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).InletAirMassFlowRate;
 
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Energy = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Power * ReportingConstant;
@@ -2261,10 +2261,10 @@ namespace WaterToAirHeatPump {
         state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).EnergySource = state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource * ReportingConstant;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(AirOutletNode).CO2 = Node(AirInletNode).CO2;
+            state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
         }
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(AirOutletNode).GenContam = Node(AirInletNode).GenContam;
+            state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
         }
     }
 
