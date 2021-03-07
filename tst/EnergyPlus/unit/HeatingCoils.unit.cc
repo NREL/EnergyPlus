@@ -154,7 +154,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).MSEfficiency(1) = 0.9;
     HeatingCoils::HeatingCoil(CoilNum).AirInletNodeNum = 1;
     HeatingCoils::HeatingCoil(CoilNum).AirOutletNodeNum = 2;
-    DataLoopNode::Node.allocate(2);
+    state->dataLoopNodes->Node.allocate(2);
     HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad.allocate(1);
     HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
 

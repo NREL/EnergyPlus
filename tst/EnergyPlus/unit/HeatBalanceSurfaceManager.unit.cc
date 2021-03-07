@@ -729,7 +729,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -797,7 +797,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
     state->dataHeatBal->TempEffBulkAir.deallocate();
@@ -1265,7 +1265,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -1840,7 +1840,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -2399,7 +2399,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
     state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
 
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataSurface->Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
     state->dataSurface->Surface(2).TAirRef = DataSurfaces::AdjacentAirTemp;
     state->dataSurface->Surface(3).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
@@ -2469,7 +2469,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataHeatBalFanSys->MAT.deallocate(); // Zone temperature C
     state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataGlobal->KickOffSimulation = false;
     DataHeatBalSurface::TempSurfInTmp.deallocate();
     state->dataHeatBal->TempEffBulkAir.deallocate();

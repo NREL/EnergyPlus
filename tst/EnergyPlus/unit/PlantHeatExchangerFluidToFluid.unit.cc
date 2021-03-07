@@ -2282,7 +2282,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     state->dataPlantHXFluidToFluid->FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
-    DataLoopNode::Node.allocate(4);
+    state->dataLoopNodes->Node.allocate(4);
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.outletNodeNum = 3;
     state->dataLoopNodes->Node(1).Temp = 18.0;
@@ -2381,7 +2381,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     state->dataPlantHXFluidToFluid->FluidHX(1).AvailSchedNum = -1;
 
     // setup four plant nodes for HX
-    DataLoopNode::Node.allocate(6);
+    state->dataLoopNodes->Node.allocate(6);
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.inletNodeNum = 1;
     state->dataPlantHXFluidToFluid->FluidHX(1).SupplySideLoop.outletNodeNum = 3;
     state->dataPlantHXFluidToFluid->FluidHX(1).SetPointNodeNum = 3;

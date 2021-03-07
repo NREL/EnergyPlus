@@ -1757,10 +1757,12 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     // set heating zone and AT unit inlet conditions
     state->dataLoopNodes->Node(ZoneNodeNum).Temp = 20.0;
     state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.005;
-    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
     state->dataLoopNodes->Node(InletNodeNum).Temp = 5.0;
     state->dataLoopNodes->Node(InletNodeNum).HumRat = 0.006;
-    state->dataLoopNodes->Node(InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(InletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNodeNum).Temp, state->dataLoopNodes->Node(InletNodeNum).HumRat);
     // calculate mass flow rates
     Real64 SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 0.2;
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * 1.0;
@@ -1790,10 +1792,12 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     // test 2: cooling load at maximum supply air flow rate
     state->dataLoopNodes->Node(ZoneNodeNum).Temp = 24.0;
     state->dataLoopNodes->Node(ZoneNodeNum).HumRat = 0.0080;
-    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
+    state->dataLoopNodes->Node(ZoneNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(ZoneNodeNum).Temp, state->dataLoopNodes->Node(ZoneNodeNum).HumRat);
     state->dataLoopNodes->Node(InletNodeNum).Temp = 16.0;
     state->dataLoopNodes->Node(InletNodeNum).HumRat = 0.0075;
-    state->dataLoopNodes->Node(InletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNodeNum).Temp, Node(InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(InletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(InletNodeNum).Temp, state->dataLoopNodes->Node(InletNodeNum).HumRat);
 
     thisHeatCoolAT.ZoneMinAirFracDes = 0.20;
     SysMinMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir * thisHeatCoolAT.ZoneMinAirFracDes * 1.0;

@@ -2497,7 +2497,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
     state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -2542,7 +2542,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     state->dataSingleDuct->SysATMixer.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
@@ -2560,7 +2560,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer.allocate(ATMixerNum);
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataAirLoop->AirLoopFlow.allocate(1);
-    DataLoopNode::Node.allocate(3);
+    state->dataLoopNodes->Node.allocate(3);
     state->dataSize->OARequirements.allocate(1);
     state->dataHeatBal->Zone.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
@@ -2625,7 +2625,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    DataLoopNode::Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataSize->OARequirements.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
