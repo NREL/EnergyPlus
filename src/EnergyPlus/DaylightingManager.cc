@@ -7604,6 +7604,7 @@ namespace EnergyPlus::DaylightingManager {
                         //         for TDDs because it is based on TVISBR which is correctly calculated for TDDs above.
 
                         ProfileAngle(state, IWin, U, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                        Real64 ProfAngTest = state.dataSurface->SurfWinProfileAng(IWin);
 
                         for (JB = 1; JB <= MaxSlatAngs; ++JB) {
                             if (!state.dataSurface->SurfWinMovableSlats(IWin) && JB > 1) break;

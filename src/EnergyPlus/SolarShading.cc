@@ -129,7 +129,6 @@ namespace EnergyPlus::SolarShading {
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using namespace DataShadowingCombinations;
-    using DaylightingManager::ProfileAngle;
     using namespace SolarReflectionManager;
     using namespace DataReportingFlags;
     using namespace DataVectorTypes;
@@ -6193,7 +6192,7 @@ namespace EnergyPlus::SolarShading {
 
                             } else {
                                 // Blind or screen on
-                                if (ShadeFlag != WinShadingType::ExtScreen) ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                                ProfAng = state.dataSurface->SurfWinProfileAng(SurfNum);
                                 if (ShadeFlag == WinShadingType::IntBlind) {
                                     // Interior blind on
                                     Real64 TGlBm = POLYF(CosInc,state.dataConstruction->Construct(ConstrNum).TransSolBeamCoef); // Glazing system front solar beam transmittance
@@ -6960,8 +6959,7 @@ namespace EnergyPlus::SolarShading {
                                     // of back exterior window with BLIND
                                     if (ANY_BLIND(ShadeFlagBack)) {
                                         int BlNumBack = state.dataSurface->SurfWinBlindNumber(BackSurfNum); // Back surface blind number
-                                        Real64 ProfAngBack; // Back window solar profile angle (radians)
-                                        ProfileAngle(state, BackSurfNum, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNumBack).SlatOrientation, ProfAngBack);
+                                        Real64 ProfAngBack = state.dataSurface->SurfWinProfileAng(BackSurfNum); // Back window solar profile angle (radians)
                                         Real64 TGlBmBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
                                         Real64 TBlBmBmBack = BlindBeamBeamTrans(ProfAngBack,
                                                                          DataGlobalConstants::Pi - SlatAngBack,
@@ -9060,9 +9058,10 @@ namespace EnergyPlus::SolarShading {
                         Real64 ThetaBlock1; // Slat angles that just block beam solar (rad)
                         Real64 ThetaBlock2;
 
+                        DaylightingManager::ProfileAngle(state, ISurf, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, state.dataSurface->SurfWinProfileAng(ISurf));
 
                         if (state.dataHeatBal->Blind(BlNum).SlatWidth > state.dataHeatBal->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
-                            ProfileAngle(state, ISurf, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                            ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
                             Real64 ThetaBase = std::acos(
                                     std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation / state.dataHeatBal->Blind(BlNum).SlatWidth);
                             // There are two solutions for the slat angle that just blocks beam radiation
@@ -9077,9 +9076,7 @@ namespace EnergyPlus::SolarShading {
                         // TH 5/20/2010, CR 8064: Slat Width <= Slat Separation
                         if (state.dataHeatBal->Blind(BlNum).SlatWidth <= state.dataHeatBal->Blind(BlNum).SlatSeparation && BeamSolarOnWindow > 0.0) {
                             if (state.dataSurface->WindowShadingControl(IShadingCtrl).SlatAngleControlForBlinds == WSC_SAC_BlockBeamSolar) {
-
-                                ProfileAngle(state, ISurf, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
-
+                                ProfAng = state.dataSurface->SurfWinProfileAng(ISurf);
                                 if (std::abs(std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation / state.dataHeatBal->Blind(BlNum).SlatWidth) <= 1.0) {
                                     // set to block 100% of beam solar, not necessarily to block maximum solar (beam + diffuse)
                                     ThetaBase = std::acos(std::cos(ProfAng) * state.dataHeatBal->Blind(BlNum).SlatSeparation / state.dataHeatBal->Blind(BlNum).SlatWidth);
@@ -9194,6 +9191,8 @@ namespace EnergyPlus::SolarShading {
                 }
             } // End of surface loop
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
+//                if (!ANY_BLIND(state.dataSurface->SurfWinShadingFlag(ISurf))) continue;
+//                int BlNum = state.dataSurface->SurfWinBlindNumber(ISurf);
                 if (!state.dataSurface->SurfWinMovableSlats(ISurf)) continue;
                 Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(ISurf);
                 if (SlatAng > DataGlobalConstants::Pi || SlatAng < 0.0) {

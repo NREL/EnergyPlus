@@ -3266,8 +3266,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                                         // Exterior shade, screen or blind
                                     } else if (ShadeFlag == WinShadingType::ExtBlind) { // Exterior blind
                                         int BlNum = state.dataSurface->SurfWinBlindNumber(SurfNum);
-                                        Real64 ProfAng; // Solar profile angle (rad)
-                                        ProfileAngle(state, SurfNum, state.dataEnvrn->SOLCOS, state.dataHeatBal->Blind(BlNum).SlatOrientation, ProfAng);
+                                        Real64 ProfAng = state.dataSurface->SurfWinProfileAng(SurfNum); // Solar profile angle (rad)
                                         Real64 SlatAng = state.dataSurface->SurfWinSlatAngThisTS(SurfNum); // Slat angle (rad)
                                         Real64 FrontDiffTrans;
                                         if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
