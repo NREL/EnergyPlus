@@ -252,7 +252,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         IsValid = false;
         for (Count = 1; Count <= NumValidConnectionTypes; ++Count) {
-            if (ConnectionType != state.dataLoopNodes->ValidConnectionTypes(Count)) continue;
+            if (ConnectionType != DataLoopNode::ValidConnectionTypes(Count)) continue;
             IsValid = true;
             break;
         }
@@ -319,11 +319,11 @@ namespace EnergyPlus::BranchNodeConnections {
 
         ErrorCounter = 0;
 
-        auto &ValidConnectionTypes(state.dataLoopNodes->ValidConnectionTypes);
+        auto &ValidConnectionTypes(DataLoopNode::ValidConnectionTypes);
 
         //  Check 1 -- check sensor and actuator nodes
         for (Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop1) {
-            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != state.dataLoopNodes->ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
+            if (state.dataBranchNodeConnections->NodeConnections(Loop1).ConnectionType != DataLoopNode::ValidConnectionTypes(NodeConnectionType_Sensor)) continue;
             IsValid = false;
             for (Loop2 = 1; Loop2 <= state.dataBranchNodeConnections->NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
@@ -1472,7 +1472,7 @@ namespace EnergyPlus::BranchNodeConnections {
         if (NumInList > 0) {
             for (NodeConnectIndex = 1; NodeConnectIndex <= NumInList; ++NodeConnectIndex) {
                 NodeConnectType(NodeConnectIndex) = UtilityRoutines::FindItemInList(state.dataBranchNodeConnections->NodeConnections(ListArray(NodeConnectIndex)).ConnectionType,
-                                                    state.dataLoopNodes->ValidConnectionTypes,
+                                                    DataLoopNode::ValidConnectionTypes,
                                                     NumValidConnectionTypes);
             }
         } else {

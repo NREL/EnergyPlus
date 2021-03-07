@@ -149,8 +149,8 @@ namespace EnergyPlus::NodeInputManager {
                                 state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NodeNumbers(Loop)));
                             ShowContinueError(state,
                                               "Existing Fluid type=" +
-                                                  state.dataLoopNodes->ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType) +
-                                                  ", Requested Fluid Type=" + state.dataLoopNodes->ValidNodeFluidTypes(NodeFluidType));
+                                                  DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType) +
+                                                  ", Requested Fluid Type=" + DataLoopNode::ValidNodeFluidTypes(NodeFluidType));
                             ErrorsFound = true;
                         }
                     }
@@ -173,7 +173,7 @@ namespace EnergyPlus::NodeInputManager {
         FluidStreamNum = NodeFluidStream;
         for (Loop = 1; Loop <= NumNodes; ++Loop) {
             if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
-                ConnectionType = state.dataLoopNodes->ValidConnectionTypes(NodeConnectionType);
+                ConnectionType = DataLoopNode::ValidConnectionTypes(NodeConnectionType);
             } else {
                 ConnectionType = format("{}-unknown", NodeConnectionType);
             }
@@ -420,7 +420,7 @@ namespace EnergyPlus::NodeInputManager {
                       " Node,{},{},{},{}\n",
                       NumNode,
                       NodeID(NumNode),
-                      state.dataLoopNodes->ValidNodeFluidTypes(Node(NumNode).FluidType),
+                      DataLoopNode::ValidNodeFluidTypes(Node(NumNode).FluidType),
                       state.dataNodeInputMgr->NodeRef(NumNode));
                 if (state.dataNodeInputMgr->NodeRef(NumNode) == 0) ++Count0;
             }
@@ -438,7 +438,7 @@ namespace EnergyPlus::NodeInputManager {
                           " Suspicious Node,{},{},{},{}\n",
                           NumNode,
                           NodeID(NumNode),
-                          state.dataLoopNodes->ValidNodeFluidTypes(Node(NumNode).FluidType),
+                          DataLoopNode::ValidNodeFluidTypes(Node(NumNode).FluidType),
                           state.dataNodeInputMgr->NodeRef(NumNode));
                 }
             }
@@ -609,8 +609,8 @@ namespace EnergyPlus::NodeInputManager {
                         ShowSevereError(state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NumNode));
                         ShowContinueError(
                             state,
-                            "Existing Fluid type=" + state.dataLoopNodes->ValidNodeFluidTypes(state.dataLoopNodes->Node(NumNode).FluidType) +
-                                ", Requested Fluid Type=" + state.dataLoopNodes->ValidNodeFluidTypes(NodeFluidType));
+                            "Existing Fluid type=" + DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NumNode).FluidType) +
+                                ", Requested Fluid Type=" + DataLoopNode::ValidNodeFluidTypes(NodeFluidType));
                         ErrorsFound = true;
                     }
                 }
@@ -725,7 +725,7 @@ namespace EnergyPlus::NodeInputManager {
         }
         if (NumNodes > 0) {
             if (NodeConnectionType >= 1 && NodeConnectionType <= NumValidConnectionTypes) {
-                ConnectionType = state.dataLoopNodes->ValidConnectionTypes(NodeConnectionType);
+                ConnectionType = DataLoopNode::ValidConnectionTypes(NodeConnectionType);
             } else {
                 ConnectionType = format("{}-unknown", NodeConnectionType);
             }

@@ -65,12 +65,17 @@ namespace DataLoopNode {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // Valid Fluid Types for Nodes
+    extern Array1D_string const ValidNodeFluidTypes;
+
     constexpr int NodeType_Unknown(0);  // 'blank'
     constexpr int NodeType_Air(1);      // 'Air'
     constexpr int NodeType_Water(2);     // 'Water'
     constexpr int NodeType_Steam(3);     // 'Steam'
     constexpr int NodeType_Electric(4);   // 'Electric'
-        
+
+    // Valid Connection Types for Nodes
+    extern Array1D_string const ValidConnectionTypes;
+
     constexpr int NumValidConnectionTypes(15);
 
     constexpr int NodeConnectionType_Inlet(1);
@@ -302,22 +307,6 @@ namespace DataLoopNode {
 
 struct LoopNodeData : BaseGlobalStruct {
 
-    Array1D_string const ValidNodeFluidTypes = {"blank", "Air", "Water", "Steam", "Electric"};
-    Array1D_string const ValidConnectionTypes = {"Inlet",
-                                                 "Outlet",
-                                                 "Internal",
-                                                 "ZoneNode",
-                                                 "Sensor",
-                                                 "Actuator",
-                                                 "OutdoorAir",
-                                                 "ReliefAir",
-                                                 "ZoneInlet",
-                                                 "ZoneReturn",
-                                                 "ZoneExhaust",
-                                                 "Setpoint",
-                                                 "Electric",
-                                                 "OutsideAirReference",
-                                                 "InducedAir"};
     int NumOfNodes = 0;
     int NumofSplitters = 0;
     int NumofMixers = 0;

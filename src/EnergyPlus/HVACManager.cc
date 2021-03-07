@@ -580,7 +580,7 @@ namespace EnergyPlus::HVACManager {
                           state.dataLoopNodes->Node(NodeNum).Press,
                           state.dataLoopNodes->Node(NodeNum).Enthalpy,
                           state.dataLoopNodes->Node(NodeNum).HumRat,
-                          state.dataLoopNodes->ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNum).FluidType));
+                          DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNum).FluidType));
                 }
             }
         }
