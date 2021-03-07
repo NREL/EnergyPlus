@@ -889,7 +889,7 @@ namespace SolarCollectors {
             this->SetDiffRadFlag = false;
         }
 
-        this->InletTemp = DataLoopNode::Node(this->InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
 
         this->MassFlowRate = this->MassFlowRateMax;
 
@@ -1970,10 +1970,10 @@ namespace SolarCollectors {
 
         PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode);
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
             state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, this->OutletTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
-        DataLoopNode::Node(this->OutletNode).Enthalpy = Cp * DataLoopNode::Node(this->OutletNode).Temp;
+        state.dataLoopNodes->Node(this->OutletNode).Enthalpy = Cp * state.dataLoopNodes->Node(this->OutletNode).Temp;
     }
 
     void CollectorData::report()
