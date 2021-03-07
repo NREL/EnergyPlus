@@ -110,6 +110,7 @@ namespace DataSurfaces {
 
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxSlatAngs(19);
+    constexpr int MaxProfAngs(37);
 
     // Parameters to indicate surface shape for use with the Surface
     // derived type (see below):
@@ -1488,6 +1489,8 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<int> SurfWinSlatsAngIndex;
     Array1D<Real64> SurfWinSlatsAngInterpFac;
     Array1D<Real64> SurfWinProfileAng;
+    Array1D<int> SurfWinProfAngIndex;
+    Array1D<Real64> SurfWinProfAngInterpFac;
     Array1D<Real64> SurfWinBlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow in gap between blind and glass
     Array1D<Real64> SurfWinTotGlazingThickness;      // Total glazing thickness from outside of outer glass to inside of inner glass (m)
     Array1D<Real64> SurfWinTanProfileAngHor;         // Tangent of horizontal profile angle
@@ -1756,6 +1759,8 @@ struct SurfacesData : BaseGlobalStruct
         this->SurfWinSlatsAngIndex.deallocate();
         this->SurfWinSlatsAngInterpFac.deallocate();
         this->SurfWinProfileAng.deallocate();
+        this->SurfWinProfAngIndex.deallocate();
+        this->SurfWinProfAngInterpFac.deallocate();
         this->SurfWinBlindAirFlowPermeability.deallocate();
         this->SurfWinTotGlazingThickness.deallocate();
         this->SurfWinTanProfileAngHor.deallocate();
