@@ -516,7 +516,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     Real64 MyLoad = 0.0;
     state->dataCondenserLoopTowers->towers(1).calculateMerkelVariableSpeedTower(*state, MyLoad);
     state->dataCondenserLoopTowers->towers(1).update(*state);
-    state->dataCondenserLoopTowers->towers(1).report(true);
+    state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower is really not cooling with no load so temp in and out is the same issue #4927
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(9).Temp, state->dataLoopNodes->Node(10).Temp);
@@ -907,7 +907,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     state->dataCondenserLoopTowers->towers(1).initialize(*state);
     state->dataCondenserLoopTowers->towers(1).calculateSingleSpeedTower(*state);
     state->dataCondenserLoopTowers->towers(1).update(*state);
-    state->dataCondenserLoopTowers->towers(1).report(true);
+    state->dataCondenserLoopTowers->towers(1).report(*state, true);
 
     // test that tower outlet temperature = set point temperature
     int inletNodeIndex = 0;

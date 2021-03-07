@@ -3250,7 +3250,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_WaterCoilSPControl)
     // reset system to original values
     thisSys->m_DehumidControlType_Num = UnitarySys::DehumCtrlType::None;
     thisSys->m_RunOnLatentLoad = false;
-    state->dataLoopNodes->Node(thisSys->AirOutNode).HumRatMax = state->dataLoopNodes->SensedNodeFlagValue;
+    state->dataLoopNodes->Node(thisSys->AirOutNode).HumRatMax = DataLoopNode::SensedNodeFlagValue;
 
     // HEATING mode
     // Unitary system AIR inlet node = 1
