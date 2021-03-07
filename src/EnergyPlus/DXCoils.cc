@@ -15638,7 +15638,6 @@ namespace EnergyPlus::DXCoils {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataHVACGlobals::TimeStepSys;
-        using DataLoopNode::Node;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const MaxIter(30);
@@ -15827,7 +15826,7 @@ namespace EnergyPlus::DXCoils {
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorPressure = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
+                OutdoorPressure = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).Press;
                 // If node is not connected to anything, pressure = default, use weather data
                 if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
                     OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -15835,8 +15834,8 @@ namespace EnergyPlus::DXCoils {
                     OutdoorPressure = state.dataEnvrn->OutBaroPress;
                     OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
                 } else {
-                    OutdoorHumRat = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
-                    OutdoorWetBulb = Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                    OutdoorHumRat = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).HumRat;
+                    OutdoorWetBulb = state.dataLoopNodes->Node(state.dataDXCoils->DXCoil(DXCoilNum).CondenserInletNodeNum(Mode)).OutAirWetBulb;
                 }
             }
         } else {

@@ -148,7 +148,7 @@ namespace CondenserLoopTowers {
         }
         this->calculateWaterUsage(state);
         this->update(state);
-        this->report(RunFlag);
+        this->report(state, RunFlag);
     }
 
     void CoolingTower::getDesignCapacities([[maybe_unused]] EnergyPlusData &state,
@@ -5977,7 +5977,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::report(bool const RunFlag)
+    void CoolingTower::report(EnergyPlusData &state, bool const RunFlag)
     {
 
         // SUBROUTINE INFORMATION:
