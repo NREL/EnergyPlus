@@ -897,7 +897,7 @@ namespace SystemAvailabilityManager {
                                                                               NodeConnectionType_Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode, cCurrentModuleObject, cAlphaArgs(1), "Hot Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).HotNode, cCurrentModuleObject, cAlphaArgs(1), "Hot Node");
                 state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode = GetOnlySingleNode(state, cAlphaArgs(3),
                                                                                ErrorsFound,
                                                                                cCurrentModuleObject,
@@ -906,7 +906,7 @@ namespace SystemAvailabilityManager {
                                                                                NodeConnectionType_Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode, cCurrentModuleObject, cAlphaArgs(1), "Cold Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).ColdNode, cCurrentModuleObject, cAlphaArgs(1), "Cold Node");
 
                 state.dataSystemAvailabilityManager->DiffTSysAvailMgrData(SysAvailNum).TempDiffOn = rNumericArgs(1);
 
@@ -964,7 +964,7 @@ namespace SystemAvailabilityManager {
                                                                                NodeConnectionType_Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->HiTurnOffSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -1010,7 +1010,7 @@ namespace SystemAvailabilityManager {
                                                                               NodeConnectionType_Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->HiTurnOnSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -1056,7 +1056,7 @@ namespace SystemAvailabilityManager {
                                                                                NodeConnectionType_Sensor,
                                                                                1,
                                                                                ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->LoTurnOffSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 
@@ -1113,7 +1113,7 @@ namespace SystemAvailabilityManager {
                                                                               NodeConnectionType_Sensor,
                                                                               1,
                                                                               ObjectIsNotParent);
-                MarkNode(state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
+                MarkNode(state, state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Node, cCurrentModuleObject, cAlphaArgs(1), "Sensor Node");
 
                 state.dataSystemAvailabilityManager->LoTurnOnSysAvailMgrData(SysAvailNum).Temp = rNumericArgs(1);
 

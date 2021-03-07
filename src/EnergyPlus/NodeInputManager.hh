@@ -133,7 +133,8 @@ namespace NodeInputManager {
 
     void CalcMoreNodeInfo(EnergyPlusData &state);
 
-    void MarkNode(int const NodeNumber, // Node Number to be marked
+    void MarkNode(EnergyPlusData &state,
+                  int const NodeNumber, // Node Number to be marked
                   std::string const &ObjectType,
                   std::string const &ObjectName,
                   std::string const &FieldName);
