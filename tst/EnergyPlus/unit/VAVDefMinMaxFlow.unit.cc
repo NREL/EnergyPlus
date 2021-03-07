@@ -287,7 +287,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     EXPECT_DOUBLE_EQ(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).ZoneMinAirFracDes, 0.22);
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.084324, 0.000001);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
@@ -467,7 +467,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).ZoneMinAirFracDes, 0.348739, 0.000001);
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
@@ -647,7 +647,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     EXPECT_DOUBLE_EQ(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).ZoneMinAirFracDes, 0.22);
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.092756, 0.000001);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
@@ -796,7 +796,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).ZoneMinAirFracDes, 0.348739, 0.000001);
     EXPECT_NEAR(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.196047, 0.000001);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
@@ -977,7 +977,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     EXPECT_DOUBLE_EQ(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).ZoneMinAirFracDes, 0.07351776 / 0.21081);
     EXPECT_DOUBLE_EQ(state->dataSingleDuct->sd_airterminal(state->dataSize->CurZoneEqNum).MaxAirVolFlowRateDuringReheat, 0.08);
 
-    Node.deallocate();
+    state->dataLoopNodes->Node.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     state->dataHeatBal->Zone.deallocate();
     state->dataSize->FinalZoneSizing.deallocate();
