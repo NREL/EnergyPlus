@@ -1034,7 +1034,7 @@ namespace WaterUse {
                                                        this->PlantLoopBranchNum,
                                                        this->PlantLoopCompNum);
 
-                    this->ReturnTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->ReturnTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 }
 
                 this->Init = false;
@@ -1044,7 +1044,7 @@ namespace WaterUse {
 
             if (this->InletNode > 0) {
                 if (!state.dataGlobal->DoingSizing) {
-                    this->HotTemp = DataLoopNode::Node(this->InletNode).Temp;
+                    this->HotTemp = state.dataLoopNodes->Node(this->InletNode).Temp;
                 } else {
                     // plant loop will not be running so need a value here.
                     // should change to use tank setpoint but water use connections don't have knowledge of the tank they are fed by
@@ -1288,7 +1288,7 @@ namespace WaterUse {
             PlantUtilities::SafeCopyPlantNode(state, this->InletNode, this->OutletNode, this->PlantLoopNum);
 
             // Set outlet node variables that are possibly changed
-            DataLoopNode::Node(this->OutletNode).Temp = this->ReturnTemp;
+            state.dataLoopNodes->Node(this->OutletNode).Temp = this->ReturnTemp;
             // should add enthalpy update to return?
         }
     }

@@ -1429,7 +1429,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     state->dataGlobal->WarmupFlag = false;
     Tank.initialize(*state, FirstHVACIteration); // read set point schedules on second pass when WarmupFlag is false.
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 60 C, tank should remain at 60 C and HP should be off.
     EXPECT_NEAR(60.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -1446,7 +1446,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
     Tank.initialize(*state, FirstHVACIteration);
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 50 C, tank should heat up and HP should be on.
     EXPECT_NEAR(57.2028862, Tank.TankTemp, 0.0000001); // final tank temperature
     EXPECT_NEAR(1.0, HeatPump.HeatingPLR, 0.0000001);          // HP operating at full capacity
@@ -1460,7 +1460,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     HeatPump.SaveMode = state->dataWaterThermalTanks->heatMode;
     Tank.SavedMode = state->dataWaterThermalTanks->heatMode;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should heat up to 60 C (within convergence tolerance) and HP should cycle.
     EXPECT_NEAR(60.0011328, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.5548081, HeatPump.HeatingPLR, 0.0000001);
@@ -1476,7 +1476,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -1493,7 +1493,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.UseMassFlowRate = 0.02;
     Tank.UseInletTemp = 90.0;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should heat up > 60 C since use nodes add heat to tank and HP should be off and floating.
     EXPECT_NEAR(61.96991668, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);
@@ -1511,7 +1511,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     Tank.UseMassFlowRate = 0.0;
     Tank.UseInletTemp = 90.0;
     Tank.CalcHeatPumpWaterHeater(*state, FirstHVACIteration);
-    Tank.UpdateWaterThermalTank();
+    Tank.UpdateWaterThermalTank(*state);
     // no standby losses, tank at 56 C, tank should remain at 56 C since use nodes are not adding heat to tank and HP set point temp was reduced
     EXPECT_NEAR(56.0, Tank.TankTemp, 0.0000001);
     EXPECT_NEAR(0.0, HeatPump.HeatingPLR, 0.0000001);

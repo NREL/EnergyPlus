@@ -315,7 +315,7 @@ namespace EnergyPlus::WaterThermalTanks {
         } else if (this->DesuperheaterNum > 0) {
             this->CalcDesuperheaterWaterHeater(state, FirstHVACIteration);
         }
-        this->UpdateWaterThermalTank();
+        this->UpdateWaterThermalTank(state);
         this->ReportWaterThermalTank();
         // reset the caller loop num to mimic what was happening in PlantLoopEquip
         this->callerLoopNum = 0;
@@ -433,7 +433,7 @@ namespace EnergyPlus::WaterThermalTanks {
         }
 
         Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
-        Tank.UpdateWaterThermalTank();
+        Tank.UpdateWaterThermalTank(state);
         Tank.ReportWaterThermalTank();
 
         this->HeatPumpAirInletNode = InletNodeSav;
@@ -11311,7 +11311,7 @@ namespace EnergyPlus::WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::UpdateWaterThermalTank()
+    void WaterThermalTankData::UpdateWaterThermalTank(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

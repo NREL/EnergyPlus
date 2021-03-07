@@ -155,7 +155,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
         this->OutletTemp = this->InletTemp - DeltaTemp;
 
-        this->UpdatePlantProfile();
+        this->UpdatePlantProfile(state);
         this->ReportPlantProfile();
 
     } // simulate()
@@ -177,7 +177,6 @@ namespace EnergyPlus::PlantLoadProfile {
         // actual available flow is set.
 
         // Using/Aliasing
-        using DataLoopNode::Node;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -209,7 +208,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
         if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
             // Clear node initial conditions
-            Node(OutletNode).Temp = 0.0;
+            state.dataLoopNodes->Node(OutletNode).Temp = 0.0;
 
             FluidDensityInit =
                 GetDensityGlycol(state, state.dataPlnt->PlantLoop(this->WLoopNum).FluidName, DataGlobalConstants::InitConvTemp, state.dataPlnt->PlantLoop(this->WLoopNum).FluidIndex, RoutineName);
@@ -235,7 +234,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
         if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
-        this->InletTemp = Node(InletNode).Temp;
+        this->InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
         this->Power = GetCurrentScheduleValue(state, this->LoadSchedule);
 
         if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
@@ -256,7 +255,7 @@ namespace EnergyPlus::PlantLoadProfile {
 
     } // InitPlantProfile()
 
-    void PlantProfileData::UpdatePlantProfile() const
+    void PlantProfileData::UpdatePlantProfile(EnergyPlusData &state) const
     {
 
         // SUBROUTINE INFORMATION:
@@ -269,7 +268,7 @@ namespace EnergyPlus::PlantLoadProfile {
         // Updates the node variables with local variables.
 
         // Set outlet node variables that are possibly changed
-        DataLoopNode::Node(this->OutletNode).Temp = this->OutletTemp;
+        state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
     }
 
     void PlantProfileData::ReportPlantProfile()

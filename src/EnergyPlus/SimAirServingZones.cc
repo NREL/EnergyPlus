@@ -869,7 +869,8 @@ namespace EnergyPlus::SimAirServingZones {
                     ShowContinueError(state, "ConnectorList object=\"" + ConnectorListName + "\" not found in input.");
                 }
                 errFlag = false;
-                GetNumSplitterMixerInConntrList(state, "AirLoop", ConnectorListName, NumofSplitters, NumofMixers, errFlag);
+                GetNumSplitterMixerInConntrList(
+                    state, "AirLoop", ConnectorListName, state.dataLoopNodes->NumofSplitters, state.dataLoopNodes->NumofMixers, errFlag);
                 if (errFlag) {
                 }
             }
