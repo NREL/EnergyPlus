@@ -4718,6 +4718,7 @@ namespace EnergyPlus::SystemReports {
                 state.dataHeatBal->ZonePreDefRep(ActualZoneNum).VozTargetTimeAboveOcc += state.dataSysRpts->ZoneTimeAboveVozDyn(CtrlZoneNum);
             } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
                 state.dataSysRpts->ZoneTimeVentUnocc(CtrlZoneNum) = TimeStepSys;
+                state.dataSysRpts->AnyZoneTimeVentUnocc = TimeStepSys;
                 state.dataHeatBal->ZonePreDefRep(ActualZoneNum).TotVentTimeNonZeroUnocc += state.dataSysRpts->ZoneTimeVentUnocc(CtrlZoneNum);
             }
             // accumulate during occupancy or not
