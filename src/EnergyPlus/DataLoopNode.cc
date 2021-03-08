@@ -75,27 +75,6 @@ namespace DataLoopNode {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    Array1D_string const ValidNodeFluidTypes({0, 4}, {"blank", "Air", "Water", "Steam", "Electric"});
-    //int const NumValidNodeFluidTypes(4);
-
-    // Valid Connection Types for Nodes
-    Array1D_string const ValidConnectionTypes(15,
-                                              {"Inlet",
-                                               "Outlet",
-                                               "Internal",
-                                               "ZoneNode",
-                                               "Sensor",
-                                               "Actuator",
-                                               "OutdoorAir",
-                                               "ReliefAir",
-                                               "ZoneInlet",
-                                               "ZoneReturn",
-                                               "ZoneExhaust",
-                                               "Setpoint",
-                                               "Electric",
-                                               "OutsideAirReference",
-                                               "InducedAir"});
-
     NodeData DefaultNodeValues(0,
                                0,
                                0.0,

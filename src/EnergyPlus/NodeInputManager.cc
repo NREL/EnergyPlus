@@ -149,8 +149,8 @@ namespace EnergyPlus::NodeInputManager {
                                 state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NodeNumbers(Loop)));
                             ShowContinueError(state,
                                               "Existing Fluid type=" +
-                                                  DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType) +
-                                                  ", Requested Fluid Type=" + DataLoopNode::ValidNodeFluidTypes(NodeFluidType));
+                                                  format("{}", DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType)) +
+                                                  ", Requested Fluid Type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(NodeFluidType)));
                             ErrorsFound = true;
                         }
                     }
@@ -609,8 +609,8 @@ namespace EnergyPlus::NodeInputManager {
                         ShowSevereError(state, "Existing Fluid type for node, incorrect for request. Node=" + state.dataLoopNodes->NodeID(NumNode));
                         ShowContinueError(
                             state,
-                            "Existing Fluid type=" + DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NumNode).FluidType) +
-                                ", Requested Fluid Type=" + DataLoopNode::ValidNodeFluidTypes(NodeFluidType));
+                            "Existing Fluid type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(state.dataLoopNodes->Node(NumNode).FluidType)) +
+                                ", Requested Fluid Type=" + format("{}", DataLoopNode::ValidNodeFluidTypes(NodeFluidType)));
                         ErrorsFound = true;
                     }
                 }
