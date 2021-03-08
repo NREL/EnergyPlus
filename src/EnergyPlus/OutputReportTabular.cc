@@ -6023,7 +6023,7 @@ namespace EnergyPlus::OutputReportTabular {
                             (Zone(iZone).Volume * Zone(iZone).Multiplier * Zone(iZone).ListMultiplier),
                             3);
                     }
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotalStdDen, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, Zone(iZone).Name, ZonePreDefRep(iZone).MechVentVolTotalStdDen);
                     totalMechVentVol += ZonePreDefRep(iZone).MechVentVolTotalStdDen * zoneMult;
 
                     // Natural ventilation
@@ -6072,7 +6072,7 @@ namespace EnergyPlus::OutputReportTabular {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaoMinSimpVent, Zone(iZone).Name, ZonePreDefRep(iZone).SimpVentVolMin / (Zone(iZone).Volume), 3);
                     }
 
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, Zone(iZone).Name, ZonePreDefRep(iZone).InfilVolTotalStdDen);
                     totalInfilVol += ZonePreDefRep(iZone).InfilVolTotalStdDen * zoneMult;
 
                     // Total ventilation and infiltration
@@ -6084,12 +6084,12 @@ namespace EnergyPlus::OutputReportTabular {
                                      0);
 
                     // Dynamic target ventilation Voz-dyn
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTotal);
                     totalVozDyn += ZonePreDefRep(iZone).VozTargetTotal * zoneMult;
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow, 0);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt, 0);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove, 0);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc, 0);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelow);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAt);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAbove);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, Zone(iZone).Name, ZonePreDefRep(iZone).TotVentTimeNonZeroUnocc);
 
                     if (Zone(iZone).isNominalOccupied && (ZonePreDefRep(iZone).TotTimeOcc > 0.0)) {
                         Real64 totTimeOccSec = ZonePreDefRep(iZone).TotTimeOcc * SecInHour;
@@ -6119,11 +6119,11 @@ namespace EnergyPlus::OutputReportTabular {
                         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, Zone(iZone).Name, avgVoz, 4);
                         totalVozDynOcc += avgVoz * zoneMult;
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc, 0);
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeBelowOcc);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc, 0);
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAtOcc);
                         PreDefTableEntry(
-                            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc, 0);
+                            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, Zone(iZone).Name, ZonePreDefRep(iZone).VozTargetTimeAboveOcc);
                     }
                 }
             }
@@ -6225,21 +6225,21 @@ namespace EnergyPlus::OutputReportTabular {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvAvgNumOcc, "Total Facility", totalAverageOccupants);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaMvMinDynTrgVent, "Total Facility", totalVozMin, 3);
 
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total Facility", totalMechVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total Facility", totalNatVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol, 0);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzMechVent, "Total Facility", totalMechVentVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzNatVent, "Total Facility", totalNatVentVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol);
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol, 0);
-        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol,;
+        PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaTaBzTmAboveUnocc, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneVentUnoccForOA);
 
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzMechVent, "Total Facility", totalMechVentRateOcc, 4);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzNatVent, "Total Facility", totalNatVentRateOcc, 4);
@@ -6252,11 +6252,11 @@ namespace EnergyPlus::OutputReportTabular {
                          4);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaOccBzDynTrgVent, "Total Facility", totalVozDynOcc, 4);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaOccBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynOccForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAt, "Total Facility", state.dataOutRptPredefined->TotalAllZonesAtVozDynOccForOA);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA, 0);
+            state, state.dataOutRptPredefined->pdchOaOccBzTmAbove, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneAboveVozDynOccForOA);
 
         // Add the number of central air distributions system to the count report
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchHVACcntVal, "HVAC Air Loops", NumPrimaryAirSys);
