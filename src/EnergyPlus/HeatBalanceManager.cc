@@ -425,13 +425,13 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const NumConstrObjects(6);
-        static Array1D_string const ConstrObjects(NumConstrObjects,
-                                                  {"Pipe:Indoor",
-                                                   "Pipe:Outdoor",
-                                                   "Pipe:Underground",
-                                                   "GroundHeatExchanger:Surface",
-                                                   "DaylightingDevice:Tubular",
-                                                   "EnergyManagementSystem:ConstructionIndexVariable"});
+        Array1D_string const ConstrObjects(NumConstrObjects,
+                                           {"Pipe:Indoor",
+                                            "Pipe:Outdoor",
+                                            "Pipe:Underground",
+                                            "GroundHeatExchanger:Surface",
+                                            "DaylightingDevice:Tubular",
+                                            "EnergyManagementSystem:ConstructionIndexVariable"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Unused;
