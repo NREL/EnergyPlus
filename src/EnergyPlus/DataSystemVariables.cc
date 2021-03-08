@@ -96,6 +96,42 @@ namespace DataSystemVariables {
 
     // MODULE PARAMETER DEFINITIONS:
 
+    const char *DDOnlyEnvVar("DDONLY");       // Only run design days
+    const char *ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
+    const char *DisableGLHECachingEnvVar("DISABLEGLHECACHING");
+    const char *FullAnnualSimulation("FULLANNUALRUN"); // Generate annual run
+    const char *cDeveloperFlag("DeveloperFlag");
+    const char *cDisplayAllWarnings("DisplayAllWarnings");
+    const char *cDisplayExtraWarnings("DisplayExtraWarnings");
+    const char *cDisplayAdvancedReportVariables("DisplayAdvancedReportVariables");
+    const char *cDisplayUnusedObjects("DisplayUnusedObjects");
+    const char *cDisplayUnusedSchedules("DisplayUnusedSchedules");
+    const char *cDisplayZoneAirHeatBalanceOffBalance("DisplayZoneAirHeatBalanceOffBalance");
+    const char *cSortIDD("SortIDD");
+    const char *cReportDuringWarmup("ReportDuringWarmup");
+    const char *cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
+    const char *cIgnoreSolarRadiation("IgnoreSolarRadiation");
+    const char *cIgnoreBeamRadiation("IgnoreBeamRadiation");
+    const char *cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
+    const char *cSutherlandHodgman("SutherlandHodgman");
+    const char *cSlaterBarsky("SlaterBarsky");
+    const char *cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
+    const char *cMinimalShadowing("MinimalShadowing");
+    const char *cNumActiveSims("cntActv");
+    const char *cInputPath1("epin");       // EP-Launch setting.  Full path + project name
+    const char *cInputPath2("input_path"); // RunEplus.bat setting.  Full path
+    const char *cProgramPath("program_path");
+    const char *cTimingFlag("TimingFlag");
+    const char *TrackAirLoopEnvVar("TRACK_AIRLOOP"); // To generate a file with runtime statistics
+    // for each controller on each air loop
+    const char *TraceAirLoopEnvVar("TRACE_AIRLOOP"); // To generate a trace file with the converged
+    // solutions of all controllers on each air loop at each call to SimAirLoop()
+    const char *TraceHVACControllerEnvVar("TRACE_HVACCONTROLLER"); // To generate a trace file for
+    //  each individual HVAC controller with all controller iterations
+
+    const char *MinReportFrequencyEnvVar("MINREPORTFREQUENCY"); // environment var for reporting frequency.
+    const char *
+        cDisplayInputInAuditEnvVar("DISPLAYINPUTINAUDIT"); // environmental variable that enables the echoing of the input file into the audit file
 
     // DERIVED TYPE DEFINITIONS
     // na

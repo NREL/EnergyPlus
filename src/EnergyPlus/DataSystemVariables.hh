@@ -69,43 +69,6 @@ namespace DataSystemVariables {
 
     // MODULE PARAMETER DEFINITIONS:
 
-    auto constexpr DDOnlyEnvVar("DDONLY");       // Only run design days
-    auto constexpr ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
-    auto constexpr DisableGLHECachingEnvVar("DISABLEGLHECACHING");
-    auto constexpr FullAnnualSimulation("FULLANNUALRUN"); // Generate annual run
-    auto constexpr cDeveloperFlag("DeveloperFlag");
-    auto constexpr cDisplayAllWarnings("DisplayAllWarnings");
-    auto constexpr cDisplayExtraWarnings("DisplayExtraWarnings");
-    auto constexpr cDisplayAdvancedReportVariables("DisplayAdvancedReportVariables");
-    auto constexpr cDisplayUnusedObjects("DisplayUnusedObjects");
-    auto constexpr cDisplayUnusedSchedules("DisplayUnusedSchedules");
-    auto constexpr cDisplayZoneAirHeatBalanceOffBalance("DisplayZoneAirHeatBalanceOffBalance");
-    auto constexpr cSortIDD("SortIDD");
-    auto constexpr cReportDuringWarmup("ReportDuringWarmup");
-    auto constexpr cReportDuringHVACSizingSimulation("REPORTDURINGHVACSIZINGSIMULATION");
-    auto constexpr cIgnoreSolarRadiation("IgnoreSolarRadiation");
-    auto constexpr cIgnoreBeamRadiation("IgnoreBeamRadiation");
-    auto constexpr cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
-    auto constexpr cSutherlandHodgman("SutherlandHodgman");
-    auto constexpr cSlaterBarsky("SlaterBarsky");
-    auto constexpr cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
-    auto constexpr cMinimalShadowing("MinimalShadowing");
-    auto constexpr cNumActiveSims("cntActv");
-    auto constexpr cInputPath1("epin");       // EP-Launch setting.  Full path + project name
-    auto constexpr cInputPath2("input_path"); // RunEplus.bat setting.  Full path
-    auto constexpr cProgramPath("program_path");
-    auto constexpr cTimingFlag("TimingFlag");
-    auto constexpr TrackAirLoopEnvVar("TRACK_AIRLOOP"); // To generate a file with runtime statistics
-    // for each controller on each air loop
-    auto constexpr TraceAirLoopEnvVar("TRACE_AIRLOOP"); // To generate a trace file with the converged
-    // solutions of all controllers on each air loop at each call to SimAirLoop()
-    auto constexpr TraceHVACControllerEnvVar("TRACE_HVACCONTROLLER"); // To generate a trace file for
-    //  each individual HVAC controller with all controller iterations
-
-    auto constexpr MinReportFrequencyEnvVar("MINREPORTFREQUENCY"); // environment var for reporting frequency.
-    auto constexpr cDisplayInputInAuditEnvVar(
-        "DISPLAYINPUTINAUDIT"); // environmental variable that enables the echoing of the input file into the audit file
-
     // DERIVED TYPE DEFINITIONS
     // na
 
