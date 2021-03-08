@@ -106,7 +106,7 @@ namespace EnergyPlus::BranchNodeConnections {
         int Found;
 
         ErrorsFoundHere = false;
-        if (!IsValidConnectionType(state, ConnectionType)) {
+        if (!IsValidConnectionType(ConnectionType)) {
             ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             ErrorsFoundHere = true;
@@ -206,7 +206,7 @@ namespace EnergyPlus::BranchNodeConnections {
 
         constexpr auto RoutineName("ModifyNodeConnectionType: ");
 
-        if (!IsValidConnectionType(state, ConnectionType)) {
+        if (!IsValidConnectionType(ConnectionType)) {
             ShowSevereError(state, format("{}{}{}", RoutineName, "Invalid ConnectionType=", ConnectionType));
             ShowContinueError(state, "Occurs for Node=" + NodeName + ", ObjectType=" + ObjectType + ", ObjectName=" + ObjectName);
             errFlag = true;
@@ -232,7 +232,7 @@ namespace EnergyPlus::BranchNodeConnections {
         }
     }
 
-    bool IsValidConnectionType(EnergyPlusData &state, std::string const &ConnectionType)
+    bool IsValidConnectionType(std::string const &ConnectionType)
     {
 
         // FUNCTION INFORMATION:

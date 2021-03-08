@@ -87,7 +87,7 @@ namespace BranchNodeConnections {
                                     bool &errFlag                      // Will be True if errors already detected or if errors found here
     );
 
-    bool IsValidConnectionType(EnergyPlusData &state, std::string const &ConnectionType);
+    bool IsValidConnectionType(std::string const &ConnectionType);
 
     void CheckNodeConnections(EnergyPlusData &state, bool &ErrorsFound);
 
