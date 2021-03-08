@@ -6230,7 +6230,7 @@ namespace EnergyPlus::OutputReportTabular {
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzTotVent, "Total Facility", totalMechVentVol + totalNatVentVol);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzInfil, "Total Facility", totalInfilVol);
         PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol,;
+            state, state.dataOutRptPredefined->pdchOaTaBzTotVentInfil, "Total Facility", totalMechVentVol + totalNatVentVol + totalInfilVol);
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchOaTaBzDynTrgVent, "Total Facility", totalVozDyn);
         PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchOaTaBzTmBelow, "Total Facility", state.dataOutRptPredefined->TotalAnyZoneBelowVozDynForOA);
