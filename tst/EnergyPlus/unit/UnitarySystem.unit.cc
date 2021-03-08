@@ -290,7 +290,6 @@ public:
         DataHVACGlobals::NumPrimaryAirSys = 0;
         Psychrometrics::cached_Twb.clear();
         Psychrometrics::cached_Psat.clear();
-        state->dataLoopNodes->Node.clear();
     }
 };
 
