@@ -2698,15 +2698,16 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
         } // Cooling or heating required
 
-        // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
-        if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-            PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
-        }
-        if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
-            PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
-        }
-
         if (SupplyMassFlowRate > 0.0) {
+            // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
+                PurchAir(PurchAirNum).SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
+            }
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
+                PurchAir(PurchAirNum).SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
+            }
+            SupplyEnthalpy = PsyHFnTdbW(PurchAir(PurchAirNum).SupplyTemp, PurchAir(PurchAirNum).SupplyHumRat);
+
             // compute coil loads
             if ((PurchAir(PurchAirNum).SupplyHumRat == PurchAir(PurchAirNum).MixedAirHumRat) &&
                 (PurchAir(PurchAirNum).SupplyTemp == PurchAir(PurchAirNum).MixedAirTemp)) {
@@ -2861,6 +2862,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         PurchAir(PurchAirNum).OALatOutput = 0.0;
         PurchAir(PurchAirNum).MixedAirTemp = Node(RecircNodeNum).Temp;
         PurchAir(PurchAirNum).MixedAirHumRat = Node(RecircNodeNum).HumRat;
+        PurchAir(PurchAirNum).SupplyTemp = Node(InNodeNum).Temp;
+        PurchAir(PurchAirNum).SupplyHumRat = Node(InNodeNum).HumRat;
     }
 
     PurchAir(PurchAirNum).OutdoorAirMassFlowRate = OAMassFlowRate;
