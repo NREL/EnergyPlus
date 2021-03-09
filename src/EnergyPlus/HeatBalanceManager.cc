@@ -6293,7 +6293,7 @@ namespace HeatBalanceManager {
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
+        Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FileLineCount;            // counter for number of lines read (used in some error messages)
