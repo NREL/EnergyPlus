@@ -204,6 +204,10 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
     Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
 
     Array2D<Real64> DiffuseArray;
+    Array1D_bool FirstCalcZone; // for error message
+
+    Real64 curQL = 0.0; // radiant value prior to adjustment for pulse for load component report
+    Real64 adjQL = 0.0; // radiant value including adjustment for pulse for load component report
 
     void clear_state() override
     {
@@ -220,6 +224,9 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
         ZoneAESum.clear();
 
         DiffuseArray.clear();
+        FirstCalcZone.clear();
+        curQL = 0.0;
+        adjQL = 0.0;
     }
 };
 

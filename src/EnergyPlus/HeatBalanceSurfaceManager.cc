@@ -3362,8 +3362,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
-        Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
 
         auto &Surface(state.dataSurface->Surface);
 
@@ -3504,15 +3502,15 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     if (!state.dataGlobal->doLoadComponentPulseNow) {
                         state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     } else {
-                        curQL = state.dataHeatBal->QL(radEnclosureNum);
+                        state.dataHeatBalSurfMgr->curQL = state.dataHeatBal->QL(radEnclosureNum);
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the
-                        adjQL = curQL +
+                        state.dataHeatBalSurfMgr->adjQL = state.dataHeatBalSurfMgr->curQL +
                                 DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // TMULT is a multiplier for each zone/enclosure
                         // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBalSurfMgr->adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     }
 
                     if (NOT_SHADED(ShadeFlag)) { // No window shading
@@ -3614,15 +3612,15 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     if (!state.dataGlobal->doLoadComponentPulseNow) {
                         state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBal->QL(radEnclosureNum) * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     } else {
-                        curQL = state.dataHeatBal->QL(radEnclosureNum);
+                        state.dataHeatBalSurfMgr->curQL = state.dataHeatBal->QL(radEnclosureNum);
                         // for the loads component report during the special sizing run increase the radiant portion
                         // a small amount to create a "pulse" of heat that is used for the
-                        adjQL = curQL +
+                        state.dataHeatBalSurfMgr->adjQL = state.dataHeatBalSurfMgr->curQL +
                                 DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
                         // ITABSF is the Inside Thermal Absorptance
                         // TMULT is a multiplier for each zone/radiant enclosure
                         // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
+                        state.dataHeatBal->SurfQRadThermInAbs(SurfNum) = state.dataHeatBalSurfMgr->adjQL * state.dataHeatBal->TMULT(radEnclosureNum) * state.dataHeatBal->ITABSF(SurfNum);
                     }
                     // Radiations absorbed by the window layers coming from zone side
                     int EQLNum = state.dataConstruction->Construct(ConstrNum).EQLConsPtr;
@@ -3934,14 +3932,13 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         auto &Surface(state.dataSurface->Surface);
 
         Real64 const SmallestAreaAbsProductAllowed(0.01); // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
-        Array1D_bool FirstCalcZone; // for error message
 
 
         if (!allocated(EnclSolVMULT)) {
             EnclSolVMULT.dimension(DataViewFactorInformation::NumOfSolarEnclosures, 0.0);
         }
         if (ComputeIntSWAbsorpFactorsfirstTime) {
-            FirstCalcZone.dimension(state.dataGlobal->NumOfZones, true);
+            state.dataHeatBalSurfMgr->FirstCalcZone.dimension(state.dataGlobal->NumOfZones, true);
             ComputeIntSWAbsorpFactorsfirstTime = false;
         }
 
@@ -4065,10 +4062,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 // back out whatever window is there.  Note that this also assumes that the shade has no effect.
                 // That's probably not correct, but how correct is it to assume that no solar is absorbed anywhere
                 // in the zone?
-                if (FirstCalcZone(enclosureNum)) {
+                if (state.dataHeatBalSurfMgr->FirstCalcZone(enclosureNum)) {
                     ShowWarningError(state, "ComputeIntSWAbsorbFactors: Sum of area times inside solar absorption for all surfaces is zero in Zone: " +
                                      DataViewFactorInformation::ZoneSolarInfo(enclosureNum).Name);
-                    FirstCalcZone(enclosureNum) = false;
+                    state.dataHeatBalSurfMgr->FirstCalcZone(enclosureNum) = false;
                 }
                 EnclSolVMULT(enclosureNum) = 0.0;
             }
