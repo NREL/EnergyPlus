@@ -4571,15 +4571,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         int HistTermNum; // DO loop counter for history terms
         int SideNum;     // DO loop counter for surfaces sides (inside, outside)
 
-        static Array1D<Real64> QExt1;    // Heat flux at the exterior surface during first time step/series
-        static Array1D<Real64> QInt1;    // Heat flux at the interior surface during first time step/series
-        static Array1D<Real64> TempInt1; // Temperature of interior surface during first time step/series
-        static Array1D<Real64> TempExt1; // Temperature of exterior surface during first time step/series
-        static Array1D<Real64> Qsrc1;    // Heat source/sink (during first time step/series)
-        static Array1D<Real64> Tsrc1;    // Temperature at source/sink (during first time step/series)
-        static Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
-        static Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
-
         // Tuned Assure safe to use shared linear indexing below
         assert(equal_dimensions(TH, THM));
         assert(equal_dimensions(TH, QH));
@@ -4594,15 +4585,15 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         }
 
         if (UpdateThermalHistoriesFirstTimeFlag) {
-            QExt1.dimension(state.dataSurface->TotSurfaces, 0.0);
-            QInt1.dimension(state.dataSurface->TotSurfaces, 0.0);
-            TempInt1.dimension(state.dataSurface->TotSurfaces, 0.0);
-            TempExt1.dimension(state.dataSurface->TotSurfaces, 0.0);
-            SumTime.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataHeatBalSurfMgr->QExt1.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataHeatBalSurfMgr->QInt1.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataHeatBalSurfMgr->TempInt1.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataHeatBalSurfMgr->TempExt1.dimension(state.dataSurface->TotSurfaces, 0.0);
+            state.dataHeatBalSurfMgr->SumTime.dimension(state.dataSurface->TotSurfaces, 0.0);
             if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
-                Qsrc1.dimension(state.dataSurface->TotSurfaces, 0.0);
-                Tsrc1.dimension(state.dataSurface->TotSurfaces, 0.0);
-                Tuser1.dimension(state.dataSurface->TotSurfaces, 0.0);
+                state.dataHeatBalSurfMgr->Qsrc1.dimension(state.dataSurface->TotSurfaces, 0.0);
+                state.dataHeatBalSurfMgr->Tsrc1.dimension(state.dataSurface->TotSurfaces, 0.0);
+                state.dataHeatBalSurfMgr->Tuser1.dimension(state.dataSurface->TotSurfaces, 0.0);
             }
             UpdateThermalHistoriesFirstTimeFlag = false;
         }
@@ -4690,14 +4681,14 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 if ((Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CTF) && (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_EMPD))
                     continue;
                 if (SUMH(SurfNum) == 0) { // First time step in a block for a surface, update arrays
-                    TempExt1(SurfNum) = TH[l11];
-                    TempInt1(SurfNum) = TempSurfIn(SurfNum);
-                    QExt1(SurfNum) = QH[l11];
-                    QInt1(SurfNum) = QH[l21];
+                    state.dataHeatBalSurfMgr->TempExt1(SurfNum) = TH[l11];
+                    state.dataHeatBalSurfMgr->TempInt1(SurfNum) = TempSurfIn(SurfNum);
+                    state.dataHeatBalSurfMgr->QExt1(SurfNum) = QH[l11];
+                    state.dataHeatBalSurfMgr->QInt1(SurfNum) = QH[l21];
                     if (state.dataHeatBal->AnyInternalHeatSourceInInput) {
-                        Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
-                        Tuser1(SurfNum) = TuserHist(SurfNum, 1);
-                        Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
+                        state.dataHeatBalSurfMgr->Tsrc1(SurfNum) = TsrcHist(SurfNum, 1);
+                        state.dataHeatBalSurfMgr->Tuser1(SurfNum) = TuserHist(SurfNum, 1);
+                        state.dataHeatBalSurfMgr->Qsrc1(SurfNum) = QsrcHist(SurfNum, 1);
                     }
                 }
             }
@@ -4720,7 +4711,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                 auto const &construct(state.dataConstruction->Construct(ConstrNum));
 
                 ++SUMH(SurfNum);
-                SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
+                state.dataHeatBalSurfMgr->SumTime(SurfNum) = double(SUMH(SurfNum)) * state.dataGlobal->TimeStepZone;
 
                 if (SUMH(SurfNum) == construct.NumHistories) {
 
@@ -4769,10 +4760,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                     auto const l21(TH.index(1, 2, SurfNum)); // Linear index
                     auto const l22(TH.index(2, 2, SurfNum)); // Linear index
-                    THM[l21] = TempExt1(SurfNum);
-                    THM[l22] = TempInt1(SurfNum);
-                    QHM[l21] = QExt1(SurfNum);
-                    QHM[l22] = QInt1(SurfNum);
+                    THM[l21] = state.dataHeatBalSurfMgr->TempExt1(SurfNum);
+                    THM[l22] = state.dataHeatBalSurfMgr->TempInt1(SurfNum);
+                    QHM[l21] = state.dataHeatBalSurfMgr->QExt1(SurfNum);
+                    QHM[l22] = state.dataHeatBalSurfMgr->QInt1(SurfNum);
 
                     TH[l21] = THM[l21];
                     TH[l22] = THM(2, 2, SurfNum);
@@ -4780,9 +4771,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                     QH[l22] = QHM(2, 2, SurfNum);
 
                     if (construct.SourceSinkPresent) {
-                        TsrcHistM(SurfNum, 2) = Tsrc1(SurfNum);
-                        TuserHistM(SurfNum, 2) = Tuser1(SurfNum);
-                        QsrcHistM(SurfNum, 2) = Qsrc1(SurfNum);
+                        TsrcHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Tsrc1(SurfNum);
+                        TuserHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Tuser1(SurfNum);
+                        QsrcHistM(SurfNum, 2) = state.dataHeatBalSurfMgr->Qsrc1(SurfNum);
                         TsrcHist(SurfNum, 2) = TsrcHistM(SurfNum, 2);
                         TuserHist(SurfNum, 2) = TuserHistM(SurfNum, 2);
                         QsrcHist(SurfNum, 2) = QsrcHistM(SurfNum, 2);
@@ -4790,7 +4781,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                 } else {
 
-                    Real64 const sum_steps(SumTime(SurfNum) / construct.CTFTimeStep);
+                    Real64 const sum_steps(state.dataHeatBalSurfMgr->SumTime(SurfNum) / construct.CTFTimeStep);
                     if (construct.NumCTFTerms > 1) {
                         int const numCTFTerms(construct.NumCTFTerms);
                         for (SideNum = 1; SideNum <= 2; ++SideNum) { // Tuned Index order switched for cache friendliness
@@ -4834,10 +4825,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                     auto const l21(TH.index(1, 2, SurfNum)); // Linear index
                     auto const l22(TH.index(2, 2, SurfNum)); // Linear index
-                    TH[l21] = THM[l21] - (THM[l21] - TempExt1(SurfNum)) * sum_steps;
-                    TH[l22] = THM[l22] - (THM[l22] - TempInt1(SurfNum)) * sum_steps;
-                    QH[l21] = QHM[l21] - (QHM[l21] - QExt1(SurfNum)) * sum_steps;
-                    QH[l22] = QHM[l22] - (QHM[l22] - QInt1(SurfNum)) * sum_steps;
+                    TH[l21] = THM[l21] - (THM[l21] - state.dataHeatBalSurfMgr->TempExt1(SurfNum)) * sum_steps;
+                    TH[l22] = THM[l22] - (THM[l22] - state.dataHeatBalSurfMgr->TempInt1(SurfNum)) * sum_steps;
+                    QH[l21] = QHM[l21] - (QHM[l21] - state.dataHeatBalSurfMgr->QExt1(SurfNum)) * sum_steps;
+                    QH[l22] = QHM[l22] - (QHM[l22] - state.dataHeatBalSurfMgr->QInt1(SurfNum)) * sum_steps;
 
                     // Tuned Linear indexing
                     // TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 ) - ( TsrcHistM( SurfNum, 2 ) - Tsrc1( SurfNum ) ) * sum_steps;
@@ -4845,9 +4836,9 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
 
                     if (construct.SourceSinkPresent) {
                         auto const l2(TsrcHist.index(SurfNum, 2));
-                        TsrcHist[l2] = TsrcHistM[l2] - (TsrcHistM[l2] - Tsrc1(SurfNum)) * sum_steps;
-                        QsrcHist[l2] = QsrcHistM[l2] - (QsrcHistM[l2] - Qsrc1(SurfNum)) * sum_steps;
-                        TuserHist[l2] = TuserHistM[l2] - (TuserHistM[l2] - Tuser1(SurfNum)) * sum_steps;
+                        TsrcHist[l2] = TsrcHistM[l2] - (TsrcHistM[l2] - state.dataHeatBalSurfMgr->Tsrc1(SurfNum)) * sum_steps;
+                        QsrcHist[l2] = QsrcHistM[l2] - (QsrcHistM[l2] - state.dataHeatBalSurfMgr->Qsrc1(SurfNum)) * sum_steps;
+                        TuserHist[l2] = TuserHistM[l2] - (TuserHistM[l2] - state.dataHeatBalSurfMgr->Tuser1(SurfNum)) * sum_steps;
                     }
                 }
             }
