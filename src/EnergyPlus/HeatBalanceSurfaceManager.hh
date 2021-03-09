@@ -200,6 +200,10 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
     Array1D<Real64> Tuser1;   // Temperature at the user specified location (during first time step/series)
     Array1D<Real64> SumTime;  // Amount of time that has elapsed from start of master history to
 
+    Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
+    Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
+
+
     void clear_state() override
     {
         QExt1.clear();
@@ -210,6 +214,9 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
         Tsrc1.clear();
         Tuser1.clear();
         SumTime.clear();
+
+        SurfaceAE.clear();
+        ZoneAESum.clear();
     }
 };
 

@@ -4859,23 +4859,21 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // calculation purposes.
 
         Real64 SumAET;                    // Intermediate calculational variable (area*emissivity*T) sum
-        static Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
         int SurfNum;                      // Surface number
-        static Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
         int ZoneNum;                      // Zone number
 
         auto &Surface(state.dataSurface->Surface);
 
         if (CalculateZoneMRTfirstTime) {
-            SurfaceAE.allocate(state.dataSurface->TotSurfaces);
-            ZoneAESum.allocate(state.dataGlobal->NumOfZones);
-            SurfaceAE = 0.0;
-            ZoneAESum = 0.0;
+            state.dataHeatBalSurfMgr->SurfaceAE.allocate(state.dataSurface->TotSurfaces);
+            state.dataHeatBalSurfMgr->ZoneAESum.allocate(state.dataGlobal->NumOfZones);
+            state.dataHeatBalSurfMgr->SurfaceAE = 0.0;
+            state.dataHeatBalSurfMgr->ZoneAESum = 0.0;
             for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                 if (Surface(SurfNum).HeatTransSurf) {
-                    SurfaceAE(SurfNum) = Surface(SurfNum).Area * state.dataConstruction->Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
+                    state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) = Surface(SurfNum).Area * state.dataConstruction->Construct(Surface(SurfNum).Construction).InsideAbsorpThermal;
                     ZoneNum = Surface(SurfNum).Zone;
-                    if (ZoneNum > 0) ZoneAESum(ZoneNum) += SurfaceAE(SurfNum);
+                    if (ZoneNum > 0) state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum);
                 }
             }
         }
@@ -4884,10 +4882,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             if (present(ZoneToResimulate) && (ZoneNum != ZoneToResimulate)) continue;
             SumAET = 0.0;
             for (SurfNum = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; SurfNum <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++SurfNum) {
-                SumAET += SurfaceAE(SurfNum) * TempSurfIn(SurfNum);
+                SumAET += state.dataHeatBalSurfMgr->SurfaceAE(SurfNum) * TempSurfIn(SurfNum);
             }
-            if (ZoneAESum(ZoneNum) > 0.01) {
-                state.dataHeatBal->MRT(ZoneNum) = SumAET / ZoneAESum(ZoneNum);
+            if (state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum) > 0.01) {
+                state.dataHeatBal->MRT(ZoneNum) = SumAET / state.dataHeatBalSurfMgr->ZoneAESum(ZoneNum);
             } else {
                 if (CalculateZoneMRTfirstTime) {
                     ShowWarningError(state, "Zone areas*inside surface emissivities are summing to zero, for Zone=\"" + state.dataHeatBal->Zone(ZoneNum).Name + "\"");
