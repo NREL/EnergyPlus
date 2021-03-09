@@ -97,9 +97,110 @@ namespace DataLoopNode {
     constexpr bool ObjectIsNotParent(false);
     constexpr bool IncrementFluidStreamYes(true);
 
-    constexpr const char *ValidNodeFluidTypes(int const intNodeType); // Valid Fluid Types for Nodes
-    constexpr const char *ValidConnectionTypes(int const intNodeConnectionType); // Valid Connection Types for Nodes
-   
+    constexpr const char *ValidNodeFluidTypes(int const intNodeType) // Valid Fluid Types for Nodes
+    {
+        char *NodeType = "blank";
+
+        switch (intNodeType) {
+        case 0:
+            NodeType = "blank";
+            break;
+
+        case 1:
+            NodeType = "Air";
+            break;
+
+        case 2:
+            NodeType = "Water";
+            break;
+
+        case 3:
+            NodeType = "Steam";
+            break;
+
+        case 4:
+            NodeType = "Electric";
+            break;
+
+        default:
+            NodeType = "blank";
+            break;
+        }
+        return NodeType;
+    }
+
+    constexpr const char *ValidConnectionTypes(int const intNodeConnectionType) // Valid Connection Types for Nodes
+    {
+        char *NodeConnectionType = "blank";
+
+        switch (intNodeConnectionType) {
+        case 1:
+            NodeConnectionType = "Inlet";
+            break;
+
+        case 2:
+            NodeConnectionType = "Outlet";
+            break;
+
+        case 3:
+            NodeConnectionType = "Internal";
+            break;
+
+        case 4:
+            NodeConnectionType = "ZoneNode";
+            break;
+
+        case 5:
+            NodeConnectionType = "Sensor";
+            break;
+
+        case 6:
+            NodeConnectionType = "Actuator";
+            break;
+
+        case 7:
+            NodeConnectionType = "OutdoorAir";
+            break;
+
+        case 8:
+            NodeConnectionType = "ReliefAir";
+            break;
+
+        case 9:
+            NodeConnectionType = "ZoneInlet";
+            break;
+
+        case 10:
+            NodeConnectionType = "ZoneReturn";
+            break;
+
+        case 11:
+            NodeConnectionType = "ZoneExhaust";
+            break;
+
+        case 12:
+            NodeConnectionType = "Setpoint";
+            break;
+
+        case 13:
+            NodeConnectionType = "Electric";
+            break;
+
+        case 14:
+            NodeConnectionType = "OutsideAirReference";
+            break;
+
+        case 15:
+            NodeConnectionType = "InducedAir";
+            break;
+
+        default:
+            NodeConnectionType = "blank";
+            break;
+        }
+        return NodeConnectionType;
+    }
+
     // Types
     struct NodeData
     {
