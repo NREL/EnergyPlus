@@ -3362,8 +3362,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
-        static Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
+        Real64 curQL(0.0); // radiant value prior to adjustment for pulse for load component report
+        Real64 adjQL(0.0); // radiant value including adjustment for pulse for load component report
 
         auto &Surface(state.dataSurface->Surface);
 
