@@ -48,7 +48,7 @@
 // C++ Headers
 #include <cmath>
 #include <string>
-
+#include <iostream>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
@@ -344,6 +344,9 @@ namespace HeatBalanceHAMTManager {
         inputProcessor->getObjectDefMaxArgs(state, cHAMTObject7, NumParams, NumAlphas, NumNums);
         MaxAlphas = max(MaxAlphas, NumAlphas);
         MaxNums = max(MaxNums, NumNums);
+        //inputProcessor->getObjectDefMaxArgs(state, cHAMTObject8, NumParams, NumAlphas, NumNums);
+        //MaxAlphas = max(MaxAlphas, NumAlphas);
+        //MaxNums = max(MaxNums, NumNums);
 
         ErrorsFound = false;
 
@@ -698,15 +701,24 @@ namespace HeatBalanceHAMTManager {
 
         // Internal Moisture Source
         auto instances = inputProcessor->epJSON.find(cHAMTObject8);
+        
+
         if (instances != inputProcessor->epJSON.end()) {
             int item = 0;
             auto &instancesValue = instances.value();
+            
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-
-                std::string construction_name{fields.at("construction_name")};
-                int construction_index = UtilityRoutines::FindItemInList(construction_name, state.dataConstruction->Construct);
+                //std::cout << "Yanfei001: " << fields << std::endl;
+                //std::cout << "Yanfei002: " << thisObjectName << std::endl;
+                std::string construction_name{UtilityRoutines::MakeUPPERCase(fields.at("construction_name"))};
+                //std::cout << "Yanfei 003: " << construction_name << std::endl;
+                // std::cout << "Yanfei 004: " << state.dataConstruction->Construct << std::endl;
+                
+                int construction_index = UtilityRoutines::FindItemInList(construction_name,
+                                                                         state.dataConstruction->Construct);
+                //std::cout << "Yanfei 005: " << construction_index << std::endl; 
                 if (construction_index == 0) {
                     ShowSevereError(state,
                                     "Did not find matching construction for " + cHAMTObject8 + ' ' + thisObjectName +
@@ -1326,7 +1338,7 @@ namespace HeatBalanceHAMTManager {
                 cells(cid).rhp1 = state.dataMaterial->Material(matid).irh;
                 cells(cid).rhp2 = state.dataMaterial->Material(matid).irh;
 
-                if (cells(cid).source_id) {
+                if (cells(cid).source_id!=-1) {
                     if (sources(cells(cid).source_id).type == InternalMoistureSource::Type::AirflowNetwork) {
                         if (!sources(cells(cid).source_id).afn_id) {
                             if (state.dataAirflowNetworkBalanceManager->AirflowNetworkNumOfSurfaces) {
