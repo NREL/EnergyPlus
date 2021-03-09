@@ -1511,8 +1511,8 @@ namespace HeatBalanceManager {
         Real64 maxLamValue;       // maximum value of wavelength
 
         // Added TH 1/9/2009 to read the thermochromic glazings
-        static int iTC(0);
-        static int iMat(0);
+        int iTC(0);
+        int iMat(0);
 
         // Added TH 7/27/2009 for constructions defined with F or C factor method
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
@@ -7938,10 +7938,10 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int Loop;
-        static int iTC(0);
-        static int iMat(0);
-        static int NumNewConst(0);
-        static int iTCG(0);
+        int iTC(0);
+        int iMat(0);
+        int NumNewConst(0);
+        int iTCG(0);
 
         NumNewConst = 0;
         for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
@@ -8022,19 +8022,19 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Real64 Riw(0.0);            // thermal resistance of interior film coefficient under winter conditions (m2-K/W)
-        static Real64 Row(0.0);            // theraml resistance of exterior film coefficient under winter conditions (m2-K/W)
-        static Real64 Rlw(0.0);            // thermal resistance of block model layer (m2-K/W)
-        static Real64 Ris(0.0);            // thermal resistance of interior film coefficient under summer conditions (m2-K/W)
-        static Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
-        static Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
-        static Real64 SolarAbsorb(0.0);    // solar aborptance
+        Real64 Riw(0.0);            // thermal resistance of interior film coefficient under winter conditions (m2-K/W)
+        Real64 Row(0.0);            // theraml resistance of exterior film coefficient under winter conditions (m2-K/W)
+        Real64 Rlw(0.0);            // thermal resistance of block model layer (m2-K/W)
+        Real64 Ris(0.0);            // thermal resistance of interior film coefficient under summer conditions (m2-K/W)
+        Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
+        Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
+        Real64 SolarAbsorb(0.0);    // solar aborptance
         bool ErrorsFound(false);
-        static Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
-        static Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
-        static Real64 DeltaSHGCandTsol(0.0); // intermediate difference
-        static Real64 RLowSide(0.0);
-        static Real64 RHiSide(0.0);
+        Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
+        Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
+        Real64 DeltaSHGCandTsol(0.0); // intermediate difference
+        Real64 RLowSide(0.0);
+        Real64 RHiSide(0.0);
 
         // first fill out defaults
         state.dataMaterial->Material(MaterNum).GlassSpectralDataPtr = 0;
