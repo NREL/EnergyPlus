@@ -2801,7 +2801,7 @@ namespace EvaporativeCoolers {
         auto &EvapCond(state.dataEvapCoolers->EvapCond);
 
         EvapCoolIndex = int(Par(1));
-        DryOrWetOperatingMode = OperatingMode(Par(2));
+        DryOrWetOperatingMode = OperatingMode(int(Par(2)));
         SysTempSetPoint = Par(3);
         EDBTSecAirSide = Par(4);
         EWBTSecAirSide = Par(5);
