@@ -613,7 +613,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("GetProjectControlData: ");
+        constexpr const char * RoutineName("GetProjectControlData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -790,8 +790,8 @@ namespace HeatBalanceManager {
             state.dataHeatBal->MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
         }
 
-        static constexpr auto Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
-        static constexpr auto Format_721("! <Building Information>, Building Name,North Axis {{deg}},Terrain,  Loads Convergence Tolerance "
+        constexpr const char * Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
+        constexpr const char * Format_721("! <Building Information>, Building Name,North Axis {{deg}},Terrain,  Loads Convergence Tolerance "
                                          "Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum "
                                          "Number of Warmup Days\n");
         // Write Building Information to the initialization output file
@@ -867,7 +867,7 @@ namespace HeatBalanceManager {
             state.dataHeatBal->DefaultInsideConvectionAlgo = ASHRAETARP;
             AlphaName(1) = "TARP";
         }
-        static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
+        constexpr const char * Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
                                          "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
         print(state.files.eio, Format_722, AlphaName(1));
 
@@ -924,7 +924,7 @@ namespace HeatBalanceManager {
             AlphaName(1) = "DOE-2";
         }
 
-        static constexpr auto Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
+        constexpr const char * Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
                                          "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
         print(state.files.eio, Format_723, AlphaName(1));
 
@@ -1022,7 +1022,7 @@ namespace HeatBalanceManager {
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
-        static constexpr auto Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
+        constexpr const char * Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
         print(state.files.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
@@ -1093,10 +1093,10 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        static constexpr auto Format_726(
+        constexpr const char * Format_726(
             "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
         print(state.files.eio, Format_726);
-        static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
+        constexpr const char * Format_727(" Zone Air Solution Algorithm, {}\n");
         print(state.files.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
@@ -1182,18 +1182,18 @@ namespace HeatBalanceManager {
 
         WindowManager::initWindowModel(state);
 
-        static constexpr auto Format_728("! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
+        constexpr const char * Format_728("! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
         print(state.files.eio, Format_728);
-        static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
+        constexpr const char * Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.CO2Simulation) {
             print(state.files.eio, Format_730, "Yes", AlphaName(1));
         } else {
             print(state.files.eio, Format_730, "No", "N/A");
         }
 
-        static constexpr auto Format_729(
+        constexpr const char * Format_729(
             "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
-        static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
+        constexpr const char * Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
         print(state.files.eio, Format_729);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants && state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
             print(state.files.eio, Format_731, "Yes", AlphaName(3));
@@ -1305,10 +1305,10 @@ namespace HeatBalanceManager {
             state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
 
-        static constexpr auto Format_732(
+        constexpr const char * Format_732(
             "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing and Return {{AdjustMixingOnly | AdjustReturnOnly | AdjustMixingThenReturn | AdjustReturnThenMixing | None}}, Adjust Zone Infiltration "
             "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
-        static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
+        constexpr const char * Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
         print(state.files.eio, Format_732);
         if (state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
@@ -1366,9 +1366,9 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        static constexpr auto Format_734(
+        constexpr const char * Format_734(
             "! <HVACSystemRootFindingAlgorithm>, Value {{RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}}\n");
-        static constexpr auto Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
+        constexpr const char * Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
         print(state.files.eio, Format_734);
         print(state.files.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
@@ -1396,7 +1396,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
-        static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
+        constexpr const char * Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
 
         CurrentModuleObject = "Site:HeightVariation";
@@ -3915,8 +3915,8 @@ namespace HeatBalanceManager {
             print(state.files.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
 
             // Formats
-            static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
-            static constexpr auto Format_702(" Material:Air,{},{:.4R}\n");
+            constexpr const char * Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
+            constexpr const char * Format_702(" Material:Air,{},{:.4R}\n");
 
             for (MaterNum = 1; MaterNum <= state.dataHeatBal->TotMaterials; ++MaterNum) {
 
@@ -4006,7 +4006,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("GetWindowGlassSpectralData: ");
+        constexpr const char * RoutineName("GetWindowGlassSpectralData: ");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -4734,7 +4734,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("GetZoneData: ");
+        constexpr const char * RoutineName("GetZoneData: ");
         //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -4980,7 +4980,7 @@ namespace HeatBalanceManager {
         using DataLoopNode::ObjectIsParent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("GetZoneLocalEnvData: ");
+        constexpr const char * RoutineName("GetZoneLocalEnvData: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlpha;
@@ -5112,7 +5112,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("ProcessZoneData: ");
+        constexpr const char * RoutineName("ProcessZoneData: ");
         //  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5366,7 +5366,7 @@ namespace HeatBalanceManager {
             state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
-                    static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
+                    constexpr const char * ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                     if (TS == state.dataGlobal->NumOfTimeStepInHour) {
                         print(state.files.shade, ShdFracFmt1, state.dataEnvrn->Month, state.dataEnvrn->DayOfMonth, iHour, 0);
                     } else {
@@ -5378,7 +5378,7 @@ namespace HeatBalanceManager {
                               (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                     }
                     for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-                        static constexpr auto ShdFracFmt2("{:10.8F},");
+                        constexpr const char * ShdFracFmt2("{:10.8F},");
                         print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SunlitFrac(TS, iHour, SurfNum));
                     }
                     print(state.files.shade, "\n");
@@ -5676,12 +5676,12 @@ namespace HeatBalanceManager {
                 if (ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
-                        static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature "
+                        constexpr const char * Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature "
                                                          "Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
                         print(state.files.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
-                    static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
+                    constexpr const char * Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
                     print(state.files.eio,
                           Format_731,
                           state.dataHeatBal->Zone(ZoneNum).Name,
@@ -5926,7 +5926,7 @@ namespace HeatBalanceManager {
         int Num; // loop control
 
         // Formats
-        static constexpr auto Format_730("! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
+        constexpr const char * Format_730("! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
                                          "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
                                          "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
                                          "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
@@ -5966,7 +5966,7 @@ namespace HeatBalanceManager {
                 StdDevZoneTemp = std::sqrt(sum(state.dataHeatBalMgr->TempZoneRptStdDev({1, state.dataHeatBalMgr->CountWarmupDayPoints})) / double(state.dataHeatBalMgr->CountWarmupDayPoints));
                 StdDevZoneLoad = std::sqrt(sum(state.dataHeatBalMgr->LoadZoneRptStdDev({1, state.dataHeatBalMgr->CountWarmupDayPoints})) / double(state.dataHeatBalMgr->CountWarmupDayPoints));
 
-                static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
+                constexpr const char * Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
                 print(state.files.eio,
                       Format_731,
                       state.dataHeatBal->Zone(ZoneNum).Name,
@@ -6054,13 +6054,13 @@ namespace HeatBalanceManager {
             if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
             if (state.dataEnvrn->PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting) {
-                    static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
+                    constexpr const char * EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
                     print(state.files.eso, "{}\n", EndOfHeaderString);
                     print(state.files.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (state.dataGlobal->DoOutputReporting) {
-                    static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
+                    constexpr const char * EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
                     print(state.files.eso,
                           EnvironmentStampFormatStr,
                           "1",
@@ -7587,7 +7587,7 @@ namespace HeatBalanceManager {
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("GetScheduledSurfaceGains: ");
+        constexpr const char * RoutineName("GetScheduledSurfaceGains: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumArgs;
@@ -8212,7 +8212,7 @@ namespace HeatBalanceManager {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS
-        const char * RoutineName("SetupComplexFenestrationMaterialInput: ");
+        constexpr const char * RoutineName("SetupComplexFenestrationMaterialInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string MaterialNames(5);   // Number of Material Alpha names defined
@@ -8628,7 +8628,7 @@ namespace HeatBalanceManager {
         using namespace DataBSDFWindow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        const char * RoutineName("SetupComlexFenestrationStateInput: ");
+        constexpr const char * RoutineName("SetupComlexFenestrationStateInput: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // The following moved to DataBSDFWindow module:
