@@ -896,23 +896,23 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         int errFlag;
         int curWSC;
         // following variables are totals for fenestration table
-        static Real64 windowAreaWMult(0.0);
-        static Real64 fenTotArea(0.0);
-        static Real64 fenTotAreaNorth(0.0);
-        static Real64 fenTotAreaNonNorth(0.0);
-        static Real64 ufactArea(0.0);
-        static Real64 ufactAreaNorth(0.0);
-        static Real64 ufactAreaNonNorth(0.0);
-        static Real64 shgcArea(0.0);
-        static Real64 shgcAreaNorth(0.0);
-        static Real64 shgcAreaNonNorth(0.0);
-        static Real64 vistranArea(0.0);
-        static Real64 vistranAreaNorth(0.0);
-        static Real64 vistranAreaNonNorth(0.0);
-        static Real64 intFenTotArea(0.0);
-        static Real64 intUfactArea(0.0);
-        static Real64 intShgcArea(0.0);
-        static Real64 intVistranArea(0.0);
+        Real64 windowAreaWMult(0.0);
+        Real64 fenTotArea(0.0);
+        Real64 fenTotAreaNorth(0.0);
+        Real64 fenTotAreaNonNorth(0.0);
+        Real64 ufactArea(0.0);
+        Real64 ufactAreaNorth(0.0);
+        Real64 ufactAreaNonNorth(0.0);
+        Real64 shgcArea(0.0);
+        Real64 shgcAreaNorth(0.0);
+        Real64 shgcAreaNonNorth(0.0);
+        Real64 vistranArea(0.0);
+        Real64 vistranAreaNorth(0.0);
+        Real64 vistranAreaNonNorth(0.0);
+        Real64 intFenTotArea(0.0);
+        Real64 intUfactArea(0.0);
+        Real64 intShgcArea(0.0);
+        Real64 intVistranArea(0.0);
         bool isNorth;
 
         auto &Surface(state.dataSurface->Surface);
@@ -5473,21 +5473,21 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("CalcHeatBalanceOutsideSurf");
-        static std::string const RoutineNameGroundTemp("CalcHeatBalanceOutsideSurf:GroundTemp");
-        static std::string const RoutineNameGroundTempFC("CalcHeatBalanceOutsideSurf:GroundTempFC");
-        static std::string const RoutineNameOtherSideCoefNoCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefNoCalcExt");
-        static std::string const RoutineNameOtherSideCoefCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefCalcExt");
-        static std::string const RoutineNameOSCM("CalcHeatBalanceOutsideSurf:OSCM");
-        static std::string const RoutineNameExtEnvWetSurf("CalcHeatBalanceOutsideSurf:extEnvWetSurf");
-        static std::string const RoutineNameExtEnvDrySurf("CalcHeatBalanceOutsideSurf:extEnvDrySurf");
-        static std::string const RoutineNameNoWind("CalcHeatBalanceOutsideSurf:nowind");
-        static std::string const RoutineNameOther("CalcHeatBalanceOutsideSurf:interior/other");
-        static std::string const RoutineNameIZPart("CalcHeatBalanceOutsideSurf:IZPart");
-        static std::string const HBSurfManGroundHAMT("HBSurfMan:Ground:HAMT");
-        static std::string const HBSurfManRainHAMT("HBSurfMan:Rain:HAMT");
-        static std::string const HBSurfManDrySurfCondFD("HBSurfMan:DrySurf:CondFD");
-        static std::string const Outside("Outside");
+        constexpr const char * RoutineName("CalcHeatBalanceOutsideSurf");
+        constexpr const char * RoutineNameGroundTemp("CalcHeatBalanceOutsideSurf:GroundTemp");
+        constexpr const char * RoutineNameGroundTempFC("CalcHeatBalanceOutsideSurf:GroundTempFC");
+        constexpr const char * RoutineNameOtherSideCoefNoCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefNoCalcExt");
+        constexpr const char * RoutineNameOtherSideCoefCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefCalcExt");
+        constexpr const char * RoutineNameOSCM("CalcHeatBalanceOutsideSurf:OSCM");
+        constexpr const char * RoutineNameExtEnvWetSurf("CalcHeatBalanceOutsideSurf:extEnvWetSurf");
+        constexpr const char * RoutineNameExtEnvDrySurf("CalcHeatBalanceOutsideSurf:extEnvDrySurf");
+        constexpr const char * RoutineNameNoWind("CalcHeatBalanceOutsideSurf:nowind");
+        constexpr const char * RoutineNameOther("CalcHeatBalanceOutsideSurf:interior/other");
+        constexpr const char * RoutineNameIZPart("CalcHeatBalanceOutsideSurf:IZPart");
+        constexpr const char * HBSurfManGroundHAMT("HBSurfMan:Ground:HAMT");
+        constexpr const char * HBSurfManRainHAMT("HBSurfMan:Rain:HAMT");
+        constexpr const char * HBSurfManDrySurfCondFD("HBSurfMan:DrySurf:CondFD");
+        constexpr const char * Outside("Outside");
         static std::string const BlankString;
 
         bool MovInsulErrorFlag = false; // Movable Insulation error flag
@@ -6210,10 +6210,10 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine HBSRF
 
-        static std::string const rhoAirZone("RhoAirZone");
-        static std::string const wsurf("Wsurf");
-        static std::string const HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
-        static std::string const Inside("Inside");
+        constexpr const char * rhoAirZone("RhoAirZone");
+        constexpr const char * wsurf("Wsurf");
+        constexpr const char * HBSurfManInsideSurf("HB,SurfMan:InsideSurf");
+        constexpr const char * Inside("Inside");
         static std::string const BlankString;
 
         Real64 TempSurfOutTmp; // Local Temporary Surface temperature for the outside surface face
@@ -7028,7 +7028,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // (I)BLAST legacy routine HBSRF
         auto &Surface(state.dataSurface->Surface);
 
-        static std::string const Inside("Inside");
+        constexpr const char * Inside("Inside");
 
         if (calcHeatBalInsideSurfCTFOnlyFirstTime) {
             // Set up coefficient arrays that never change - loop over non-window HT surfaces
