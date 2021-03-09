@@ -4088,19 +4088,19 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // This subroutine computes the diffuse solar exchange factors between zones with
         // interzone windows.
 
-        static Array2D<Real64> D;
+        Array2D<Real64> DiffuseArray;
 
         auto &Surface(state.dataSurface->Surface);
 
         if (!allocated(FractDifShortZtoZ)) {
             FractDifShortZtoZ.allocate(NumberOfEnclosures, NumberOfEnclosures);
             RecDifShortFromZ.allocate(NumberOfEnclosures);
-            D.allocate(NumberOfEnclosures, NumberOfEnclosures);
+            DiffuseArray.allocate(NumberOfEnclosures, NumberOfEnclosures);
         }
 
         RecDifShortFromZ = false;
         FractDifShortZtoZ.to_identity();
-        D.to_identity();
+        DiffuseArray.to_identity();
 
         //      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
         if (state.dataGlobal->KickOffSimulation || state.dataGlobal->KickOffSizing) return;
@@ -4127,13 +4127,13 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             Real64 D_d(0.0); // Local accumulator
             for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ, ++l, m += NumberOfEnclosures) {
                 if (MZ == NZ) continue;
-                D[l] = FractDifShortZtoZ[l] / (1.0 - FractDifShortZtoZ[l] * FractDifShortZtoZ[m]); // [ l ] == ( MZ, NZ ), [ m ] == ( NZ, MZ )
-                D_d += FractDifShortZtoZ[m] * D[l];
+                DiffuseArray[l] = FractDifShortZtoZ[l] / (1.0 - FractDifShortZtoZ[l] * FractDifShortZtoZ[m]); // [ l ] == ( MZ, NZ ), [ m ] == ( NZ, MZ )
+                D_d += FractDifShortZtoZ[m] * DiffuseArray[l];
             }
-            D[d] += D_d; // [ d ] == ( NZ, NZ )
+            DiffuseArray[d] += D_d; // [ d ] == ( NZ, NZ )
         }
 
-        FractDifShortZtoZ = D;
+        FractDifShortZtoZ = DiffuseArray;
         // added for CR 7999 & 7869
         assert(FractDifShortZtoZ.isize1() == NumberOfEnclosures);
         assert(FractDifShortZtoZ.isize2() == NumberOfEnclosures);
@@ -4156,22 +4156,22 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
             for (int JZ = 1; JZ <= NumberOfEnclosures; ++JZ) {
                 if (!RecDifShortFromZ(JZ)) continue;
                 if (IZ == JZ) continue;
-                if (D(IZ, JZ) == 0.0) continue;
+                if (DiffuseArray(IZ, JZ) == 0.0) continue;
 
                 for (int KZ = 1; KZ <= NumberOfEnclosures; ++KZ) {
                     if (!RecDifShortFromZ(KZ)) continue;
                     if (IZ == KZ) continue;
                     if (JZ == KZ) continue;
-                    if (D(JZ, KZ) == 0.0) continue;
-                    FractDifShortZtoZ(IZ, KZ) += D(JZ, KZ) * D(IZ, JZ);
+                    if (DiffuseArray(JZ, KZ) == 0.0) continue;
+                    FractDifShortZtoZ(IZ, KZ) += DiffuseArray(JZ, KZ) * DiffuseArray(IZ, JZ);
 
                     for (int LZ = 1; LZ <= NumberOfEnclosures; ++LZ) {
                         if (!RecDifShortFromZ(LZ)) continue;
                         if (IZ == LZ) continue;
                         if (JZ == LZ) continue;
                         if (KZ == LZ) continue;
-                        if (D(KZ, LZ) == 0.0) continue;
-                        FractDifShortZtoZ(IZ, LZ) += D(KZ, LZ) * D(JZ, KZ) * D(IZ, JZ);
+                        if (DiffuseArray(KZ, LZ) == 0.0) continue;
+                        FractDifShortZtoZ(IZ, LZ) += DiffuseArray(KZ, LZ) * DiffuseArray(JZ, KZ) * DiffuseArray(IZ, JZ);
 
                         for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ) {
                             if (!RecDifShortFromZ(MZ)) continue;
@@ -4179,8 +4179,8 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
                             if (JZ == MZ) continue;
                             if (KZ == MZ) continue;
                             if (LZ == MZ) continue;
-                            if (D(LZ, MZ) == 0.0) continue;
-                            FractDifShortZtoZ(IZ, MZ) += D(LZ, MZ) * D(KZ, LZ) * D(JZ, KZ) * D(IZ, JZ);
+                            if (DiffuseArray(LZ, MZ) == 0.0) continue;
+                            FractDifShortZtoZ(IZ, MZ) += DiffuseArray(LZ, MZ) * DiffuseArray(KZ, LZ) * DiffuseArray(JZ, KZ) * DiffuseArray(IZ, JZ);
                         } // MZ Loop
 
                     } // LZ Loop

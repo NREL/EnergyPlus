@@ -203,7 +203,6 @@ struct HeatBalSurfMgr : BaseGlobalStruct {
     Array1D<Real64> SurfaceAE; // Product of area and emissivity for each surface
     Array1D<Real64> ZoneAESum; // Sum of area times emissivity for all zone surfaces
 
-
     void clear_state() override
     {
         QExt1.clear();
