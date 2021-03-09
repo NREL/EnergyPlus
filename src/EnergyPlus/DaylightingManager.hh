@@ -543,6 +543,27 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array2D_int MapErrIndex;
     Array2D_int RefErrIndex;
 
+    // static variables extracted from functions
+    Vector3<Real64> AR;  // Inside surface area sum for floor/wall/ceiling (m2)
+    Vector3<Real64> ARH; // Inside surface area*reflectance sum for floor/wall/ceiling (m2)
+    Vector3<Real64> AP;  // Zone inside surface floor/wall/ceiling area without a selected floor/wall/ceiling (m2)
+    Vector3<Real64> ARHP; // Zone inside surface floor/wall/ceiling area*reflectance without a selected floor/wall/ceiling (m2)
+    Vector3<Real64> W2;     // Second vertex of window
+    Vector3<Real64> W3;     // Third vertex of window
+    Vector3<Real64> W21;    // Vector from window vertex 2 to window vertex 1
+    Vector3<Real64> W23;    // Vector from window vertex 2 to window vertex 3
+    Vector3<Real64> RREF;   // Location of a reference point in absolute coordinate system
+    Vector3<Real64> RREF2;  // Location of virtual reference point in absolute coordinate system
+    Vector3<Real64> RWIN;   // Center of a window element in absolute coordinate system
+    Vector3<Real64> RWIN2;  // Center of a window element for TDD:DOME (if exists) in abs coord sys
+    Vector3<Real64> Ray;    // Unit vector along ray from reference point to window element
+    Vector3<Real64> WNORM2; // Unit vector normal to TDD:DOME (if exists)
+    Vector3<Real64> VIEWVC; // View vector in absolute coordinate system
+    Vector3<Real64> U2;     // Second vertex of window for TDD:DOME (if exists)
+    Vector3<Real64> U21;    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
+    Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
+    Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
+
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
@@ -589,6 +610,26 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->TDDFluxTrans.deallocate();
         this->MapErrIndex.deallocate();
         this->RefErrIndex.deallocate();
+        // seems like a reasonable initialization for the Vector variables
+        this->AR = 0.0;
+        this->ARH = 0.0;
+        this->AP = 0.0;
+        this->ARHP = 0.0;
+        this->W2 = 0.0;
+        this->W3 = 0.0;
+        this->W21 = 0.0;
+        this->W23 = 0.0;
+        this->RREF = 0.0;
+        this->RREF2 = 0.0;
+        this->RWIN = 0.0;
+        this->RWIN2 = 0.0;
+        this->Ray = 0.0;
+        this->WNORM2 = 0.0;
+        this->VIEWVC = 0.0;
+        this->U2 = 0.0;
+        this->U21 = 0.0;
+        this->U23 = 0.0;
+        this->VIEWVC2 = 0.0;
     }
 };
 

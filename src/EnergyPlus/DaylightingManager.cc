@@ -180,12 +180,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 ARHTOT;              // Sum over surfaces of AREA*(inside visible reflectance) (m2)
         int ITILT;                  // Surface tilt category (1 = floor, 2 = wall, 3 = ceiling)
         int IT;                     // Tilt index
-        static Vector3<Real64> AR;  // Inside surface area sum for floor/wall/ceiling (m2)
-        static Vector3<Real64> ARH; // Inside surface area*reflectance sum for floor/wall/ceiling (m2)
-        static Vector3<Real64> AP;  // Zone inside surface floor/wall/ceiling area without a selected
-        //  floor/wall/ceiling (m2)
-        static Vector3<Real64> ARHP; // Zone inside surface floor/wall/ceiling area*reflectance without
-        //  a selected floor/wall/ceiling (m2)
         Real64 ATWL;   // Opaque surface area (m2)
         Real64 ARHTWL; // ATWL times inside visible reflectance of surface (m2)
         Real64 ETA;    // Ratio of floor-to-window-center height and average floor-to-ceiling height
@@ -195,8 +189,8 @@ namespace EnergyPlus::DaylightingManager {
         // Sum of products of inside surface area * vis reflectance
         ARHTOT = 0.0;
         // Area sum and area * reflectance sum for different orientations
-        AR = 0.0;
-        ARH = 0.0;
+        state.dataDaylightingManager->AR = 0.0;
+        state.dataDaylightingManager->ARH = 0.0;
         // Loop over surfaces in the zone's enclosure
         auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(Zone(ZoneNum).SolarEnclosureNum));
         for (int ISurf : thisEnclosure.SurfacePtr) {
@@ -228,9 +222,9 @@ namespace EnergyPlus::DaylightingManager {
                 ITILT = 3;                                                                // Ceiling
                 if (state.dataSurface->Surface(ISurf).Tilt > 10.0 && state.dataSurface->Surface(ISurf).Tilt < 170.0) ITILT = 2; // Wall
                 if (state.dataSurface->Surface(ISurf).Tilt >= 170.0) ITILT = 1;                              // Floor
-                AR(ITILT) += AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
+                state.dataDaylightingManager->AR(ITILT) += AREA + state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) +
                              state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf));
-                ARH(ITILT) +=
+                state.dataDaylightingManager->ARH(ITILT) +=
                     AREA * state.dataConstruction->Construct(state.dataSurface->Surface(ISurf).Construction).ReflectVisDiffBack +
                     state.dataSurface->SurfWinFrameArea(ISurf) * (1.0 + 0.5 * state.dataSurface->SurfWinProjCorrFrIn(ISurf)) * (1.0 - state.dataSurface->SurfWinFrameSolAbsorp(ISurf)) +
                     state.dataSurface->SurfWinDividerArea(ISurf) * (1.0 + state.dataSurface->SurfWinProjCorrDivIn(ISurf)) * (1.0 - state.dataSurface->SurfWinDividerSolAbsorp(ISurf));
@@ -242,7 +236,7 @@ namespace EnergyPlus::DaylightingManager {
         // Total inside surface area of zone
         state.dataDaylightingData->ZoneDaylight(ZoneNum).TotInsSurfArea = AInsTot;
         // Average floor visible reflectance
-        state.dataDaylightingData->ZoneDaylight(ZoneNum).FloorVisRefl = ARH(3) / (AR(3) + 1.e-6);
+        state.dataDaylightingData->ZoneDaylight(ZoneNum).FloorVisRefl = state.dataDaylightingManager->ARH(3) / (state.dataDaylightingManager->AR(3) + 1.e-6);
 
         for (int ISurf : thisEnclosure.SurfacePtr) {
             IType = state.dataSurface->Surface(ISurf).Class;
@@ -277,15 +271,15 @@ namespace EnergyPlus::DaylightingManager {
                 // Inside surface area of floor, walls and ceilings, minus surface ISurf and its subsurfaces
                 for (IT = 1; IT <= 3; ++IT) {
                     if (IT == ITILT) {
-                        AP(IT) = AR(IT) - ATWL;
-                        ARHP(IT) = ARH(IT) - ARHTWL;
+                        state.dataDaylightingManager->AP(IT) = state.dataDaylightingManager->AR(IT) - ATWL;
+                        state.dataDaylightingManager->ARHP(IT) = state.dataDaylightingManager->ARH(IT) - ARHTWL;
                     } else {
-                        AP(IT) = AR(IT);
-                        ARHP(IT) = ARH(IT);
+                        state.dataDaylightingManager->AP(IT) = state.dataDaylightingManager->AR(IT);
+                        state.dataDaylightingManager->ARHP(IT) = state.dataDaylightingManager->ARH(IT);
                     }
                 }
-                state.dataSurface->SurfaceWindow(ISurf).ZoneAreaMinusThisSurf = AP;
-                state.dataSurface->SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf = ARHP;
+                state.dataSurface->SurfaceWindow(ISurf).ZoneAreaMinusThisSurf = state.dataDaylightingManager->AP;
+                state.dataSurface->SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf = state.dataDaylightingManager->ARHP;
             }
         } // End of loop over opaque surfaces in zone
 
@@ -294,12 +288,12 @@ namespace EnergyPlus::DaylightingManager {
                 int ISurf = state.dataSurface->Surface(IWin).BaseSurf;
                 // Ratio of floor-to-window-center height and average floor-to-ceiling height
                 ETA = max(0.0, min(1.0, (state.dataSurface->SurfaceWindow(IWin).WinCenter(3) - Zone(ZoneNum).OriginZ) * Zone(ZoneNum).FloorArea / Zone(ZoneNum).Volume));
-                AP = state.dataSurface->SurfaceWindow(ISurf).ZoneAreaMinusThisSurf;
-                ARHP = state.dataSurface->SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf;
+                state.dataDaylightingManager->AP = state.dataSurface->SurfaceWindow(ISurf).ZoneAreaMinusThisSurf;
+                state.dataDaylightingManager->ARHP = state.dataSurface->SurfaceWindow(ISurf).ZoneAreaReflProdMinusThisSurf;
                 // Average reflectance seen by light moving up (RhoCeilingWall) and down (RhoFloorWall)
                 // across horizontal plane through center of window
-                state.dataSurface->SurfWinRhoCeilingWall(IWin) = (ARHP(2) * (1.0 - ETA) + ARHP(3)) / (AP(2) * (1.0 - ETA) + AP(3) + 1.0e-5);
-                state.dataSurface->SurfWinRhoFloorWall(IWin) = (ARHP(2) * ETA + ARHP(1)) / (AP(2) * ETA + AP(1) + 1.e-9);
+                state.dataSurface->SurfWinRhoCeilingWall(IWin) = (state.dataDaylightingManager->ARHP(2) * (1.0 - ETA) + state.dataDaylightingManager->ARHP(3)) / (state.dataDaylightingManager->AP(2) * (1.0 - ETA) + state.dataDaylightingManager->AP(3) + 1.0e-5);
+                state.dataSurface->SurfWinRhoFloorWall(IWin) = (state.dataDaylightingManager->ARHP(2) * ETA + state.dataDaylightingManager->ARHP(1)) / (state.dataDaylightingManager->AP(2) * ETA + state.dataDaylightingManager->AP(1) + 1.e-9);
 
                 // Angle factor for windows with diffusing shades. SurfaceWindow(IWin)%FractionUpgoing is
                 // fraction of light from the shade that goes up toward ceiling and upper part of walls.
@@ -790,22 +784,6 @@ namespace EnergyPlus::DaylightingManager {
         using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Vector3<Real64> W2;     // Second vertex of window
-        static Vector3<Real64> W3;     // Third vertex of window
-        static Vector3<Real64> W21;    // Vector from window vertex 2 to window vertex 1
-        static Vector3<Real64> W23;    // Vector from window vertex 2 to window vertex 3
-        static Vector3<Real64> RREF;   // Location of a reference point in absolute coordinate system
-        static Vector3<Real64> RREF2;  // Location of virtual reference point in absolute coordinate system
-        static Vector3<Real64> RWIN;   // Center of a window element in absolute coordinate system
-        static Vector3<Real64> RWIN2;  // Center of a window element for TDD:DOME (if exists) in abs coord sys
-        static Vector3<Real64> Ray;    // Unit vector along ray from reference point to window element
-        static Vector3<Real64> WNORM2; // Unit vector normal to TDD:DOME (if exists)
-        static Vector3<Real64> VIEWVC; // View vector in absolute coordinate system
-        static Vector3<Real64> U2;     // Second vertex of window for TDD:DOME (if exists)
-        static Vector3<Real64> U21;    // Vector from window vertex 2 to window vertex 1 for TDD:DOME (if exists)
-        static Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
-                                       //		static Vector2< Real64 > ZF; // Fraction of zone controlled by each reference point //Unused
-        static Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
         int IHR;                        // Hour of day counter
         int NRF;                        // Number of daylighting reference points in a zone
         int IL;                         // Reference point counter
@@ -852,6 +830,22 @@ namespace EnergyPlus::DaylightingManager {
         Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
         static bool MySunIsUpFlag(false);
 
+        auto & W2 = state.dataDaylightingManager->W2;
+        auto & W3 = state.dataDaylightingManager->W3;
+        auto & W21 = state.dataDaylightingManager->W21;
+        auto & W23 = state.dataDaylightingManager->W23;
+        auto & RREF = state.dataDaylightingManager->RREF;
+        auto & RREF2 = state.dataDaylightingManager->RREF2;
+        auto & RWIN = state.dataDaylightingManager->RWIN;
+        auto & RWIN2 = state.dataDaylightingManager->RWIN2;
+        auto & Ray = state.dataDaylightingManager->Ray;
+        auto & WNORM2 = state.dataDaylightingManager->WNORM2;
+        auto & VIEWVC = state.dataDaylightingManager->VIEWVC;
+        auto & U2 = state.dataDaylightingManager->U2;
+        auto & U21 = state.dataDaylightingManager->U21;
+        auto & U23 = state.dataDaylightingManager->U23;
+        auto & VIEWVC2 = state.dataDaylightingManager->VIEWVC2;
+        
         int WinEl; // Current window element
 
         if (state.dataDaylightingManager->refFirstTime &&
