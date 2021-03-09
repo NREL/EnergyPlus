@@ -3934,7 +3934,7 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         auto &Surface(state.dataSurface->Surface);
 
         Real64 const SmallestAreaAbsProductAllowed(0.01); // Avoid a division by zero of the user has entered a bunch of surfaces with zero absorptivity on the inside
-        static Array1D_bool FirstCalcZone; // for error message
+        Array1D_bool FirstCalcZone; // for error message
 
 
         if (!allocated(EnclSolVMULT)) {
