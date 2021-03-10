@@ -543,6 +543,9 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Array2D_int MapErrIndex;
     Array2D_int RefErrIndex;
 
+    bool MySunIsUpFlag = false;
+    bool CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
+
     // static variables extracted from functions
     Vector3<Real64> AR;  // Inside surface area sum for floor/wall/ceiling (m2)
     Vector3<Real64> ARH; // Inside surface area*reflectance sum for floor/wall/ceiling (m2)
@@ -592,6 +595,21 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Vector3<Real64> HitPtRefl; // Point that ray hits reflecting surface
     Vector3<Real64> HitPtObs;  // Hit point on obstruction
     Vector3<Real64> HitPtIntWinDisk; // Intersection point on an interior window for ray from ref pt to sun (m)
+    
+    int AltSteps_last = 0;
+    Array1D<Real64> cos_Phi; // cos( Phi ) table
+    Array1D<Real64> sin_Phi; // sin( Phi ) table
+    int AzimSteps_last = 0;
+    Array1D<Real64> cos_Theta; // cos( Theta ) table
+    Array1D<Real64> sin_Theta; // sin( Theta ) table
+
+    DaylightingManagerData()
+    {
+        this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
+        this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // sin( Phi ) table
+        this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
+        this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
+    }
 
     void clear_state() override
     {
@@ -639,6 +657,8 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->TDDFluxTrans.deallocate();
         this->MapErrIndex.deallocate();
         this->RefErrIndex.deallocate();
+        this->MySunIsUpFlag = false;
+        this->CalcDayltgCoeffsMapPointsMySunIsUpFlag = false;
         // seems like a reasonable initialization for the Vector variables
         this->AR = 0.0;
         this->ARH = 0.0;
@@ -684,6 +704,13 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->HitPtRefl = 0.0;
         this->HitPtObs = 0.0;
         this->HitPtIntWinDisk = 0.0;
+
+        this->AltSteps_last = 0;
+        this->AzimSteps_last = 0;
+        this->cos_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2);    // cos( Phi ) table
+        this->sin_Phi = Array1D<Real64>(DataSurfaces::AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
+        this->cos_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // cos( Theta ) table
+        this->sin_Theta = Array1D<Real64>(2 * DataSurfaces::AzimAngStepsForSolReflCalc); // sin( Theta ) table
     }
 };
 

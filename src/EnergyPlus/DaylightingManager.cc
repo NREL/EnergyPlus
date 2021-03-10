@@ -828,7 +828,6 @@ namespace EnergyPlus::DaylightingManager {
         bool hitExtObs;        // True iff ray from ref pt to ext win hits an exterior obstruction
         Real64 TVISIntWin;     // Visible transmittance of int win at COSBIntWin for light from ext win
         Real64 TVISIntWinDisk; // Visible transmittance of int win at COSBIntWin for sun
-        static bool MySunIsUpFlag(false);
 
         auto & W2 = state.dataDaylightingManager->W2;
         auto & W3 = state.dataDaylightingManager->W3;
@@ -1057,15 +1056,15 @@ namespace EnergyPlus::DaylightingManager {
 
                             }    // End of hourly sun position loop, IHR
                         } else { // timestep integrated
-                            if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                            if (state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->MySunIsUpFlag) {
                                 ISunPos = 0;
-                                MySunIsUpFlag = true;
-                            } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
+                                state.dataDaylightingManager->MySunIsUpFlag = true;
+                            } else if (state.dataEnvrn->SunIsUp && state.dataDaylightingManager->MySunIsUpFlag) {
                                 ISunPos = 1;
-                            } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
-                                MySunIsUpFlag = false;
+                            } else if (!state.dataEnvrn->SunIsUp && state.dataDaylightingManager->MySunIsUpFlag) {
+                                state.dataDaylightingManager->MySunIsUpFlag = false;
                                 ISunPos = -1;
-                            } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                            } else if (!state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->MySunIsUpFlag) {
                                 ISunPos = -1;
                             }
 
@@ -1123,15 +1122,15 @@ namespace EnergyPlus::DaylightingManager {
 
                     } // End of sun position loop, IHR
                 } else {
-                    if (state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                    if (state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->MySunIsUpFlag) {
                         ISunPos = 0;
-                        MySunIsUpFlag = true;
-                    } else if (state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
+                        state.dataDaylightingManager->MySunIsUpFlag = true;
+                    } else if (state.dataEnvrn->SunIsUp && state.dataDaylightingManager->MySunIsUpFlag) {
                         ISunPos = 1;
-                    } else if (!state.dataEnvrn->SunIsUp && MySunIsUpFlag) {
-                        MySunIsUpFlag = false;
+                    } else if (!state.dataEnvrn->SunIsUp && state.dataDaylightingManager->MySunIsUpFlag) {
+                        state.dataDaylightingManager->MySunIsUpFlag = false;
                         ISunPos = -1;
-                    } else if (!state.dataEnvrn->SunIsUp && !MySunIsUpFlag) {
+                    } else if (!state.dataEnvrn->SunIsUp && !state.dataDaylightingManager->MySunIsUpFlag) {
                         ISunPos = -1;
                     }
                     FigureRefPointDayltgFactorsToAddIllums(state, ZoneNum, ILB, state.dataGlobal->HourOfDay, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
@@ -1212,7 +1211,7 @@ namespace EnergyPlus::DaylightingManager {
         // Array2D< Real64 > MapWindowSolidAngAtRefPt; //Inactive Only allocated and assigning to: Also only 1 value used at a time
         // Array2D< Real64 > MapWindowSolidAngAtRefPtWtd; // Only 1 value used at a time: Replaced by below
         Real64 MapWindowSolidAngAtRefPtWtd;
-        static bool MySunIsUpFlag(false);
+        auto &MySunIsUpFlag(state.dataDaylightingManager->CalcDayltgCoeffsMapPointsMySunIsUpFlag);
         int WinEl; // window elements counter
 
         auto & W2 = state.dataDaylightingManager->W2;
@@ -2864,10 +2863,10 @@ namespace EnergyPlus::DaylightingManager {
         int iTrnRay;
         Real64 XR;
         Real64 YR;
-        static Vector3<Real64> V;
+        auto & V = state.dataDaylightingManager->V;
+        auto & InterPoint = state.dataDaylightingManager->InterPoint;
         bool hit;
-        static Vector3<Real64> InterPoint;
-
+        
         // Object Data
         DataBSDFWindow::BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
 
@@ -2917,7 +2916,6 @@ namespace EnergyPlus::DaylightingManager {
         Real64 ObstrMultiplier;
 
         // Locals
-        static Vector3<Real64> URay; // Unit vector in (Phi,Theta) direction
         Real64 DPhi;                 // Phi increment (radians)
         Real64 DTheta;               // Theta increment (radians)
         Real64 SkyGndUnObs;          // Unobstructed sky irradiance at a ground point
@@ -2932,13 +2930,14 @@ namespace EnergyPlus::DaylightingManager {
         Real64 dOmegaGnd;                // Solid angle element of ray from ground point (steradians)
         Real64 IncAngSolidAngFac;        // CosIncAngURay*dOmegaGnd/Pi
         bool hitObs;                     // True iff obstruction is hit
-        static Vector3<Real64> ObsHitPt; // Coordinates of hit point on an obstruction (m)
-        static int AltSteps_last(0);
-        static Array1D<Real64> cos_Phi(AltAngStepsForSolReflCalc / 2); // cos( Phi ) table
-        static Array1D<Real64> sin_Phi(AltAngStepsForSolReflCalc / 2); // sin( Phi ) table
-        static int AzimSteps_last(0);
-        static Array1D<Real64> cos_Theta(2 * AzimAngStepsForSolReflCalc); // cos( Theta ) table
-        static Array1D<Real64> sin_Theta(2 * AzimAngStepsForSolReflCalc); // sin( Theta ) table
+        auto & URay = state.dataDaylightingManager->URay;     // Unit vector in (Phi,Theta) direction
+        auto &ObsHitPt = state.dataDaylightingManager->ObsHitPt; // Unit vector in (Phi,Theta) direction
+        auto &AltSteps_last = state.dataDaylightingManager->AltSteps_last; // Unit vector in (Phi,Theta) direction
+        auto &cos_Phi = state.dataDaylightingManager->cos_Phi;             // Unit vector in (Phi,Theta) direction
+        auto &sin_Phi = state.dataDaylightingManager->sin_Phi;             // Unit vector in (Phi,Theta) direction
+        auto &cos_Theta = state.dataDaylightingManager->cos_Theta;         // Unit vector in (Phi,Theta) direction
+        auto &sin_Theta = state.dataDaylightingManager->sin_Theta;         // Unit vector in (Phi,Theta) direction
+        auto &AzimSteps_last = state.dataDaylightingManager->AzimSteps_last;
 
         assert(AzimSteps <= AzimAngStepsForSolReflCalc);
 
@@ -2997,7 +2996,7 @@ namespace EnergyPlus::DaylightingManager {
                 } else { // Surface octree search
 
                     // Lambda function for the octree to test for surface hit
-                    auto surfaceHit = [&GroundHitPt, &hitObs](SurfaceData const &surface) -> bool {
+                    auto surfaceHit = [&GroundHitPt, &hitObs, &URay, &ObsHitPt](SurfaceData const &surface) -> bool {
                         if (surface.ShadowSurfPossibleObstruction) {
                             PierceSurface(surface, GroundHitPt, URay, ObsHitPt, hitObs); // Check if ray pierces surface
                             return hitObs;                                               // Ray pierces surface
