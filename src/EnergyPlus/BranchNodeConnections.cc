@@ -1462,10 +1462,10 @@ namespace EnergyPlus::BranchNodeConnections {
         int NodeConnectIndex;
         int NumInList;
         Array1D_int ListArray;
-        Array1D_string ConnectionTypes;
+        Array1D_string ConnectionTypes(15);
 
-        for (int nodetype = 1; nodetype <= 15; ++nodetype) {
-            ConnectionTypes[nodetype] = ValidConnectionTypes(nodetype);
+        for (int nodetype = 1; nodetype <= NumValidConnectionTypes; ++nodetype) {
+            ConnectionTypes(nodetype) = ValidConnectionTypes(nodetype);
         }
 
         if (allocated(NodeConnectType)) NodeConnectType.deallocate();

@@ -133,10 +133,6 @@ namespace DataLoopNode {
                                        // EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic
                                        // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
 
-    
-
-    
-
 } // namespace DataLoopNode
 
 } // namespace EnergyPlus
