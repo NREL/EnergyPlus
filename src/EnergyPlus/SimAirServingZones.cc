@@ -5160,20 +5160,6 @@ namespace EnergyPlus::SimAirServingZones {
         Real64 RetTempRise;                 // difference between zone return temperature and zone temperature [delta K]
         Real64 SysCoolingEv;                // System level ventilation effectiveness for cooling mode
         Real64 SysHeatingEv;                // System level ventilation effectiveness for heating mode
-        static Array1D<Real64> EvBySysCool; // saved value of SysCoolingEv used in 62.1 tabular report
-        static Array1D<Real64> EvBySysHeat; // saved value of SysHeatingEv used in 62.1 tabular report
-        static Real64 Ep(1.0);              // zone primary air fraction
-        static Real64 Er(0.0);              // zone secondary recirculation fraction
-        static Real64 Fa(1.0);              // temporary variable used in multi-path VRP calc
-        static Real64 Fb(1.0);              // temporary variable used in multi-path VRP calc
-        static Real64 Fc(1.0);              // temporary variable used in multi-path VRP calc
-        static Real64 Xs(1.0);              // uncorrected system outdoor air fraction
-        static Real64 MinHeatingEvz(1.0);   // minimum zone ventilation efficiency for heating (to be used as system efficiency)
-        static Real64 MinCoolingEvz(1.0);   // minimum zone ventilation efficiency for cooling (to be used as system efficiency)
-        static Real64 ZoneOAFrac(0.0);      // zone OA fraction
-        static Real64 ZoneEz(1.0);          // zone air distribution effectiveness
-        static Real64 Vou(0.0);             // Uncorrected outdoor air intake for all zones per ASHRAE std 62.1
-        static Real64 Vot(0.0);             // Required outdoor air intake at primary AHU per ASHRAE std 62.1
         Real64 SysHtgPeakAirflow;           // Peak heating airflow
         int MatchingCooledZoneNum;          // temporary variable
         Real64 termunitsizingtempfrac;      // 1.0/(1.0+termunitsizing(ctrlzone)%inducrat)
@@ -5209,8 +5195,8 @@ namespace EnergyPlus::SimAirServingZones {
             state.dataSize->FbByZoneHeat.dimension(NumAirTerminalUnits, 0.0);
             state.dataSize->FcByZoneCool.dimension(NumAirTerminalUnits, 0.0);
             state.dataSize->FcByZoneHeat.dimension(NumAirTerminalUnits, 0.0);
-            EvBySysCool.dimension(NumPrimaryAirSys, 1.0);
-            EvBySysHeat.dimension(NumPrimaryAirSys, 1.0);
+            state.dataSimAirServingZones->EvBySysCool.dimension(NumPrimaryAirSys, 1.0);
+            state.dataSimAirServingZones->EvBySysHeat.dimension(NumPrimaryAirSys, 1.0);
             state.dataSize->XsBySysCool.dimension(NumPrimaryAirSys, 1.0);
             state.dataSize->XsBySysHeat.dimension(NumPrimaryAirSys, 1.0);
             state.dataSize->EvzByZoneCool.dimension(NumAirTerminalUnits, 1.0);
@@ -5729,63 +5715,63 @@ namespace EnergyPlus::SimAirServingZones {
                                 }
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
                                 if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                                    Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
+                                    state.dataSimAirServingZones->Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
                                 } else {
-                                    Xs = 0.0;
+                                    state.dataSimAirServingZones->Xs = 0.0;
                                 }
                                 if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
                                     int numZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-                                    MinCoolingEvz = 1.0;
+                                    state.dataSimAirServingZones->MinCoolingEvz = 1.0;
                                     state.dataSize->VozSumClgBySys(AirLoopNum) = 0.0;
                                     for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
                                         int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
 
                                         // Zone air secondary recirculation fraction
-                                        Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                        Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
-                                        ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
-                                        ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                                        state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                        state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
+                                        state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
+                                        state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
                                         VozClg = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
-                                        if (Er > 0.0) {
+                                        if (state.dataSimAirServingZones->Er > 0.0) {
                                             // multi-path ventilation system using VRP
-                                            Fa = Ep + (1.0 - Ep) * Er;
-                                            Fb = Ep;
-                                            Fc = 1.0 - (1.0 - ZoneEz) * (1.0 - Er) * (1.0 - Ep);
+                                            state.dataSimAirServingZones->Fa = state.dataSimAirServingZones->Ep + (1.0 - state.dataSimAirServingZones->Ep) * state.dataSimAirServingZones->Er;
+                                            state.dataSimAirServingZones->Fb = state.dataSimAirServingZones->Ep;
+                                            state.dataSimAirServingZones->Fc = 1.0 - (1.0 - state.dataSimAirServingZones->ZoneEz) * (1.0 - state.dataSimAirServingZones->Er) * (1.0 - state.dataSimAirServingZones->Ep);
                                             // save Fa Fb and Fc for standard 62.1 report
-                                            state.dataSize->FaByZoneCool(TermUnitSizingIndex) = Fa;
-                                            state.dataSize->FbByZoneCool(TermUnitSizingIndex) = Fb;
-                                            state.dataSize->FcByZoneCool(TermUnitSizingIndex) = Fc;
+                                            state.dataSize->FaByZoneCool(TermUnitSizingIndex) = state.dataSimAirServingZones->Fa;
+                                            state.dataSize->FbByZoneCool(TermUnitSizingIndex) = state.dataSimAirServingZones->Fb;
+                                            state.dataSize->FcByZoneCool(TermUnitSizingIndex) = state.dataSimAirServingZones->Fc;
 
                                             // Calc zone ventilation efficiency
-                                            if (Fa > 0.0) {
-                                                SysCoolingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+                                            if (state.dataSimAirServingZones->Fa > 0.0) {
+                                                SysCoolingEv = 1.0 + state.dataSimAirServingZones->Xs * state.dataSimAirServingZones->Fb / state.dataSimAirServingZones->Fa - state.dataSimAirServingZones->ZoneOAFrac * state.dataSimAirServingZones->Ep * state.dataSimAirServingZones->Fc / state.dataSimAirServingZones->Fa;
                                             } else {
                                                 SysCoolingEv = 1.0;
                                             }
 
                                         } else {
                                             // single-path ventilation system
-                                            SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+                                            SysCoolingEv = 1.0 + state.dataSimAirServingZones->Xs - state.dataSimAirServingZones->ZoneOAFrac;
                                             // Apply ventilation efficiency limit; reset SysCoolingEv if necessary
-                                            LimitZoneVentEff(state, Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
+                                            LimitZoneVentEff(state, state.dataSimAirServingZones->Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
                                         }
-                                        if (SysCoolingEv < MinCoolingEvz) MinCoolingEvz = SysCoolingEv;
+                                        if (SysCoolingEv < state.dataSimAirServingZones->MinCoolingEvz) state.dataSimAirServingZones->MinCoolingEvz = SysCoolingEv;
                                         state.dataSize->EvzByZoneCoolPrev(TermUnitSizingIndex) = state.dataSize->EvzByZoneCool(TermUnitSizingIndex); // Save previous EvzByZoneCool
                                         state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = SysCoolingEv;
                                         state.dataSize->VozSumClgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
                                     }
 
-                                    if (MinCoolingEvz > 0) {
+                                    if (state.dataSimAirServingZones->MinCoolingEvz > 0) {
                                         // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                                         // equation
                                         // Vou = Diversity*(Rp*Pz) + Ra*Az
-                                        Vou = FinalSysSizing(AirLoopNum).SysUncOA;
-                                        Vot = Vou / MinCoolingEvz;
-                                        if (Vot > state.dataSize->VotClgBySys(AirLoopNum)) {
+                                        state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                                        state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinCoolingEvz;
+                                        if (state.dataSimAirServingZones->Vot > state.dataSize->VotClgBySys(AirLoopNum)) {
                                             // This might be the cooling design day so only update if Vot is larger than the previous
-                                            state.dataSize->VotClgBySys(AirLoopNum) = Vot;
-                                            state.dataSize->XsBySysCool(AirLoopNum) = Xs;
-                                            state.dataSize->EvzMinBySysCool(AirLoopNum) = MinCoolingEvz;
+                                            state.dataSize->VotClgBySys(AirLoopNum) = state.dataSimAirServingZones->Vot;
+                                            state.dataSize->XsBySysCool(AirLoopNum) = state.dataSimAirServingZones->Xs;
+                                            state.dataSize->EvzMinBySysCool(AirLoopNum) = state.dataSimAirServingZones->MinCoolingEvz;
                                         } else {
                                             // Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
                                             for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
@@ -5830,16 +5816,16 @@ namespace EnergyPlus::SimAirServingZones {
                                 if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
                                     // SysSizing(AirLoopNum,CurOverallSimDay)%DesHeatVolFlow may be out of sync with
                                     // FinalZoneSizing(CtrlZoneNum)%DesHeatVolFlow
-                                    Xs = min(1.0,
+                                    state.dataSimAirServingZones->Xs = min(1.0,
                                              FinalSysSizing(AirLoopNum).SysUncOA /
                                                  max(SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow, SysHtgPeakAirflow));
                                 } else {
-                                    Xs = 0.0;
+                                    state.dataSimAirServingZones->Xs = 0.0;
                                 }
 
                                 if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
                                     int numZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-                                    MinHeatingEvz = 1.0;
+                                    state.dataSimAirServingZones->MinHeatingEvz = 1.0;
                                     state.dataSize->VozSumHtgBySys(AirLoopNum) = 0.0;
                                     if (numZonesHeated > 0) {
                                         for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesHeated; ++ZonesHeatedNum) {
@@ -5848,31 +5834,31 @@ namespace EnergyPlus::SimAirServingZones {
                                                 TermUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
                                             if (MatchingCooledZoneNum == 0) {
                                                 // Zone air secondary recirculation fraction
-                                                Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                                Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                                ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                                ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                                if (Er > 0.0) {
+                                                state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                                state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                                state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                                state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                                if (state.dataSimAirServingZones->Er > 0.0) {
                                                     // multi-path ventilation system using VRP
-                                                    Fa = Ep + (1.0 - Ep) * Er;
-                                                    Fb = Ep;
-                                                    Fc = 1.0 - (1.0 - ZoneEz) * (1.0 - Er) * (1.0 - Ep);
+                                                    state.dataSimAirServingZones->Fa = state.dataSimAirServingZones->Ep + (1.0 - state.dataSimAirServingZones->Ep) * state.dataSimAirServingZones->Er;
+                                                    state.dataSimAirServingZones->Fb = state.dataSimAirServingZones->Ep;
+                                                    state.dataSimAirServingZones->Fc = 1.0 - (1.0 - state.dataSimAirServingZones->ZoneEz) * (1.0 - state.dataSimAirServingZones->Er) * (1.0 - state.dataSimAirServingZones->Ep);
                                                     // save Fa Fb and Fc for standard 62.1 report
-                                                    state.dataSize->FaByZoneHeat(TermUnitSizingIndex) = Fa;
-                                                    state.dataSize->FbByZoneHeat(TermUnitSizingIndex) = Fb;
-                                                    state.dataSize->FcByZoneHeat(TermUnitSizingIndex) = Fc;
+                                                    state.dataSize->FaByZoneHeat(TermUnitSizingIndex) = state.dataSimAirServingZones->Fa;
+                                                    state.dataSize->FbByZoneHeat(TermUnitSizingIndex) = state.dataSimAirServingZones->Fb;
+                                                    state.dataSize->FcByZoneHeat(TermUnitSizingIndex) = state.dataSimAirServingZones->Fc;
 
                                                     // Calc zone ventilation efficiency
-                                                    if (Fa > 0.0) {
-                                                        SysHeatingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+                                                    if (state.dataSimAirServingZones->Fa > 0.0) {
+                                                        SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs * state.dataSimAirServingZones->Fb / state.dataSimAirServingZones->Fa - state.dataSimAirServingZones->ZoneOAFrac * state.dataSimAirServingZones->Ep * state.dataSimAirServingZones->Fc / state.dataSimAirServingZones->Fa;
                                                     } else {
                                                         SysHeatingEv = 1.0;
                                                     }
                                                 } else {
                                                     // single-path ventilation system
-                                                    SysHeatingEv = 1.0 + Xs - ZoneOAFrac;
+                                                    SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs - state.dataSimAirServingZones->ZoneOAFrac;
                                                 }
-                                                if (SysHeatingEv < MinHeatingEvz) MinHeatingEvz = SysHeatingEv;
+                                                if (SysHeatingEv < state.dataSimAirServingZones->MinHeatingEvz) state.dataSimAirServingZones->MinHeatingEvz = SysHeatingEv;
                                                 state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex) =
                                                     state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                                 state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
@@ -5883,31 +5869,31 @@ namespace EnergyPlus::SimAirServingZones {
                                         for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesCooled; ++ZonesHeatedNum) {
                                             int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                                             // Zone air secondary recirculation fraction
-                                            Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                            Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                            ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                            ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                            if (Er > 0.0) {
+                                            state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                            state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                            state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                            state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                            if (state.dataSimAirServingZones->Er > 0.0) {
                                                 // multi-path ventilation system using VRP
-                                                Fa = Ep + (1.0 - Ep) * Er;
-                                                Fb = Ep;
-                                                Fc = 1.0 - (1.0 - ZoneEz) * (1.0 - Er) * (1.0 - Ep);
+                                                state.dataSimAirServingZones->Fa = state.dataSimAirServingZones->Ep + (1.0 - state.dataSimAirServingZones->Ep) * state.dataSimAirServingZones->Er;
+                                                state.dataSimAirServingZones->Fb = state.dataSimAirServingZones->Ep;
+                                                state.dataSimAirServingZones->Fc = 1.0 - (1.0 - state.dataSimAirServingZones->ZoneEz) * (1.0 - state.dataSimAirServingZones->Er) * (1.0 - state.dataSimAirServingZones->Ep);
                                                 // save Fa Fb and Fc for standard 62.1 report
-                                                state.dataSize->FaByZoneHeat(TermUnitSizingIndex) = Fa;
-                                                state.dataSize->FbByZoneHeat(TermUnitSizingIndex) = Fb;
-                                                state.dataSize->FcByZoneHeat(TermUnitSizingIndex) = Fc;
+                                                state.dataSize->FaByZoneHeat(TermUnitSizingIndex) = state.dataSimAirServingZones->Fa;
+                                                state.dataSize->FbByZoneHeat(TermUnitSizingIndex) = state.dataSimAirServingZones->Fb;
+                                                state.dataSize->FcByZoneHeat(TermUnitSizingIndex) = state.dataSimAirServingZones->Fc;
 
                                                 // Calc zone ventilation efficiency
-                                                if (Fa > 0.0) {
-                                                    SysHeatingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+                                                if (state.dataSimAirServingZones->Fa > 0.0) {
+                                                    SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs * state.dataSimAirServingZones->Fb / state.dataSimAirServingZones->Fa - state.dataSimAirServingZones->ZoneOAFrac * state.dataSimAirServingZones->Ep * state.dataSimAirServingZones->Fc / state.dataSimAirServingZones->Fa;
                                                 } else {
                                                     SysHeatingEv = 1.0;
                                                 }
                                             } else {
                                                 // single-path ventilation system
-                                                SysHeatingEv = 1.0 + Xs - ZoneOAFrac;
+                                                SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs - state.dataSimAirServingZones->ZoneOAFrac;
                                             }
-                                            if (SysHeatingEv < MinHeatingEvz) MinHeatingEvz = SysHeatingEv;
+                                            if (SysHeatingEv < state.dataSimAirServingZones->MinHeatingEvz) state.dataSimAirServingZones->MinHeatingEvz = SysHeatingEv;
                                             state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex) =
                                                 state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
@@ -5915,18 +5901,18 @@ namespace EnergyPlus::SimAirServingZones {
                                         }
                                     }
 
-                                    if (MinHeatingEvz > 0) {
+                                    if (state.dataSimAirServingZones->MinHeatingEvz > 0) {
                                         // Std 62.1-2010, section 6.2.5.4: Eq. 6.6
                                         // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                                         // equation
                                         // Vou = Diversity*(Rp*Pz) + Ra*Az
-                                        Vou = FinalSysSizing(AirLoopNum).SysUncOA;
-                                        Vot = Vou / MinHeatingEvz;
-                                        if (Vot > state.dataSize->VotHtgBySys(AirLoopNum)) {
+                                        state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                                        state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinHeatingEvz;
+                                        if (state.dataSimAirServingZones->Vot > state.dataSize->VotHtgBySys(AirLoopNum)) {
                                             // This might be the cooling design day so only update if Vot is larger than the previous
-                                            state.dataSize->VotHtgBySys(AirLoopNum) = Vot;
-                                            state.dataSize->XsBySysHeat(AirLoopNum) = Xs;
-                                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = MinHeatingEvz;
+                                            state.dataSize->VotHtgBySys(AirLoopNum) = state.dataSimAirServingZones->Vot;
+                                            state.dataSize->XsBySysHeat(AirLoopNum) = state.dataSimAirServingZones->Xs;
+                                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = state.dataSimAirServingZones->MinHeatingEvz;
                                         } else {
                                             // Restore EvzByZoneHeat() since it was reset by the current (but not highest Vot) design day
                                             // This kludge is probably because inside EndDay block and code gets called for each design day.
@@ -5996,63 +5982,67 @@ namespace EnergyPlus::SimAirServingZones {
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
                                 if (SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
-                                    Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
+                                    state.dataSimAirServingZones->Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow);
                                 } else {
-                                    Xs = 0.0;
+                                    state.dataSimAirServingZones->Xs = 0.0;
                                 }
                                 if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesCoolVolFlow > 0) {
                                     int numZonesCooled = AirToZoneNodeInfo(AirLoopNum).NumZonesCooled;
-                                    MinCoolingEvz = 1.0;
+                                    state.dataSimAirServingZones->MinCoolingEvz = 1.0;
                                     state.dataSize->VozSumClgBySys(AirLoopNum) = 0.0;
                                     for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
                                         int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesCooledNum);
 
                                         // Zone air secondary recirculation fraction
-                                        Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                        Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
-                                        ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
-                                        ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
+                                        state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                        state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFraction;
+                                        state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzClgByZone;
+                                        state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffCooling;
                                         VozClg = TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
-                                        if (Er > 0.0) {
+                                        if (state.dataSimAirServingZones->Er > 0.0) {
                                             // multi-path ventilation system using VRP
-                                            Fa = Ep + (1.0 - Ep) * Er;
-                                            Fb = Ep;
-                                            Fc = 1.0 - (1.0 - ZoneEz) * (1.0 - Er) * (1.0 - Ep);
+                                            state.dataSimAirServingZones->Fa = state.dataSimAirServingZones->Ep + (1.0 - state.dataSimAirServingZones->Ep) * state.dataSimAirServingZones->Er;
+                                            state.dataSimAirServingZones->Fb = state.dataSimAirServingZones->Ep;
+                                            state.dataSimAirServingZones->Fc = 1.0 - (1.0 - state.dataSimAirServingZones->ZoneEz) * (1.0 - state.dataSimAirServingZones->Er) * (1.0 - state.dataSimAirServingZones->Ep);
                                             // save Fa Fb and Fc for standard 62.1 report
-                                            state.dataSize->FaByZoneCool(TermUnitSizingIndex) = Fa;
-                                            state.dataSize->FbByZoneCool(TermUnitSizingIndex) = Fb;
-                                            state.dataSize->FcByZoneCool(TermUnitSizingIndex) = Fc;
+                                            state.dataSize->FaByZoneCool(TermUnitSizingIndex) = state.dataSimAirServingZones->Fa;
+                                            state.dataSize->FbByZoneCool(TermUnitSizingIndex) = state.dataSimAirServingZones->Fb;
+                                            state.dataSize->FcByZoneCool(TermUnitSizingIndex) = state.dataSimAirServingZones->Fc;
 
                                             // Calc zone ventilation efficiency
-                                            if (Fa > 0.0) {
-                                                SysCoolingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+                                            if (state.dataSimAirServingZones->Fa > 0.0) {
+                                                SysCoolingEv = 1.0 +
+                                                               state.dataSimAirServingZones->Xs * state.dataSimAirServingZones->Fb /
+                                                                   state.dataSimAirServingZones->Fa -
+                                                               state.dataSimAirServingZones->ZoneOAFrac * state.dataSimAirServingZones->Ep *
+                                                                   state.dataSimAirServingZones->Fc / state.dataSimAirServingZones->Fa;
                                             } else {
                                                 SysCoolingEv = 1.0;
                                             }
                                         } else {
                                             // single-path ventilation system
-                                            SysCoolingEv = 1.0 + Xs - ZoneOAFrac;
+                                            SysCoolingEv = 1.0 + state.dataSimAirServingZones->Xs - state.dataSimAirServingZones->ZoneOAFrac;
                                             // Apply ventilation efficiency limit; reset SysCoolingEv if necessary
-                                            LimitZoneVentEff(state, Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
+                                            LimitZoneVentEff(state, state.dataSimAirServingZones->Xs, VozClg, TermUnitSizingIndex, SysCoolingEv);
                                         }
-                                        if (SysCoolingEv < MinCoolingEvz) MinCoolingEvz = SysCoolingEv;
+                                        if (SysCoolingEv < state.dataSimAirServingZones->MinCoolingEvz) state.dataSimAirServingZones->MinCoolingEvz = SysCoolingEv;
                                         state.dataSize->EvzByZoneCoolPrev(TermUnitSizingIndex) = state.dataSize->EvzByZoneCool(TermUnitSizingIndex);
                                         state.dataSize->EvzByZoneCool(TermUnitSizingIndex) = SysCoolingEv;
                                         state.dataSize->VozSumClgBySys(AirLoopNum) += TermUnitFinalZoneSizing(TermUnitSizingIndex).VozClgByZone;
                                     }
 
-                                    if (MinCoolingEvz > 0) {
+                                    if (state.dataSimAirServingZones->MinCoolingEvz > 0) {
                                         // Std 62.1-2010, section 6.2.5.4: Eq. 6.6
                                         // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                                         // equation
                                         // Vou = Diversity*(Rp*Pz) + Ra*Az
-                                        Vou = FinalSysSizing(AirLoopNum).SysUncOA;
-                                        Vot = Vou / MinCoolingEvz;
-                                        if (Vot > state.dataSize->VotClgBySys(AirLoopNum)) {
+                                        state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                                        state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinCoolingEvz;
+                                        if (state.dataSimAirServingZones->Vot > state.dataSize->VotClgBySys(AirLoopNum)) {
                                             // This might be the cooling design day so only update if Vot is larger than the previous
-                                            state.dataSize->VotClgBySys(AirLoopNum) = Vot;
-                                            state.dataSize->XsBySysCool(AirLoopNum) = Xs;
-                                            state.dataSize->EvzMinBySysCool(AirLoopNum) = MinCoolingEvz;
+                                            state.dataSize->VotClgBySys(AirLoopNum) = state.dataSimAirServingZones->Vot;
+                                            state.dataSize->XsBySysCool(AirLoopNum) = state.dataSimAirServingZones->Xs;
+                                            state.dataSize->EvzMinBySysCool(AirLoopNum) = state.dataSimAirServingZones->MinCoolingEvz;
                                         } else {
                                             // Restore EvzByZoneCool() since it was reset by the current (but not highest Vot) design day
                                             for (int ZonesCooledNum = 1; ZonesCooledNum <= numZonesCooled; ++ZonesCooledNum) {
@@ -6075,13 +6065,13 @@ namespace EnergyPlus::SimAirServingZones {
                                 OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 
                                 if (SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
-                                    Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
+                                    state.dataSimAirServingZones->Xs = min(1.0, FinalSysSizing(AirLoopNum).SysUncOA / SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow);
                                 } else {
-                                    Xs = 0.0;
+                                    state.dataSimAirServingZones->Xs = 0.0;
                                 }
                                 if (FinalSysSizing(AirLoopNum).OAAutoSized && SysSizing(CurOverallSimDay, AirLoopNum).DesHeatVolFlow > 0) {
                                     int numZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-                                    MinHeatingEvz = 1.0;
+                                    state.dataSimAirServingZones->MinHeatingEvz = 1.0;
                                     state.dataSize->VozSumHtgBySys(AirLoopNum) = 0.0;
                                     if (numZonesHeated > 0) {
                                         for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesHeated; ++ZonesHeatedNum) {
@@ -6090,28 +6080,28 @@ namespace EnergyPlus::SimAirServingZones {
                                                 TermUnitSizingIndex, AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex, NumZonesCooled);
                                             if (MatchingCooledZoneNum == 0) {
                                                 // Zone air secondary recirculation fraction
-                                                Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                                Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                                ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                                ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                                if (Er > 0.0) {
+                                                state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                                state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                                state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                                state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                                if (state.dataSimAirServingZones->Er > 0.0) {
                                                     // multi-path ventilation system using VRP
-                                                    Fa = Ep + (1.0 - Ep) * Er;
-                                                    Fb = Ep;
-                                                    Fc = 1.0 - (1.0 - ZoneEz) * (1.0 - Er) * (1.0 - Ep);
+                                                    state.dataSimAirServingZones->Fa = state.dataSimAirServingZones->Ep + (1.0 - state.dataSimAirServingZones->Ep) * state.dataSimAirServingZones->Er;
+                                                    state.dataSimAirServingZones->Fb = state.dataSimAirServingZones->Ep;
+                                                    state.dataSimAirServingZones->Fc = 1.0 - (1.0 - state.dataSimAirServingZones->ZoneEz) * (1.0 - state.dataSimAirServingZones->Er) * (1.0 - state.dataSimAirServingZones->Ep);
 
                                                     // Calc zone ventilation efficiency
-                                                    if (Fa > 0.0) {
-                                                        SysHeatingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+                                                    if (state.dataSimAirServingZones->Fa > 0.0) {
+                                                        SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs * state.dataSimAirServingZones->Fb / state.dataSimAirServingZones->Fa - state.dataSimAirServingZones->ZoneOAFrac * state.dataSimAirServingZones->Ep * state.dataSimAirServingZones->Fc / state.dataSimAirServingZones->Fa;
                                                     } else {
                                                         SysHeatingEv = 1.0;
                                                     }
                                                 } else {
                                                     // single-path ventilation system
-                                                    SysHeatingEv = 1.0 + Xs - ZoneOAFrac;
+                                                    SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs - state.dataSimAirServingZones->ZoneOAFrac;
                                                 }
                                             }
-                                            if (SysHeatingEv < MinHeatingEvz) MinHeatingEvz = SysHeatingEv;
+                                            if (SysHeatingEv < state.dataSimAirServingZones->MinHeatingEvz) state.dataSimAirServingZones->MinHeatingEvz = SysHeatingEv;
                                             state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex) =
                                                 state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
@@ -6122,27 +6112,31 @@ namespace EnergyPlus::SimAirServingZones {
                                         for (int ZonesHeatedNum = 1; ZonesHeatedNum <= numZonesCooled; ++ZonesHeatedNum) {
                                             int TermUnitSizingIndex = AirToZoneNodeInfo(AirLoopNum).TermUnitCoolSizingIndex(ZonesHeatedNum);
                                             // Zone air secondary recirculation fraction
-                                            Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
-                                            Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
-                                            ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
-                                            ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
-                                            if (Er > 0.0) {
+                                            state.dataSimAirServingZones->Er = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneSecondaryRecirculation;
+                                            state.dataSimAirServingZones->Ep = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZonePrimaryAirFractionHtg;
+                                            state.dataSimAirServingZones->ZoneOAFrac = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZpzHtgByZone;
+                                            state.dataSimAirServingZones->ZoneEz = TermUnitFinalZoneSizing(TermUnitSizingIndex).ZoneADEffHeating;
+                                            if (state.dataSimAirServingZones->Er > 0.0) {
                                                 // multi-path ventilation system using VRP
-                                                Fa = Ep + (1.0 - Ep) * Er;
-                                                Fb = Ep;
-                                                Fc = 1.0 - (1.0 - ZoneEz) * (1.0 - Er) * (1.0 - Ep);
+                                                state.dataSimAirServingZones->Fa = state.dataSimAirServingZones->Ep + (1.0 - state.dataSimAirServingZones->Ep) * state.dataSimAirServingZones->Er;
+                                                state.dataSimAirServingZones->Fb = state.dataSimAirServingZones->Ep;
+                                                state.dataSimAirServingZones->Fc = 1.0 - (1.0 - state.dataSimAirServingZones->ZoneEz) * (1.0 - state.dataSimAirServingZones->Er) * (1.0 - state.dataSimAirServingZones->Ep);
 
                                                 // Calc zone ventilation efficiency
-                                                if (Fa > 0.0) {
-                                                    SysHeatingEv = 1.0 + Xs * Fb / Fa - ZoneOAFrac * Ep * Fc / Fa;
+                                                if (state.dataSimAirServingZones->Fa > 0.0) {
+                                                    SysHeatingEv = 1.0 +
+                                                                   state.dataSimAirServingZones->Xs * state.dataSimAirServingZones->Fb /
+                                                                       state.dataSimAirServingZones->Fa -
+                                                                   state.dataSimAirServingZones->ZoneOAFrac * state.dataSimAirServingZones->Ep *
+                                                                       state.dataSimAirServingZones->Fc / state.dataSimAirServingZones->Fa;
                                                 } else {
                                                     SysHeatingEv = 1.0;
                                                 }
                                             } else {
                                                 // single-path ventilation system
-                                                SysHeatingEv = 1.0 + Xs - ZoneOAFrac;
+                                                SysHeatingEv = 1.0 + state.dataSimAirServingZones->Xs - state.dataSimAirServingZones->ZoneOAFrac;
                                             }
-                                            if (SysHeatingEv < MinHeatingEvz) MinHeatingEvz = SysHeatingEv;
+                                            if (SysHeatingEv < state.dataSimAirServingZones->MinHeatingEvz) state.dataSimAirServingZones->MinHeatingEvz = SysHeatingEv;
                                             state.dataSize->EvzByZoneHeatPrev(TermUnitSizingIndex) =
                                                 state.dataSize->EvzByZoneHeat(TermUnitSizingIndex); // Save previous EvzByZoneHeat
                                             state.dataSize->EvzByZoneHeat(TermUnitSizingIndex) = SysHeatingEv;
@@ -6150,18 +6144,18 @@ namespace EnergyPlus::SimAirServingZones {
                                         }
                                     }
 
-                                    if (MinHeatingEvz > 0) {
+                                    if (state.dataSimAirServingZones->MinHeatingEvz > 0) {
                                         // Std 62.1-2010, section 6.2.5.4: Eq. 6.6
                                         // (However, I don't think people diversity can be done correctly in E+ Sizing so assuming D=1 in this
                                         // equation
                                         // Vou = Diversity*(Rp*Pz) + Ra*Az
-                                        Vou = FinalSysSizing(AirLoopNum).SysUncOA;
-                                        Vot = Vou / MinHeatingEvz;
-                                        if (Vot > state.dataSize->VotHtgBySys(AirLoopNum)) {
+                                        state.dataSimAirServingZones->Vou = FinalSysSizing(AirLoopNum).SysUncOA;
+                                        state.dataSimAirServingZones->Vot = state.dataSimAirServingZones->Vou / state.dataSimAirServingZones->MinHeatingEvz;
+                                        if (state.dataSimAirServingZones->Vot > state.dataSize->VotHtgBySys(AirLoopNum)) {
                                             // This might be the cooling design day so only update if Vot is larger than the previous
-                                            state.dataSize->VotHtgBySys(AirLoopNum) = Vot;
-                                            state.dataSize->XsBySysHeat(AirLoopNum) = Xs;
-                                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = MinHeatingEvz;
+                                            state.dataSize->VotHtgBySys(AirLoopNum) = state.dataSimAirServingZones->Vot;
+                                            state.dataSize->XsBySysHeat(AirLoopNum) = state.dataSimAirServingZones->Xs;
+                                            state.dataSize->EvzMinBySysHeat(AirLoopNum) = state.dataSimAirServingZones->MinHeatingEvz;
                                         } else {
                                             // Restore EvzByZoneHeat() since it was just reset by the current (but not highest Vot) design day
                                             // This kludge is probably because inside EndDay block and code gets called for each design day.
