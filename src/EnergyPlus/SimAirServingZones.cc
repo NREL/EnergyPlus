@@ -6956,7 +6956,7 @@ namespace EnergyPlus::SimAirServingZones {
                 // }
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
-                        static constexpr auto SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
+                        constexpr const char * SSizeFmt12("{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}{}{}{}{:2}{}");
                         print(state.files.ssz,
                               SSizeFmt12,
                               SizingFileColSep,
@@ -7000,11 +7000,11 @@ namespace EnergyPlus::SimAirServingZones {
                         } else {
                             HourPrint = HourCounter - 1;
                         }
-                        static constexpr auto SSizeFmt20("{:02}:{:02}:00");
+                        constexpr const char * SSizeFmt20("{:02}:{:02}:00");
                         print(state.files.ssz, SSizeFmt20, HourPrint, Minutes);
                         for (I = 1; I <= NumPrimaryAirSys; ++I) {
                             for (J = 1; J <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++J) {
-                                static constexpr auto SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                                constexpr const char * SSizeFmt22("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
 
                                 print(state.files.ssz,
                                       SSizeFmt22,
@@ -7024,7 +7024,7 @@ namespace EnergyPlus::SimAirServingZones {
                     }
                 }
 
-                static constexpr auto SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
+                constexpr const char * SSizeFmt31("{}{:12.6E}{}{:12.6E}{}{:12.6E}{}{:12.6E}");
                 print(state.files.ssz, "Coinc Peak   ");
                 for (I = 1; I <= NumPrimaryAirSys; ++I) {
                     print(state.files.ssz,
