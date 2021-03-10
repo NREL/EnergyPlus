@@ -5457,7 +5457,6 @@ namespace EnergyPlus::HeatBalanceSurfaceManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char * RoutineName("CalcHeatBalanceOutsideSurf");
         constexpr const char * RoutineNameGroundTemp("CalcHeatBalanceOutsideSurf:GroundTemp");
         constexpr const char * RoutineNameGroundTempFC("CalcHeatBalanceOutsideSurf:GroundTempFC");
         constexpr const char * RoutineNameOtherSideCoefNoCalcExt("CalcHeatBalanceOutsideSurf:OtherSideCoefNoCalcExt");
