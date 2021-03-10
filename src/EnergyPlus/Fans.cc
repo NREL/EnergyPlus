@@ -76,9 +76,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace Fans {
+namespace EnergyPlus::Fans {
     // Module containing the fan simulation routines
 
     // MODULE INFORMATION:
@@ -93,12 +91,6 @@ namespace Fans {
     // To encapsulate the data and algorithms required to
     // manage the Fan System Component
 
-    // REFERENCES: none
-
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-    // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
     using DataHVACGlobals::BalancedExhMassFlow;
@@ -126,43 +118,11 @@ namespace Fans {
     using Psychrometrics::PsyTdbFnHW;
     using namespace ScheduleManager;
 
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this module should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool MyOneTimeFlag(true);             // used for allocation in Init
-        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-
-        Array1D_bool MySizeFlag;
-        Array1D_bool MyEnvrnFlag;
-        Array1D_bool CheckEquipName;
-    } // namespace
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
     // Object Data
     Array1D<FanEquipConditions> Fan;
     std::unordered_map<std::string, std::string> UniqueFanNames;
     Array1D<NightVentPerfData> NightVentPerf;
     Array1D<FanNumericFieldData> FanNumericFields;
-
-    // MODULE SUBROUTINES:
-    //*************************************************************************
 
     void SimulateFanComponents(EnergyPlusData &state,
                                std::string const &CompName,
@@ -184,12 +144,8 @@ namespace Fans {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine manages Fan component simulation.
 
-        // Using/Aliasing
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FanNum; // current fan number
-
-
 
         // Obtains and Allocates fan related parameters from input file
         if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
@@ -212,7 +168,7 @@ namespace Fans {
                                       state.dataFans->NumFans,
                                       CompName));
             }
-            if (CheckEquipName(FanNum)) {
+            if (state.dataFans->CheckEquipName(FanNum)) {
                 if (!CompName.empty() && CompName != Fan(FanNum).FanName) {
                     ShowFatalError(state,
                                    format("SimulateFanComponents: Invalid CompIndex passed={}, Fan name={}, stored Fan Name for that index={}",
@@ -220,7 +176,7 @@ namespace Fans {
                                           CompName,
                                           Fan(FanNum).FanName));
                 }
-                CheckEquipName(FanNum) = false;
+                state.dataFans->CheckEquipName(FanNum) = false;
             }
         }
 
@@ -279,9 +235,6 @@ namespace Fans {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Obtains input data for fans and stores it in fan data structures
-
-        // METHODOLOGY EMPLOYED:
-        // Uses "Get" routines to read in data.
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
@@ -374,7 +327,7 @@ namespace Fans {
             FanNumericFields.allocate(state.dataFans->NumFans);
             UniqueFanNames.reserve(state.dataFans->NumFans);
         }
-        CheckEquipName.dimension(state.dataFans->NumFans, true);
+        state.dataFans->CheckEquipName.dimension(state.dataFans->NumFans, true);
 
         for (SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
             FanNum = SimpFanNum;
@@ -988,7 +941,7 @@ namespace Fans {
 
         bool anyRan;
         ManageEMS(state, EMSManager::EMSCallFrom::ComponentGetInput, anyRan, ObjexxFCL::Optional_int_const());
-        MySizeFlag.dimension(state.dataFans->NumFans, true);
+        state.dataFans->MySizeFlag.dimension(state.dataFans->NumFans, true);
     }
 
     // End of Get Input subroutines for the HB Module
@@ -1024,18 +977,16 @@ namespace Fans {
         int OutNode;
         int Loop;
 
+        if (state.dataFans->MyOneTimeFlag) {
 
+            state.dataFans->MyEnvrnFlag.dimension(state.dataFans->NumFans, true);
 
-        if (MyOneTimeFlag) {
-
-            MyEnvrnFlag.dimension(state.dataFans->NumFans, true);
-
-            MyOneTimeFlag = false;
+            state.dataFans->MyOneTimeFlag = false;
         }
 
         // need to check all fans to see if they are on Zone Equipment List or issue warning
-        if (!ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!state.dataFans->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
+            state.dataFans->ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
                 if (!UtilityRoutines::SameString(Fan(Loop).FanType, "Fan:ZoneExhaust")) continue;
                 if (CheckZoneEquipmentList(state, Fan(Loop).FanType, Fan(Loop).FanName)) continue;
@@ -1044,7 +995,7 @@ namespace Fans {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(FanNum)) {
 
             SizeFan(state, FanNum);
             // Set the loop cycling flag
@@ -1054,11 +1005,11 @@ namespace Fans {
                 }
             }
 
-            MySizeFlag(FanNum) = false;
+            state.dataFans->MySizeFlag(FanNum) = false;
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FanNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataFans->MyEnvrnFlag(FanNum)) {
 
             // For all Fan inlet nodes convert the Volume flow to a mass flow
             // unused0909    InNode = Fan(FanNum)%InletNodeNum
@@ -1093,11 +1044,11 @@ namespace Fans {
             Fan(FanNum).PowerLossToAir = 0.0;
             Fan(FanNum).FanEnergy = 0.0;
 
-            MyEnvrnFlag(FanNum) = false;
+            state.dataFans->MyEnvrnFlag(FanNum) = false;
         }
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(FanNum) = true;
+            state.dataFans->MyEnvrnFlag(FanNum) = true;
         }
 
         // Do the Begin Day initializations
@@ -1480,12 +1431,6 @@ namespace Fans {
         if (++NumFansSized == state.dataFans->NumFans) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     {
 
@@ -1507,21 +1452,6 @@ namespace Fans {
         // REFERENCES:
         // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2]
@@ -1529,8 +1459,6 @@ namespace Fans {
         Real64 MotInAirFrac;
         Real64 MotEff;
         Real64 MassFlow; // [kg/sec]
-        // unused0909      REAL(r64) Tin         ! [C]
-        // unused0909      REAL(r64) Win
         Real64 FanShaftPower; // power delivered to fan shaft
 
         int NVPerfNum;
@@ -1640,21 +1568,6 @@ namespace Fans {
         // REFERENCES:
         // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2 = Pa]
@@ -1665,10 +1578,7 @@ namespace Fans {
         Real64 MotInAirFrac;
         Real64 MotEff;
         Real64 MassFlow; // [kg/sec]
-        // unused0909      REAL(r64) Tin         ! [C]
-        // unused0909      REAL(r64) Win
         Real64 PartLoadFrac;
-        // unused0909      REAL(r64) MaxFlowFrac   !Variable Volume Fan Max Flow Fraction [-]
         Real64 MinFlowFrac;                  // Variable Volume Fan Min Flow Fraction [-]
         static Real64 FlowFracForPower(0.0); // Variable Volume Fan Flow Fraction for power calcs[-]
         static Real64 FlowFracActual(0.0);   // actual VAV fan flow fraction
@@ -1857,35 +1767,19 @@ namespace Fans {
         // Using/Aliasing
         using CurveManager::CurveValue;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2]
         Real64 FanEff;
         Real64 MassFlow;           // [kg/sec]
         Real64 MaxAirMassFlowRate; // [kg/sec]
-        // unused0909      REAL(r64) Tin         ! [C]
-        // unused0909      REAL(r64) Win
         Real64 PartLoadRatio;        // Ratio of actual mass flow rate to max mass flow rate
         Real64 FlowFrac;             // Actual Fan Flow Fraction = actual mass flow rate / max air mass flow rate
         Real64 FanShaftPower;        // power delivered to fan shaft
         Real64 SpeedRaisedToPower;   // Result of the speed ratio raised to the power of n (Curve object)
-        Real64 EffRatioAtSpeedRatio; // Efficeincy ratio at current speed ratio (Curve object)
+        Real64 EffRatioAtSpeedRatio; // Efficiency ratio at current speed ratio (Curve object)
         static int ErrCount(0);
 
-        // unused0909   Tin        = Fan(FanNum)%InletAirTemp
-        // unused0909   Win        = Fan(FanNum)%InletAirHumRat
         MassFlow = Fan(FanNum).InletAirMassFlowRate;
         MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate;
         DeltaPress = Fan(FanNum).DeltaPress;
@@ -2046,21 +1940,6 @@ namespace Fans {
         // REFERENCES:
         // ASHRAE HVAC 2 Toolkit, page 2-3 (FANSIM)
 
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 RhoAir;
         Real64 DeltaPress; // [N/m2]
@@ -2175,45 +2054,15 @@ namespace Fans {
         // Calculate air temperature rise due to fan (and belt+motor if in airstream) power entering air-handler airflow
         // Calculate output node conditions
 
-        // REFERENCES:
-        // TBD
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using namespace OutputReportPredefined;
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NVPerfNum;
 
         Real64 MaxAirMassFlowRate; // Fan Max mass airflow [kg/s]
-        // unused062011  REAL(r64) MinFlowFrac        ! Fan Min Volumetric airflow Fraction [-]
-        // unused062011  REAL(r64) FlowFrac           ! Fan Volumetric airflow Fraction [-]
-
-        // unused062011  REAL(r64) DeltaPress         ! Delta Pressure Across the Fan (Fan Static Pressure Rise) [N/m2 = Pa]
-        // unused062011  REAL(r64) FanAirPower        ! Air power for Fan being Simulated [W]
-        // unused062011  REAL(r64) FanSpd             ! Fan shaft rotational speed [rpm]
-        // unused062011  REAL(r64) FanTrq             ! Fan shaft torque [N-m]
-        // unused062011  REAL(r64) FanWheelEff        ! Fan efficiency (mechanical) [-]
-        // unused062011  REAL(r64) FanShaftPower      ! Shaft input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) BeltEff            ! Belt efficiency (mechanical) [-]
-        // unused062011  REAL(r64) BeltInputPower     ! Belt input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) MotEff             ! Fan motor efficiency [-]
-        // unused062011  REAL(r64) MotorInputPower    ! Motor input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) VFDEff             ! VFD efficiency (electrical) [-]
-        // unused062011  REAL(r64) VFDInputPower      ! VFD input power for Fan being Simulated [W]
-        // unused062011  REAL(r64) FanEff             ! Fan total system efficiency (fan*belt*motor*VFD) [-]
         Real64 MotInAirFrac; // Fraction of fan power input to airstream
 
         // Local variables
@@ -2407,12 +2256,6 @@ namespace Fans {
         }
     }
 
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Fan Module
-    // *****************************************************************************
-
     void UpdateFan(EnergyPlusData &state, int const FanNum)
     {
 
@@ -2475,12 +2318,6 @@ namespace Fans {
         }
     }
 
-    //        End of Update subroutines for the Fan Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Fan Module
-    // *****************************************************************************
-
     void ReportFan(EnergyPlusData &state, int const FanNum)
     {
 
@@ -2493,29 +2330,8 @@ namespace Fans {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the report variables for the fans.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::TimeStepSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         Fan(FanNum).FanEnergy = Fan(FanNum).FanPower * TimeStepSys * DataGlobalConstants::SecInHour;
         Fan(FanNum).DeltaTemp = Fan(FanNum).OutletAirTemp - Fan(FanNum).InletAirTemp;
@@ -2526,12 +2342,6 @@ namespace Fans {
             }
         }
     }
-
-    //        End of Reporting subroutines for the Fan Module
-    // *****************************************************************************
-
-    // Beginning of Utility subroutines for the Fan Module
-    // *****************************************************************************
 
     void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
     {
@@ -2575,30 +2385,6 @@ namespace Fans {
         // This subroutine gets the fan volumetric flow for use by zone equipment (e.g. Packaged Terminal Heat Pump)
         // Zone equipment must ensure that a properly sized fan is used to meet the maximum supply air flow rate
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (FanIndex == 0) {
             FanVolFlow = 0.0;
         } else {
@@ -2617,30 +2403,6 @@ namespace Fans {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine gets the fan power draw
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         if (FanIndex == 0) {
             return 0.0;
@@ -2963,26 +2725,6 @@ namespace Fans {
         // information from the ZoneHVAC:EnergyRecoveryVentilator object.
         // This is an illustration of setting data from an outside source.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WhichFan; // index to generic HX
 
@@ -3013,7 +2755,7 @@ namespace Fans {
         }
     }
 
-    Real64 FanDesDT(EnergyPlusData &state,
+    [[maybe_unused]] Real64 FanDesDT(EnergyPlusData &state,
                     int const FanNum,                        // index of fan in Fan array
                     [[maybe_unused]] Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
@@ -3082,33 +2824,13 @@ namespace Fans {
         // Calculate the decrease of the fan air flow rate, given the fan curve
         // and the increase of fan pressure rise due to fouling air filters
 
-        // METHODOLOGY EMPLOYED:
-        // NA
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace CurveManager;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 FanFaultyAirFlowRate; // Fan Volume Flow Rate in the Faulty Case [m3/sec]
         Real64 FanCalDeltaPress;     // Calculated Fan Delta Pressure for temp use [Pa]
         Real64 FanCalDeltaPresstemp; // Calculated Fan Delta Pressure for temp use [Pa]
-
-
 
         // Check whether the fan curve covers the design operational point of the fan
         FanCalDeltaPress = CurveValue(state, FanCurvePtr, FanDesignAirFlowRate);
@@ -3180,9 +2902,9 @@ namespace Fans {
             FanPowerTot = (FanVolFlow * DeltaP) / TotEff;
             DesignHeatGain = MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
         } else {
-            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(FanNum)) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(FanNum)) {
                 SizeFan(state, FanNum);
-                MySizeFlag(FanNum) = false;
+                state.dataFans->MySizeFlag(FanNum) = false;
             }
             DesignHeatGain = Fan(FanNum).FanShaftPower + (Fan(FanNum).MotorInputPower - Fan(FanNum).FanShaftPower) * Fan(FanNum).MotInAirFrac;
         }
@@ -3216,9 +2938,9 @@ namespace Fans {
             totEff = Fan(fanIndex).FanEff;
             motInAirFrac = Fan(fanIndex).MotInAirFrac;
         } else {
-            if (!state.dataGlobal->SysSizingCalc && MySizeFlag(fanIndex)) {
+            if (!state.dataGlobal->SysSizingCalc && state.dataFans->MySizeFlag(fanIndex)) {
                 SizeFan(state, fanIndex);
-                MySizeFlag(fanIndex) = false;
+                state.dataFans->MySizeFlag(fanIndex) = false;
             }
             fanCompModel = true;
             fanShaftPow = Fan(fanIndex).FanShaftPower;
@@ -3227,30 +2949,9 @@ namespace Fans {
         }
     }
 
-    // Clears the global data in Fans.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        MyOneTimeFlag = true;
-        ZoneEquipmentListChecked = false;
-
-        CheckEquipName.deallocate();
-        MySizeFlag.deallocate();
-        MyEnvrnFlag.deallocate();
-        Fan.deallocate();
-        NightVentPerf.deallocate();
-        FanNumericFields.deallocate();
-        UniqueFanNames.clear();
-    }
-
     void SetFanAirLoopNumber(int const FanIndex, int const AirLoopNum)
     {
         Fan(FanIndex).AirLoopNum = AirLoopNum;
     }
-
-    // End of Utility subroutines for the Fan Module
-    // *****************************************************************************
-
-} // namespace Fans
 
 } // namespace EnergyPlus
