@@ -275,7 +275,7 @@ namespace EnergyPlus::SimAirServingZones {
         using WaterCoils::GetCoilWaterInletNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("GetAirPathData: ");
+        constexpr const char * RoutineName("GetAirPathData: ");
 
         auto &PrimaryAirSystems(state.dataAirSystemsData->PrimaryAirSystems);
         auto &OutsideAirSys(state.dataAirLoop->OutsideAirSys);
@@ -1335,7 +1335,7 @@ namespace EnergyPlus::SimAirServingZones {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found retrieving input for " + CurrentModuleObject + '.');
+            ShowFatalError(state, format("{}Errors found retrieving input for {}.",RoutineName,CurrentModuleObject));
         }
 
         for (AirSysNum = 1; AirSysNum <= NumPrimaryAirSys; ++AirSysNum) {
@@ -7077,7 +7077,7 @@ namespace EnergyPlus::SimAirServingZones {
         using Psychrometrics::PsyHFnTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
+        constexpr const char * RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSize;           // autosized value
