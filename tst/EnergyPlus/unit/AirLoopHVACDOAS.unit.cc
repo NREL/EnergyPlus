@@ -2951,7 +2951,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    100;                     !- Maximum Value of y",
 
         "  AirLoopHVAC,",
-        "    PSZ-AC:1,                !- Name",
+        "    PSZ-ac:1,                !- Name",
         "    ,                        !- Controller List Name",
         "    PSZ-AC:1 Availability Manager List,  !- Availability Manager List Name",
         "    AUTOSIZE,                !- Design Supply Air Flow Rate {m3/s}",
@@ -3815,7 +3815,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    11.5,                    !- Precool Design Temperature {C}",
         "    0.008,                   !- Precool Design Humidity Ratio {kgWater/kgDryAir}",
         "    5,                       !- Number of AirLoopHVAC",
-        "    PSZ-AC:1,                !- AirLoopHVAC 1 Name",
+        "    PSZ-ac:1,                !- AirLoopHVAC 1 Name",
         "    PSZ-AC:2,                !- AirLoopHVAC 2 Name",
         "    PSZ-AC:3,                !- AirLoopHVAC 3 Name",
         "    PSZ-AC:4,                !- AirLoopHVAC 4 Name",
@@ -4006,7 +4006,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(11).Temp = -10.0;
     DataLoopNode::Node(11).HumRat = 0.0008;
     DataLoopNode::Node(70).TempSetPoint = 4.5;
-    Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
     thisAirLoopDOASObjec.SimAirLoopHVACDOAS(*state, true, index);
 
     // Mixer outlet

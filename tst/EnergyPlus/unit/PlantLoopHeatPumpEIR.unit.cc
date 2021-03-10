@@ -580,11 +580,11 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     Real64 const plantSizingLoadVolFlow = 0.01;
     Real64 const plantSizingLoadDeltaT = 1.0;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.010;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.010;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.030;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
@@ -666,7 +666,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSou
     thisCoolingPLHP->loadSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.0;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideWSHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -766,11 +766,11 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     state->dataPlnt->PlantLoop(2).LoopSide(2).Branch(1).Comp.allocate(1);
     state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.020;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.030;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.020;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.030;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
@@ -2348,11 +2348,11 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
 
     Real64 const COP = 1;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.01;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.03;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);
@@ -2413,7 +2413,7 @@ TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSourc
     thisCoolingPLHP->loadSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->sourceSideDesignVolFlowRate = DataSizing::AutoSize;
     thisCoolingPLHP->referenceCapacity = DataSizing::AutoSize;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.0;
     thisCoolingPLHP->sizeLoadSide(*state);
     thisCoolingPLHP->sizeSrcSideASHP(*state);
     EXPECT_NEAR(0.0, thisCoolingPLHP->loadSideDesignVolFlowRate, 0.0001);
@@ -2508,11 +2508,11 @@ TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_
     Real64 const plantSizingLoadVolFlow = 0.01;
     Real64 const plantSizingLoadDeltaT = 1.0;
 
-    DataSizing::PlantSizData.allocate(2);
-    DataSizing::PlantSizData(1).DesVolFlowRate = 0.01;
-    DataSizing::PlantSizData(1).DeltaT = 1.0;
-    DataSizing::PlantSizData(2).DesVolFlowRate = 0.03;
-    DataSizing::PlantSizData(2).DeltaT = 1.0;
+    state->dataSize->PlantSizData.allocate(2);
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 0.01;
+    state->dataSize->PlantSizData(1).DeltaT = 1.0;
+    state->dataSize->PlantSizData(2).DesVolFlowRate = 0.03;
+    state->dataSize->PlantSizData(2).DeltaT = 1.0;
 
     auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
     auto &loop1supplyComponent2 = state->dataPlnt->PlantLoop(1).LoopSide(2).Branch(1).Comp(2);

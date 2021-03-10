@@ -304,11 +304,11 @@ namespace DElightManagerF {
                     // Zone Surface Data Section
                     // Count the number of opaque surfaces bounding the current zone
                     iNumOpaqueSurfs = 0;
-                    iSurfaceFirst = zn.SurfaceFirst;
-                    int const iSurfaceLast = zn.SurfaceLast; // ending loop variable for surfaces
+                    iSurfaceFirst = zn.HTSurfaceFirst;
+                    int const iSurfaceLast = zn.HTSurfaceLast; // ending loop variable for surfaces
 
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
-                        auto &surf(Surface(isurf));
+                        auto &surf(state.dataSurface->Surface(isurf));
                         if (surf.Class == SurfaceClass::Wall) ++iNumOpaqueSurfs;
                         if (surf.Class == SurfaceClass::Roof) ++iNumOpaqueSurfs;
                         if (surf.Class == SurfaceClass::Floor) ++iNumOpaqueSurfs;
@@ -319,7 +319,7 @@ namespace DElightManagerF {
                     // Write each opaque bounding Surface to the DElight input file
                     for (int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf) {
 
-                        auto &surf(Surface(isurf));
+                        auto &surf(state.dataSurface->Surface(isurf));
 
                         // Only process "opaque bounding" surface types
                         if ((surf.Class == SurfaceClass::Wall) || (surf.Class == SurfaceClass::Roof) || (surf.Class == SurfaceClass::Floor)) {
@@ -359,8 +359,8 @@ namespace DElightManagerF {
                             // Count each Window hosted by the current opaque bounding Surface
                             iNumWindows = 0;
                             for (int iwndo = iSurfaceFirst; iwndo <= iSurfaceLast; ++iwndo) {
-                                if (Surface(iwndo).Class == SurfaceClass::Window) {
-                                    auto &wndo(Surface(iwndo));
+                                if (state.dataSurface->Surface(iwndo).Class == SurfaceClass::Window) {
+                                    auto &wndo(state.dataSurface->Surface(iwndo));
                                     if (wndo.BaseSurfName == surf.Name) {
 
                                         // Error if window has multiplier > 1 since this causes incorrect illuminance calc
@@ -405,9 +405,9 @@ namespace DElightManagerF {
                             // and track the Window Construction type for later writing
                             if (iNumWindows > 0) {
                                 for (int iwndo2 = iSurfaceFirst; iwndo2 <= iSurfaceLast; ++iwndo2) {
-                                    if (Surface(iwndo2).Class == SurfaceClass::Window) {
+                                    if (state.dataSurface->Surface(iwndo2).Class == SurfaceClass::Window) {
 
-                                        auto &wndo2(Surface(iwndo2));
+                                        auto &wndo2(state.dataSurface->Surface(iwndo2));
 
                                         if (wndo2.BaseSurfName == surf.Name) {
 
@@ -490,7 +490,7 @@ namespace DElightManagerF {
                                     iDoppelganger = 0;
                                     for (int iwndo3 = iSurfaceFirst; iwndo3 <= iSurfaceLast; ++iwndo3) {
 
-                                        auto &wndo3(Surface(iwndo3));
+                                        auto &wndo3(state.dataSurface->Surface(iwndo3));
 
                                         if (wndo3.Class == SurfaceClass::Window) {
 
@@ -506,7 +506,7 @@ namespace DElightManagerF {
                                     if (iDoppelganger > 0) {
 
                                         // Write the data for this hosted CFS
-                                        auto &doppelgangerSurf(Surface(iDoppelganger));
+                                        auto &doppelgangerSurf(state.dataSurface->Surface(iDoppelganger));
 
                                         // Remove any blanks from the CFS Name for ease of input to DElight
                                         cNameWOBlanks = ReplaceBlanksWithUnderscores(cfs.Name);
@@ -545,7 +545,7 @@ namespace DElightManagerF {
                             // Limit to maximum of 100 RefPts
                             if (znDayl.TotalDaylRefPoints <= 100) {
 
-                                if (DaylRefWorldCoordSystem) {
+                                if (state.dataSurface->DaylRefWorldCoordSystem) {
                                     RefPt_WCS_Coord(1) = refPt.x;
                                     RefPt_WCS_Coord(2) = refPt.y;
                                     RefPt_WCS_Coord(3) = refPt.z;
@@ -690,7 +690,6 @@ namespace DElightManagerF {
         // Glazer - July 2016
 
         using namespace DataIPShortCuts; // Gives access to commonly dimensioned field names, etc for getinput
-        using DataSurfaces::Surface;
 
         int NumAlpha;
         int NumNumber;
@@ -717,12 +716,12 @@ namespace DElightManagerF {
             cfs.Name = cAlphaArgs(1);
             cfs.ComplexFeneType = cAlphaArgs(2);
             cfs.surfName = cAlphaArgs(3);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, Surface) == 0) {
+            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(3) + "=\"" + cfs.surfName + "\"."));
                 ErrorsFound = true;
             }
             cfs.wndwName = cAlphaArgs(4);
-            if (UtilityRoutines::FindItemInList(cfs.surfName, Surface) == 0) {
+            if (UtilityRoutines::FindItemInList(cfs.surfName, state.dataSurface->Surface) == 0) {
                 ShowSevereError(state, format("{}{}", cCurrentModuleObject, ": " + cfs.Name + ", invalid " + cAlphaFieldNames(4) + "=\"" + cfs.wndwName + "\"."));
                 ErrorsFound = true;
             }
@@ -751,11 +750,7 @@ namespace DElightManagerF {
         //  change them to reflect a different aspect
         // ratio for the entire building based on user input.
 
-        // USE STATEMENTS:
-        // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSurfaces::AspectTransform;
-        using DataSurfaces::WorldCoordSystem;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr auto CurrentModuleObject("GeometryTransform");
@@ -792,11 +787,11 @@ namespace DElightManagerF {
                 ShowWarningError(state, format("{}{}", CurrentModuleObject, ": invalid " + cAlphaFieldNames(1) + "=" + cAlphas(1) + "...ignored."));
             }
             doTransform = true;
-            AspectTransform = true;
+            state.dataSurface->AspectTransform = true;
         }
-        if (WorldCoordSystem) {
+        if (state.dataSurface->WorldCoordSystem) {
             doTransform = false;
-            AspectTransform = false;
+            state.dataSurface->AspectTransform = false;
         }
     }
 

@@ -1478,10 +1478,10 @@ namespace EnergyPlus::ThermalISO15099Calc {
         if (ThermalMod == THERM_MOD_CSM) {
             for (i = 1; i <= nlayer; ++i) {
                 if (IsShadingLayer(LayerType(i))) {
-                    //					LayerTypeSpec( i ) = 0; //Unused
+                    //                    LayerTypeSpec( i ) = 0; //Unused
                     SDLayerIndex = i;
                 } else {
-                    //					LayerTypeSpec( i ) = LayerType( i ); //Unused
+                    //                    LayerTypeSpec( i ) = LayerType( i ); //Unused
                 }
             }
         }

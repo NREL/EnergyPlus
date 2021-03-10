@@ -1114,69 +1114,69 @@ namespace General {
         return InterpProfAng;
     }
 
-    //	Real64
-    //	InterpSlatAng(
-    //		Real64 const SlatAng, // Slat angle (rad)
-    //		bool const VarSlats, // True if slat angle is variable
-    //		Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
-    //	)
-    //	{
+    //    Real64
+    //    InterpSlatAng(
+    //        Real64 const SlatAng, // Slat angle (rad)
+    //        bool const VarSlats, // True if slat angle is variable
+    //        Array1A< Real64 > const PropArray // Array of blind properties as function of slat angle
+    //    )
+    //    {
     //
-    //		// SUBROUTINE INFORMATION:
-    //		//       AUTHOR         Fred Winkelmann
-    //		//       DATE WRITTEN   Dec 2001
-    //		//       MODIFIED       na
-    //		//       RE-ENGINEERED  na
+    //        // SUBROUTINE INFORMATION:
+    //        //       AUTHOR         Fred Winkelmann
+    //        //       DATE WRITTEN   Dec 2001
+    //        //       MODIFIED       na
+    //        //       RE-ENGINEERED  na
     //
-    //		// PURPOSE OF THIS SUBROUTINE:
-    //		// Does slat-angle interpolation of window blind solar-thermal properties that
-    //		// do not depend on profile angle
+    //        // PURPOSE OF THIS SUBROUTINE:
+    //        // Does slat-angle interpolation of window blind solar-thermal properties that
+    //        // do not depend on profile angle
     //
-    //		// METHODOLOGY EMPLOYED:
-    //		// Linear interpolation.
+    //        // METHODOLOGY EMPLOYED:
+    //        // Linear interpolation.
     //
-    //		// REFERENCES:na
+    //        // REFERENCES:na
     //
-    //		// USE STATEMENTS:
-    //		// Using/Aliasing
-    //		//		//		using DataSurfaces::MaxSlatAngs;
+    //        // USE STATEMENTS:
+    //        // Using/Aliasing
+    //        //        //        using DataSurfaces::MaxSlatAngs;
     //
-    //		// Return value
-    //		Real64 InterpSlatAng;
+    //        // Return value
+    //        Real64 InterpSlatAng;
     //
-    //		// Argument array dimensioning
-    //		PropArray.dim( MaxSlatAngs );
+    //        // Argument array dimensioning
+    //        PropArray.dim( MaxSlatAngs );
     //
-    //		// Locals
-    //		// FUNCTION ARGUMENT DEFINITIONS:
+    //        // Locals
+    //        // FUNCTION ARGUMENT DEFINITIONS:
     //
-    //		// FUNCTION PARAMETER DEFINITIONS:
-    //		Real64 const DeltaAng( Pi / ( double( MaxSlatAngs ) - 1.0 ) );
+    //        // FUNCTION PARAMETER DEFINITIONS:
+    //        Real64 const DeltaAng( Pi / ( double( MaxSlatAngs ) - 1.0 ) );
     //
-    //		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-    //		Real64 InterpFac; // Interpolation factor
-    //		int IBeta; // Slat angle index
-    //		Real64 SlatAng1;
+    //        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    //        Real64 InterpFac; // Interpolation factor
+    //        int IBeta; // Slat angle index
+    //        Real64 SlatAng1;
     //
-    //		if ( SlatAng > Pi || SlatAng < 0.0 ) {
-    //			//  InterpSlatAng = 0.0
-    //			//  RETURN
-    //			//END IF
-    //			SlatAng1 = min( max( SlatAng, 0.0 ), Pi );
-    //		} else {
-    //			SlatAng1 = SlatAng;
-    //		}
+    //        if ( SlatAng > Pi || SlatAng < 0.0 ) {
+    //            //  InterpSlatAng = 0.0
+    //            //  RETURN
+    //            //END IF
+    //            SlatAng1 = min( max( SlatAng, 0.0 ), Pi );
+    //        } else {
+    //            SlatAng1 = SlatAng;
+    //        }
     //
-    //		if ( VarSlats ) { // Variable-angle slats
-    //			IBeta = 1 + int( SlatAng1 / DeltaAng );
-    //			InterpFac = ( SlatAng1 - DeltaAng * ( IBeta - 1 ) ) / DeltaAng;
-    //			InterpSlatAng = PropArray( IBeta ) + InterpFac * ( PropArray( min( MaxSlatAngs, IBeta + 1 ) ) - PropArray( IBeta ) );
-    //		} else { // Fixed-angle slats or shade
-    //			InterpSlatAng = PropArray( 1 );
-    //		}
+    //        if ( VarSlats ) { // Variable-angle slats
+    //            IBeta = 1 + int( SlatAng1 / DeltaAng );
+    //            InterpFac = ( SlatAng1 - DeltaAng * ( IBeta - 1 ) ) / DeltaAng;
+    //            InterpSlatAng = PropArray( IBeta ) + InterpFac * ( PropArray( min( MaxSlatAngs, IBeta + 1 ) ) - PropArray( IBeta ) );
+    //        } else { // Fixed-angle slats or shade
+    //            InterpSlatAng = PropArray( 1 );
+    //        }
     //
-    //		return InterpSlatAng;
-    //	}
+    //        return InterpSlatAng;
+    //    }
 
     Real64 InterpSlatAng(Real64 const SlatAng,           // Slat angle (rad)
                          bool const VarSlats,            // True if slat angle is variable

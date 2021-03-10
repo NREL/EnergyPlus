@@ -70,9 +70,9 @@ using namespace MultiLayerOptics;
 
 namespace WindowManager {
 
-    bool isSurfaceHit(const int t_SurfNum, const Vector &t_Ray)
+    bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const Vector &t_Ray)
     {
-        Real64 DotProd = dot(t_Ray, Surface(t_SurfNum).NewellSurfaceNormalVector);
+        Real64 DotProd = dot(t_Ray, state.dataSurface->Surface(t_SurfNum).NewellSurfaceNormalVector);
         return (DotProd > 0);
     }
 
@@ -82,8 +82,8 @@ namespace WindowManager {
         Real64 Phi = 0;
 
         // get window tilt and azimuth
-        Real64 Gamma = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Tilt;
-        Real64 Alpha = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Azimuth;
+        Real64 Gamma = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
+        Real64 Alpha = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
 
         int RadType = state.dataWindowComplexManager->Front_Incident;
 

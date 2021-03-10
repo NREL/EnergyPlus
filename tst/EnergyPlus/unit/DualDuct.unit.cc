@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     int numOfdd_airterminals = 2;
 
     state->dataHeatBal->Zone.allocate(1);
-    DataSizing::OARequirements.allocate(1);
+    state->dataSize->OARequirements.allocate(1);
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataHeatBal->ZoneIntGain.allocate(1);
 
@@ -114,10 +114,10 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.5;
     state->dataAirLoop->AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
-    DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
-    DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
-    DataSizing::OARequirements(1).OAFlowPerPerson = 0.003149;
-    DataSizing::OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
     state->dataEnvrn->StdRhoAir = 1.20;
     state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
 
@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 
     // Cleanup
     state->dataHeatBal->Zone.deallocate();
-    DataSizing::OARequirements.deallocate();
+    state->dataSize->OARequirements.deallocate();
     state->dataAirLoop->AirLoopControlInfo.deallocate();
     state->dataHeatBal->ZoneIntGain.deallocate();
 
@@ -431,7 +431,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     state->dataEnvrn->Month = 1;
     state->dataEnvrn->DayOfMonth = 21;
     state->dataGlobal->HourOfDay = 1;
@@ -443,8 +443,8 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);

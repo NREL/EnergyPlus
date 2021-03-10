@@ -83,11 +83,11 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
 
     EnergyPlus::DataPhotovoltaics::PVarray.deallocate();
     state->dataHeatBal->Zone.deallocate();
-    DataSurfaces::Surface.deallocate();
+    state->dataSurface->Surface.deallocate();
 
     EnergyPlus::DataPhotovoltaics::PVarray.allocate(3);
     state->dataHeatBal->Zone.allocate(2);
-    DataSurfaces::Surface.allocate(3);
+    state->dataSurface->Surface.allocate(3);
 
     state->dataGlobal->NumOfZones = 2;
     state->dataHeatBal->Zone(1).Name = "Zone1";
@@ -105,12 +105,12 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
     EnergyPlus::DataPhotovoltaics::PVarray(3).SurfacePtr = 3;
     EnergyPlus::DataPhotovoltaics::PVarray(3).CellIntegrationMode = -9999;
 
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "Zone1";
-    DataSurfaces::Surface(2).Zone = 0;
-    DataSurfaces::Surface(2).ZoneName = "Zone2";
-    DataSurfaces::Surface(3).Zone = 0;
-    DataSurfaces::Surface(3).ZoneName = "None";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "Zone1";
+    state->dataSurface->Surface(2).Zone = 0;
+    state->dataSurface->Surface(2).ZoneName = "Zone2";
+    state->dataSurface->Surface(3).Zone = 0;
+    state->dataSurface->Surface(3).ZoneName = "None";
 
     // Test 1: Zone 1--PV has multiplier, Zone index already set
     EnergyPlus::DataPhotovoltaics::PVarray(1).Report.DCPower = 1000.0;

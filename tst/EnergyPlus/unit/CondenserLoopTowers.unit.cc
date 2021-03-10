@@ -3048,7 +3048,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1000.0;
 
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -3440,7 +3440,6 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
-    // DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
 
     // SizingManager::ManageSizing();
 

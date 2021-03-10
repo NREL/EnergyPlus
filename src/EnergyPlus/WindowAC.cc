@@ -146,8 +146,6 @@ namespace WindowAC {
         // PURPOSE OF THIS SUBROUTINE:
         // Manages the simulation of a window AC unit. Called from SimZone Equipment
 
-        using DataHeatBalFanSys::TempControlType;
-
         int WindACNum;                     // index of window AC unit being simulated
         Real64 QZnReq;                     // zone load (W)
         Real64 RemainingOutputToCoolingSP; // - remaining load to cooling setpoint (W)
@@ -188,14 +186,14 @@ namespace WindowAC {
 
         RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
-        if (RemainingOutputToCoolingSP < 0.0 && TempControlType(ZoneNum) != SingleHeatingSetPoint) {
+        if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != SingleHeatingSetPoint) {
             QZnReq = RemainingOutputToCoolingSP;
         } else {
             QZnReq = 0.0;
         }
 
-        ZoneEqDXCoil = true;
-        ZoneCoolingOnlyFan = true;
+        state.dataSize->ZoneEqDXCoil = true;
+        state.dataSize->ZoneCoolingOnlyFan = true;
 
         // Initialize the window AC unit
         InitWindowAC(state, WindACNum, QZnReq, ZoneNum, FirstHVACIteration);
@@ -205,8 +203,8 @@ namespace WindowAC {
         // Report the result of the simulation
         ReportWindowAC(state, WindACNum);
 
-        ZoneEqDXCoil = false;
-        ZoneCoolingOnlyFan = false;
+        state.dataSize->ZoneEqDXCoil = false;
+        state.dataSize->ZoneCoolingOnlyFan = false;
     }
 
     void GetWindowAC(EnergyPlusData &state)
@@ -239,7 +237,6 @@ namespace WindowAC {
         using DataHVACGlobals::cFanTypes;
         using DataHVACGlobals::FanType_SimpleConstVolume;
         using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataSizing::ZoneHVACSizing;
         using MixedAir::GetOAMixerIndex;
         using MixedAir::GetOAMixerNodeNumbers;
 
@@ -505,7 +502,7 @@ namespace WindowAC {
 
             state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = 0;
             if (!lAlphaBlanks(14)) {
-                state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(14), ZoneHVACSizing);
+                state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex = UtilityRoutines::FindItemInList(Alphas(14), state.dataSize->ZoneHVACSizing);
                 if (state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex == 0) {
                     ShowSevereError(state, cAlphaFields(14) + " = " + Alphas(14) + " not found.");
                     ShowContinueError(state, "Occurs in " + CurrentModuleObject + " = " + state.dataWindowAC->WindAC(WindACNum).Name);
@@ -916,6 +913,8 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the zone or system sizing arrays
 
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
         // Using/Aliasing
         using namespace DataSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
@@ -948,56 +947,56 @@ namespace WindowAC {
         MaxAirVolFlowUser = 0.0;
         OutAirVolFlowDes = 0.0;
         OutAirVolFlowUser = 0.0;
-        DataFracOfAutosizedCoolingAirflow = 1.0;
-        DataFracOfAutosizedHeatingAirflow = 1.0;
-        DataFracOfAutosizedCoolingCapacity = 1.0;
-        DataFracOfAutosizedHeatingCapacity = 1.0;
-        DataScalableSizingON = false;
-        ZoneHeatingOnlyFan = false;
-        ZoneCoolingOnlyFan = true;
-        DataScalableCapSizingON = false;
+        state.dataSize->DataFracOfAutosizedCoolingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingAirflow = 1.0;
+        state.dataSize->DataFracOfAutosizedCoolingCapacity = 1.0;
+        state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
+        state.dataSize->DataScalableSizingON = false;
+        state.dataSize->ZoneHeatingOnlyFan = false;
+        state.dataSize->ZoneCoolingOnlyFan = true;
+        state.dataSize->DataScalableCapSizingON = false;
         CompType = "ZoneHVAC:WindowAirConditioner";
         CompName = state.dataWindowAC->WindAC(WindACNum).Name;
-        DataZoneNumber = state.dataWindowAC->WindAC(WindACNum).ZonePtr;
+        state.dataSize->DataZoneNumber = state.dataWindowAC->WindAC(WindACNum).ZonePtr;
         if (state.dataWindowAC->WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+            state.dataSize->DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
         } else {
-            DataSizing::DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+            state.dataSize->DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
         }
-        DataSizing::DataFanIndex = state.dataWindowAC->WindAC(WindACNum).FanIndex;
+        state.dataSize->DataFanIndex = state.dataWindowAC->WindAC(WindACNum).FanIndex;
         if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
+            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
         } else if (state.dataWindowAC->WindAC(WindACNum).FanPlace == DrawThru) {
-            DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
+            state.dataSize->DataFanPlacement = DataSizing::zoneFanPlacement::zoneDrawThru;
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
             if (state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex;
                 // N1 , \field Maximum Supply Air Flow Rate
                 SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
                 PrintFlag = true;
-                SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+                SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
                     SAFMethod == FractionOfAutosizedCoolingAirflow) {
                     if (SAFMethod == SupplyAirFlowRate) {
-                        if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                            ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
                         }
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     } else if (SAFMethod == FlowPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-                        ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        TempSize = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                        DataScalableSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        TempSize = ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow;
+                        state.dataSize->DataScalableSizingON = true;
                     } else if (SAFMethod == FractionOfAutosizedCoolingAirflow) {
-                        DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        state.dataSize->DataFracOfAutosizedCoolingAirflow = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         TempSize = AutoSize;
-                        DataScalableSizingON = true;
+                        state.dataSize->DataScalableSizingON = true;
                     } else {
-                        TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                        TempSize = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
                     bool errorsFound = false;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
@@ -1012,17 +1011,17 @@ namespace WindowAC {
                     SizingMethod = CoolingCapacitySizing;
                     TempSize = AutoSize;
                     PrintFlag = false;
-                    DataScalableSizingON = true;
-                    DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                    if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-                        DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                    state.dataSize->DataScalableSizingON = true;
+                    state.dataSize->DataFlowUsedForSizing = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
+                    if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
+                        state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
                     bool errorsFound = false;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
-                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
-                    DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+                    state.dataSize->DataCapacityUsedForSizing = sizerCoolingCapacity.size(state, TempSize, errorsFound);
+                    state.dataSize->DataFlowPerCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
                     errorsFound = false;
@@ -1037,23 +1036,23 @@ namespace WindowAC {
                 // DataScalableSizingON = false;
 
                 // initialize capacity sizing variables: cooling
-                CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
-                ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+                CapSizingMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
+                ZoneEqSizing(state.dataSize->CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
                 if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea ||
                     CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                     if (CapSizingMethod == HeatingDesignCapacity) {
-                        if (ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
-                            ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                            ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                        if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                            ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                         }
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
-                        ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-                        ZoneEqSizing(CurZoneEqNum).DesCoolingLoad =
-                            ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(DataZoneNumber).FloorArea;
-                        DataScalableCapSizingON = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).CoolingCapacity = true;
+                        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesCoolingLoad =
+                            state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * state.dataHeatBal->Zone(state.dataSize->DataZoneNumber).FloorArea;
+                        state.dataSize->DataScalableCapSizingON = true;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-                        DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-                        DataScalableCapSizingON = true;
+                        state.dataSize->DataFracOfAutosizedCoolingCapacity = state.dataSize->ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+                        state.dataSize->DataScalableCapSizingON = true;
                     }
                 }
             } else {
@@ -1075,12 +1074,12 @@ namespace WindowAC {
 
         if (state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow == AutoSize) {
 
-            if (CurZoneEqNum > 0) {
+            if (state.dataSize->CurZoneEqNum > 0) {
 
                 CheckZoneSizing(state, state.dataWindowAC->cWindowAC_UnitTypes(state.dataWindowAC->WindAC(WindACNum).UnitType),
                                 state.dataWindowAC->WindAC(WindACNum).Name);
                 state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow =
-                    min(FinalZoneSizing(CurZoneEqNum).MinOA, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow);
+                    min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow);
                 if (state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow < SmallAirVolFlow) {
                     state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow = 0.0;
                 }
@@ -1091,12 +1090,12 @@ namespace WindowAC {
             }
         }
 
-        if (CurZoneEqNum > 0) {
-            ZoneEqSizing(CurZoneEqNum).OAVolFlow = state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow;
-            ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow;
+        if (state.dataSize->CurZoneEqNum > 0) {
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow;
+            ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow;
         }
 
-        DataScalableCapSizingON = false;
+        state.dataSize->DataScalableCapSizingON = false;
     }
 
     void SimCyclingWindowAC(EnergyPlusData &state,
@@ -1256,7 +1255,7 @@ namespace WindowAC {
 
         if (state.dataWindowAC->WindAC(WindACNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataWindowAC->WindAC(WindACNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataWindowAC->WindAC(WindACNum).FirstPass);
             }
         }
     }

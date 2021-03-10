@@ -145,15 +145,9 @@ namespace HeatBalanceManager {
     using namespace DataHeatBalSurface;
     using namespace DataRoomAirModel;
     using namespace DataIPShortCuts;
-    using DataSurfaces::CalcSolRefl;
     using DataSurfaces::DividedLite;
-    using DataSurfaces::FrameDivider;
     using DataSurfaces::FrameDividerProperties;
-    using DataSurfaces::ShadingTransmittanceVaries;
-    using DataSurfaces::StormWindow;
     using DataSurfaces::Suspended;
-    using DataSurfaces::TotStormWin;
-    using DataSurfaces::TotSurfaces;
     using DataWindowEquivalentLayer::TotWinEquivLayerConstructs;
     using ScheduleManager::GetCurrentScheduleValue;
     using ScheduleManager::GetScheduleIndex;
@@ -161,10 +155,6 @@ namespace HeatBalanceManager {
     using WindowManager::W5LsqFit;
 
     Array1D_string const PassFail(2, {"Fail", "Pass"});
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -324,13 +314,13 @@ namespace HeatBalanceManager {
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
             //   if in the future surfaces are altered after this point
-            if (TotSurfaces >= DaylightingManager::octreeCrossover) {                        // Octree can be active
+            if (state.dataSurface->TotSurfaces >= DaylightingManager::octreeCrossover) {                        // Octree can be active
                 if (inputProcessor->getNumObjectsFound(state, "Daylighting:Controls") > 0) { // Daylighting is active
-                    surfaceOctree.init(DataSurfaces::Surface);                               // Set up surface octree
+                    surfaceOctree.init(state.dataSurface->Surface);                               // Set up surface octree
                 }
             }
 
-            for (auto &surface : DataSurfaces::Surface)
+            for (auto &surface : state.dataSurface->Surface)
                 surface.set_computed_geometry(); // Set up extra surface geometry info for PierceSurface
 
             ManageHeatBalanceGetInputFlag = false;
@@ -450,7 +440,7 @@ namespace HeatBalanceManager {
         // Added TH 1/9/2009 to create thermochromic window constructions
         CreateTCConstructions(state, ErrorsFound);
 
-        if (TotSurfaces > 0 && state.dataGlobal->NumOfZones == 0) {
+        if (state.dataSurface->TotSurfaces > 0 && state.dataGlobal->NumOfZones == 0) {
             ValidSimulationWithNoZones = CheckValidSimulationObjects(state);
             if (!ValidSimulationWithNoZones) {
                 ShowSevereError(state, "GetHeatBalanceInput: There are surfaces in input but no zones found.  Invalid simulation.");
@@ -775,23 +765,23 @@ namespace HeatBalanceManager {
             if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || lMinimalShadowing) {
                 state.dataHeatBal->SolarDistribution = MinimalShadowing;
                 AlphaName(3) = "MinimalShadowing";
-                CalcSolRefl = false;
+                state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIOR" || AlphaName(3) == "0") {
                 state.dataHeatBal->SolarDistribution = FullExterior;
                 AlphaName(3) = "FullExterior";
-                CalcSolRefl = false;
+                state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIOR" || AlphaName(3) == "1") {
                 state.dataHeatBal->SolarDistribution = FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExterior";
-                CalcSolRefl = false;
+                state.dataSurface->CalcSolRefl = false;
             } else if (AlphaName(3) == "FULLEXTERIORWITHREFLECTIONS") {
                 state.dataHeatBal->SolarDistribution = FullExterior;
                 AlphaName(3) = "FullExteriorWithReflectionsFromExteriorSurfaces";
-                CalcSolRefl = true;
+                state.dataSurface->CalcSolRefl = true;
             } else if (AlphaName(3) == "FULLINTERIORANDEXTERIORWITHREFLECTIONS") {
                 state.dataHeatBal->SolarDistribution = FullInteriorExterior;
                 AlphaName(3) = "FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
-                CalcSolRefl = true;
+                state.dataSurface->CalcSolRefl = true;
             } else {
                 ShowSevereError(state, RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames(3) + " invalid=" + AlphaName(3));
                 ErrorsFound = true;
@@ -5378,9 +5368,9 @@ namespace HeatBalanceManager {
             MaxLoadZoneRpt = 0.0;
             CountWarmupDayPoints = 0;
 
-            for (SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
-                DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
-                DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
+            for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; SurfNum++) {
+                state.dataSurface->SurfaceWindow(SurfNum).ThetaFace = 296.15;
+                state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }
 
@@ -5389,15 +5379,15 @@ namespace HeatBalanceManager {
             HeatBalanceSurfaceManager::InitEMSControlledSurfaceProperties(state);
         }
 
-        if (TotStormWin > 0) {
+        if (state.dataSurface->TotStormWin > 0) {
             if (state.dataGlobal->BeginDayFlag) {
                 SetStormWindowControl(state);
                 ChangeSet = false;
             } else if (!ChangeSet) {
                 state.dataHeatBal->StormWinChangeThisDay = false;
-                for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
-                    SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-                    DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
+                for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
+                    SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
+                    state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
                 }
                 ChangeSet = true;
             }
@@ -5440,7 +5430,7 @@ namespace HeatBalanceManager {
                               iHour - 1,
                               (60 / state.dataGlobal->NumOfTimeStepInHour) * TS);
                     }
-                    for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
                         print(state.files.shade, ShdFracFmt2, state.dataHeatBal->SunlitFrac(TS, iHour, SurfNum));
                     }
@@ -5511,9 +5501,9 @@ namespace HeatBalanceManager {
                 int const firstSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceFirst;
                 int const lastSurfWin = state.dataHeatBal->Zone(zoneNum).WindowSurfaceLast;
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
-                    if (DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
-                        DataSurfaces::SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
-                        DataSurfaces::SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
+                    if (state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowBSDFModel &&
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) != DataSurfaces::WindowEQLModel) {
+                        state.dataSurface->SurfWinWindowModelType(SurfNum) = DataSurfaces::Window5DetailedModel;
                     }
                 }
             }
@@ -5561,64 +5551,64 @@ namespace HeatBalanceManager {
         // Allocate real Variables
         // Following used for Calculations
         //  Allocate variables in DataHeatBalSys
-        SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
-        XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
-        XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTV.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPM.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTM.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MixingMassFlowZone.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MixingMassFlowXHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
-        ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
-        ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
-        ZoneReOrder = 0;
-        ZoneLatentGain.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneLatentGainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
-        OAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        VAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZTAV.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZTAVComf.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
-        MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
-        ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->SumConvHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumLatentHTRadSys.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumConvPool.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumLatentPool.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QHTRadSysToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QHWBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QSteamBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QElecBaseboardToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->QCoolingPanelToPerson.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->XMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXMAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXM2T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXM3T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->DSXM4T.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->XMPT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->MCPI.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTI.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPV.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTV.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPM.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTM.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MixingMassFlowZone.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MixingMassFlowXHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneReOrder.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneMassBalanceFlag.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataHeatBalFanSys->ZoneInfiltrationFlag.dimension(state.dataGlobal->NumOfZones, false);
+        state.dataHeatBalFanSys->ZoneReOrder = 0;
+        state.dataHeatBalFanSys->ZoneLatentGain.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneLatentGainExceptPeople.dimension(state.dataGlobal->NumOfZones, 0.0); // Added for hybrid model
+        state.dataHeatBalFanSys->OAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->VAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZTAV.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZTAVComf.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->TempTstatAir.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->MAT.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZoneTMX.dimension(state.dataGlobal->NumOfZones, 23.0);
+        state.dataHeatBalFanSys->ZoneTM2.dimension(state.dataGlobal->NumOfZones, 23.0);
         // Allocate this zone air humidity ratio
-        ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
-        ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);
-        ZoneAirHumRat.dimension(state.dataGlobal->NumOfZones, 0.01);
-        ZoneAirHumRatOld.dimension(state.dataGlobal->NumOfZones, 0.01);
-        SumHmAW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumHmARa.dimension(state.dataGlobal->NumOfZones, 0.0);
-        SumHmARaW.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTE.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPE.dimension(state.dataGlobal->NumOfZones, 0.0);
-        EAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        EAMFLxHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPTC.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MCPC.dimension(state.dataGlobal->NumOfZones, 0.0);
-        CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
-        MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneAirHumRatAvg.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->ZoneAirHumRatAvgComf.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->ZoneAirHumRat.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->ZoneAirHumRatOld.dimension(state.dataGlobal->NumOfZones, 0.01);
+        state.dataHeatBalFanSys->SumHmAW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumHmARa.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->SumHmARaW.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTE.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPE.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->EAMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->EAMFLxHumRat.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPTC.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MCPC.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->CTMFL.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MDotCPOA.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->MDotOA.dimension(state.dataGlobal->NumOfZones, 0.0);
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
             state.dataContaminantBalance->OutdoorCO2 = GetCurrentScheduleValue(state, state.dataContaminantBalance->Contaminant.CO2OutdoorSchedPtr);
             state.dataContaminantBalance->ZoneAirCO2.dimension(state.dataGlobal->NumOfZones, state.dataContaminantBalance->OutdoorCO2);
@@ -5656,22 +5646,22 @@ namespace HeatBalanceManager {
         LoadZoneRptStdDev.allocate(state.dataGlobal->NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
 
-        ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneHumidex.dimension(state.dataGlobal->NumOfZones, 0.0);
-        ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
-        ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
-        ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHeatIndex.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneHumidex.dimension(state.dataGlobal->NumOfZones, 0.0);
+        state.dataHeatBalFanSys->ZoneNumOcc.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataHeatBalFanSys->ZoneHeatIndexHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHumidexHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHeatIndexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHumidexOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneCO2LevelHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneCO2LevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLightingLevelHourBins.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneLightingLevelOccuHourBins.allocate(state.dataGlobal->NumOfZones);
 
-        ZoneOccPierceSET.dimension(state.dataGlobal->NumOfZones, 0);
-        ZoneOccPierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
-        ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
-        ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneOccPierceSET.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataHeatBalFanSys->ZoneOccPierceSETLastStep.dimension(state.dataGlobal->NumOfZones, 0);
+        state.dataHeatBalFanSys->ZoneLowSETHours.allocate(state.dataGlobal->NumOfZones);
+        state.dataHeatBalFanSys->ZoneHighSETHours.allocate(state.dataGlobal->NumOfZones);
 
         CountWarmupDayPoints = 0;
     }
@@ -5689,7 +5679,7 @@ namespace HeatBalanceManager {
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   April 1997
         //       MODIFIED       June 2011, Daeho Kang for individual zone maximums & convergence outputs
-        //       				July 2016, Rick Strand for movable insulation bug fix
+        //                       July 2016, Rick Strand for movable insulation bug fix
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver for record keeping within the
@@ -5706,11 +5696,11 @@ namespace HeatBalanceManager {
 
         // Record Maxs & Mins for individual zone
         for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-            if (ZTAV(ZoneNum) > MaxTempZone(ZoneNum)) {
-                MaxTempZone(ZoneNum) = ZTAV(ZoneNum);
+            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) > MaxTempZone(ZoneNum)) {
+                MaxTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
-            if (ZTAV(ZoneNum) < MinTempZone(ZoneNum)) {
-                MinTempZone(ZoneNum) = ZTAV(ZoneNum);
+            if (state.dataHeatBalFanSys->ZTAV(ZoneNum) < MinTempZone(ZoneNum)) {
+                MinTempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             }
             if (state.dataHeatBal->SNLoadHeatRate(ZoneNum) > MaxHeatLoadZone(ZoneNum)) {
                 MaxHeatLoadZone(ZoneNum) = state.dataHeatBal->SNLoadHeatRate(ZoneNum);
@@ -5724,7 +5714,7 @@ namespace HeatBalanceManager {
             LoadZoneSecPrevDay(ZoneNum) = LoadZonePrevDay(ZoneNum);
             TempZonePrevDay(ZoneNum) = TempZone(ZoneNum);
             LoadZonePrevDay(ZoneNum) = LoadZone(ZoneNum);
-            TempZone(ZoneNum) = ZTAV(ZoneNum);
+            TempZone(ZoneNum) = state.dataHeatBalFanSys->ZTAV(ZoneNum);
             LoadZone(ZoneNum) = max(state.dataHeatBal->SNLoadHeatRate(ZoneNum), std::abs(state.dataHeatBal->SNLoadCoolRate(ZoneNum)));
 
             // Calculate differences in temperature and load for the last two warmup days
@@ -5758,8 +5748,8 @@ namespace HeatBalanceManager {
 
         // Update interior movable insulation flag--needed at the end of a zone time step so that the interior radiant
         // exchange algorithm knows whether there has been a change in interior movable insulation or not.
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            state.dataSurface->Surface(SurfNum).MovInsulIntPresentPrevTS = state.dataSurface->Surface(SurfNum).MovInsulIntPresent;
         }
 
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero
@@ -6051,8 +6041,8 @@ namespace HeatBalanceManager {
 
         int SurfNum;
 
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            auto &thisSurface(DataSurfaces::Surface(SurfNum));
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            auto &thisSurface(state.dataSurface->Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!state.dataConstruction->Construct(thisConstruct).WindowTypeBSDF) {
@@ -6179,16 +6169,13 @@ namespace HeatBalanceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Open and set up headers for a external shading fraction export file.
 
-        // Using/Aliasing
-        using DataSurfaces::Surface;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
         state.files.shade.ensure_open(state, "OpenOutputFiles", state.files.outputControl.extshd);
         print(state.files.shade, "Surface Name,");
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            print(state.files.shade, "{},", Surface(SurfNum).Name);
+        for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            print(state.files.shade, "{},", state.dataSurface->Surface(SurfNum).Name);
         }
         print(state.files.shade, "()\n");
     }
@@ -6217,7 +6204,7 @@ namespace HeatBalanceManager {
 
         CurrentModuleObject = "WindowProperty:FrameAndDivider";
         state.dataHeatBal->TotFrameDivider = inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
-        FrameDivider.allocate(state.dataHeatBal->TotFrameDivider);
+        state.dataSurface->FrameDivider.allocate(state.dataHeatBal->TotFrameDivider);
         if (state.dataHeatBal->TotFrameDivider == 0) return;
 
         FrameDividerNum = 0;
@@ -6241,63 +6228,63 @@ namespace HeatBalanceManager {
 
             // Load the frame/divider derived type from the input data.
             ++FrameDividerNum;
-            FrameDivider(FrameDividerNum).Name = FrameDividerNames(1);
-            FrameDivider(FrameDividerNum).FrameWidth = FrameDividerProps(1);
-            FrameDivider(FrameDividerNum).FrameProjectionOut = FrameDividerProps(2);
-            FrameDivider(FrameDividerNum).FrameProjectionIn = FrameDividerProps(3);
-            if (FrameDivider(FrameDividerNum).FrameWidth == 0.0) {
-                FrameDivider(FrameDividerNum).FrameProjectionOut = 0.0;
-                FrameDivider(FrameDividerNum).FrameProjectionIn = 0.0;
+            state.dataSurface->FrameDivider(FrameDividerNum).Name = FrameDividerNames(1);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameWidth = FrameDividerProps(1);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameProjectionOut = FrameDividerProps(2);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameProjectionIn = FrameDividerProps(3);
+            if (state.dataSurface->FrameDivider(FrameDividerNum).FrameWidth == 0.0) {
+                state.dataSurface->FrameDivider(FrameDividerNum).FrameProjectionOut = 0.0;
+                state.dataSurface->FrameDivider(FrameDividerNum).FrameProjectionIn = 0.0;
             }
-            FrameDivider(FrameDividerNum).FrameConductance = FrameDividerProps(4);
-            FrameDivider(FrameDividerNum).FrEdgeToCenterGlCondRatio = FrameDividerProps(5);
-            FrameDivider(FrameDividerNum).FrameSolAbsorp = FrameDividerProps(6);
-            FrameDivider(FrameDividerNum).FrameVisAbsorp = FrameDividerProps(7);
-            FrameDivider(FrameDividerNum).FrameEmis = FrameDividerProps(8);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameConductance = FrameDividerProps(4);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrEdgeToCenterGlCondRatio = FrameDividerProps(5);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameSolAbsorp = FrameDividerProps(6);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameVisAbsorp = FrameDividerProps(7);
+            state.dataSurface->FrameDivider(FrameDividerNum).FrameEmis = FrameDividerProps(8);
             if (UtilityRoutines::SameString(FrameDividerNames(2), "DividedLite")) {
-                FrameDivider(FrameDividerNum).DividerType = DividedLite;
+                state.dataSurface->FrameDivider(FrameDividerNum).DividerType = DividedLite;
             } else if (UtilityRoutines::SameString(FrameDividerNames(2), "Suspended")) {
-                FrameDivider(FrameDividerNum).DividerType = Suspended;
+                state.dataSurface->FrameDivider(FrameDividerNum).DividerType = Suspended;
             } else {
                 ShowWarningError(state, CurrentModuleObject + "=\"" + FrameDividerNames(1) + "\", Invalid " + cAlphaFieldNames(2));
                 ShowContinueError(state, "Entered=\"" + FrameDividerNames(2) + "\", must be DividedLite or Suspended.  Will be set to DividedLite.");
-                FrameDivider(FrameDividerNum).DividerType = DividedLite;
+                state.dataSurface->FrameDivider(FrameDividerNum).DividerType = DividedLite;
             }
-            FrameDivider(FrameDividerNum).DividerWidth = FrameDividerProps(9);
-            FrameDivider(FrameDividerNum).HorDividers = FrameDividerProps(10);
-            FrameDivider(FrameDividerNum).VertDividers = FrameDividerProps(11);
-            FrameDivider(FrameDividerNum).DividerProjectionOut = FrameDividerProps(12);
-            FrameDivider(FrameDividerNum).DividerProjectionIn = FrameDividerProps(13);
-            if (FrameDivider(FrameDividerNum).DividerWidth == 0.0 || FrameDivider(FrameDividerNum).DividerType == Suspended) {
-                FrameDivider(FrameDividerNum).DividerProjectionOut = 0.0;
-                FrameDivider(FrameDividerNum).DividerProjectionIn = 0.0;
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerWidth = FrameDividerProps(9);
+            state.dataSurface->FrameDivider(FrameDividerNum).HorDividers = FrameDividerProps(10);
+            state.dataSurface->FrameDivider(FrameDividerNum).VertDividers = FrameDividerProps(11);
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerProjectionOut = FrameDividerProps(12);
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerProjectionIn = FrameDividerProps(13);
+            if (state.dataSurface->FrameDivider(FrameDividerNum).DividerWidth == 0.0 || state.dataSurface->FrameDivider(FrameDividerNum).DividerType == Suspended) {
+                state.dataSurface->FrameDivider(FrameDividerNum).DividerProjectionOut = 0.0;
+                state.dataSurface->FrameDivider(FrameDividerNum).DividerProjectionIn = 0.0;
             }
-            FrameDivider(FrameDividerNum).DividerConductance = FrameDividerProps(14);
-            FrameDivider(FrameDividerNum).DivEdgeToCenterGlCondRatio = FrameDividerProps(15);
-            FrameDivider(FrameDividerNum).DividerSolAbsorp = FrameDividerProps(16);
-            FrameDivider(FrameDividerNum).DividerVisAbsorp = FrameDividerProps(17);
-            FrameDivider(FrameDividerNum).DividerEmis = FrameDividerProps(18);
-            FrameDivider(FrameDividerNum).OutsideRevealSolAbs = FrameDividerProps(19);
-            FrameDivider(FrameDividerNum).InsideSillDepth = FrameDividerProps(20);
-            FrameDivider(FrameDividerNum).InsideSillSolAbs = FrameDividerProps(21);
-            FrameDivider(FrameDividerNum).InsideReveal = FrameDividerProps(22);
-            FrameDivider(FrameDividerNum).InsideRevealSolAbs = FrameDividerProps(23);
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerConductance = FrameDividerProps(14);
+            state.dataSurface->FrameDivider(FrameDividerNum).DivEdgeToCenterGlCondRatio = FrameDividerProps(15);
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerSolAbsorp = FrameDividerProps(16);
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerVisAbsorp = FrameDividerProps(17);
+            state.dataSurface->FrameDivider(FrameDividerNum).DividerEmis = FrameDividerProps(18);
+            state.dataSurface->FrameDivider(FrameDividerNum).OutsideRevealSolAbs = FrameDividerProps(19);
+            state.dataSurface->FrameDivider(FrameDividerNum).InsideSillDepth = FrameDividerProps(20);
+            state.dataSurface->FrameDivider(FrameDividerNum).InsideSillSolAbs = FrameDividerProps(21);
+            state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal = FrameDividerProps(22);
+            state.dataSurface->FrameDivider(FrameDividerNum).InsideRevealSolAbs = FrameDividerProps(23);
 
-            if (FrameDivider(FrameDividerNum).DividerWidth > 0.0 &&
-                (FrameDivider(FrameDividerNum).HorDividers == 0 && FrameDivider(FrameDividerNum).VertDividers == 0)) {
+            if (state.dataSurface->FrameDivider(FrameDividerNum).DividerWidth > 0.0 &&
+                (state.dataSurface->FrameDivider(FrameDividerNum).HorDividers == 0 && state.dataSurface->FrameDivider(FrameDividerNum).VertDividers == 0)) {
                 ShowWarningError(state,
-                                 CurrentModuleObject + ": In FrameAndDivider " + FrameDivider(FrameDividerNum).Name + ' ' + cNumericFieldNames(9) +
+                                 CurrentModuleObject + ": In FrameAndDivider " + state.dataSurface->FrameDivider(FrameDividerNum).Name + ' ' + cNumericFieldNames(9) +
                                      " > 0 ");
                 ShowContinueError(state, "...but " + cNumericFieldNames(10) + " = 0 and " + cNumericFieldNames(11) + " = 0.");
                 ShowContinueError(state, "..." + cNumericFieldNames(9) + " set to 0.");
-                FrameDivider(FrameDividerNum).DividerWidth = 0.0;
+                state.dataSurface->FrameDivider(FrameDividerNum).DividerWidth = 0.0;
             }
             // Prevent InsideSillDepth < InsideReveal
-            if (FrameDivider(FrameDividerNum).InsideSillDepth < FrameDivider(FrameDividerNum).InsideReveal) {
+            if (state.dataSurface->FrameDivider(FrameDividerNum).InsideSillDepth < state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal) {
                 ShowWarningError(state,
-                                 CurrentModuleObject + ": In FrameAndDivider " + FrameDivider(FrameDividerNum).Name + ' ' + cNumericFieldNames(20) +
+                                 CurrentModuleObject + ": In FrameAndDivider " + state.dataSurface->FrameDivider(FrameDividerNum).Name + ' ' + cNumericFieldNames(20) +
                                      " is less than " + cNumericFieldNames(22) + "; it will be set to " + cNumericFieldNames(22) + '.');
-                FrameDivider(FrameDividerNum).InsideSillDepth = FrameDivider(FrameDividerNum).InsideReveal;
+                state.dataSurface->FrameDivider(FrameDividerNum).InsideSillDepth = state.dataSurface->FrameDivider(FrameDividerNum).InsideReveal;
             }
 
             //    ! Warn if InsideSillDepth OR InsideReveal > 0.2meters to warn of inaccuracies
@@ -7198,46 +7185,46 @@ namespace HeatBalanceManager {
             }
 
             if (state.dataHeatBal->TotFrameDivider > TotFrameDividerPrev) {
-                FrameDivider.redimension(state.dataHeatBal->TotFrameDivider);
+                state.dataSurface->FrameDivider.redimension(state.dataHeatBal->TotFrameDivider);
             }
 
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 if (FrameWidth > 0.0 || DividerWidth(IGlSys) > 0.0) {
                     FrDivNum = state.dataConstruction->Construct(state.dataHeatBal->TotConstructs - NGlSys + IGlSys).W5FrameDivider;
-                    FrameDivider(FrDivNum).FrameWidth = FrameWidth;
-                    FrameDivider(FrDivNum).FrameProjectionOut = FrameProjectionOut;
-                    FrameDivider(FrDivNum).FrameProjectionIn = FrameProjectionIn;
-                    FrameDivider(FrDivNum).FrameConductance = FrameConductance;
-                    FrameDivider(FrDivNum).FrEdgeToCenterGlCondRatio = FrEdgeToCenterGlCondRatio;
-                    FrameDivider(FrDivNum).FrameSolAbsorp = FrameSolAbsorp;
-                    FrameDivider(FrDivNum).FrameVisAbsorp = FrameVisAbsorp;
-                    FrameDivider(FrDivNum).FrameEmis = FrameEmis;
-                    FrameDivider(FrDivNum).FrameEdgeWidth = 0.06355; // 2.5 in
+                    state.dataSurface->FrameDivider(FrDivNum).FrameWidth = FrameWidth;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut = FrameProjectionOut;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn = FrameProjectionIn;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameConductance = FrameConductance;
+                    state.dataSurface->FrameDivider(FrDivNum).FrEdgeToCenterGlCondRatio = FrEdgeToCenterGlCondRatio;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameSolAbsorp = FrameSolAbsorp;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameVisAbsorp = FrameVisAbsorp;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameEmis = FrameEmis;
+                    state.dataSurface->FrameDivider(FrDivNum).FrameEdgeWidth = 0.06355; // 2.5 in
                     if (UtilityRoutines::SameString(MullionOrientation, "Vertical")) {
-                        FrameDivider(FrDivNum).MullionOrientation = Vertical;
+                        state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = Vertical;
                     } else if (UtilityRoutines::SameString(MullionOrientation, "Horizontal")) {
-                        FrameDivider(FrDivNum).MullionOrientation = Horizontal;
+                        state.dataSurface->FrameDivider(FrDivNum).MullionOrientation = Horizontal;
                     }
                     if (UtilityRoutines::SameString(DividerType(IGlSys), "DividedLite")) {
-                        FrameDivider(FrDivNum).DividerType = DividedLite;
+                        state.dataSurface->FrameDivider(FrDivNum).DividerType = DividedLite;
                     } else if (UtilityRoutines::SameString(DividerType(IGlSys), "Suspended")) {
-                        FrameDivider(FrDivNum).DividerType = Suspended;
+                        state.dataSurface->FrameDivider(FrDivNum).DividerType = Suspended;
                     }
-                    FrameDivider(FrDivNum).DividerWidth = DividerWidth(IGlSys);
-                    FrameDivider(FrDivNum).HorDividers = HorDividers(IGlSys);
-                    FrameDivider(FrDivNum).VertDividers = VertDividers(IGlSys);
-                    FrameDivider(FrDivNum).DividerProjectionOut = DividerProjectionOut(IGlSys);
-                    FrameDivider(FrDivNum).DividerProjectionIn = DividerProjectionIn(IGlSys);
-                    FrameDivider(FrDivNum).DividerConductance = DividerConductance(IGlSys);
-                    FrameDivider(FrDivNum).DivEdgeToCenterGlCondRatio = DivEdgeToCenterGlCondRatio(IGlSys);
-                    FrameDivider(FrDivNum).DividerSolAbsorp = DividerSolAbsorp(IGlSys);
-                    FrameDivider(FrDivNum).DividerVisAbsorp = DividerVisAbsorp(IGlSys);
-                    FrameDivider(FrDivNum).DividerEmis = DividerEmis(IGlSys);
-                    FrameDivider(FrDivNum).DividerEdgeWidth = 0.06355; // 2.5 in
+                    state.dataSurface->FrameDivider(FrDivNum).DividerWidth = DividerWidth(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).HorDividers = HorDividers(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).VertDividers = VertDividers(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerProjectionOut = DividerProjectionOut(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerProjectionIn = DividerProjectionIn(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerConductance = DividerConductance(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DivEdgeToCenterGlCondRatio = DivEdgeToCenterGlCondRatio(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerSolAbsorp = DividerSolAbsorp(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerVisAbsorp = DividerVisAbsorp(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerEmis = DividerEmis(IGlSys);
+                    state.dataSurface->FrameDivider(FrDivNum).DividerEdgeWidth = 0.06355; // 2.5 in
                     if (NGlSys == 1) {
-                        FrameDivider(FrDivNum).Name = "W5:" + DesiredConstructionName;
+                        state.dataSurface->FrameDivider(FrDivNum).Name = "W5:" + DesiredConstructionName;
                     } else {
-                        FrameDivider(FrDivNum).Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys);
+                        state.dataSurface->FrameDivider(FrDivNum).Name = "W5:" + DesiredConstructionName + ':' + NumName(IGlSys);
                     }
                 }
             }
@@ -7283,20 +7270,8 @@ namespace HeatBalanceManager {
         //  -Month that Storm Window Is Taken Off
         //  -Day of Month that Storm Window Is Taken Off
 
-        // REFERENCES:na
         // Using/Aliasing
-        using DataSurfaces::SurfWinStormWinFlag;
-        using DataSurfaces::SurfWinStormWinFlagPrevDay;
         using General::BetweenDates;
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:na
-
-        // INTERFACE BLOCK SPECIFICATIONS:na
-
-        // DERIVED TYPE DEFINITIONS:na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         int SurfNum;      // Surface number
         int StormWinNum;  // Number of storm window object
@@ -7307,20 +7282,20 @@ namespace HeatBalanceManager {
 
         state.dataHeatBal->StormWinChangeThisDay = false;
 
-        for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
-            SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-            SurfWinStormWinFlagPrevDay(SurfNum) = SurfWinStormWinFlag(SurfNum);
-            DateOff = StormWindow(StormWinNum).DateOff - 1;
+        for (StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
+            SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum;
+            state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = state.dataSurface->SurfWinStormWinFlag(SurfNum);
+            DateOff = state.dataSurface->StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
-            if (BetweenDates(state.dataEnvrn->DayOfYear_Schedule, StormWindow(StormWinNum).DateOn, DateOff)) {
+            if (BetweenDates(state.dataEnvrn->DayOfYear_Schedule, state.dataSurface->StormWindow(StormWinNum).DateOn, DateOff)) {
                 StormWinFlag = 1;
             } else {
                 StormWinFlag = 0;
             }
-            SurfWinStormWinFlag(SurfNum) = StormWinFlag;
-            if (state.dataGlobal->BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
-            if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) state.dataHeatBal->StormWinChangeThisDay = true;
+            state.dataSurface->SurfWinStormWinFlag(SurfNum) = StormWinFlag;
+            if (state.dataGlobal->BeginSimFlag) state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
+            if (state.dataSurface->SurfWinStormWinFlag(SurfNum) != state.dataSurface->SurfWinStormWinFlagPrevDay(SurfNum)) state.dataHeatBal->StormWinChangeThisDay = true;
         }
     }
 
@@ -7662,13 +7637,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using DataSurfaces::FenLayAbsSSG;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfIncSolSSG;
-        using DataSurfaces::TotFenLayAbsSSG;
-        using DataSurfaces::TotSurfaces;
-        using DataSurfaces::TotSurfIncSolSSG;
-
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -7702,13 +7670,13 @@ namespace HeatBalanceManager {
             ErrorsFound = true;
         }
 
-        TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (TotSurfIncSolSSG > 0) {
-            if (!allocated(SurfIncSolSSG)) {
-                SurfIncSolSSG.allocate(TotSurfIncSolSSG);
+        state.dataSurface->TotSurfIncSolSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataSurface->TotSurfIncSolSSG > 0) {
+            if (!allocated(state.dataSurface->SurfIncSolSSG)) {
+                state.dataSurface->SurfIncSolSSG.allocate(state.dataSurface->TotSurfIncSolSSG);
             }
 
-            for (Loop = 1; Loop <= TotSurfIncSolSSG; ++Loop) {
+            for (Loop = 1; Loop <= state.dataSurface->TotSurfIncSolSSG; ++Loop) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
@@ -7727,10 +7695,10 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
-                SurfIncSolSSG(Loop).Name = cAlphaArgs(1);
+                state.dataSurface->SurfIncSolSSG(Loop).Name = cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
+                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
                                     RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -7740,7 +7708,7 @@ namespace HeatBalanceManager {
                                           "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    SurfIncSolSSG(Loop).SurfPtr = SurfNum;
+                    state.dataSurface->SurfIncSolSSG(Loop).SurfPtr = SurfNum;
                 }
 
                 // Assign construction number
@@ -7754,7 +7722,7 @@ namespace HeatBalanceManager {
                                           "\" no corresponding construction (ref Construction) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    SurfIncSolSSG(Loop).ConstrPtr = ConstrNum;
+                    state.dataSurface->SurfIncSolSSG(Loop).ConstrPtr = ConstrNum;
                 }
 
                 // Assign schedule number
@@ -7768,7 +7736,7 @@ namespace HeatBalanceManager {
                                           "\" no corresponding schedule has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    SurfIncSolSSG(Loop).SchedPtr = ScheduleNum;
+                    state.dataSurface->SurfIncSolSSG(Loop).SchedPtr = ScheduleNum;
                 }
             }
         }
@@ -7778,13 +7746,13 @@ namespace HeatBalanceManager {
         //-----------------------------------------------------------------------
         cCurrentModuleObject = "ComplexFenestrationProperty:SolarAbsorbedLayers";
 
-        TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
-        if (TotFenLayAbsSSG > 0) {
-            if (!allocated(FenLayAbsSSG)) {
-                FenLayAbsSSG.allocate(TotFenLayAbsSSG);
+        state.dataSurface->TotFenLayAbsSSG = inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        if (state.dataSurface->TotFenLayAbsSSG > 0) {
+            if (!allocated(state.dataSurface->FenLayAbsSSG)) {
+                state.dataSurface->FenLayAbsSSG.allocate(state.dataSurface->TotFenLayAbsSSG);
             }
 
-            for (Loop = 1; Loop <= TotFenLayAbsSSG; ++Loop) {
+            for (Loop = 1; Loop <= state.dataSurface->TotFenLayAbsSSG; ++Loop) {
                 inputProcessor->getObjectItem(state,
                                               cCurrentModuleObject,
                                               Loop,
@@ -7804,10 +7772,10 @@ namespace HeatBalanceManager {
                     continue;
                 }
 
-                FenLayAbsSSG(Loop).Name = cAlphaArgs(1);
+                state.dataSurface->FenLayAbsSSG(Loop).Name = cAlphaArgs(1);
 
                 // Assign surface number
-                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Surface);
+                SurfNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataSurface->Surface);
                 if (SurfNum == 0) {
                     ShowSevereError(state,
                                     RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " +
@@ -7817,7 +7785,7 @@ namespace HeatBalanceManager {
                                           "\" no corresponding surface (ref BuildingSurface:Detailed) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    FenLayAbsSSG(Loop).SurfPtr = SurfNum;
+                    state.dataSurface->FenLayAbsSSG(Loop).SurfPtr = SurfNum;
                 }
 
                 // Assign construction number
@@ -7831,7 +7799,7 @@ namespace HeatBalanceManager {
                                           "\" no corresponding construction (ref Construction) has been found in the input file.");
                     ErrorsFound = true;
                 } else {
-                    FenLayAbsSSG(Loop).ConstrPtr = ConstrNum;
+                    state.dataSurface->FenLayAbsSSG(Loop).ConstrPtr = ConstrNum;
                     NumOfScheduledLayers = NumAlpha - 3;
                     NumOfLayersMatch = false;
                     // Check if number of layers in construction matches number of layers in schedule surface gains object
@@ -7853,11 +7821,11 @@ namespace HeatBalanceManager {
                         ErrorsFound = true;
                     }
 
-                    if (!allocated(FenLayAbsSSG(Loop).SchedPtrs)) {
-                        FenLayAbsSSG(Loop).SchedPtrs.allocate(NumOfScheduledLayers);
+                    if (!allocated(state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs)) {
+                        state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs.allocate(NumOfScheduledLayers);
                     }
 
-                    FenLayAbsSSG(Loop).NumOfSched = NumOfScheduledLayers;
+                    state.dataSurface->FenLayAbsSSG(Loop).NumOfSched = NumOfScheduledLayers;
 
                     for (i = 1; i <= NumOfScheduledLayers; ++i) {
                         ScheduleNum = GetScheduleIndex(state, cAlphaArgs(i + 3));
@@ -7871,7 +7839,7 @@ namespace HeatBalanceManager {
                                                   "\" no corresponding schedule has been found in the input file.");
                             ErrorsFound = true;
                         } else {
-                            FenLayAbsSSG(Loop).SchedPtrs(i) = ScheduleNum;
+                            state.dataSurface->FenLayAbsSSG(Loop).SchedPtrs(i) = ScheduleNum;
                         }
                     }
                 }
@@ -7880,7 +7848,7 @@ namespace HeatBalanceManager {
 
         // Check if scheduled surface gains are assigined to each surface in every zone.  If not then warning message to user will be
         // issued
-        if ((TotSurfIncSolSSG > 0) || (TotFenLayAbsSSG > 0)) {
+        if ((state.dataSurface->TotSurfIncSolSSG > 0) || (state.dataSurface->TotFenLayAbsSSG > 0)) {
             for (iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
                 CheckScheduledSurfaceGains(state, iZone);
             }
@@ -7933,14 +7901,14 @@ namespace HeatBalanceManager {
         ZoneUnscheduled = false;
         ZoneScheduled = false;
 
-        for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
-            iConst = Surface(iSurf).Construction;
-            if (Surface(iSurf).Class == SurfaceClass::Window) {
-                SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
+        for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
+            iConst = state.dataSurface->Surface(iSurf).Construction;
+            if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
+                SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
             } else {
-                SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
+                SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
             }
-            if (iSurf == state.dataHeatBal->Zone(ZoneNum).SurfaceFirst) {
+            if (iSurf == state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst) {
                 if (SchedPtr != 0) {
                     ZoneScheduled = true;
                     ZoneUnscheduled = false;
@@ -7967,16 +7935,16 @@ namespace HeatBalanceManager {
         }
 
         if ((!ZoneScheduled) && (!ZoneUnscheduled)) {
-            for (iSurf = state.dataHeatBal->Zone(ZoneNum).SurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).SurfaceLast; ++iSurf) {
-                iConst = Surface(iSurf).Construction;
-                if (Surface(iSurf).Class == SurfaceClass::Window) {
-                    SchedPtr = WindowScheduledSolarAbs(iSurf, iConst);
+            for (iSurf = state.dataHeatBal->Zone(ZoneNum).HTSurfaceFirst; iSurf <= state.dataHeatBal->Zone(ZoneNum).HTSurfaceLast; ++iSurf) {
+                iConst = state.dataSurface->Surface(iSurf).Construction;
+                if (state.dataSurface->Surface(iSurf).Class == SurfaceClass::Window) {
+                    SchedPtr = WindowScheduledSolarAbs(state, iSurf, iConst);
                 } else {
-                    SchedPtr = SurfaceScheduledSolarInc(iSurf, iConst);
+                    SchedPtr = SurfaceScheduledSolarInc(state, iSurf, iConst);
                 }
 
                 if (SchedPtr == 0) {
-                    ShowContinueError(state, "Surface " + Surface(iSurf).Name + " does not have scheduled surface gains.");
+                    ShowContinueError(state, "Surface " + state.dataSurface->Surface(iSurf).Name + " does not have scheduled surface gains.");
                 }
             }
         }

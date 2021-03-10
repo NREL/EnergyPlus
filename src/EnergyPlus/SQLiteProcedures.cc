@@ -160,7 +160,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
         for (int groupNum = 1; groupNum <= state.dataHeatBal->NumOfZoneGroups; ++groupNum) {
             sqlite->addZoneGroupData(groupNum, state.dataHeatBal->ZoneGroup(groupNum));
         }
-        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(); scheduleNumber <= numberOfSchedules;
+        for (int scheduleNumber = 1, numberOfSchedules = ScheduleManager::GetNumberOfSchedules(state); scheduleNumber <= numberOfSchedules;
              ++scheduleNumber) {
             sqlite->addScheduleData(scheduleNumber,
                                     ScheduleManager::GetScheduleName(state, scheduleNumber),
@@ -168,8 +168,8 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state)
                                     ScheduleManager::GetScheduleMinValue(state, scheduleNumber),
                                     ScheduleManager::GetScheduleMaxValue(state, scheduleNumber));
         }
-        for (int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
-            auto const &surface = DataSurfaces::Surface(surfaceNumber);
+        for (int surfaceNumber = 1; surfaceNumber <= state.dataSurface->TotSurfaces; ++surfaceNumber) {
+            auto const &surface = state.dataSurface->Surface(surfaceNumber);
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= state.dataHeatBal->TotMaterials; ++materialNum) {
@@ -2775,12 +2775,12 @@ bool SQLiteProcedures::sqliteWithinTransaction()
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
 // {
-// 	return sqlite3_clear_bindings(stmt);
+//     return sqlite3_clear_bindings(stmt);
 // }
 
 // int SQLiteProcedures::sqliteFinalizeCommand(sqlite3_stmt * stmt)
 // {
-// 	return sqlite3_finalize(stmt);
+//     return sqlite3_finalize(stmt);
 // }
 
 } // namespace EnergyPlus

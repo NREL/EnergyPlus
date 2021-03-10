@@ -380,77 +380,77 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     bool ErrorsFound = false;
     ScheduleManager::ProcessScheduleInput(*state);
     GetZoneData(*state, ErrorsFound);
-    DataHeatBalFanSys::ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneReOrder.allocate(state->dataGlobal->NumOfZones);
 
     GetSimpleAirModelInputs(*state, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
-    DataHeatBalFanSys::MAT.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPM.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPTM.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MAT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPM.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTM.allocate(state->dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MCPI.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::OAMFL.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MCPTI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->OAMFL.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MCPTI.allocate(state->dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
-    DataHeatBalFanSys::MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MixingMassFlowZone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->MixingMassFlowXHumRat.allocate(state->dataGlobal->NumOfZones);
 
-    DataHeatBalFanSys::MAT(1) = 21.0;
-    DataHeatBalFanSys::MAT(2) = 22.0;
-    DataHeatBalFanSys::MAT(3) = 23.0;
-    DataHeatBalFanSys::MAT(4) = 24.0;
-    DataHeatBalFanSys::MAT(5) = 25.0;
-    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.001;
-    DataHeatBalFanSys::ZoneAirHumRat(5) = 0.001;
+    state->dataHeatBalFanSys->MAT(1) = 21.0;
+    state->dataHeatBalFanSys->MAT(2) = 22.0;
+    state->dataHeatBalFanSys->MAT(3) = 23.0;
+    state->dataHeatBalFanSys->MAT(4) = 24.0;
+    state->dataHeatBalFanSys->MAT(5) = 25.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(2) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(3) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(4) = 0.001;
+    state->dataHeatBalFanSys->ZoneAirHumRat(5) = 0.001;
 
     state->dataHeatBal->AirFlowFlag = true;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MIXINGAVAILSCHED")).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MININDOORTEMP")).CurrentValue = 18.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXINDOORTEMP")).CurrentValue = 100.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "DELTATEMP")).CurrentValue = 2.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MINOUTDOORTEMP")).CurrentValue = -100.0;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "MAXOUTDOORTEMP")).CurrentValue = 100.0;
     state->dataEnvrn->OutBaroPress = 101325.0;
 
     InitSimpleMixingConvectiveHeatGains(*state);
 
     CalcAirFlowSimple(*state, 2);
 
-    EXPECT_NEAR(720.738493, DataHeatBalFanSys::MCPM(1), 0.00001);
-    EXPECT_NEAR(119.818784, DataHeatBalFanSys::MCPM(2), 0.00001);
-    EXPECT_NEAR(599.907893, DataHeatBalFanSys::MCPM(3), 0.00001);
-    EXPECT_NEAR(719.116710, DataHeatBalFanSys::MCPM(4), 0.00001);
-    EXPECT_NEAR(16937.0496, DataHeatBalFanSys::MCPTM(1), 0.001);
-    EXPECT_NEAR(2875.6508, DataHeatBalFanSys::MCPTM(2), 0.001);
-    EXPECT_NEAR(13315.7667, DataHeatBalFanSys::MCPTM(3), 0.001);
-    EXPECT_NEAR(15699.7370, DataHeatBalFanSys::MCPTM(4), 0.001);
-    EXPECT_NEAR(0.71594243, DataHeatBalFanSys::MixingMassFlowZone(1), 0.00001);
-    EXPECT_NEAR(0.11902146, DataHeatBalFanSys::MixingMassFlowZone(2), 0.00001);
-    EXPECT_NEAR(0.59591588, DataHeatBalFanSys::MixingMassFlowZone(3), 0.00001);
-    EXPECT_NEAR(0.71433143, DataHeatBalFanSys::MixingMassFlowZone(4), 0.00001);
-    EXPECT_NEAR(0.00071594243, DataHeatBalFanSys::MixingMassFlowXHumRat(1), 0.0000001);
-    EXPECT_NEAR(0.00011902146, DataHeatBalFanSys::MixingMassFlowXHumRat(2), 0.0000001);
-    EXPECT_NEAR(0.00059591588, DataHeatBalFanSys::MixingMassFlowXHumRat(3), 0.0000001);
-    EXPECT_NEAR(0.00071433143, DataHeatBalFanSys::MixingMassFlowXHumRat(4), 0.0000001);
+    EXPECT_NEAR(720.738493, state->dataHeatBalFanSys->MCPM(1), 0.00001);
+    EXPECT_NEAR(119.818784, state->dataHeatBalFanSys->MCPM(2), 0.00001);
+    EXPECT_NEAR(599.907893, state->dataHeatBalFanSys->MCPM(3), 0.00001);
+    EXPECT_NEAR(719.116710, state->dataHeatBalFanSys->MCPM(4), 0.00001);
+    EXPECT_NEAR(16937.0496, state->dataHeatBalFanSys->MCPTM(1), 0.001);
+    EXPECT_NEAR(2875.6508, state->dataHeatBalFanSys->MCPTM(2), 0.001);
+    EXPECT_NEAR(13315.7667, state->dataHeatBalFanSys->MCPTM(3), 0.001);
+    EXPECT_NEAR(15699.7370, state->dataHeatBalFanSys->MCPTM(4), 0.001);
+    EXPECT_NEAR(0.71594243, state->dataHeatBalFanSys->MixingMassFlowZone(1), 0.00001);
+    EXPECT_NEAR(0.11902146, state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.00001);
+    EXPECT_NEAR(0.59591588, state->dataHeatBalFanSys->MixingMassFlowZone(3), 0.00001);
+    EXPECT_NEAR(0.71433143, state->dataHeatBalFanSys->MixingMassFlowZone(4), 0.00001);
+    EXPECT_NEAR(0.00071594243, state->dataHeatBalFanSys->MixingMassFlowXHumRat(1), 0.0000001);
+    EXPECT_NEAR(0.00011902146, state->dataHeatBalFanSys->MixingMassFlowXHumRat(2), 0.0000001);
+    EXPECT_NEAR(0.00059591588, state->dataHeatBalFanSys->MixingMassFlowXHumRat(3), 0.0000001);
+    EXPECT_NEAR(0.00071433143, state->dataHeatBalFanSys->MixingMassFlowXHumRat(4), 0.0000001);
 
     // Deallocate everything - should all be taken care of in clear_states
 
-    DataHeatBalFanSys::MAT.deallocate();
-    DataHeatBalFanSys::ZoneAirHumRat.deallocate();
-    DataHeatBalFanSys::MCPM.deallocate();
-    DataHeatBalFanSys::MCPTM.deallocate();
-    DataHeatBalFanSys::MCPI.deallocate();
-    DataHeatBalFanSys::OAMFL.deallocate();
-    DataHeatBalFanSys::MCPTI.deallocate();
-    DataHeatBalFanSys::MixingMassFlowZone.deallocate();
-    DataHeatBalFanSys::MixingMassFlowXHumRat.deallocate();
-    DataHeatBalFanSys::ZoneReOrder.deallocate();
+    state->dataHeatBalFanSys->MAT.deallocate();
+    state->dataHeatBalFanSys->ZoneAirHumRat.deallocate();
+    state->dataHeatBalFanSys->MCPM.deallocate();
+    state->dataHeatBalFanSys->MCPTM.deallocate();
+    state->dataHeatBalFanSys->MCPI.deallocate();
+    state->dataHeatBalFanSys->OAMFL.deallocate();
+    state->dataHeatBalFanSys->MCPTI.deallocate();
+    state->dataHeatBalFanSys->MixingMassFlowZone.deallocate();
+    state->dataHeatBalFanSys->MixingMassFlowXHumRat.deallocate();
+    state->dataHeatBalFanSys->ZoneReOrder.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
@@ -1319,10 +1319,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
-    DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
+    state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
     auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
@@ -1342,15 +1342,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     bool firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1400,15 +1400,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
 
     // UniformPLR Test 4 - Cooling, FirstHVACIteration = false, only 2 pieces of equipment are active for cooling
     firstHVACIteration = false;
@@ -1537,10 +1537,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
 
     // Set up capacities for PLR calcs
-    DataSizing::FinalZoneSizing.allocate(1);
-    DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
+    state->dataSize->FinalZoneSizing.allocate(1);
+    state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad = 4000;
     // For finalzonesizing, desing cooling load is positive
-    DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
+    state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad = 2500;
     auto &thisZEqList(state->dataZoneEquip->ZoneEquipList(ZoneNum));
     thisZEqList.HeatingCapacity(1) = 2000.0;
     thisZEqList.HeatingCapacity(2) = 1000.0;
@@ -1560,15 +1560,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     bool firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), state->dataSize->FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
@@ -1666,15 +1666,15 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     firstHVACIteration = true;
     InitSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
     DistributeSystemOutputRequired(*state, ZoneNum, firstHVACIteration);
-    EXPECT_EQ(energy.SequencedOutputRequired(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequired(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
-    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -DataSizing::FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequired(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToHeatingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(1), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(2), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
+    EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), -state->dataSize->FinalZoneSizing(ZoneNum).DesCoolLoad);
 
     // SequentialUniformPLR Test 4a - Cooling, FirstHVACIteration = false, low load requiring 1 equipment
     firstHVACIteration = false;
@@ -1851,8 +1851,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -2077,8 +2077,8 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
-    DataHeatBalFanSys::TempControlType.allocate(1);
-    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -2093,10 +2093,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     auto &energy(state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum));
     state->dataZoneEquipmentManager->PrioritySimOrder.allocate(NumEquip);
 
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
-    ScheduleManager::Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU COOLING FRACTION")).CurrentValue = 0.3;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "AIR TERMINAL 1 ADU HEATING FRACTION")).CurrentValue = 0.4;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A COOLING FRACTION")).CurrentValue = 0.5;
+    state->dataScheduleMgr->Schedule(ScheduleManager::GetScheduleIndex(*state, "IDEAL SYSTEM A HEATING FRACTION")).CurrentValue = 0.6;
 
     // Sequential Test 1 - Heating, FirstHVACIteration = true
     energy.TotalOutputRequired = 1000.0;
@@ -2172,14 +2172,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
     int totDesDays = state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays;
     state->dataGlobal->NumOfZones = 5;
     state->dataZoneEquipmentManager->NumOfTimeStepInDay = 4;
-    DataSizing::ZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::CalcZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
-    DataSizing::FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
-    DataSizing::CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->ZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->CalcZoneSizing.allocate(totDesDays, state->dataGlobal->NumOfZones);
+    state->dataSize->FinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
+    state->dataSize->CalcFinalZoneSizing.allocate(state->dataGlobal->NumOfZones);
 
     for (int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum) {
         for (int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum) {
-            auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType.ZoneName = "test";
             thisSizingType.ADUName = "test";
             thisSizingType.CoolDesDay = "test";
@@ -2376,7 +2376,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
                 thisSizingType.CoolOutHumRatSeq(TimeStepIndex) = 1.0;
             }
 
-            auto &thisSizingType2(DataSizing::CalcZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType2(state->dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum));
             thisSizingType2.ZoneName = "test";
             thisSizingType2.ADUName = "test";
             thisSizingType2.CoolDesDay = "test";
@@ -2579,7 +2579,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
 
     for ( int CtrlZoneNum = 1; CtrlZoneNum <= state->dataGlobal->NumOfZones; ++CtrlZoneNum ) {
         for ( int DesDayNum = 1; DesDayNum <= state->dataEnvrn->TotDesDays + state->dataEnvrn->TotRunDesPersDays; ++DesDayNum ) {
-            auto &thisSizingType(DataSizing::ZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType(state->dataSize->ZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType.ZoneName, "");
             //EXPECT_EQ(thisSizingType.ADUName, "");
             EXPECT_EQ(thisSizingType.CoolDesDay, "");
@@ -2747,7 +2747,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_RezeroZoneSizingArrays) {
                 EXPECT_EQ(thisSizingType.CoolOutHumRatSeq(TimeStepIndex), 0.0);
             }
 
-            auto &thisSizingType2(DataSizing::CalcZoneSizing(DesDayNum, CtrlZoneNum));
+            auto &thisSizingType2(state->dataSize->CalcZoneSizing(DesDayNum, CtrlZoneNum));
             //EXPECT_EQ(thisSizingType2.ZoneName, "");
             //EXPECT_EQ(thisSizingType2.ADUName, "");
             EXPECT_EQ(thisSizingType2.CoolDesDay, "");
@@ -3067,7 +3067,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_ZoneMassBalance_wAdjustInfiltrati
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.0;
@@ -3311,7 +3311,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
@@ -3366,7 +3366,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
@@ -3392,7 +3392,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.413368, 0.000001);
     ;
     ;
@@ -3421,7 +3421,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnOnly)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.173265, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 1.173265, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.173265, 0.000001);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.826735, 0.000001);
 }
 
@@ -3573,7 +3573,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
@@ -3629,7 +3629,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
@@ -3656,7 +3656,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 1.0, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
@@ -3686,7 +3686,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 2.0, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 2.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 }
 
@@ -3838,7 +3838,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->ZoneAirMassFlow.InfiltrationZoneType, DataHeatBalance::AllZones);
     GetSimpleAirModelInputs(*state, ErrorsFound);
     SetZoneMassConservationFlag(*state);
-    ScheduleManager::Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
     state->dataHeatBal->AirFlowFlag = 1;
     // set zone conditions
     state->dataEnvrn->StdRhoAir = 1.2;
@@ -3894,7 +3894,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 0.586632, 0.000001);
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 0.586632, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
     ;
     ;
@@ -3921,7 +3921,7 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 1.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 1.0, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 1.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 
 
@@ -3951,6 +3951,6 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustMixingThenReturn)
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).MixingSourceMassFlowRate, 0.0);
     EXPECT_NEAR(state->dataHeatBal->MassConservation(2).MixingMassFlowRate, 2.0, 0.000001);
     // zone mixing object flow is modified
-    EXPECT_NEAR(DataHeatBalFanSys::MixingMassFlowZone(2), 2.0, 0.000001);
+    EXPECT_NEAR(state->dataHeatBalFanSys->MixingMassFlowZone(2), 2.0, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
 }

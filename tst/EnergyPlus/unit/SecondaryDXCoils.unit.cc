@@ -68,8 +68,6 @@
 using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataHVACGlobals;
-using DataHeatBalFanSys::ZT;
-using DataHeatBalFanSys::ZoneAirHumRat;
 using DataLoopNode::Node;
 using Psychrometrics::InitializePsychRoutines;
 using Psychrometrics::PsyHFnTdbW;
@@ -157,10 +155,10 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilSingleSpeed_Test4)
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
     Node.allocate(2);
-    ZT.allocate(1);
-    ZoneAirHumRat.allocate(1);
-    ZT(1) = 10.0;
-    ZoneAirHumRat(1) = 0.003;
+    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZT(1) = 10.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilAirFlow = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).CompressorPartLoadRatio = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).SecCoilRatedSHR = 1.0;
@@ -228,10 +226,10 @@ TEST_F(EnergyPlusFixture, SecondaryDXHeatingCoilMultiSpeed_Test5)
 
     state->dataDXCoils->DXCoil(DXCoilNum).SecZonePtr = 1;
     Node.allocate(2);
-    ZT.allocate(1);
-    ZoneAirHumRat.allocate(1);
-    ZT(1) = 10.0;
-    ZoneAirHumRat(1) = 0.003;
+    state->dataHeatBalFanSys->ZT.allocate(1);
+    state->dataHeatBalFanSys->ZoneAirHumRat.allocate(1);
+    state->dataHeatBalFanSys->ZT(1) = 10.0;
+    state->dataHeatBalFanSys->ZoneAirHumRat(1) = 0.003;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(1) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilAirFlow(2) = 1.0;
     state->dataDXCoils->DXCoil(DXCoilNum).MSSecCoilSHRFT(1) = 0;
