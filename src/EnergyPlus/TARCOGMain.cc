@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,13 +55,10 @@
 #include <EnergyPlus/TARCOGMain.hh>
 #include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
-#include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/ThermalEN673Calc.hh>
 #include <EnergyPlus/ThermalISO15099Calc.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGMain {
+namespace EnergyPlus::TARCOGMain {
     // TARCOG: Thermal Analysis Routine for Center of Glazing
 
     // MODULE INFORMATION:
@@ -334,16 +331,10 @@ namespace TARCOGMain {
     // REFERENCES:
     // ISO 15099/ASHRAE SPC142, ISO10292, EN673, Tarcog technical documentation
 
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
     using namespace TARCOGOutput;
     using namespace TARCOGGassesParams;
     using namespace TARCOGParams;
-    using namespace TarcogShading;
     using namespace TARCOGArgs;
     using namespace ThermalISO15099Calc;
     using namespace ThermalEN673Calc;
@@ -351,7 +342,7 @@ namespace TARCOGMain {
 
     // Functions
 
-    void TARCOG90(int const nlayer,                     // Number of layers (glass + SD)
+    void TARCOG90(EnergyPlusData &state, int const nlayer,                     // Number of layers (glass + SD)
                   int const iwd,                        // Wind direction:
                   Real64 &tout,                         // Outdoor temperature [K]
                   Real64 &tind,                         // Indoor temperature [K]
@@ -662,22 +653,18 @@ namespace TARCOGMain {
         houtTemp = 0.0;
         ErrorMessage = "Normal Termination";
 
-        // sol = 0.0d0
-        // if (dir.ne.0) then
-        //  do i= 1, nlayer
-        //    sol(i) = dir * asol(i)
-        //  end do
-        // end if
-
         for (i = 1; i <= nlayer - 1; ++i) {
             CurGap(i) = gap(i);
         }
 
+        Files files;
+
         //  Prepare common debug variables:
-        PrepDebugFilesAndVariables(Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID, nperr);
+        PrepDebugFilesAndVariables(state, files, Debug_dir, Debug_file, Debug_mode, win_ID, igu_ID);
 
         // Check input arguments:
-        nperr = ArgCheck(nlayer,
+        nperr = ArgCheck(state, files,
+                         nlayer,
                          iwd,
                          tout,
                          tind,
@@ -789,7 +776,8 @@ namespace TARCOGMain {
         if (GoAhead(nperr)) {
 
             if (standard == ISO15099) {
-                Calc_ISO15099(nlayer,
+                Calc_ISO15099(state, files,
+                              nlayer,
                               iwd,
                               tout,
                               tind,
@@ -883,7 +871,8 @@ namespace TARCOGMain {
                               NumOfIterations,
                               edgeGlCorrFac);
             } else if ((standard == EN673) || (standard == EN673Design)) {
-                Calc_EN673(standard,
+                Calc_EN673(files,
+                           standard,
                            nlayer,
                            tout,
                            tind,
@@ -967,7 +956,8 @@ namespace TARCOGMain {
 
                     // after performed deflection recalculate temperatures with new gap widths
                     if (standard == ISO15099) {
-                        Calc_ISO15099(nlayer,
+                        Calc_ISO15099(state, files,
+                                      nlayer,
                                       iwd,
                                       tout,
                                       tind,
@@ -1061,7 +1051,8 @@ namespace TARCOGMain {
                                       NumOfIterations,
                                       edgeGlCorrFac);
                     } else if ((standard == EN673) || (standard == EN673Design)) {
-                        Calc_EN673(standard,
+                        Calc_EN673(files,
+                                   standard,
                                    nlayer,
                                    tout,
                                    tind,
@@ -1122,9 +1113,7 @@ namespace TARCOGMain {
             }     // if ((CalcDeflection.eq.DEFLECTION_CALC_TEMPERATURE).or.(CalcDeflection.eq.DEFLECTION_CALC_GAP_WIDTHS)) then
         }         // if (GoAhead(nperr)) then
 
-        FinishDebugOutputFiles(nperr);
+        FinishDebugOutputFiles(files, nperr);
     }
-
-} // namespace TARCOGMain
 
 } // namespace EnergyPlus

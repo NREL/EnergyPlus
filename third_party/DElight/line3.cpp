@@ -31,7 +31,7 @@
 #include <cmath>
 #include <cctype>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 using namespace std;
 
 extern double NaN_QUIET;
@@ -180,7 +180,7 @@ istream &operator >> (istream &s, line3 &line)
     point3	lorigin;
 	vector3	ldir;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [Point3 Vec3] = [[1 2 3] [4 5 6]]
 	
@@ -233,7 +233,7 @@ istream &operator >> (istream &s, lineseg3 &ls)
 {
     point3	end1, end2;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [Point2 Point2] = [[1 2 3] [4 5 6]]
 	
@@ -287,7 +287,7 @@ istream &operator >> (istream &s, ray3 &ray)
     point3	rorigin;
 	vector3	rdir;
     Char	c;
-	ostrstream osstream;
+	std::ostringstream osstream;
 	
 	// Expected format: [Point2 Vec2] = [[1 2 3] [4 5 6]]
 	

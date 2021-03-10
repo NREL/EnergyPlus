@@ -41,19 +41,19 @@ The optional name of the return plenum outlet node (or induced air outlet node) 
 
 \paragraph{Field: Maximum Heating Supply Air Temperature}\label{field-maximum-heating-supply-air-temperature-000}
 
-The maximum air temperature (degrees C) of the air used for heating the zone. The default is 50C (122F).
+The maximum air temperature (\si{\degreeCelsius}) of the air used for heating the zone. The default is 50\si{\degreeCelsius} (122F).
 
 \paragraph{Field: Minimum Cooling Supply Air Temperature}\label{field-minimum-cooling-supply-air-temperature-000}
 
-The minimum air temperature (degrees C) of the air used for cooling the zone. The default is 13C (55.4F).
+The minimum air temperature (\si{\degreeCelsius}) of the air used for cooling the zone. The default is 13\si{\degreeCelsius} (55.4F).
 
 \paragraph{Field: Maximum Heating Supply Air Humidity Ratio}\label{field-maximum-heating-supply-air-humidity-ratio-000}
 
-The maximum humidity ratio (kg of water per kg of dry air) of the hot supply air. The default is 0.0156 kgWater/kgDryAir which corresponds to a 20\%RH at 50C (122F) dry bulb.
+The maximum humidity ratio (kg of water per kg of dry air) of the hot supply air. The default is 0.0156 kgWater/kgDryAir which corresponds to a 20\%RH at 50\si{\degreeCelsius} (122F) dry bulb.
 
 \paragraph{Field: Minimum Cooling Supply Air Humidity Ratio}\label{field-minimum-cooling-supply-air-humidity-ratio-000}
 
-The minimum humidity ratio (kg of water per kg of dry air) of the cool supply air. The default is 0.0077 kgWater/kgDryAir which corresponds to a 10C (50F) dew point.
+The minimum humidity ratio (kg of water per kg of dry air) of the cool supply air. The default is 0.0077 kgWater/kgDryAir which corresponds to a 10\si{\degreeCelsius} (50F) dew point.
 
 \paragraph{Field: Heating Limit}\label{field-heating-limit-000}
 
@@ -296,6 +296,14 @@ The Ideal Loads air system outdoor air load variables are only calculated when t
   HVAC,Average,Zone Ideal Loads Supply Air Mass Flow Rate {[}kg/s{]}
 \item
   HVAC,Average,Zone Ideal Loads Supply Air Standard Density Volume Flow Rate {[}m3/s{]}
+\item
+  HVAC,Average,Zone Ideal Loads Supply Air Temperature {[}\si{\degreeCelsius}{]}
+\item
+  HVAC,Average,Zone Ideal Loads Supply Air Humidity Ratio {[}kgWater/kgDryAir{]}
+\item
+  HVAC,Average,Zone Ideal Loads Mixed Air Temperature {[}\si{\degreeCelsius}{]}
+\item
+  HVAC,Average,Zone Ideal Loads Mixed Air Humidity Ratio {[}kgWater/kgDryAir{]}
 \end{itemize}
 
 \paragraph{Ideal Loads Output Variable Overview}\label{ideal-loads-output-variable-overview}
@@ -476,7 +484,7 @@ The mass flow rate of the outdoor air stream in kg/s.
 
 \paragraph{Zone Ideal Loads Outdoor Air Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-ideal-loads-outdoor-air-standard-density-volume-flow-rate-m3s}
 
-The volume flow rate of the outdoor air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location's elevation and a temperature of 20.0ºC. The standard density does not vary over time.
+The volume flow rate of the outdoor air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location's elevation and a temperature of 20.0\si{\degreeCelsius}. The standard density does not vary over time.
 
 \paragraph{Zone Ideal Loads Supply Air Mass Flow Rate {[}kg/s{]}}\label{zone-ideal-loads-supply-air-mass-flow-rate-kgs}
 
@@ -484,7 +492,27 @@ The mass flow rate of the supply air stream in kg/s.
 
 \paragraph{Zone Ideal Loads Supply Air Standard Density Volume Flow Rate {[}m3/s{]}}\label{zone-ideal-loads-supply-air-standard-density-volume-flow-rate-m3s}
 
-The volume flow rate of the supply air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location's elevation and a temperature of 20.0ºC. The standard density does not vary over time.
+The volume flow rate of the supply air stream in m3/s using the standard density. The standard density is determined for dry air at the standard barometric pressure for the location's elevation and a temperature of 20.0\si{\degreeCelsius}. The standard density does not vary over time.
+
+\paragraph{Zone Ideal Loads Supply Air Temperature {[}\si{\degreeCelsius}{]}}\label{zone-ideal-loads-supply-air-temperature-c}
+
+The dry bulb temperature of the supply air stream in \si{\degreeCelsius}.
+
+
+\paragraph{Zone Ideal Loads Supply Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-ideal-loads-supply-air-humidity-ratio-kgWaterkgDryAir}
+
+The humidity ratio of the supply air stream in kgWater/kgDryAir.
+
+
+\paragraph{Zone Ideal Loads Mixed Air Temperature {[}\si{\degreeCelsius}{]}}\label{zone-ideal-loads-mixed-air-temperature-c}
+
+The dry bulb temperature of the mixed air stream after mixing the recirculation air stream and outdoor air stream (if present), in \si{\degreeCelsius}.
+
+
+\paragraph{Zone Ideal Loads Mixed Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-ideal-loads-mixed-air-humidity-ratio-kgWaterkgDryAir}
+
+The humidity ratio of the mixed air stream after mixing the recirculation air stream and outdoor air stream (if present) in kgWater/kgDryAir.
+
 
 \subsection{ZoneHVAC:FourPipeFanCoil}\label{zonehvacfourpipefancoil}
 
@@ -833,9 +861,9 @@ An example input for a fan coil unit, including its constituent components, is s
 \item
   HVAC,Sum,Fan Coil Sensible Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Fan Coil Fan Electric Power{[}W{]}
+  HVAC,Average,Fan Coil Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Fan Coil Fan Electric Energy {[}J{]}
+  HVAC,Sum,Fan Coil Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Fan Coil Runtime Fraction {[]}
 \item
@@ -874,11 +902,11 @@ This field reports the dry air sensible heat extraction rate of the fan coil uni
 
 This field is the dry air sensible heat extraction of the fan coil unit from the zone it is serving in Joules over the timestep being reported. This is determined by the outlet and zone conditions, the mass flow rate through the unit, and the timestep.
 
-\paragraph{Fan Coil Fan Electric Power {[}W{]}}\label{fan-coil-fan-electric-power-w}
+\paragraph{Fan Coil Fan Electricity Rate {[}W{]}}\label{fan-coil-fan-electric-power-w}
 
 This field reports the electricity consumption rate of the fan coil unit in Watts.
 
-\paragraph{Fan Coil Fan Electric Energy {[}J{]}}\label{fan-coil-fan-electric-energy-j}
+\paragraph{Fan Coil Fan Electricity Energy {[}J{]}}\label{fan-coil-fan-electric-energy-j}
 
 This field is the electricity consumption of the fan coil unit in Joules over the timestep being reported.
 
@@ -1180,9 +1208,9 @@ ZoneHVAC:UnitVentilator,
 \item
   HVAC,Sum,Zone Unit Ventilator Sensible Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Unit Ventilator Fan Electric Power{[}W{]}
+  HVAC,Average,Zone Unit Ventilator Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Unit Ventilator Fan Electric Energy {[}J{]}
+  HVAC,Sum,Zone Unit Ventilator Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Unit Ventilator Fan Availability Status {[]}
 \item
@@ -1213,11 +1241,11 @@ This field reports the sensible cooling output rate of the unit ventilator syste
 
 This field is the sensible cooling output of the unit ventilator system to the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the unit ventilator, and the timestep.
 
-\paragraph{Zone Unit Ventilator Fan Electric Power {[}W{]}}\label{zone-unit-ventilator-fan-electric-power-w}
+\paragraph{Zone Unit Ventilator Fan Electricity Rate {[}W{]}}\label{zone-unit-ventilator-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the unit ventilator in Watts.
 
-\paragraph{Zone Unit Ventilator Fan Electric Energy {[}J{]}}\label{zone-unit-ventilator-fan-electric-energy-j}
+\paragraph{Zone Unit Ventilator Fan Electricity Energy {[}J{]}}\label{zone-unit-ventilator-fan-electric-energy-j}
 
 This field reports the electric power consumed by the fan of the unit ventilator over the timestep in Joules.
 
@@ -1396,9 +1424,9 @@ ZoneHVAC:UnitHeater,
 \item
   HVAC,Sum,Zone Unit Heater Heating Energy {[}J{]}
 \item
-  HVAC,Average,Zone Unit Heater Fan Electric Power{[}W{]}
+  HVAC,Average,Zone Unit Heater Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Unit Heater Fan Electric Energy {[}J{]}
+  HVAC,Sum,Zone Unit Heater Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average, Zone Unit Heater Fan Availability Status {[]}
 \item
@@ -1413,11 +1441,11 @@ This field reports the heating output rate of the unit heater system to the zone
 
 This field is the heating output of the unit heater system to the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the unit heater, and the timestep.
 
-\paragraph{Zone Unit Heater Fan Electric Power {[}W{]}}\label{zone-unit-heater-fan-electric-power-w}
+\paragraph{Zone Unit Heater Fan Electricity Rate {[}W{]}}\label{zone-unit-heater-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the unit heater in Watts.
 
-\paragraph{Zone Unit Heater Fan Electric Energy {[}J{]}}\label{zone-unit-heater-fan-electric-energy-j}
+\paragraph{Zone Unit Heater Fan Electricity Energy {[}J{]}}\label{zone-unit-heater-fan-electric-energy-j}
 
 This field reports the electric power consumed by the fan of the unit heater over the timestep in Joules.
 
@@ -1493,7 +1521,7 @@ This alpha field is used to determine how the unit is to be controlled.~ There a
 
 \paragraph{Field: Throttling Range Temperature Difference {[}DeltaC{]}}\label{field-throttling-range-temperature-difference-deltac}
 
-This numeric input field defines the throttling range to use for zone-temperature based control, in degrees Celsius. This value is used when the unit's control method is ZoneTemperatureDeadbandOnOffCycling.~ This temperature range is used for hysteresis thermostatic control.~ It is modeled as symmetric about the cooling setpoint. The default is 1.0°C.
+This numeric input field defines the throttling range to use for zone-temperature based control, in degrees Celsius. This value is used when the unit's control method is ZoneTemperatureDeadbandOnOffCycling.~ This temperature range is used for hysteresis thermostatic control.~ It is modeled as symmetric about the cooling setpoint. The default is 1.0\si{\degreeCelsius}.
 
 \paragraph{Field: Cooling Load Control Threshold Heat Transfer Rate {[}W{]}}\label{field-cooling-load-control-threshold-heat-transfer-rate-w}
 
@@ -1759,9 +1787,9 @@ ZoneHVAC:OutdoorAirUnit,
 \item
   HVAC,Sum, Zone Outdoor Air Unit Sensible Heating Energy {[}J{]}
 \item
-  HVAC,Average, Zone Outdoor Air Unit Fan Electric Power {[}W{]}
+  HVAC,Average, Zone Outdoor Air Unit Fan Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Zone Outdoor Air Unit Fan Electric Energy {[}J{]}
+  HVAC,Sum, Zone Outdoor Air Unit Fan Electricity Energy {[}J{]}
 \item
   HVAC,Average, Zone Outdoor Air Unit Air Mass Flow Rate {[}kg/s{]}
 \item
@@ -1810,11 +1838,11 @@ These are the latent cooling output of the outdoor air unit system to the zone i
 
 These are the latent heating output of the outdoor air unit system to the zone it is serving, in Joules and Watts. This is determined by outlet and zone air conditions, the mass flow rate through the zone outdoor air unit, and the time step.
 
-\paragraph{Zone Outdoor Air Unit Fan Electric Power {[}W{]}}\label{zone-outdoor-air-unit-fan-electric-power-w}
+\paragraph{Zone Outdoor Air Unit Fan Electricity Rate {[}W{]}}\label{zone-outdoor-air-unit-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the outdoor air unit in Watts.
 
-\paragraph{Zone Outdoor Air Unit Fan Electric Energy {[}J{]}}\label{zone-outdoor-air-unit-fan-electric-energy-j}
+\paragraph{Zone Outdoor Air Unit Fan Electricity Energy {[}J{]}}\label{zone-outdoor-air-unit-fan-electric-energy-j}
 
 This field reports the electric power consumed by the fan of the outdoor air unit over the time step in Joules.
 
@@ -2057,9 +2085,9 @@ Following is an example input for the cycling window air conditioner, along with
 \item
   HVAC,Sum,Zone Window Air Conditioner Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Window Air Conditioner Electric Power{[}W{]}
+  HVAC,Average,Zone Window Air Conditioner Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Window Air Conditioner Electric Energy {[}J{]}
+  HVAC,Sum,Zone Window Air Conditioner Electricity Energy {[}J{]}
 \item
   HVAC,Average, Zone Window Air Conditioner Fan Part Load Ratio {[]}
 \item
@@ -2092,11 +2120,11 @@ This output is the latent heat extraction rate of the window air conditioner uni
 
 This is the latent heat extraction of the window air conditioner unit from the zone it is serving in Joules over the timestep being reported. This is determined by the outlet and zone conditions and the mass flow rate through the unit.
 
-\paragraph{Zone Window Air Conditioner Electric Power{[}W{]}}\label{zone-window-air-conditioner-electric-powerw}
+\paragraph{Zone Window Air Conditioner Electricity Rate {[}W{]}}\label{zone-window-air-conditioner-electric-powerw}
 
 This output is the electricity consumption rate of the window air conditioner unit in Watts. The consumption includes electricity used by the compressor and the fans (indoor supply air fan and the condenser fan).
 
-\paragraph{Zone Window Air Conditioner Electric Energy {[}J{]}}\label{zone-window-air-conditioner-electric-energy-j}
+\paragraph{Zone Window Air Conditioner Electricity Energy {[}J{]}}\label{zone-window-air-conditioner-electric-energy-j}
 
 This output is the electricity consumption of the window air conditioner unit in Joules for the time period being reported. The consumption includes electricity used by the compressor and the fans (indoor supply air fan and the condenser fan).
 
@@ -2250,11 +2278,11 @@ This input denotes how the unit's output is controlled in order to meet zone hea
 
 \paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-2}
 
-When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\si{\degreeCelsius}. This field is autosizable and the default is autosize.
 
 \paragraph{Field: Maximum Supply Air Temperature in Heating Mode}\label{field-maximum-supply-air-temperature-in-heating-mode-2}
 
-When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\si{\degreeCelsius}. This field is autosizable and the default is autosize.
 
 
 As shown in the example below, correct specification of the packaged terminal air conditioner requires the following objects in addition to the compound object itself:
@@ -2378,9 +2406,9 @@ ZoneHVAC:PackagedTerminalAirConditioner,
 \item
   HVAC,Sum,Zone Packaged Terminal Air Conditioner Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Packaged Terminal Air Conditioner Electric Power {[}W{]}
+  HVAC,Average,Zone Packaged Terminal Air Conditioner Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Packaged Terminal Air Conditioner Electric Energy {[}J{]}
+  HVAC,Sum,Zone Packaged Terminal Air Conditioner Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio {[]}
 \item
@@ -2437,11 +2465,11 @@ This output field is the latent heat extraction (dehumidification) rate of the p
 
 This output field is the latent heat extraction (dehumidification) of the packaged terminal air conditioner from the zone it is serving in Joules over the timestep being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the packaged terminal air conditioner. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are summed for the timestep being reported.
 
-\paragraph{Zone Packaged Terminal Air Conditioner Electric Power {[}W{]}}\label{zone-packaged-terminal-air-conditioner-electric-power-w}
+\paragraph{Zone Packaged Terminal Air Conditioner Electricity Rate {[}W{]}}\label{zone-packaged-terminal-air-conditioner-electric-power-w}
 
 This output field is the electricity consumption rate of the packaged terminal air conditioner in Watts. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the heating coil (includes electricity consumption rate for electric heating coil or parasitic electricity consumption rate for non-electric coils). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{Zone Packaged Terminal Air Conditioner Electric Energy {[}J{]}}\label{zone-packaged-terminal-air-conditioner-electric-energy-j}
+\paragraph{Zone Packaged Terminal Air Conditioner Electricity Energy {[}J{]}}\label{zone-packaged-terminal-air-conditioner-electric-energy-j}
 
 This output field is the electricity consumption of the packaged terminal air conditioner in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the heating coil (includes electricity consumption for electric heating coil or parasitic electricity consumption for non-electric coils). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 
@@ -2610,7 +2638,7 @@ This numeric field defines the maximum supply air temperature in degrees Celsius
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-000}
 
-This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for PTHP supplemental heater operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21°C. If this field is left blank, the default value is 21°C.
+This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for PTHP supplemental heater operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21\si{\degreeCelsius}. If this field is left blank, the default value is 21\si{\degreeCelsius}.
 
 \paragraph{Field: Fan Placement}\label{field-fan-placement-4-000}
 
@@ -2636,11 +2664,11 @@ This input denotes how the unit's output is controlled in order to meet zone hea
 
 \paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-3}
 
-When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+When Capacity Control Method = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\si{\degreeCelsius}. This field is autosizable and the default is autosize.
 
 \paragraph{Field: Maximum Supply Air Temperature in Heating Mode}\label{field-maximum-supply-air-temperature-in-heating-mode-3}
 
-When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\(^{o}\)C. This field is autosizable and the default is autosize.
+When Capacity Control Method = SingleZoneVAV, enter the maximum air temperature limit for reduced fan speed in heating mode. For SingleZoneVAV, this field's minimum supply air temperature is 0.0\si{\degreeCelsius}. This field is autosizable and the default is autosize.
 
 
 As shown in the example below, correct specification of the packaged terminal heat pump requires the following objects in addition to the compound object itself:
@@ -2791,9 +2819,9 @@ ZoneHVAC:PackagedTerminalHeatPump,
 \item
   HVAC,Sum,Zone Packaged Terminal Heat Pump Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Packaged Terminal Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Zone Packaged Terminal Heat Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Packaged Terminal Heat Pump Electric Energy {[}J{]}
+  HVAC,Sum,Zone Packaged Terminal Heat Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Packaged Terminal Heat Pump Fan Part Load Ratio {[]}
 \item
@@ -2850,11 +2878,11 @@ This output field is the latent heat extraction (dehumidification) rate of the p
 
 This output field is the latent heat extraction (dehumidification) of the packaged terminal heat pump from the zone it is serving in Joules over the timestep being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the packaged terminal heat pump. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are summed for the timestep being reported.
 
-\paragraph{Zone Packaged Terminal Heat Pump Electric Power {[}W{]}}\label{zone-packaged-terminal-heat-pump-electric-power-w}
+\paragraph{Zone Packaged Terminal Heat Pump Electricity Rate {[}W{]}}\label{zone-packaged-terminal-heat-pump-electric-power-w}
 
 This output field is the electricity consumption rate of the packaged terminal heat pump in Watts. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{Zone Packaged Terminal Heat Pump Electric Energy {[}J{]}}\label{zone-packaged-terminal-heat-pump-electric-energy-j}
+\paragraph{Zone Packaged Terminal Heat Pump Electricity Energy {[}J{]}}\label{zone-packaged-terminal-heat-pump-electric-energy-j}
 
 This output field is the electricity consumption of the packaged terminal heat pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 
@@ -3095,7 +3123,7 @@ This numeric field defines the maximum allowed supply air temperature exiting th
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-1-000}
 
-This numeric field defines the outdoor air dry-bulb temperature in degrees Celsius above which the heat pump supplemental heating coil is disabled. The temperature for this input field must be less than or equal to 21°C. If this input field is left blank, the default value is 21°C.
+This numeric field defines the outdoor air dry-bulb temperature in degrees Celsius above which the heat pump supplemental heating coil is disabled. The temperature for this input field must be less than or equal to 21\si{\degreeCelsius}. If this input field is left blank, the default value is 21\si{\degreeCelsius}.
 
 \paragraph{Field: Outdoor Dry-Bulb Temperature Sensor Node Name}\label{field-outdoor-dry-bulb-temperature-sensor-node-name-000}
 
@@ -3289,9 +3317,9 @@ ZoneHVAC:WaterToAirHeatPump,
 \item
   HVAC,Sum,Zone Water to Air Heat Pump Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Water to Air Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Zone Water to Air Heat Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Water to Air Heat Pump Electric Energy {[}J{]}
+  HVAC,Sum,Zone Water to Air Heat Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Water to Air Heat Pump Fan Part Load Ratio {[]}
 \item
@@ -3348,11 +3376,11 @@ This output field is the latent heat extraction (dehumidification) rate of the W
 
 This output field is the latent heat extraction (dehumidification) of the Water to Air Heat Pump from the zone it is serving in Joules over the time step being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the WaterToAirHP heat pump. This value is calculated for each HVAC system time step being simulated, and the results (latent heat extraction only) are summed for the time step being reported.
 
-\paragraph{Zone Water to Air Heat Pump Electric Power {[}W{]}}\label{zone-water-to-air-heat-pump-electric-power-w}
+\paragraph{Zone Water to Air Heat Pump Electricity Rate {[}W{]}}\label{zone-water-to-air-heat-pump-electric-power-w}
 
 This output field is the electricity consumption rate of the Water to Air Heat Pump in Watts. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
-\paragraph{Zone Water to Air Heat Pump Electric Energy {[}J{]}}\label{zone-water-to-air-heat-pump-electric-energy-j}
+\paragraph{Zone Water to Air Heat Pump Electricity Energy {[}J{]}}\label{zone-water-to-air-heat-pump-electric-energy-j}
 
 This output field is the electricity consumption of the Water to Air Heat Pump in Joules for the time period being reported. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported.
 
@@ -3378,7 +3406,7 @@ This object can be used for modeling conventional mechanical dehumidifiers. Thes
 \caption{Schematic of a mechanical dehumidifier \protect \label{fig:schematic-of-a-mechanical-dehumidifier}}
 \end{figure}
 
-The model has inputs for water removal, energy factor and air flow rate at rated conditions (26.7°C, 60\% RH). Curve objects must be specified to describe performance at off-rated conditions. A part-load cycling curve input must also be specified to account for inefficiencies due to cycling. Other inputs including minimum and maximum operating temperatures for dehumidifier operation, off-cycle parasitic load, and an input to direct the removed water to a storage tank.
+The model has inputs for water removal, energy factor and air flow rate at rated conditions (26.7\si{\degreeCelsius}, 60\% RH). Curve objects must be specified to describe performance at off-rated conditions. A part-load cycling curve input must also be specified to account for inefficiencies due to cycling. Other inputs including minimum and maximum operating temperatures for dehumidifier operation, off-cycle parasitic load, and an input to direct the removed water to a storage tank.
 
 The model assumes that this equipment dehumidifies and heats the air. If used in tandem with another system that cools and dehumidifies the zone air, then the zone dehumidifier should be specified as the lowest cooling priority in the \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList} object for best control of zone temperature and humidity levels (e.g., if there are 3 pieces of equipment in \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}, then the zone dehumidifier should have Cooling Priority = 3). With this zone equipment prioritization, the other cooling and dehumidification system would operate first to meet the temperature setpoint (and possibly meet the high humidity setpoint as well). If additional dehumidification is needed, then the zone dehumidifier would operate. The sensible heat generated by the dehumidifier is carried over to the zone air heat balance for the next HVAC time step.
 
@@ -3402,23 +3430,23 @@ This alpha field defines the name of the HVAC system node to which the dehumidif
 
 \paragraph{Field: Rated Water Removal}\label{field-rated-water-removal}
 
-This numeric input is the full load water removal rate, in liters per day, at rated conditions (air entering the dehumidifier at 26.7°C {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
+This numeric input is the full load water removal rate, in liters per day, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Rated Energy Factor}\label{field-rated-energy-factor}
 
-This numeric input is the energy factor (liters of water removed per kWh of electricity consumed) at rated conditions (air entering the dehumidifier at 26.7°C {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
+This numeric input is the energy factor (liters of water removed per kWh of electricity consumed) at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' below). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Rated Air Flow Rate}\label{field-rated-air-flow-rate-001}
 
-This numeric input is the volumetric air flow rate through the dehumidifier, in m\(^{3}\) per second, at rated conditions (air entering the dehumidifier at 26.7°C {[}80°F{]} dry-bulb and 60\% relative humidity). This is a required input field and the entered value must be greater than zero.
+This numeric input is the volumetric air flow rate through the dehumidifier, in m\(^{3}\) per second, at rated conditions (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity). This is a required input field and the entered value must be greater than zero.
 
 \paragraph{Field: Water Removal Curve Name}\label{field-water-removal-curve-name}
 
-This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of water removal as a function of the dry-bulb temperature (°C) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Water Removal to give the water removal of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7°C {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
+This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of water removal as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Water Removal to give the water removal of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
 
 \paragraph{Field: Energy Factor Curve Name}\label{field-energy-factor-curve-name}
 
-This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy factor as a function of the dry-bulb temperature (°C) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7°C {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
+This alpha field defines the name of a biquadratic performance curve (ref: Performance Curves) that parameterizes the variation of the energy factor as a function of the dry-bulb temperature (\si{\degreeCelsius}) and relative humidity (\%) of the air entering the dehumidifier. The output of this curve is multiplied by the Rated Energy Factor to give the energy factor of the dehumidifier at specific operating conditions (i.e., at temperatures and relative humidity levels different from the rating point conditions). The curve should be normalized to have the value of 1.0 at the rating point (air entering the dehumidifier at 26.7\si{\degreeCelsius} {[}80°F{]} dry-bulb and 60\% relative humidity, and air flow rate as defined by field ``Rated Air Flow Rate'' above).
 
 \paragraph{Field: Part Load Fraction Correlation Curve Name}\label{field-part-load-fraction-correlation-curve-name-000}
 
@@ -3440,11 +3468,11 @@ If the user wishes to model no efficiency degradation due to compressor cycling,
 
 \paragraph{Field: Minimum Dry-Bulb Temperature for Dehumidifier Operation}\label{field-minimum-dry-bulb-temperature-for-dehumidifier-operation}
 
-This numeric field defines the minimum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is below this value. This input value must be less than the Maximum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 10°C.
+This numeric field defines the minimum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is below this value. This input value must be less than the Maximum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 10\si{\degreeCelsius}.
 
 \paragraph{Field: Maximum Dry-Bulb Temperature for Dehumidifier Operation}\label{field-maximum-dry-bulb-temperature-for-dehumidifier-operation}
 
-This numeric field defines the maximum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is above this value. This input value must be greater than the Minimum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 35°C.
+This numeric field defines the maximum inlet air dry-bulb temperature for dehumidifier operation. The dehumidifier will not operate if the inlet air temperature is above this value. This input value must be greater than the Minimum Dry-Bulb Temperature for Dehumidifier Operation, and the default value is 35\si{\degreeCelsius}.
 
 \paragraph{Field: Off-Cycle Parasitic Electric Load}\label{field-off-cycle-parasitic-electric-load-001}
 
@@ -3492,19 +3520,19 @@ Following is an example input for a zone DX dehumidifier object. A \hyperref[zon
 \item
   HVAC,Sum,Zone Dehumidifier Removed Water Mass {[}kg{]}
 \item
-  HVAC,Average,Zone Dehumidifier Electric Power {[}W{]}
+  HVAC,Average,Zone Dehumidifier Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Dehumidifier Electric Energy {[}J{]}
+  HVAC,Sum,Zone Dehumidifier Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Zone Dehumidifier Off Cycle Parasitic Electric Power {[}W{]}
+  HVAC,Average,Zone Dehumidifier Off Cycle Parasitic Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}
+  HVAC,Sum,Zone Dehumidifier Off Cycle Parasitic Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Dehumidifier Part Load Ratio {[]}
 \item
   HVAC,Average,Zone Dehumidifier Runtime Fraction {[]}
 \item
-  HVAC,Average,Zone Dehumidifier Outlet Air Temperature {[}C{]}
+  HVAC,Average,Zone Dehumidifier Outlet Air Temperature {[}\si{\degreeCelsius}{]}
 \end{itemize}
 
 If Condensate Collection Water Storage Tank Name is specified:
@@ -3532,17 +3560,17 @@ This output field is the water removal rate by the dehumidifier in kg/s. This va
 
 This output field is the water removed by the dehumidifier in kg. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
 
-\paragraph{Zone Dehumidifier Electric Power {[}W{]}}\label{zone-dehumidifier-electric-power-w}
+\paragraph{Zone Dehumidifier Electricity Rate {[}W{]}}\label{zone-dehumidifier-electric-power-w}
 
-\paragraph{Zone Dehumidifier Electric Energy {[}J{]}}\label{zone-dehumidifier-electric-energy-j}
+\paragraph{Zone Dehumidifier Electricity Energy {[}J{]}}\label{zone-dehumidifier-electric-energy-j}
 
 These outputs are the electric power and electric consumption of the dehumidifier for the time period being reported. They include all electricity used by the dehumidifier (including off-cycle electric parasitics). These values are calculated for each HVAC system timestep, and the results are averaged (power) or summed (consumption) for the timestep being reported. The electric consumption output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Zone Dehumidifier Off Cycle Parasitic Electric Power {[}W{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-power-w}
+\paragraph{Zone Dehumidifier Off Cycle Parasitic Electricity Rate {[}W{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-power-w}
 
-\paragraph{Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-energy-j}
+\paragraph{Zone Dehumidifier Off Cycle Parasitic Electricity Energy {[}J{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-energy-j}
 
-These outputs are the parasitic electric power and electric consumption for controls or other electrical devices associated with the dehumidifier. This parasitic electric load is consumed whenever the dehumidifier is available to operate, but is not operating. The model assumes that this parasitic power contributes to heating the zone air (i.e., affects the zone air heat balance). These outputs values are included in the Zone Dehumidifier Electric Power and Zone Dehumidifier Electric Energy output variables.
+These outputs are the parasitic electric power and electric consumption for controls or other electrical devices associated with the dehumidifier. This parasitic electric load is consumed whenever the dehumidifier is available to operate, but is not operating. The model assumes that this parasitic power contributes to heating the zone air (i.e., affects the zone air heat balance). These outputs values are included in the Zone Dehumidifier Electric Power and Zone Dehumidifier Electricity Energy output variables.
 
 \paragraph{Zone Dehumidifier Part Load Ratio {[]}}\label{zone-dehumidifier-part-load-ratio}
 
@@ -3552,7 +3580,7 @@ This output field is the part-load ratio for the dehumidifier. Part-load ratio i
 
 This output field is the runtime fraction for the dehumidifier. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
-\paragraph{Zone Dehumidifier Outlet Air Temperature {[}C{]}}\label{zone-dehumidifier-outlet-air-temperature-c}
+\paragraph{Zone Dehumidifier Outlet Air Temperature {[}\si{\degreeCelsius}{]}}\label{zone-dehumidifier-outlet-air-temperature-c}
 
 This output field is dry-bulb temperature of the air leaving the dehumidifier in Celsius. This value represents the dry-bulb temperature of the air leaving the dehumidifier when it is operating. For periods when the dehumidifier is not operating, the outlet air temperature is set equal to the inlet air temperature. This value is calculated for each HVAC system timestep, and the results are averaged for the timestep being reported.
 
@@ -3621,7 +3649,7 @@ The user-assigned name corresponding to the air-to-air heat exchanger used in th
 
 \paragraph{Field: Supply Air Flow Rate}\label{field-supply-air-flow-rate-000}
 
-The supply air flow rate through the ERV unit in cubic meters per second at standard temperature and pressure (dry air at 20\(^{o}\) C drybulb). The program uses local barometric pressure to account for altitude using the equation for ``standard atmospheric'' pressure on p 6.1 of the ASHRAE 1997 HOF (SI edition) to initialize the air systems being simulated.
+The supply air flow rate through the ERV unit in cubic meters per second at standard temperature and pressure (dry air at 20\si{\degreeCelsius} drybulb). The program uses local barometric pressure to account for altitude using the equation for ``standard atmospheric'' pressure on p 6.1 of the ASHRAE 1997 HOF (SI edition) to initialize the air systems being simulated.
 
 p = 101325*(1-2.25577E-05*Z)**5.2559
 
@@ -3633,7 +3661,7 @@ Note: The supply air inlet node specified in the generic heat exchanger object m
 
 \paragraph{Field: Exhaust Air Flow Rate}\label{field-exhaust-air-flow-rate-1}
 
-The exhaust air flow rate through the ERV unit in cubic meters per second at standard temperature and pressure (dry air at 20\(^{o}\) C drybulb). The program uses local barometric pressure to account for altitude using the equation for ``standard atmospheric'' pressure on p 6.1 of the ASHRAE 1997 HOF (SI edition) to initialize the air systems being simulated.
+The exhaust air flow rate through the ERV unit in cubic meters per second at standard temperature and pressure (dry air at 20\si{\degreeCelsius} drybulb). The program uses local barometric pressure to account for altitude using the equation for ``standard atmospheric'' pressure on p 6.1 of the ASHRAE 1997 HOF (SI edition) to initialize the air systems being simulated.
 
 p = 101325*(1-2.25577E-05*Z)**5.2559
 
@@ -3797,9 +3825,9 @@ ZoneHVAC:EnergyRecoveryVentilator,
 
 \begin{itemize}
 \item
-  HVAC,Average,Zone Ventilator Electric Power{[}W{]}
+  HVAC,Average,Zone Ventilator Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone Ventilator Electric Energy {[}J{]}
+  HVAC,Sum,Zone Ventilator Electricity Energy {[}J{]}
 \item
   HVAC,Average,Zone Ventilator Total Cooling Rate {[}W{]}
 \item
@@ -3828,11 +3856,11 @@ ZoneHVAC:EnergyRecoveryVentilator,
   HVAC,Average,Zone Ventilator Supply Fan Availability Status {[]}
 \end{itemize}
 
-\paragraph{Zone Ventilator Electric Power {[}W{]}}\label{zone-ventilator-electric-power-w}
+\paragraph{Zone Ventilator Electricity Rate {[}W{]}}\label{zone-ventilator-electric-power-w}
 
 This output field is the electric consumption rate of the stand alone energy recovery ventilator in Watts. This rate includes the electric consumption by the supply air fan, exhaust air fan and the generic air-to-air heat exchanger.
 
-\paragraph{Zone Ventilator Electric Energy {[}J{]}}\label{zone-ventilator-electric-energy-j}
+\paragraph{Zone Ventilator Electricity Energy {[}J{]}}\label{zone-ventilator-electric-energy-j}
 
 This output field is the electric consumption of the stand alone energy recovery ventilator in Joules for the timestep being reported. This value includes the electric consumption by the supply air fan, exhaust air fan and the generic air-to-air heat exchanger.
 
@@ -3894,15 +3922,15 @@ Terminal units with variable refrigerant flow compound HVAC object are used excl
 
 \begin{callout}
 Note: The terminal unit may be used in the air loop and/or outdoor air system, however, at this time only constant flow (or limited variation within the limits allowed for DX coils) through the unit is allowed. Using a wide range of outdoor air flow rates will cause the DX coil model to fail. For example, if the minimum outdoor air flow rate is allowed to fall near 0, the DX coil model will calculate very low, even very negative, coil outlet temperatures. This can cause psychrometric warnings to occur and cause the simulation to end prematurely.
-\end{callout} 
+\end{callout}
 
 For zone equipment the terminal units are connected to a zone using the inlet and exhaust node names specified in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. The zone exhaust node has the same name as the terminal unit air inlet node. The zone inlet node has the same name as the terminal unit air outlet node. The zone terminal unit is also listed in a zone's equipment list and will typically be the first equipment operating for both cooling and heating (i.e., Sequence = 1 in the \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}). Other ZoneHVAC equipment may be used in the same zone and should be sequenced to operate after the zone terminal units (i.e., sequence = 2 or higher).
 
 For air loop equipment and outdoor air system equipment the VRF terminal unit inlet and outlet nodes define the location of the system in the air loop and outdoor air system. The node names must define the path of the air stream in order from the beginning of the air loop or outdoor air system to the outlet of that system.
 
-This VRF terminal unit can be controlled based on a load or set point. When the system is used as zone equipment load control is always used. When the VRF terminal unit is used in an air loop and the control zone name or thermostat location is specified, the system is controlled based on zone load. If the control zone name or thermostat location is not specified the VRF terminal unit will be controlled based on termninal unit or coil outlet node set point temperature. When set point based control is used the node temperature set points may be placed at the outlet of the terminal unit or at individual coil outlet nodes. If the VRF terminal unit is used in an air loop's outdoor air system, control is always based on a termninal unit or coil outlet node temperature set point. 
+This VRF terminal unit can be controlled based on a load or set point. When the system is used as zone equipment load control is always used. When the VRF terminal unit is used in an air loop and the control zone name or thermostat location is specified, the system is controlled based on zone load. If the control zone name or thermostat location is not specified the VRF terminal unit will be controlled based on termninal unit or coil outlet node set point temperature. When set point based control is used the node temperature set points may be placed at the outlet of the terminal unit or at individual coil outlet nodes. If the VRF terminal unit is used in an air loop's outdoor air system, control is always based on a termninal unit or coil outlet node temperature set point.
 
-The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. An optional supplemental heating coil can also be added to the terminal unit to provide additional heating when the main DX heating coil could not meet the entire heating load of a zone during cold outdoor conditions. The Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatingfuel]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
+The terminal units operate to satisfy a heating or cooling load in a zone based on a zone thermostat temperature set point. A direct-expansion (DX) cooling and/or DX heating coil is specified depending on the operating mode required. Both a DX cooling and DX heating coil will typically be installed in the terminal unit, however only one may be used if desired. An optional supplemental heating coil can also be added to the terminal unit to provide additional heating when the main DX heating coil could not meet the entire heating load of a zone during cold outdoor conditions. The Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}. Outdoor ventilation air is modeled with the use of an optional outside air mixer object. Outside air may be provided to the zone only when the coil is operating or can be supplied continuously even when the coil is not operating.
 
 A supply air fan can be modeled as either draw through or blow through. The supply air fan is required for zone equipment and optional for air loop and outdoor air system equipment. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume} if \hyperref[airconditionervariablerefrigerantflow]{AirConditioner:VariableRefrigerantFlow} is used to model the VRF outdoor unit. The Supply Air Fan Object Type must be \hyperref[fansystemmodel]{Fan:SystemModel} or \hyperref[fanvariablevolume]{Fan:VariableVolume} if AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl or AirConditioner:VariableRefrigerantFlow:\-FluidTemperatureControl:HR is used to model the VRF outdoor unit.
 
@@ -3976,7 +4004,7 @@ This field may be left blank when the VRF terminal unit is used as air loop or o
 
 This alpha field defines the name of the terminal unit's supply air fan. This field may be left blank when the VRF terminal unit is used as air loop or outdoor air system equipment.
 
-\paragraph{Field: Outdoor Air Mixer Object Type}\label{field-outdoor-air-mixer-object-type}
+\paragraph{Field: Outdoor Air Mixer Object Type}
 
 This alpha field contains the identifying type of outdoor air mixer specified for the terminal unit. Outdoor air mixer type must be \textit{\hyperref[outdoorairmixer]{OutdoorAir:Mixer}}. This input field should be left blank when the VRF terminal unit is connected to an \textit{\hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}} object. If this field is left blank, an outdoor air mixer is not simulated. If the VRF terminal unit is used as air loop equipment and this terminal unit's outdoor air flow rates are autosized then the autosized flow rates will be set to 0 when an outdoor air system is used in the air loop (ref \textit{\hyperref[airloophvacoutdoorairsystem]{AirloopHVAC:OutdoorAirSystem}}).
 
@@ -4022,7 +4050,7 @@ This optional input field is the name of a \hyperref[designspecificationzonehvac
 
 \paragraph{Field: Supplemental Heating Coil Object Type}\label{field-supplemental-heating-coil-object-type-2-000}
 
-This alpha field defines the type of supplemental heating coil to be used by this VRF terminal unit. The input requirements for these heating coil objects are described elsewhere in this document. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (VRF terminal unit) itself provides the “controller” function of modulating water flow. Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatingfuel]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}.
+This alpha field defines the type of supplemental heating coil to be used by this VRF terminal unit. The input requirements for these heating coil objects are described elsewhere in this document. The hot water and steam heating coils require specifying plant loop, branches, and connector objects to support the heating coils, and are placed on the demand side of the plantloop. The hot water flow modulation through the supplemental heating coil does not require additional controller or Controller:WaterCoil object. The parent object (VRF terminal unit) itself provides the “controller” function of modulating water flow. Supplemental Heating Coil Object Type must be \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam}.
 
 \paragraph{Field: Supplemental Heating Coil Name}\label{field-supplemental-heating-coil-name-2-000}
 
@@ -4034,7 +4062,7 @@ This numeric field defines the maximum supply air temperature in degrees Celsius
 
 \paragraph{Field: Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation}\label{field-maximum-outdoor-dry-bulb-temperature-for-supplemental-heater-operation-2-000}
 
-This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for this VRF terminal unit supplemental heating coil operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21°C. If this field is left blank, the default value of 21°C will be used.
+This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for this VRF terminal unit supplemental heating coil operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21\si{\degreeCelsius}. If this field is left blank, the default value of 21\si{\degreeCelsius} will be used.
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{controlling-zone-or-thermostat-location-2-110}
 
@@ -4106,13 +4134,13 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
 \item
   HVAC,Sum, Zone VRF Air Terminal Latent Heating Energy {[}J{]}
 \item
-  HVAC,Average, Zone VRF Air Terminal Cooling Electric Power {[}W{]}
+  HVAC,Average, Zone VRF Air Terminal Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Zone VRF Air Terminal Cooling Electric Energy {[}J{]}
+  HVAC,Sum, Zone VRF Air Terminal Cooling Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Zone VRF Air Terminal Heating Electric Power {[}W{]}
+  HVAC,Average,Zone VRF Air Terminal Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Zone VRF Air Terminal Heating Electric Energy {[}J{]}
+  HVAC,Sum,Zone VRF Air Terminal Heating Electricity Energy {[}J{]}
 \item
   HVAC,Average, Zone VRF Air Terminal Fan Availability Status {[]}
 \end{itemize}
@@ -4165,19 +4193,19 @@ This is the latent heating rate output of the terminal unit in Watts. This is de
 
 This is the latent heating output of the terminal unit in Joules for the time step being reported. This is determined by the inlet and outlet air specific humidity ratios and the air mass flow rate through the unit. This value describes the latent heating energy delivered to the zone.
 
-\paragraph{Zone VRF Air Terminal Cooling Electric Power{[}W{]}}\label{zone-vrf-air-terminal-cooling-electric-powerw}
+\paragraph{Zone VRF Air Terminal Cooling Electricity Rate {[}W{]}}\label{zone-vrf-air-terminal-cooling-electric-powerw}
 
 This output field is the parasitic electricity consumption rate of the zone terminal unit in Watts. The consumption rate includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The terminal unit parasitic on and off electricity is reported in this cooling output variable when the unit operates in cooling mode or the most recent operation was for cooling.
 
-\paragraph{Zone VRF Air Terminal Cooling Electric Energy {[}J{]}}\label{zone-vrf-air-terminal-cooling-electric-energy-j}
+\paragraph{Zone VRF Air Terminal Cooling Electricity Energy {[}J{]}}\label{zone-vrf-air-terminal-cooling-electric-energy-j}
 
 This output field is the electricity consumption of the zone terminal unit in Joules for the time period being reported. The consumption includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. The terminal unit parasitic on and off electricity consumption is reported in this cooling output variable when the unit operates in cooling mode or the most recent operation was for cooling. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Zone VRF Air Terminal Heating Electric Power{[}W{]}}\label{zone-vrf-air-terminal-heating-electric-powerw}
+\paragraph{Zone VRF Air Terminal Heating Electricity Rate {[}W{]}}\label{zone-vrf-air-terminal-heating-electric-powerw}
 
 This output field is the parasitic electricity consumption rate of the zone terminal unit in Watts. The consumption rate includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The terminal unit parasitic on and off electricity is reported in this heating output variable when the unit operates in heating mode or the most recent operation was for heating.
 
-\paragraph{Zone VRF Air Terminal Heating Electric Energy {[}J{]}}\label{zone-vrf-air-terminal-heating-electric-energy-j}
+\paragraph{Zone VRF Air Terminal Heating Electricity Energy {[}J{]}}\label{zone-vrf-air-terminal-heating-electric-energy-j}
 
 This output field is the electricity consumption of the zone terminal unit in Joules for the time period being reported. The consumption includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. The terminal unit parasitic on and off electricity consumption is reported in this heating output variable when the unit operates in heating mode or the most recent operation was for heating. This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
@@ -4241,7 +4269,7 @@ This alpha input field specifies the method that will be used to choose operatin
 This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws return air. This node name must also be specified as a zone return air node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. It may also be included in \hyperref[nodelist]{NodeList} object that is specified as a zone return air node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. (Ref. Group - Zone Equipment \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} and Group - Node-Branch Management \hyperref[nodelist]{NodeList}).
 
 \paragraph{Field: Outdoor Air Node Name}
-This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws outdoor air. This node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. If this field is blank, a node name will be created internally. (Ref. Group - Node-Branch Management \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
+This alpha input field specifies the name of the HVAC system node from which the hybrid unit draws outdoor air. This node name must also be specified in an \hyperref[outdoorairnode]{OutdoorAir:Node} or \hyperref[outdoorairnodelist]{OutdoorAir:NodeList} object. (Ref. Group - Node-Branch Management \hyperref[outdoorairnode]{OutdoorAir:Node} and \hyperref[outdoorairnodelist]{OutdoorAir:NodeList}).
 
 \paragraph{Field: Supply Air Node Name}
 This alpha input field specifies the name of the HVAC system node to which the hybrid unit sends supply air. This node name must also be specified as zone inlet node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. It may also be included in \hyperref[nodelist]{NodeList} object that is specified as a zone inlet node in a \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} object. (Ref. Group - Zone Equipment \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} and Group - Node-Branch Management \hyperref[nodelist]{NodeList}).
@@ -4250,16 +4278,22 @@ This alpha input field specifies the name of the HVAC system node to which the h
 This optional alpha input field specifies the name of an HVAC system node which can extract air from the zone to balance the air supplied to the zone by the unit. This node name would match the name of a zone exhaust air node.
 
 \paragraph{Field: System Maximum Supply Air Volume Flow Rate}
-This numeric input field specifies the maximum standard density supply air volume flow rate among all operating modes. The field allows custom resizing of the hybrid unit. The values specified in each \hyperref[tablelookup]{Table:Lookup} object associated with a hybrid unit represent performance data for a specific product of a particular size, but the value output from each \hyperref[tablelookup]{Table:Lookup} object is augmented by a normalization reference (Ref: Group - Performance Tables \hyperref[tablelookup]{Table:Lookup}). The normalization reference specified for all \hyperref[tablelookup]{Table:Lookup} objects associated with a hybrid unit should be the maximum supply air mass flow rate for the real hybrid unit that was used to create the performance data included in each table object. The value in this field is used to rescale the normalized values output from tables for extensive dependent variables. If the standard density supply air volume flow rate input to this field is equivalent to the system maximum supply air mass flow rate used as the normalization reference – given appropriate unit conversions – then the resulting output from the model will exactly match the original performance data specified in each table. If the value in this field is larger or smaller, the values for extensive dependent variables will be scaled proportionally. The values of intensive dependent variables are rescaled by the normalization reference value, so will always match the original performance data specified in each table object. The value in this field should be specified as standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa.
+This numeric input field specifies the maximum standard density supply air volume flow rate among all operating modes. The field allows custom resizing of the hybrid unit. The values specified in each \hyperref[tablelookup]{Table:Lookup} object associated with a hybrid unit represent performance data for a specific product of a particular size, but the value output from each \hyperref[tablelookup]{Table:Lookup} object is augmented by a normalization reference (Ref: Group - Performance Tables \hyperref[tablelookup]{Table:Lookup}). The normalization reference specified for all \hyperref[tablelookup]{Table:Lookup} objects associated with a hybrid unit should be the maximum supply air mass flow rate for the real hybrid unit that was used to create the performance data included in each table object. The value in this field is used to rescale the normalized values output from tables for extensive dependent variables. If the standard density supply air volume flow rate input to this field is equivalent to the system maximum supply air mass flow rate used as the normalization reference – given appropriate unit conversions – then the resulting output from the model will exactly match the original performance data specified in each table. If the value in this field is larger or smaller, the values for extensive dependent variables will be scaled proportionally. The values of intensive dependent variables are rescaled by the normalization reference value, so will always match the original performance data specified in each table object. The value in this field should be specified as standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20\si{\degreeCelsius} drybulb, and 101,325 Pa.
 
 \paragraph{Field: External Static Pressure at System Maximum Supply Air Flow Rate}
 This optional numeric input field specifies the external static pressure at the system maximum supply air flow rate specified in the previous field. Fan affinity laws are used to scale supply fan power from the scenario used to create the performance data included in each \hyperref[tablelookup]{Table:Lookup} object, to a scenario that corresponds to the value specified in this field. The result is also used to adjust the system electric power accordingly. If this field is blank, the supply fan power is not scaled from the values specified in lookup tables.
 
-\paragraph{Field: Scaling Factor}
-This optional numeric field  scales all extensive dependent variables including: supply air mass flow rate, electricity use, fuel uses, and water use. The value in this field acts together with the value in field System Maximum Standard Density Supply Air Volume Flow Rate to allow custom resizing of the hybrid unit.
+\paragraph{Field: Fan Heat Included in Lookup Tables}
+This alpha field specifies if the fan heat gain was taken into account in the lookup tables specified for each mode. Valid choices are \textbf{\emph{Yes}} and \textbf{\emph{No}}. If No, the fan heat is calculated based on the fan power and the next two fields specify the location and fraction of the fan heat gain to the air stream, otherwise the fan heat gain is not calculated.
 
-\paragraph{Field: Number of Operating Modes}
-This numeric field specifies the number of discrete operating modes for the hybrid unit. Supply air mass flow rate ratio and outdoor air fraction are treated as continuous controlled independent variables within each discrete operating mode. All other independent parameters, such as compressor speed, must be described by discrete operating modes.  Mode 0 always describes standby operation. Mode 1 - Mode 25 describe active operating modes that provide ventilation, heating, cooling, humidification or dehumidification. 26 modes are allowed (including Mode 0). If the value input to this field is 1, only Mode 0 will be considered when the model choses setting to satisfy sensible loads, latent loads, or scheduled ventilation volume. If this field is blank, the default number of operating modes is 1.
+\paragraph{Field: Fan Heat Gain Location}
+This optional alpha field specifies the location that the fan heat gain should be applied if not included in the lookup tables. Valid choices include: \textbf{\emph{MixedAirStream}} and \textbf{\emph{SupplyAirStream}}. MixedAirStream is upstream of the cooling medium while SupplyAirStream is downstream of the cooling medium.
+
+\paragraph{Field: Fan Heat Gain in Airstream Fraction}
+This optional numeric field is the fraction of the fan heat that is added to the air stream if not included in the lookup tables. A value of 0 means that the fan heat is completely outside the air stream. A value of 1 means that all of the fan heat loss will go into the air stream and act to cause a temperature rise. Must be between 0 and 1. The default is 1.0.
+
+\paragraph{Field: Scaling Factor}
+This optional numeric field scales all extensive dependent variables including: supply air mass flow rate, electricity use, fuel uses, and water use. The value in this field acts together with the value in field System Maximum Standard Density Supply Air Volume Flow Rate to allow custom resizing of the hybrid unit.
 
 \paragraph{Field: Minimum Time Between Mode Change}
 This numeric field specifies the minimum time that must pass before the hybrid unit can change mode. If the value in this field is larger than each timestep, the mode selected in one time step will persist in later time steps until the minimum time between mode change is satisfied. If the value in this field is smaller than each timestep, it will determine the minimum part runtime fraction allowed for any mode. Supply air mass flow rate and outdoor air fraction within a mode are not subject to minimum runtime and may change in every time step, or with any part runtime fraction. Mode 0 does not have a minimum time. If this field is blank, the default minimum time between mode change is 10 minutes.
@@ -4317,7 +4351,7 @@ This optional numeric field specifies the supply air mass flow rate ratio for Mo
 The definition of each operating mode is given as inputs to 25 fields. The first field specifies a unique name for the mode. The following eight fields specify the names of \hyperref[tablelookup]{Table:Lookup} objects that describe hybrid unit performance parameters. The remaining sixteen fields specify constraints on controlled independent variables, and constraints to describe the indoor and outdoor psychrometric conditions at which the mode is allowed. The definition of operating modes is extensible. To define multiple modes, repeat the following 25 fields with appropriate input values for each mode. The object does not require that modes be defined in a particular order. Up to 25 modes can be defined in this way.
 
 \paragraph{Field: Mode \# Name}
-This alpha input field specifies a unique user-assigned descriptive name for Mode \#.
+This alpha input field specifies a unique user-assigned descriptive name for Mode \#. Each desired mode must have a mode name in order for that mode to be included in the simulation.
 
 \paragraph{Field: Mode \# Supply Air Temperature Lookup Table Name}
 This optional alpha input field specifies the name of a \hyperref[tablelookup]{Table:Lookup} object that describes supply air temperature for Mode \# as a function of six independent variables: outdoor air temperature, outdoor air humidity ratio, return air temperature, return air humidity ratio, supply air mass flow rate, and outdoor air fraction. If this field is blank, Mode \# will not be considered for any time step that requires ventilation, heating, cooling, humidification, or dehumidification.
@@ -4433,12 +4467,12 @@ HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity [%]
 HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate [kg/s]
 HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate [m3/s]
 HVAC,Average,Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate [m3/s]
-HVAC,Average,Zone Hybrid Unitary HVAC Electric Power [W]
-HVAC,Average,Zone Hybrid Unitary HVAC Electric Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Electricity Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Electricity Energy [J]
 Water use
 Second Fuel Use
 Third Fuel Use
-Supply Fan Electric Power
+Supply Fan Electricity Rate
 External Static Pressure
 HVAC,Average,Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]
 HVAC,Average,Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate [kg/s]
@@ -4554,17 +4588,17 @@ This output reports the predicted latent heat transfer rate required to meet the
 \paragraph{Zone Hybrid Unitary HVAC Predicted Moisture Load to Humidistat Setpoint Moisture Transfer Rate [kgWater/s]}
 This output reports the predicted moisture transfer rate required to meet the current zone humidistat setpoint. A positive value indicates a humidification load, a negative value indicates a dehumidification load. For a dual setpoint humidistat, the value is zero when the controlled zone’s relative humidity is between the defined humidifying and dehumidifying setpoints. See \hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat} for further information. This value is used as a soft inequality constraint in the constrained optimization problem that determines system settings in each time step. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Supply Air Temperature [C]}
-This output reports the supply air temperature. For each timestep the value is calculated as a supply air mass weighted average of the supply air temperature for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air temperature of 16 °C, and for half of the timestep at 2 kg/s and 10 °C, the supply air temperature calculated for the time step would be 12 °C. The output is the average over the reporting period.
+\paragraph{Zone Hybrid Unitary HVAC Supply Air Temperature [\si{\degreeCelsius}]}
+This output reports the supply air temperature. For each timestep the value is calculated as a supply air mass weighted average of the supply air temperature for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air temperature of 16\si{\degreeCelsius}, and for half of the timestep at 2 kg/s and 10\si{\degreeCelsius}, the supply air temperature calculated for the time step would be 12 \si{\degreeCelsius}. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Return Air Temperature [C]}
+\paragraph{Zone Hybrid Unitary HVAC Return Air Temperature [\si{\degreeCelsius}]}
 This output reports the return air temperature. The return air temperature is inherited from the associated zone outlet node in each timestep. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Temperature [C]}
+\paragraph{Zone Hybrid Unitary HVAC Outdoor Air Temperature [\si{\degreeCelsius}]}
 This output reports the outdoor air temperature.  The outdoor air temperature is inherited from the associated outdoor air node in each timestep.  The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Supply Air Humidity Ratio [kgWater/kgDryAir]}
-This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kg/kg, and for half of the timestep at 2 kg/s and 0.010 kg/kg, the supply air humidity ratio calculated for the time step would be 0.012 °C. The output is the average over the reporting period.
+This output reports the supply air humidity ratio. For each timestep the value is calculated as a supply air mass weighted average of the supply air humidity ratio for each of the settings selected for the time step. For example, if the system operates for half of the timestep with supply air mass flow rate of 1 kg/s and supply air humidity ratio of 0.016 kgWater/kgDryAir, and for half of the timestep at 2 kg/s and 0.010 kgWater/kgDryAir, the supply air humidity ratio calculated for the time step would be 0.012 kgWater/kgDryAir. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Return Air Humidity Ratio [kgWater/kgDryAir]}
 This output reports the return air humidity ratio. The return air humidity ratio is inherited from the associated zone outlet node in each timestep.  The output is the average over the reporting period.
@@ -4585,15 +4619,15 @@ This output reports the outdoor air relative humidity. The outdoor air relative 
 This output reports the supply air mass flow rate. For each timestep the value is calculated as a time weighted average of the supply air mass flow rate for each of the settings selected for the time step. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate [m3/s]}
-This output reports the supply air flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa. The output is the average over the reporting period.
+This output reports the supply air flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20\si{\degreeCelsius} drybulb, and 101,325 Pa. The output is the average over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate [m3/s]}
-This output reports the outdoor air (ventilation) flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa. The output is the average over the reporting period.
+This output reports the outdoor air (ventilation) flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20\si{\degreeCelsius} drybulb, and 101,325 Pa. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Electric Power [W]}
+\paragraph{Zone Hybrid Unitary HVAC Electricity Rate [W]}
 This output reports the electric power input to the system. For each timestep the value is calculated as a time weighted average of the electric power for each of the settings selected for the time step. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Electric Energy [J]}
+\paragraph{Zone Hybrid Unitary HVAC Electricity Energy [J]}
 This output reports the electric energy consumed by the system. For each timestep the value is calculated from the average electric power. The output is the sum over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]}

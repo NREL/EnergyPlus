@@ -46,7 +46,7 @@ Zone floor area is used in many places within EnergyPlus. EnergyPlus automatical
 
 \paragraph{Field: Zone Inside Convection Algorithm}\label{field-zone-inside-convection-algorithm}
 
-The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{TARP} (combines natural and wind-driven convection correlations from laboratory measurements on flat plates), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized) and \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity). See the Inside Convection Algorithm object for further descriptions of the available models.
+The Zone Inside Convection Algorithm field is optional. This field specifies the convection model to be used for the inside face of heat transfer surfaces associated with this zone. The choices are: \textbf{Simple} (constant natural convection - ASHRAE), \textbf{TARP} (combines natural and wind-driven convection correlations from laboratory measurements on flat plates), \textbf{CeilingDiffuser} (ACH based forced and mixed convection correlations for ceiling diffuser configuration with simple natural convection limit), \textbf{AdaptiveConvectionAlgorithm} (complex arrangement of various models that adapt to various zone conditions and can be customized), \textbf{TrombeWall} (variable natural convection in an enclosed rectangular cavity), and \textbf{ASTMC1340} (mixed convection coefficients specified for attic zone). See the Inside Convection Algorithm object for further descriptions of the available models.
 
 If omitted or blank, the algorithm specified in the \hyperref[surfaceconvectionalgorithminside]{SurfaceConvectionAlgorithm:Inside} object is the default.
 
@@ -652,11 +652,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 This is the zone name to which the surface belongs.
 
-\paragraph{Field: Azimuth Angle}\label{field-azimuth-angle}
+\paragraph{Field: Azimuth Angle}
 
 The Azimuth Angle indicates the direction that the wall faces (outward normal). The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
-\paragraph{Field: Tilt Angle}\label{field-tilt-angle}
+\paragraph{Field: Tilt Angle}
 
 The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Normally, walls are tilted 90 degrees and that is the default for this field.
 
@@ -4075,7 +4075,7 @@ Shading:Site:Detailed,
 
 Window shading with coverings like drapes, blinds, screens or pull-down shades can be used to reduce the amount of solar radiation entering the window or reduce daylighting glare. It can also be used to reduce heat loss through the window (movable insulation). Leaving the window covering open in the winter can maximize solar heat gain and thereby reduce heating loads.
 
-With WindowShadingControl you specify the type and location of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled. Each WindowShadingControl object is associated with a zone and has a list of one or more windows and glass doors to which the shading control is applied (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} with Type = Window or GlassDoor, Window, and \hyperref[glazeddoor]{GlazedDoor}).
+With WindowShadingControl you specify the type,  location, and timing of the shading device, what variable or combination of variables controls deployment of the shading device, and what the control setpoint is. If the shading device is a blind, you also specify how the slat angle is controlled. Each WindowShadingControl object is associated with a zone and has a list of one or more windows and glass doors to which the shading control is applied (ref: \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} with Type = Window or GlassDoor, Window, and \hyperref[glazeddoor]{GlazedDoor}).
 
 NOTE: WindowShadingControl does not work with complex fenestration systems. Controlled complex fenestration systems can be made only with Energy Management Systems objects. Refrencing a \hyperref[fenestrationsurfacedetailed]{FenestrationSurface:Detailed} in a WindowShadingControl while using complex fenestration systems will be ignored by program.
 
@@ -4115,7 +4115,9 @@ This method is the required if you want to add a shading device to a constructio
 Note that if both ``Name of Construction with Shading'' and ``Material Name of Shading Device'' are specified, the former takes precedence.
 \end{itemize}
 
-Most Shading Control Types allow you to specify a schedule that determines when the control is active. One example is a control that is active seasonally. For example, to deploy shading only in the summer when the incident solar is high enough, use Shading Control Type = OnIfHighSolarOnWindow with a schedule that is 1 during the summer months and 0 otherwise and specify Shading Control Is Scheduled = YES.
+Most Shading Control Types allow you to specify a schedule that determines when the control is active. One example is a control that is active seasonally. For example, to deploy shading only in the summer when the incident solar is high enough, use Shading Control Type = OnIfHighSolarOnWindow with a schedule that is 1 during the summer months and 0 otherwise and specify Shading Control Is Scheduled = YES. 
+
+To deploy one shading device during one time period and another during another time period for the same window, specify two different WindowShadingControl objects that both reference the same fenestration.  Each of the WindowShadingControl input objects would include the same window on their lists of fenestration objects, but would reference different schedule input objects. The referenced schedule input objects should have non-zero values specified at different times for each WindowShadingControl. This approach can be used to add shading that is different for different seasons. When more than one WindowShadingControl is used for the same window based on schedule, the type of shading, control type, setpoints, and several other parameters must be the same in the different WindowShadingControl objects, but the shading device and construction can be different.
 
 In addition, most Shading Control Types also allow you to specify that glare control is active in addition to the specified Control Type. For example, you might want to deploy shading when the solar incident on a window is too high OR the glare from the window is too high. This type of joint control requires that the window be in a daylit zone, that the maximum allowed glare be specified in the Daylighting object for the zone, and that Glare Control Is Active = YES in WindowShadingControl.
 
@@ -4945,6 +4947,8 @@ Zone,Average,Zone Mean Air Temperature [C]
 HVAC,Average,Zone Air Temperature [C]
 Zone,Average,Zone Mean Radiant Temperature [C]
 Zone,Average,Zone Operative Temperature [C]
+Zone,Average,Zone Heat Index [C]
+Zone,Average,Zone Humidity Index [C]
 HVAC,Sum,Zone Air System Sensible Heating Energy [J]
 HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
 HVAC,Average,Zone Air System Sensible Heating Rate [W]
@@ -4977,6 +4981,15 @@ The Mean Radiant Temperature (MRT) in degrees Celsius of a space is really the m
 \subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c-1}
 
 Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
+
+\subsubsection{Zone Heat Index {[}C{]}}\label{zone-heat-index-c-1}
+
+Zone heat index (HI) is an index that combines air temperature and relative humidity in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. Zone Heat Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
+
+
+\subsubsection{Zone Humdity Index {[}C{]}}\label{zone-humidity-index-c-1}
+
+The Humdity Index (humidex) is an index number used by Canadian meteorologists to describe how hot the weather feels to the average person, by combining the effect of heat and humidity. The humidex is a nominally dimensionless quantity (though generally recognized by the public as equivalent to the degree Celsius) based on the dew-point temperature. Zone Humdity Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
 
 \subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j-1}
 

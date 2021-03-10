@@ -19,24 +19,24 @@
  * under contract with Lawrence Berkeley National Laboratory.
  **************************************************************/
 
-// This work was supported by the Assistant Secretary for Energy Efficiency 
-// and Renewable Energy, Office of Building Technologies, 
-// Building Systems and Materials Division of the 
+// This work was supported by the Assistant Secretary for Energy Efficiency
+// and Renewable Energy, Office of Building Technologies,
+// Building Systems and Materials Division of the
 // U.S. Department of Energy under Contract No. DE-AC03-76SF00098.
 
 /*
-NOTICE: The Government is granted for itself and others acting on its behalf 
-a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce, 
-prepare derivative works, and perform publicly and display publicly. 
+NOTICE: The Government is granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable worldwide license in this data to reproduce,
+prepare derivative works, and perform publicly and display publicly.
 Beginning five (5) years after (date permission to assert copyright was obtained),
-subject to two possible five year renewals, the Government is granted for itself 
+subject to two possible five year renewals, the Government is granted for itself
 and others acting on its behalf a paid-up, nonexclusive, irrevocable worldwide
-license in this data to reproduce, prepare derivative works, distribute copies to 
-the public, perform publicly and display publicly, and to permit others to do so. 
+license in this data to reproduce, prepare derivative works, distribute copies to
+the public, perform publicly and display publicly, and to permit others to do so.
 NEITHER THE UNITED STATES NOR THE UNITED STATES DEPARTMENT OF ENERGY, NOR ANY OF
-THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL 
-LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY 
-INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE 
+THEIR EMPLOYEES, MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF ANY
+INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS USE
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 #pragma warning(disable:4786)
@@ -126,7 +126,7 @@ int geometrans(
 
 				/* radiosity modification */
 				/* calculate window nodal area and coordinates in bldg coord sys */
-				wndo_nodal_calcs(bldg_ptr,num_wnodes,iz,is,iw, pofdmpfile);
+				wndo_nodal_calcs(bldg_ptr,num_wnodes,iz,is,iw);
 
                 /* Create zone shades for shaded windows. */
 				for (lzs=0; lzs<NZSHADES; lzs++) {
@@ -154,7 +154,7 @@ int geometrans(
 							return (-1);
 						}
 					}
-				} 
+				}
 			}
 
 			/* calculate derived quantities for surface */
@@ -181,7 +181,7 @@ int geometrans(
                 // This Vertex list begins at outside "upper-left" and is in OUTSIDE-CounterClockWise order
                 bldg_ptr->zone[iz]->surf[is]->vPt3VerticesWCS_OCCW.push_back(p3TmpPt);
 			}
-			
+
 			/* calculate surface azimuth and tilt in bldg coord system */
 			apol(bldg_ptr->zone[iz]->surf[is]->vert,&bldg_ptr->zone[iz]->surf[is]->azm_bs,&bldg_ptr->zone[iz]->surf[is]->tilt_bs);
 
@@ -189,11 +189,11 @@ int geometrans(
 			/* calculate surface direction cosine values (slite) in bldg coord sys */
 //			dircos_calc(bldg_ptr,iz,is, pofdmpfile);
 			// RJH 10-16-03 Replace with new version that uses DOE2 WCS, but Superlite conventions
-			dircos_calc_new(bldg_ptr,iz,is, pofdmpfile);
+			dircos_calc_new(bldg_ptr,iz,is);
 
 			/* radiosity modification */
 			/* calculate nodal area and coordinates in bldg coord sys */
-			nodal_calcs(bldg_ptr,num_nodes,iz,is, pofdmpfile);
+			nodal_calcs(bldg_ptr,num_nodes,iz,is);
 
 			/* radiosity modification */
 			/* Calc outward (DOE2) and inward (Slite) unit vector surface normals in DOE2 BCS */
@@ -496,9 +496,9 @@ int apol(
 /* This (vectc) is the vector normal for surfaces for which vecta and vectb */
 /* have been calculated from DOE2 BCS surface vertices 0, 1 (origin), and 2. */
 /* If vecta is from vertex 1 to 2 (along width edge), and vectb is from 1 to 0 (along height edge), */
-/*		then vectc is DOE2 outward normal.
+/*		then vectc is DOE2 outward normal. */
 /* If vecta is from vertex 1 to 0, and vectb is from 1 to 2, */
-/*		then vectc is Superlite inward normal.
+/*		then vectc is Superlite inward normal. */
 /* If vecta and vectb are unit vectors, then (vectc) is a unit vector normal. */
 /****************************************************************************/
 /* C Language Implementation of DOE2 Daylighting Algorithms */
@@ -771,7 +771,7 @@ int zshade_calc_verts(
 	double dist10, dist21, dist12;		/* distance between vertices */
 	double wnorm[NCOORDS];		/* window outward normal vector */
 	int icoord;		/* loop index */
-	
+
 	/* Determine zone shade vertices (bldg sys coords) located on window host surface. */
 
 	/* Get window vertices numbered counter-clockwise starting at upper left viewed from OUTSIDE of room. */
@@ -781,7 +781,7 @@ int zshade_calc_verts(
 		w2[icoord] = bldg_ptr->zone[iz]->surf[is]->wndo[iw]->vert[icoord][2];
 		w3[icoord] = bldg_ptr->zone[iz]->surf[is]->wndo[iw]->vert[icoord][3];
 	}
-	
+
 	/* Calc unit vectors between wndo vertices: */
 	/*   1 to 0 (i.e., "up" along host surface height), */
 	/*   2 to 1 (i.e., "right to left viewed from outside" along host surface width). */
@@ -808,7 +808,7 @@ int zshade_calc_verts(
 
     /* Zshade distance from wndo along host surface. */
     zshade_y = bldg_ptr->zone[iz]->surf[is]->wndo[iw]->zshade_y[lzs];
-    
+
 	/* Set bldg coord system vertices based on zshade location (type). */
 	switch (lzs)
 	{
@@ -834,7 +834,7 @@ int zshade_calc_verts(
 			}
 			break;
 	}
-		
+
 	/* Determine zone shade vertices (bldg sys coords) not located on window host surface. */
 
 	/* Calc unit vector normal to window (pointing away from room) */

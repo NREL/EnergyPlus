@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,32 +57,33 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataWindowEquivalentLayer.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DaylightingManager.hh>
-
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
 
+// Fixtures
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
@@ -98,8 +99,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "Version,9.3;",
-
         "  Construction:WindowEquivalentLayer,",
         "  CLR CLR VB,                !- Name",
         "  GLZCLR,                    !- Outside Layer",
@@ -179,25 +178,25 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
+    HeatBalanceManager::GetConstructData(*state, ErrorsFound);
 
     int VBMatNum(0);
     for (int i = 1; i <= 4; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
-    EXPECT_EQ(1, DataHeatBalance::TotBlindsEQL);
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBNOBM);
+    EXPECT_EQ(1, state->dataHeatBal->TotBlindsEQL);
+    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).Group, DataHeatBalance::BlindEquivalentLayer);
+    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
 
     int ConstrNum = 1;
     int EQLNum = 0;
-    InitEquivalentLayerWindowCalculations();
-    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
-    EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, WindowEquivalentLayer::lscVBNOBM);
+    InitEquivalentLayerWindowCalculations(*state);
+    EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
+    EXPECT_EQ(CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).CNTRL, state->dataWindowEquivalentLayer->lscVBNOBM);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
@@ -209,8 +208,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     static Array2D<Real64> AbsSolBeam(2, CFSMAXNL + 1);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -526,35 +523,35 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2); //
-    SimulationManager::ManageSimulation(state, outputFiles());
-    // re-set the hour of the day to mide day
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 12;
-    DataGlobals::CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(DataEnvironment::SOLCOS);
+    SimulationManager::ManageSimulation(*state);
+    // re-set the hour of the day to mid-day
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 12;
+    state->dataGlobal->CurrentTime = 12.0;
+    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get window surface index
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
+        if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // get equivalent layer window optical properties
-    CalcEQLOpticalProperty(SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
     // check that the slat angle control type is set to MaximizeSolar
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBPROF);
+    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBPROF);
     // check the slat angle
-    EXPECT_NEAR(-71.0772, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(-71.0772, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
-    DaylightingManager::ProfileAngle(SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
-    EXPECT_NEAR(-DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
+    EXPECT_NEAR(-DataGlobalConstants::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
@@ -566,8 +563,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     static Array2D<Real64> AbsSolBeam(2, CFSMAXNL + 1);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -883,38 +878,38 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(*state);
     // re-set the hour of the day to noon
-    DataGlobals::TimeStep = 1;
-    DataGlobals::HourOfDay = 12;
-    DataGlobals::CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(DataEnvironment::SOLCOS);
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->HourOfDay = 12;
+    state->dataGlobal->CurrentTime = 12.0;
+    WeatherManager::DetermineSunUpDown(*state, state->dataEnvrn->SOLCOS);
     // get equivalent layer window surface index
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
+        if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
     }
     // get venetian blind material index
     for (int i = 1; i <= 7; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // calc window optical property
-    CalcEQLOpticalProperty(SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
+    CalcEQLOpticalProperty(*state, SurfNum, DataWindowEquivalentLayer::isBEAM, AbsSolBeam);
     // check VB slat angle for BlockBeamSolar slat angle control
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscVBNOBM);
+    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscVBNOBM);
     // check the VB slat angle
-    EXPECT_NEAR(18.9228, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(18.9228, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
-    DaylightingManager::ProfileAngle(SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
-    EXPECT_NEAR(90.0 - DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    DaylightingManager::ProfileAngle(*state, SurfNum, state->dataEnvrn->SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
+    EXPECT_NEAR(90.0 - DataGlobalConstants::RadToDeg * ProfAngVer, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // get the slat angle from profile angle
-    Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobals::RadToDeg * ProfAngVer);
-    EXPECT_NEAR(SlateAngleBlockBeamSolar, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobalConstants::RadToDeg * ProfAngVer);
+    EXPECT_NEAR(SlateAngleBlockBeamSolar, state->dataSurface->SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
@@ -923,8 +918,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "   WindowMaterial:SimpleGlazingSystem,",
         "     Simple Glazing System Layer,   !- Name",
@@ -938,16 +931,16 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotMaterials);
-    EXPECT_EQ(DataHeatBalance::Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
+    EXPECT_EQ(1, state->dataHeatBal->TotMaterials);
+    EXPECT_EQ(state->dataMaterial->Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction returns error forund true due to invalid layer
-    GetConstructData(ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    GetConstructData(*state, ErrorsFound);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
     EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
-    EXPECT_TRUE(DataHeatBalance::Construct(1).TypeIsWindow);
-    EXPECT_TRUE(DataHeatBalance::Construct(1).WindowTypeEQL);
+    EXPECT_TRUE(state->dataConstruction->Construct(1).TypeIsWindow);
+    EXPECT_TRUE(state->dataConstruction->Construct(1).WindowTypeEQL);
     EXPECT_TRUE(ErrorsFound); // error found due to invalid layer
 }
 
@@ -955,8 +948,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
 {
     // GitHub issue 7345
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -1237,7 +1228,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(*state);
 
     int EQLNum(1);
     Array1D<Real64> T({1, CFSMAXNL}, 0.0);
@@ -1261,17 +1252,17 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapOutdoorVentedTest)
     H(2) = HcIn;
 
     // check the window air gap vent type: vented to outdoor
-    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, gtyOPENout);
+    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENout);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 308.610, 0.001);
     EXPECT_NEAR(T(2), 306.231, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 313.886, 0.001);
     EXPECT_NEAR(T(2), 310.559, 0.001);
 }
@@ -1279,8 +1270,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
 {
     // GitHub issue 7345
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -1561,7 +1550,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(*state);
 
     int EQLNum(1);
     Array1D<Real64> T({1, CFSMAXNL}, 0.0);
@@ -1585,17 +1574,17 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_AirGapIndoorVentedTest)
     H(2) = HcIn;
 
     // check the window air gap vent type: vented to outdoor
-    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, gtyOPENin);
+    EXPECT_EQ(CFS(EQLNum).G(1).GTYPE, state->dataWindowEquivalentLayer->gtyOPENin);
     // zero solar absorbed on glazing layers or no solar input
     Source = 0.0;
-    ASHWAT_ThermalCalc(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 307.054, 0.001);
     EXPECT_NEAR(T(2), 304.197, 0.001);
 
     // with solar absrobed on glazing layers
     Source(1) = 100.0; // outside glass layer
     Source(2) = 50.0;  // inside glass layer
-    ASHWAT_ThermalCalc(CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
+    ASHWAT_ThermalCalc(*state, CFS(EQLNum), TIN, Tout, HcIn, HcOut, TRMOUT, TRMIN, Source, TOL, QOCF, QOCFRoom, T, Q, JF, JB, H);
     EXPECT_NEAR(T(1), 314.666, 0.001);
     EXPECT_NEAR(T(2), 311.282, 0.001);
 }
@@ -1603,8 +1592,6 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
 {
     // GitHub issue 7345
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.3;",
 
         "  Timestep,1;",
 
@@ -1949,36 +1936,36 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(state, outputFiles());
+    SimulationManager::ManageSimulation(*state);
 
     int EQLNum(0);
     int SurfNum(0);
     int VBMatNum(0);
     int ConstrNum(0);
 
-    for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+    for (int iSurf = 1; iSurf <= state->dataSurface->TotSurfaces; iSurf++) {
+        if (state->dataSurface->SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
     }
     // get venetian blind material index
-    for (int i = 1; i <= DataHeatBalance::TotMaterials; i++) {
-        if (DataHeatBalance::Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
+    for (int i = 1; i <= state->dataHeatBal->TotMaterials; i++) {
+        if (state->dataMaterial->Material(i).Group == DataHeatBalance::BlindEquivalentLayer) {
             VBMatNum = i;
             break;
         }
     }
     // get equivalent layer window contruction index
-    for (int ConstrPtr = 1; ConstrPtr <= DataHeatBalance::TotConstructs; ++ConstrPtr) {
-        if (DataHeatBalance::Construct(ConstrPtr).WindowTypeEQL) {
+    for (int ConstrPtr = 1; ConstrPtr <= state->dataHeatBal->TotConstructs; ++ConstrPtr) {
+        if (state->dataConstruction->Construct(ConstrPtr).WindowTypeEQL) {
             ConstrNum = ConstrPtr;
         }
     }
     // check VB slat angle control for FixedSlatAngle
-    EXPECT_EQ(DataHeatBalance::Material(VBMatNum).SlatAngleType, WindowEquivalentLayer::lscNONE);
+    EXPECT_EQ(state->dataMaterial->Material(VBMatNum).SlatAngleType, state->dataWindowEquivalentLayer->lscNONE);
 
-    EQLNum = DataHeatBalance::Construct(ConstrNum).EQLConsPtr;
+    EQLNum = state->dataConstruction->Construct(ConstrNum).EQLConsPtr;
     // check number of solid layers
     EXPECT_EQ(CFS(EQLNum).NL, 3);
     // check optical and thermal property of the VB layer (Inside Layer)
@@ -1987,7 +1974,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLF, 0.90);
     EXPECT_EQ(CFS(EQLNum).L(3).LWP_MAT.EPSLB, 0.90);
     // check inside face effective emissivity
-    EXPECT_NEAR(DataHeatBalance::Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
+    EXPECT_NEAR(state->dataConstruction->Construct(ConstrNum).InsideAbsorpThermal, 0.91024, 0.00001);
     // for fixed slate angle the emissivity remains the same
-    EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(ConstrNum), 0.91024, 0.00001);
+    EXPECT_NEAR(EQLWindowInsideEffectiveEmiss(*state, ConstrNum), 0.91024, 0.00001);
 }

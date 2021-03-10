@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define HeatBalanceMovableInsulation_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -67,13 +68,15 @@ namespace HeatBalanceMovableInsulation {
 
     // Functions
 
-    void EvalOutsideMovableInsulation(int const SurfNum,       // DO loop counter for surfaces
+    void EvalOutsideMovableInsulation(EnergyPlusData &state,
+                                      int const SurfNum,       // DO loop counter for surfaces
                                       Real64 &HMovInsul,       // Resistance or "h" value of movable insulation
                                       int &RoughIndexMovInsul, // Roughness index of movable insulation
                                       Real64 &AbsExt           // Absorptivity of outer most layer
     );
 
-    void EvalInsideMovableInsulation(int const SurfNum, // DO loop counter for surfaces
+    void EvalInsideMovableInsulation(EnergyPlusData &state,
+                                     int const SurfNum, // DO loop counter for surfaces
                                      Real64 &HMovInsul, // Resistance or "h" value of movable insulation
                                      Real64 &AbsInt     // Inside solar absorptance of movable insulation
     );

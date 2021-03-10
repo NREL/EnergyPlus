@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,11 +57,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 // Derived class for Finite-Difference Model
 class FiniteDiffGroundTempsModel : public BaseGroundTempsModel
@@ -128,15 +131,15 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(DataGlobal &dataGlobals, int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
-    void getWeatherData(DataGlobal &dataGlobals);
+    void getWeatherData(EnergyPlusData &state);
 
-    void initAndSim(DataGlobal &dataGlobals);
+    void initAndSim(EnergyPlusData &state);
 
     void developMesh();
 
-    void performSimulation();
+    void performSimulation(EnergyPlusData& state);
 
     void updateSurfaceCellTemperature();
 
@@ -144,7 +147,7 @@ public:
 
     void updateBottomCellTemperature();
 
-    void initDomain();
+    void initDomain(EnergyPlusData& state);
 
     bool checkFinalTemperatureConvergence();
 
@@ -156,11 +159,11 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp() override;
+    Real64 getGroundTemp(EnergyPlusData& state) override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
+    Real64 getGroundTempAtTimeInSeconds(EnergyPlusData& state, Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
+    Real64 getGroundTempAtTimeInMonths(EnergyPlusData& state, Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 

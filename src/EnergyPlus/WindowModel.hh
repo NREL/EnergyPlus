@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,11 +48,17 @@
 #ifndef WindowModel_H
 #define WindowModel_H
 
+// C++ headers
 #include <map>
 #include <memory>
+
+// EnergyPlus headers
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 template <typename T> class EnumParser
 {
@@ -61,11 +67,11 @@ template <typename T> class EnumParser
 public:
     EnumParser(){};
 
-    T StringToEnum(const std::string &value)
+    T StringToEnum(EnergyPlusData &state, const std::string &value)
     {
         auto iValue = m_Map.find(value);
         if (iValue == m_Map.end()) {
-            ShowFatalError("Incorrect enumerator assigned.");
+            ShowFatalError(state, "Incorrect enumerator assigned.");
         }
         return iValue->second;
     }
@@ -86,7 +92,7 @@ namespace WindowManager {
     public:
         CWindowModel();
 
-        static std::unique_ptr<CWindowModel> WindowModelFactory(std::string const &objectName);
+        static std::unique_ptr<CWindowModel> WindowModelFactory(EnergyPlusData &state, std::string const &objectName);
 
         WindowsModel getWindowsModel() const;
         bool isExternalLibraryModel() const;
@@ -106,7 +112,7 @@ namespace WindowManager {
     public:
         CWindowOpticalModel();
 
-        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory();
+        static std::unique_ptr<CWindowOpticalModel> WindowOpticalModelFactory(EnergyPlusData &state);
 
         WindowsOpticalModel getWindowsOpticalModel() const;
         bool isSimplifiedModel() const;

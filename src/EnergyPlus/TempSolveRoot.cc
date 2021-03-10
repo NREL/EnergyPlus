@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,25 +52,13 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/OutputFiles.hh>
-// TODO: move DetermineMinuteForReporting to avoid bringing this one in
-#include <EnergyPlus/OutputProcessor.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -100,7 +88,6 @@ namespace TempSolveRoot {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHVACGlobals::Bisection;
     using DataHVACGlobals::HVACSystemRootFinding;
 
@@ -109,24 +96,10 @@ namespace TempSolveRoot {
     // intended strictly to provide "interfaces" to routines used by other
     // parts of the simulation.
 
-    // MODULE PARAMETER DEFINITIONS
-    static std::string const BlankString;
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // INTERFACE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE General
-    // PUBLIC  SaveCompDesWaterFlow
-    // PUBLIC  ErfFunction
-
     // Functions
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -302,7 +275,8 @@ namespace TempSolveRoot {
         XRes = XTemp;
     }
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -478,7 +452,8 @@ namespace TempSolveRoot {
         XRes = XTemp;
     }
 
-    void SolveRoot(EnergyPlusData &state, Real64 const Eps, // required absolute accuracy
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x,Par) = 0
@@ -623,12 +598,13 @@ namespace TempSolveRoot {
         XX_0 = X0;
         XX_1 = X1;
     }
-/*
-    void SolveRoot(Real64 const Eps, // required absolute accuracy
+
+    void SolveRoot(EnergyPlusData &state,
+                   Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x) = 0
-                   std::function<Real64(Real64 const)> f,
+                   std::function<Real64(EnergyPlusData &state, Real64 const)> f,
                    Real64 const X_0, // 1st bound of interval that contains the solution
                    Real64 const X_1  // 2nd bound of interval that contains the solution
     )
@@ -694,8 +670,8 @@ namespace TempSolveRoot {
         NIte = 0;
         AltIte = 0;
 
-        Y0 = f(X0);
-        Y1 = f(X1);
+        Y0 = f(state, X0);
+        Y1 = f(state, X1);
         // check initial values
         if (Y0 * Y1 > 0) {
             Flag = -2;
@@ -750,7 +726,7 @@ namespace TempSolveRoot {
             }
             }
 
-            YTemp = f(XTemp);
+            YTemp = f(state, XTemp);
 
             ++NIte;
             ++AltIte;
@@ -798,7 +774,7 @@ namespace TempSolveRoot {
         }
         XRes = XTemp;
     }
-*/
+
 /*
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations

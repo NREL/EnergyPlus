@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,46 +52,47 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace OutAirNodeManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
+    void SetOutAirNodes(EnergyPlusData &state);
 
-    // Type declarations in OutAirNodeManager module
+    void GetOutAirNodesInput(EnergyPlusData &state);
 
-    // MODULE VARIABLE DECLARATIONS:
+    void InitOutAirNodes(EnergyPlusData &state);
 
-    extern Array1D_int OutsideAirNodeList; // List of all outside air inlet nodes
-    extern int NumOutsideAirNodes;         // Number of single outside air nodes
-    extern bool GetOutAirNodesInputFlag;   // Flag set to make sure you get input once
+    bool CheckOutAirNodeNumber(EnergyPlusData &state, int NodeNumber); // Number of node to check to see if in Outside Air list
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE OutAirNodeManager
-
-    // Functions
-
-    // Clears the global data in OutAirNodeManager.
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
-    void SetOutAirNodes();
-
-    void GetOutAirNodesInput();
-
-    void InitOutAirNodes();
-
-    bool CheckOutAirNodeNumber(int const NodeNumber); // Number of node to check to see if in Outside Air list
-
-    void CheckAndAddAirNodeNumber(int const NodeNumber, // Number of node to check to see if in Outside Air list
-                                  bool &Okay            // True if found, false if not
+    void CheckAndAddAirNodeNumber(EnergyPlusData &state,
+                                  int NodeNumber, // Number of node to check to see if in Outside Air list
+                                  bool &Okay      // True if found, false if not
     );
-    void SetOANodeValues(int const NodeNum, // Number of node to check to see if in Outside Air list
-                         bool InitCall            // True if Init calls, false if CheckAndAddAirNodeNumber calls
+    void SetOANodeValues(EnergyPlusData &state,
+                         int NodeNum,  // Number of node to check to see if in Outside Air list
+                         bool InitCall // True if Init calls, false if CheckAndAddAirNodeNumber calls
     );
 } // namespace OutAirNodeManager
+
+struct OutAirNodeManagerData : BaseGlobalStruct
+{
+    Array1D_int OutsideAirNodeList;      // List of all outside air inlet nodes
+    int NumOutsideAirNodes = 0;          // Number of single outside air nodes
+    bool GetOutAirNodesInputFlag = true; // Flag set to make sure you get input once
+
+    void clear_state() override
+    {
+        this->OutsideAirNodeList.deallocate();
+        this->NumOutsideAirNodes = 0;
+        this->GetOutAirNodesInputFlag = true;
+    }
+};
 
 } // namespace EnergyPlus
 

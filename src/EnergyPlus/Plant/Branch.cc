@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -71,7 +71,7 @@ namespace DataPlant {
         //  propagate the min/max avail down the branch.
         // Some possibilities for flow request are:
         //  1) take the outlet flow rate -- assumes that the last component wins
-        //  2) take the inlet flow rate request -- assumes that the request is propogated up and is good
+        //  2) take the inlet flow rate request -- assumes that the request is propagated up and is good
         //  3) take the maximum request
         //  4) move down the loop and take the maximum "non-load-range-based" request within min/max avail bounds
         //     This assumes that load range based should not request flow for load-rejection purposes, and we
@@ -81,7 +81,7 @@ namespace DataPlant {
         int const BranchOutletNodeNum = this->NodeNumOut;
         Real64 OverallFlowRequest = 0.0;
 
-        if (this->ControlType != DataBranchAirLoopPlant::ControlType_SeriesActive) {
+        if (this->ControlType != DataBranchAirLoopPlant::ControlTypeEnum::SeriesActive) {
             OverallFlowRequest = DataLoopNode::Node(BranchInletNodeNum).MassFlowRateRequest;
         } else { // is series active, so take largest request of all the component inlet nodes
             for (int CompCounter = 1; CompCounter <= this->TotalComponents; ++CompCounter) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,16 +53,15 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace DataHeatBalance {
+namespace EnergyPlus::DataHeatBalance {
 
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
@@ -90,181 +89,11 @@ namespace DataHeatBalance {
     // SolarShading, etc. Modules.
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-    using DataGlobals::AutoCalculate;
-    using DataGlobals::DegToRadians;
     using DataSurfaces::MaxSlatAngs;
     using namespace DataVectorTypes;
     using DataBSDFWindow::BSDFLayerAbsorpStruct;
     using DataBSDFWindow::BSDFWindowInputStruct;
 
-    // Data
-    // module should be available to other modules and routines.  Thus,
-    // all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // Parameters for the definition and limitation of arrays:
-    int const MaxLayersInConstruct(11); // Maximum number of layers allowed in a single construction
-    int const MaxCTFTerms(
-        19); // Maximum number of CTF terms allowed to still allow stability //Note Sync with SurfaceGroundHeatExchanger::local::MaxCTFTerms
-    int MaxSolidWinLayers(0);               // Maximum number of solid layers in a window construction
-                                            // ** has to be big enough to hold no matter what window model
-                                            //    each window model should validate layers individually
-    int const MaxSpectralDataElements(800); // Maximum number in Spectral Data arrays.
-
-    // Parameters to indicate material group type for use with the Material
-    // derived type (see below):
-
-    int const RegularMaterial(0);
-    int const Air(1);
-    int const Shade(2);
-    int const WindowGlass(3);
-    int const WindowGas(4);
-    int const WindowBlind(5);
-    int const WindowGasMixture(6);
-    int const Screen(7);
-    int const EcoRoof(8);
-    int const IRTMaterial(9);
-    int const WindowSimpleGlazing(10);
-    int const ComplexWindowShade(11);
-    int const ComplexWindowGap(12);
-
-    int const GlassEquivalentLayer(13);
-    int const ShadeEquivalentLayer(14);
-    int const DrapeEquivalentLayer(15);
-    int const BlindEquivalentLayer(16);
-    int const ScreenEquivalentLayer(17);
-    int const GapEquivalentLayer(18);
-
-    Array1D_string const cMaterialGroupType({-1, 18},
-                                            {"invalid",
-                                             "Material/Material:NoMass",
-                                             "Material:AirGap",
-                                             "WindowMaterial:Shade",
-                                             "WindowMaterial:Glazing*",
-                                             "WindowMaterial:Gas",
-                                             "WindowMaterial:Blind",
-                                             "WindowMaterial:GasMixture",
-                                             "WindowMaterial:Screen",
-                                             "Material:RoofVegetation",
-                                             "Material:InfraredTransparent",
-                                             "WindowMaterial:SimpleGlazingSystem",
-                                             "WindowMaterial:ComplexShade",
-                                             "WindowMaterial:Gap",
-                                             "WindowMaterial:Glazing:EquivalentLayer",
-                                             "WindowMaterial:Shade:EquivalentLayer",
-                                             "WindowMaterial:Drape:EquivalentLayer",
-                                             "WindowMaterial:Blind:EquivalentLayer",
-                                             "WindowMaterial:Screen:EquivalentLayer",
-                                             "WindowMaterial:Gap:EquivalentLayer"});
-
-    // Parameters to indicate surface roughness for use with the Material
-    // derived type (see below):
-
-    int const VeryRough(1);
-    int const Rough(2);
-    int const MediumRough(3);
-    int const MediumSmooth(4);
-    int const Smooth(5);
-    int const VerySmooth(6);
-
-    // Parameters to indicate blind orientation for use with the Material
-    // derived type (see below):
-
-    int const Horizontal(1);
-    int const Vertical(2);
-    int const FixedSlats(1);
-    int const VariableSlats(2);
-    // Parameters for Interior and Exterior Solar Distribution
-
-    int const MinimalShadowing(-1);            // all incoming solar hits floor, no exterior shadowing except reveals
-    int const FullExterior(0);                 // all incoming solar hits floor, full exterior shadowing
-    int const FullInteriorExterior(1);         // full interior solar distribution, full exterior solar shadowing
-    int const FullExteriorWithRefl(2);         // all incoming solar hits floor, full exterior shadowing and reflections
-    int const FullInteriorExteriorWithRefl(3); // full interior solar distribution,
-    // full exterior shadowing and reflections
-    // Parameters to indicate the zone type for use with the Zone derived
-    // type (see below--Zone%OfType):
-
-    int const StandardZone(1);
-    // INTEGER, PARAMETER :: PlenumZone = 2
-    // INTEGER, PARAMETER :: SolarWallZone = 11  ! from old ZTYP, OSENV
-    // INTEGER, PARAMETER :: RoofPondZone = 12   ! from old ZTYP, OSENV
-
-    // Parameters to indicate the convection correlation being used for use with
-    // InsideConvectionAlgo and OutsideConvectionAlgo
-
-    int const ASHRAESimple(1);
-    int const ASHRAETARP(2);
-    int const CeilingDiffuser(3); // Only valid for inside use
-    int const TrombeWall(4);      // Only valid for inside use
-    int const TarpHcOutside(5);   // Only valid for outside use
-    int const MoWiTTHcOutside(6); // Only valid for outside use
-    int const DOE2HcOutside(7);   // Only valid for outside use
-    int const BLASTHcOutside(8);  // Only valid for outside use
-    int const AdaptiveConvectionAlgorithm(9);
-
-    // Parameters for WarmupDays
-    int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
-    int const DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
-
-    // Parameters for Sky Radiance Distribution
-    int const Isotropic(0);
-    int const Anisotropic(1);
-
-    // Parameters for ZoneAirSolutionAlgo
-    int const Use3rdOrder(0);
-    int const UseAnalyticalSolution(1);
-    int const UseEulerMethod(2);
-
-    // Parameter for MRT calculation type
-    int const ZoneAveraged(1);
-    int const SurfaceWeighted(2);
-    int const AngleFactor(3);
-
-    // Parameters for Ventilation
-    int const NaturalVentilation(0);
-    int const IntakeVentilation(1);
-    int const ExhaustVentilation(2);
-    int const BalancedVentilation(3);
-
-    // Parameters for hybrid ventilation using Ventilation and Mixing objects
-    int const HybridControlTypeIndiv(0);
-    int const HybridControlTypeClose(1);
-    int const HybridControlTypeGlobal(2);
-
-    // System type, detailed refrigeration or refrigerated case rack
-    int const RefrigSystemTypeDetailed(1);
-    int const RefrigSystemTypeRack(2);
-
-    // Refrigeration condenser type
-    int const RefrigCondenserTypeAir(1);
-    int const RefrigCondenserTypeEvap(2);
-    int const RefrigCondenserTypeWater(3);
-    int const RefrigCondenserTypeCascade(4);
-
-    // Parameters for type of infiltration model
-    int const InfiltrationDesignFlowRate(1);
-    int const InfiltrationShermanGrimsrud(2);
-    int const InfiltrationAIM2(3);
-
-    // Parameters for type of ventilation model
-    int const VentilationDesignFlowRate(1);
-    int const VentilationWindAndStack(2);
-
-    // Parameters for type of zone air balance model
-    int const AirBalanceNone(0);
-    int const AirBalanceQuadrature(1);
-
-    // Parameter for source zone air flow mass balance infiltration treatment
-    int const NoInfiltrationFlow(0);
-    int const AddInfiltrationFlow(1);
-    int const AdjustInfiltrationFlow(2);
-    int const MixingSourceZonesOnly(1);
-    int const AllZones(2);
-
-    int const NumZoneIntGainDeviceTypes(53);
     Array1D_string const ZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                 {"PEOPLE",
                                                  "LIGHTS",
@@ -287,6 +116,7 @@ namespace DataHeatBalance {
                                                  "ELECTRICLOADCENTER:INVERTER:SIMPLE",
                                                  "ELECTRICLOADCENTER:INVERTER:FUNCTIONOFPOWER",
                                                  "ELECTRICLOADCENTER:INVERTER:LOOKUPTABLE",
+                                                 "ELECTRICLOADCENTER:STORAGE:LIIONNMCBATTERY",
                                                  "ELECTRICLOADCENTER:STORAGE:BATTERY",
                                                  "ELECTRICLOADCENTER:STORAGE:SIMPLE",
                                                  "PIPE:INDOOR",
@@ -318,10 +148,7 @@ namespace DataHeatBalance {
                                                  "COIL:COOLING:DX:MULTISPEED",
                                                  "COIL:HEATING:DX:MULTISPEED",
                                                  "ELECTRICLOADCENTER:STORAGE:CONVERTER",
-                                                 "FAN:SYSTEMMODEL"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16
-                                                                      // | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 |
-                                                                      // 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47
-                                                                      // | 48 | 49 | 50 | 51 | 52 | 53
+                                                 "FAN:SYSTEMMODEL"});
 
     Array1D_string const ccZoneIntGainDeviceTypes(NumZoneIntGainDeviceTypes,
                                                   {"People",
@@ -345,6 +172,7 @@ namespace DataHeatBalance {
                                                    "ElectricLoadCenter:Inverter:Simple",
                                                    "ElectricLoadCenter:Inverter:FunctionOfPower",
                                                    "ElectricLoadCenter:Inverter:LookUpTable",
+                                                   "ElectricLoadCenter:Storage:LiIonNMCBattery",
                                                    "ElectricLoadCenter:Storage:Battery",
                                                    "ElectricLoadCenter:Storage:Simple",
                                                    "Pipe:Indoor",
@@ -376,379 +204,9 @@ namespace DataHeatBalance {
                                                    "Coil:Cooling:DX:MultiSpeed",
                                                    "Coil:Heating:DX:MultiSpeed",
                                                    "ElectricLoadCenter:Storage:Converter",
-                                                   "Fan:SystemModel"}); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 |
-                                                                        // 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 |
-                                                                        // 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 |
-                                                                        // 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53
+                                                   "Fan:SystemModel"});
 
-    int const IntGainTypeOf_People(1);
-    int const IntGainTypeOf_Lights(2);
-    int const IntGainTypeOf_ElectricEquipment(3);
-    int const IntGainTypeOf_GasEquipment(4);
-    int const IntGainTypeOf_HotWaterEquipment(5);
-    int const IntGainTypeOf_SteamEquipment(6);
-    int const IntGainTypeOf_OtherEquipment(7);
-    int const IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled(8);
-    int const IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide(9);
-    int const IntGainTypeOf_WaterUseEquipment(10);
-    int const IntGainTypeOf_DaylightingDeviceTubular(11);
-    int const IntGainTypeOf_WaterHeaterMixed(12);
-    int const IntGainTypeOf_WaterHeaterStratified(13);
-    int const IntGainTypeOf_ThermalStorageChilledWaterMixed(14);
-    int const IntGainTypeOf_ThermalStorageChilledWaterStratified(15);
-    int const IntGainTypeOf_GeneratorFuelCell(16);
-    int const IntGainTypeOf_GeneratorMicroCHP(17);
-    int const IntGainTypeOf_ElectricLoadCenterTransformer(18);
-    int const IntGainTypeOf_ElectricLoadCenterInverterSimple(19);
-    int const IntGainTypeOf_ElectricLoadCenterInverterFunctionOfPower(20);
-    int const IntGainTypeOf_ElectricLoadCenterInverterLookUpTable(21);
-    int const IntGainTypeOf_ElectricLoadCenterStorageBattery(22);
-    int const IntGainTypeOf_ElectricLoadCenterStorageSimple(23);
-    int const IntGainTypeOf_PipeIndoor(24);
-    int const IntGainTypeOf_RefrigerationCase(25);
-    int const IntGainTypeOf_RefrigerationCompressorRack(26);
-    int const IntGainTypeOf_RefrigerationSystemAirCooledCondenser(27);
-    int const IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler(28);
-    int const IntGainTypeOf_RefrigerationSystemSuctionPipe(29);
-    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeMT(30);
-    int const IntGainTypeOf_RefrigerationTransSysSuctionPipeLT(31);
-    int const IntGainTypeOf_RefrigerationSecondaryReceiver(32);
-    int const IntGainTypeOf_RefrigerationSecondaryPipe(33);
-    int const IntGainTypeOf_RefrigerationWalkIn(34);
-    int const IntGainTypeOf_Pump_VarSpeed(35);
-    int const IntGainTypeOf_Pump_ConSpeed(36);
-    int const IntGainTypeOf_Pump_Cond(37);
-    int const IntGainTypeOf_PumpBank_VarSpeed(38);
-    int const IntGainTypeOf_PumpBank_ConSpeed(39);
-    int const IntGainTypeOf_ZoneContaminantSourceAndSinkGenericContam(40);
-    int const IntGainTypeOf_PlantComponentUserDefined(41);
-    int const IntGainTypeOf_CoilUserDefined(42);
-    int const IntGainTypeOf_ZoneHVACForcedAirUserDefined(43);
-    int const IntGainTypeOf_AirTerminalUserDefined(44);
-    int const IntGainTypeOf_PackagedTESCoilTank(45);
-    int const IntGainTypeOf_ElectricEquipmentITEAirCooled(46);
-    int const IntGainTypeOf_SecCoolingDXCoilSingleSpeed(47);
-    int const IntGainTypeOf_SecHeatingDXCoilSingleSpeed(48);
-    int const IntGainTypeOf_SecCoolingDXCoilTwoSpeed(49);
-    int const IntGainTypeOf_SecCoolingDXCoilMultiSpeed(50);
-    int const IntGainTypeOf_SecHeatingDXCoilMultiSpeed(51);
-    int const IntGainTypeOf_ElectricLoadCenterConverter(52);
-    int const IntGainTypeOf_FanSystemModel(53);
-
-    // Parameters for checking surface heat transfer models
-    Real64 const HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
-    Real64 const ThinMaterialLayerThreshold(0.003); // 3 mm lower limit to expected material layers
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // thermochromic windows
-
-    // For predefined tabular reporting
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // MODULE VARIABLE Type DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SiteData aka building data
-    Real64 LowHConvLimit(0.1); // Lowest allowed convection coefficient for detailed model
-    // before reverting to the simple model.  This avoids a
-    // divide by zero elsewhere.  Not based on any physical
-    // reasoning, just the number that was picked.  It corresponds
-    // to a delta T for a vertical surface of 0.000444C.
-    // REAL(r64), PARAMETER :: LowHConvLimit = 1.0 !W/m2-K  Lowest allowed natural convection coefficient
-    //                           ! A lower limit is needed to avoid numerical problems
-    //                           ! Natural convection correlations are a function of temperature difference,
-    //                           !   there are many times when those temp differences pass through zero leading to non-physical results
-    //                           ! Value of 1.0 chosen here is somewhat arbitrary, but based on the following reasons:
-    //                           !  1) Low values of HconvIn indicate a layer of high thermal resistance, however
-    //                           !       the R-value of a convection film layer should be relatively low (compared to building surfaces)
-    //                           !  2) The value of 1.0 corresponds to the thermal resistance of 0.05 m of batt insulation
-    //                           !  3) Limit on the order of 1.0 is suggested by the abrupt changes in an inverse relationship
-    //                           !  4) A conduction-only analysis can model a limit by considering the thermal performance of
-    //                           !       boundary layer to be pure conduction (with no movement to enhance heat transfer);
-    //                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
-    //                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
-    //                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
-    Real64 HighHConvLimit(1000.0);         // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
-    Real64 MaxAllowedDelTempCondFD(0.002); // Convergence criteria for inside surface temperatures for CondFD
-
-    std::string BuildingName;           // Name of building
-    Real64 BuildingAzimuth(0.0);        // North Axis of Building
-    Real64 LoadsConvergTol(0.0);        // Tolerance value for Loads Convergence
-    Real64 TempConvergTol(0.0);         // Tolerance value for Temperature Convergence
-    int DefaultInsideConvectionAlgo(1); // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser;
-    // 4 = trombe wall
-    int DefaultOutsideConvectionAlgo(1);                                      // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
-    int SolarDistribution(0);                                                 // Solar Distribution Algorithm
-    int InsideSurfIterations(0);                                              // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting
-
-    // Flags for HeatTransfer Algorithms Used
-    bool AnyCTF(false);                     // CTF used
-    bool AnyEMPD(false);                    // EMPD used
-    bool AnyCondFD(false);                  // CondFD used
-    bool AnyHAMT(false);                    // HAMT used
-    bool AnyKiva(false);                    // Kiva used
-    bool AnyAirBoundary(false);             // Construction:AirBoundary used
-    bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
-
-    int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
-    Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
-    Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
-
-    int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
-    bool OverrideZoneAirSolutionAlgo(false);   // Override the zone air solution algorithm in PerformancePrecisionTradeoffs
-    Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
-    Real64 ZoneTotalExfiltrationHeatLoss(0.0); // Building total heat emission through zone exfiltration;
-    Real64 ZoneTotalExhaustHeatLoss(0.0);      // Building total heat emission through zone air exhaust;
-    Real64 SysTotalHVACReliefHeatLoss(0.0);    // Building total heat emission through HVAC system relief air;
-    Real64 SysTotalHVACRejectHeatLoss(0.0);    // Building total heat emission through HVAC system heat rejection;
-
-    // END SiteData
-
-    int NumOfZoneLists(0);             // Total number of zone lists
-    int NumOfZoneGroups(0);            // Total number of zone groups
-    int NumPeopleStatements(0);        // Number of People objects in input - possibly global assignments
-    int NumLightsStatements(0);        // Number of Lights objects in input - possibly global assignments
-    int NumZoneElectricStatements(0);  // Number of ZoneElectric objects in input - possibly global assignments
-    int NumZoneGasStatements(0);       // Number of ZoneGas objects in input - possibly global assignments
-    int NumInfiltrationStatements(0);  // Number of Design Flow Infiltration objects in input - possibly global assignments
-    int NumVentilationStatements(0);   // Number of Design Flow Ventilation objects in input - possibly global assignments
-    int NumHotWaterEqStatements(0);    // number of Hot Water Equipment objects in input. - possibly global assignments
-    int NumSteamEqStatements(0);       // number of Steam Equipment objects in input. - possibly global assignments
-    int NumOtherEqStatements(0);       // number of Other Equipment objects in input. - possibly global assignments
-    int NumZoneITEqStatements(0);      // number of Other Equipment objects in input. - possibly global assignments
-    int TotPeople(0);                  // Total People Statements in input and extrapolated from global assignments
-    int TotLights(0);                  // Total Lights Statements in input and extrapolated from global assignments
-    int TotElecEquip(0);               // Total Electric Equipment Statements in input and extrapolated from global assignments
-    int TotGasEquip(0);                // Total Gas Equipment Statements in input
-    int TotOthEquip(0);                // Total Other Equipment Statements in input
-    int TotHWEquip(0);                 // Total Hot Water Equipment Statements in input
-    int TotStmEquip(0);                // Total Steam Equipment Statements in input
-    int TotInfiltration(0);            // Total Infiltration Statements in input and extrapolated from global assignments
-    int TotDesignFlowInfiltration(0);  // number of Design Flow rate ZoneInfiltration in input
-    int TotShermGrimsInfiltration(0);  // number of Sherman Grimsrud (ZoneInfiltration:ResidentialBasic) in input
-    int TotAIM2Infiltration(0);        // number of AIM2 (ZoneInfiltration:ResidentialEnhanced) in input
-    int TotVentilation(0);             // Total Ventilation Statements in input
-    int TotDesignFlowVentilation(0);   // number of Design Flow rate ZoneVentilation in input
-    int TotWindAndStackVentilation(0); // number of wind and stack open area ZoneVentilation in input
-    int TotMixing(0);                  // Total Mixing Statements in input
-    int TotCrossMixing(0);             // Total Cross Mixing Statements in input
-    int TotRefDoorMixing(0);           // Total RefrigerationDoor Mixing Statements in input
-    int TotBBHeat(0);                  // Total BBHeat Statements in input
-    int TotMaterials(0);               // Total number of unique materials (layers) in this simulation
-    int TotConstructs(0);              // Total number of unique constructions in this simulation
-    int TotSpectralData(0);            // Total window glass spectral data sets
-    int W5GlsMat(0);                   // Window5 Glass Materials, specified by transmittance and front and back reflectance
-    int W5GlsMatAlt(0);                // Window5 Glass Materials, specified by index of refraction and extinction coeff
-    int W5GasMat(0);                   // Window5 Single-Gas Materials
-    int W5GasMatMixture(0);            // Window5 Gas Mixtures
-    int W7SupportPillars(0);           // Complex fenestration support pillars
-    int W7DeflectionStates(0);         // Complex fenestration deflection states
-    int W7MaterialGaps(0);             // Complex fenestration material gaps
-    int TotBlinds(0);                  // Total number of blind materials
-    int TotScreens(0);                 // Total number of exterior window screen materials
-    int TotTCGlazings(0);              // Number of TC glazing object - WindowMaterial:Glazing:Thermochromic found in the idf file
-    int NumSurfaceScreens(0);          // Total number of screens on exterior windows
-    int TotShades(0);                  // Total number of shade materials
-    int TotComplexShades(0);           // Total number of shading materials for complex fenestrations
-    int TotComplexGaps(0);             // Total number of window gaps for complex fenestrations
-    int TotSimpleWindow;               // number of simple window systems.
-
-    int W5GlsMatEQL(0);   // Window5 Single-Gas Materials for Equivalent Layer window model
-    int TotShadesEQL(0);  // Total number of shade materials for Equivalent Layer window model
-    int TotDrapesEQL(0);  // Total number of drape materials for Equivalent Layer window model
-    int TotBlindsEQL(0);  // Total number of blind materials for Equivalent Layer window model
-    int TotScreensEQL(0); // Total number of exterior window screen materials for Equivalent Layer window model
-    int W5GapMatEQL(0);   // Window5 Equivalent Layer Single-Gas Materials
-
-    int TotZoneAirBalance(0); // Total Zone Air Balance Statements in input
-    int TotFrameDivider(0);   // Total number of window frame/divider objects
-    int AirFlowFlag(0);
-    int TotCO2Gen(0);                       // Total CO2 source and sink statements in input
-    bool CalcWindowRevealReflection(false); // True if window reveal reflection is to be calculated
-    // for at least one exterior window
-    bool StormWinChangeThisDay(false); // True if a storm window has been added or removed from any
-    // window during the current day; can only be true for first
-    // time step of the day.
-    bool AnyConstructInternalSourceInInput(false); // true if the user has entered any constructions with internal sources
-    bool AdaptiveComfortRequested_CEN15251(false); // true if people objects have adaptive comfort requests. CEN15251
-    bool AdaptiveComfortRequested_ASH55(false);    // true if people objects have adaptive comfort requests. ASH55
-
-    bool NoFfactorConstructionsUsed(true);
-    bool NoCfactorConstructionsUsed(true);
-    bool NoRegularMaterialsUsed(true);
-
-    int NumRefrigeratedRacks(0); // Total number of refrigerated case compressor racks in input
-    int NumRefrigSystems(0);     // Total number of detailed refrigeration systems in input
-    int NumRefrigCondensers(0);  // Total number of detailed refrigeration condensers in input
-    int NumRefrigChillerSets(0); // Total number of refrigerated warehouse coils in input
-    Array1D<Real64> SNLoadHeatEnergy;
-    Array1D<Real64> SNLoadCoolEnergy;
-    Array1D<Real64> SNLoadHeatRate;
-    Array1D<Real64> SNLoadCoolRate;
-    Array1D<Real64> SNLoadPredictedRate;
-    Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
-    Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
-    Array1D<Real64> MoisturePredictedRate;
-    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
-    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
-
-    Array1D<Real64> ListSNLoadHeatEnergy;
-    Array1D<Real64> ListSNLoadCoolEnergy;
-    Array1D<Real64> ListSNLoadHeatRate;
-    Array1D<Real64> ListSNLoadCoolRate;
-
-    Array1D<Real64> GroupSNLoadHeatEnergy;
-    Array1D<Real64> GroupSNLoadCoolEnergy;
-    Array1D<Real64> GroupSNLoadHeatRate;
-    Array1D<Real64> GroupSNLoadCoolRate;
-
-    Array1D<Real64> MRT;            // MEAN RADIANT TEMPERATURE (C)
-    Array1D<Real64> SUMAI;          // 1 over the Sum of zone areas or 1/SumA
-    Array1D<Real64> ZoneTransSolar; // Exterior beam plus diffuse solar entering zone;
-    //   sum of WinTransSolar for exterior windows in zone (W)
-    Array1D<Real64> ZoneWinHeatGain; // Heat gain to zone from all exterior windows (includes
-    //   ZoneTransSolar); sum of WinHeatGain for exterior
-    //   windows in zone (W)
-    Array1D<Real64> ZoneWinHeatGainRep;     // = ZoneWinHeatGain when ZoneWinHeatGain >= 0
-    Array1D<Real64> ZoneWinHeatLossRep;     // = -ZoneWinHeatGain when ZoneWinHeatGain < 0
-    Array1D<Real64> ZoneBmSolFrExtWinsRep;  // Beam solar into zone from exterior windows [W]
-    Array1D<Real64> ZoneBmSolFrIntWinsRep;  // Beam solar into zone from interior windows [W]
-    Array1D<Real64> InitialZoneDifSolReflW; // Initial diffuse solar in zone from ext and int windows
-    // reflected from interior surfaces [W]
-    Array1D<Real64> ZoneDifSolFrExtWinsRep;         // Diffuse solar into zone from exterior windows [W]
-    Array1D<Real64> ZoneDifSolFrIntWinsRep;         // Diffuse solar into zone from interior windows [W]
-    Array1D<Real64> ZoneOpaqSurfInsFaceCond;        // Zone inside face opaque surface conduction (W)
-    Array1D<Real64> ZoneOpaqSurfInsFaceCondGainRep; // = Zone inside face opaque surface conduction when >= 0
-    Array1D<Real64> ZoneOpaqSurfInsFaceCondLossRep; // = -Zone inside face opaque surface conduction when < 0
-    Array1D<Real64> ZoneOpaqSurfExtFaceCond;        // Zone outside face opaque surface conduction (W)
-    Array1D<Real64> ZoneOpaqSurfExtFaceCondGainRep; // = Zone outside face opaque surface conduction when >= 0
-    Array1D<Real64> ZoneOpaqSurfExtFaceCondLossRep; // = -Zone outside face opaque surface conduction when < 0
-    Array1D<Real64> QRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
-    Array2D<Real64> QRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
-    Array2D<Real64> InitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers
-    // from inside(W/m2)
-    Array1D<Real64> QRadSWOutIncident;           // Exterior beam plus diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncidentBeam;       // Exterior beam solar incident on surface (W/m2)
-    Array1D<Real64> BmIncInsSurfIntensRep;       // Beam sol irrad from ext wins on inside of surface (W/m2)
-    Array1D<Real64> BmIncInsSurfAmountRep;       // Beam sol amount from ext wins incident on inside of surface (W)
-    Array1D<Real64> IntBmIncInsSurfIntensRep;    // Beam sol irrad from int wins on inside of surface (W/m2)
-    Array1D<Real64> IntBmIncInsSurfAmountRep;    // Beam sol amount from int wins incident on inside of surface (W)
-    Array1D<Real64> QRadSWOutIncidentSkyDiffuse; // Exterior sky diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncidentGndDiffuse; // Exterior ground diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToDiffReflGnd; // Exterior diffuse solar incident from beam to diffuse
-    // reflection from ground (W/m2)
-    Array1D<Real64> QRadSWOutIncSkyDiffReflGnd; // Exterior diffuse solar incident from sky diffuse
-    // reflection from ground (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToBmReflObs; // Exterior beam solar incident from beam-to-beam
-    // reflection from obstructions (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToDiffReflObs; // Exterior diffuse solar incident from beam-to-diffuse
-    // reflection from obstructions (W/m2)
-    Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
-    // reflection from obstructions (W/m2)
-    Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
-
-    Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-    Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-
-    Array2D<Real64> FenLaySurfTempFront;            // Front surface temperatures of fenestration layers
-    Array2D<Real64> FenLaySurfTempBack;             // Back surface temperatures of fenestration layers
-    Array1D<Real64> ZoneTransSolarEnergy;           // Energy of ZoneTransSolar [J]
-    Array1D<Real64> ZoneWinHeatGainRepEnergy;       // Energy of ZoneWinHeatGainRep [J]
-    Array1D<Real64> ZoneWinHeatLossRepEnergy;       // Energy of ZoneWinHeatLossRep [J]
-    Array1D<Real64> ZoneBmSolFrExtWinsRepEnergy;    // Energy of ZoneBmSolFrExtWinsRep [J]
-    Array1D<Real64> ZoneBmSolFrIntWinsRepEnergy;    // Energy of ZoneBmSolFrIntWinsRep [J]
-    Array1D<Real64> ZoneDifSolFrExtWinsRepEnergy;   // Energy of ZoneDifSolFrExtWinsRep [J]
-    Array1D<Real64> ZoneDifSolFrIntWinsRepEnergy;   // Energy of ZoneDifSolFrIntWinsRep [J]
-    Array1D<Real64> ZnOpqSurfInsFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    Array1D<Real64> ZnOpqSurfInsFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
-    Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
-    Array1D<Real64> BmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
-    Array1D<Real64> IntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
-    Array1D<Real64> QRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
-    Array1D<Real64> SWwinAbsTotalReport;            // Report - Total interior/exterior shortwave
-    // absorbed in all glass layers of window (W)
-    Array1D<Real64> InitialDifSolInAbsReport; // Report - Initial transmitted diffuse solar
-    // absorbed on inside of surface (W)
-    Array1D<Real64> InitialDifSolInTransReport; // Report - Initial transmitted diffuse solar
-    // transmitted out through inside of window surface (W)
-    Array1D<Real64> SWInAbsTotalReport; // Report - Total interior/exterior shortwave
-    // absorbed on inside of surface (W)
-    Array1D<Real64> SWOutAbsTotalReport; // Report - Total exterior shortwave/solar
-    // absorbed on outside of surface (W)
-    Array1D<Real64> SWOutAbsEnergyReport; // Report - Total exterior shortwave/solar
-    // absorbed on outside of surface (j)
-
-    Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
-    Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
-    Array1D<Real64> NominalU;                       // Nominal U value for each construction -- used in matching interzone surfaces
-
-    // removed variables (these were all arrays):
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfIntensRep    !Diffuse sol irradiance from ext wins on inside of surface (W/m2)
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfAmountRep    !Diffuse sol amount from ext wins on inside of surface (W)
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfIntensRep    !Diffuse sol irradiance from int wins on inside of surface (W/m2)
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfAmountRep    !Diffuse sol amount from int wins on inside of surface (W)
-    // REAL(r64), ALLOCATABLE, :: DifIncInsSurfAmountRepEnergy    !energy of DifIncInsSurfAmountRep [J]
-    // REAL(r64), ALLOCATABLE, :: IntDifIncInsSurfAmountRepEnergy    !energy of IntDifIncInsSurfAmountRep [J]
-
-    // Variables moved from HeatBalanceSurfaceManager and SolarShading
-    // to avoid conflict with their use in WindowManager
-
-    Array1D<Real64> TempEffBulkAir; // air temperature adjacent to the surface used for
-    // inside surface heat balances
-    Array1D<Real64> HConvIn;      // INSIDE CONVECTION COEFFICIENT
-    Array1D<Real64> AnisoSkyMult; // Multiplier on exterior-surface sky view factor to
-    // account for anisotropy of sky radiance; = 1.0 for
-    // for isotropic sky
-
-    // Moved from SolarShading to avoid conflicts in DaylightingDevices
-    Array1D<Real64> DifShdgRatioIsoSky;     // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array3D<Real64> DifShdgRatioIsoSkyHRTS; // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> curDifShdgRatioIsoSky;  // Diffuse shading ratio (WithShdgIsoSky/WoShdgIsoSky)
-    Array1D<Real64> DifShdgRatioHoriz;      // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array3D<Real64> DifShdgRatioHorizHRTS;  // Horizon shading ratio (WithShdgHoriz/WoShdgHoriz)
-    Array1D<Real64> WithShdgIsoSky;         // Diffuse solar irradiance from sky on surface, with shading
-    Array1D<Real64> WoShdgIsoSky;           // Diffuse solar from sky on surface, without shading
-    Array1D<Real64> WithShdgHoriz;          // Diffuse solar irradiance from horizon portion of sky on surface,
-    // with shading
-    Array1D<Real64> WoShdgHoriz; // Diffuse solar irradiance from horizon portion of sky on surface,
-    // without shading
-    Array1D<Real64> MultIsoSky;        // Contribution to eff sky view factor from isotropic sky
-    Array1D<Real64> MultCircumSolar;   // Contribution to eff sky view factor from circumsolar brightening
-    Array1D<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
-
-    Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
-    //     radiation absorbed on inside surfaces of zone or enclosure
-    Array1D<Real64> QSLights; // Like QS, but Lights short-wave only.
-
-    Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
-    Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
-    Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
-    Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
-    Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
-    Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
-    Array3D<Real64> SunlitFracWithoutReveal; // For a window with reveal, the sunlit fraction
-    // without shadowing by the reveal
-    Array3D<Real64> CosIncAng; // TimeStep cosine of beam radiation incidence angle on surface
-    Array4D_int BackSurfaces;  // For a given hour and timestep, a list of up to 20 surfaces receiving
-    // beam solar radiation from a given exterior window
-    Array4D<Real64> OverlapAreas; // For a given hour and timestep, the areas of the exterior window sending
-                                  // beam solar radiation to the surfaces listed in BackSurfaces
-                                  //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsCon(
         3,
         10,
@@ -757,7 +215,7 @@ namespace DataHeatBalance {
              0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
             {3, 10})); // Gas conductivity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsVis(
         3,
         10,
@@ -766,7 +224,7 @@ namespace DataHeatBalance {
              0.0,      0.0,      0.0,      0.0,      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,      0.0,      0.0,      0.0,      0.0},
             {3, 10})); // Gas viscosity coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-    //                     Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array2D<Real64> const GasCoeffsCp(
         3,
         10,
@@ -775,353 +233,15 @@ namespace DataHeatBalance {
              0.0,      0.0,     0.0,     0.0,     0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,       0.0, 0.0, 0.0, 0.0},
             {3, 10})); // Gas specific heat coefficients for gases in a mixture // Explicit reshape2 template args are work-around for VC++2013 bug
 
-    //                       Air       Argon     Krypton   Xenon
+    // Air       Argon     Krypton   Xenon
     Array1D<Real64> const GasWght(10, {28.97, 39.948, 83.8, 131.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas molecular weights for gases in a mixture
 
-    Array1D<Real64> const
-        GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas specific heat ratios.  Used for gasses in low pressure
-
-    Real64 zeroPointerVal(0.0);
-
-    int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
-    std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
-    std::vector<int> AirBoundaryMixingZone2(0);    // Air boundary simple mixing zone 2
-    std::vector<int> AirBoundaryMixingSched(0);    // Air boundary simple mixing schedule index
-    std::vector<Real64> AirBoundaryMixingVol(0.0); // Air boundary simple mixing volume flow rate [m3/s]
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
-
-    // Object Data
-    Array1D<ZonePreDefRepType> ZonePreDefRep;
-    ZonePreDefRepType BuildingPreDefRep; // Autodesk:Note Removed explicit constructor that was missing some entries
-    Array1D<ZoneSimData> ZoneIntGain;
-    Array1D<MaterialProperties> Material;
-    Array1D<GapSupportPillar> SupportPillar;
-    Array1D<GapDeflectionState> DeflectionState;
-    Array1D<ConstructionData> Construct;
-    Array1D<SpectralDataProperties> SpectralData;
-    Array1D<ZoneData> Zone;
-    Array1D<ZoneListData> ZoneList;
-    Array1D<ZoneGroupData> ZoneGroup;
-    Array1D<PeopleData> People;
-    Array1D<LightsData> Lights;
-    Array1D<ZoneEquipData> ZoneElectric;
-    Array1D<ZoneEquipData> ZoneGas;
-    Array1D<ZoneEquipData> ZoneOtherEq;
-    Array1D<ZoneEquipData> ZoneHWEq;
-    Array1D<ZoneEquipData> ZoneSteamEq;
-    Array1D<ITEquipData> ZoneITEq;
-    Array1D<BBHeatData> ZoneBBHeat;
-    Array1D<InfiltrationData> Infiltration;
-    Array1D<VentilationData> Ventilation;
-    Array1D<ZoneAirBalanceData> ZoneAirBalance;
-    Array1D<MixingData> Mixing;
-    Array1D<MixingData> CrossMixing;
-    Array1D<MixingData> RefDoorMixing;
-    Array1D<WindowBlindProperties> Blind;
-    Array1D<WindowComplexShade> ComplexShade;
-    Array1D<WindowThermalModelParams> WindowThermalModel;
-    Array1D<SurfaceScreenProperties> SurfaceScreens;
-    Array1D<ScreenTransData> ScreenTrans;
-    Array1D<ZoneCatEUseData> ZoneIntEEuse;
-    Array1D<RefrigCaseCreditData> RefrigCaseCredit;
-    Array1D<HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
-    Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    Array1D<HeatReclaimDataBase> HeatReclaimDXCoil;
-    Array1D<HeatReclaimDataBase> HeatReclaimVS_DXCoil;
-    Array1D<HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
-    Array1D<AirReportVars> ZnAirRpt;
-    Array1D<TCGlazingsType> TCGlazings;
-    Array1D<ZoneEquipData> ZoneCO2Gen;
-    Array1D<GlobalInternalGainMiscObject> PeopleObjects;
-    Array1D<GlobalInternalGainMiscObject> LightsObjects;
-    Array1D<GlobalInternalGainMiscObject> ZoneElectricObjects;
-    Array1D<GlobalInternalGainMiscObject> ZoneGasObjects;
-    Array1D<GlobalInternalGainMiscObject> HotWaterEqObjects;
-    Array1D<GlobalInternalGainMiscObject> SteamEqObjects;
-    Array1D<GlobalInternalGainMiscObject> OtherEqObjects;
-    Array1D<GlobalInternalGainMiscObject> InfiltrationObjects;
-    Array1D<GlobalInternalGainMiscObject> VentilationObjects;
-    Array1D<ZoneReportVars> ZnRpt;
-    Array1D<ZoneMassConservationData> MassConservation;
-    ZoneAirMassFlowConservation ZoneAirMassFlow;
-
-    Array1D<ZoneLocalEnvironmentData> ZoneLocalEnvironment;
+    // Gas specific heat ratios.  Used for gasses in low pressure
+    Array1D<Real64> const GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
 
     // Functions
 
-    // Clears the global data in DataHeatBalance.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        MaxSolidWinLayers = 0;
-        LowHConvLimit = 0.1;
-        HighHConvLimit = 1000.0;
-        MaxAllowedDelTempCondFD = 0.002;
-        BuildingName = std::string();
-        BuildingAzimuth = 0.0;
-        LoadsConvergTol = 0.0;
-        TempConvergTol = 0.0;
-        DefaultInsideConvectionAlgo = 1;
-        DefaultOutsideConvectionAlgo = 1;
-        SolarDistribution = 0;
-        InsideSurfIterations = 0;
-        OverallHeatTransferSolutionAlgo = DataSurfaces::HeatTransferModel_CTF;
-        AnyCTF = false;
-        AnyEMPD = false;
-        AnyCondFD = false;
-        AnyHAMT = false;
-        AnyKiva = false;
-        AnyAirBoundary = false;
-        AnyAirBoundaryGroupedSolar = false;
-        MaxNumberOfWarmupDays = 25;
-        MinNumberOfWarmupDays = 1;
-        CondFDRelaxFactor = 1.0;
-        CondFDRelaxFactorInput = 1.0;
-        ZoneAirSolutionAlgo = Use3rdOrder;
-        BuildingRotationAppendixG = 0.0;
-        ZoneTotalExfiltrationHeatLoss = 0.0;
-        ZoneTotalExhaustHeatLoss = 0.0;
-        SysTotalHVACReliefHeatLoss = 0.0;
-        SysTotalHVACRejectHeatLoss = 0.0;
-        NumOfZoneLists = 0;
-        NumOfZoneGroups = 0;
-        NumPeopleStatements = 0;
-        NumLightsStatements = 0;
-        NumZoneElectricStatements = 0;
-        NumZoneGasStatements = 0;
-        NumInfiltrationStatements = 0;
-        NumVentilationStatements = 0;
-        NumHotWaterEqStatements = 0;
-        NumSteamEqStatements = 0;
-        NumOtherEqStatements = 0;
-        NumZoneITEqStatements = 0;
-        TotPeople = 0;
-        TotLights = 0;
-        TotElecEquip = 0;
-        TotGasEquip = 0;
-        TotOthEquip = 0;
-        TotHWEquip = 0;
-        TotStmEquip = 0;
-        TotInfiltration = 0;
-        TotDesignFlowInfiltration = 0;
-        TotShermGrimsInfiltration = 0;
-        TotAIM2Infiltration = 0;
-        TotVentilation = 0;
-        TotDesignFlowVentilation = 0;
-        TotWindAndStackVentilation = 0;
-        TotMixing = 0;
-        TotCrossMixing = 0;
-        TotRefDoorMixing = 0;
-        TotBBHeat = 0;
-        TotMaterials = 0;
-        TotConstructs = 0;
-        TotSpectralData = 0;
-        W5GlsMat = 0;
-        W5GlsMatAlt = 0;
-        W5GasMat = 0;
-        W5GasMatMixture = 0;
-        W7SupportPillars = 0;
-        W7DeflectionStates = 0;
-        W7MaterialGaps = 0;
-        TotBlinds = 0;
-        TotScreens = 0;
-        TotTCGlazings = 0;
-        NumSurfaceScreens = 0;
-        TotShades = 0;
-        TotComplexShades = 0;
-        TotComplexGaps = 0;
-        TotSimpleWindow = int();
-        W5GlsMatEQL = 0;
-        TotShadesEQL = 0;
-        TotDrapesEQL = 0;
-        TotBlindsEQL = 0;
-        TotScreensEQL = 0;
-        W5GapMatEQL = 0;
-        TotZoneAirBalance = 0;
-        TotFrameDivider = 0;
-        AirFlowFlag = 0;
-        TotCO2Gen = 0;
-        CalcWindowRevealReflection = false;
-        StormWinChangeThisDay = false;
-        AnyConstructInternalSourceInInput = false;
-        AdaptiveComfortRequested_CEN15251 = false;
-        AdaptiveComfortRequested_ASH55 = false;
-        NoFfactorConstructionsUsed = true;
-        NoCfactorConstructionsUsed = true;
-        NoRegularMaterialsUsed = true;
-        NumRefrigeratedRacks = 0;
-        NumRefrigSystems = 0;
-        NumRefrigCondensers = 0;
-        NumRefrigChillerSets = 0;
-        SNLoadHeatEnergy.deallocate();
-        SNLoadCoolEnergy.deallocate();
-        SNLoadHeatRate.deallocate();
-        SNLoadCoolRate.deallocate();
-        SNLoadPredictedRate.deallocate();
-        SNLoadPredictedHSPRate.deallocate();
-        SNLoadPredictedCSPRate.deallocate();
-        MoisturePredictedRate.deallocate();
-        MoisturePredictedHumSPRate.deallocate();
-        MoisturePredictedDehumSPRate.deallocate();
-        ListSNLoadHeatEnergy.deallocate();
-        ListSNLoadCoolEnergy.deallocate();
-        ListSNLoadHeatRate.deallocate();
-        ListSNLoadCoolRate.deallocate();
-        GroupSNLoadHeatEnergy.deallocate();
-        GroupSNLoadCoolEnergy.deallocate();
-        GroupSNLoadHeatRate.deallocate();
-        GroupSNLoadCoolRate.deallocate();
-        MRT.deallocate();
-        SUMAI.deallocate();
-        ZoneTransSolar.deallocate();
-        ZoneWinHeatGain.deallocate();
-        ZoneWinHeatGainRep.deallocate();
-        ZoneWinHeatLossRep.deallocate();
-        ZoneBmSolFrExtWinsRep.deallocate();
-        ZoneBmSolFrIntWinsRep.deallocate();
-        InitialZoneDifSolReflW.deallocate();
-        ZoneDifSolFrExtWinsRep.deallocate();
-        ZoneDifSolFrIntWinsRep.deallocate();
-        ZoneOpaqSurfInsFaceCond.deallocate();
-        ZoneOpaqSurfInsFaceCondGainRep.deallocate();
-        ZoneOpaqSurfInsFaceCondLossRep.deallocate();
-        ZoneOpaqSurfExtFaceCond.deallocate();
-        ZoneOpaqSurfExtFaceCondGainRep.deallocate();
-        ZoneOpaqSurfExtFaceCondLossRep.deallocate();
-        QRadThermInAbs.deallocate();
-        QRadSWwinAbs.deallocate();
-        InitialDifSolwinAbs.deallocate();
-        QRadSWOutIncident.deallocate();
-        QRadSWOutIncidentBeam.deallocate();
-        BmIncInsSurfIntensRep.deallocate();
-        BmIncInsSurfAmountRep.deallocate();
-        IntBmIncInsSurfIntensRep.deallocate();
-        IntBmIncInsSurfAmountRep.deallocate();
-        QRadSWOutIncidentSkyDiffuse.deallocate();
-        QRadSWOutIncidentGndDiffuse.deallocate();
-        QRadSWOutIncBmToDiffReflGnd.deallocate();
-        QRadSWOutIncSkyDiffReflGnd.deallocate();
-        QRadSWOutIncBmToBmReflObs.deallocate();
-        QRadSWOutIncBmToDiffReflObs.deallocate();
-        QRadSWOutIncSkyDiffReflObs.deallocate();
-        CosIncidenceAngle.deallocate();
-        BSDFBeamDirectionRep.deallocate();
-        BSDFBeamThetaRep.deallocate();
-        BSDFBeamPhiRep.deallocate();
-        QRadSWwinAbsTot.deallocate();
-        QRadSWwinAbsLayer.deallocate();
-        FenLaySurfTempFront.deallocate();
-        FenLaySurfTempBack.deallocate();
-        ZoneTransSolarEnergy.deallocate();
-        ZoneWinHeatGainRepEnergy.deallocate();
-        ZoneWinHeatLossRepEnergy.deallocate();
-        ZoneBmSolFrExtWinsRepEnergy.deallocate();
-        ZoneBmSolFrIntWinsRepEnergy.deallocate();
-        ZoneDifSolFrExtWinsRepEnergy.deallocate();
-        ZoneDifSolFrIntWinsRepEnergy.deallocate();
-        ZnOpqSurfInsFaceCondGnRepEnrg.deallocate();
-        ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
-        ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
-        ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
-        BmIncInsSurfAmountRepEnergy.deallocate();
-        IntBmIncInsSurfAmountRepEnergy.deallocate();
-        QRadSWwinAbsTotEnergy.deallocate();
-        SWwinAbsTotalReport.deallocate();
-        InitialDifSolInAbsReport.deallocate();
-        InitialDifSolInTransReport.deallocate();
-        SWInAbsTotalReport.deallocate();
-        SWOutAbsTotalReport.deallocate();
-        SWOutAbsEnergyReport.deallocate();
-        NominalR.deallocate();
-        NominalRforNominalUCalculation.deallocate();
-        NominalU.deallocate();
-        TempEffBulkAir.deallocate();
-        HConvIn.deallocate();
-        AnisoSkyMult.deallocate();
-        DifShdgRatioIsoSky.deallocate();
-        DifShdgRatioIsoSkyHRTS.deallocate();
-        curDifShdgRatioIsoSky.deallocate();
-        DifShdgRatioHoriz.deallocate();
-        DifShdgRatioHorizHRTS.deallocate();
-        WithShdgIsoSky.deallocate();
-        WoShdgIsoSky.deallocate();
-        WithShdgHoriz.deallocate();
-        WoShdgHoriz.deallocate();
-        MultIsoSky.deallocate();
-        MultCircumSolar.deallocate();
-        MultHorizonZenith.deallocate();
-        QS.deallocate();
-        QSLights.deallocate();
-        QSDifSol.deallocate();
-        ITABSF.deallocate();
-        TMULT.deallocate();
-        QL.deallocate();
-        SunlitFracHR.deallocate();
-        CosIncAngHR.deallocate();
-        SunlitFrac.deallocate();
-        SunlitFracWithoutReveal.deallocate();
-        CosIncAng.deallocate();
-        BackSurfaces.deallocate();
-        OverlapAreas.deallocate();
-        ZonePreDefRep.deallocate();
-        BuildingPreDefRep = ZonePreDefRepType();
-        ZoneIntGain.deallocate();
-        Material.deallocate();
-        SupportPillar.deallocate();
-        DeflectionState.deallocate();
-        Construct.deallocate();
-        SpectralData.deallocate();
-        Zone.deallocate();
-        ZoneList.deallocate();
-        ZoneGroup.deallocate();
-        People.deallocate();
-        Lights.deallocate();
-        ZoneElectric.deallocate();
-        ZoneGas.deallocate();
-        ZoneOtherEq.deallocate();
-        ZoneHWEq.deallocate();
-        ZoneSteamEq.deallocate();
-        ZoneITEq.deallocate();
-        ZoneBBHeat.deallocate();
-        Infiltration.deallocate();
-        Ventilation.deallocate();
-        ZoneAirBalance.deallocate();
-        Mixing.deallocate();
-        CrossMixing.deallocate();
-        RefDoorMixing.deallocate();
-        Blind.deallocate();
-        ComplexShade.deallocate();
-        WindowThermalModel.deallocate();
-        SurfaceScreens.deallocate();
-        ScreenTrans.deallocate();
-        ZoneIntEEuse.deallocate();
-        RefrigCaseCredit.deallocate();
-        HeatReclaimRefrigeratedRack.deallocate();
-        HeatReclaimRefrigCondenser.deallocate();
-        HeatReclaimDXCoil.deallocate();
-        HeatReclaimVS_DXCoil.deallocate();
-        HeatReclaimSimple_WAHPCoil.deallocate();
-        ZnAirRpt.deallocate();
-        TCGlazings.deallocate();
-        ZoneCO2Gen.deallocate();
-        PeopleObjects.deallocate();
-        LightsObjects.deallocate();
-        ZoneElectricObjects.deallocate();
-        ZoneGasObjects.deallocate();
-        HotWaterEqObjects.deallocate();
-        SteamEqObjects.deallocate();
-        OtherEqObjects.deallocate();
-        InfiltrationObjects.deallocate();
-        VentilationObjects.deallocate();
-        ZnRpt.deallocate();
-        MassConservation.deallocate();
-        ZoneLocalEnvironment.deallocate();
-        ZoneAirMassFlow = ZoneAirMassFlowConservation();
-        zeroPointerVal = 0;
-    }
-
-    void ZoneData::SetOutBulbTempAt()
+    void ZoneData::SetOutBulbTempAt(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Noel Keen (LBL)/Linda Lawrie
@@ -1132,31 +252,26 @@ namespace DataHeatBalance {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Temperature at Height.
 
-        // Using/Aliasing
-        using DataEnvironment::EarthRadius;
-        using DataEnvironment::SiteTempGradient;
-        using DataEnvironment::WeatherFileTempModCoeff;
-
-        if (SiteTempGradient == 0.0) {
-            OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-            OutWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+        if (state.dataEnvrn->SiteTempGradient == 0.0) {
+            OutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
+            OutWetBulbTemp = state.dataEnvrn->OutWetBulbTemp;
         } else {
             // Base temperatures at Z = 0 (C)
-            Real64 const BaseDryTemp(DataEnvironment::OutDryBulbTemp + WeatherFileTempModCoeff);
-            Real64 const BaseWetTemp(DataEnvironment::OutWetBulbTemp + WeatherFileTempModCoeff);
+            Real64 const BaseDryTemp(state.dataEnvrn->OutDryBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
+            Real64 const BaseWetTemp(state.dataEnvrn->OutWetBulbTemp + state.dataEnvrn->WeatherFileTempModCoeff);
 
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
                 OutDryBulbTemp = BaseDryTemp;
                 OutWetBulbTemp = BaseWetTemp;
             } else {
-                OutDryBulbTemp = BaseDryTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
-                OutWetBulbTemp = BaseWetTemp - SiteTempGradient * EarthRadius * Z / (EarthRadius + Z);
+                OutDryBulbTemp = BaseDryTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
+                OutWetBulbTemp = BaseWetTemp - state.dataEnvrn->SiteTempGradient * DataEnvironment::EarthRadius * Z / (DataEnvironment::EarthRadius + Z);
             }
         }
     }
 
-    void ZoneData::SetWindSpeedAt(Real64 const fac)
+    void ZoneData::SetWindSpeedAt(EnergyPlusData &state, Real64 const fac)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
@@ -1167,11 +282,8 @@ namespace DataHeatBalance {
         // PURPOSE OF THIS SUBROUTINE:
         // Routine provides facility for doing bulk Set Windspeed at Height.
 
-        // Using/Aliasing
-        using DataEnvironment::SiteWindExp;
-
-        if (SiteWindExp == 0.0) {
-            WindSpeed = DataEnvironment::WindSpeed;
+        if (state.dataEnvrn->SiteWindExp == 0.0) {
+            WindSpeed = state.dataEnvrn->WindSpeed;
         } else {
             Real64 const Z(Centroid.z); // Centroid value
             if (Z <= 0.0) {
@@ -1180,7 +292,7 @@ namespace DataHeatBalance {
                 //  [Met] - at meterological Station, Height of measurement is usually 10m above ground
                 //  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
                 //                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-                WindSpeed = fac * std::pow(Z, SiteWindExp);
+                WindSpeed = fac * std::pow(Z, state.dataEnvrn->SiteWindExp);
             }
         }
     }
@@ -1190,48 +302,44 @@ namespace DataHeatBalance {
         WindDir = fac;
     }
 
-    void SetZoneOutBulbTempAt()
+    void SetZoneOutBulbTempAt(EnergyPlusData &state)
     {
-        for (auto &zone : Zone) {
-            zone.SetOutBulbTempAt();
+        for (auto &zone : state.dataHeatBal->Zone) {
+            zone.SetOutBulbTempAt(state);
         }
     }
 
-    void CheckZoneOutBulbTempAt()
+    void CheckZoneOutBulbTempAt(EnergyPlusData &state)
     {
         // Using/Aliasing
         using DataEnvironment::SetOutBulbTempAt_error;
 
         Real64 minBulb = 0.0;
-        for (auto &zone : Zone) {
+        for (auto &zone : state.dataHeatBal->Zone) {
             minBulb = min(minBulb, zone.OutDryBulbTemp, zone.OutWetBulbTemp);
-            if (minBulb < -100.0) SetOutBulbTempAt_error("Zone", zone.Centroid.z, zone.Name);
+            if (minBulb < -100.0) SetOutBulbTempAt_error(state, "Zone", zone.Centroid.z, zone.Name);
         }
     }
 
-    void SetZoneWindSpeedAt()
+    void SetZoneWindSpeedAt(EnergyPlusData &state)
     {
-        // Using/Aliasing
-        using DataEnvironment::SiteWindBLHeight;
-        using DataEnvironment::SiteWindExp;
-        using DataEnvironment::WeatherFileWindModCoeff;
-
-        Real64 const fac(DataEnvironment::WindSpeed * WeatherFileWindModCoeff * std::pow(SiteWindBLHeight, -SiteWindExp));
-        for (auto &zone : Zone) {
-            zone.SetWindSpeedAt(fac);
+        Real64 const fac(state.dataEnvrn->WindSpeed * state.dataEnvrn->WeatherFileWindModCoeff * std::pow(state.dataEnvrn->SiteWindBLHeight, -state.dataEnvrn->SiteWindExp));
+        for (auto &zone : state.dataHeatBal->Zone) {
+            zone.SetWindSpeedAt(state, fac);
         }
     }
 
-    void SetZoneWindDirAt()
+    void SetZoneWindDirAt(EnergyPlusData &state)
     {
         // Using/Aliasing
-        Real64 const fac(DataEnvironment::WindDir);
-        for (auto &zone : Zone) {
+        Real64 const fac(state.dataEnvrn->WindDir);
+        for (auto &zone : state.dataHeatBal->Zone) {
             zone.SetWindDirAt(fac);
         }
     }
 
-    void CheckAndSetConstructionProperties(int const ConstrNum, // Construction number to be set/checked
+    void CheckAndSetConstructionProperties(EnergyPlusData &state,
+                                           int const ConstrNum, // Construction number to be set/checked
                                            bool &ErrorsFound    // error flag that is set when certain errors have occurred
     )
     {
@@ -1264,41 +372,41 @@ namespace DataHeatBalance {
         bool ValidBGShadeBlindConst; // True if a valid window construction with between-glass shade/blind
         int GlassLayNum;             // Glass layer number
 
-        TotLayers = Construct(ConstrNum).TotLayers;
+        TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
         if (TotLayers == 0) return; // error condition, hopefully caught elsewhere
         InsideLayer = TotLayers;
-        if (Construct(ConstrNum).LayerPoint(InsideLayer) <= 0) return; // Error condition
+        if (state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer) <= 0) return; // Error condition
 
         //   window screen is not allowed on inside layer
 
-        Construct(ConstrNum).DayltPropPtr = 0;
-        InsideMaterNum = Construct(ConstrNum).LayerPoint(InsideLayer);
+        state.dataConstruction->Construct(ConstrNum).DayltPropPtr = 0;
+        InsideMaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer);
         if (InsideMaterNum != 0) {
-            Construct(ConstrNum).InsideAbsorpVis = Material(InsideMaterNum).AbsorpVisible;
-            Construct(ConstrNum).InsideAbsorpSolar = Material(InsideMaterNum).AbsorpSolar;
+            state.dataConstruction->Construct(ConstrNum).InsideAbsorpVis = state.dataMaterial->Material(InsideMaterNum).AbsorpVisible;
+            state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar = state.dataMaterial->Material(InsideMaterNum).AbsorpSolar;
 
             // Following line applies only to opaque surfaces; it is recalculated later for windows.
-            Construct(ConstrNum).ReflectVisDiffBack = 1.0 - Material(InsideMaterNum).AbsorpVisible;
+            state.dataConstruction->Construct(ConstrNum).ReflectVisDiffBack = 1.0 - state.dataMaterial->Material(InsideMaterNum).AbsorpVisible;
         }
 
-        OutsideMaterNum = Construct(ConstrNum).LayerPoint(1);
+        OutsideMaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(1);
         if (OutsideMaterNum != 0) {
-            Construct(ConstrNum).OutsideAbsorpVis = Material(OutsideMaterNum).AbsorpVisible;
-            Construct(ConstrNum).OutsideAbsorpSolar = Material(OutsideMaterNum).AbsorpSolar;
+            state.dataConstruction->Construct(ConstrNum).OutsideAbsorpVis = state.dataMaterial->Material(OutsideMaterNum).AbsorpVisible;
+            state.dataConstruction->Construct(ConstrNum).OutsideAbsorpSolar = state.dataMaterial->Material(OutsideMaterNum).AbsorpSolar;
         }
 
-        Construct(ConstrNum).TotSolidLayers = 0;
-        Construct(ConstrNum).TotGlassLayers = 0;
-        Construct(ConstrNum).AbsDiffShade = 0.0;
+        state.dataConstruction->Construct(ConstrNum).TotSolidLayers = 0;
+        state.dataConstruction->Construct(ConstrNum).TotGlassLayers = 0;
+        state.dataConstruction->Construct(ConstrNum).AbsDiffShade = 0.0;
 
         // Check if any layer is glass, gas, shade, screen or blind; if so it is considered a window construction for
         // purposes of error checking.
 
-        Construct(ConstrNum).TypeIsWindow = false;
+        state.dataConstruction->Construct(ConstrNum).TypeIsWindow = false;
         for (Layer = 1; Layer <= TotLayers; ++Layer) {
-            MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+            MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
             if (MaterNum == 0) continue; // error -- has been caught will stop program later
-            switch (Material(MaterNum).Group) {
+            switch (state.dataMaterial->Material(MaterNum).Group) {
             case WindowGlass:
             case WindowGas:
             case WindowGasMixture:
@@ -1314,23 +422,23 @@ namespace DataHeatBalance {
             case ScreenEquivalentLayer:
             case BlindEquivalentLayer:
             case GapEquivalentLayer:
-                Construct(ConstrNum).TypeIsWindow = true;
+                state.dataConstruction->Construct(ConstrNum).TypeIsWindow = true;
             }
         }
 
         if (InsideMaterNum == 0) return;
         if (OutsideMaterNum == 0) return;
 
-        if (Construct(ConstrNum).TypeIsWindow) {
+        if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
 
-            Construct(ConstrNum).NumCTFTerms = 0;
-            Construct(ConstrNum).NumHistories = 0;
+            state.dataConstruction->Construct(ConstrNum).NumCTFTerms = 0;
+            state.dataConstruction->Construct(ConstrNum).NumHistories = 0;
             WrongMaterialsMix = false;
             WrongWindowLayering = false;
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                switch (Material(MaterNum).Group) {
+                switch (state.dataMaterial->Material(MaterNum).Group) {
                 case WindowGlass:
                 case WindowGas:
                 case WindowGasMixture:
@@ -1353,26 +461,26 @@ namespace DataHeatBalance {
             }
 
             if (WrongMaterialsMix) { // Illegal material for a window construction
-                ShowSevereError("Error: Window construction=" + Construct(ConstrNum).Name +
+                ShowSevereError(state, "Error: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
                                 " has materials other than glass, gas, shade, screen, blind, complex shading, complex gap, or simple system.");
                 ErrorsFound = true;
                 // Do not check number of layers for BSDF type of window since that can be handled
-            } else if ((TotLayers > 8) && (!Construct(ConstrNum).WindowTypeBSDF) &&
-                       (!Construct(ConstrNum).WindowTypeEQL)) { // Too many layers for a window construction
-                ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + Construct(ConstrNum).Name +
+            } else if ((TotLayers > 8) && (!state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) &&
+                       (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL)) { // Too many layers for a window construction
+                ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
                                 " has too many layers (max of 8 allowed -- 4 glass + 3 gap + 1 shading device).");
                 ErrorsFound = true;
 
             } else if (TotLayers == 1) {
 
-                if (Material(Construct(ConstrNum).LayerPoint(1)).Group == Shade || Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowBlind ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == Screen ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowShade ||
-                    Material(Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowGap) {
-                    ShowSevereError(
-                        "CheckAndSetConstructionProperties: The single-layer window construction=" + Construct(ConstrNum).Name +
+                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == Shade || state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowBlind ||
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == Screen ||
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowShade ||
+                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == ComplexWindowGap) {
+                    ShowSevereError(state,
+                        "CheckAndSetConstructionProperties: The single-layer window construction=" + state.dataConstruction->Construct(ConstrNum).Name +
                         " has a gas, complex gap, shade, complex shade, screen or blind material; it should be glass of simple glazing system.");
                     ErrorsFound = true;
                 }
@@ -1384,55 +492,55 @@ namespace DataHeatBalance {
             TotShadeLayers = 0; // Includes shades, blinds, and screens
             TotGasLayers = 0;
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                if (Material(MaterNum).Group == WindowGlass) ++TotGlassLayers;
-                if (Material(MaterNum).Group == WindowSimpleGlazing) ++TotGlassLayers;
-                if (Material(MaterNum).Group == Shade || Material(MaterNum).Group == WindowBlind || Material(MaterNum).Group == Screen ||
-                    Material(MaterNum).Group == ComplexWindowShade)
+                if (state.dataMaterial->Material(MaterNum).Group == WindowGlass) ++TotGlassLayers;
+                if (state.dataMaterial->Material(MaterNum).Group == WindowSimpleGlazing) ++TotGlassLayers;
+                if (state.dataMaterial->Material(MaterNum).Group == Shade || state.dataMaterial->Material(MaterNum).Group == WindowBlind || state.dataMaterial->Material(MaterNum).Group == Screen ||
+                    state.dataMaterial->Material(MaterNum).Group == ComplexWindowShade)
                     ++TotShadeLayers;
-                if (Material(MaterNum).Group == WindowGas || Material(MaterNum).Group == WindowGasMixture ||
-                    Material(MaterNum).Group == ComplexWindowGap)
+                if (state.dataMaterial->Material(MaterNum).Group == WindowGas || state.dataMaterial->Material(MaterNum).Group == WindowGasMixture ||
+                    state.dataMaterial->Material(MaterNum).Group == ComplexWindowGap)
                     ++TotGasLayers;
                 if (Layer < TotLayers) {
-                    MaterNumNext = Construct(ConstrNum).LayerPoint(Layer + 1);
+                    MaterNumNext = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer + 1);
                     // Adjacent layers of same type not allowed
                     if (MaterNumNext == 0) continue;
-                    if (Material(MaterNum).Group == Material(MaterNumNext).Group) WrongWindowLayering = true;
+                    if (state.dataMaterial->Material(MaterNum).Group == state.dataMaterial->Material(MaterNumNext).Group) WrongWindowLayering = true;
                 }
             }
 
             // It is not necessary to check rest of BSDF window structure since that is performed inside TARCOG90 routine.
             // That routine also allow structures which are not allowed in rest of this routine
-            if (Construct(ConstrNum).WindowTypeBSDF) {
-                Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
-                Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
-                Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+            if (state.dataConstruction->Construct(ConstrNum).WindowTypeBSDF) {
+                state.dataConstruction->Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
+                state.dataConstruction->Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
+                state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
+                state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
                 return;
             }
 
-            if (Construct(ConstrNum).WindowTypeEQL) {
-                Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+            if (state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) {
+                state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
+                state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
                 return;
             }
 
-            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
-                Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGas ||
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGasMixture)
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGas ||
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGasMixture ||
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGas ||
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Group == WindowGasMixture)
                 WrongWindowLayering = true;                     // Gas cannot be first or last layer
             if (TotShadeLayers > 1) WrongWindowLayering = true; // At most one shade, screen or blind allowed
 
             // If there is a diffusing glass layer no shade, screen or blind is allowed
             for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                 if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                if (Material(MaterNum).SolarDiffusing && TotShadeLayers > 0) {
+                if (state.dataMaterial->Material(MaterNum).SolarDiffusing && TotShadeLayers > 0) {
                     ErrorsFound = true;
-                    ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + Construct(ConstrNum).Name);
-                    ShowContinueError("has diffusing glass=" + Material(MaterNum).Name + " and a shade, screen or blind layer.");
+                    ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name);
+                    ShowContinueError(state, "has diffusing glass=" + state.dataMaterial->Material(MaterNum).Name + " and a shade, screen or blind layer.");
                     break;
                 }
             }
@@ -1441,31 +549,31 @@ namespace DataHeatBalance {
             if (TotGlassLayers > 1) {
                 GlassLayNum = 0;
                 for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                    MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                    MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                    if (Material(MaterNum).Group == WindowGlass) {
+                    if (state.dataMaterial->Material(MaterNum).Group == WindowGlass) {
                         ++GlassLayNum;
-                        if (GlassLayNum < TotGlassLayers && Material(MaterNum).SolarDiffusing) {
+                        if (GlassLayNum < TotGlassLayers && state.dataMaterial->Material(MaterNum).SolarDiffusing) {
                             ErrorsFound = true;
-                            ShowSevereError("CheckAndSetConstructionProperties: Window construction=" + Construct(ConstrNum).Name);
-                            ShowContinueError("has diffusing glass=" + Material(MaterNum).Name + " that is not the innermost glass layer.");
+                            ShowSevereError(state, "CheckAndSetConstructionProperties: Window construction=" + state.dataConstruction->Construct(ConstrNum).Name);
+                            ShowContinueError(state, "has diffusing glass=" + state.dataMaterial->Material(MaterNum).Name + " that is not the innermost glass layer.");
                         }
                     }
                 }
             }
 
             // interior window screen is not allowed. Check for invalid between-glass screen is checked below.
-            if (TotShadeLayers == 1 && Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group == Screen && TotLayers != 1) {
+            if (TotShadeLayers == 1 && state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Group == Screen && TotLayers != 1) {
                 WrongWindowLayering = true;
             }
 
             // Consistency checks for a construction with a between-glass shade or blind
 
-            if (TotShadeLayers == 1 && Material(Construct(ConstrNum).LayerPoint(1)).Group != Shade &&
-                Material(Construct(ConstrNum).LayerPoint(1)).Group != WindowBlind && Material(Construct(ConstrNum).LayerPoint(1)).Group != Screen &&
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group != Shade &&
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group != WindowBlind &&
-                Material(Construct(ConstrNum).LayerPoint(TotLayers)).Group != ComplexWindowShade && !WrongWindowLayering) {
+            if (TotShadeLayers == 1 && state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != Shade &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != WindowBlind && state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group != Screen &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Group != Shade &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Group != WindowBlind &&
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayers)).Group != ComplexWindowShade && !WrongWindowLayering) {
 
                 // This is a construction with a between-glass shade or blind
 
@@ -1478,63 +586,63 @@ namespace DataHeatBalance {
                         if (TotLayers != 5) {
                             WrongWindowLayering = true;
                         } else {
-                            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
-                                (Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
-                                ((Material(Construct(ConstrNum).LayerPoint(3)).Group == Shade ||
-                                  Material(Construct(ConstrNum).LayerPoint(3)).Group == WindowBlind) &&
-                                 Material(Construct(ConstrNum).LayerPoint(3)).Group != Screen) &&
-                                (Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
-                                Material(Construct(ConstrNum).LayerPoint(5)).Group == WindowGlass)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
+                                (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
+                                ((state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == Shade ||
+                                  state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == WindowBlind) &&
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group != Screen) &&
+                                (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
+                                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == WindowGlass)
                                 ValidBGShadeBlindConst = true;
                         }
                     } else { // TotGlassLayers = 3
                         if (TotLayers != 7) {
                             WrongWindowLayering = true;
                         } else {
-                            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
-                                (Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
-                                Material(Construct(ConstrNum).LayerPoint(3)).Group == WindowGlass &&
-                                (Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
-                                ((Material(Construct(ConstrNum).LayerPoint(5)).Group == Shade ||
-                                  Material(Construct(ConstrNum).LayerPoint(5)).Group == WindowBlind) &&
-                                 Material(Construct(ConstrNum).LayerPoint(5)).Group != Screen) &&
-                                (Material(Construct(ConstrNum).LayerPoint(6)).Group == WindowGas ||
-                                 Material(Construct(ConstrNum).LayerPoint(6)).Group == WindowGasMixture) &&
-                                Material(Construct(ConstrNum).LayerPoint(7)).Group == WindowGlass)
+                            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass &&
+                                (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2)).Group == WindowGas ||
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(2)).Group == WindowGasMixture) &&
+                                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(3)).Group == WindowGlass &&
+                                (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(4)).Group == WindowGas ||
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(4)).Group == WindowGasMixture) &&
+                                ((state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == Shade ||
+                                  state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group == WindowBlind) &&
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(5)).Group != Screen) &&
+                                (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(6)).Group == WindowGas ||
+                                 state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(6)).Group == WindowGasMixture) &&
+                                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(7)).Group == WindowGlass)
                                 ValidBGShadeBlindConst = true;
                         }
                     } // End of check if TotGlassLayers = 2 or 3
                     if (!ValidBGShadeBlindConst) WrongWindowLayering = true;
                     if (!WrongWindowLayering) {
                         LayNumSh = 2 * TotGlassLayers - 1;
-                        MatSh = Construct(ConstrNum).LayerPoint(LayNumSh);
+                        MatSh = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNumSh);
                         // For double pane, shade/blind must be layer #3.
                         // For triple pane, it must be layer #5 (i.e., between two inner panes).
-                        if (Material(MatSh).Group != Shade && Material(MatSh).Group != WindowBlind) WrongWindowLayering = true;
+                        if (state.dataMaterial->Material(MatSh).Group != Shade && state.dataMaterial->Material(MatSh).Group != WindowBlind) WrongWindowLayering = true;
                         if (TotLayers != 2 * TotGlassLayers + 1) WrongWindowLayering = true;
                         if (!WrongWindowLayering) {
                             // Gas on either side of a between-glass shade/blind must be the same
-                            MatGapL = Construct(ConstrNum).LayerPoint(LayNumSh - 1);
-                            MatGapR = Construct(ConstrNum).LayerPoint(LayNumSh + 1);
+                            MatGapL = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNumSh - 1);
+                            MatGapR = state.dataConstruction->Construct(ConstrNum).LayerPoint(LayNumSh + 1);
                             for (IGas = 1; IGas <= 5; ++IGas) {
-                                if ((Material(MatGapL).GasType(IGas) != Material(MatGapR).GasType(IGas)) ||
-                                    (Material(MatGapL).GasFract(IGas) != Material(MatGapR).GasFract(IGas)))
+                                if ((state.dataMaterial->Material(MatGapL).GasType(IGas) != state.dataMaterial->Material(MatGapR).GasType(IGas)) ||
+                                    (state.dataMaterial->Material(MatGapL).GasFract(IGas) != state.dataMaterial->Material(MatGapR).GasFract(IGas)))
                                     WrongWindowLayering = true;
                             }
                             // Gap width on either side of a between-glass shade/blind must be the same
-                            if (std::abs(Material(MatGapL).Thickness - Material(MatGapR).Thickness) > 0.0005) WrongWindowLayering = true;
-                            if (Material(MatSh).Group == WindowBlind) {
-                                BlNum = Material(MatSh).BlindDataPtr;
+                            if (std::abs(state.dataMaterial->Material(MatGapL).Thickness - state.dataMaterial->Material(MatGapR).Thickness) > 0.0005) WrongWindowLayering = true;
+                            if (state.dataMaterial->Material(MatSh).Group == WindowBlind) {
+                                BlNum = state.dataMaterial->Material(MatSh).BlindDataPtr;
                                 if (BlNum > 0) {
-                                    if ((Material(MatGapL).Thickness + Material(MatGapR).Thickness) < Blind(BlNum).SlatWidth) {
+                                    if ((state.dataMaterial->Material(MatGapL).Thickness + state.dataMaterial->Material(MatGapR).Thickness) < state.dataHeatBal->Blind(BlNum).SlatWidth) {
                                         ErrorsFound = true;
-                                        ShowSevereError("CheckAndSetConstructionProperties: For window construction " + Construct(ConstrNum).Name);
-                                        ShowContinueError("the slat width of the between-glass blind is greater than");
-                                        ShowContinueError("the sum of the widths of the gas layers adjacent to the blind.");
+                                        ShowSevereError(state, "CheckAndSetConstructionProperties: For window construction " + state.dataConstruction->Construct(ConstrNum).Name);
+                                        ShowContinueError(state, "the slat width of the between-glass blind is greater than");
+                                        ShowContinueError(state, "the sum of the widths of the gas layers adjacent to the blind.");
                                     }
                                 } // End of check if BlNum > 0
                             }     // End of check if material is window blind
@@ -1544,117 +652,118 @@ namespace DataHeatBalance {
             }                     // End of check if construction has between-glass shade/blind
 
             // Check Simple Windows,
-            if (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing) {
                 if (TotLayers > 1) {
                     // check that none of the other layers are glazing or gas
                     for (Layer = 1; Layer <= TotLayers; ++Layer) {
-                        MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                        MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                         if (MaterNum == 0) continue; // error -- has been caught will stop program later
-                        if (Material(MaterNum).Group == WindowGlass) {
+                        if (state.dataMaterial->Material(MaterNum).Group == WindowGlass) {
                             ErrorsFound = true;
-                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + Construct(ConstrNum).Name + "--");
-                            ShowContinueError("For simple window constructions, no other glazing layers are allowed.");
+                            ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
+                            ShowContinueError(state, "For simple window constructions, no other glazing layers are allowed.");
                         }
-                        if (Material(MaterNum).Group == WindowGas) {
+                        if (state.dataMaterial->Material(MaterNum).Group == WindowGas) {
                             ErrorsFound = true;
-                            ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + Construct(ConstrNum).Name + "--");
-                            ShowContinueError("For simple window constructions, no other gas layers are allowed.");
+                            ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
+                            ShowContinueError(state, "For simple window constructions, no other gas layers are allowed.");
                         }
                     }
                 }
             }
 
             if (WrongWindowLayering) {
-                ShowSevereError("CheckAndSetConstructionProperties: Error in window construction " + Construct(ConstrNum).Name + "--");
-                ShowContinueError("  For multi-layer window constructions the following rules apply:");
-                ShowContinueError("    --The first and last layer must be a solid layer (glass or shade/screen/blind),");
-                ShowContinueError("    --Adjacent glass layers must be separated by one and only one gas layer,");
-                ShowContinueError("    --Adjacent layers must not be of the same type,");
-                ShowContinueError("    --Only one shade/screen/blind layer is allowed,");
-                ShowContinueError("    --An exterior shade/screen/blind must be the first layer,");
-                ShowContinueError("    --An interior shade/blind must be the last layer,");
-                ShowContinueError("    --An interior screen is not allowed,");
-                ShowContinueError("    --For an exterior shade/screen/blind or interior shade/blind, there should not be a gas layer");
-                ShowContinueError("    ----between the shade/screen/blind and adjacent glass,");
-                ShowContinueError("    --A between-glass screen is not allowed,");
-                ShowContinueError("    --A between-glass shade/blind is allowed only for double and triple glazing,");
-                ShowContinueError("    --A between-glass shade/blind must have adjacent gas layers of the same type and width,");
-                ShowContinueError("    --For triple glazing the between-glass shade/blind must be between the two inner glass layers,");
-                ShowContinueError("    --The slat width of a between-glass blind must be less than the sum of the widths");
-                ShowContinueError("    ----of the gas layers adjacent to the blind.");
+                ShowSevereError(state, "CheckAndSetConstructionProperties: Error in window construction " + state.dataConstruction->Construct(ConstrNum).Name + "--");
+                ShowContinueError(state, "  For multi-layer window constructions the following rules apply:");
+                ShowContinueError(state, "    --The first and last layer must be a solid layer (glass or shade/screen/blind),");
+                ShowContinueError(state, "    --Adjacent glass layers must be separated by one and only one gas layer,");
+                ShowContinueError(state, "    --Adjacent layers must not be of the same type,");
+                ShowContinueError(state, "    --Only one shade/screen/blind layer is allowed,");
+                ShowContinueError(state, "    --An exterior shade/screen/blind must be the first layer,");
+                ShowContinueError(state, "    --An interior shade/blind must be the last layer,");
+                ShowContinueError(state, "    --An interior screen is not allowed,");
+                ShowContinueError(state, "    --For an exterior shade/screen/blind or interior shade/blind, there should not be a gas layer");
+                ShowContinueError(state, "    ----between the shade/screen/blind and adjacent glass,");
+                ShowContinueError(state, "    --A between-glass screen is not allowed,");
+                ShowContinueError(state, "    --A between-glass shade/blind is allowed only for double and triple glazing,");
+                ShowContinueError(state, "    --A between-glass shade/blind must have adjacent gas layers of the same type and width,");
+                ShowContinueError(state, "    --For triple glazing the between-glass shade/blind must be between the two inner glass layers,");
+                ShowContinueError(state, "    --The slat width of a between-glass blind must be less than the sum of the widths");
+                ShowContinueError(state, "    ----of the gas layers adjacent to the blind.");
                 ErrorsFound = true;
             }
 
-            Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
-            Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
+            state.dataConstruction->Construct(ConstrNum).TotGlassLayers = TotGlassLayers;
+            state.dataConstruction->Construct(ConstrNum).TotSolidLayers = TotGlassLayers + TotShadeLayers;
 
             // In following, InsideLayer is layer number of inside glass and InsideAbsorpThermal applies
             // only to inside glass; it is corrected later in InitGlassOpticalCalculations
             // if construction has inside shade or blind.
-            if (Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Shade ||
-                Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Group == WindowBlind) {
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Shade ||
+                state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Group == WindowBlind) {
                 --InsideLayer;
             }
             if (InsideLayer > 0) {
-                InsideMaterNum = Construct(ConstrNum).LayerPoint(InsideLayer);
-                Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
+                InsideMaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer);
+                state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermalBack;
             }
             if (InsideMaterNum != 0) {
-                Construct(ConstrNum).InsideAbsorpVis = Material(InsideMaterNum).AbsorpVisible;
-                Construct(ConstrNum).InsideAbsorpSolar = Material(InsideMaterNum).AbsorpSolar;
+                state.dataConstruction->Construct(ConstrNum).InsideAbsorpVis = state.dataMaterial->Material(InsideMaterNum).AbsorpVisible;
+                state.dataConstruction->Construct(ConstrNum).InsideAbsorpSolar = state.dataMaterial->Material(InsideMaterNum).AbsorpSolar;
             }
 
-            if ((Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass) ||
-                (Material(Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing)) { // Glass
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
+            if ((state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowGlass) ||
+                (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == WindowSimpleGlazing)) { // Glass
+                state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermalFront;
             } else { // Exterior shade, blind or screen
-                Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+                state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             }
 
         } else { // Opaque surface
-            Construct(ConstrNum).InsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermal;
-            Construct(ConstrNum).OutsideAbsorpThermal = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            state.dataConstruction->Construct(ConstrNum).InsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).AbsorpThermal;
+            state.dataConstruction->Construct(ConstrNum).OutsideAbsorpThermal = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
         }
 
-        Construct(ConstrNum).OutsideRoughness = Material(Construct(ConstrNum).LayerPoint(1)).Roughness;
+        state.dataConstruction->Construct(ConstrNum).OutsideRoughness = state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Roughness;
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).Group == Air) {
-            ShowSevereError("CheckAndSetConstructionProperties: Outside Layer is Air for construction " + Construct(ConstrNum).Name);
-            ShowContinueError("  Error in material " + Material(Construct(ConstrNum).LayerPoint(1)).Name);
+        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == Air) {
+            ShowSevereError(state, "CheckAndSetConstructionProperties: Outside Layer is Air for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+            ShowContinueError(state, "  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Name);
             ErrorsFound = true;
         }
         if (InsideLayer > 0) {
-            if (Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Air) {
-                ShowSevereError("CheckAndSetConstructionProperties: Inside Layer is Air for construction " + Construct(ConstrNum).Name);
-                ShowContinueError("  Error in material " + Material(Construct(ConstrNum).LayerPoint(InsideLayer)).Name);
+            if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Group == Air) {
+                ShowSevereError(state, "CheckAndSetConstructionProperties: Inside Layer is Air for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+                ShowContinueError(state, "  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(InsideLayer)).Name);
                 ErrorsFound = true;
             }
         }
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).Group == EcoRoof) {
-            Construct(ConstrNum).TypeIsEcoRoof = true;
+        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == EcoRoof) {
+            state.dataConstruction->Construct(ConstrNum).TypeIsEcoRoof = true;
             // need to check EcoRoof is not non-outside layer
             for (Layer = 2; Layer <= TotLayers; ++Layer) {
-                if (Material(Construct(ConstrNum).LayerPoint(Layer)).Group == EcoRoof) {
-                    ShowSevereError("CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction " + Construct(ConstrNum).Name);
-                    ShowContinueError("  Error in material " + Material(Construct(ConstrNum).LayerPoint(Layer)).Name);
+                if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Group == EcoRoof) {
+                    ShowSevereError(state, "CheckAndSetConstructionProperties: Interior Layer is EcoRoof for construction " + state.dataConstruction->Construct(ConstrNum).Name);
+                    ShowContinueError(state, "  Error in material " + state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer)).Name);
                     ErrorsFound = true;
                 }
             }
         }
 
-        if (Material(Construct(ConstrNum).LayerPoint(1)).Group == IRTMaterial) {
-            Construct(ConstrNum).TypeIsIRT = true;
-            if (Construct(ConstrNum).TotLayers != 1) {
-                ShowSevereError("CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " +
-                                Construct(ConstrNum).Name);
-                ShowContinueError("  Too many layers in referenced construction.");
+        if (state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(1)).Group == IRTMaterial) {
+            state.dataConstruction->Construct(ConstrNum).TypeIsIRT = true;
+            if (state.dataConstruction->Construct(ConstrNum).TotLayers != 1) {
+                ShowSevereError(state, "CheckAndSetConstructionProperties: Infrared Transparent (IRT) Construction is limited to 1 layer " +
+                                state.dataConstruction->Construct(ConstrNum).Name);
+                ShowContinueError(state, "  Too many layers in referenced construction.");
                 ErrorsFound = true;
             }
         }
     }
 
-    int AssignReverseConstructionNumber(int const ConstrNum, // Existing Construction number of first surface
+    int AssignReverseConstructionNumber(EnergyPlusData &state,
+                                        int const ConstrNum, // Existing Construction number of first surface
                                         bool &ErrorsFound)
     {
 
@@ -1672,29 +781,11 @@ namespace DataHeatBalance {
         // METHODOLOGY EMPLOYED:
         // Create reverse layers.  Look in current constructions to see if match.  If no match, create a new one.
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         int NewConstrNum; // Reverse Construction Number
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int LayerPoint(MaxLayersInConstruct, 0); // Pointer array which refers back to
+        static Array1D_int LayerPoint(Construction::MaxLayersInConstruct, 0); // Pointer array which refers back to
         int nLayer;
         int Loop;
         bool Found;
@@ -1705,20 +796,20 @@ namespace DataHeatBalance {
             return NewConstrNum;
         }
 
-        Construct(ConstrNum).IsUsed = true;
+        state.dataConstruction->Construct(ConstrNum).IsUsed = true;
         nLayer = 0;
         LayerPoint = 0;
-        for (Loop = Construct(ConstrNum).TotLayers; Loop >= 1; --Loop) {
+        for (Loop = state.dataConstruction->Construct(ConstrNum).TotLayers; Loop >= 1; --Loop) {
             ++nLayer;
-            LayerPoint(nLayer) = Construct(ConstrNum).LayerPoint(Loop);
+            LayerPoint(nLayer) = state.dataConstruction->Construct(ConstrNum).LayerPoint(Loop);
         }
 
         // now, got thru and see if there is a match already....
         NewConstrNum = 0;
-        for (Loop = 1; Loop <= TotConstructs; ++Loop) {
+        for (Loop = 1; Loop <= state.dataHeatBal->TotConstructs; ++Loop) {
             Found = true;
-            for (nLayer = 1; nLayer <= MaxLayersInConstruct; ++nLayer) {
-                if (Construct(Loop).LayerPoint(nLayer) != LayerPoint(nLayer)) {
+            for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
+                if (state.dataConstruction->Construct(Loop).LayerPoint(nLayer) != LayerPoint(nLayer)) {
                     Found = false;
                     break;
                 }
@@ -1731,39 +822,40 @@ namespace DataHeatBalance {
 
         // if need new one, bunch o stuff
         if (NewConstrNum == 0) {
-            ++TotConstructs;
-            Construct.redimension(TotConstructs);
-            NominalRforNominalUCalculation.redimension(TotConstructs);
-            NominalRforNominalUCalculation(TotConstructs) = 0.0;
-            NominalU.redimension(TotConstructs);
-            NominalU(TotConstructs) = 0.0;
+            ++state.dataHeatBal->TotConstructs;
+            state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
+            state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+            state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
             //  Put in new attributes
-            NewConstrNum = TotConstructs;
-            Construct(NewConstrNum).IsUsed = true;
-            Construct(TotConstructs) = Construct(ConstrNum); // preserve some of the attributes.
+            NewConstrNum = state.dataHeatBal->TotConstructs;
+            state.dataConstruction->Construct(NewConstrNum).IsUsed = true;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs) = state.dataConstruction->Construct(ConstrNum); // preserve some of the attributes.
             // replace others...
-            Construct(TotConstructs).Name = "iz-" + Construct(ConstrNum).Name;
-            Construct(TotConstructs).TotLayers = Construct(ConstrNum).TotLayers;
-            for (nLayer = 1; nLayer <= MaxLayersInConstruct; ++nLayer) {
-                Construct(TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).Name = "iz-" + state.dataConstruction->Construct(ConstrNum).Name;
+            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).TotLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
+            for (nLayer = 1; nLayer <= Construction::MaxLayersInConstruct; ++nLayer) {
+                state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).LayerPoint(nLayer) = LayerPoint(nLayer);
                 if (LayerPoint(nLayer) != 0) {
-                    NominalRforNominalUCalculation(TotConstructs) += NominalR(LayerPoint(nLayer));
+                    state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) += state.dataHeatBal->NominalR(LayerPoint(nLayer));
                 }
             }
 
             // no error if zero -- that will have been caught with earlier construction
             // the following line was changed to fix CR7601
-            if (NominalRforNominalUCalculation(TotConstructs) != 0.0) {
-                NominalU(TotConstructs) = 1.0 / NominalRforNominalUCalculation(TotConstructs);
+            if (state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) != 0.0) {
+                state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 1.0 / state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs);
             }
 
-            CheckAndSetConstructionProperties(TotConstructs, ErrorsFound);
+            CheckAndSetConstructionProperties(state, state.dataHeatBal->TotConstructs, ErrorsFound);
         }
 
         return NewConstrNum;
     }
 
-    void AddVariableSlatBlind(int const inBlindNumber, // current Blind Number/pointer to name
+    void AddVariableSlatBlind(EnergyPlusData &state,
+                              int const inBlindNumber, // current Blind Number/pointer to name
                               int &outBlindNumber,     // resultant Blind Number to pass back
                               bool &errFlag            // error flag should one be needed
     )
@@ -1781,27 +873,6 @@ namespace DataHeatBalance {
         // elsewhere with "fixed", a material needs to be added with variable properties -- having most of the
         // "fixed" properties in tact.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using General::RoundSigDigits;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Found;
         Real64 MinSlatAngGeom;
@@ -1811,19 +882,19 @@ namespace DataHeatBalance {
 
         // maybe it's already there
         errFlag = false;
-        Found = UtilityRoutines::FindItemInList("~" + Blind(inBlindNumber).Name, Blind);
+        Found = UtilityRoutines::FindItemInList("~" + state.dataHeatBal->Blind(inBlindNumber).Name, state.dataHeatBal->Blind);
         if (Found == 0) {
             // Add a new blind
-            Blind.redimension(++TotBlinds);
-            Blind(TotBlinds) = Blind(inBlindNumber);
-            Blind(TotBlinds).Name = "~" + Blind(inBlindNumber).Name;
-            outBlindNumber = TotBlinds;
-            Blind(TotBlinds).SlatAngleType = VariableSlats;
+            state.dataHeatBal->Blind.redimension(++state.dataHeatBal->TotBlinds);
+            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds) = state.dataHeatBal->Blind(inBlindNumber);
+            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).Name = "~" + state.dataHeatBal->Blind(inBlindNumber).Name;
+            outBlindNumber = state.dataHeatBal->TotBlinds;
+            state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngleType = VariableSlats;
 
             // Minimum and maximum slat angles allowed by slat geometry
-            if (Blind(TotBlinds).SlatWidth > Blind(TotBlinds).SlatSeparation) {
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatWidth > state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation) {
                 MinSlatAngGeom =
-                    std::asin(Blind(TotBlinds).SlatThickness / (Blind(TotBlinds).SlatThickness + Blind(TotBlinds).SlatSeparation)) / DegToRadians;
+                    std::asin(state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness / (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatThickness + state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatSeparation)) / DataGlobalConstants::DegToRadians;
             } else {
                 MinSlatAngGeom = 0.0;
             }
@@ -1831,51 +902,60 @@ namespace DataHeatBalance {
 
             // Error if maximum slat angle less than minimum
 
-            if (Blind(TotBlinds).MaxSlatAngle < Blind(TotBlinds).MinSlatAngle) {
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle < state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle) {
                 errFlag = true;
-                ShowSevereError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
-                ShowContinueError("Minimum Slat Angle=[" + RoundSigDigits(Blind(TotBlinds).MinSlatAngle, 1) +
-                                  "], is greater than Maximum Slat Angle=[" + RoundSigDigits(Blind(TotBlinds).MaxSlatAngle, 1) + "] deg.");
+                ShowSevereError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowContinueError(state,
+                                  format("Minimum Slat Angle=[{:.1R}], is greater than Maximum Slat Angle=[{:.1R}] deg.",
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
             }
 
             // Error if input slat angle not in input min/max range
 
-            if (Blind(TotBlinds).MaxSlatAngle > Blind(TotBlinds).MinSlatAngle &&
-                (Blind(TotBlinds).SlatAngle < Blind(TotBlinds).MinSlatAngle || Blind(TotBlinds).SlatAngle > Blind(TotBlinds).MaxSlatAngle)) {
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle &&
+                (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle < state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle || state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle > state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle)) {
                 errFlag = true;
-                ShowSevereError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
-                ShowContinueError("Slat Angle=[" + RoundSigDigits(Blind(TotBlinds).SlatAngle, 1) + "] is outside of the input min/max range, min=[" +
-                                  RoundSigDigits(Blind(TotBlinds).MinSlatAngle, 1) + "], max=[" + RoundSigDigits(Blind(TotBlinds).MaxSlatAngle, 1) +
-                                  "] deg.");
+                ShowSevereError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowContinueError(state,
+                                  format("Slat Angle=[{:.1R}] is outside of the input min/max range, min=[{:.1R}], max=[{:.1R}] deg.",
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).SlatAngle,
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                                         state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle));
             }
 
             // Warning if input minimum slat angle is less than that allowed by slat geometry
 
-            if (Blind(TotBlinds).MinSlatAngle < MinSlatAngGeom) {
-                ShowWarningError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
-                ShowContinueError("Minimum Slat Angle=[" + RoundSigDigits(Blind(TotBlinds).MinSlatAngle, 1) +
-                                  "] is less than the smallest allowed by slat dimensions and spacing, min=[" + RoundSigDigits(MinSlatAngGeom, 1) +
-                                  "] deg.");
-                ShowContinueError("Minimum Slat Angle will be set to " + RoundSigDigits(MinSlatAngGeom, 1) + " deg.");
-                Blind(TotBlinds).MinSlatAngle = MinSlatAngGeom;
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle < MinSlatAngGeom) {
+                ShowWarningError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowContinueError(
+                    state,
+                    format("Minimum Slat Angle=[{:.1R}] is less than the smallest allowed by slat dimensions and spacing, min=[{:.1R}] deg.",
+                           state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle,
+                           MinSlatAngGeom));
+                ShowContinueError(state, format("Minimum Slat Angle will be set to {:.1R} deg.", MinSlatAngGeom));
+                state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MinSlatAngle = MinSlatAngGeom;
             }
 
             // Warning if input maximum slat angle is greater than that allowed by slat geometry
 
-            if (Blind(TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
-                ShowWarningError("WindowMaterial:Blind=\"" + Blind(inBlindNumber).Name + "\", Illegal value combination.");
-                ShowContinueError("Maximum Slat Angle=[" + RoundSigDigits(Blind(TotBlinds).MaxSlatAngle, 1) +
-                                  "] is greater than the largest allowed by slat dimensions and spacing, [" + RoundSigDigits(MaxSlatAngGeom, 1) +
-                                  "] deg.");
-                ShowContinueError("Maximum Slat Angle will be set to " + RoundSigDigits(MaxSlatAngGeom, 1) + " deg.");
-                Blind(TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
+            if (state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle > MaxSlatAngGeom) {
+                ShowWarningError(state, "WindowMaterial:Blind=\"" + state.dataHeatBal->Blind(inBlindNumber).Name + "\", Illegal value combination.");
+                ShowContinueError(
+                    state,
+                    format("Maximum Slat Angle=[{:.1R}] is greater than the largest allowed by slat dimensions and spacing, [{:.1R}] deg.",
+                           state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle,
+                           MaxSlatAngGeom));
+                ShowContinueError(state, format("Maximum Slat Angle will be set to {:.1R} deg.", MaxSlatAngGeom));
+                state.dataHeatBal->Blind(state.dataHeatBal->TotBlinds).MaxSlatAngle = MaxSlatAngGeom;
             }
         } else {
             outBlindNumber = Found;
         }
     }
 
-    void CalcScreenTransmittance(int const SurfaceNum,
+    void CalcScreenTransmittance(EnergyPlusData &state,
+                                 int const SurfaceNum,
                                  Optional<Real64 const> Phi,     // Optional sun altitude relative to surface outward normal (radians)
                                  Optional<Real64 const> Theta,   // Optional sun azimuth relative to surface outward normal (radians)
                                  Optional_int_const ScreenNumber // Optional screen number
@@ -1911,7 +991,7 @@ namespace DataHeatBalance {
         //  CALL CalcScreenTransmittance(0, Phi=0.0, Theta=0.0, ScreenNumber=ScNum)
         //   -OR-
         //  CALL same as above using the material structure
-        //  CALL CalcScreenTransmittance(0, Phi=0.0, Theta=0.0, ScreenNumber=Material(MatShade)%ScreenDataPtr)
+        //  CALL CalcScreenTransmittance(0, Phi=0.0, Theta=0.0, ScreenNumber=dataMaterial.Material(MatShade)%ScreenDataPtr)
         //   -OR-
         //  CALL with the surface number and relative azimuth and altitude angles
         //  CALL CalcScreenTransmittance(SurfaceNum, Phi=0.0, Theta=0.0)
@@ -1919,19 +999,10 @@ namespace DataHeatBalance {
         //  CALL's passing the screen number without the relative azimuth and altitude angles is not allowed
         //  CALL CalcScreenTransmittance(0, ScreenNumber=ScNum) ! DO NOT use this syntax
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataEnvironment::SOLCOS;
-        using DataGlobals::DegToRadians;
-        using DataGlobals::Pi;
-        using DataGlobals::PiOvr2;
         using DataSurfaces::DoNotModel;
         using DataSurfaces::ModelAsDiffuse;
         using DataSurfaces::ModelAsDirectBeam;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1985,30 +1056,30 @@ namespace DataHeatBalance {
         if (present(ScreenNumber)) {
             ScNum = ScreenNumber;
             if (!present(Theta) || !present(Phi)) {
-                ShowFatalError("Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
+                ShowFatalError(state, "Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
             }
         } else {
-            ScNum = SurfaceWindow(SurfaceNum).ScreenNumber;
+            ScNum = state.dataSurface->SurfWinScreenNumber(SurfaceNum);
         }
 
         if (present(Theta)) {
             SunAzimuthToScreenNormal = std::abs(Theta);
-            if (SunAzimuthToScreenNormal > Pi) {
+            if (SunAzimuthToScreenNormal > DataGlobalConstants::Pi) {
                 SunAzimuthToScreenNormal = 0.0;
             } else {
-                if (SunAzimuthToScreenNormal > PiOvr2) {
-                    SunAzimuthToScreenNormal = Pi - SunAzimuthToScreenNormal;
+                if (SunAzimuthToScreenNormal > DataGlobalConstants::PiOvr2) {
+                    SunAzimuthToScreenNormal = DataGlobalConstants::Pi - SunAzimuthToScreenNormal;
                 }
             }
             NormalAzimuth = SunAzimuthToScreenNormal;
         } else {
-            SunAzimuth = std::atan2(SOLCOS(1), SOLCOS(2));
-            if (SunAzimuth < 0.0) SunAzimuth += 2.0 * Pi;
-            SurfaceAzimuth = Surface(SurfaceNum).Azimuth * DegToRadians;
+            SunAzimuth = std::atan2(state.dataEnvrn->SOLCOS(1), state.dataEnvrn->SOLCOS(2));
+            if (SunAzimuth < 0.0) SunAzimuth += 2.0 * DataGlobalConstants::Pi;
+            SurfaceAzimuth = state.dataSurface->Surface(SurfaceNum).Azimuth * DataGlobalConstants::DegToRadians;
             NormalAzimuth = SunAzimuth - SurfaceAzimuth;
             //   Calculate the transmittance whether sun is in front of or behind screen, place result in BmBmTrans or BmBmTransBack
-            if (std::abs(SunAzimuth - SurfaceAzimuth) > PiOvr2) {
-                SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - PiOvr2;
+            if (std::abs(SunAzimuth - SurfaceAzimuth) > DataGlobalConstants::PiOvr2) {
+                SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth) - DataGlobalConstants::PiOvr2;
             } else {
                 SunAzimuthToScreenNormal = std::abs(SunAzimuth - SurfaceAzimuth);
             }
@@ -2016,23 +1087,23 @@ namespace DataHeatBalance {
 
         if (present(Phi)) {
             SunAltitudeToScreenNormal = std::abs(Phi);
-            if (SunAltitudeToScreenNormal > PiOvr2) {
-                SunAltitudeToScreenNormal = Pi - SunAltitudeToScreenNormal;
+            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
+                SunAltitudeToScreenNormal = DataGlobalConstants::Pi - SunAltitudeToScreenNormal;
             }
             SunAltitude = SunAltitudeToScreenNormal;
         } else {
-            SunAltitude = (PiOvr2 - std::acos(SOLCOS(3)));
-            SurfaceTilt = Surface(SurfaceNum).Tilt * DegToRadians;
-            SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - PiOvr2));
-            if (SunAltitudeToScreenNormal > PiOvr2) {
-                SunAltitudeToScreenNormal -= PiOvr2;
+            SunAltitude = (DataGlobalConstants::PiOvr2 - std::acos(state.dataEnvrn->SOLCOS(3)));
+            SurfaceTilt = state.dataSurface->Surface(SurfaceNum).Tilt * DataGlobalConstants::DegToRadians;
+            SunAltitudeToScreenNormal = std::abs(SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2));
+            if (SunAltitudeToScreenNormal > DataGlobalConstants::PiOvr2) {
+                SunAltitudeToScreenNormal -= DataGlobalConstants::PiOvr2;
             }
         }
 
         if (SurfaceNum == 0 || !present(ScreenNumber)) {
             NormalAltitude = SunAltitude;
         } else {
-            NormalAltitude = SunAltitude + (SurfaceTilt - PiOvr2);
+            NormalAltitude = SunAltitude + (SurfaceTilt - DataGlobalConstants::PiOvr2);
         }
 
         if (NormalAltitude != 0.0 && NormalAzimuth != 0.0) {
@@ -2046,18 +1117,18 @@ namespace DataHeatBalance {
         }
 
         // ratio of screen material diameter to screen material spacing
-        Gamma = SurfaceScreens(ScNum).ScreenDiameterToSpacingRatio;
+        Gamma = state.dataHeatBal->SurfaceScreens(ScNum).ScreenDiameterToSpacingRatio;
 
         // ************************************************************************************************
         // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
         // ************************************************************************************************
 
         // calculate compliment of relative solar azimuth
-        Beta = PiOvr2 - SunAzimuthToScreenNormal;
+        Beta = DataGlobalConstants::PiOvr2 - SunAzimuthToScreenNormal;
 
         // Catch all divide by zero instances
         if (Beta > Small) {
-            if (std::abs(SunAltitudeToScreenNormal - PiOvr2) > Small) {
+            if (std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) > Small) {
                 AlphaDblPrime = std::atan(std::tan(SunAltitudeToScreenNormal) / std::cos(SunAzimuthToScreenNormal));
                 TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) + std::sin(AlphaDblPrime) * std::tan(SunAltitudeToScreenNormal) *
                                                                          std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
@@ -2073,7 +1144,7 @@ namespace DataHeatBalance {
                           pow_2(std::sin(SunAltitudeToScreenNormal)));
         if (COSMu > Small) {
             Epsilon = std::acos(std::cos(SunAltitudeToScreenNormal) * std::cos(SunAzimuthToScreenNormal) / COSMu);
-            Eta = PiOvr2 - Epsilon;
+            Eta = DataGlobalConstants::PiOvr2 - Epsilon;
             if (std::cos(Epsilon) != 0.0) {
                 MuPrime = std::atan(std::tan(std::acos(COSMu)) / std::cos(Epsilon));
                 if (Eta != 0.0) {
@@ -2095,16 +1166,16 @@ namespace DataHeatBalance {
         // * calculate transmittance of scattered beam due to reflecting screen material *
         // *******************************************************************************
 
-        ReflectCyl = SurfaceScreens(ScNum).ReflectCylinder;
-        ReflectCylVis = SurfaceScreens(ScNum).ReflectCylinderVis;
+        ReflectCyl = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinder;
+        ReflectCylVis = state.dataHeatBal->SurfaceScreens(ScNum).ReflectCylinderVis;
 
-        if (std::abs(SunAzimuthToScreenNormal - PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - PiOvr2) < Small) {
+        if (std::abs(SunAzimuthToScreenNormal - DataGlobalConstants::PiOvr2) < Small || std::abs(SunAltitudeToScreenNormal - DataGlobalConstants::PiOvr2) < Small) {
             Tscattered = 0.0;
             TscatteredVis = 0.0;
         } else {
             //   DeltaMax and Delta are in degrees
             DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
-            Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DegToRadians) + pow_2(SunAltitudeToScreenNormal / DegToRadians));
+            Delta = std::sqrt(pow_2(SunAzimuthToScreenNormal / DataGlobalConstants::DegToRadians) + pow_2(SunAltitudeToScreenNormal / DataGlobalConstants::DegToRadians));
 
             //   Use empirical model to determine maximum (peak) scattering
             Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflectCyl) - 0.44416 * Gamma * ReflectCyl;
@@ -2137,62 +1208,62 @@ namespace DataHeatBalance {
         Tscattered = max(0.0, Tscattered);
         TscatteredVis = max(0.0, TscatteredVis);
 
-        if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
-            if (std::abs(IncidentAngle) <= PiOvr2) {
-                SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+        if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == DoNotModel) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
             } else {
-                SurfaceScreens(ScNum).BmBmTrans = 0.0;
-                SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-                SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
             }
             Tscattered = 0.0;
             TscatteredVis = 0.0;
-        } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
-            if (std::abs(IncidentAngle) <= PiOvr2) {
-                SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
-                SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
-                SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+        } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDirectBeam) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect + Tscattered;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect + TscatteredVis;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
             } else {
-                SurfaceScreens(ScNum).BmBmTrans = 0.0;
-                SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-                SurfaceScreens(ScNum).BmBmTransBack = Tdirect + Tscattered;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect + Tscattered;
             }
             Tscattered = 0.0;
             TscatteredVis = 0.0;
-        } else if (SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
-            if (std::abs(IncidentAngle) <= PiOvr2) {
-                SurfaceScreens(ScNum).BmBmTrans = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
-                SurfaceScreens(ScNum).BmBmTransBack = 0.0;
+        } else if (state.dataHeatBal->SurfaceScreens(ScNum).ScreenBeamReflectanceAccounting == ModelAsDiffuse) {
+            if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = 0.0;
             } else {
-                SurfaceScreens(ScNum).BmBmTrans = 0.0;
-                SurfaceScreens(ScNum).BmBmTransVis = 0.0;
-                SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTrans = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransVis = 0.0;
+                state.dataHeatBal->SurfaceScreens(ScNum).BmBmTransBack = Tdirect;
             }
         }
 
-        if (std::abs(IncidentAngle) <= PiOvr2) {
-            SurfaceScreens(ScNum).BmDifTrans = Tscattered;
-            SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
-            SurfaceScreens(ScNum).BmDifTransBack = 0.0;
-            SurfaceScreens(ScNum).ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-            SurfaceScreens(ScNum).ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-            SurfaceScreens(ScNum).AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-            SurfaceScreens(ScNum).ReflectSolBeamBack = 0.0;
-            SurfaceScreens(ScNum).ReflectVisBeamBack = 0.0;
-            SurfaceScreens(ScNum).AbsorpSolarBeamBack = 0.0;
+        if (std::abs(IncidentAngle) <= DataGlobalConstants::PiOvr2) {
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = Tscattered;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = TscatteredVis;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = 0.0;
         } else {
-            SurfaceScreens(ScNum).BmDifTrans = 0.0;
-            SurfaceScreens(ScNum).BmDifTransVis = 0.0;
-            SurfaceScreens(ScNum).BmDifTransBack = Tscattered;
-            SurfaceScreens(ScNum).ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
-            SurfaceScreens(ScNum).ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
-            SurfaceScreens(ScNum).AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
-            SurfaceScreens(ScNum).ReflectSolBeamFront = 0.0;
-            SurfaceScreens(ScNum).ReflectVisBeamFront = 0.0;
-            SurfaceScreens(ScNum).AbsorpSolarBeamFront = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTrans = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransVis = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).BmDifTransBack = Tscattered;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamBack = max(0.0, ReflectCyl * (1.0 - Tdirect) - Tscattered);
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamBack = max(0.0, ReflectCylVis * (1.0 - Tdirect) - TscatteredVis);
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflectCyl));
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectSolBeamFront = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).ReflectVisBeamFront = 0.0;
+            state.dataHeatBal->SurfaceScreens(ScNum).AbsorpSolarBeamFront = 0.0;
         }
     }
 
@@ -2208,31 +1279,8 @@ namespace DataHeatBalance {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is given a roughness value and returns the character representation.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         std::string cRoughness; // Character representation of Roughness
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Select the correct Number for the associated ascii name for the roughness type
         {
@@ -2257,7 +1305,8 @@ namespace DataHeatBalance {
         return cRoughness;
     }
 
-    Real64 ComputeNominalUwithConvCoeffs(int const numSurf, // index for Surface array.
+    Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
+                                         int const numSurf, // index for Surface array.
                                          bool &isValid      // returns true if result is valid
     )
     {
@@ -2281,37 +1330,14 @@ namespace DataHeatBalance {
         //      Interior vertical surfaces                     IP: 0.68  SI: 0.1198
         // This section shows the same value in 90.1-2007 and 90.2-2010
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Ground;
         using DataSurfaces::GroundFCfactorMethod;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Door;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Roof;
-        using DataSurfaces::SurfaceClass_Wall;
+        using DataSurfaces::SurfaceClass;
 
         // Return value
         Real64 NominalUwithConvCoeffs; // return value
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Real64 insideFilm;
         Real64 outsideFilm;
@@ -2319,24 +1345,24 @@ namespace DataHeatBalance {
         isValid = true;
         // exterior conditions
         {
-            auto const SELECT_CASE_var(Surface(numSurf).ExtBoundCond);
+            auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).ExtBoundCond);
             if (SELECT_CASE_var == ExternalEnvironment) {
                 outsideFilm = 0.0299387; // All exterior conditions
             } else if ((SELECT_CASE_var == Ground) || (SELECT_CASE_var == GroundFCfactorMethod)) {
                 outsideFilm = 0.0; // No outside film when underground
             } else {
-                if (Surface(numSurf).ExtBoundCond > 0) { // interzone partition
+                if (state.dataSurface->Surface(numSurf).ExtBoundCond > 0) { // interzone partition
                     // use companion surface in adjacent zone
                     {
-                        auto const SELECT_CASE_var1(Surface(Surface(numSurf).ExtBoundCond).Class);
-                        if ((SELECT_CASE_var1 == SurfaceClass_Wall) ||
-                            (SELECT_CASE_var1 == SurfaceClass_Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                        auto const SELECT_CASE_var1(state.dataSurface->Surface(state.dataSurface->Surface(numSurf).ExtBoundCond).Class);
+                        if ((SELECT_CASE_var1 == SurfaceClass::Wall) ||
+                            (SELECT_CASE_var1 == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                             outsideFilm = 0.1197548;
                         } else if (SELECT_CASE_var1 ==
-                                   SurfaceClass_Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                                   SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
                             outsideFilm = 0.1620212;
                         } else if (SELECT_CASE_var1 ==
-                                   SurfaceClass_Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                                   SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
                             outsideFilm = 0.1074271;
                         } else {
                             outsideFilm = 0.0810106; // All semi-exterior surfaces
@@ -2348,46 +1374,31 @@ namespace DataHeatBalance {
             }
         }
         // interior conditions
-        if (NominalU(Surface(numSurf).Construction) > 0.0) {
+        if (state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction) > 0.0) {
             {
-                auto const SELECT_CASE_var(Surface(numSurf).Class);
-                if ((SELECT_CASE_var == SurfaceClass_Wall) ||
-                    (SELECT_CASE_var == SurfaceClass_Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
+                auto const SELECT_CASE_var(state.dataSurface->Surface(numSurf).Class);
+                if ((SELECT_CASE_var == SurfaceClass::Wall) ||
+                    (SELECT_CASE_var == SurfaceClass::Door)) { // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                     insideFilm = 0.1197548;
-                } else if (SELECT_CASE_var == SurfaceClass_Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
+                } else if (SELECT_CASE_var == SurfaceClass::Floor) { // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
                     insideFilm = 0.1620212;
-                } else if (SELECT_CASE_var == SurfaceClass_Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
+                } else if (SELECT_CASE_var == SurfaceClass::Roof) { // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
                     insideFilm = 0.1074271;
                 } else {
                     insideFilm = 0.0;
                     outsideFilm = 0.0;
                 }
             }
-            NominalUwithConvCoeffs = 1.0 / (insideFilm + (1.0 / NominalU(Surface(numSurf).Construction)) + outsideFilm);
+            NominalUwithConvCoeffs = 1.0 / (insideFilm + (1.0 / state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction)) + outsideFilm);
         } else {
             isValid = false;
-            NominalUwithConvCoeffs = NominalU(Surface(numSurf).Construction);
+            NominalUwithConvCoeffs = state.dataHeatBal->NominalU(state.dataSurface->Surface(numSurf).Construction);
         }
 
         return NominalUwithConvCoeffs;
     }
 
-    bool ConstructionData::isGlazingConstruction() const
-    {
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Simon Vidanovic
-        //       DATE WRITTEN   September 2016
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Commonly used routine in several places in EnergyPlus which examines if current
-        // construcdtion is glazing construction
-        auto const MaterialGroup = Material(LayerPoint(1)).Group;
-        return MaterialGroup == WindowGlass || MaterialGroup == Shade || MaterialGroup == Screen || MaterialGroup == WindowBlind ||
-               MaterialGroup == WindowSimpleGlazing;
-    }
-    void SetFlagForWindowConstructionWithShadeOrBlindLayer()
+    void SetFlagForWindowConstructionWithShadeOrBlindLayer(EnergyPlusData &state)
     {
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -2398,30 +1409,8 @@ namespace DataHeatBalance {
         // Loop through Surface and register any shading controls, and loop through the construction
         // material layer
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::Construct;
-        using DataHeatBalance::Material;
         using DataSurfaces::ExternalEnvironment;
-        using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
-        using DataSurfaces::TotSurfaces;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int loopSurfNum(0); // surface index
@@ -2430,27 +1419,24 @@ namespace DataHeatBalance {
         static int Layer(0);       // construction material layer index
         static int MaterNum(0);    // construction material index
 
-        for (loopSurfNum = 1; loopSurfNum <= TotSurfaces; ++loopSurfNum) {
+        for (loopSurfNum = 1; loopSurfNum <= state.dataSurface->TotSurfaces; ++loopSurfNum) {
 
-            if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
-            if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
-            if (!Surface(loopSurfNum).HasShadeControl) continue;
-            if (SurfaceWindow(loopSurfNum).ShadedConstruction == 0) continue;
+            if (state.dataSurface->Surface(loopSurfNum).Class != DataSurfaces::SurfaceClass::Window) continue;
+            if (state.dataSurface->Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
+            if (!state.dataSurface->Surface(loopSurfNum).HasShadeControl) continue;
+            if (state.dataSurface->Surface(loopSurfNum).activeShadedConstruction == 0) continue;
 
-            ConstrNum = SurfaceWindow(loopSurfNum).ShadedConstruction;
-            if (Construct(ConstrNum).TypeIsWindow) {
-                NumLayers = Construct(ConstrNum).TotLayers;
+            ConstrNum = state.dataSurface->Surface(loopSurfNum).activeShadedConstruction;
+            if (state.dataConstruction->Construct(ConstrNum).TypeIsWindow) {
+                NumLayers = state.dataConstruction->Construct(ConstrNum).TotLayers;
                 for (Layer = 1; Layer <= NumLayers; ++Layer) {
-                    MaterNum = Construct(ConstrNum).LayerPoint(Layer);
+                    MaterNum = state.dataConstruction->Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue;
-                    if (Material(MaterNum).Group == Shade || Material(MaterNum).Group == WindowBlind)
-                        SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer = true;
-                    ;
+                    if (state.dataMaterial->Material(MaterNum).Group == Shade || state.dataMaterial->Material(MaterNum).Group == WindowBlind)
+                        state.dataSurface->SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
                 }
             }
         }
     }
-
-} // namespace DataHeatBalance
 
 } // namespace EnergyPlus

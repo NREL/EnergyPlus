@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,10 +49,13 @@
 #define RoomAirModelAirflowNetwork_hh_INCLUDED
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace RoomAirModelAirflowNetwork {
 
@@ -76,22 +79,22 @@ namespace RoomAirModelAirflowNetwork {
         void InitRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void CalcRoomAirModelAirflowNetwork(int const ThisRoomAirNode); // index number for the specified zone and room air node
+        void CalcRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ThisRoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
-        void UpdateRoomAirModelAirflowNetwork(); // index number for the specified zone
+        void UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state); // index number for the specified zone
 
         //*****************************************************************************************
-        void CalcNodeSums(int const RoomAirNode); // index number for the specified zone and room air node
+        void CalcNodeSums(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
 
         //*****************************************************************************************
         void SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RoomAirNode); // index number for the specified zone and room air node
         //*****************************************************************************************
-        void SumSystemDepResponseForNode(); // index number for the specified zone and room air node
+        void SumSystemDepResponseForNode(EnergyPlusData &state); // index number for the specified zone and room air node
 
         //*****************************************************************************************
 
-        void CalcSurfaceMoistureSums(int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &SurfMask);
+        void CalcSurfaceMoistureSums(EnergyPlusData &state, int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &SurfMask);
     };
 
     // Object data
@@ -106,6 +109,15 @@ namespace RoomAirModelAirflowNetwork {
     //*****************************************************************************************
 
 } // namespace RoomAirModelAirflowNetwork
+
+struct RoomAirModelAirflowNetworkData : BaseGlobalStruct
+{
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

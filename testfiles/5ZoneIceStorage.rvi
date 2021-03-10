@@ -24,8 +24,8 @@ Chiller Evaporator Cooling Rate
 Chiller Evaporator Inlet Temperature
 Chiller Evaporator Outlet Temperature
 Chiller COP
-Chiller Electric Power
-Chiller Electric Energy
+Chiller Electricity Rate
+Chiller Electricity Energy
 Electricity:Plant
 Electricity:Facility
 0

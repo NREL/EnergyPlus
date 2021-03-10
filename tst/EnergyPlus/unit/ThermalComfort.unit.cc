@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,7 +51,8 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -61,146 +62,138 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
-#include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ThermalComfort;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataGlobals;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataRoomAirModel;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::InternalHeatGains;
-using namespace EnergyPlus::HeatBalanceManager;
-using namespace EnergyPlus::OutputProcessor;
-using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataHeatBalSurface;
+//using namespace EnergyPlus::ScheduleManager;
 using namespace SimulationManager;
 using namespace ObjexxFCL;
 
-using DataZoneEnergyDemands::ZoneSysEnergyDemand;
-
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetTest1)
 {
-    NumOfZones = 1;
-    ZoneSysEnergyDemand.allocate(NumOfZones);
-    ThermalComfortSetPoint.allocate(NumOfZones);
-    TempControlType.allocate(1);
-    AirModel.allocate(NumOfZones);
-    AirModel(1).AirModelType = RoomAirModel_Mixing;
-    ZTAV.allocate(NumOfZones);
-    ZoneThermostatSetPointLo.allocate(NumOfZones);
-    ZoneThermostatSetPointHi.allocate(NumOfZones);
-    TimeStepZone = 0.25;
-    ThermalComfortInASH55.allocate(NumOfZones);
-    ThermalComfortInASH55(1).ZoneIsOccupied = true;
-    Zone.allocate(NumOfZones);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
+    state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+    state->dataHeatBalFanSys->ZTAV.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataThermalComforts->ThermalComfortInASH55.allocate(state->dataGlobal->NumOfZones);
+    state->dataThermalComforts->ThermalComfortInASH55(1).ZoneIsOccupied = true;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
 
     // SingleHeatingSetPoint thermostat
 
-    TempControlType(1) = SingleHeatingSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = SingleHeatingSetPoint;
 
     // heating
-    ZTAV(1) = 21.1;                                     // 70F
-    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    ZTAV(1) = 25.0;                                      // 77F
-    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // SingleCoolingSetPoint thermostat
 
-    TempControlType(1) = SingleCoolingSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = SingleCoolingSetPoint;
 
     // heating
-    ZTAV(1) = 21.1;                                     // 70F
-    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    ZTAV(1) = 25.0;                                      // 77F
-    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // SingleHeatCoolSetPoint thermostat
 
-    TempControlType(1) = SingleHeatCoolSetPoint;
+    state->dataHeatBalFanSys->TempControlType(1) = SingleHeatCoolSetPoint;
 
     // heating
-    ZTAV(1) = 21.1;                                     // 70F
-    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    ZTAV(1) = 25.0;                                      // 77F
-    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // DualSetPointWithDeadBand thermostat
 
-    TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
 
     // heating
-    ZTAV(1) = 21.1;                                     // 70F
-    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    ZTAV(1) = 25.0;                                      // 77F
-    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
@@ -710,47 +703,47 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    DataGlobals::DDOnlySimulation = true;
+    state->dataGlobal->DDOnlySimulation = true;
 
-    ManageSimulation(state, outputFiles());
+    ManageSimulation(*state);
 
     //	compare_err_stream( "" );
 
-    ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
+    state->dataHeatBalFanSys->ZTAVComf(1) = 25.0;
+    state->dataHeatBal->MRT(1) = 26.0;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(*state);
 
-    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -1.262, 0.005);
-    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 38.3, 0.1);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.262, 0.005);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 38.3, 0.1);
 
-    ZTAVComf(1) = 26.0;
-    MRT(1) = 27.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
+    state->dataHeatBalFanSys->ZTAVComf(1) = 26.0;
+    state->dataHeatBal->MRT(1) = 27.0;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(*state);
 
-    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -0.860, 0.005);
-    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 20.6, 0.1);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.860, 0.005);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 20.6, 0.1);
 
-    ZTAVComf(1) = 27.0;
-    MRT(1) = 28.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
+    state->dataHeatBalFanSys->ZTAVComf(1) = 27.0;
+    state->dataHeatBal->MRT(1) = 28.0;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(*state);
 
-    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -0.460, 0.005);
-    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 9.4, 0.1);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -0.460, 0.005);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 9.4, 0.1);
 
-    ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
+    state->dataHeatBalFanSys->ZTAVComf(1) = 25.0;
+    state->dataHeatBal->MRT(1) = 26.0;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = 0.00629; // 0.002 to 0.006
 
-    CalcThermalComfortFanger();
+    CalcThermalComfortFanger(*state);
 
-    EXPECT_NEAR(ThermalComfortData(1).FangerPMV, -1.201, 0.005);
-    EXPECT_NEAR(ThermalComfortData(1).FangerPPD, 35.3, 0.1);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPMV, -1.201, 0.005);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).FangerPPD, 35.3, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
@@ -761,51 +754,50 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcSurfaceWeightedMRT)
     Real64 RadTemp;
 
     TH.deallocate();
-    Surface.deallocate();
-    Construct.deallocate();
-    Zone.deallocate();
-    AngleFactorList.allocate(1);
-    TotSurfaces = 3;
-    NumOfZones = 1;
-    TH.allocate(2, 2, TotSurfaces);
-    Surface.allocate(TotSurfaces);
-    Construct.allocate(TotSurfaces);
-    Zone.allocate(1);
+    state->dataSurface->Surface.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataThermalComforts->AngleFactorList.allocate(1);
+    state->dataSurface->TotSurfaces = 3;
+    state->dataGlobal->NumOfZones = 1;
+    TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
+    state->dataHeatBal->Zone.allocate(1);
 
-    Surface(1).Area = 20.0;
-    Surface(2).Area = 15.0;
-    Surface(3).Area = 10.0;
-    Surface(1).HeatTransSurf = true;
-    Surface(2).HeatTransSurf = true;
-    Surface(3).HeatTransSurf = true;
-    Surface(1).Construction = 1;
-    Surface(2).Construction = 2;
-    Surface(3).Construction = 3;
-    Construct(1).InsideAbsorpThermal = 1.0;
-    Construct(2).InsideAbsorpThermal = 0.9;
-    Construct(3).InsideAbsorpThermal = 0.8;
-    Surface(1).Zone = 1;
-    Surface(2).Zone = 1;
-    Surface(3).Zone = 1;
-    Zone(1).SurfaceFirst = 1;
-    Zone(1).SurfaceLast = 3;
+    state->dataSurface->Surface(1).Area = 20.0;
+    state->dataSurface->Surface(2).Area = 15.0;
+    state->dataSurface->Surface(3).Area = 10.0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(2).HeatTransSurf = true;
+    state->dataSurface->Surface(3).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 2;
+    state->dataSurface->Surface(3).Construction = 3;
+    state->dataConstruction->Construct(1).InsideAbsorpThermal = 1.0;
+    state->dataConstruction->Construct(2).InsideAbsorpThermal = 0.9;
+    state->dataConstruction->Construct(3).InsideAbsorpThermal = 0.8;
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(2).Zone = 1;
+    state->dataSurface->Surface(3).Zone = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceFirst = 1;
+    state->dataHeatBal->Zone(1).HTSurfaceLast = 3;
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
     TH(2, 1, 3) = 10.0;
 
     SurfNum = 1;
-    ThermalComfort::clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 16.6, 0.1);
 
     SurfNum = 2;
-    ThermalComfort::clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 16.1, 0.1);
 
     SurfNum = 3;
-    ThermalComfort::clear_state();
-    RadTemp = CalcSurfaceWeightedMRT(ZoneNum, SurfNum);
+    state->dataThermalComforts->clear_state();
+    RadTemp = CalcSurfaceWeightedMRT(*state, ZoneNum, SurfNum);
     EXPECT_NEAR(RadTemp, 14.0, 0.1);
 }
 
@@ -814,195 +806,250 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcAngleFactorMRT)
 
     Real64 RadTemp;
 
-    AngleFactorList.allocate(1);
-    AngleFactorList(1).TotAngleFacSurfaces = 3;
-    AngleFactorList(1).SurfacePtr.allocate(AngleFactorList(1).TotAngleFacSurfaces);
-    AngleFactorList(1).AngleFactor.allocate(AngleFactorList(1).TotAngleFacSurfaces);
+    state->dataThermalComforts->AngleFactorList.allocate(1);
+    state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces = 3;
+    state->dataThermalComforts->AngleFactorList(1).SurfacePtr.allocate(state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces);
+    state->dataThermalComforts->AngleFactorList(1).AngleFactor.allocate(state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces);
 
-    AngleFactorList(1).SurfacePtr(1) = 1;
-    AngleFactorList(1).SurfacePtr(2) = 2;
-    AngleFactorList(1).SurfacePtr(3) = 3;
-    AngleFactorList(1).AngleFactor(1) = 0.5;
-    AngleFactorList(1).AngleFactor(2) = 0.3;
-    AngleFactorList(1).AngleFactor(3) = 0.2;
+    state->dataThermalComforts->AngleFactorList(1).SurfacePtr(1) = 1;
+    state->dataThermalComforts->AngleFactorList(1).SurfacePtr(2) = 2;
+    state->dataThermalComforts->AngleFactorList(1).SurfacePtr(3) = 3;
+    state->dataThermalComforts->AngleFactorList(1).AngleFactor(1) = 0.5;
+    state->dataThermalComforts->AngleFactorList(1).AngleFactor(2) = 0.3;
+    state->dataThermalComforts->AngleFactorList(1).AngleFactor(3) = 0.2;
 
     TH.deallocate();
-    TotSurfaces = AngleFactorList(1).TotAngleFacSurfaces;
-    TH.allocate(2, 2, TotSurfaces);
-    Surface.deallocate();
-    Construct.deallocate();
-    Surface.allocate(TotSurfaces);
-    Construct.allocate(TotSurfaces);
+    state->dataSurface->TotSurfaces = state->dataThermalComforts->AngleFactorList(1).TotAngleFacSurfaces;
+    TH.allocate(2, 2, state->dataSurface->TotSurfaces);
+    state->dataSurface->Surface.deallocate();
+    state->dataConstruction->Construct.deallocate();
+    state->dataSurface->Surface.allocate(state->dataSurface->TotSurfaces);
+    state->dataConstruction->Construct.allocate(state->dataSurface->TotSurfaces);
 
     TH(2, 1, 1) = 20.0;
     TH(2, 1, 2) = 15.0;
     TH(2, 1, 3) = 10.0;
-    Surface(1).Construction = 1;
-    Surface(2).Construction = 2;
-    Surface(3).Construction = 3;
-    Construct(1).InsideAbsorpThermal = 1.0;
-    Construct(2).InsideAbsorpThermal = 0.9;
-    Construct(3).InsideAbsorpThermal = 0.8;
+    state->dataSurface->Surface(1).Construction = 1;
+    state->dataSurface->Surface(2).Construction = 2;
+    state->dataSurface->Surface(3).Construction = 3;
+    state->dataConstruction->Construct(1).InsideAbsorpThermal = 1.0;
+    state->dataConstruction->Construct(2).InsideAbsorpThermal = 0.9;
+    state->dataConstruction->Construct(3).InsideAbsorpThermal = 0.8;
 
-    RadTemp = CalcAngleFactorMRT(1);
+    RadTemp = CalcAngleFactorMRT(*state, 1);
     EXPECT_NEAR(RadTemp, 16.9, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortAdaptiveASH55Test)
 {
     // 5381
-    useEpwData = true;
+    state->dataThermalComforts->useEpwData = true;
 
-    DailyAveOutTemp(1) = 8.704166667;
-    DailyAveOutTemp(2) = 9.895833333;
-    DailyAveOutTemp(3) = 12.2;
-    DailyAveOutTemp(4) = 8.445833333;
-    DailyAveOutTemp(5) = 7.8;
-    DailyAveOutTemp(6) = 7.158333333;
-    DailyAveOutTemp(7) = 8.0125;
-    DailyAveOutTemp(8) = 8.279166667;
-    DailyAveOutTemp(9) = 8.166666667;
-    DailyAveOutTemp(10) = 7.141666667;
-    DailyAveOutTemp(11) = 7.433333333;
-    DailyAveOutTemp(12) = 9.0625;
-    DailyAveOutTemp(13) = 9.741666667;
-    DailyAveOutTemp(14) = 9.545833333;
-    DailyAveOutTemp(15) = 11.43333333;
-    DailyAveOutTemp(16) = 12.375;
-    DailyAveOutTemp(17) = 12.59583333;
-    DailyAveOutTemp(18) = 12.6625;
-    DailyAveOutTemp(19) = 13.50833333;
-    DailyAveOutTemp(20) = 12.99583333;
-    DailyAveOutTemp(21) = 11.58333333;
-    DailyAveOutTemp(22) = 11.72083333;
-    DailyAveOutTemp(23) = 9.1875;
-    DailyAveOutTemp(24) = 6.8;
-    DailyAveOutTemp(25) = 9.391666667;
-    DailyAveOutTemp(26) = 8.1125;
-    DailyAveOutTemp(27) = 8.4;
-    DailyAveOutTemp(28) = 8.475;
-    DailyAveOutTemp(29) = 7.941666667;
-    DailyAveOutTemp(30) = 9.316666667;
+    state->dataThermalComforts->DailyAveOutTemp(1) = 8.704166667;
+    state->dataThermalComforts->DailyAveOutTemp(2) = 9.895833333;
+    state->dataThermalComforts->DailyAveOutTemp(3) = 12.2;
+    state->dataThermalComforts->DailyAveOutTemp(4) = 8.445833333;
+    state->dataThermalComforts->DailyAveOutTemp(5) = 7.8;
+    state->dataThermalComforts->DailyAveOutTemp(6) = 7.158333333;
+    state->dataThermalComforts->DailyAveOutTemp(7) = 8.0125;
+    state->dataThermalComforts->DailyAveOutTemp(8) = 8.279166667;
+    state->dataThermalComforts->DailyAveOutTemp(9) = 8.166666667;
+    state->dataThermalComforts->DailyAveOutTemp(10) = 7.141666667;
+    state->dataThermalComforts->DailyAveOutTemp(11) = 7.433333333;
+    state->dataThermalComforts->DailyAveOutTemp(12) = 9.0625;
+    state->dataThermalComforts->DailyAveOutTemp(13) = 9.741666667;
+    state->dataThermalComforts->DailyAveOutTemp(14) = 9.545833333;
+    state->dataThermalComforts->DailyAveOutTemp(15) = 11.43333333;
+    state->dataThermalComforts->DailyAveOutTemp(16) = 12.375;
+    state->dataThermalComforts->DailyAveOutTemp(17) = 12.59583333;
+    state->dataThermalComforts->DailyAveOutTemp(18) = 12.6625;
+    state->dataThermalComforts->DailyAveOutTemp(19) = 13.50833333;
+    state->dataThermalComforts->DailyAveOutTemp(20) = 12.99583333;
+    state->dataThermalComforts->DailyAveOutTemp(21) = 11.58333333;
+    state->dataThermalComforts->DailyAveOutTemp(22) = 11.72083333;
+    state->dataThermalComforts->DailyAveOutTemp(23) = 9.1875;
+    state->dataThermalComforts->DailyAveOutTemp(24) = 6.8;
+    state->dataThermalComforts->DailyAveOutTemp(25) = 9.391666667;
+    state->dataThermalComforts->DailyAveOutTemp(26) = 8.1125;
+    state->dataThermalComforts->DailyAveOutTemp(27) = 8.4;
+    state->dataThermalComforts->DailyAveOutTemp(28) = 8.475;
+    state->dataThermalComforts->DailyAveOutTemp(29) = 7.941666667;
+    state->dataThermalComforts->DailyAveOutTemp(30) = 9.316666667;
 
-    DataGlobals::BeginDayFlag = true;
+    state->dataGlobal->BeginDayFlag = true;
 
-    CalcThermalComfortAdaptiveASH55(false);
-    EXPECT_NEAR(ThermalComfort::runningAverageASH, 9.29236111, 0.001);
-    useEpwData = false;
-    DataGlobals::BeginDayFlag = false;
+    CalcThermalComfortAdaptiveASH55(*state, false);
+    EXPECT_NEAR(state->dataThermalComforts->runningAverageASH, 9.29236111, 0.001);
+    state->dataThermalComforts->useEpwData = false;
+    state->dataGlobal->BeginDayFlag = false;
 }
 
 TEST_F(EnergyPlusFixture, ThermalComfort_CalcIfSetPointMetWithCutoutTest)
 {
-    NumOfZones = 1;
-    ZoneSysEnergyDemand.allocate(NumOfZones);
-    ThermalComfortSetPoint.allocate(NumOfZones);
-    TempControlType.allocate(1);
-    AirModel.allocate(NumOfZones);
-    AirModel(1).AirModelType = RoomAirModel_Mixing;
-    ZTAV.allocate(NumOfZones);
-    ZoneThermostatSetPointLo.allocate(NumOfZones);
-    ZoneThermostatSetPointHi.allocate(NumOfZones);
-    ZoneThermostatSetPointLoAver.allocate(NumOfZones);
-    ZoneThermostatSetPointHiAver.allocate(NumOfZones);
-    ThermalComfortInASH55.allocate(NumOfZones);
-    ThermalComfortInASH55(1).ZoneIsOccupied = true;
-    TimeStepZone = 0.25;
-    Zone.allocate(NumOfZones);
-    ZoneTempPredictorCorrector::NumOnOffCtrZone = 1;
+    state->dataGlobal->NumOfZones = 1;
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(state->dataGlobal->NumOfZones);
+    state->dataThermalComforts->ThermalComfortSetPoint.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->TempControlType.allocate(1);
+    state->dataRoomAirMod->AirModel.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->AirModel(1).AirModelType = DataRoomAirModel::RoomAirModel::Mixing;
+    state->dataHeatBalFanSys->ZTAV.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLoAver.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHiAver.allocate(state->dataGlobal->NumOfZones);
+    state->dataThermalComforts->ThermalComfortInASH55.allocate(state->dataGlobal->NumOfZones);
+    state->dataThermalComforts->ThermalComfortInASH55(1).ZoneIsOccupied = true;
+    state->dataGlobal->TimeStepZone = 0.25;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataZoneTempPredictorCorrector->NumOnOffCtrZone = 1;
 
-    TempControlType(1) = DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = DualSetPointWithDeadBand;
 
     // heating
-    ZTAV(1) = 21.1;                                     // 70F
-    ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
-    ZoneThermostatSetPointLoAver(1) = 22.2;                 // 72F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0., ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 21.1;                                     // 70F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.2;                 // 72F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointLoAver(1) = 22.2;                 // 72F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 500.0; // must be greater than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0., state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // cooling
-    ZTAV(1) = 25.0;                                      // 77F
-    ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
-    ZoneThermostatSetPointHiAver(1) = 23.9;                  // 75F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 25.0;                                      // 77F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.9;                  // 75F
+    state->dataHeatBalFanSys->ZoneThermostatSetPointHiAver(1) = 23.9;                  // 75F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = -500.0; // must be less than zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
 
     // no cooling or heating
-    ZTAV(1) = 23.0;                                      // 73F
-    ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0; // must be zero
-    CalcIfSetPointMet();
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeating);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetHeatingOccupied);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetCooling);
-    EXPECT_EQ(0, ThermalComfortSetPoint(1).notMetCoolingOccupied);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetHeating);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetHeatingOccupied);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetCooling);
-    EXPECT_EQ(TimeStepZone, ThermalComfortSetPoint(1).totalNotMetCoolingOccupied);
+    state->dataHeatBalFanSys->ZTAV(1) = 23.0;                                      // 73F
+    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).TotalOutputRequired = 0.0; // must be zero
+    CalcIfSetPointMet(*state);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeating);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetHeatingOccupied);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCooling);
+    EXPECT_EQ(0, state->dataThermalComforts->ThermalComfortSetPoint(1).notMetCoolingOccupied);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetHeating);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetHeatingOccupied);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetCooling);
+    EXPECT_EQ(state->dataGlobal->TimeStepZone, state->dataThermalComforts->ThermalComfortSetPoint(1).totalNotMetCoolingOccupied);
 
 }
 
-TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortPierceSET)
+TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortASH55)
 {
-    
-    // Set the data for the test    
-    TotPeople = 1;
-    People.allocate(TotPeople);
-    ThermalComfortData.allocate(TotPeople);
-    NumOfZones = 1;
-    Zone.allocate(NumOfZones);
-    ZTAVComf.allocate(NumOfZones);
-    MRT.allocate(NumOfZones);
-    ZoneAirHumRatAvgComf.allocate(NumOfZones);
-    IsZoneDV.allocate(NumOfZones);
-    IsZoneUI.allocate(NumOfZones);
-    QHTRadSysToPerson.allocate(NumOfZones);
-    QCoolingPanelToPerson.allocate(NumOfZones);
-    QHWBaseboardToPerson.allocate(NumOfZones);
-    QSteamBaseboardToPerson.allocate(NumOfZones);
-    QElecBaseboardToPerson.allocate(NumOfZones);
-        
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeoplePtr = -1;
-    People(1).NumberOfPeople = 5.0;
-    People(1).NomMinNumberPeople = 5.0;
-    People(1).NomMaxNumberPeople = 5.0;
-    Zone(People(1).ZonePtr).TotOccupants = People(1).NumberOfPeople;
-    People(1).FractionRadiant = 0.3;
-    People(1).FractionConvected = 1.0 - People(1).FractionRadiant;
-    People(1).UserSpecSensFrac = AutoCalculate;
-    People(1).CO2RateFactor = 3.82e-8;
-    People(1).ActivityLevelPtr = -1;
-    People(1).Show55Warning = true;
-    People(1).Pierce = true;
-    People(1).MRTCalcType = ZoneAveraged;
-    People(1).WorkEffPtr = 0;
-    People(1).ClothingType = 1;
-    People(1).ClothingPtr = -1;
-    People(1).AirVelocityPtr = 0;
-    
-    ZTAVComf(1) = 25.0;
-    MRT(1) = 26.0;
-    ZoneAirHumRatAvgComf(1) = 0.00529; // 0.002 to 0.006    
-    DataEnvironment::OutBaroPress = 101217.;
-    IsZoneDV(1) = IsZoneUI(1) = false;
-    QHTRadSysToPerson(1) = 0.0;
-    QCoolingPanelToPerson(1) = 0.0;
-    QHWBaseboardToPerson(1) = 0.0;
-    QSteamBaseboardToPerson(1) = 0.0;
-    QElecBaseboardToPerson(1) = 0.0;
 
-    CalcThermalComfortPierce();
-    
-    EXPECT_NEAR(ThermalComfortData(1).PiercePMVSET, -3.350, 0.005);
-    EXPECT_NEAR(ThermalComfortData(1).PierceSET, 23.62, 0.01);
+    // Set the data for the test
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
+    state->dataThermalComforts->ThermalComfortData.allocate(state->dataHeatBal->TotPeople);
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZTAVComf.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->MRT.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->IsZoneDV.allocate(state->dataGlobal->NumOfZones);
+    state->dataRoomAirMod->IsZoneUI.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->QHTRadSysToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->QCoolingPanelToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->QHWBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->QSteamBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBalFanSys->QElecBaseboardToPerson.allocate(state->dataGlobal->NumOfZones);
 
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeoplePtr = -1;
+    state->dataHeatBal->People(1).NumberOfPeople = 5.0;
+    state->dataHeatBal->People(1).NomMinNumberPeople = 5.0;
+    state->dataHeatBal->People(1).NomMaxNumberPeople = 5.0;
+    state->dataHeatBal->Zone(state->dataHeatBal->People(1).ZonePtr).TotOccupants = state->dataHeatBal->People(1).NumberOfPeople;
+    state->dataHeatBal->People(1).FractionRadiant = 0.3;
+    state->dataHeatBal->People(1).FractionConvected = 1.0 - state->dataHeatBal->People(1).FractionRadiant;
+    state->dataHeatBal->People(1).UserSpecSensFrac = DataGlobalConstants::AutoCalculate;
+    state->dataHeatBal->People(1).CO2RateFactor = 3.82e-8;
+    state->dataHeatBal->People(1).Show55Warning = true;
+    state->dataHeatBal->People(1).Pierce = true;
+    state->dataHeatBal->People(1).MRTCalcType = ZoneAveraged;
+    state->dataHeatBal->People(1).WorkEffPtr = 0;
+    state->dataHeatBal->People(1).ClothingType = 1;
+
+    state->dataRoomAirMod->IsZoneDV(1) = state->dataRoomAirMod->IsZoneUI(1) = false;
+    state->dataHeatBalFanSys->QHTRadSysToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->QCoolingPanelToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->QHWBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->QSteamBaseboardToPerson(1) = 0.0;
+    state->dataHeatBalFanSys->QElecBaseboardToPerson(1) = 0.0;
+    Real64 BodySurfaceArea = 1.8258;
+    state->dataEnvrn->OutBaroPress = 101325.;
+    Real64 WorkEff = 0.0;
+    state->dataHeatBal->People(1).ActivityLevelPtr = 1;
+    state->dataHeatBal->People(1).ClothingPtr = 2;
+    state->dataHeatBal->People(1).AirVelocityPtr = 3;
+    state->dataHeatBal->People(1).AnkleAirVelocityPtr = 4;
+    state->dataScheduleMgr->Schedule.allocate(4);
+
+    // Part 1: Test SET calculations.
+    // Reference: ANSI/ASHRAE Standard 55-2017 Appendix D - Table D3 Validation Table for SET Computer Model
+    const std::vector<double> TAir = {25, 0, 40, 25, 25, 25, 25, 25};
+    const std::vector<double> RH = {0.5, 0.5, 0.5, 0.9, 0.5, 0.5, 0.5, 0.5};
+    const std::vector<double> Vel = {0.15, 0.15, 0.15, 0.15, 3, 0.15, 0.15, 0.15};
+    const std::vector<double> TRad = {25, 25, 25, 25, 25, 40, 25, 25};
+    const std::vector<double> MET = {1, 1, 1, 1, 1, 1, 2, 1};
+    const std::vector<double> Clo = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 2};
+    const std::vector<double> SET = {23.8, 12.3, 34.3, 24.9, 18.8, 31.8, 29.7, 32.5};
+
+    for (unsigned i = 0; i < TAir.size(); i++) {
+        Real64 SETResult = CalcStandardEffectiveTemp(*state, TAir[i], TRad[i], RH[i], Vel[i], MET[i], Clo[i], WorkEff);
+        EXPECT_NEAR(SETResult, SET[i], 0.1);
+    }
+
+    // Part 2: Test cooling effect
+    state->dataHeatBal->People(1).CoolingEffectASH55 = true;
+    Real64 AirTemp = 25.0;
+    Real64 RadTemp = 25.0;
+    Real64 RelHum = 0.5;
+    Real64 ActMet = 1;
+    Real64 CloUnit = 0.5;
+
+    state->dataHeatBalFanSys->ZTAVComf(1) = AirTemp;
+    state->dataHeatBal->MRT(1) = RadTemp;
+    state->dataHeatBalFanSys->ZoneAirHumRatAvgComf(1) = Psychrometrics::PsyWFnTdbRhPb(*state, state->dataHeatBalFanSys->ZTAVComf(1), RelHum, state->dataEnvrn->OutBaroPress);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = ActMet * BodySurfaceArea * state->dataThermalComforts->ActLevelConv;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = CloUnit;
+
+    // Test 1 - Air velocity = 0.15 m/s.
+    Real64 AirVel = 0.15;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
+    CalcThermalComfortCoolingEffectASH(*state);
+    Real64 CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
+    Real64 StillAirVel = 0.1;
+    Real64 RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
+    Real64 InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
+    Real64 CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
+
+    // Test 2 - Air velocity = 1 m/s.
+    AirVel = 1;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
+    CalcThermalComfortCoolingEffectASH(*state);
+    CoolingEffect = state->dataThermalComforts->ThermalComfortData(1).CoolingEffectASH55;
+    CoolingEffectSET = CalcStandardEffectiveTemp(*state, AirTemp - CoolingEffect, RadTemp - CoolingEffect, RelHum, StillAirVel, ActMet, CloUnit, WorkEff);
+
+    RelAirVel = CalcRelativeAirVelocity(AirVel, ActMet);
+    InitialSET = CalcStandardEffectiveTemp(*state, AirTemp, RadTemp, RelHum, RelAirVel, ActMet, CloUnit, WorkEff);
+    EXPECT_NEAR(CoolingEffectSET, InitialSET, 0.1);
+
+    // Part 3: Test ankle draft PPD.
+    state->dataHeatBal->People(1).AnkleDraftASH55 = true;
+    AirVel = 0.15;
+    Real64 AnkleAirVel = 0.3;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = AirVel;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = AnkleAirVel;
+    CalcThermalComfortAnkleDraftASH(*state);
+    EXPECT_NEAR(state->dataThermalComforts->ThermalComfortData(1).AnkleDraftPPDASH55, 25.0, 0.1);
 }

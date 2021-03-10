@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,14 +54,14 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
-namespace SwimmingPool {
+// Forward declarations
+struct EnergyPlusData;
 
-    extern int NumSwimmingPools; // Number of swimming pools
+namespace SwimmingPool {
 
     struct SwimmingPoolData : PlantComponent
     {
@@ -87,8 +87,6 @@ namespace SwimmingPool {
         std::string ActivityFactorSchedName;    // Activity factor schedule name
         int ActivityFactorSchedPtr;             // Activity factor schedule pointer
         Real64 CurActivityFactor;               // Current activity factor value
-        std::string MakeupWaterSupplyName;      // Name of make-up water source
-        std::string MakeupWaterSupplySchedName; // Name of make-up water supply schedule
         int MakeupWaterSupplySchedPtr;          // Index to schedule for make-up water
         Real64 CurMakeupWaterTemp;              // Current makeup water temperature
         std::string CoverSchedName;             // Pool cover schedule name
@@ -104,7 +102,6 @@ namespace SwimmingPool {
         Real64 CurCoverLWRadFac;                // Current pool cover long-wavelength radiation factor
         Real64 RadConvertToConvect;             // LW and SW radiation converted to convective gain by pool cover in W/m2
         Real64 MiscPowerFactor;                 // Pool miscellaneous power equipment consumption coefficient in W/(kg/s)
-        std::string SetPtTempSchedName;         // Schedule name for water setpoint temperature
         int SetPtTempSchedPtr;                  // Schedule pointer for water setpoint temperature
         Real64 CurSetPtTemp;                    // Current water setpoint temperature
         Real64 MaxNumOfPeople;                  // Number of people in the pool as defined by user input
@@ -136,7 +133,6 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D_int SurfaceToPoolIndex;
         Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
         Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
         Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -161,43 +157,44 @@ namespace SwimmingPool {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(bool FirstHVACIteration // true during the first HVAC iteration
+        void ErrorCheckSetupPoolSurface(EnergyPlusData &state,
+                                        std::string const &Alpha1,
+                                        std::string const &Alpha2,
+                                        std::string const &cAlphaField2,
+                                        bool &ErrorsFound
         );
 
-        void setupOutputVars();
-
-        void initSwimmingPoolPlantLoopIndex();
-
-        void initSwimmingPoolPlantNodeFlow(bool MyPlantScanFlagPool // logical flag true when plant index has not yet been set
+        void initialize(EnergyPlusData &state, bool FirstHVACIteration // true during the first HVAC iteration
         );
 
-        void calculate();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void calcSwimmingPoolEvap(Real64 &EvapRate, // Evaporation rate
+        void initSwimmingPoolPlantLoopIndex(EnergyPlusData &state);
+
+        void initSwimmingPoolPlantNodeFlow(EnergyPlusData &state) const;
+
+        void calculate(EnergyPlusData &state);
+
+        void calcSwimmingPoolEvap(EnergyPlusData &state, Real64 &EvapRate, // Evaporation rate
                                   int SurfNum,      // Surface index
                                   Real64 MAT,       // mean air temperature
                                   Real64 HumRat     // zone air humidity ratio
         );
 
-        void update();
+        void update(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<SwimmingPoolData> Pool;
-
-    void clear_state();
-
-    void GetSwimmingPool();
+    void GetSwimmingPool(EnergyPlusData &state);
 
     void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
+    void UpdatePoolSourceValAvg(EnergyPlusData &state, bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 
-    Real64 SumHATsurf(int ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
-    void ReportSwimmingPool();
+    void ReportSwimmingPool(EnergyPlusData &state);
 
     Real64 MakeUpWaterVolFlowFunct(Real64 MakeUpWaterMassFlowRate, Real64 Density);
 
@@ -205,6 +202,25 @@ namespace SwimmingPool {
 
 } // namespace SwimmingPool
 
+struct SwimmingPoolsData : BaseGlobalStruct {
+
+    // MODULE VARIABLE DECLARATIONS:
+    int NumSwimmingPools = 0; // Number of swimming pools
+    Array1D_bool CheckEquipName;
+    bool getSwimmingPoolInput = true;
+    Array1D<SwimmingPool::SwimmingPoolData> Pool;
+
+    void clear_state() override
+    {
+        NumSwimmingPools = 0;
+        getSwimmingPoolInput = true;
+        CheckEquipName.deallocate();
+        Pool.deallocate();
+    }
+
+    // Default Constructor
+    SwimmingPoolsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

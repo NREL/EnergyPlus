@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,25 +52,18 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace UserDefinedComponents {
-
-    extern int NumUserPlantComps;
-    extern int NumUserCoils;
-    extern int NumUserZoneAir;
-    extern int NumUserAirTerminals;
-
-    extern Array1D_bool CheckUserPlantCompName;
-    extern Array1D_bool CheckUserCoilName;
-    extern Array1D_bool CheckUserZoneAirName;
-    extern Array1D_bool CheckUserAirTerminal;
 
     struct PlantConnectionStruct
     {
@@ -194,17 +187,17 @@ namespace UserDefinedComponents {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(int LoopNum, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
-        void report(int LoopNum);
+        void report(EnergyPlusData &state, int LoopNum);
     };
 
     struct UserCoilComponentStruct
@@ -228,9 +221,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize();
+        void initialize(EnergyPlusData &state);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     struct UserZoneHVACForcedAirComponentStruct
@@ -260,9 +253,9 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(int ZoneNum);
+        void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
     struct UserAirTerminalComponentStruct
@@ -294,48 +287,88 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(int ZoneNum);
+        void initialize(EnergyPlusData &state, int ZoneNum);
 
-        void report();
+        void report(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<UserPlantComponentStruct> UserPlantComp;
-    extern Array1D<UserCoilComponentStruct> UserCoil;
-    extern Array1D<UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
-    extern Array1D<UserAirTerminalComponentStruct> UserAirTerminal;
-
-    void clear_state();
-
-    void SimCoilUserDefined(std::string const &EquipName, // user name for component
+    void SimCoilUserDefined(EnergyPlusData &state,
+                            std::string const &EquipName, // user name for component
                             int &CompIndex,
                             int AirLoopNum,
                             bool &HeatingActive,
                             bool &CoolingActive);
 
-    void SimZoneAirUserDefined(std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneAirUserDefined(EnergyPlusData &state,
+                               std::string const &CompName,    // name of the packaged terminal heat pump
                                int ZoneNum,                    // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
                                int &CompIndex                  // index to zone hvac unit
     );
 
-    void SimAirTerminalUserDefined(std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
+    void SimAirTerminalUserDefined(EnergyPlusData &state,
+                                   std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetUserDefinedPlantComponents();
+    void GetUserDefinedPlantComponents(EnergyPlusData &state);
 
-    void GetUserDefinedComponents();
+    void GetUserDefinedComponents(EnergyPlusData &state);
 
-    void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
-
-    void
-    GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
     void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    GetUserDefinedCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+
+    void
+    GetUserDefinedCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace UserDefinedComponents
 
+struct UserDefinedComponentsData : BaseGlobalStruct {
+
+    int NumUserPlantComps = 0;
+    int NumUserCoils = 0;
+    int NumUserZoneAir = 0;
+    int NumUserAirTerminals = 0;
+
+    bool GetInput = true;
+    bool GetPlantCompInput = true;
+
+    Array1D_bool CheckUserPlantCompName;
+    Array1D_bool CheckUserCoilName;
+    Array1D_bool CheckUserZoneAirName;
+    Array1D_bool CheckUserAirTerminal;
+
+    // Object Data
+    Array1D<UserDefinedComponents::UserPlantComponentStruct> UserPlantComp;
+    Array1D<UserDefinedComponents::UserCoilComponentStruct> UserCoil;
+    Array1D<UserDefinedComponents::UserZoneHVACForcedAirComponentStruct> UserZoneAirHVAC;
+    Array1D<UserDefinedComponents::UserAirTerminalComponentStruct> UserAirTerminal;
+
+    void clear_state() override
+    {
+        GetInput = true;
+        GetPlantCompInput = true;
+
+        NumUserPlantComps = 0;
+        NumUserCoils = 0;
+        NumUserZoneAir = 0;
+        NumUserAirTerminals = 0;
+
+        CheckUserPlantCompName.deallocate();
+        CheckUserCoilName.deallocate();
+        CheckUserZoneAirName.deallocate();
+        CheckUserAirTerminal.deallocate();
+
+        UserPlantComp.deallocate();
+        UserCoil.deallocate();
+        UserZoneAirHVAC.deallocate();
+        UserAirTerminal.deallocate();
+    }
+
+    // Default Constructor
+    UserDefinedComponentsData() = default;
+};
 } // namespace EnergyPlus
 
 #endif

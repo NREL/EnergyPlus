@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,15 +53,15 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
-namespace IntegratedHeatPump {
+// Forward declarations
+struct EnergyPlusData;
 
-    // Identifier is VarSpeedCoil
-    extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
+namespace IntegratedHeatPump {
 
     // operation mode
     enum class IHPOperationMode : int
@@ -234,13 +234,8 @@ namespace IntegratedHeatPump {
         }
     };
 
-    // Object Data
-    extern Array1D<IntegratedHeatPumpData> IntegratedHeatPumps;
-
-    // Functions
-    void clear_state();
-
-    void SimIHP(EnergyPlusData &state, std::string const &CompName,   // Coil Name
+    void SimIHP(EnergyPlusData &state,
+                std::string const &CompName,   // Coil Name
                 int &CompIndex,                // Index for Component name
                 int const CyclingScheme,       // Continuous fan OR cycling compressor
                 Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -257,72 +252,82 @@ namespace IntegratedHeatPump {
                 Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    void GetIHPInput();
+    void GetIHPInput(EnergyPlusData &state);
 
     void SizeIHP(EnergyPlusData &state, int const CoilNum);
 
-    void InitializeIHP(int const DXCoilNum);
+    void InitializeIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    void UpdateIHP(int const DXCoilNum);
+    void UpdateIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
+    void DecideWorkMode(EnergyPlusData &state,
+                        int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
     );
 
     IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum);
 
-    int GetLowSpeedNumIHP(int const DXCoilNum);
+    int GetLowSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    int GetMaxSpeedNumIHP(int const DXCoilNum);
+    int GetMaxSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum);
 
-    Real64 GetAirVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
+    Real64 GetAirVolFlowRateIHP(EnergyPlusData &state,
+                                int const DXCoilNum,
                                 int const SpeedNum,
                                 Real64 const SpeedRatio,
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
+                                  int const DXCoilNum,
                                   int const SpeedNum,
                                   Real64 const SpeedRatio,
                                   bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    Real64 GetAirMassFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
+    Real64 GetAirMassFlowRateIHP(EnergyPlusData &state,
+                                 int const DXCoilNum,
                                  int const SpeedNum,
                                  Real64 const SpeedRatio,
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
     );
 
-    bool IHPInModel();
+    bool IHPInModel(EnergyPlusData &state);
 
-    int GetCoilIndexIHP(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexIHP(EnergyPlusData &state,
+                        std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeIHP(EnergyPlusData &state,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDWHCoilInletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDWHCoilOutletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
+                                 std::string const &CoilType, // must match coil types in this module
                                  std::string const &CoilName, // must match coil names for the coil type
                                  IHPOperationMode const Mode, // mode coil type
                                  bool &ErrorsFound            // set to true if problem
     );
 
-    int GetIHPDWHCoilPLFFPLR(std::string const &CoilType, // must match coil types in this module
+    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
+                             std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              IHPOperationMode const Mode, // mode coil type
                              bool &ErrorsFound            // set to true if problem
@@ -332,6 +337,19 @@ namespace IntegratedHeatPump {
     );
 
 } // namespace IntegratedHeatPump
+
+struct IntegratedHeatPumpGlobalData : BaseGlobalStruct
+{
+
+    bool GetCoilsInputFlag = true;
+    Array1D<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
+
+    void clear_state() override
+    {
+        this->GetCoilsInputFlag = true;
+        this->IntegratedHeatPumps.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

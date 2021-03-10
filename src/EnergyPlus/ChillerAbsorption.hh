@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,23 +52,19 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace ChillerAbsorption {
-
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
-
-    extern int numBlastAbsorbers; // number of Absorption Chillers specified in input
-
-    extern bool getInput; // When TRUE, calls subroutine to read input file
 
     struct ReportVars
     {
@@ -110,7 +106,7 @@ namespace ChillerAbsorption {
         bool NomCapWasAutoSized;          // true if Nominal capacity was autosize on input
         Real64 NomPumpPower;              // W - design nominal capacity of Absorber
         bool NomPumpPowerWasAutoSized;    // true if nominal pump power was autosize on input
-        int FlowMode;                     // one of 3 modes for componet flow during operation
+        DataPlant::FlowMode FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         Real64 EvapVolFlowRate;           // m3/s - design water volumetric flow rate through the evaporator
@@ -118,7 +114,7 @@ namespace ChillerAbsorption {
         Real64 CondVolFlowRate;           // m3/s - design water volumetric flow rate through the condenser
         bool CondVolFlowRateWasAutoSized; // true if condenser flow rate was autosize on input
         Real64 EvapMassFlowRateMax;       // Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-        Real64 CondMassFlowRateMax;       // Max Design Condeneser Mass Flow Rate [kg/s]
+        Real64 CondMassFlowRateMax;       // Max Design Condenser Mass Flow Rate [kg/s]
         Real64 GenMassFlowRateMax;        // Max Design Generator Mass Flow Rate converted from Volume Flow Rate
         Real64 SizFac;                    // Sizing factor
         int EvapInletNodeNum;             // Node number on the inlet side of the plant
@@ -178,12 +174,12 @@ namespace ChillerAbsorption {
         bool MyEnvrnFlag;
         bool GenInputOutputNodesUsed;
         ReportVars Report;
-        int EquipFlowCtrl;
+        DataBranchAirLoopPlant::ControlTypeEnum EquipFlowCtrl;
 
         // Default Constructor
         BLASTAbsorberSpecs()
             : Available(false), ON(false), NomCap(0.0), NomCapWasAutoSized(false), NomPumpPower(0.0), NomPumpPowerWasAutoSized(false),
-              FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
+              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0),
               CondMassFlowRateMax(0.0), GenMassFlowRateMax(0.0), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0),
               CondOutletNodeNum(0), GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0),
@@ -194,41 +190,53 @@ namespace ChillerAbsorption {
               FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0),
               EvapMassFlowRate(0.0), SteamMassFlowRate(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0),
               PumpingPower(0.0), PumpingEnergy(0.0), QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0),
-              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(0)
+              CondenserEnergy(0.0), MyOneTimeFlag(true), MyEnvrnFlag(true), GenInputOutputNodesUsed(false), EquipFlowCtrl(DataBranchAirLoopPlant::ControlTypeEnum::Unknown)
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+        void oneTimeInit(EnergyPlusData &state) override;
+
+        void initEachEnvironment(EnergyPlusData &state);
+
+        void getDesignCapacities(EnergyPlusData &state, const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getDesignTemperatures(Real64 &tempDesCondIn, Real64 &TempDesEvapOut) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
 
-        void sizeChiller();
+        void sizeChiller(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad, bool RunFlag);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
-        void updateRecords(Real64 MyLoad, bool RunFlag);
+        void updateRecords(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
-    // Object Data
-    extern Array1D<BLASTAbsorberSpecs> BLASTAbsorber; // dimension to number of machines
-
-    void clear_state();
-
-    void GetBLASTAbsorberInput();
+    void GetBLASTAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerAbsorption
+
+    struct ChillerAbsorberData : BaseGlobalStruct {
+        int numAbsorbers = 0;
+        bool getInput = true;
+        Array1D<ChillerAbsorption::BLASTAbsorberSpecs> absorptionChillers;
+
+        void clear_state() override
+        {
+            this->numAbsorbers = 0;
+            this->getInput = true;
+            this->absorptionChillers.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

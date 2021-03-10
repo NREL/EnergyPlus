@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace HVACSingleDuctInduc {
 
@@ -139,6 +142,7 @@ namespace HVACSingleDuctInduc {
         int CtrlZoneNum;            // Pointer to CtrlZone data structure
         int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
         int AirLoopNum;             // index to airloop that this terminal unit is connected to
+        Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
 
         // Default Constructor
         IndUnitData()
@@ -148,9 +152,11 @@ namespace HVACSingleDuctInduc {
               HWCoilFailNum1(0), HWCoilFailNum2(0), CCoil_Num(0), CCoil_PlantTypeNum(0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0),
               MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWLoopNum(0), CWLoopSide(0), CWBranchNum(0), CWCompNum(0),
               CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0), MaxSecAirMassFlow(0.0), ADUNum(0), DesCoolingLoad(0.0),
-              DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0)
+              DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }
+        void ReportIndUnit(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
     // Object Data
@@ -167,13 +173,14 @@ namespace HVACSingleDuctInduc {
                     int &CompIndex                 // which terminal unit in data structure
     );
 
-    void GetIndUnits();
+    void GetIndUnits(EnergyPlusData &state);
 
-    void InitIndUnit(int const IUNum,              // number of the current induction unit being simulated
+    void InitIndUnit(EnergyPlusData &state,
+                     int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );
 
-    void SizeIndUnit(int const IUNum);
+    void SizeIndUnit(EnergyPlusData &state, int const IUNum);
 
     void SimFourPipeIndUnit(EnergyPlusData &state, int const IUNum,              // number of the current unit being simulated
                             int const ZoneNum,            // number of zone being served
@@ -199,9 +206,17 @@ namespace HVACSingleDuctInduc {
 
     // ========================= Utilities =======================
 
-    bool FourPipeInductionUnitHasMixer(std::string const &CompName); // component (mixer) name
+    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName); // component (mixer) name
 
 } // namespace HVACSingleDuctInduc
+
+struct HVACSingleDuctInducData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

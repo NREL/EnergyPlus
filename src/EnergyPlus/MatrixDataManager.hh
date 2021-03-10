@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,10 +54,14 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace MatrixDataManager {
 
@@ -108,9 +112,9 @@ namespace MatrixDataManager {
 
     // Functions
 
-    void GetMatrixInput();
+    void GetMatrixInput(EnergyPlusData &state);
 
-    int MatrixIndex(std::string const &MatrixName);
+    int MatrixIndex(EnergyPlusData &state, std::string const &MatrixName);
 
     void Get2DMatrix(int const Idx, // pointer index to location in MatData
                      Array2S<Real64> Mat2D);
@@ -120,6 +124,14 @@ namespace MatrixDataManager {
                                int &NumCols);
 
 } // namespace MatrixDataManager
+
+struct MatrixDataManagerData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -5,11 +5,11 @@ Site Outdoor Air Relative Humidity
 Zone Mean Air Temperature
 Zone Air Relative Humidity
 Zone Unit Heater Heating Rate
-Freezer_1AirChiller_1,Refrigeration Zone Air Chiller Total Electric Power
-Freezer_1AirChiller_2,Refrigeration Zone Air Chiller Total Electric Power
-LowTemp001Bitzer_OSNA8591_K,Refrigeration Air Chiller System Compressor Electric Power
-LowTemp002Bitzer_OSNA8591_K,Refrigeration Air Chiller System Compressor Electric Power
-Freezer_1LowTempSystem,Refrigeration Air Chiller System Total Compressor Electric Power
+Freezer_1AirChiller_1,Refrigeration Zone Air Chiller Total Electricity Rate
+Freezer_1AirChiller_2,Refrigeration Zone Air Chiller Total Electricity Rate
+LowTemp001Bitzer_OSNA8591_K,Refrigeration Air Chiller System Compressor Electricity Rate
+LowTemp002Bitzer_OSNA8591_K,Refrigeration Air Chiller System Compressor Electricity Rate
+Freezer_1LowTempSystem,Refrigeration Air Chiller System Total Compressor Electricity Rate
 SUBFREEZER,Refrigeration Zone Air Chiller Water Removed Mass Flow Rate
 FREEZER_1,Refrigeration Zone Air Chiller Water Removed Mass Flow Rate
 COOLER_2,Refrigeration Zone Air Chiller Water Removed Mass Flow Rate
@@ -45,9 +45,9 @@ Freezer_1AirChiller_2,Refrigeration Zone Air Chiller Sensible Heat Ratio
 Freezer_1AirChiller_3,Refrigeration Zone Air Chiller Sensible Heat Ratio
 Freezer_1AirChiller_4,Refrigeration Zone Air Chiller Sensible Heat Ratio
 Freezer_1AirChiller_5,Refrigeration Zone Air Chiller Sensible Heat Ratio
-Freezer_1AirChiller_1,Refrigeration Zone Air Chiller Defrost Electric Power
-Freezer_1AirChiller_2,Refrigeration Zone Air Chiller Defrost Electric Power
-Freezer_1AirChiller_3,Refrigeration Zone Air Chiller Defrost Electric Power
-Freezer_1AirChiller_4,Refrigeration Zone Air Chiller Defrost Electric Power
-Freezer_1AirChiller_5,Refrigeration Zone Air Chiller Defrost Electric Power
+Freezer_1AirChiller_1,Refrigeration Zone Air Chiller Defrost Electricity Rate
+Freezer_1AirChiller_2,Refrigeration Zone Air Chiller Defrost Electricity Rate
+Freezer_1AirChiller_3,Refrigeration Zone Air Chiller Defrost Electricity Rate
+Freezer_1AirChiller_4,Refrigeration Zone Air Chiller Defrost Electricity Rate
+Freezer_1AirChiller_5,Refrigeration Zone Air Chiller Defrost Electricity Rate
 0

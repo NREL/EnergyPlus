@@ -20,6 +20,8 @@ The following settings are valid and must be used:
 \item
   3.0: ~~~~~ Exterior shade is on.
 \item
+  4.0: ~~~~~ Exterior screen is on.
+\item
   6.0: ~~~~~ Interior blind is on.
 \item
   7.0: ~~~~~ Exterior blind is on.
@@ -49,9 +51,42 @@ An actuator is available for controlling the construction assigned to a surface 
 
 When using surface construction state to change window properties in combination with daylighting calculations, then the Calculation Method in the ShadowCalculation object must be set to TimestepFrequency. This will cause the daylighting factor calculations to be updated every timestep.
 
-Using the surface construction state actuator brings with it a high degree of risk when it comes to modeling thermal heat capacity and transient heat transfer in opaque surfaces.~ If this actuator is used inappropriately, for example to assign different constructions, to a single surface, that have radically different heat storage capacities, then the heat transfer modeling results may not be physically accurate.~ When a construction state is overridden using this actuator, the thermal history data that evolved while using the previous construction are reused for the new construction. When this actuator is used, the program attempts to detect if incompatible constructions are being assigned. In some cases it issues a warning and allows the assignments to proceed, in others it warns and doesn't allow the assignment to proceed.~ If the original construction assigned to a surface has internal source/sink (defined using Construction:InternalSource) then any assignments to the surface must also be internal source constructions.~ If using the heat transfer algorithm called ConductionFiniteDifference, then the constructions must have the same number of finite difference nodes or the assignment is not allowed.~ The construction state actuator cannot be used in conjunction with the heat transfer algorithms called ConductionFiniteDifferenceSimplified or CombinedHeatAndMoistureFiniteElement.
+Using the surface construction state actuator brings with it a high degree of
+risk when it comes to modeling thermal heat capacity and transient heat
+transfer in opaque surfaces. If this actuator is used inappropriately, for
+example to assign different constructions, to a single surface, that have
+radically different heat storage capacities, then the heat transfer modeling
+results may not be physically accurate. When a construction state is overridden
+using this actuator, the thermal history data that evolved while using the
+previous construction are reused for the new construction. When this actuator
+is used, the program attempts to detect if incompatible constructions are being
+assigned. In some cases it issues a warning and allows the assignments to
+proceed, in others it warns and doesn't allow the assignment to proceed. If the
+original construction assigned to a surface has internal source/sink (defined
+using ConstructionProperty:InternalHeatSource) then any assignments to the
+surface must also be internal source constructions. If using the heat transfer
+algorithm called ConductionFiniteDifference, then the constructions must have
+the same number of finite difference nodes or the assignment is not allowed.
+The construction state actuator cannot be used in conjunction with the heat
+transfer algorithms called ConductionFiniteDifferenceSimplified or
+CombinedHeatAndMoistureFiniteElement.
 
 \subsection{Surface Boundary Conditions}\label{surface-boundary-conditions}
+
+Three actuators, called ``Surface,''~ are available for controlling the temperature and wind speed used for ``Outdoors''~ boundary conditions during heat transfer calculations at the outside face of surfaces. Each heat transfer surface will make available actuators with the following three control types:
+
+\begin{itemize}
+\item
+  ``Outdoor Air Drybulb Temperature.''~ This is the drybulb temperature of the ambient outdoor air exposed to the surface, in degrees C. This is the temperature used for surface convection heat transfer boundary conditions on the outdoor, outside-face, of the surface exposed to exterior environment (unless it is raining).
+\item
+  ``Outdoor Air Wetbulb Temperature.''~ This is the wetbulb temperature of the ambient outdoor air exposed to the surface, in degrees C. When the weather indicates that it is raining outside, the surface convection heat transfer boundary conditions use the wetbulb temperature rather than the drybulb temperature (along with a high convection heat transfer coefficient). This override allows changing the outdoor wetbulb experienced by the surface exposed to exterior environment (when it is raining).
+\item
+  ``Outdoor Air Wind Speed.''~ This is the wind speed of the outdoor air exposed to the surface, in m/s. This is the velocity used for some surface convection heat transfer correlations for the outside-face of surfaces exposed to wind. 
+\item
+  ``Outdoor Air Wind Direction.''~ This is the wind direction of the outdoor air exposed to the surface, in degree. This is the direction used for some surface convection heat transfer correlations for the outside-face of surfaces exposed to wind.
+\item
+  ``View Factor To Ground.''~ This is the view factor to ground of the outside face of the surface. This is the view factor used for ground diffuse solar and for radiant heat exchange. This is useful from the calling point named BeginZoneTimestepAfterInitHeatBalance and BeginZoneTimestepBeforeInitHeatBalance.
+\end{itemize}
 
 Four actuators, called ``Other Side Boundary Conditions,'' are available for controlling the convection and radiation boundary conditions for surfaces that use ``OtherSideConditionsModel.''~ Each instance of a SurfaceProperty:OtherSideConditionsModel object will make available these actuators with the following four control types:
 

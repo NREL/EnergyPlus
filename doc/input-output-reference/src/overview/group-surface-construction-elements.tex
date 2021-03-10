@@ -4015,9 +4015,19 @@ Construction:FfactorGroundFloor,
       15.24,15.24,0.0;         !- X,Y,Z = = > Vertex 4
 \end{lstlisting}
 
-\subsection{Construction:InternalSource}\label{constructioninternalsource}
+\subsection{ConstructionProperty:InternalHeatSource}\label{constructioninternalsource}
 
-In some cases such as radiant systems, a construction will actually have resistance wires or hydronic tubing embedded within the construction. Heat is then either added or removed from this building element to provide heating or cooling to the zone in question. In the case of building-integrated photovoltaics, the energy removed in the form of electricity will form a sink. It is possible to enter such constructions into EnergyPlus with the syntax described below. The definition is similar to the Construction definition with a few additions related to radiant or other systems that will lead to source/sink terms. The internal source capability is available with both the \textbf{ConductionTransferFunction} and \textbf{ConductionFiniteDifference} solution algorithms.~ The only difference is that the two dimensional pipe arrangements are not available to ConductionFiniteDifference. Those fields are ignored in that implementation.
+In some cases, such as radiant systems, a construction will actually have
+resistance wires or hydronic tubing embedded within the construction. Heat is
+then either added or removed from this building element to provide heating or
+cooling to the zone in question. In the case of building-integrated
+photovoltaics, the energy removed in the form of electricity will form a sink.
+It is possible to enter such constructions into EnergyPlus with the syntax
+described below. The internal source capability is available with both the
+\textbf{ConductionTransferFunction} and \textbf{ConductionFiniteDifference}
+solution algorithms. The only difference is that the two dimensional pipe
+arrangements are not available to ConductionFiniteDifference. Those fields are
+ignored in that implementation.
 
 \subsubsection{Inputs}\label{inputs-38}
 
@@ -4027,29 +4037,44 @@ This field is a user specified name that will be used as a reference by other in
 
 \paragraph{Field: Source Present After Layer Number}\label{field-source-present-after-layer-number}
 
-This field is an integer that relates the location of the heat source or sink. The integer refers to the list of material layers that follow later in the syntax and determines the layer after which the source is present. If a source is embedded within a single homogenous layer (such as concrete), that layer should be split into two layers and the source added between them. For example, a value of ``2'' in this field tells EnergyPlus that the source is located between the second and third material layers listed later in the construction description (see layer fields below).
+This field is an integer that relates the location of the heat source or sink. The integer refers to the list of material layers that follow later in the syntax and determines the layer after which the source is present. If a source is embedded within a single homogenous layer (such as concrete), that layer should be split into two layers and the source added between them. For example, a value of ``2'' in this field tells EnergyPlus that the source is located between the second and third material layers listed later in the construction description (see layer fields below). This field must be between 1 and the number of material layers in the construction (maximum of 10 layers).
 
 \paragraph{Field: Temperature Calculation Requested After Layer Number}\label{field-temperature-calculation-requested-after-layer-number}
 
-The nature of this field is similar to the source interface parameter (see previous field) in that it is an integer, refers to the list of material layers that follow, and defines a location after the layer number identified by the user-defined number. In this case, the user is specifying the location for a separate temperature calculation rather than the location of the heat source/sink. This feature is intended to allow users to calculate a temperature within the construction. This might be important in a radiant cooling system where condensation could be a problem. This temperature calculation can assist users in making that determination in absence of a full heat and mass balance calculation.
+The nature of this field is similar to the source interface parameter (see previous field) in that it is an integer, refers to the list of material layers that follow, and defines a location after the layer number identified by the user-defined number. In this case, the user is specifying the location for a separate temperature calculation rather than the location of the heat source/sink. This feature is intended to allow users to calculate a temperature within the construction. This might be important in a radiant cooling system where condensation could be a problem. This temperature calculation can assist users in making that determination in absence of a full heat and mass balance calculation. This field must be between 1 and the number of material layers in the construction (maximum of 10 layers).
+
+It should also be noted that when using this construction in conjunction with a low temperature radiant system such as the \textbf{\hyperref[zonehvaclowtemperatureradiantvariableflow]{variable flow}}, \textbf{\hyperref[zonehvaclowtemperatureradiantconstantflow]{constant flow}}, or \textbf{\hyperref[zonehvaclowtemperatureradiantelectric]{electric}} radiant system that this parameter also defines the location for the temperature that is used with the Surface Interior Temperature control.  In other words, when using the Surface Interior Temperature control with a low temperature radiant system, the location for this temperature that is interior to the radiant surface is also defined in part by this input field.  Note that two fields below (\textbf{\hyperref[field-dimensions-for-the-ctf-calculation]{Dimensions for the CTF Calculation}} and \textbf{\hyperref[field-two-dimensional-temperature-calculation-position]{Two-Dimensional Temperature Calculation Position}}) will also have an impact on this location if the user elects to perform a 2-D solution for the surfaces using this construction.
 
 \paragraph{Field: Dimensions for the CTF Calculation}\label{field-dimensions-for-the-ctf-calculation}
 
 This field is also an integer and refers to the detail level of the calculation. A value of ``1'' states that the user is only interested in a one-dimensional calculation. This is appropriate for electric resistance heating and for hydronic heating (when boiler/hot water heater performance is not affected by return and supply water temperatures). A value of ``2'' will trigger a two-dimensional solution for this surface only. This may be necessary for hydronic radiant cooling situations since chiller performance is affected by the water temperatures provided.
 
-A few things should be noted about requesting two-dimensional solutions. First, the calculation of the conduction transfer functions (CTF) is fairly intensive and will require a significant amount of computing time. Second, the solution regime is two-dimensional internally but it has a one-dimensional boundary condition imposed at the inside and outside surface (i.e., surface temperatures are still isothermal is if the surface was one-dimensional).
+A few things should be noted about requesting two-dimensional solutions. First, the calculation of the conduction transfer functions (CTF) is fairly intensive and will require a significant amount of computing time. Second, the solution regime is two-dimensional internally but it has a one-dimensional boundary condition imposed at the inside and outside surface (i.e., surface temperatures are still isothermal as if the surface was one-dimensional).
 
 \paragraph{Field: Tube Spacing}\label{field-tube-spacing}
 
-This field defines how far apart in meters the hydronic tubing or electrical resistance wires are spaced in the direction perpendicular to the main direction of heat transfer. Note that this parameter is only used for two-dimensional solutions (see previous field).
+This field defines the distance between adjacent hydronic tubes spaced in the direction perpendicular to the main direction of heat transfer. The value for this parameter must be greater than 0.01m (or a tube spacing of 1 cm) and less than 1.0m (or a tube spacing of 1m). Note that this parameter is only used for two-dimensional solutions (see previous field).
 
-\paragraph{Field: Outside Layer}\label{field-outside-layer-1}
+\paragraph{Field: Two-Dimensional Temperature Calculation Position}\label{field-two-dimensional-temperature-calculation-position}
 
-Each construction must have at least one layer. This field defines the material name associated with the layer on the outside of this construction---outside referring to the side that is not exposed to the zone but rather the opposite side environment, whether this is the outdoor environment or another zone. Material layers are defined based on their thermal properties elsewhere in the input file (ref: Material and Material Properties and Materials for Glass Windows and Doors). As noted above, the outside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+This field only has a meaning when the user opts to have a two-dimensional solution in \textbf{\hyperref[field-dimensions-for-the-ctf-calculation]{Dimensions for the CTF Calculation}} above.  It is used in conjunction with the information in \textbf{\hyperref[field-temperature-calculation-requested-after-layer-number]{Temperature Calculation Requested After Layer Number}} above to specify a location for where the simulation will calculate a temperature at the interior of a surface.  The \textbf{\hyperref[field-temperature-calculation-requested-after-layer-number]{Temperature Calculation Requested After Layer Number}} field sets where the position is in the main direction of heat transfer.  This field determines the position of this point in the direction \textbf{perpendicular} to the main direction of heat transfer.  Note that this parameter is a dimensionless value that is allowed to range from 0.0 to 1.0.  A value of 0.0 is used for a position that is in line with the tubing in the construction.  A value of 1.0 is used for a position that is at the mid-point between adjacent tubes.  The user is also given the flexibility to select a point in between those two extremes.
 
-\paragraph{Field(s) 2-10: Layers}\label{fields-2-10-layers-1}
-
-The next fields are optional and the number of them showing up in a particular Construction definition depends solely on the number of material layers present in that particular construction. The data expected is identical to the outside layer field (see previous field description). The order of the remaining layers is important and should be listed in order of occurrence from the one just inside the outside layer until the inside layer is reached. As noted above, the inside layer should NOT be a film coefficient since EnergyPlus will calculate convection and radiation heat transfer more precisely.
+It should also be noted that for values between 0.0 and 1.0 will not allow for
+exact positioning of the point at which this temperature is calculated.
+Instead, it will be used to calculate which node in the state space
+representation will be used to calculate the temperature.  Currently,
+EnergyPlus uses seven nodes in the direction perpendicular to the main
+direction of heat transfer.  In this case, 0.0 represents the first node and
+1.0 represents the seventh or last node in the perpendicular direction.  So,
+this field will be used to determine which node in the direction pendicular to
+the main direction of heat transfer to use and there are five other nodes
+(second, third, fourth, fifth, and sixth) that are possible locations.  For
+example, if the user enters a value of 0.167, the second node will be used.
+Likewise, if the user enters a value of 0.1, because this will be closest to
+the second node, the second node will be used to calculate the internal
+temperature.  For more information on two-dimensional heat transfer within
+surfaces using ConstructionProperty:InternalHeatSource, please refer to the
+EnergyPlus Engineering Reference.
 
 \subsubsection{Outputs}\label{outputs-36-1}
 
@@ -4072,29 +4097,13 @@ Construction:AirBoundary indicates an open boundary between two zones. It may be
 When this construction type is used, the Outside Boundary Condition of the surface (or the base surface of a fenestration surface)
 must be either \textit{Surface} or \textit{Zone}. A base surface with Construction:AirBoundary cannot hold any fenestration surfaces.
 
+The two zones separated by this air boundary will be grouped together into a combined enclosure for solar distribution, daylighting, and radiant exchange (including distribution of radiant internal gains). If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single enclosure. Normal default simplified view factors will apply unless detailed view factors are specified using \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:BySurfaceName}.
+
 \subsubsection{Inputs}\label{inputs-38-01}
 
 \paragraph{Field: Name}\label{field-name-31-0001}
 
 The name of the construction.
-
-\paragraph{Field: Solar and Daylighting Method}\label{field-solar and-daylighting-method}
-
-This field controls how the surface is modeled for solar distribution and daylighting calculations. There are two
-choices:
-\begin{description}
-  \item[GroupedZones] The two zones separated by this air boundary will be grouped together into a combined zone for solar distribution and daylighting. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air  boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone.
-  \item[InteriorWindow] The air boundary will be modeled as a perfectly transmitting interior window. As with other interior windows, all direct solar passing through the interior window will be diffuse in the adjacent zone.
-\end{description}
-
-\paragraph{Field: Radiant Exchange Method}\label{field-radiant-exchange-method}
-
-This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
-
-\begin{description}
-  \item[GroupedZones] The two zones separated by this air boundary will be grouped together into a combined zone for radiant exchange between surfaces and distribution of radiant internal gains. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone. Normal default simplified view factors will apply unless detailed view factors are specified using \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:bySurfaceName}.
-  \item[IRTSurface] The air boundary will be modeled as blackbody surface between the adjacent zones (similar to, but not exactly the same as, \hyperref[materialinfraredtransparent]{Material:InfraredTransparent}. The surface participates in the radiant exchange within each zone and receives long-wave radiant energy from internal sources. The surface does not absorb any visible or solar radiation, has no thermal resistance, and has zero convective heat transfer coefficients on both sides.
-\end{description}
 
 \paragraph{Field: Air Exchange Method}\label{field-air-exchange-method}
 
@@ -4118,8 +4127,6 @@ IDF Example:
 \begin{lstlisting}
   Construction:AirBoundary,
     Air Wall,                !- Name
-    GroupedZones,            !- Solar and Daylighting Method
-    GroupedZones,            !- Radiant Exchange Method
     SimpleMixing,            !- Air Exchange Method
     0.5,                     !- Simple Mixing Air Changes per Hour {1/hr}
     ;                        !- Simple Mixing Schedule Name

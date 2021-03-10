@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace RuntimeLanguageProcessor {
 
@@ -67,19 +71,6 @@ namespace RuntimeLanguageProcessor {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     extern int const MaxErrors;
-
-    // keyword parameters for types of Erl statements
-    extern int const KeywordNone;     // statement type not set
-    extern int const KeywordReturn;   // Return statement, as in leave program
-    extern int const KeywordGoto;     // Goto statement, used in parsing to manage IF-ElseIf-Else-EndIf and nesting
-    extern int const KeywordSet;      // Set statement, as in assign RHS to LHS
-    extern int const KeywordRun;      // Run statement, used to call a subroutine from a main program
-    extern int const KeywordIf;       // If statement, begins an IF-ElseIf-Else-EndIf logic block
-    extern int const KeywordElseIf;   // ElseIf statement, begins an ElseIf block
-    extern int const KeywordElse;     // Else statement, begins an Else block
-    extern int const KeywordEndIf;    // EndIf statement, terminates an IF-ElseIf-Else-EndIf logic block
-    extern int const KeywordWhile;    // While statement, begins a While block
-    extern int const KeywordEndWhile; // EndWhile statement, terminates a While block
 
     // token type parameters for Erl code parsing
     extern int const TokenNumber;     // matches the ValueNumber
@@ -119,6 +110,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
@@ -174,30 +167,29 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage();
+    void InitializeRuntimeLanguage(EnergyPlusData &state);
 
-    void BeginEnvrnInitializeRuntimeLanguage();
+    void BeginEnvrnInitializeRuntimeLanguage(EnergyPlusData &state);
 
-    void ParseStack(OutputFiles &outputFiles, int const StackNum);
+    void ParseStack(EnergyPlusData &state, int const StackNum);
 
-    int AddInstruction(int const StackNum,
+    int AddInstruction(EnergyPlusData &state,
+                       int const StackNum,
                        int const LineNum,
-                       int const Keyword,
+                       DataRuntimeLanguage::ErlKeywordParam Keyword,
                        Optional_int_const Argument1 = _, // Erl variable index
                        Optional_int_const Argument2 = _);
 
-    void AddError(int const StackNum,      // index pointer to location in ErlStack structure
+    void AddError(EnergyPlusData &state,
+                  int const StackNum,      // index pointer to location in ErlStack structure
                   int const LineNum,       // Erl program line number
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(int const StackNum);
+    ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum);
 
-    void WriteTrace(int const StackNum,
-                    int const InstructionNum,
-                    ErlValueType const &ReturnValue,
-                    bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
-    );
+    void
+    WriteTrace(EnergyPlusData &state, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -205,24 +197,32 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(OutputFiles &outputFiles,
+    void ParseExpression(EnergyPlusData &state,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(EnergyPlusData &state, const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
-    int NewExpression();
+    int NewExpression(EnergyPlusData &state);
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput();
+    void TodayTomorrowWeather(EnergyPlusData &state,
+                              int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
 
-    void ReportRuntimeLanguage();
+    void TodayTomorrowWeather(EnergyPlusData &state,
+                              int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
 
-    std::string IntegerToString(int const Number);
+    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
+
+    int TodayTomorrowWeather(EnergyPlusData &state, int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
+
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state);
+
+    void ReportRuntimeLanguage(EnergyPlusData &state);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 
@@ -230,25 +230,35 @@ namespace RuntimeLanguageProcessor {
 
     std::string ValueToString(ErlValueType const &Value);
 
-    int FindEMSVariable(std::string const &VariableName, // variable name in Erl
+    int FindEMSVariable(EnergyPlusData &state,
+                        std::string const &VariableName, // variable name in Erl
                         int const StackNum);
 
-    int NewEMSVariable(std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
+    int NewEMSVariable(EnergyPlusData &state, std::string const &VariableName, int const StackNum, Optional<ErlValueType const> Value = _);
 
-    void SetupPossibleOperators();
+    void SetupPossibleOperators(EnergyPlusData &state);
 
-    void ExternalInterfaceSetErlVariable(int const varNum,  // The variable index to be written during run time
+    void ExternalInterfaceSetErlVariable(EnergyPlusData &state,
+                                         int const varNum,  // The variable index to be written during run time
                                          Real64 const value // The real time value of the vairable to be set
     );
 
-    void ExternalInterfaceInitializeErlVariable(int const varNum,                 // The variable index to be written during run time
+    void ExternalInterfaceInitializeErlVariable(EnergyPlusData &state,
+                                                int const varNum,                 // The variable index to be written during run time
                                                 ErlValueType const &initialValue, // The initial value
                                                 bool const setToNull              // Flag, if true, value will be initialized to Null
     );
 
-    bool isExternalInterfaceErlVariable(int const varNum); // The variable index to be written during run time
+    bool isExternalInterfaceErlVariable(EnergyPlusData &state, int const varNum); // The variable index to be written during run time
 
 } // namespace RuntimeLanguageProcessor
+
+struct RuntimeLanguageProcessorData : BaseGlobalStruct {
+
+    void clear_state() override {
+
+    }
+};
 
 } // namespace EnergyPlus
 

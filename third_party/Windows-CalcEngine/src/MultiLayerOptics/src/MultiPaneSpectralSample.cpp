@@ -1,4 +1,5 @@
 #include <iterator>
+#include <stdexcept>
 
 #include "MultiPaneSpectralSample.hpp"
 #include "MultiPaneSampleData.hpp"

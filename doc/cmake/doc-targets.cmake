@@ -11,4 +11,13 @@ macro( CREATE_DOC_TARGET SOURCE_FILENAME OUTPUT_FILENAME )
     )
 
   add_dependencies(docs zPDF_${OUTPUT_FILENAME})
+
+  set_target_properties(zPDF_${OUTPUT_FILENAME} PROPERTIES FOLDER Documentation)
+
+  if (DOCS_TESTING)
+    add_custom_command(TARGET zPDF_${OUTPUT_FILENAME}
+      POST_BUILD
+      COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/tools/parse_latex_log.py" "${PROJECT_SOURCE_DIR}/${SOURCE_FILENAME}/${SOURCE_FILENAME}.log" "${PROJECT_SOURCE_DIR}/${SOURCE_FILENAME}" "${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}_errors.json"
+      )
+  endif()
 endmacro()

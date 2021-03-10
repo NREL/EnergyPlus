@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,22 +45,16 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
 
 #include <EnergyPlus/DataGlobals.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/TARCOGArgs.hh>
 #include <EnergyPlus/TARCOGCommon.hh>
 #include <EnergyPlus/TARCOGGassesParams.hh>
-#include <EnergyPlus/TARCOGOutput.hh>
 #include <EnergyPlus/TARCOGParams.hh>
 
-namespace EnergyPlus {
-
-namespace TARCOGArgs {
+namespace EnergyPlus::TARCOGArgs {
 
     // MODULE INFORMATION:
     //       AUTHOR         Simon Vidanovic
@@ -74,30 +68,14 @@ namespace TARCOGArgs {
     // A module which contains common functions for error checking and
     //    preparation of arguments and intermediate variables
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-
     // Using/Aliasing
-    using DataGlobals::Pi;
-    using DataGlobals::StefanBoltzmann;
     using namespace TARCOGCommon;
     using namespace TARCOGGassesParams;
     using namespace TARCOGOutput;
     using namespace TARCOGParams;
 
-    static ObjexxFCL::gio::Fmt fmtI3("(I3)");
-
-    // Functions
-
-    int ArgCheck(int const nlayer,
+    int ArgCheck(EnergyPlusData &state, Files &files,
+                 int const nlayer,
                  int const iwd,
                  Real64 const tout,
                  Real64 const tind,
@@ -169,10 +147,6 @@ namespace TARCOGArgs {
                  std::string &ErrorMessage)
     {
 
-        /// INPUTS:
-
-        /// General:
-
         // Return value
         int ArgCheck;
 
@@ -218,32 +192,13 @@ namespace TARCOGArgs {
         EP_SIZE_CHECK(LaminateB, maxlay);
         EP_SIZE_CHECK(sumsol, maxlay);
 
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-        /// Venetians:
-
-        /// Laminates:
-
-        /// Gaps:
-
-        // Deflection
-
-        // Support Pillars
-        //   0 - does not have support pillar
-        //   1 - have support pillar
-
-        //// INPUTS/OUTPUTS:
-
-        int i;
-        std::string a;
-
         // bi...Write debug output files - if debug flag = 1:
 
-        if (WriteDebugOutput) {
+        if (files.WriteDebugOutput) {
 
-            WriteInputArguments(tout,
+            WriteInputArguments(state, files.DebugOutputFile,
+                                files.DBGD,
+                                tout,
                                 tind,
                                 trmin,
                                 wso,
@@ -302,7 +257,9 @@ namespace TARCOGArgs {
                                 xgcp,
                                 xwght);
 
-            WriteTARCOGInputFile(VersionNumber,
+            std::string const VersionNumber(" 7.0.15.00 ");
+            WriteTARCOGInputFile(state, files,
+                                 VersionNumber,
                                  tout,
                                  tind,
                                  trmin,
@@ -388,6 +345,8 @@ namespace TARCOGArgs {
             return ArgCheck;
         }
 
+        int constexpr MinThermalMode(0);
+        int constexpr MaxThermalMode(2);
         if ((ThermalMod < MinThermalMode) || (ThermalMod > MaxThermalMode)) {
             ArgCheck = 29;
             ErrorMessage = "Invalid code for thermal mode.";
@@ -406,20 +365,18 @@ namespace TARCOGArgs {
             return ArgCheck;
         }
 
-        for (i = 1; i <= nlayer - 1; ++i) {
+        for (int i = 1; i <= nlayer - 1; ++i) {
             if (gap(i) <= 0.0) {
                 ArgCheck = 20;
-                ObjexxFCL::gio::write(a, fmtI3) << i;
-                ErrorMessage = "Gap width is less than (or equal to) zero. Gap #" + a;
+                ErrorMessage = format("Gap width is less than (or equal to) zero. Gap #{:3}", i);
                 return ArgCheck;
             }
         }
 
-        for (i = 1; i <= nlayer; ++i) {
+        for (int i = 1; i <= nlayer; ++i) {
             if (thick(i) <= 0.0) {
                 ArgCheck = 21;
-                ObjexxFCL::gio::write(a, fmtI3) << i;
-                ErrorMessage = "Layer width is less than (or equal to) zero. Layer #" + a;
+                ErrorMessage = format("Layer width is less than (or equal to) zero. Layer #{:3}", i);
                 return ArgCheck;
             }
             if ((i < nlayer) && IsShadingLayer(LayerType(i)) && IsShadingLayer(LayerType(i + 1))) {
@@ -461,20 +418,18 @@ namespace TARCOGArgs {
         }
 
         // bi...Check layers and update Venetian blinds properties:
-        for (i = 1; i <= nlayer; ++i) {
+        for (int i = 1; i <= nlayer; ++i) {
             if (scon(i) <= 0.0) {
                 ArgCheck = 26;
-                ObjexxFCL::gio::write(a, fmtI3) << i;
-                ErrorMessage = "Layer " + a + " has conductivity whcih is less or equal to zero.";
+                ErrorMessage = format("Layer {:3} has conductivity whcih is less or equal to zero.", i);
                 return ArgCheck;
             }
 
             if ((LayerType(i) < MinLayType) || (LayerType(i) > MaxLayType)) {
                 ArgCheck = 22;
-                ObjexxFCL::gio::write(a, fmtI3) << i;
-                ErrorMessage = "Incorrect layer type for layer #" + a +
+                ErrorMessage = format("Incorrect layer type for layer #{:3}"
                                ".  Layer type can either be 0 (glazing layer), 1 (Venetian blind), 2 (woven shade), 3 (perforated), 4 (diffuse "
-                               "shade) or 5 (bsdf).";
+                               "shade) or 5 (bsdf).", i);
                 return ArgCheck;
             }
 
@@ -493,38 +448,32 @@ namespace TARCOGArgs {
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) { // Venetian blind specific:
                 if (SlatThick(i) <= 0) {
                     ArgCheck = 31;
-                    ObjexxFCL::gio::write(a, fmtI3) << i;
-                    ErrorMessage = "Invalid slat thickness (must be >0). Layer #" + a;
+                    ErrorMessage = format("Invalid slat thickness (must be >0). Layer #{:3}", i);
                     return ArgCheck;
                 }
                 if (SlatWidth(i) <= 0.0) {
                     ArgCheck = 32;
-                    ObjexxFCL::gio::write(a, fmtI3) << i;
-                    ErrorMessage = "Invalid slat width (must be >0). Layer #" + a;
+                    ErrorMessage = format("Invalid slat width (must be >0). Layer #{:3}", i);
                     return ArgCheck;
                 }
                 if ((SlatAngle(i) < -90.0) || (SlatAngle(i) > 90.0)) {
                     ArgCheck = 33;
-                    ObjexxFCL::gio::write(a, fmtI3) << i;
-                    ErrorMessage = "Invalid slat angle (must be between -90 and 90). Layer #" + a;
+                    ErrorMessage = format("Invalid slat angle (must be between -90 and 90). Layer #{:3}", i);
                     return ArgCheck;
                 }
                 if (SlatCond(i) <= 0.0) {
                     ArgCheck = 34;
-                    ObjexxFCL::gio::write(a, fmtI3) << i;
-                    ErrorMessage = "Invalid conductivity of slat material (must be >0). Layer #" + a;
+                    ErrorMessage = format("Invalid conductivity of slat material (must be >0). Layer #{:3}", i);
                     return ArgCheck;
                 }
                 if (SlatSpacing(i) <= 0.0) {
                     ArgCheck = 35;
-                    ObjexxFCL::gio::write(a, fmtI3) << i;
-                    ErrorMessage = "Invalid slat spacing (must be >0). Layer #" + a;
+                    ErrorMessage = format("Invalid slat spacing (must be >0). Layer #{:3}", i);
                     return ArgCheck;
                 }
                 if ((SlatCurve(i) != 0.0) && (std::abs(SlatCurve(i)) <= (SlatWidth(i) / 2.0))) {
                     ArgCheck = 36;
-                    ObjexxFCL::gio::write(a, fmtI3) << i;
-                    ErrorMessage = "Invalid curvature radius (absolute value must be >SlatWidth/2, or 0 for flat slats). Layer #" + a;
+                    ErrorMessage = format("Invalid curvature radius (absolute value must be >SlatWidth/2, or 0 for flat slats). Layer #{:3}", i);
                     return ArgCheck;
                 }
 
@@ -532,27 +481,17 @@ namespace TARCOGArgs {
 
         } // Layers...
 
-        for (i = 1; i <= nlayer + 1; ++i) {
+        for (int i = 1; i <= nlayer + 1; ++i) {
             if (presure(i) < 0.0) {
                 ArgCheck = 27;
-                ObjexxFCL::gio::write(a, fmtI3) << i;
                 if ((i == 1) || (i == (nlayer + 1))) {
                     ErrorMessage = "One of enviroments (inside or outside) has pressure which is less than zero.";
                 } else {
-                    ErrorMessage = "One of gaps has pressure which is less than zero. Gap #" + a;
+                    ErrorMessage = format("One of gaps has pressure which is less than zero. Gap #{:3}", i);
                 }
                 return ArgCheck;
             }
         }
-
-        // bi...Debug output:
-        //      open(unit=18,  file='iprop.dbg',  status='unknown', position='APPEND',
-        //  2            form='formatted', iostat=nperr)
-        //    write(18,5555) 'Iprop1:', iprop(1, 1), iprop(1, 2), iprop (1, 3)
-        //    write(18,5555) 'Iprop2:', iprop(2, 1), iprop(2, 2), iprop (2, 3)
-        //    write(18,5555) 'Iprop3:', iprop(3, 1), iprop(3, 2), iprop (3, 3)
-        // 5555  format(A, I3, I3, I3)
-        //    close(18)
 
         return ArgCheck;
     }
@@ -629,19 +568,6 @@ namespace TARCOGArgs {
         EP_SIZE_CHECK(rir, maxlay2);
         EP_SIZE_CHECK(vfreevent, maxlay1);
 
-        // Locals
-        /// Environment related:
-
-        /// Layers:
-
-        /// Venetians:
-
-        //// INPUTS/OUTPUTS:
-
-        /// OUTPUTS:
-
-        int i;
-        int k;
         int k1;
         Real64 tiltr;
         Real64 Rsky;
@@ -649,8 +575,6 @@ namespace TARCOGArgs {
         Real64 Fground;
         Real64 e0;
         std::string a;
-
-        //! Initialize variables:
 
         //! Scalars:
         ShadeEmisRatioOut = 1.0;
@@ -674,20 +598,20 @@ namespace TARCOGArgs {
         ShadeGapKeffConv = 0.0;
 
         // Adjust shading layer properties
-        for (i = 1; i <= nlayer; ++i) {
+        for (int i = 1; i <= nlayer; ++i) {
             if (LayerType(i) == VENETBLIND_HORIZ || LayerType(i) == VENETBLIND_VERT) {
                 scon(i) = SlatCond(i);
                 if (ThermalMod == THERM_MOD_SCW) {
                     // bi...the idea here is to have glass-to-glass width the same as before scaling
                     // bi...TODO: check for outdoor and indoor blinds! SCW model is only applicable to in-between SDs!!!
-                    thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * Pi / 180.0);
+                    thick(i) = SlatWidth(i) * std::cos(SlatAngle(i) * DataGlobalConstants::Pi / 180.0);
                     if (i > 1) gap(i - 1) += (1.0 - SDScalar) / 2.0 * thick(i); // Autodesk:BoundsViolation gap(i-1) @ i=1: Added if condition
                     gap(i) += (1.0 - SDScalar) / 2.0 * thick(i);
                     thick(i) *= SDScalar;
                     if (thick(i) < SlatThick(i)) thick(i) = SlatThick(i);
                 } else if ((ThermalMod == THERM_MOD_ISO15099) || (ThermalMod == THERM_MOD_CSM)) {
                     thick(i) = SlatThick(i);
-                    const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobals::Pi / 360.0;
+                    const Real64 slatAngRad = SlatAngle(i) * 2.0 * DataGlobalConstants::Pi / 360.0;
                     Real64 C4_VENET(0);
                     if (LayerType(i) == VENETBLIND_HORIZ) {
                         C4_VENET = C4_VENET_HORIZONTAL;
@@ -702,17 +626,17 @@ namespace TARCOGArgs {
 
         hint = hin;
         houtt = hout;
-        tiltr = tilt * 2.0 * DataGlobals::Pi / 360.0; // convert tilt in degrees to radians
+        tiltr = tilt * 2.0 * DataGlobalConstants::Pi / 360.0; // convert tilt in degrees to radians
 
         // external radiation term
         {
             auto const SELECT_CASE_var(isky);
             if (SELECT_CASE_var == 3) {
                 Gout = outir;
-                trmout = root_4(Gout / StefanBoltzmann);
+                trmout = root_4(Gout / DataGlobalConstants::StefanBoltzmann);
             } else if (SELECT_CASE_var == 2) { // effective clear sky emittance from swinbank (SPC142/ISO15099 equations 131, 132, ...)
                 Rsky = 5.31e-13 * pow_6(tout);
-                esky = Rsky / (StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
+                esky = Rsky / (DataGlobalConstants::StefanBoltzmann * pow_4(tout)); // check esky const, also check what esky to use when tsky input...
             } else if (SELECT_CASE_var == 1) {
                 esky = pow_4(tsky) / pow_4(tout);
             } else if (SELECT_CASE_var == 0) { // for isky=0 it is assumed that actual values for esky and Tsky are specified
@@ -738,48 +662,36 @@ namespace TARCOGArgs {
                 trmout = tout * root_4(e0);
             }
 
-            Gout = StefanBoltzmann * pow_4(trmout);
+            Gout = DataGlobalConstants::StefanBoltzmann * pow_4(trmout);
         } // if (isky.ne.3) then
 
         ebsky = Gout;
-
-        //     Ebsky=sigma*Tout**4.0d0
-        // As of 6/1/01 The expression for Ebsky is different in the current ISO 15099
-        // (Ebsky=sigma*Tout**4) because equations 32 and 33 specify Tout and Tind as reference
-        // outdoor and indoor temperatures, but I think that they should be Tne and Tni
-        // (environmental temps).  Therefore, Ebsky becomes the same as Gout.
-        // Inside (room) radiation
-        //     Ebroom = sigma*tind**4.0d0
-        // See comment above about Ebsky
 
         if (ibc(2) == 1) { // inside BC - fixed combined film coef.
             trmin = tind;
         }
 
-        Gin = StefanBoltzmann * pow_4(trmin);
+        Gin = DataGlobalConstants::StefanBoltzmann * pow_4(trmin);
         ebroom = Gin;
 
         // calculate ir reflectance:
-        for (k = 1; k <= nlayer; ++k) {
+        for (int k = 1; k <= nlayer; ++k) {
             k1 = 2 * k - 1;
             rir(k1) = 1 - tir(k1) - emis(k1);
             rir(k1 + 1) = 1 - tir(k1) - emis(k1 + 1);
             if ((tir(k1) < 0.0) || (tir(k1) > 1.0) || (tir(k1 + 1) < 0.0) || (tir(k1 + 1) > 1.0)) {
                 nperr = 4;
-                ObjexxFCL::gio::write(a, fmtI3) << k;
-                ErrorMessage = "Layer transmissivity is our of range (<0 or >1). Layer #" + a;
+                ErrorMessage = format("Layer transmissivity is our of range (<0 or >1). Layer #{:3}", k);
                 return;
             }
             if ((emis(k1) < 0.0) || (emis(k1) > 1.0) || (emis(k1 + 1) < 0.0) || (emis(k1 + 1) > 1.0)) {
                 nperr = 14;
-                ObjexxFCL::gio::write(a, fmtI3) << k;
-                ErrorMessage = "Layer emissivity is our of range (<0 or >1). Layer #" + a;
+                ErrorMessage = format("Layer emissivity is our of range (<0 or >1). Layer #{:3}", k);
                 return;
             }
             if ((rir(k1) < 0.0) || (rir(k1) > 1.0) || (rir(k1 + 1) < 0.0) || (rir(k1 + 1) > 1.0)) {
                 nperr = 3;
-                ObjexxFCL::gio::write(a, fmtI3) << k;
-                ErrorMessage = "Layer reflectivity is our of range (<0 or >1). Layer #" + a;
+                ErrorMessage = format("Layer reflectivity is our of range (<0 or >1). Layer #{:3}", k);
                 return;
             }
         }
@@ -787,19 +699,7 @@ namespace TARCOGArgs {
 
     bool GoAhead(int const nperr)
     {
-
-        // Return value
-        bool GoAhead;
-
-        if (((nperr > 0) && (nperr < 1000)) || ((nperr > 2000) && (nperr < 3000))) {
-            GoAhead = false; // error
-        } else {
-            GoAhead = true; // all OK, or a warning
-        }
-
-        return GoAhead;
+        return !(((nperr > 0) && (nperr < 1000)) || ((nperr > 2000) && (nperr < 3000)));
     }
-
-} // namespace TARCOGArgs
 
 } // namespace EnergyPlus

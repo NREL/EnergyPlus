@@ -172,7 +172,7 @@ Value & File Type Description \tabularnewline
 \midrule
 \endhead
 
-Tmy or ,tm2 & TMY2 Data File \tabularnewline
+Tmy or tm2 & TMY2 Data File \tabularnewline
 Iwec or iwc & IWEC Data File \tabularnewline
 Samson or dat & SAMSON Data File \tabularnewline
 wyec2 or wy2 & WYEC2 Data File \tabularnewline
@@ -212,41 +212,41 @@ Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline
 \midrule
 \endhead
 
-year & Year & - & n \tabularnewline
-month & Month & - & y \tabularnewline
-day & Day & - & y \tabularnewline
-hour & hour & - & y \tabularnewline
-minute & minute & - & n \tabularnewline
-datasource & datasource & - & n \tabularnewline
-drybulb & dry\_bulb\_temperature & C & y \tabularnewline
-dewpoint & dew\_point\_temperature & C & y \tabularnewline
-relhum & relative\_humidity & \% & y \tabularnewline
-atmos\_pressure & atmospheric\_pressure & Pa & y \tabularnewline
-exthorrad & extraterrestrial\_horizontal\_radiation & Wh/m2 & n \tabularnewline
-extdirrad & extraterrestrial\_direct\_normal\_radiation & Wh/m2 & n \tabularnewline
-horirsky & horizontal\_infrared\_radiation\_intensity\_from\_sky & Wh/m2 & y \tabularnewline
-glohorrad & global\_horizontal\_radiation & Wh/m2 & n \tabularnewline
-dirnorrad & direct\_normal\_radiation & Wh/m2 & y \tabularnewline
-difhorrad & diffuse\_horizontal\_radiation & Wh/m2 & y \tabularnewline
-glohorillum & global\_horizontal\_illuminance & lux & n \tabularnewline
-dirnorillum & direct\_normal\_illuminance & lux & n \tabularnewline
-difhorillum & diffuse\_horizontal\_illuminance & lux & n \tabularnewline
-zenlum & zenith\_luminance & lux & n \tabularnewline
-winddir & wind\_direction & degrees & y \tabularnewline
-windspd & wind\_speed & m/2 & y \tabularnewline
-totskycvr & total\_sky\_cover & tenths & n \tabularnewline
-opaqskycvr & opaque\_sky\_cover & tenths & n \tabularnewline
-visibility & visibility & km & n \tabularnewline
-ceiling\_hgt & ceiling\_height & m & n \tabularnewline
-presweathobs & present\_weather\_observation & - & y \tabularnewline
-presweathcodes & present\_weather\_codes & - & y \tabularnewline
-precip\_wtr & precipitable\_water & mm & n \tabularnewline
+year & Year & - & N \tabularnewline
+month & Month & - & Y \tabularnewline
+day & Day & - & Y \tabularnewline
+hour & hour & - & Y \tabularnewline
+minute & minute & - & N \tabularnewline
+datasource & datasource & - & N \tabularnewline
+drybulb & dry\_bulb\_temperature & \si{\celsius} & Y \tabularnewline
+dewpoint & dew\_point\_temperature & \si{\celsius} & Y \tabularnewline
+relhum & relative\_humidity & \si{\percent} & Y \tabularnewline
+atmos\_pressure & atmospheric\_pressure & \si{\pascal} & Y \tabularnewline
+exthorrad & extraterrestrial\_horizontal\linebreak\_radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
+extdirrad & extraterrestrial\_direct\linebreak\_normal\_radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
+horirsky & horizontal\_infrared\linebreak\_radiation\_intensity\_from\_sky & \si{\watt\hour\per\meter\squared} & Y \tabularnewline
+glohorrad & global\_horizontal\_radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
+dirnorrad & direct\_normal\_radiation & \si{\watt\hour\per\meter\squared} & Y \tabularnewline
+difhorrad & diffuse\_horizontal\_radiation & \si{\watt\hour\per\meter\squared} & Y \tabularnewline
+glohorillum & global\_horizontal\_illuminance & \si{\lux} & N \tabularnewline
+dirnorillum & direct\_normal\_illuminance & \si{\lux} & N \tabularnewline
+difhorillum & diffuse\_horizontal\_illuminance & \si{\lux} & N \tabularnewline
+zenlum & zenith\_luminance & \si{\lux} & N \tabularnewline
+winddir & wind\_direction & \si{\degree} & Y \tabularnewline
+windspd & wind\_speed & \si{\m/s} & Y \tabularnewline
+totskycvr & total\_sky\_cover & tenths & N \tabularnewline
+opaqskycvr & opaque\_sky\_cover & tenths & N \tabularnewline
+visibility & visibility & \si{\km} & N \tabularnewline
+ceiling\_hgt & ceiling\_height & \si{\m} & N \tabularnewline
+presweathobs & present\_weather\_observation & - & Y \tabularnewline
+presweathcodes & present\_weather\_codes & - & Y \tabularnewline
+precip\_wtr & precipitable\_water & \si{\mm} & N \tabularnewline
 aerosol\_opt\_depth & aerosol\_optical\_depth & thousandths & N \tabularnewline
-snowdepth & snow\_depth & cm & Y \tabularnewline
+snowdepth & snow\_depth & \si{\cm} & Y \tabularnewline
 days\_last\_snow & days\_since\_last\_snow & - & N \tabularnewline
 Albedo & albedo & - & N \tabularnewline
-liq\_precip\_depth & liquid\_precip\_depth & mm & Y \tabularnewline
-liq\_precip\_rate & liquid\_precip\_rate & Hour & N \tabularnewline
+liq\_precip\_depth & liquid\_precip\_depth & \si{\mm} & Y \tabularnewline
+liq\_precip\_rate & liquid\_precip\_rate & \si{\hour} & N \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -269,35 +269,35 @@ Short Name & Long Name & Default EPW Units & Used by EnergyPlus \tabularnewline
 Date & Date (used to derive Month/Day) & - & N \tabularnewline
 hh:mm & HH:MM (used to derive hour/minute) & - & N \tabularnewline
 datasource & datasource & - & N \tabularnewline
-Drybulb & dry bulb temperature & C & Y \tabularnewline
-dewpoint & dew point temperature & C & Y \tabularnewline
+Drybulb & dry bulb temperature & \si{\celsius} & Y \tabularnewline
+dewpoint & dew point temperature & \si{\celsius} & Y \tabularnewline
 Relhum & relative humidity & \% & Y \tabularnewline
 atmos pressure & atmospheric pressure & Pa & Y \tabularnewline
-exthorzrad & extraterrestrial horizontal radiation & Wh/m2 & N \tabularnewline
-extdirrad & extraterrestrial direct normal radiation & Wh/m2 & N \tabularnewline
-horzirsky & horizontal infrared radiation intensity from sky & Wh/m2 & Y \tabularnewline
-glohorzrad & global horizontal radiation & Wh/m2 & N \tabularnewline
-dirnorzrad & direct normal radiation & Wh/m2 & Y \tabularnewline
-difhorzrad & diffuse horizontal radiation & Wh/m2 & Y \tabularnewline
-glohorzillum & global horizontal illuminance & lux & N \tabularnewline
-dirnorzillum & direct normal illuminance & lux & N \tabularnewline
-difhorzillum & diffuse horizontal illuminance & lux & N \tabularnewline
-Zenlum & zenith luminance & lux & N \tabularnewline
-winddir & wind direction & degrees & Y \tabularnewline
-windspd & wind speed & m/2 & Y \tabularnewline
+exthorzrad & extraterrestrial horizontal radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
+extdirrad & extraterrestrial direct normal radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
+horzirsky & horizontal infrared radiation intensity from sky & \si{\watt\hour\per\meter\squared} & Y \tabularnewline
+glohorzrad & global horizontal radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
+dirnorzrad & direct normal radiation & \si{\watt\hour\per\meter\squared} & Y \tabularnewline
+difhorzrad & diffuse horizontal radiation & \si{\watt\hour\per\meter\squared} & Y \tabularnewline
+glohorzillum & global horizontal illuminance & \si{\lux} & N \tabularnewline
+dirnorzillum & direct normal illuminance & \si{\lux} & N \tabularnewline
+difhorzillum & diffuse horizontal illuminance & \si{\lux} & N \tabularnewline
+Zenlum & zenith luminance & \si{\lux} & N \tabularnewline
+winddir & wind direction & \si{\degree} & Y \tabularnewline
+windspd & wind speed & \si{m/s} & Y \tabularnewline
 totskycvr & total sky cover & tenths & N \tabularnewline
 opaqskycvr & opaque sky cover & tenths & N \tabularnewline
-visibility & visibility & km & N \tabularnewline
-ceiling hgt & ceiling height & m & N \tabularnewline
+visibility & visibility & \si{\km} & N \tabularnewline
+ceiling hgt & ceiling height & \si{\m} & N \tabularnewline
 presweathobs & present weather observation & - & Y \tabularnewline
 presweathcodes & present weather codes & - & Y \tabularnewline
-precip wtr & precipitable water & mm & N \tabularnewline
+precip wtr & precipitable water & \si{\mm} & N \tabularnewline
 aerosol opt depth & aerosol optical depth & thousandths & N \tabularnewline
-snowdepth & snow depth & cm & Y \tabularnewline
+snowdepth & snow depth & \si{\cm} & Y \tabularnewline
 days last snow & days since last snow & - & N \tabularnewline
 Albedo & albedo & - & N \tabularnewline
-rain & liquid precipitation depth & mm & Y \tabularnewline
-rain quantity & liquid precipitation rate & Hour & N \tabularnewline
+rain & liquid precipitation depth & \si{\mm} & Y \tabularnewline
+rain quantity & liquid precipitation rate & \si{\hour} & N \tabularnewline
 \bottomrule
 \end{longtable}
 
@@ -319,11 +319,11 @@ Short Name & Long Name & Units & Useh by EnergyPlus \tabularnewline
 \midrule
 \endhead
 
-wetbulb & wet\_bulb\_temperature & C & N \tabularnewline
-humratio & humidity\_ratio & g/kg & N \tabularnewline
-dirhorrad & direct\_horizontal\_radiation & Wh/m2 & N \tabularnewline
+wetbulb & wet\_bulb\linebreak\_temperature & \si{\celsius} & N \tabularnewline
+humratio & humidity\_ratio & \si{\g/kg} & N \tabularnewline
+dirhorrad & direct\_horizontal\linebreak\_radiation & \si{\watt\hour\per\meter\squared} & N \tabularnewline
 interval & Interval & unit & N \tabularnewline
-hour\_yr & hour\_of\_year & hour & N \tabularnewline
+hour\_yr & hour\_of\_year &\si{\hour} & N \tabularnewline
 time & Time & hh:mm & N \tabularnewline
 hh:mm & HH:MM & hh:mm & N \tabularnewline
 Date & Date & mm/dd/yyyy & N \tabularnewline
@@ -362,13 +362,13 @@ Dates can be entered as month, day, and year. The units field must be entered an
 
 % table 11
 \begin{longtable}[c]{@{}lll@{}}
-\caption{Allowable hate formats for Custom Data entries. \label{table:allowable-hate-formats-for-custom-data}} \tabularnewline
+\caption{Allowable date formats for Custom Data entries. \label{table:allowable-date-formats-for-custom-data}} \tabularnewline
 \toprule 
 Units Format & Interpretation & Example \tabularnewline
 \midrule
 \endfirsthead
 
-\caption[]{Allowable hate formats for Custom Data entries.} \tabularnewline
+\caption[]{Allowable date formats for Custom Data entries.} \tabularnewline
 \toprule 
 Units Format & Interpretation & Example \tabularnewline
 \midrule
@@ -427,8 +427,10 @@ Records to Read & MaxNumRecordsToRead & Integer \tabularnewline
 Missing Data Action & MissingDataAction &  \tabularnewline
 Missing Wind Direction Action & MissingWindDirAction &  \tabularnewline
 Missing Wind Direction Value & MissingWindDirValue & Real \tabularnewline
-Missing Opaque Sky Cover Action & MissingOpaqueSkyCoverAction &  \tabularnewline
-Missing Opaque Sky Cover Value & MissingOpaqueSkyCoverValue & Real (Value 0.0 to 10.0) - tenths of sky cover \tabularnewline
+Missing Opaque Sky Cover Action & MissingOpaqueSky\linebreak
+CoverAction &  \tabularnewline
+Missing Opaque Sky Cover Value & MissingOpaqueSky\linebreak
+CoverValue & Real (Value 0.0 to 10.0) - tenths of sky cover \tabularnewline
 Maximum Wind Speed & MaxWindSpeed & Real \tabularnewline
 Maximum Direct Solar & MaxDirectSolar & Real \tabularnewline
 Maximum Diffuse Solar & MaxDiffuseSolar & Real \tabularnewline
@@ -752,7 +754,7 @@ Global_{horizontalradiation} = Direct_{horizontalradiation}+Diffuse_{horizontalr
 Using known solar position (calculated internally by the Weather converter from latitude, longitude, date and hour), one has:
 
 \begin{equation}
-Direct_{normalradiation} = \frac{Direct_{horizontalradiation}}{\sin(Solar_{height}}
+Direct_{normalradiation} = \frac{Direct_{horizontalradiation}}{\sin(Solar_{height})}
 \end{equation}
 
 In custom weather file processing does the following:

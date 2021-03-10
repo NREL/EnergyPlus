@@ -45,7 +45,7 @@ The AirLoopHVAC:UnitarySystem object is a ``virtual'' component that consists of
 
 Links to the fan, cooling coil, heating coil and reheat coil specifications are provided in the unitary system input data syntax. In addition, the control zone name and the system design operating conditions are specified by the unitary system inputs.
 
-\paragraph{Schedules And Availability Manager}\label{schedules-and-availability-manager}
+\paragraph{Schedules And Availability Manager}
 
 For unitary systems, don't use the night cycle manager. Use a scheduled availability manager and let the system be always on. Then use the Supply Air Fan Operating Mode Schedule Name in the unitary system to switch between continuous fan (for ventilation) during occupied periods and switch to cycling fan for unoccupied. The system will cycle on as the thermostat requests, and this way it will run just enough to meet the load - no need for a minimum cycle time.
 
@@ -193,7 +193,7 @@ This alpha field contains the identifying name given to the unitary system cooli
 
 This input field enables DX Cooling coils to be used for 100\% outdoor air dedicated outdoor air system applications. There are two choices Yes or No. If Yes, the DX coil is used as 100\% outdoor DX coil. If No, the DX coil is used as regular DX coil. This input field is optional and the default is No. No should be specified when selecting the SingleZoneVAV control type.
 
-\paragraph{Field: Minimum Supply Air Temperature}\label{field-minimum-supply-air-temperature}
+\paragraph{Field: Minimum Supply Air Temperature}
 
 When Use DOAS DX Cooling Coil is specified as Yes, this input field is the DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. The minimum and maximum values of this input field are 0.0\(^{o}\)C and 7.5\(^{o}\)C, and the default value is 2.0\(^{o}\)C. This field is not autosizable when the input for Use DOAS DX Cooling Coil = Yes. When Control Type = SingleZoneVAV, enter the minimum air temperature limit for reduced fan speed in cooling mode. For SingleZoneVAV, the maximum limit for the minimum supply air temperature is 20.0\(^{o}\)C. Additionally, for the SingleZoneVAV model this input does not limit the minimum supply air temperature resulting from cooling coil operation at high fan speed.
 
@@ -271,7 +271,7 @@ This alpha field defines the supply air flow method when neither cooling or heat
 
 \paragraph{Field: No Load Supply Air Flow Rate}\label{field-no-load-supply-air-flow-rate-000}
 
-This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation. Values must be greater than or equal to 0, or this field is autosizable. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation).
+This numeric field defines the supply air flow rate leaving the unitary system in cubic meters per second when neither cooling or heating is required (i.e., main cooling/heating coils and supplemental heater are off but the supply air fan operates). This field is only used when the unitary system operating mode is specified as continuous fan operation or when the Control Type is specified as SingleZoneVAV. Values must be greater than or equal to 0, or this field is autosizable. If this field is autosized, then it is sized to the minimum of the heating and cooling lowest speed supply air flow rate. If the Control Type is specified as SingleZoneVAV and this field is autosized, then the no load supply air flow rate is set equal to 0.5 or 0.667 times the maximum flow rate for water or coils, respectively. If the unitary system operating mode is specified as continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the compressor was last operating (for cooling operation or heating operation). This field should not be set to 0 when Control Type is specified as SingleZoneVAV.
 
 \paragraph{Field: No Load Supply Air Flow Rate Per Floor Area}\label{field-no-load-supply-air-flow-rate-per-floor-area}
 
@@ -483,7 +483,15 @@ AirLoopHVAC:UnitarySystem,
 \item
   HVAC,Average,Unitary System Latent Heating Rate {[}W{]}
 \item
-  HVAC,Average,Unitary System Ancillary Electric Power{[}W{]}
+  HVAC,Average,Unitary System Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Unitary System Electricity Energy {[}J{]}
+\item
+  HVAC,Average,Unitary System Ancillary Electricity Rate {[}W{]}
+\item
+  HVAC,Sum,Unitary System Cooling Ancillary Electricity Energy {[}J{]}
+\item
+  HVAC,Sum,Unitary System Heating Ancillary Electricity Energy {[}J{]}
 \end{itemize}
 
 Load based and SingleZoneVAV control outputs
@@ -514,14 +522,6 @@ Multi speed coil outputs
   HVAC,Average,Unitary System DX Coil Speed Ratio {[]}
 \item
   HVAC,Average,Unitary System DX Coil Speed Level {[]}
-\item
-  HVAC,Average,Unitary System Electric Power{[}W{]}
-\item
-  HVAC,Sum,Unitary System Electric Energy {[}J{]}
-\item
-  HVAC,Sum,Unitary System Cooling Ancillary Electric Energy {[}J{]}
-\item
-  HVAC,Sum,Unitary System Heating Ancillary Electric Energy {[}J{]}
 \end{itemize}
 
 Multi speed coil outputs(If heat recovery is specified)
@@ -625,23 +625,23 @@ This output field is the latent heat addition (humidification) rate of the unita
 
 This output field is the latent heat extraction (dehumidification) rate of the unitary system in Watts. This value is calculated as the difference between the total energy rate and the sensible energy rate provided by the unitary system. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are averaged for the timestep being reported.
 
-\paragraph{Unitary System Electric Power {[}W{]}}\label{unitary-system-electric-power-w}
+\paragraph{Unitary System Electricity Rate {[}W{]}}\label{unitary-system-electric-power-w}
 
 This output field is the electricity consumption rate of the unitary system in Watts. The consumption includes electricity used by the DX coils (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported. Any non-electric energy use is not reported by the unitary system object but is reported in the associated coil objects as appropriate.
 
-\paragraph{Unitary System Electric Energy {[}J{]}}\label{unitary-system-electric-energy-j}
+\paragraph{Unitary System Electricity Energy {[}J{]}}\label{unitary-system-electric-energy-j}
 
 This output field is the electricity consumption of the unitary system in Joules for the timestep being reported. The consumption includes electricity used by the DX compressor (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported. Any non-electric energy use is not reported by the unitary system object but is reported in the associated coil objects as appropriate.
 
-\paragraph{Unitary System Ancillary Electric Power {[}W{]}}\label{unitary-system-ancillary-electric-power-w}
+\paragraph{Unitary System Ancillary Electricity Rate {[}W{]}}\label{unitary-system-ancillary-electric-power-w}
 
 This output field is the average auxiliary electricity consumption rate (including both on-cycle and off-cycle) in Watts for the timestep being reported.
 
-\paragraph{Unitary System Cooling Ancillary Electric Energy {[}J{]}}\label{unitary-system-cooling-ancillary-electric-energy-j}
+\paragraph{Unitary System Cooling Ancillary Electricity Energy {[}J{]}}\label{unitary-system-cooling-ancillary-electric-energy-j}
 
 This is the auxiliary electricity consumption in Joules for the timestep being reported. This is the auxiliary electricity consumption during periods when the unitary system is providing cooling (DX cooling coil is operating). This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Unitary System Heating Ancillary Electric Energy {[}J{]}}\label{unitary-system-heating-ancillary-electric-energy-j}
+\paragraph{Unitary System Heating Ancillary Electricity Energy {[}J{]}}\label{unitary-system-heating-ancillary-electric-energy-j}
 
 This is the auxiliary electricity consumption in Joules for the timestep being reported. This is the auxiliary electricity consumption during periods when the unitary system is providing heating (DX heating coil is operating). This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
@@ -726,7 +726,7 @@ The allowed cooling and heating coil types are restricted to the following combi
 
 \paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
-This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
+This field defines the no load operating air flow rate when the system fan is specified to operate continuously. The allowed fractions are between 0 and 1 with a default value of 1. This fraction is usually set to the mimumum of heating and cooling operation lowest speed supply air flow fraction. The no load air flow rate will be calculated as this fraction multiplied by the minimum of the cooling and heating high speed supply air flow rate. If the cooling or heating coil is not present, this fraction is multiplied by the operating supply air flow rate.
 
 \paragraph{Field Group: Heating and Cooling Speeds 1 to 10}\label{field-group-heating-and-cooling-speeds-1-to-10}
 
@@ -1940,9 +1940,9 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
 \item
   HVAC,Average,Unitary System DX Coil Speed Level {[]}
 \item
-  HVAC,Average,Unitary System Electric Power{[}W{]}
+  HVAC,Average,Unitary System Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Unitary System Electric Energy {[}J{]}
+  HVAC,Sum,Unitary System Electricity Energy {[}J{]}
 \item
   HVAC,Average,Unitary System Total Cooling Rate {[}W{]}
 \item
@@ -1956,11 +1956,11 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
 \item
   HVAC,Average,Unitary System Latent Heating Rate {[}W{]}
 \item
-  HVAC,Average,Unitary System Ancillary Electric Power{[}W{]}
+  HVAC,Average,Unitary System Ancillary Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Unitary System Cooling Ancillary Electric Energy {[}J{]}
+  HVAC,Sum,Unitary System Cooling Ancillary Electricity Energy {[}J{]}
 \item
-  HVAC,Sum,Unitary System Heating Ancillary Electric Energy {[}J{]}
+  HVAC,Sum,Unitary System Heating Ancillary Electricity Energy {[}J{]}
 \end{itemize}
 
 If heat recovery is specified:
@@ -2028,23 +2028,23 @@ This output field is the latent heat addition (humidification) rate of the multi
 
 This output field is the latent heat extraction (dehumidification) rate of the multispeed heat pump in Watts. This value is calculated as the difference between the total energy rate and the sensible energy rate provided by the multispeed heat pump. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are averaged for the timestep being reported.
 
-\paragraph{Unitary System Electric Power {[}W{]}}\label{unitary-system-electric-power-w-1}
+\paragraph{Unitary System Electricity Rate {[}W{]}}\label{unitary-system-electric-power-w-1}
 
 This output field is the electricity consumption rate of the multispeed heat pump in Watts. The consumption includes electricity used by the DX coils (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported. Any non-electric energy use is not reported by the heat pump object but is reported in the associated coil objects as appropriate.
 
-\paragraph{Unitary System Electric Energy {[}J{]}}\label{unitary-system-electric-energy-j-1}
+\paragraph{Unitary System Electricity Energy {[}J{]}}\label{unitary-system-electric-energy-j-1}
 
 This output field is the electricity consumption of the multispeed heat pump in Joules for the timestep being reported. The consumption includes electricity used by the DX compressor (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported. Any non-electric energy use is not reported by the heat pump object but is reported in the associated coil objects as appropriate.
 
-\paragraph{Unitary System Ancillary Electric Power {[}W{]}}\label{unitary-system-ancillary-electric-power-w-1}
+\paragraph{Unitary System Ancillary Electricity Rate {[}W{]}}\label{unitary-system-ancillary-electric-power-w-1}
 
 This output field is the average auxiliary electricity consumption rate (including both on-cycle and off-cycle) in Watts for the timestep being reported.
 
-\paragraph{Unitary System Cooling Ancillary Electric Energy {[}J{]}}\label{unitary-system-cooling-ancillary-electric-energy-j-1}
+\paragraph{Unitary System Cooling Ancillary Electricity Energy {[}J{]}}\label{unitary-system-cooling-ancillary-electric-energy-j-1}
 
 This is the auxiliary electricity consumption in Joules for the timestep being reported. This is the auxiliary electricity consumption during periods when the heat pump is providing cooling (DX cooling coil is operating). This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Unitary System Heating Ancillary Electric Energy {[}J{]}}\label{unitary-system-heating-ancillary-electric-energy-j-1}
+\paragraph{Unitary System Heating Ancillary Electricity Energy {[}J{]}}\label{unitary-system-heating-ancillary-electric-energy-j-1}
 
 This is the auxiliary electricity consumption in Joules for the timestep being reported. This is the auxiliary electricity consumption during periods when the heat pump is providing heating (DX heating coil is operating). This output is also added to a meter with Resource Type = Electricity, End Use Key = Heating, Group Key = System (ref. Output:Meter objects).
 
@@ -2925,7 +2925,7 @@ This alpha field defines the name of a schedule (ref: Schedule) that contains mu
 
 This alpha field defines the name of the HVAC system node from which the system draws its inlet air.
 
-\paragraph{Field: Bypass Duct Mixer Node Name}\label{field-bypass-duct-mixer-node-name}
+\paragraph{Field: Bypass Duct Mixer Node Name}
 
 This alpha field defines the name of the HVAC system node where the bypass air mixes with the unitary system's inlet air. This name should match the name of the Return Air Stream Node Name for the \hyperref[outdoorairmixer]{OutdoorAir:Mixer} associated with this system. This node name must be different from the system's air inlet node name.
 
@@ -3225,9 +3225,9 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
 \item
   HVAC,Sum,Unitary System Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Unitary System Electric Power {[}W{]}
+  HVAC,Average,Unitary System Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Unitary System Electric Energy {[}J{]}
+  HVAC,Sum,Unitary System Electricity Energy {[}J{]}
 \item
   HVAC,Average,Unitary System Fan Part Load Ratio {[]}
 \item
@@ -3288,11 +3288,11 @@ This output field is the latent heat extraction (dehumidification) rate of the C
 
 This output field is the latent heat extraction (dehumidification) of the CBVAV system in Joules over the timestep being reported. This value is calculated as the difference between the total energy and the sensible energy delivered by the system. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are summed for the timestep being reported.
 
-\paragraph{Unitary System Electric Power {[}W{]}}\label{unitary-system-electric-power-w-2}
+\paragraph{Unitary System Electricity Rate {[}W{]}}\label{unitary-system-electric-power-w-2}
 
 This output field is the electricity consumption rate of the CBVAV system in Watts. The consumption includes electricity used by the DX compressor (including crankcase heater), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), and the heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
-\paragraph{Unitary System Electric Energy {[}J{]}}\label{unitary-system-electric-energy-j-2}
+\paragraph{Unitary System Electricity Energy {[}J{]}}\label{unitary-system-electric-energy-j-2}
 
 This output field is the electricity consumption of the CBVAV system in Joules for the time period being reported. The consumption includes electricity used by the DX compressor (including crankcase heater), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), and the heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported.
 

@@ -15,7 +15,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/BArray.hh>
-#include <ObjexxFCL/fmt.hh>
 #include <ObjexxFCL/TypeTraits.hh>
 
 // C++ Headers

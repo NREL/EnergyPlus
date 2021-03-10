@@ -17,33 +17,34 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#define WINDOWS 1
+#define IS_WINDOWS 1
 #else
-#define WINDOWS 0
+#define IS_WINDOWS 0
 #define HANDLE void *
 /* See http://www.yolinux.com/TUTORIALS/LibraryArchives-StaticAndDynamic.html */
 #include <sys/stat.h> // for creating dirs on Linux
+#include <stddef.h>   // defines size_t
 #endif
 
-//static char* getfmuPat(const char* fmuFilNam);
-int delete(char* tmpPat);
+// static char* getfmuPat(const char* fmuFilNam);
+int delete (char *tmpPat);
 
-void doubleToCommaString(char* buffer, double r);
+void doubleToCommaString(char *buffer, double r);
 
-char *getTmpPath(const char *nam, int length);
+char *getTmpPath(const char *nam, size_t length);
 
-void printDebug(const char* msg);
+void printDebug(const char *msg);
 
-void printfDebug(const char* str1, const char* str2);
+void printfDebug(const char *str1, const char *str2);
 
-void printfIntDebug(const char* str1, int integer);
+void printfIntDebug(const char *str1, const int integer);
 
-void printError(const char* msg);
+void printError(const char *msg);
 
-void printfError(const char* str1, const char* str2);
+void printfError(const char *str1, const char *str2);
 
 void setDebug();
 
-int unpack(const char* fmuFilNam, const char* tmpPat);
+int unpack(const char *fmuFilNam, const char *tmpPat);
 
-int unpackminizip(const char* fmuFilNam, char* tmpPat);
+int unpackminizip(const char *fmuFilNam, char *tmpPat);

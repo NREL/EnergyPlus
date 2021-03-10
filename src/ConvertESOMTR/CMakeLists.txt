@@ -1,26 +1,31 @@
 project(ConvertESOMTR Fortran)
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products")
 
 set(SRC mainModule.f90)
 
 set(STATIC_EXE FALSE)
 
 set(SKIP_BUILD_RPATH TRUE)
-add_executable( convertESOMTR ${SRC} )
+add_executable(convertESOMTR ${SRC})
+set_target_properties(convertESOMTR PROPERTIES FOLDER Auxiliary)
 
 if(APPLE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
   endif()
 elseif(UNIX)
   set(CMAKE_SKIP_RPATH TRUE)
   if(CMAKE_Fortran_COMPILER MATCHES "ifort")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static-intel")
   else()
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static" )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
     set(STATIC_EXE TRUE)
   endif()
 else()
@@ -34,10 +39,9 @@ else()
   endif()
 endif()
 
-install( TARGETS convertESOMTR DESTINATION "PostProcess/convertESOMTRpgm/" )
+install(TARGETS convertESOMTR DESTINATION "PostProcess/convertESOMTRpgm/")
 if(NOT ${STATIC_EXE})
   include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-  install_target_prereqs(convertESOMTR "PostProcess/convertESOMTRpgm/" )
+  install_target_prereqs(convertESOMTR "PostProcess/convertESOMTRpgm/")
 endif()
 install(FILES "convert.txt" DESTINATION "PostProcess/convertESOMTRpgm/")
-

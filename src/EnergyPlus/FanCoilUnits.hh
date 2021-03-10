@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,12 +57,15 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace FanCoilUnits {
 
@@ -74,8 +77,8 @@ namespace FanCoilUnits {
     extern std::string const cMO_FanCoil;
 
     // coil operation
-    extern int const On;  // normal coil operation
-    extern int const Off; // signal coil shouldn't run
+    constexpr int On(1);  // normal coil operation
+    constexpr int Off(0); // signal coil shouldn't run
 
     // coil type units supported in this module
     extern int const FanCoilUnit_4Pipe;
@@ -217,6 +220,7 @@ namespace FanCoilUnits {
         Real64 DesZoneHeatingLoad; // used for reporting in watts
         int DSOAPtr;               // design specification outdoor air object index
         bool FirstPass;            // detects first time through for resetting sizing data
+        int fanAvailSchIndex;      // fan availability schedule index
 
         // SZVAV Model inputs
         std::string Name;                // name of unit
@@ -268,7 +272,7 @@ namespace FanCoilUnits {
               QUnitOutNoHC(0.0), QUnitOutMaxH(0.0), QUnitOutMaxC(0.0), LimitErrCountH(0), LimitErrCountC(0), ConvgErrCountH(0), ConvgErrCountC(0),
               HeatPower(0.0), HeatEnergy(0.0), TotCoolPower(0.0), TotCoolEnergy(0.0), SensCoolPower(0.0), SensCoolEnergy(0.0), ElecPower(0.0),
               ElecEnergy(0.0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), DesZoneCoolingLoad(0.0), DesZoneHeatingLoad(0.0), DSOAPtr(0),
-              FirstPass(true), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
+              FirstPass(true), fanAvailSchIndex(0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0), DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0),
               MaxNoCoolHeatAirMassFlow(0.0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0),
               CoolCoilFluidInletNode(0), CoolCoilFluidOutletNodeNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
               CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),
@@ -349,7 +353,8 @@ namespace FanCoilUnits {
                           int const ControlledZoneNum,   // ZoneEquipConfig index
                           bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                           Real64 &LoadMet,               // load met by unit (watts)
-                          Optional<Real64> PLR = _       // Part Load Ratio, fraction of time step fancoil is on
+                          Optional<Real64> PLR = _,      // Part Load Ratio, fraction of time step fancoil is on
+                          Real64 ElecHeatCoilPLR = 1.0   // electric heating coil PLR used with MultiSpeedFan capacity control
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state, int &FanCoilNum,               // number of the current fan coil unit being simulated
@@ -367,7 +372,7 @@ namespace FanCoilUnits {
                                     Real64 &PowerMet               // Sensible power supplied (W)
     );
 
-    void ReportFanCoilUnit(int const FanCoilNum); // number of the current fan coil unit being simulated
+    void ReportFanCoilUnit(EnergyPlusData &state, int const FanCoilNum); // number of the current fan coil unit being simulated
 
     int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum);
 
@@ -387,6 +392,10 @@ namespace FanCoilUnits {
 
     Real64 CalcFanCoilPLRResidual(EnergyPlusData &state, Real64 const PLR,          // part-load ratio of air and water mass flow rate
                                   Array1D<Real64> const &Par // Function parameters
+    );
+
+    Real64 CalcFanCoilHeatCoilPLRResidual(EnergyPlusData &state, Real64 const CyclingR,  // electric heating coil cycling ratio
+        Array1D<Real64> const &Par // Function parameters
     );
 
     Real64 CalcFanCoilHWLoadResidual(EnergyPlusData &state, Real64 const HWFlow,       // water mass flow rate [kg/s]
@@ -424,6 +433,14 @@ namespace FanCoilUnits {
                                            Array1D<Real64> const &Par // Function parameters
     );
 } // namespace FanCoilUnits
+
+struct FanCoilUnitsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

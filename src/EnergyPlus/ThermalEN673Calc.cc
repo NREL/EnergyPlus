@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -91,7 +91,8 @@ namespace ThermalEN673Calc {
 
     // Functions
 
-    void Calc_EN673(int const standard,
+    void Calc_EN673(TARCOGOutput::Files &files,
+                    int const standard,
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
@@ -220,7 +221,7 @@ namespace ThermalEN673Calc {
                 solar_EN673(dir, totsol, rtot, rs, nlayer, asol, sft, standard, nperr, ErrorMessage);
                 if (GoAhead(nperr)) {
                     shgc = sft;
-                    if (WriteDebugOutput) WriteOutputEN673(OutArgumentsFile, DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
+                    if (files.WriteDebugOutput) WriteOutputEN673(files.DebugOutputFile, files.DBGD, nlayer, ufactor, hout, hin, Ra, Nu, hg, hr, hs, nperr);
                 } // GoAhead after solar
             }     // GoAhead after EN673ISO10292
         }         // GopAhead after propcon90
@@ -259,9 +260,6 @@ namespace ThermalEN673Calc {
                        std::string &ErrorMessage)
     {
         // Using
-        using DataGlobals::GravityConstant;
-        using DataGlobals::StefanBoltzmann;
-
         // Argument array dimensioning
         EP_SIZE_CHECK(emis, maxlay2);
         EP_SIZE_CHECK(gap, MaxGap);
@@ -409,7 +407,7 @@ namespace ThermalEN673Calc {
                              standard,
                              nperr,
                              ErrorMessage);
-                    Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                    Gr(i) = (DataGlobalConstants::GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                     Ra(i) = Gr(i) * pr;
                     Nu(i) = A * std::pow(Ra(i), n);
                     if (Nu(i) < 1.0) {
@@ -424,7 +422,7 @@ namespace ThermalEN673Calc {
                 }
             }
             for (i = 1; i <= nlayer - 1; ++i) {
-                hr(i) = 4.0 * StefanBoltzmann * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
+                hr(i) = 4.0 * DataGlobalConstants::StefanBoltzmann * std::pow(1.0 / emis(2 * i) + 1.0 / emis(2 * i + 1) - 1.0, -1.0) * pow_3(Tm);
                 hs(i) = hg(i) + hr(i);
                 rs(2 * i + 1) = 1.0 / hs(i); // Thermal resistance of each gap
                 sumRs += rs(2 * i + 1);
@@ -477,7 +475,7 @@ namespace ThermalEN673Calc {
                                      standard,
                                      nperr,
                                      ErrorMessage);
-                            Gr(i) = (GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
+                            Gr(i) = (DataGlobalConstants::GravityConstant * pow_3(gap(i)) * dT(i) * pow_2(dens)) / (Tm * pow_2(visc));
                             Ra(i) = Gr(i) * pr;
                             Nu(i) = A * std::pow(Ra(i), n);
                             if (Nu(i) < 1.0) {

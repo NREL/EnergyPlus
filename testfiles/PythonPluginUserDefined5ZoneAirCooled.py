@@ -1,196 +1,262 @@
-import sys
+# EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University
+# of Illinois, The Regents of the University of California, through Lawrence
+# Berkeley National Laboratory (subject to receipt of any required approvals
+# from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
+# Battelle, Alliance for Sustainable Energy, LLC, and other contributors. All
+# rights reserved.
+#
+# NOTICE: This Software was developed under funding from the U.S. Department of
+# Energy and the U.S. Government consequently retains certain rights. As such,
+# the U.S. Government has been granted for itself and others acting on its
+# behalf a paid-up, nonexclusive, irrevocable, worldwide license in the
+# Software to reproduce, distribute copies to the public, prepare derivative
+# works, and perform publicly and display publicly, and to permit others to do
+# so.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# (1) Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#
+# (2) Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+# (3) Neither the name of the University of California, Lawrence Berkeley
+#     National Laboratory, the University of Illinois, U.S. Dept. of Energy nor
+#     the names of its contributors may be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+# (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in
+#     stand-alone form without changes from the version obtained under this
+#     License, or (ii) Licensee makes a reference solely to the software
+#     portion of its product, Licensee must refer to the software as
+#     "EnergyPlus version X" software, where "X" is the version number Licensee
+#     obtained under this License and may not use a different name for the
+#     software. Except as specifically required in this Section (4), Licensee
+#     shall not use in a company name, a product name, in advertising,
+#     publicity, or other promotional activities any name, trade name,
+#     trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or
+#     confusingly similar designation, without the U.S. Department of Energy's
+#     prior written consent.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
-class UserDefinedCoilInit(EnergyPlusPlugin):
+class InitChiller(EnergyPlusPlugin):
+    CWLoopExitTemp = 7.0
+    CWLoopDeltaTemp = 4.0
 
     def __init__(self):
         # init parent class
         super().__init__()
 
         # get functional api glycol instance
-        self.glycol = self.api.functional.glycol(u"water")
+        self.glycol = None
+
+        # handles
         self.need_to_get_handles = True
-        self.cw_loop_vdot_design_handle = None
-        self.chiller_vdot_design_handle = None
-        self.chiller_mdot_min_handle = None
-        self.chiller_mdot_max_handle = None
-        self.chiller_cap_min_handle = None
-        self.chiller_cap_max_handle = None
-        self.chiller_cap_opt_handle = None
+        self.handles = {}
 
-    def on_user_defined_component_model(self) -> int:
-        # loop set points
-        # local scope only
-        cw_loop_exit_temp = 7.0
-        cw_loop_delta_temp = 4.0
+    def get_handles(self, state):
+        self.handles["h_intvar_design_flow"] = self.api.exchange.get_internal_variable_handle(
+            state,
+            "Plant Design Volume Flow Rate",
+            "Chilled Water Loop"
+        )
+        self.handles["h_act_chiller_design_flow"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Design Volume Flow Rate",
+            "Central Chiller"
+        )
+        self.handles["h_act_chiller_min_flow"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Minimum Mass Flow Rate",
+            "Central Chiller"
+        )
+        self.handles["h_act_mdot_max"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Maximum Mass Flow Rate",
+            "Central Chiller"
+        )
+        self.handles["h_act_min_cap"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Minimum Loading Capacity",
+            "Central Chiller"
+        )
+        self.handles["h_act_max_cap"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Maximum Loading Capacity",
+            "Central Chiller"
+        )
+        self.handles["h_act_opt_cap"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Optimal Loading Capacity",
+            "Central Chiller"
+        )
+        self.need_to_get_handles = False
 
-        # get some properties
-        cw_cp = self.glycol.specific_heat(cw_loop_exit_temp)
-        cw_rho = self.glycol.density(cw_loop_exit_temp)
+    def handles_are_valid(self, state):
+        handles_are_valid = True
+        for (k, v) in self.handles.items():
+            if v == -1:
+                handles_are_valid = False
+                print(k, v)
+                self.api.runtime.issue_severe(state, f"Handle not found for '{k}'")
+        return handles_are_valid
 
+    def on_user_defined_component_model(self, state) -> int:
+        if not self.glycol:
+            self.glycol = self.api.functional.glycol(state, u"water")
         if self.need_to_get_handles:
-            self.cw_loop_vdot_design_handle = self.api.exchange.get_internal_variable_handle(
-                "Plant Design Volume Flow Rate",
-                "Chilled Water Loop"
-            )
-            self.chiller_vdot_design_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Design Volume Flow Rate",
-                "Central Chiller"
-            )
-            self.chiller_mdot_min_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Minimum Mass Flow Rate",
-                "Central Chiller"
-            )
-            self.chiller_mdot_max_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Maximum Mass Flow Rate",
-                "Central Chiller"
-            )
-            self.chiller_cap_min_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Minimum Loading Capacity",
-                "Central Chiller"
-            )
-            self.chiller_cap_max_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Maximum Loading Capacity",
-                "Central Chiller"
-            )
-            self.chiller_cap_opt_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Optimal Loading Capacity",
-                "Central Chiller"
-            )
-            self.need_to_get_handles = False
-
-        # get design vdot
-        cw_loop_vdot_design = self.api.exchange.get_internal_variable_value(self.cw_loop_vdot_design_handle)
-
-        # set chiller design vdot
-        self.api.exchange.set_actuator_value(self.chiller_vdot_design_handle, cw_loop_vdot_design)
-
-        # set chiller minimum mdot
-        chiller_mdot_min = 0.0
-        self.api.exchange.set_actuator_value(self.chiller_mdot_min_handle, chiller_mdot_min)
-
-        # set chiller maximum mdot
-        chiller_mdot_max = cw_loop_vdot_design * cw_rho
-        self.api.exchange.set_actuator_value(self.chiller_mdot_max_handle, chiller_mdot_max)
-
-        # reference chiller capacity - local scope
-        chiller_cap = cw_cp * cw_rho * cw_loop_delta_temp * cw_loop_vdot_design
-
-        # set minimum chiller capacity
-        chiller_cap_min = 0.0
-        self.api.exchange.set_actuator_value(self.chiller_cap_min_handle, chiller_cap_min)
-
-        # set maximum chiller capacity
-        chiller_cap_max = chiller_cap
-        self.api.exchange.set_actuator_value(self.chiller_cap_max_handle, chiller_cap_max)
-
-        # set optimal chiller capacity
-        chiller_cap_opt = 0.9 * chiller_cap
-        self.api.exchange.set_actuator_value(self.chiller_cap_opt_handle, chiller_cap_opt)
-
+            self.get_handles(state)
+            if not self.handles_are_valid(state):
+                return 1
+        specific_heat = self.glycol.specific_heat(state, self.CWLoopExitTemp)
+        density = self.glycol.density(state, self.CWLoopExitTemp)
+        vol_flow_design = self.api.exchange.get_internal_variable_value(state, self.handles["h_intvar_design_flow"])
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_chiller_design_flow"], vol_flow_design)
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_chiller_min_flow"], 0.0)
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_mdot_max"], vol_flow_design * density)
+        capacity = specific_heat * density * self.CWLoopDeltaTemp * vol_flow_design
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_min_cap"], 0.0)
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_max_cap"], capacity)
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_opt_cap"], 0.9 * capacity)
         return 0
 
 
-class UserDefinedCoilSim(EnergyPlusPlugin):
+class SimChiller(EnergyPlusPlugin):
+    CWLoopExitTemp = 7.0
 
     def __init__(self):
         # init parent class
         super().__init__()
 
-        # get functional api glycol instance
-        self.glycol = self.api.functional.glycol(u"water")
+        self.glycol = None
+
+        # handles
         self.need_to_get_handles = True
-        self.cw_load_request_handle = None
-        self.cw_inlet_temp_handle = None
-        self.cw_mdot_handle = None
-        self.cw_outlet_temp_handle = None
-        self.cw_mdot_request_handle = None
-        self.chiller_elect_energy_handle = None
-        self.chiller_cap_max_handle = None
-        self.chiller_mdot_max_handle = None
+        self.handles = {}
 
-    def on_user_defined_component_model(self) -> int:
+    def get_handles(self, state):
+        self.handles["h_act_mdot_max"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Maximum Mass Flow Rate",
+            "Central Chiller"
+        )
+        self.handles["h_act_max_cap"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Maximum Loading Capacity",
+            "Central Chiller"
+        )
+        self.handles["h_intvar_chiller_load"] = self.api.exchange.get_internal_variable_handle(
+            state,
+            "Load Request for Plant Connection 1",
+            "Central Chiller"
+        )
+        self.handles["h_intvar_inlet_temp"] = self.api.exchange.get_internal_variable_handle(
+            state,
+            "Inlet Temperature for Plant Connection 1",
+            "Central Chiller"
+        )
+        self.handles["h_intvar_inlet_mass_flow"] = self.api.exchange.get_internal_variable_handle(
+            state,
+            "Inlet Mass Flow Rate for Plant Connection 1",
+            "Central Chiller"
+        )
+        self.handles["h_act_outlet_temp"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Outlet Temperature",
+            "Central Chiller"
+        )
+        self.handles["h_act_mass_flow_request"] = self.api.exchange.get_actuator_handle(
+            state,
+            "Plant Connection 1",
+            "Mass Flow Rate",
+            "Central Chiller"
+        )
+        self.handles["h_global_chiller_energy"] = self.api.exchange.get_global_handle(
+            state,
+            "Chiller_ElectEnergy"
+        )
 
+        self.need_to_get_handles = False
+
+    def handles_are_valid(self, state):
+        handles_are_valid = True
+        for (k, v) in self.handles.items():
+            if v == -1:
+                handles_are_valid = False
+                print(k, v)
+                self.api.runtime.issue_severe(state, f"Handle not found for '{k}'")
+        return handles_are_valid
+
+    def on_user_defined_component_model(self, state) -> int:
+        if not self.glycol:
+            self.glycol = self.api.functional.glycol(state, u"water")
         if self.need_to_get_handles:
-            self.cw_load_request_handle = self.api.exchange.get_internal_variable_handle(
-                "Load Request for Plant Connection 1",
-                "Central Chiller"
-            )
-            self.cw_inlet_temp_handle = self.api.exchange.get_internal_variable_handle(
-                "Inlet Temperature for Plant Connection 1",
-                "Central Chiller"
-            )
-            self.cw_mdot_handle = self.api.exchange.get_internal_variable_handle(
-                "Inlet Mass Flow Rate for Plant Connection 1",
-                "Central Chiller"
-            )
-            self.cw_outlet_temp_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Outlet Temperature",
-                "Central Chiller"
-            )
-            self.cw_mdot_request_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Mass Flow Rate",
-                "Central Chiller"
-            )
-            self.chiller_elect_energy_handle = self.api.exchange.get_global_handle(
-                "Chiller_ElectEnergy")
-            self.chiller_cap_max_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Maximum Loading Capacity",
-                "Central Chiller"
-            )
-            self.chiller_mdot_max_handle = self.api.exchange.get_actuator_handle(
-                "Plant Connection 1",
-                "Maximum Mass Flow Rate",
-                "Central Chiller"
-            )
-            self.need_to_get_handles = False
-
+            self.get_handles(state)
+            if not self.handles_are_valid(state):
+                return 1
         # get load, inlet temp, and mdot
-        cw_load = self.api.exchange.get_internal_variable_value(self.cw_load_request_handle)
-        cw_inlet_temp = self.api.exchange.get_internal_variable_value(self.cw_inlet_temp_handle)
-        cw_mdot = self.api.exchange.get_internal_variable_value(self.cw_mdot_handle)
+        chiller_load = self.api.exchange.get_internal_variable_value(state, self.handles["h_intvar_chiller_load"])
+        inlet_temp = self.api.exchange.get_internal_variable_value(state, self.handles["h_intvar_inlet_temp"])
+        mass_flow_rate = self.api.exchange.get_internal_variable_value(state, self.handles["h_intvar_inlet_mass_flow"])
 
         # leave early if chiller is off
-        if cw_load > -100.0:
+        if chiller_load > -100.0:
             # pass inlet temp through
-            self.api.exchange.set_actuator_value(self.cw_outlet_temp_handle, cw_inlet_temp)
+            self.api.exchange.set_actuator_value(state, self.handles["h_act_outlet_temp"], inlet_temp)
             # set mass flow rate and electricity to 0
-            self.api.exchange.set_actuator_value(self.cw_mdot_request_handle, 0.0)
-            self.api.exchange.set_global_value(self.chiller_elect_energy_handle, 0.0)
+            self.api.exchange.set_actuator_value(state, self.handles["h_act_mass_flow_request"], 0.0)
+            self.api.exchange.set_global_value(state, self.handles["h_global_chiller_energy"], 0.0)
             return 0
 
         # set chiller load
-        chiller_cap_max = self.api.exchange.get_actuator_value(self.chiller_cap_max_handle)
-        if abs(cw_load) > chiller_cap_max:
-            chiller_load = chiller_cap_max
+        abs_load = abs(self.api.exchange.get_internal_variable_value(state, self.handles["h_intvar_chiller_load"]))
+        max_capacity = self.api.exchange.get_actuator_value(state, self.handles["h_act_max_cap"])
+        if abs_load > max_capacity:
+            q_act = max_capacity
         else:
-            chiller_load = abs(cw_load)
+            q_act = abs_load
 
         # set chiller mdot
-        if cw_mdot == 0.0:
-            chiller_mdot_max = self.api.exchange.get_actuator_value(self.chiller_mdot_max_handle)
-            chiller_mdot = chiller_mdot_max
+        if mass_flow_rate == 0.0:
+            m_dot_act = self.api.exchange.get_actuator_value(state, self.handles["h_act_mdot_max"])
+            self.api.exchange.set_actuator_value(state, self.handles["h_act_mass_flow_request"], m_dot_act)
         else:
-            chiller_mdot = cw_mdot
+            m_dot_act = mass_flow_rate
 
         # set outlet temp
-        cw_cp = self.glycol.specific_heat(cw_inlet_temp)
-        cw_outlet_temp = cw_inlet_temp - (chiller_load / (chiller_mdot * cw_cp))
-        self.api.exchange.set_actuator_value(self.cw_outlet_temp_handle, cw_outlet_temp)
+        specific_heat = self.glycol.specific_heat(state, self.CWLoopExitTemp)
+        t_out = inlet_temp - (q_act / (m_dot_act * specific_heat))
+        self.api.exchange.set_actuator_value(state, self.handles["h_act_outlet_temp"], t_out)
 
         # set chiller energy
-        chiller_power = chiller_load / 4.6
-        chiller_elect_energy = chiller_power * 3600.0 * self.api.exchange.system_time_step()
-        self.api.exchange.set_global_value(self.chiller_elect_energy_handle, chiller_elect_energy)
-
+        eir = 1 / 4.6
+        power = q_act * eir
+        energy = power * 3600.0 * self.api.exchange.system_time_step(state)
+        self.api.exchange.set_global_value(state, self.handles["h_global_chiller_energy"], energy)
         return 0

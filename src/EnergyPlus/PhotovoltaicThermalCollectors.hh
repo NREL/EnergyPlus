@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,14 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PhotovoltaicThermalCollectors {
 
@@ -189,21 +193,21 @@ namespace PhotovoltaicThermalCollectors {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void setupReportVars();
+        void setupReportVars(EnergyPlusData &state);
 
-        void initialize(bool FirstHVACIteration);
+        void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void size();
+        void size(EnergyPlusData &state);
 
-        void control();
+        void control(EnergyPlusData &state);
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
 
        void SimplePVTcalculate();
 
@@ -213,14 +217,15 @@ namespace PhotovoltaicThermalCollectors {
 
        void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
 
-       void update();
+       void update(EnergyPlusData &state);
+
     };
 
     extern Array1D<PVTCollectorStruct> PVT;
 
     void clear_state();
 
-    void GetPVTcollectorsInput();
+    void GetPVTcollectorsInput(EnergyPlusData &state);
 
     void GetPVTSimpleCollectorsInput(int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf);
 
@@ -232,15 +237,23 @@ namespace PhotovoltaicThermalCollectors {
 
     void simPVTfromOASys(EnergyPlusData &state, int index, bool FirstHVACIteration);
 
-    int getPVTindexFromName(std::string const &name);
+    int getPVTindexFromName(EnergyPlusData &state, std::string const &name);
 
     void GetPVTThermalPowerProduction(int PVindex, Real64 &ThermalPower, Real64 &ThermalEnergy);
 
-    int GetAirInletNodeNum(std::string const &PVTName, bool &ErrorsFound);
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
-    int GetAirOutletNodeNum(std::string const &PVTName, bool &ErrorsFound);
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &PVTName, bool &ErrorsFound);
 
 } // namespace PhotovoltaicThermalCollectors
+
+struct PhotovoltaicThermalCollectorsData : BaseGlobalStruct {
+
+    void clear_state() override
+    {
+
+    }
+};
 
 } // namespace EnergyPlus
 

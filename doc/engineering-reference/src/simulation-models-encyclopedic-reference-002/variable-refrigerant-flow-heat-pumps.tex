@@ -286,7 +286,7 @@ where:
 
 \subsubsection{Heat-Recovery-Cooling-Capacity-Modifier}\label{heat-recovery-cooling-capacity-modifier}
 
-When operating in heat recovery mode, the heat pump's available cooling capacity is typically different than the available capacity when operating in cooling only mode. This modifier is used to adjust the available cooling capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with indoor and outdoor temperatures used as the independent terms.
+When operating in heat recovery mode, the heat pump's available cooling capacity is typically different than the available capacity when operating in cooling only mode. This modifier is used to adjust the available cooling capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with weighted average indoor temperature (i.e., the indoor terminal units weighted average inlet temperatures) and outdoor temperatures used as the independent terms.
 
 \begin{equation}
   HRCapMod_{HP,cooling} = a + b \left( T_{ent} \right) + c \left( T_{ent} \right)^2 + d \left( T_{cond} \right) + e \left( T_{cond} \right)^2 + f \left( T_{ent} \right) \left( T_{cond} \right)
@@ -597,12 +597,12 @@ where:
 The heat pump's total available heating capacity is then determined using the previously described modifiers.
 
 \begin{equation}
-  \dot{Q}_{HP,cooling,total} = \dot{Q}_{cooling,total,rated} \left( CAPFT_{HP,cooling} \right) \left( CR_{cooling,correction} \right)
+  \dot{Q}_{HP,heating,total} = \dot{Q}_{heating,total,rated} \left( CAPFT_{HP,heating} \right) \left( CR_{heating,correction} \right)
 \end{equation}
 
 \subsubsection{Heat Recovery Heating Capacity Modifier}\label{heat-recovery-heating-capacity-modifier}
 
-When operating in heat recovery mode, the heat pump's available heating capacity is typically different than the available capacity when operating in heating only mode. This modifier is used to adjust the available heating capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with indoor and outdoor temperatures used as the independent terms.
+When operating in heat recovery mode, the heat pump's available heating capacity is typically different than the available capacity when operating in heating only mode. This modifier is used to adjust the available heating capacity using a fraction when heat recovery is active. This fraction is based on a bi-quadratic equation with weighted average indoor temperature (i.e., the indoor terminal units weighted average inlet temperatures) and outdoor temperatures used as the independent terms.
 
 \begin{equation}
 HRCapMod_{HP,heating} = a + b \left( T_{ent} \right) + c \left( T_{ent} \right)^2 + d \left( T_{cond} \right) + e \left( T_{cond} \right)^2 + f \left( T_{ent} \right) \left( T_{cond} \right)

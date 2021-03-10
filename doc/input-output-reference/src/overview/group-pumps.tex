@@ -176,9 +176,9 @@ Pump:VariableSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Pump Electric Power {[}W{]}
+  HVAC,Average,Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Pump Electric Energy {[}J{]}
+  HVAC,Sum,Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Pump Shaft Power {[}W{]}
 \item
@@ -199,9 +199,9 @@ Pump:VariableSpeed,
   HVAC,Average,Pump Zone Radiative Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Pump Electric Power {[}W{]}}\label{pump-electric-power-w}
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w}
 
-\paragraph{Pump Electric Energy {[}J{]}}\label{pump-electric-energy-j}
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j}
 
 These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -367,9 +367,9 @@ Pump:ConstantSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Pump Electric Power {[}W{]}
+  HVAC,Average,Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Pump Electric Energy {[}J{]}
+  HVAC,Sum,Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Pump Shaft Power {[}W{]}
 \item
@@ -390,9 +390,9 @@ Pump:ConstantSpeed,
   HVAC,Average,Pump Zone Radiative Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Pump Electric Power {[}W{]}}\label{pump-electric-power-w-1}
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-1}
 
-\paragraph{Pump Electric Energy {[}J{]}}\label{pump-electric-energy-j-1}
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-1}
 
 These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -432,7 +432,7 @@ The Pump:VariableSpeed:Condensate object can only be used in steam system simula
 
 \subsubsection{Inputs}\label{inputs-2-031}
 
-\paragraph{Field: Name}\label{field-name-2-030}
+\paragraph{Field: Name}
 
 This alpha field contains the identifying unique name for the pump.
 
@@ -510,7 +510,7 @@ This field is optional. This input is used when the input field Design Power Con
 
 This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-3-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
 
@@ -552,9 +552,9 @@ Pump:VariableSpeed:Condensate,
 
 \begin{itemize}
 \item
-  HVAC,Average,Pump Electric Power {[}W{]}
+  HVAC,Average,Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Pump Electric Energy {[}J{]}
+  HVAC,Sum,Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Pump Shaft Power {[}W{]}
 \item
@@ -575,9 +575,9 @@ Pump:VariableSpeed:Condensate,
   HVAC, Average, Pump Zone Radiative Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Pump Electric Power {[}W{]}}\label{pump-electric-power-w-2}
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-2}
 
-\paragraph{Pump Electric Energy {[}J{]}}\label{pump-electric-energy-j-2}
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-2}
 
 These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -685,7 +685,7 @@ This field is optional. This input is used when the input field Design Power Con
 
 This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-4-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
 
@@ -712,9 +712,9 @@ HeaderedPumps:ConstantSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Pump Electric Power {[}W{]}
+  HVAC,Average,Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Pump Electric Energy {[}J{]}
+  HVAC,Sum, Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Pump Shaft Power {[}W{]}
 \item
@@ -737,9 +737,9 @@ HeaderedPumps:ConstantSpeed,
   HVAC, Average, Pump Zone Radiative Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Pump Electric Power {[}W{]}}\label{pump-electric-power-w-3}
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-3}
 
-\paragraph{Pump Electric Energy {[}J{]}}\label{pump-electric-energy-j-3}
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-3}
 
 These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
 
@@ -877,7 +877,7 @@ This field is optional. This input is used when the input field Design Power Con
 
 This field is optional. This input is used when the input field Design Power Consumption is set to autosize and the Design Power Sizing Method is set to PowerPerFlowPerPressure. It allows setting the efficiency of the impeller and drive assembly when calculating the pump power consumption for the design flow rate, motor efficiency, and pump head. If omitted the default value of 1.282051 W/((m\(^{3}\)/s)-Pa) will be used.
 
-\paragraph{Field: End-Use Subcategory}\label{field-end-use-subcategory-5-000}
+\paragraph{Field: End-Use Subcategory}
 
 Allows you to specify a user-defined end-use subcategory, e.g., ``Main Pumps'', etc. A new meter for reporting is created for each unique subcategory (ref: Output:Meter objects). Subcategories are also reported in the ABUPS table. If this field is omitted or blank, the pump will be assigned to the ``General'' end-use subcategory.
 
@@ -909,9 +909,9 @@ HeaderedPumps:VariableSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Pump Electric Power {[}W{]}
+  HVAC,Average,Pump Electricity Rate {[}W{]}
 \item
-  HVAC,Sum, Pump Electric Energy {[}J{]}
+  HVAC,Sum, Pump Electricity Energy {[}J{]}
 \item
   HVAC,Average,Pump Shaft Power {[}W{]}
 \item
@@ -934,9 +934,9 @@ HeaderedPumps:VariableSpeed,
   HVAC, Average, Pump Zone Radiative Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Pump Electric Power {[}W{]}}\label{pump-electric-power-w-4}
+\paragraph{Pump Electricity Rate {[}W{]}}\label{pump-electric-power-w-4}
 
-\paragraph{Pump Electric Energy {[}J{]}}\label{pump-electric-energy-j-4}
+\paragraph{Pump Electricity Energy {[}J{]}}\label{pump-electric-energy-j-4}
 
 These outputs are the electric power input to the pump motor. Consumption is metered on Pumps:Electricity, Electricity:Plant, and Electricity:Facility.
 

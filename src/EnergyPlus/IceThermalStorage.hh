@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,23 +52,17 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace IceThermalStorage {
-
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const cIceStorageSimple;
-    extern std::string const cIceStorageDetailed;
-
-    // ITS numbers and FoundOrNot
-    extern int NumSimpleIceStorage;
-    extern int NumDetailedIceStorage;
-    extern int TotalNumIceStorage;
 
     enum class IceStorageType
     {
@@ -151,21 +145,21 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage();
+        void InitSimpleIceStorage(EnergyPlusData &state);
 
-        void CalcIceStorageDormant();
+        void CalcIceStorageDormant(EnergyPlusData &state);
 
-        void CalcIceStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+        void CalcIceStorageCapacity(EnergyPlusData &state, Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
 
-        void CalcIceStorageDischarge(Real64 myLoad, bool RunFlag, Real64 MaxCap);
+        void CalcIceStorageDischarge(EnergyPlusData &state, Real64 myLoad, bool RunFlag, Real64 MaxCap);
 
-        void CalcQiceDischageMax(Real64 &QiceMin);
+        void CalcQiceDischageMax(EnergyPlusData &state, Real64 &QiceMin);
 
-        void CalcIceStorageCharge();
+        void CalcIceStorageCharge(EnergyPlusData &state);
 
         void CalcQiceChargeMaxByChiller(Real64 &QiceMaxByChiller);
 
@@ -173,11 +167,11 @@ namespace IceThermalStorage {
 
         void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
 
-        void UpdateNode(Real64 myLoad, bool RunFlag);
+        void UpdateNode(EnergyPlusData &state, Real64 myLoad, bool RunFlag);
 
         void RecordOutput(Real64 myLoad, bool RunFlag);
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
     };
 
     struct DetailedIceStorageData : PlantComponent
@@ -250,36 +244,30 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate([[maybe_unused]] EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitDetailedIceStorage();
+        void InitDetailedIceStorage(EnergyPlusData &state);
 
-        void SimDetailedIceStorage();
+        void SimDetailedIceStorage(EnergyPlusData &state);
 
-        void UpdateDetailedIceStorage();
+        void UpdateDetailedIceStorage(EnergyPlusData &state);
 
         void ReportDetailedIceStorage();
 
-        void setupOutputVars();
+        void setupOutputVars(EnergyPlusData &state);
     };
 
-    // Object Data
-    extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
-
-    // Static Functions
-    void clear_state();
-
-    void GetIceStorageInput();
+    void GetIceStorageInput(EnergyPlusData &state);
 
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
                                   Real64 Tout, // ice storage unit outlet (setpoint) temperature
                                   Real64 Tfr   // freezing temperature
     );
 
-    Real64 CalcQstar(int CurveIndex,      // curve index
+    Real64 CalcQstar(EnergyPlusData &state,
+                     int CurveIndex,      // curve index
                      enum CurveVars CurveIndVarType, // independent variable type for ice storage
                      Real64 FracCharged,  // fraction charged for ice storage unit
                      Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit
@@ -290,9 +278,29 @@ namespace IceThermalStorage {
 
     Real64 TempIPtoSI(Real64 Temp);
 
-    void UpdateIceFractions();
+    void UpdateIceFractions(EnergyPlusData &state);
 
 } // namespace IceThermalStorage
+
+struct IceThermalStorageData : BaseGlobalStruct {
+
+    bool getITSInput = true;
+    int NumSimpleIceStorage = 0;
+    int NumDetailedIceStorage = 0;
+    int TotalNumIceStorage = 0;
+    Array1D<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
+    Array1D<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
+
+    void clear_state() override
+    {
+        this->getITSInput = true;
+        this->NumSimpleIceStorage = 0;
+        this->NumDetailedIceStorage = 0;
+        this->TotalNumIceStorage = 0;
+        this->SimpleIceStorage.deallocate();
+        this->DetailedIceStorage.deallocate();
+    }
+};
 
 } // namespace EnergyPlus
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2021, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -233,12 +233,8 @@ TEST_F(IdfParserFixture, parse_idf)
                                                      {"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
                                                       "FullInteriorAndExterior", "25", "6"}}),
               output);
-#ifdef _WIN32
-    // Windows has \r\n for line ending so it needs to be 2 back
-    EXPECT_EQ(test_object.size() - 2, index);
-#else
+
     EXPECT_EQ(test_object.size() - 1, index);
-#endif
     EXPECT_TRUE(success);
 }
 
@@ -262,12 +258,8 @@ TEST_F(IdfParserFixture, parse_object)
     EXPECT_EQ(std::vector<std::string>({"Building", "Ref Bldg Medium Office New2004_v1.3_5.0", "0.0000", "City", "0.0400", "0.2000",
                                         "FullInteriorAndExterior", "25", "6"}),
               output_vector);
-#ifdef _WIN32
-    // Windows has \r\n for line ending so it needs to be 2 back
-    EXPECT_EQ(test_object.size() - 2, index);
-#else
+
     EXPECT_EQ(test_object.size() - 1, index);
-#endif
     EXPECT_TRUE(success);
 }
 
