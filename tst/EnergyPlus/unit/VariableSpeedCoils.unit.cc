@@ -2811,7 +2811,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     EXPECT_LT(OutletAirRH, 1.0);
 }
 
-TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Tests)
+TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
 {
     std::string const idf_objects = delimited_string({
         "  Coil:Cooling:DX:VariableSpeed,",
@@ -2925,8 +2925,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Tests)
     Real64 MaxONOFFCyclesperHour(0.0);
     Real64 HPTimeConstant(0.0);
     Real64 FanDelayTime(0.0);
+
     // run coil init
-    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    VariableSpeedCoils::InitVarSpeedCoil(
+        *state, DXCoilNum, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
@@ -2943,7 +2945,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Tests)
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
         *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     ;
-    // check outlet and inlet air conditions match
+    // check coil outlet and inlet air conditions match
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
@@ -2964,7 +2966,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Tests)
     // run the coil
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
         *state, DXCoilNum, CyclingScheme, RuntimeFrac, SensLoad, LatentLoad, CompOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-    // check outlet condition
+    // check coil air outlet conditions
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.79484, 0.00001);
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, 0.00810, 0.00001);
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy, 26170.26, 0.01);
