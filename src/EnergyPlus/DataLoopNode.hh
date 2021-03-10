@@ -99,106 +99,79 @@ namespace DataLoopNode {
 
     constexpr const char *ValidNodeFluidTypes(int const intNodeType) // Valid Fluid Types for Nodes
     {
-        char *NodeType = "blank";
-
         switch (intNodeType) {
-        case 0:
-            NodeType = "blank";
-            break;
+        case NodeType_Unknown:
+            return "blank";
 
-        case 1:
-            NodeType = "Air";
-            break;
+        case NodeType_Air:
+            return "Air";
 
-        case 2:
-            NodeType = "Water";
-            break;
+        case NodeType_Water:
+            return "Water";
 
-        case 3:
-            NodeType = "Steam";
-            break;
+        case NodeType_Steam:
+            return "Steam";
 
-        case 4:
-            NodeType = "Electric";
-            break;
+        case NodeType_Electric:
+            return "Electric";
 
         default:
-            NodeType = "blank";
-            break;
+            return "blank";
         }
-        return NodeType;
     }
 
     constexpr const char *ValidConnectionTypes(int const intNodeConnectionType) // Valid Connection Types for Nodes
     {
-        char *NodeConnectionType = "blank";
 
         switch (intNodeConnectionType) {
-        case 1:
-            NodeConnectionType = "Inlet";
-            break;
+        case NodeConnectionType_Inlet:
+            return  "Inlet";
 
-        case 2:
-            NodeConnectionType = "Outlet";
-            break;
+        case NodeConnectionType_Outlet:
+            return  "Outlet";
 
-        case 3:
-            NodeConnectionType = "Internal";
-            break;
+        case NodeConnectionType_Internal:
+            return  "Internal";
 
-        case 4:
-            NodeConnectionType = "ZoneNode";
-            break;
+        case NodeConnectionType_ZoneNode:
+            return  "ZoneNode";
 
-        case 5:
-            NodeConnectionType = "Sensor";
-            break;
+        case NodeConnectionType_Sensor:
+            return  "Sensor";
 
-        case 6:
-            NodeConnectionType = "Actuator";
-            break;
+        case NodeConnectionType_Actuator:
+            return  "Actuator";
 
-        case 7:
-            NodeConnectionType = "OutdoorAir";
-            break;
+        case NodeConnectionType_OutsideAir:
+            return  "OutdoorAir";
 
-        case 8:
-            NodeConnectionType = "ReliefAir";
-            break;
+        case NodeConnectionType_ReliefAir:
+            return  "ReliefAir";
 
-        case 9:
-            NodeConnectionType = "ZoneInlet";
-            break;
+        case NodeConnectionType_ZoneInlet:
+            return  "ZoneInlet";
 
-        case 10:
-            NodeConnectionType = "ZoneReturn";
-            break;
+        case NodeConnectionType_ZoneReturn:
+            return  "ZoneReturn";
 
-        case 11:
-            NodeConnectionType = "ZoneExhaust";
-            break;
+        case NodeConnectionType_ZoneExhaust:
+            return  "ZoneExhaust";
 
-        case 12:
-            NodeConnectionType = "Setpoint";
-            break;
+        case NodeConnectionType_SetPoint:
+            return  "Setpoint";
 
-        case 13:
-            NodeConnectionType = "Electric";
-            break;
+        case NodeConnectionType_Electric:
+            return  "Electric";
 
-        case 14:
-            NodeConnectionType = "OutsideAirReference";
-            break;
+        case NodeConnectionType_OutsideAirReference:
+            return  "OutsideAirReference";
 
-        case 15:
-            NodeConnectionType = "InducedAir";
-            break;
+        case NodeConnectionType_InducedAir:
+            return  "InducedAir";
 
         default:
-            NodeConnectionType = "blank";
-            break;
+            return  "blank";
         }
-        return NodeConnectionType;
     }
 
     // Types
