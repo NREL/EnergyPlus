@@ -74,45 +74,27 @@ namespace FanCoilUnits {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    extern std::string const cMO_FanCoil;
-
     // coil operation
     constexpr int On(1);  // normal coil operation
     constexpr int Off(0); // signal coil shouldn't run
 
     // coil type units supported in this module
-    extern int const FanCoilUnit_4Pipe;
+    constexpr int FanCoilUnit_4Pipe(1);
 
-    extern int const CCoil_Water;
-    extern int const CCoil_Detailed;
-    extern int const CCoil_HXAssist;
+    constexpr int CCoil_Water(1);
+    constexpr int CCoil_Detailed(2);
+    constexpr int CCoil_HXAssist(3);
 
-    extern int const HCoil_Water;
-    extern int const HCoil_Electric;
+    constexpr int HCoil_Water(1);
+    constexpr int HCoil_Electric(2);
 
     // capacity control method supported in this module
-    extern int const CCM_ConsFanVarFlow;
-    extern int const CCM_CycFan;
-    extern int const CCM_VarFanVarFlow;
-    extern int const CCM_VarFanConsFlow;
-    extern int const CCM_MultiSpeedFan;
-    extern int const CCM_ASHRAE;
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumFanCoils;
-    extern int Num4PipeFanCoils;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern bool GetFanCoilInputFlag; // First time, input is "gotten"
-    extern Real64 FanFlowRatio;
-    extern bool HeatingLoad;         // True when zone needs heating
-    extern bool CoolingLoad;         // True when zone needs cooling
-    extern Real64 const Small5WLoad; // load threshold 5.0 W
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
+    constexpr int CCM_ConsFanVarFlow(1);
+    constexpr int CCM_CycFan(2);
+    constexpr int CCM_VarFanVarFlow(3);
+    constexpr int CCM_VarFanConsFlow(4);
+    constexpr int CCM_MultiSpeedFan(5);
+    constexpr int CCM_ASHRAE(6);
 
     // look up functions for node numbers
 
@@ -294,14 +276,6 @@ namespace FanCoilUnits {
         }
     };
 
-    // Object Data
-    extern Array1D<FanCoilData> FanCoil;
-    extern Array1D<FanCoilNumericFieldData> FanCoilNumericFields;
-
-    // Functions
-
-    void clear_state();
-
     void SimFanCoilUnit(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                         int const ZoneNum,             // number of zone being served
                         int const ControlledZoneNum,   // index into ZoneEquipConfig array; may not be equal to ZoneNum
@@ -436,8 +410,35 @@ namespace FanCoilUnits {
 
 struct FanCoilUnitsData : BaseGlobalStruct {
 
+    std::string const cMO_FanCoil = "ZoneHVAC:FourPipeFanCoil";
+    int NumFanCoils = 0;
+    int Num4PipeFanCoils = 0;
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+    bool GetFanCoilInputFlag = true; // First time, input is "gotten"
+    Real64 FanFlowRatio = 0.0;
+    bool HeatingLoad = false;       // True when zone needs heating
+    bool CoolingLoad = false;       // True when zone needs cooling
+    Real64 const Small5WLoad = 5.0; // load threshold 5.0 W
+    Array1D<FanCoilUnits::FanCoilData> FanCoil;
+    Array1D<FanCoilUnits::FanCoilNumericFieldData> FanCoilNumericFields;
+    bool InitFanCoilUnitsOneTimeFlag = true;
+    bool InitFanCoilUnitsCheckInZoneEquipmentListFlag = false; // True after the Zone Equipment List has been checked for items
+
     void clear_state() override
     {
+        this->NumFanCoils = 0;
+        this->Num4PipeFanCoils = 0;
+        this->MySizeFlag.deallocate();
+        this->CheckEquipName.deallocate();
+        this->GetFanCoilInputFlag = true;
+        this->FanFlowRatio = 0.0;
+        this->HeatingLoad = false;
+        this->CoolingLoad = false;
+        this->FanCoil.deallocate();
+        this->FanCoilNumericFields.deallocate();
+        this->InitFanCoilUnitsOneTimeFlag = true;
+        this->InitFanCoilUnitsCheckInZoneEquipmentListFlag = false;
 
     }
 };
