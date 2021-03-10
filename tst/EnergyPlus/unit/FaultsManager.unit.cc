@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     int CurveNum;
     int FanNum;
-    bool TestRestult;
+    bool TestResult;
 
     // Allocate
     state->dataCurveManager->NumCurves = 1;
@@ -132,12 +132,12 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
     FanNum = 1;
-    TestRestult = state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
-    EXPECT_TRUE(TestRestult);
+    TestResult = state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
+    EXPECT_TRUE(TestResult);
     // (2)The rated operational point of Fan_2 does not fall on the fan curve
     FanNum = 2;
-    TestRestult = state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
-    EXPECT_FALSE(TestRestult);
+    TestResult = state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
+    EXPECT_FALSE(TestResult);
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
