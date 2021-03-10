@@ -564,6 +564,35 @@ struct DaylightingManagerData : BaseGlobalStruct {
     Vector3<Real64> U23;    // Vector from window vertex 2 to window vertex 3 for TDD:DOME (if exists)
     Vector3<Real64> VIEWVC2; // Virtual view vector in absolute coordinate system
 
+    Vector3<Real64> W1; // First vertex of window (where vertices are numbered
+    Vector3<Real64> WC;    // Center point of window
+    Vector3<Real64> REFWC; // Vector from reference point to center of window
+    Vector3<Real64> WNORM; // Unit vector normal to window (pointing away from room)
+    Vector3<Real64> W2REF; // Vector from window origin to project of ref. pt. on window plane
+    Vector3<Real64> REFD;   // Vector from ref pt to center of win in TDD:DIFFUSER coord sys (if exists)
+    Vector3<Real64> VIEWVD; // Virtual view vector in TDD:DIFFUSER coord sys (if exists)
+    Vector3<Real64> U1;     // First vertex of window for TDD:DOME (if exists)
+    Vector3<Real64> U3;     // Third vertex of window for TDD:DOME (if exists)
+    Vector3<Real64> RayVector;
+
+    Vector3<Real64> HitPtIntWin; // Intersection point on an interior window for ray from ref pt to ext win (m)
+    Vector3<Real64> GroundHitPt; // Coordinates of point that ray hits ground (m)
+    Vector3<Real64> URay;        // Unit vector in (Phi,Theta) direction
+    Vector3<Real64> ObsHitPt;    // Coordinates of hit point on an obstruction (m)
+
+    Vector3<Real64> WNorm; // unit vector from window (point towards outside)
+    Vector3<Real64> RayNorm;    // unit vector along ray from window to reference point
+    Vector3<Real64> InterPoint; // Intersection point
+    Vector3<Real64> RWin; // window element center point (same as centroid)
+    Vector3<Real64> V;    // vector array
+
+    Vector3<Real64> NearestHitPt; // Hit point of ray on nearest obstruction
+    Vector3<Real64> ReflNorm;  // Normal vector to reflecting surface
+    Vector3<Real64> SunVecMir; // Sun ray mirrored in reflecting surface
+    Vector3<Real64> HitPtRefl; // Point that ray hits reflecting surface
+    Vector3<Real64> HitPtObs;  // Hit point on obstruction
+    Vector3<Real64> HitPtIntWinDisk; // Intersection point on an interior window for ray from ref pt to sun (m)
+
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;
@@ -630,6 +659,31 @@ struct DaylightingManagerData : BaseGlobalStruct {
         this->U21 = 0.0;
         this->U23 = 0.0;
         this->VIEWVC2 = 0.0;
+        this->W1 = 0.0;
+        this->WC = 0.0;
+        this->REFWC = 0.0;
+        this->WNORM = 0.0;
+        this->W2REF = 0.0;
+        this->REFD = 0.0;
+        this->VIEWVD = 0.0;
+        this->U1 = 0.0;
+        this->U3 = 0.0;
+        this->RayVector = 0.0;
+        this->HitPtIntWin = 0.0;
+        this->GroundHitPt = 0.0;
+        this->URay = 0.0;
+        this->ObsHitPt = 0.0;
+        this->WNorm = 0.0;
+        this->RayNorm = 0.0;
+        this->InterPoint = 0.0;
+        this->RWin = 0.0;
+        this->V = 0.0;
+        this->NearestHitPt = 0.0;
+        this->ReflNorm = 0.0;
+        this->SunVecMir = 0.0;
+        this->HitPtRefl = 0.0;
+        this->HitPtObs = 0.0;
+        this->HitPtIntWinDisk = 0.0;
     }
 };
 
