@@ -3036,14 +3036,14 @@ namespace EnergyPlus::SimAirServingZones {
         // TRUE when air loop has been evaluated with latest actuated variables
         bool IsUpToDateFlag;
         // Iteration counter
-        static int Iter_SolveWaterCoilController(0);
+        static int Iter(0);
         // Number of times that the maximum iterations was exceeded
-        static int ErrCount_SolveWaterCoilController(0);
+        static int ErrCount(0);
         // Number of times that the maximum iterations was exceeded
-        static int MaxErrCount_SolveWaterCoilController(0);
+        static int MaxErrCount(0);
         // Placeholder for environment name used in error reporting
         static std::string ErrEnvironmentName;
-        // A character string equivalent of ErrCount_SolveWaterCoilController
+        // A character string equivalent of ErrCount
         int static AirLoopPass;
         static bool BypassOAController;
 
@@ -3096,7 +3096,7 @@ namespace EnergyPlus::SimAirServingZones {
         IsUpToDateFlag = true;
 
         // Loop over the air sys controllers until convergence or MaxIter iterations
-        Iter_SolveWaterCoilController = 0;
+        Iter = 0;
         ControllerConvergedFlag = false;
         // if the controller can be locked out by the economizer operation and the economizer is active, leave the controller inactive
         if (AirLoopCheck) {
@@ -3110,7 +3110,7 @@ namespace EnergyPlus::SimAirServingZones {
         // For this controller, iterate until convergence
         while (!ControllerConvergedFlag) {
 
-            ++Iter_SolveWaterCoilController;
+            ++Iter;
 
             ManageControllers(state,
                               ControllerName,
@@ -3130,12 +3130,12 @@ namespace EnergyPlus::SimAirServingZones {
             if (!ControllerConvergedFlag) {
                 // Only check abnormal termination if not yet converged
                 // The iteration counter has been exceeded.
-                if (Iter_SolveWaterCoilController > MaxIter) {
+                if (Iter > MaxIter) {
 
                     // The warning message will be suppressed during the warm up days.
                     if (!state.dataGlobal->WarmupFlag) {
-                        ++ErrCount_SolveWaterCoilController;
-                        if (ErrCount_SolveWaterCoilController < 15) {
+                        ++ErrCount;
+                        if (ErrCount < 15) {
                             ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                             const auto CharErrOut = fmt::to_string(MaxIter);
                             ShowWarningError(state, "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " +
@@ -3143,12 +3143,12 @@ namespace EnergyPlus::SimAirServingZones {
                                              ' ' + CreateSysTimeIntervalString(state));
                         } else {
                             if (state.dataEnvrn->EnvironmentName != ErrEnvironmentName) {
-                                MaxErrCount_SolveWaterCoilController = 0;
+                                MaxErrCount = 0;
                                 ErrEnvironmentName = state.dataEnvrn->EnvironmentName;
                             }
                             ShowRecurringWarningErrorAtEnd(state, "SolveAirLoopControllers: Exceeding Maximum iterations for " +
                                                                PrimaryAirSystems(AirLoopNum).Name + " during " + state.dataEnvrn->EnvironmentName + " continues",
-                                                           MaxErrCount_SolveWaterCoilController);
+                                                           MaxErrCount);
                         }
                     }
 
