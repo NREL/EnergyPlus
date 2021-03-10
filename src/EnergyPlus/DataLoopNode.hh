@@ -459,16 +459,15 @@ struct LoopNodeData : BaseGlobalStruct {
                                                 0.0,
                                                 false,
                                                 false}; // Autodesk:Note If intent is default construction drop initializer to elim bug exposure | FluidType |
-                                  // FluidIndex | Temp {C} | TempMin {C} | TempMax {C} | TempSetPoint {C} | TempLastTimeStep {C} |
-                                  // MassFlowRateRequest {kg/s} | MassFlowRate {kg/s} | MassFlowRateMin {kg/s} | MassFlowRateMax {kg/s}
-                                  // //Autodesk:Note SensedNodeFlagValue is default initializer | MassFlowRateMinAvail {kg/s} |
-                                  // MassFlowRateMaxAvail {kg/s} | MassFlowRateSetPoint {kg/s} | Quality {0.0-1.0 vapor fraction/percent} | Press
-                                  // {Pa}   REAL(r64)     :: | Enthalpy {J/kg} | EnthalpyLastTimeStep {J/kg} | HumRat {} | HumRatMin {} |
-                                  // HumRatMax {} | HumRatSetPoint {} | TempSetPointHi {C} | TempSetPointLo {C} | Height {m} | OutAirDryBulb {C}
-                                  // | EMSOverrideOutAirDryBulb | EMSValueForOutAirDryBulb {C} | OutAirWetBulb {C} | EMSOverrideOutAirWetBulb |
-                                  // EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic
-                                  // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
-    ;
+                                                        // FluidIndex | Temp {C} | TempMin {C} | TempMax {C} | TempSetPoint {C} | TempLastTimeStep {C} |
+                                                        // MassFlowRateRequest {kg/s} | MassFlowRate {kg/s} | MassFlowRateMin {kg/s} | MassFlowRateMax {kg/s}
+                                                        // //Autodesk:Note SensedNodeFlagValue is default initializer | MassFlowRateMinAvail {kg/s} |
+                                                        // MassFlowRateMaxAvail {kg/s} | MassFlowRateSetPoint {kg/s} | Quality {0.0-1.0 vapor fraction/percent} | Press
+                                                        // {Pa}   REAL(r64)     :: | Enthalpy {J/kg} | EnthalpyLastTimeStep {J/kg} | HumRat {} | HumRatMin {} |
+                                                        // HumRatMax {} | HumRatSetPoint {} | TempSetPointHi {C} | TempSetPointLo {C} | Height {m} | OutAirDryBulb {C}
+                                                        // | EMSOverrideOutAirDryBulb | EMSValueForOutAirDryBulb {C} | OutAirWetBulb {C} | EMSOverrideOutAirWetBulb |
+                                                        // EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic
+                                                        // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
     Array1D<DataLoopNode::MoreNodeData> MoreNodeInfo;
     Array1D<DataLoopNode::MarkedNodeData> MarkedNode;
     Array1D<DataLoopNode::NodeSetpointCheckData> NodeSetpointCheck;
