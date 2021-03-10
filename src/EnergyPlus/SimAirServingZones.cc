@@ -318,25 +318,25 @@ namespace EnergyPlus::SimAirServingZones {
         std::string ControllerListName;        // Name of a controller list object
         std::string AvailManagerListName;      // Name of an availability manager list object
         std::string ConnectorListName;         // Name of a connector list object
-        static Array1D_string BranchNames;     // Branch names from GetBranchList call
-        static Array1D_string CompTypes;       // Component types from GetBranchList call
-        static Array1D_string CompNames;       // Component names from GetBranchList call
-        static Array1D_string InletNodeNames;  // Component inlet node names from GetBranchData call
-        static Array1D_string OutletNodeNames; // Component outlet node names from GetBranchData call
-        static Array1D_string NodeNames;       // Outlet node names from GetLoopSplitter call
-        static Array1D_int NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
-        static Array1D_int InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
-        static Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
+        Array1D_string BranchNames;     // Branch names from GetBranchList call
+        Array1D_string CompTypes;       // Component types from GetBranchList call
+        Array1D_string CompNames;       // Component names from GetBranchList call
+        Array1D_string InletNodeNames;  // Component inlet node names from GetBranchData call
+        Array1D_string OutletNodeNames; // Component outlet node names from GetBranchData call
+        Array1D_string NodeNames;       // Outlet node names from GetLoopSplitter call
+        Array1D_int NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
+        Array1D_int InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
+        Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
         DataBranchAirLoopPlant::PressureCurveType PressCurveType;
         int PressCurveIndex;
-        static bool ErrorsFound(false);        // TRUE if errors detected in input
-        static Array1D_bool PackagedUnit;
+        bool ErrorsFound(false);        // TRUE if errors detected in input
+        Array1D_bool PackagedUnit;
         int test;
         int count;
         bool ErrInList;
-        static int ConListNum(0);          // index of a Connector List object in the input
-        static bool SplitterExists(false); // TRUE if there is a slitter in a primary air system
-        static bool MixerExists(false);    // TRUE if there is a mixer in a primary air system
+        int ConListNum(0);          // index of a Connector List object in the input
+        bool SplitterExists(false); // TRUE if there is a slitter in a primary air system
+        bool MixerExists(false);    // TRUE if there is a mixer in a primary air system
         bool errFlag;
         bool IsNotOK;
         /////////// hoisted into namespace
