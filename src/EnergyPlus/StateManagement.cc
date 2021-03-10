@@ -118,7 +118,6 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelUserTempPattern.hh>
-#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -190,6 +189,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     clearCoilSelectionReportObj(); // ReportCoilSelection
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelUserTempPattern::clear_state();
-    RuntimeLanguageProcessor::clear_state();
     ScheduleManager::clear_state();
 }
