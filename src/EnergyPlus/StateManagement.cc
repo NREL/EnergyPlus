@@ -92,7 +92,6 @@
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -156,7 +155,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     Furnaces::clear_state();
     General::clear_state();
     GroundTemperatureManager::clear_state();
-    HeatBalanceAirManager::clear_state();
     HeatBalanceIntRadExchange::clear_state();
     HeatBalanceManager::clear_state();
     HeatBalanceSurfaceManager::clear_state();
