@@ -1337,14 +1337,14 @@ namespace EnergyPlus::ExternalInterface {
                             Array1D_string tempSingleStringB(1, state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).Name);
 
                             // Make the call with arrays
-                            GetReportVariableKey(state, tempSingleStringA, 1, tempSingleStringB, keyIndexes, varTypes);
+                            GetReportVariableKey(state, tempSingleStringA, 1, tempSingleStringB, keyIndexes, state.dataExternalInterface->varTypes);
 
                             // Then postprocess the array items back in case they changed
                             state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarKey = tempSingleStringA(1);
                             state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).Name = tempSingleStringB(1);
 
                             state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarIndex = keyIndexes(1);
-                            state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarType = varTypes(1);
+                            state.dataExternalInterface->FMU(i).Instance(j).eplusOutputVariable(k).VarType = state.dataExternalInterface->varTypes(1);
                             state.dataExternalInterface->FMU(i).Instance(j).NumInputVariablesInIDF = k;
                             ++k;
                         }
