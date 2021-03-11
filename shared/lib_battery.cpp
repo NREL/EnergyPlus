@@ -530,7 +530,7 @@ double battery_t::calculate_max_discharge_kw(double *max_current_A) {
     double current = 0;
     size_t its = 0;
     while (fabs(power_W - voltage->calculate_max_discharge_w(q, qmax, thermal->T_battery(), &current)) > tolerance
-           && its++ < 10) {
+           && its++ < 5) {
         power_W = voltage->calculate_max_discharge_w(q, qmax, thermal->T_battery(), &current);
         thermal->updateTemperature(current, state->last_idx + 1);
         qmax = capacity->qmax() * thermal->capacity_percent()  * 0.01 * SOC_ratio;

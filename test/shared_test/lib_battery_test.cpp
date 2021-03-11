@@ -453,12 +453,12 @@ TEST_F(lib_battery_test, RoundtripEffModel){
         current += fabs(max_current) / 100.;
         eff_vs_current.emplace_back(fabs(output_power/input_power));
     }
-    std::vector<double> eff_expected = {0.99, 0.99, 0.98, 0.98, 0.97, 0.97, 0.96, 0.97, 0.95, 0.95, 0.94, 0.95, 0.93, // i = 12
-                                        0.91, 0.93, 0.93, 0.92, 0.92, 0.90, 0.93, 0.88, 0.92, 0.90, 0.88, 0.91, 0.89, // i = 25
-                                        0.88, 0.90, 0.90, 0.84, 0.87, 0.88, 0.89, 0.89, 0.81, 0.85, 0.85, 0.86, 0.88, // i = 38
+    std::vector<double> eff_expected = {0.99, 0.99, 0.98, 0.98, 0.97, 0.97, 0.96, 0.96, 0.95, 0.95, 0.94, 0.95, 0.93, // i = 12
+                                        0.93, 0.93, 0.93, 0.95, 0.92, 0.90, 0.93, 0.88, 0.92, 0.90, 0.91, 0.90, 0.89, // i = 25
+                                        0.89, 0.90, 0.90, 0.84, 0.87, 0.88, 0.89, 0.89, 0.81, 0.85, 0.85, 0.86, 0.88, // i = 38
                                         0.88, 0.87, 0.78, 0.81, 0.81, 0.83, 0.84, 0.85, 0.86, 0.87, 0.87, 0.85, 0.79, // i = 51
-                                        0.73, 0.75, 0.76, 0.77, 0.78, 0.79, 0.80, 0.81, 0.82, 0.83, 0.84, 0.85, 0.85, // i = 64
-                                        0.84, 0.84, 0.82, 0.76, 0.65, 0.66, 0.66, 0.67, 0.68, 0.69, 0.70, 0.70, 0.71, // i = 77
+                                        0.75, 0.75, 0.76, 0.77, 0.78, 0.79, 0.80, 0.81, 0.82, 0.83, 0.84, 0.85, 0.85, // i = 64
+                                        0.84, 0.84, 0.82, 0.76, 0.66, 0.66, 0.66, 0.67, 0.68, 0.69, 0.70, 0.70, 0.71, // i = 77
                                         0.72, 0.73, 0.74, 0.74, 0.75, 0.76, 0.77, 0.77, 0.78, 0.78, 0.79, 0.80, 0.81, // i = 90
                                         0.81, 0.81, 0.81, 0.81, 0.82, 0.82, 0.81, 0.81, // i = 98
     };
@@ -751,7 +751,7 @@ TEST_F(lib_battery_test, ReplaceByCapacityTest){
 
 TEST_F(lib_battery_test, NMCLifeModel) {
     auto lifetimeModelNMC = new lifetime_nmc_t(dtHour);
-    auto thermalModelNMC = new thermal_t(1.0, mass, surface_area, resistance, Cp, h, T_room);
+    auto thermalModelNMC = new thermal_t(dtHour, mass, surface_area, resistance, Cp, h, T_room);
     auto capacityModelNMC = new capacity_lithium_ion_t(q, SOC_init, SOC_max, SOC_min, dtHour);
     auto voltageModelNMC = new voltage_dynamic_t(n_series, n_strings, Vnom_default, Vfull, Vexp, Vnom, Qfull, Qexp, Qnom,
                                          C_rate, resistance, dtHour);
@@ -781,10 +781,9 @@ TEST_F(lib_battery_test, NMCLifeModel) {
     EXPECT_NEAR(state->nmc_li_neg->c2_dt, 1.393e-5, 1e-8);
 }
 
-
 TEST_F(lib_battery_test, AdaptiveTimestepNMC) {
     auto lifetimeModelNMC = new lifetime_nmc_t(dtHour);
-    auto thermalModelNMC = new thermal_t(1.0, mass, surface_area, resistance, Cp, h, T_room);
+    auto thermalModelNMC = new thermal_t(dtHour, mass, surface_area, resistance, Cp, h, T_room);
     auto capacityModelNMC = new capacity_lithium_ion_t(q, SOC_init, SOC_max, SOC_min, dtHour);
     auto voltageModelNMC = new voltage_dynamic_t(n_series, n_strings, Vnom_default, Vfull, Vexp, Vnom, Qfull, Qexp, Qnom,
                                                  C_rate, resistance, dtHour);
@@ -892,11 +891,11 @@ TEST_F(lib_battery_test, AdaptiveTimestepNMC) {
 
     }
 
-    EXPECT_NEAR(batteryModel->charge_maximum(), 889.17, 1e-2);
-    EXPECT_NEAR(batt_subhourly->charge_maximum(), 881.46, 1e-2);
-    EXPECT_NEAR(batt_adaptive->charge_maximum(), 882.53, 1e-2);
+    EXPECT_NEAR(batteryModel->charge_maximum(), 895.75, 1e-2);
+    EXPECT_NEAR(batt_subhourly->charge_maximum(), 889.07, 1e-2);
+    EXPECT_NEAR(batt_adaptive->charge_maximum(), 890.60, 1e-2);
 
-    EXPECT_NEAR(batteryModel->SOC(), 89.95, 1e-2);
-    EXPECT_NEAR(batt_subhourly->SOC(), 88.73, 1e-2);
-    EXPECT_NEAR(batt_adaptive->SOC(), 88.64, 1e-2);
+    EXPECT_NEAR(batteryModel->SOC(), 89.31, 1e-2);
+    EXPECT_NEAR(batt_subhourly->SOC(), 88.05, 1e-2);
+    EXPECT_NEAR(batt_adaptive->SOC(), 87.91, 1e-2);
 }
