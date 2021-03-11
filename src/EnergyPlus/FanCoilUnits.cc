@@ -275,8 +275,6 @@ namespace FanCoilUnits {
         int NumNumbers;                        // Number of Numbers for each GetObjectItem call
         Array1D_int OANodeNums(4);             // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
         int IOStatus;                          // Used in GetObjectItem
-        static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
-        static bool errFlag(false);            // Local error flag for GetOAMixerNodeNums
         bool IsNotOK;                          // Flag to verify name
         std::string CurrentModuleObject;       // Object type for getting and error messages
         Array1D_string Alphas;                 // Alpha input items for object
@@ -285,19 +283,13 @@ namespace FanCoilUnits {
         Array1D<Real64> Numbers;               // Numeric input items for object
         Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
-        static int TotalArgs(0);               // Total number of alpha and numeric arguments (max) for a
         int CtrlZone;                          // index to loop counter
         int NodeNum;                           // index to loop counter
-        static bool ZoneExNodeNotFound(false); // used in error checking
-        static bool ZoneInNodeNotFound(false); // used in error checking
-        static int ATMixerNum(0);              // index of air terminal mixer in the air terminal mixer data array
-        static int ATMixerType(0);             // type of air terminal mixer (1=inlet side; 2=supply side)
-        static int ATMixerPriNode(0);          // node number of the air terminal mixer primary air inlet
-        static int ATMixerSecNode(0);          // node number of the air terminal mixer secondary air inlet
-        static int ATMixerOutNode(0);          // node number of the air terminal mixer secondary air inlet
         std::string ATMixerName;
 
         auto &FanCoil(state.dataFanCoilUnits->FanCoil);
+        auto &ErrorsFound(state.dataFanCoilUnits->ErrorsFound);
+        auto errFlag(state.dataFanCoilUnits->errFlag);
 
         // find the number of each type of fan coil unit
 
@@ -309,7 +301,7 @@ namespace FanCoilUnits {
         state.dataFanCoilUnits->FanCoilNumericFields.allocate(state.dataFanCoilUnits->NumFanCoils);
         state.dataFanCoilUnits->CheckEquipName.dimension(state.dataFanCoilUnits->NumFanCoils, true);
 
-        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers);
+        inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, state.dataFanCoilUnits->TotalArgs, NumAlphas, NumNumbers);
         Alphas.allocate(NumAlphas);
         cAlphaFields.allocate(NumAlphas);
         cNumericFields.allocate(NumNumbers);
@@ -703,28 +695,28 @@ namespace FanCoilUnits {
             GetATMixer(state,
                        FanCoil(FanCoilNum).Name,
                        ATMixerName,
-                       ATMixerNum,
-                       ATMixerType,
-                       ATMixerPriNode,
-                       ATMixerSecNode,
-                       ATMixerOutNode,
+                       state.dataFanCoilUnits->ATMixerNum,
+                       state.dataFanCoilUnits->ATMixerType,
+                       state.dataFanCoilUnits->ATMixerPriNode,
+                       state.dataFanCoilUnits->ATMixerSecNode,
+                       state.dataFanCoilUnits->ATMixerOutNode,
                        FanCoil(FanCoilNum).AirOutNode);
-            if (ATMixerType == ATMixer_InletSide) {
+            if (state.dataFanCoilUnits->ATMixerType == ATMixer_InletSide) {
                 // save the air terminal mixer data in the fan coil data array
                 FanCoil(FanCoilNum).ATMixerExists = true;
-                FanCoil(FanCoilNum).ATMixerIndex = ATMixerNum;
+                FanCoil(FanCoilNum).ATMixerIndex = state.dataFanCoilUnits->ATMixerNum;
                 FanCoil(FanCoilNum).ATMixerName = ATMixerName;
                 FanCoil(FanCoilNum).ATMixerType = ATMixer_InletSide;
-                FanCoil(FanCoilNum).ATMixerPriNode = ATMixerPriNode;
-                FanCoil(FanCoilNum).ATMixerSecNode = ATMixerSecNode;
-                FanCoil(FanCoilNum).ATMixerOutNode = ATMixerOutNode;
+                FanCoil(FanCoilNum).ATMixerPriNode = state.dataFanCoilUnits->ATMixerPriNode;
+                FanCoil(FanCoilNum).ATMixerSecNode = state.dataFanCoilUnits->ATMixerSecNode;
+                FanCoil(FanCoilNum).ATMixerOutNode = state.dataFanCoilUnits->ATMixerOutNode;
                 // check that fan coil doesn' have local outside air
                 if (!lAlphaBlanks(8)) {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit has local as well as central outdoor air specified");
                 }
                 // check that the air teminal mixer out node is the fan coil inlet node
-                if (FanCoil(FanCoilNum).AirInNode != ATMixerOutNode) {
+                if (FanCoil(FanCoilNum).AirInNode != state.dataFanCoilUnits->ATMixerOutNode) {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit air inlet node name must be the same as an air terminal mixer outlet node name.");
                     ShowContinueError(state, "..Air terminal mixer outlet node name is specified in AirTerminal:SingleDuct:InletSideMixer object.");
@@ -732,22 +724,22 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 }
                 // check for supply side air terminal mixer
-            } else if (ATMixerType == ATMixer_SupplySide) {
+            } else if (state.dataFanCoilUnits->ATMixerType == ATMixer_SupplySide) {
                 // save the air terminal mixer data in the fan coil data array
                 FanCoil(FanCoilNum).ATMixerExists = true;
-                FanCoil(FanCoilNum).ATMixerIndex = ATMixerNum;
+                FanCoil(FanCoilNum).ATMixerIndex = state.dataFanCoilUnits->ATMixerNum;
                 FanCoil(FanCoilNum).ATMixerName = ATMixerName;
                 FanCoil(FanCoilNum).ATMixerType = ATMixer_SupplySide;
-                FanCoil(FanCoilNum).ATMixerPriNode = ATMixerPriNode;
-                FanCoil(FanCoilNum).ATMixerSecNode = ATMixerSecNode;
-                FanCoil(FanCoilNum).ATMixerOutNode = ATMixerOutNode;
+                FanCoil(FanCoilNum).ATMixerPriNode = state.dataFanCoilUnits->ATMixerPriNode;
+                FanCoil(FanCoilNum).ATMixerSecNode = state.dataFanCoilUnits->ATMixerSecNode;
+                FanCoil(FanCoilNum).ATMixerOutNode = state.dataFanCoilUnits->ATMixerOutNode;
                 // check that fan coil doesn' have local outside air
                 if (!lAlphaBlanks(8)) {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit has local as well as central outdoor air specified");
                 }
                 // check that the air teminal mixer secondary air inlet node is the fan coil outlet node
-                if (FanCoil(FanCoilNum).AirOutNode != ATMixerSecNode) {
+                if (FanCoil(FanCoilNum).AirOutNode != state.dataFanCoilUnits->ATMixerSecNode) {
                     ShowSevereError(state,
                         CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                         "\". Fan coil unit air outlet node name must be the same as the air terminal mixer secondary air inlet node name.");
@@ -759,16 +751,16 @@ namespace FanCoilUnits {
                 // no air terminal mixer; do the normal connectivity checks
             } else {
                 // check that the fan coil inlet node is the same as one of the zone exhaust nodes
-                ZoneExNodeNotFound = true;
+                state.dataFanCoilUnits->ZoneExNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
                         if (FanCoil(FanCoilNum).AirInNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ExhaustNode(NodeNum)) {
-                            ZoneExNodeNotFound = false;
+                            state.dataFanCoilUnits->ZoneExNodeNotFound = false;
                         }
                     }
                 }
-                if (ZoneExNodeNotFound) {
+                if (state.dataFanCoilUnits->ZoneExNodeNotFound) {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit air inlet node name must be the same as a zone exhaust node name.");
                     ShowContinueError(state, "..Zone exhaust node name is specified in ZoneHVAC:EquipmentConnections object.");
@@ -776,18 +768,18 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 }
                 // check that the fan coil outlet node is the same as one of the zone inlet nodes
-                ZoneInNodeNotFound = true;
+                state.dataFanCoilUnits->ZoneInNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                     for (NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
                         if (FanCoil(FanCoilNum).AirOutNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
                             FanCoil(FanCoilNum).ControlZoneNum = CtrlZone;
                             FanCoil(FanCoilNum).NodeNumOfControlledZone = state.dataZoneEquip->ZoneEquipConfig(CtrlZone).ZoneNode;
-                            ZoneInNodeNotFound = false;
+                            state.dataFanCoilUnits->ZoneInNodeNotFound = false;
                         }
                     }
                 }
-                if (ZoneInNodeNotFound) {
+                if (state.dataFanCoilUnits->ZoneInNodeNotFound) {
                     ShowSevereError(state, CurrentModuleObject + " = \"" + FanCoil(FanCoilNum).Name +
                                     "\". Fan coil unit air outlet node name must be the same as a zone inlet node name.");
                     ShowContinueError(state, "..Zone inlet node name is specified in ZoneHVAC:EquipmentConnections object.");
