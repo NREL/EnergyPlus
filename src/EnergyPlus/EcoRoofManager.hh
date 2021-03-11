@@ -137,6 +137,26 @@ struct EcoRoofManagerData : BaseGlobalStruct {
     Real64 sensibleg = 0.0;          // sensible heat flux TO ground (w/m^2) DJS Jan 2011
     Real64 Lg = 0.0;            // latent heat flux from ground surface
     Real64 Vfluxg = 0.0;        // Water evapotr. rate associated with latent heat from ground surface [m/s]
+    Real64 TopDepth = 0.0;     // Thickness of "near-surface" soil layer
+    Real64 RootDepth = 0.0; // Thickness of "root zone" soil layer //Autodesk Was used uninitialized
+    // Note TopDepth+RootDepth = thickness of ecoroof soil layer
+    Real64 TimeStepZoneSec = 0.0; // Seconds per TimeStep
+    Real64 DryCond = 0.0;     // Dry soil value of conductivity
+    Real64 DryDens = 0.0;     // Dry soil value of density
+    Real64 DryAbsorp = 0.0;   // Dry soil value of solar absorptance (1-albedo)
+    Real64 DrySpecHeat = 0.0; // Dry soil value of specific heat
+    bool UpdatebeginFlag = true; // one time flag
+    Real64 CapillaryPotentialTop = -3.8997;     // This variable keeps track of the capillary potential of the soil in both layers and time (m)
+    Real64 CapillaryPotentialRoot = -3.8997;    // This variable keeps track of the capillary potential of the soil in both layers and time (m)
+    Real64 SoilHydroConductivityTop = 8.72e-6;  // This is the soil water conductivity in the soil (m/s)
+    Real64 SoilHydroConductivityRoot = 8.72e-6; // This is the soil water conductivity in the soil (m/s)
+    Real64 SoilConductivityAveTop = 8.72e-6;    // This is the average soil water conductivity (m/s)
+    Real64 SoilConductivityAveRoot = 8.72e-6;
+    Real64 RelativeSoilSaturationTop = 0.0; // Relative Soil Saturation (soil moisture-residual soil moisture)/(saturation soil moisture-residual soil moisture)
+    Real64 RelativeSoilSaturationRoot = 0.0;
+    Real64 TestMoisture = 0.15; // This makes sure that the moisture cannot change by too much in each step
+    int ErrIndex = 0;
+
 
     void clear_state() override
     {
@@ -172,7 +192,26 @@ struct EcoRoofManagerData : BaseGlobalStruct {
         this->sheatg = 0.0;
         this->sensibleg = 0.0;
         this->Lg = 0.0;
-        this->Vfluxg = 0.0;    
+        this->Vfluxg = 0.0;
+        this->TopDepth = 0.0;
+        this->RootDepth = 0.0;
+        // Note TopDepth+RootDepth = thickness of e
+        this->TimeStepZoneSec = 0.0;
+        this->DryCond = 0.0;
+        this->DryDens = 0.0;
+        this->DryAbsorp = 0.0;
+        this->DrySpecHeat = 0.0;
+        this->UpdatebeginFlag = true;
+        this->CapillaryPotentialTop = -3.8997;
+        this->CapillaryPotentialRoot = -3.8997;
+        this->SoilHydroConductivityTop = 8.72e-6;
+        this->SoilHydroConductivityRoot = 8.72e-6;
+        this->SoilConductivityAveTop = 8.72e-6;
+        this->SoilConductivityAveRoot = 8.72e-6;
+        this->RelativeSoilSaturationTop = 0.0;
+        this->RelativeSoilSaturationRoot = 0.0;
+        this->TestMoisture = 0.15;
+        this->ErrIndex = 0;
     }
 };
 
