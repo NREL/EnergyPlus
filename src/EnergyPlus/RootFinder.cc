@@ -277,7 +277,7 @@ namespace EnergyPlus::RootFinder {
             e.DefinedFlag = false;
         }
 
-        // Reset increments over successive iterationes
+        // Reset increments over successive iterations
         RootFinderData.Increment.X = 0.0;
         RootFinderData.Increment.Y = 0.0;
         RootFinderData.Increment.DefinedFlag = false;
@@ -285,7 +285,7 @@ namespace EnergyPlus::RootFinder {
         RootFinderData.XCandidate = 0.0;
 
         // Reset default state
-        RootFinderData.StatusFlag = iStatusNone;
+        RootFinderData.StatusFlag = iStatus::None;
         RootFinderData.CurrentMethodType = iMethod::None;
         RootFinderData.ConvergenceRate = -1.0;
     }
@@ -400,11 +400,11 @@ namespace EnergyPlus::RootFinder {
         // - CheckBracketRoundOff()
 
         // Reset status flag
-        RootFinderData.StatusFlag = iStatusNone;
+        RootFinderData.StatusFlag = iStatus::None;
 
         // Check that MinPoint%X <= X <= MaxPoint%X
         if (!CheckMinMaxRange(RootFinderData, X)) {
-            RootFinderData.StatusFlag = iStatusErrorRange;
+            RootFinderData.StatusFlag = iStatus::ErrorRange;
 
             // Fatal error: No need to continue iterating
             IsDoneFlag = true;
@@ -425,7 +425,7 @@ namespace EnergyPlus::RootFinder {
 
             // Check that min and max points are distinct
             if (RootFinderData.MinPoint.X == RootFinderData.MaxPoint.X) {
-                RootFinderData.StatusFlag = iStatusOKMin;
+                RootFinderData.StatusFlag = iStatus::OKMin;
                 RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -435,7 +435,7 @@ namespace EnergyPlus::RootFinder {
 
             if (RootFinderData.MinPoint.DefinedFlag) {
                 if (CheckMinConstraint(state, RootFinderData)) {
-                    RootFinderData.StatusFlag = iStatusOKMin;
+                    RootFinderData.StatusFlag = iStatus::OKMin;
                     RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                     // Solution found: No need to continue iterating
@@ -446,7 +446,7 @@ namespace EnergyPlus::RootFinder {
 
             // Check singularity condition between min and max points
             if (!CheckNonSingularity(RootFinderData)) {
-                RootFinderData.StatusFlag = iStatusErrorSingular;
+                RootFinderData.StatusFlag = iStatus::ErrorSingular;
 
                 // Fatal error: No need to continue iterating
                 IsDoneFlag = true;
@@ -455,7 +455,7 @@ namespace EnergyPlus::RootFinder {
 
             // Check slope condition between min and max points
             if (!CheckSlope(state, RootFinderData)) {
-                RootFinderData.StatusFlag = iStatusErrorSlope;
+                RootFinderData.StatusFlag = iStatus::ErrorSlope;
 
                 // Fatal error: No need to continue iterating
                 IsDoneFlag = true;
@@ -471,7 +471,7 @@ namespace EnergyPlus::RootFinder {
         // in ManagerControllers()
         if (RootFinderData.MinPoint.DefinedFlag) {
             if (CheckMinConstraint(state, RootFinderData)) {
-                RootFinderData.StatusFlag = iStatusOKMin;
+                RootFinderData.StatusFlag = iStatus::OKMin;
                 RootFinderData.XCandidate = RootFinderData.MinPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -487,7 +487,7 @@ namespace EnergyPlus::RootFinder {
         if (RootFinderData.MaxPoint.DefinedFlag) {
             if (CheckMaxConstraint(state, RootFinderData)) {
 
-                RootFinderData.StatusFlag = iStatusOKMax;
+                RootFinderData.StatusFlag = iStatus::OKMax;
                 RootFinderData.XCandidate = RootFinderData.MaxPoint.X;
 
                 // Solution found: No need to continue iterating
@@ -503,7 +503,7 @@ namespace EnergyPlus::RootFinder {
         // Check unconstrained convergence after we are sure that the candidate X value lies
         // within the allowed min/max range
         if (CheckRootFinderConvergence(RootFinderData, Y)) {
-            RootFinderData.StatusFlag = iStatusOK;
+            RootFinderData.StatusFlag = iStatus::OK;
             RootFinderData.XCandidate = X;
 
             // Update root finder internal data with current iterate (X,Y)
@@ -519,7 +519,7 @@ namespace EnergyPlus::RootFinder {
         // - the distance between the lower and upper bounds is smaller than the user-specified
         //   tolerance for the X variables. (USING brackets from previous iteration)
         if (CheckBracketRoundOff(RootFinderData)) {
-            RootFinderData.StatusFlag = iStatusOKRoundOff;
+            RootFinderData.StatusFlag = iStatus::OKRoundOff;
 
             // Solution found: No need to continue iterating
             IsDoneFlag = true;
@@ -538,7 +538,7 @@ namespace EnergyPlus::RootFinder {
 
         // Check that current iterate is within the current lower and upper points
         if (!CheckLowerUpperBracket(RootFinderData, X)) {
-            RootFinderData.StatusFlag = iStatusErrorBracket;
+            RootFinderData.StatusFlag = iStatus::ErrorBracket;
 
             // Fatal error: No need to continue iterating
             IsDoneFlag = true;
@@ -558,7 +558,7 @@ namespace EnergyPlus::RootFinder {
         IsDoneFlag = false;
     }
 
-    int CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
+    iStatus CheckInternalConsistency(EnergyPlusData &state, RootFinderDataType const &RootFinderData) // Data used by root finding algorithm
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dimitri Curtil (LBNL)
@@ -574,17 +574,17 @@ namespace EnergyPlus::RootFinder {
         // Only used internally for debugging.
 
         // Return value
-        int CheckInternalConsistency;
+        iStatus CheckInternalConsistency;
 
         // Default initialization
-        CheckInternalConsistency = iStatusNone;
+        CheckInternalConsistency = iStatus::None;
 
         // Internal consistency check involving both support points
         if (RootFinderData.LowerPoint.DefinedFlag && RootFinderData.UpperPoint.DefinedFlag) {
 
             // Check that the existing lower and upper points do bracket the root
             if (RootFinderData.LowerPoint.X > RootFinderData.UpperPoint.X) {
-                CheckInternalConsistency = iStatusErrorRange;
+                CheckInternalConsistency = iStatus::ErrorRange;
                 return CheckInternalConsistency;
             }
 
@@ -594,14 +594,14 @@ namespace EnergyPlus::RootFinder {
                 if (SELECT_CASE_var == iSlopeIncreasing) {
                     // Y-value of lower point must be strictly smaller than Y-value of upper point
                     if (RootFinderData.LowerPoint.Y > RootFinderData.UpperPoint.Y) {
-                        CheckInternalConsistency = iStatusWarningNonMonotonic;
+                        CheckInternalConsistency = iStatus::WarningNonMonotonic;
                         return CheckInternalConsistency;
                     }
 
                 } else if (SELECT_CASE_var == iSlopeDecreasing) {
                     // Y-value of lower point must be strictly larger than Y-value of upper point
                     if (RootFinderData.LowerPoint.Y < RootFinderData.UpperPoint.Y) {
-                        CheckInternalConsistency = iStatusWarningNonMonotonic;
+                        CheckInternalConsistency = iStatus::WarningNonMonotonic;
                         return CheckInternalConsistency;
                     }
 
@@ -618,7 +618,7 @@ namespace EnergyPlus::RootFinder {
             // Only check if the lower and upper points are distinct!
             if (RootFinderData.UpperPoint.X > RootFinderData.LowerPoint.X) {
                 if (RootFinderData.UpperPoint.Y == RootFinderData.LowerPoint.Y) {
-                    CheckInternalConsistency = iStatusErrorSingular;
+                    CheckInternalConsistency = iStatus::ErrorSingular;
                     return CheckInternalConsistency;
                 }
             }
@@ -630,13 +630,13 @@ namespace EnergyPlus::RootFinder {
                 auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
                 if (SELECT_CASE_var == iSlopeIncreasing) {
                     if (RootFinderData.MinPoint.Y >= 0.0) {
-                        CheckInternalConsistency = iStatusOKMin;
+                        CheckInternalConsistency = iStatus::OKMin;
                         return CheckInternalConsistency;
                     }
 
                 } else if (SELECT_CASE_var == iSlopeDecreasing) {
                     if (RootFinderData.MinPoint.Y <= 0.0) {
-                        CheckInternalConsistency = iStatusOKMin;
+                        CheckInternalConsistency = iStatus::OKMin;
                         return CheckInternalConsistency;
                     }
 
@@ -656,13 +656,13 @@ namespace EnergyPlus::RootFinder {
                 auto const SELECT_CASE_var(RootFinderData.Controls.SlopeType);
                 if (SELECT_CASE_var == iSlopeIncreasing) {
                     if (RootFinderData.MaxPoint.Y <= 0.0) {
-                        CheckInternalConsistency = iStatusOKMax;
+                        CheckInternalConsistency = iStatus::OKMax;
                         return CheckInternalConsistency;
                     }
 
                 } else if (SELECT_CASE_var == iSlopeDecreasing) {
                     if (RootFinderData.MaxPoint.Y >= 0.0) {
-                        CheckInternalConsistency = iStatusOKMax;
+                        CheckInternalConsistency = iStatus::OKMax;
                         return CheckInternalConsistency;
                     }
 
@@ -1122,9 +1122,9 @@ namespace EnergyPlus::RootFinder {
                     } else {
                         if (X >= RootFinderData.LowerPoint.X) {
                             if (Y == RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y < RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update lower point with current iterate
                             RootFinderData.LowerPoint.X = X;
@@ -1149,9 +1149,9 @@ namespace EnergyPlus::RootFinder {
                     } else {
                         if (X <= RootFinderData.UpperPoint.X) {
                             if (Y == RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y > RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update upper point with current iterate
                             RootFinderData.UpperPoint.X = X;
@@ -1179,9 +1179,9 @@ namespace EnergyPlus::RootFinder {
                     } else {
                         if (X >= RootFinderData.LowerPoint.X) {
                             if (Y == RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y > RootFinderData.LowerPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update lower point with current iterate
                             RootFinderData.LowerPoint.X = X;
@@ -1206,9 +1206,9 @@ namespace EnergyPlus::RootFinder {
                     } else {
                         if (X <= RootFinderData.UpperPoint.X) {
                             if (Y == RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningSingular;
+                                RootFinderData.StatusFlag = iStatus::WarningSingular;
                             } else if (Y < RootFinderData.UpperPoint.Y) {
-                                RootFinderData.StatusFlag = iStatusWarningNonMonotonic;
+                                RootFinderData.StatusFlag = iStatus::WarningNonMonotonic;
                             }
                             // Update upper point with current iterate
                             RootFinderData.UpperPoint.X = X;
@@ -1464,11 +1464,11 @@ namespace EnergyPlus::RootFinder {
         } else {
             {
                 auto const SELECT_CASE_var(RootFinderData.StatusFlag);
-                if (SELECT_CASE_var == iStatusOKRoundOff) {
+                if (SELECT_CASE_var == iStatus::OKRoundOff) {
                     // Should never happen if we exit the root finder upon detecting round-off condition
                     RootFinderData.XCandidate = BisectionMethod(RootFinderData);
 
-                } else if ((SELECT_CASE_var == iStatusWarningSingular) || (SELECT_CASE_var == iStatusWarningNonMonotonic)) {
+                } else if ((SELECT_CASE_var == iStatus::WarningSingular) || (SELECT_CASE_var == iStatus::WarningNonMonotonic)) {
                     // Following local singularity or non-monotonicity warnings we attempt
                     // to recover with the false position method to avoid running into trouble
                     // because the latest iterate did nt produce any improvement compared to
@@ -1545,7 +1545,7 @@ namespace EnergyPlus::RootFinder {
         }
 
         // Should not use Secant method if the last 2 points produced a warning
-        if (RootFinderData.StatusFlag == iStatusWarningSingular || RootFinderData.StatusFlag == iStatusWarningNonMonotonic) {
+        if (RootFinderData.StatusFlag == iStatus::WarningSingular || RootFinderData.StatusFlag == iStatus::WarningNonMonotonic) {
             BracketRoot = false;
             return BracketRoot;
         }
@@ -1969,27 +1969,27 @@ namespace EnergyPlus::RootFinder {
         //       RE-ENGINEERED  na
 
             auto const SELECT_CASE_var(RootFinderData.StatusFlag);
-            if (SELECT_CASE_var == iStatusOK) {
+            if (SELECT_CASE_var == iStatus::OK) {
                 print(File, "Found unconstrained root");
-            } else if (SELECT_CASE_var == iStatusOKMin) {
+            } else if (SELECT_CASE_var == iStatus::OKMin) {
                 print(File, "Found min constrained root");
-            } else if (SELECT_CASE_var == iStatusOKMax) {
+            } else if (SELECT_CASE_var == iStatus::OKMax) {
                 print(File, "Found max constrained root");
-            } else if (SELECT_CASE_var == iStatusOKRoundOff) {
+            } else if (SELECT_CASE_var == iStatus::OKRoundOff) {
                 print(File, "Detected round-off convergence in bracket");
 
-            } else if (SELECT_CASE_var == iStatusWarningSingular) {
+            } else if (SELECT_CASE_var == iStatus::WarningSingular) {
                 print(File, "Detected singularity warning");
-            } else if (SELECT_CASE_var == iStatusWarningNonMonotonic) {
+            } else if (SELECT_CASE_var == iStatus::WarningNonMonotonic) {
                 print(File, "Detected non-monotonicity warning");
 
-            } else if (SELECT_CASE_var == iStatusErrorRange) {
+            } else if (SELECT_CASE_var == iStatus::ErrorRange) {
                 print(File, "Detected out-of-range error");
-            } else if (SELECT_CASE_var == iStatusErrorBracket) {
+            } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
                 print(File, "Detected bracket error");
-            } else if (SELECT_CASE_var == iStatusErrorSlope) {
+            } else if (SELECT_CASE_var == iStatus::ErrorSlope) {
                 print(File, "Detected slope error");
-            } else if (SELECT_CASE_var == iStatusErrorSingular) {
+            } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
                 print(File, "Detected singularity error");
 
             } else {

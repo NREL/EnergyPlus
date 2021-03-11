@@ -896,7 +896,7 @@ namespace EnergyPlus::HVACControllers {
 
         // Reset root finder
         // This is independent of the processing in InitializeRootFinder() performed in Calc() routine.
-        RootFinders(ControlNum).StatusFlag = iStatusNone;
+        RootFinders(ControlNum).StatusFlag = iStatus::None;
         RootFinders(ControlNum).CurrentMethodType = DataRootFinder::iMethod::None;
 
         RootFinders(ControlNum).CurrentPoint.DefinedFlag = false;
@@ -1617,7 +1617,7 @@ namespace EnergyPlus::HVACControllers {
         // Map root finder status onto controller mode
         {
             auto const SELECT_CASE_var(RootFinders(ControlNum).StatusFlag);
-            if ((SELECT_CASE_var == iStatusNone) || (SELECT_CASE_var == iStatusWarningNonMonotonic) || (SELECT_CASE_var == iStatusWarningSingular)) {
+            if ((SELECT_CASE_var == iStatus::None) || (SELECT_CASE_var == iStatus::WarningNonMonotonic) || (SELECT_CASE_var == iStatus::WarningSingular)) {
                 // We need to keep iterating...
                 IsConvergedFlag = false;
 
@@ -1655,21 +1655,21 @@ namespace EnergyPlus::HVACControllers {
                     ControllerProps(ControlNum).NextActuatedValue = RootFinders(ControlNum).XCandidate;
                 }
 
-            } else if ((SELECT_CASE_var == iStatusOK) || (SELECT_CASE_var == iStatusOKRoundOff)) {
+            } else if ((SELECT_CASE_var == iStatus::OK) || (SELECT_CASE_var == iStatus::OKRoundOff)) {
                 // Indicate convergence with base value (used to obtain DeltaSensed!)
                 ExitCalcController(ControlNum, RootFinders(ControlNum).XCandidate, iModeActive, IsConvergedFlag, IsUpToDateFlag);
 
-            } else if (SELECT_CASE_var == iStatusOKMin) {
+            } else if (SELECT_CASE_var == iStatus::OKMin) {
                 // Indicate convergence with min value
                 // Should be the same as ControllerProps(ControlNum)%MinAvailActuated
                 ExitCalcController(ControlNum, RootFinders(ControlNum).MinPoint.X, iModeMinActive, IsConvergedFlag, IsUpToDateFlag);
 
-            } else if (SELECT_CASE_var == iStatusOKMax) {
+            } else if (SELECT_CASE_var == iStatus::OKMax) {
                 // Indicate convergence with max value
                 // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
                 ExitCalcController(ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
 
-            } else if (SELECT_CASE_var == iStatusErrorSingular) {
+            } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
                 // Indicate inactive mode with min actuated value
                 // NOTE: Original code returned Node(ActuatedNode)%MassFlowRateMinAvail
                 //       This was not portable in case the actuated variable was NOT a mass flow rate!
@@ -1680,7 +1680,7 @@ namespace EnergyPlus::HVACControllers {
                 ExitCalcController(ControlNum, RootFinders(ControlNum).MinPoint.X, iModeInactive, IsConvergedFlag, IsUpToDateFlag);
 
                 // Abnormal case: should never happen
-            } else if (SELECT_CASE_var == iStatusErrorRange) {
+            } else if (SELECT_CASE_var == iStatus::ErrorRange) {
                 ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=\"" + ControllerName + "\"");
                 ShowContinueError(state,
@@ -1692,7 +1692,7 @@ namespace EnergyPlus::HVACControllers {
                 ShowFatalError(state, "Preceding error causes program termination.");
 
                 // Abnormal case: should never happen
-            } else if (SELECT_CASE_var == iStatusErrorBracket) {
+            } else if (SELECT_CASE_var == iStatus::ErrorBracket) {
                 ShowSevereError(state, "FindRootSimpleController: Root finder failed at " + CreateHVACStepFullString(state));
                 ShowContinueError(state, " Controller name=" + ControllerProps(ControlNum).ControllerName);
                 ShowContinueError(state, " Controller action=" + ActionTypes(ControllerProps(ControlNum).Action));
@@ -1719,7 +1719,7 @@ namespace EnergyPlus::HVACControllers {
                 //       - REVERSE ACTION:
                 //         - If y(xMin) < ySetPoint && y(xMax) > y(xMin), then  x = xMin
                 //         - If y(xMin) > ySetPoint && y(xMax) > y(xMin), then  x = xMax
-            } else if (SELECT_CASE_var == iStatusErrorSlope) {
+            } else if (SELECT_CASE_var == iStatus::ErrorSlope) {
                 if (!state.dataGlobal->WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
                     ++ControllerProps(ControlNum).BadActionErrCount;
                     ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");

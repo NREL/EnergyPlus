@@ -60,27 +60,31 @@ constexpr int iSlopeNone(0);        // Undefined slope specification
 constexpr int iSlopeIncreasing(1);  // For overall increasing function F(X) between min and max points
 constexpr int iSlopeDecreasing(-1); // For overall decreasing function F(X) between min and max points
 
-constexpr int iStatusErrorSingular(-4); // Error because the overall slope appears to be flat between the min and max points, implying that the
-                                        // function might be singular over the interval: F(XMin) == F(XMax)
+enum class iStatus
+{
+    ErrorSingular, // Error because the overall slope appears to be flat between the min and max points, implying that the
+                   // function might be singular over the interval: F(XMin) == F(XMax)
 
-constexpr int iStatusErrorSlope(-3); // Error because the overall slope assumption is not observed at the min and max points:
-                                     // - for an increasing function F(X), we expect F(XMin) < F(XMax)  otherwise error
-                                     // - for a decreasing function F(X),  we expect F(XMin) > F(XMax)  otherwise error
-                                     // Note that this error status does not detect strict monotonicity at points
-                                     // between the min and max points.
+    ErrorSlope, // Error because the overall slope assumption is not observed at the min and max points:
+                // - for an increasing function F(X), we expect F(XMin) < F(XMax)  otherwise error
+                // - for a decreasing function F(X),  we expect F(XMin) > F(XMax)  otherwise error
+                // Note that this error status does not detect strict monotonicity at points
+                // between the min and max points.
 
-constexpr int iStatusErrorBracket(-2); // Error because the current candidate X does not lie within the current lower an upper points:
-                                       // X < XLower or X > XUpper
+    ErrorBracket, // Error because the current candidate X does not lie within the current lower an upper points:
+                  // X < XLower or X > XUpper
 
-constexpr int iStatusErrorRange(-1); // Error because the current candidate X does not lie within the min and max points:
-                                     // X < XMin or X > XMax
-constexpr int iStatusNone(0);        // Indeterminate error state (not converged), also default state
-constexpr int iStatusOK(1);          // Unconstrained convergence achieved with root solution so that: XMin < XRoot < XMax
-constexpr int iStatusOKMin(2);       // Constrained convergence achieved with solution XRoot==XMin
-constexpr int iStatusOKMax(3);       // Constrained convergence achieved with solution XRoot==XMax
-constexpr int iStatusOKRoundOff(4);  // Reached requested tolerance in X variables although Y=F(X) does not satisfy unconstrained convergence check
-constexpr int iStatusWarningNonMonotonic(10); // Error because F(X) is not strictly monotonic between the lower and upper points
-constexpr int iStatusWarningSingular(11); // Error because F(X) == YLower or F(X) == YUpper
+    ErrorRange, // Error because the current candidate X does not lie within the min and max points:
+                // X < XMin or X > XMax
+
+    None,                // Indeterminate error state (not converged), also default state
+    OK,                  // Unconstrained convergence achieved with root solution so that: XMin < XRoot < XMax
+    OKMin,               // Constrained convergence achieved with solution XRoot==XMin
+    OKMax,               // Constrained convergence achieved with solution XRoot==XMax
+    OKRoundOff,          // Reached requested tolerance in X variables although Y=F(X) does not satisfy unconstrained convergence check
+    WarningNonMonotonic, // Error because F(X) is not strictly monotonic between the lower and upper points
+    WarningSingular,     // Error because F(X) == YLower or F(X) == YUpper
+};
 
 enum class iMethod
 {
@@ -125,7 +129,7 @@ struct RootFinderDataType
 {
     // Members
     ControlsType Controls;
-    int StatusFlag; // Current status of root finder
+    iStatus StatusFlag; // Current status of root finder
     // Valid values are any of the STATUS_<code> constants
     iMethod CurrentMethodType;  // Solution method used to perform current step
     Real64 XCandidate;          // Candidate X value to use next when evaluating F(X)
@@ -140,7 +144,8 @@ struct RootFinderDataType
     Array1D<PointType> History; // Vector containing last 3 best iterates
 
     // Default Constructor
-    RootFinderDataType() : StatusFlag(iStatusNone), CurrentMethodType(iMethod::None), XCandidate(0.0), ConvergenceRate(0.0), NumHistory(0), History(3)
+    RootFinderDataType()
+        : StatusFlag(iStatus::None), CurrentMethodType(iMethod::None), XCandidate(0.0), ConvergenceRate(0.0), NumHistory(0), History(3)
     {
     }
 };

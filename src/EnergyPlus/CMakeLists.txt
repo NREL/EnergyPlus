@@ -202,7 +202,6 @@ set(SRC
     DataReportingFlags.hh
     DataRoomAirModel.cc
     DataRoomAirModel.hh
-    DataRootFinder.cc
     DataRootFinder.hh
     DataRuntimeLanguage.cc
     DataRuntimeLanguage.hh
