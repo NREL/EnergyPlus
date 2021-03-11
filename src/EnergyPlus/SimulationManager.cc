@@ -226,7 +226,6 @@ namespace SimulationManager {
         using SizingManager::ManageSizing;
         using SystemReports::CreateEnergyReportStructure;
         using SystemReports::ReportAirLoopConnections;
-        using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
         using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -281,7 +280,7 @@ namespace SimulationManager {
         DisplayPerfSimulationFlag = false;
         DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
-            (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
+            (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
@@ -1063,7 +1062,7 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
                                 MakeMirroredAttachedShading = false;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
-                                ReportDuringWarmup = true;
+                                state.dataSysVars->ReportDuringWarmup = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
                                 state.dataEnvrn->DisplayWeatherMissingDataWarnings = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
@@ -1073,13 +1072,13 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
                                 state.dataEnvrn->IgnoreDiffuseRadiation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
-                                DeveloperFlag = true;
+                                state.dataSysVars->DeveloperFlag = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
-                                TimingFlag = true;
+                                state.dataSysVars->TimingFlag = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
-                                ReportDetailedWarmupConvergence = true;
+                                state.dataSysVars->ReportDetailedWarmupConvergence = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
-                                ReportDuringHVACSizingSimulation = true;
+                                state.dataSysVars->ReportDuringHVACSizingSimulation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
                                 continue;
                                 //        CreateMinimalSurfaceVariables=.TRUE.
@@ -1161,11 +1160,11 @@ namespace SimulationManager {
                 if (Alphas(6) == "YES") state.dataGlobal->DoHVACSizingSimulation = true;
             }
         }
-        if (DDOnly) {
+        if (state.dataSysVars->DDOnly) {
             state.dataGlobal->DoDesDaySim = true;
             state.dataGlobal->DoWeathSim = false;
         }
-        if (FullAnnualRun) {
+        if (state.dataSysVars->FullAnnualRun) {
             state.dataGlobal->DoDesDaySim = false;
             state.dataGlobal->DoWeathSim = true;
         }
@@ -1871,8 +1870,8 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", state.dataSurface->MaxVerticesPerSurface);
         print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
         print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
-        if (SutherlandHodgman) {
-            if (SlaterBarsky) {
+        if (state.dataSysVars->SutherlandHodgman) {
+            if (state.dataSysVars->SlaterBarsky) {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
             } else {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SutherlandHodgman");
@@ -1932,50 +1931,50 @@ namespace SimulationManager {
                                               "Parallel Sims");
         print(state.files.eio, "{}\n", ThreadingHeader);
         static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
-        if (Threading) {
-            if (iEnvSetThreads == 0) {
+        if (state.dataSysVars->Threading) {
+            if (state.dataSysVars->iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";
             } else {
-                cEnvSetThreads = fmt::to_string(iEnvSetThreads);
+                cEnvSetThreads = fmt::to_string(state.dataSysVars->iEnvSetThreads);
             }
-            if (iepEnvSetThreads == 0) {
+            if (state.dataSysVars->iepEnvSetThreads == 0) {
                 cepEnvSetThreads = "Not Set";
             } else {
-                cepEnvSetThreads = fmt::to_string(iepEnvSetThreads);
+                cepEnvSetThreads = fmt::to_string(state.dataSysVars->iepEnvSetThreads);
             }
-            if (iIDFSetThreads == 0) {
+            if (state.dataSysVars->iIDFSetThreads == 0) {
                 cIDFSetThreads = "Not Set";
             } else {
-                cIDFSetThreads = fmt::to_string(iIDFSetThreads);
+                cIDFSetThreads = fmt::to_string(state.dataSysVars->iIDFSetThreads);
             }
-            if (lnumActiveSims) {
+            if (state.dataSysVars->lnumActiveSims) {
                 print(state.files.eio,
                       ThreadReport,
                       "Yes",
-                      MaxNumberOfThreads,
+                      state.dataSysVars->MaxNumberOfThreads,
                       cEnvSetThreads,
                       cepEnvSetThreads,
                       cIDFSetThreads,
-                      NumberIntRadThreads,
-                      iNominalTotSurfaces,
-                      inumActiveSims);
+                      state.dataSysVars->NumberIntRadThreads,
+                      state.dataSysVars->iNominalTotSurfaces,
+                      state.dataSysVars->inumActiveSims);
             } else {
                 print(state.files.eio,
                       ThreadReport,
                       "Yes",
-                      MaxNumberOfThreads,
+                      state.dataSysVars->MaxNumberOfThreads,
                       cEnvSetThreads,
                       cepEnvSetThreads,
                       cIDFSetThreads,
-                      NumberIntRadThreads,
-                      iNominalTotSurfaces,
+                      state.dataSysVars->NumberIntRadThreads,
+                      state.dataSysVars->iNominalTotSurfaces,
                       "N/A");
             }
         } else { // no threading
-            if (lnumActiveSims) {
-                print(state.files.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
+            if (state.dataSysVars->lnumActiveSims) {
+                print(state.files.eio, ThreadReport, "No", state.dataSysVars->MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", state.dataSysVars->inumActiveSims);
             } else {
-                print(state.files.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
+                print(state.files.eio, ThreadReport, "No", state.dataSysVars->MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
             }
         }
 
@@ -2048,7 +2047,7 @@ namespace SimulationManager {
 
             state.dataGlobal->TimeStep = 1;
 
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -2065,7 +2064,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             ManageWeather(state);
 
@@ -2079,7 +2078,7 @@ namespace SimulationManager {
             state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
             ManageWeather(state);
 
             ManageExteriorEnergyUse(state);

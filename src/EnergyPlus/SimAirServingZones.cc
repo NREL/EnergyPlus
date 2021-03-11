@@ -2726,14 +2726,14 @@ namespace EnergyPlus::SimAirServingZones {
         // Updates air loop statistics
         // To enable runtime statistics tracking for each air loop, define the environment variable
         // TRACK_AIRLOOP=YES or TRACK_AIRLOOP=Y
-        if (TrackAirLoopEnvFlag) {
+        if (state.dataSysVars->TrackAirLoopEnvFlag) {
             TrackAirLoopControllers(state, AirLoopNum, WarmRestartStatus, AirLoopIterMax, AirLoopIterTot, AirLoopNumCalls);
         }
 
         // Generate trace for all controllers on this air loop
         // To enable generating a trace file with the converged solution for all controllers on each air loop,
         // define the environment variable TRACE_AIRLOOP=YES or TRACE_AIRLOOP=Y.
-        if (TraceAirLoopEnvFlag) {
+        if (state.dataSysVars->TraceAirLoopEnvFlag) {
             TraceAirLoopControllers(state, FirstHVACIteration, AirLoopNum, AirLoopPass, AirLoopConvergedFlag, AirLoopNumCalls);
         }
 

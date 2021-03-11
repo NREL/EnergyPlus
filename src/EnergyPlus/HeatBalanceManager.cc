@@ -659,7 +659,6 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using DataHVACGlobals::HVACSystemRootFinding;
-        using DataSystemVariables::lMinimalShadowing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -762,7 +761,7 @@ namespace HeatBalanceManager {
                 ErrorsFound = true;
             }
             // Solar Distribution
-            if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || lMinimalShadowing) {
+            if (has_prefix(AlphaName(3), "MIN") || AlphaName(3) == "-1" || state.dataSysVars->lMinimalShadowing) {
                 state.dataHeatBal->SolarDistribution = MinimalShadowing;
                 AlphaName(3) = "MinimalShadowing";
                 state.dataSurface->CalcSolRefl = false;
@@ -5318,8 +5317,6 @@ namespace HeatBalanceManager {
         using namespace WindowManager;
         using namespace SolarShading;
         using DataLoopNode::Node;
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
-        using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
@@ -5393,7 +5390,7 @@ namespace HeatBalanceManager {
             }
         }
 
-        if (state.dataGlobal->BeginSimFlag && state.dataGlobal->DoWeathSim && ReportExtShadingSunlitFrac) {
+        if (state.dataGlobal->BeginSimFlag && state.dataGlobal->DoWeathSim && state.dataSysVars->ReportExtShadingSunlitFrac) {
             OpenShadingFile(state);
         }
 
@@ -5406,17 +5403,17 @@ namespace HeatBalanceManager {
                     MinTempZone = 1000.0;
                 }
             }
-            if (!DetailedSolarTimestepIntegration) {
+            if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                 PerformSolarCalculations(state);
             }
         }
 
-        if (DetailedSolarTimestepIntegration) { // always redo solar calcs
+        if (state.dataSysVars->DetailedSolarTimestepIntegration) { // always redo solar calcs
             PerformSolarCalculations(state);
         }
 
         if (state.dataGlobal->BeginDayFlag && !state.dataGlobal->WarmupFlag &&
-            state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && ReportExtShadingSunlitFrac) {
+            state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && state.dataSysVars->ReportExtShadingSunlitFrac) {
             for (int iHour = 1; iHour <= 24; ++iHour) { // Do for all hours.
                 for (int TS = 1; TS <= state.dataGlobal->NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
@@ -5686,7 +5683,6 @@ namespace HeatBalanceManager {
         // heat balance.
 
         // Using/Aliasing
-        using DataSystemVariables::ReportDetailedWarmupConvergence;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
@@ -5726,7 +5722,7 @@ namespace HeatBalanceManager {
                 LoadZoneRpt(ZoneNum, CountWarmupDayPoints) = WarmupLoadDiff(ZoneNum);
                 MaxLoadZoneRpt(ZoneNum, CountWarmupDayPoints) = LoadZone(ZoneNum);
 
-                if (ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
+                if (state.dataSysVars->ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
                         static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature "
@@ -6079,8 +6075,6 @@ namespace HeatBalanceManager {
         // na
 
         // Using/Aliasing
-        using DataSystemVariables::ReportDuringWarmup; // added for FMI
-        using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using EconomicTariff::UpdateUtilityBills; // added for computing annual utility costs
         using NodeInputManager::CalcMoreNodeInfo;
         using OutputReportTabular::UpdateTabularReports;
@@ -6099,7 +6093,7 @@ namespace HeatBalanceManager {
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills(state);
-        } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
+        } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
             if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
                 state.dataEnvrn->PrintEnvrnStampWarmup = true;
                 state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
@@ -6141,7 +6135,7 @@ namespace HeatBalanceManager {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep(state);
             }
 
-        } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
+        } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
             UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay ||
                 state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
@@ -6342,7 +6336,6 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace DataStringGlobals;
         using DataSystemVariables::CheckForActualFileName;
-        using DataSystemVariables::iUnicode_end;
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -6445,7 +6438,7 @@ namespace HeatBalanceManager {
         auto NextLine = W5DataFile.readLine();
         endcol = len(NextLine.data);
         if (endcol > 0) {
-            if (int(NextLine.data[endcol - 1]) == iUnicode_end) {
+            if (int(NextLine.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                 ShowSevereError(state,
                                 "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName +
                                     " fiile, appears to be a Unicode or binary file.");
