@@ -1585,7 +1585,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                   _,
                                   ZoneCompTurnFansOn,
                                   ZoneCompTurnFansOff);
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate += Fans::GetFanPower(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate += Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex);
         } else {
             HVACFan::fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate += HVACFan::fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex]->fanPower();
@@ -1596,7 +1596,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                                   FirstHVACIteration,
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex); // why no Turn on off flags here?
-            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate += Fans::GetFanPower(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
+            state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate += Fans::GetFanPower(state, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
         } else {
             HVACFan::fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ElecUseRate += HVACFan::fanObjs[state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->fanPower();
@@ -2076,7 +2076,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                 // Fan:OnOff
                 SupplyFanInletNodeIndex = Fans::GetFanInletNode(state, "Fan:OnOff", StandAloneERV.SupplyAirFanName, ErrorsFound);
                 SupplyFanOutletNodeIndex = Fans::GetFanOutletNode(state, "Fan:OnOff", StandAloneERV.SupplyAirFanName, ErrorsFound);
-                GetFanVolFlow(StandAloneERV.SupplyAirFanIndex, SupplyFanAirFlow);
+                GetFanVolFlow(state, StandAloneERV.SupplyAirFanIndex, SupplyFanAirFlow);
                 if (ErrorsFound) {
                     ShowWarningError(state, "Could not retrieve fan outlet node for this unit=\"" + StandAloneERV.Name + "\".");
                     ErrorsFound = true;
@@ -2092,7 +2092,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                 // Fan:OnOff
                 ExhaustFanInletNodeIndex = Fans::GetFanInletNode(state, "Fan:OnOff", StandAloneERV.ExhaustAirFanName, ErrorsFound);
                 ExhaustFanOutletNodeIndex = Fans::GetFanOutletNode(state, "Fan:OnOff", StandAloneERV.ExhaustAirFanName, ErrorsFound);
-                GetFanVolFlow(StandAloneERV.ExhaustAirFanIndex, ExhaustFanAirFlow);
+                GetFanVolFlow(state, StandAloneERV.ExhaustAirFanIndex, ExhaustFanAirFlow);
                 if (ErrorsFound) {
                     ShowWarningError(state, "Could not retrieve fan outlet node for this unit=\"" + StandAloneERV.Name + "\".");
                     ErrorsFound = true;

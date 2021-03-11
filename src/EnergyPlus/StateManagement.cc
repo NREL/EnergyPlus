@@ -154,7 +154,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     EvaporativeFluidCoolers::clear_state();
     ExternalInterface::clear_state();
     FanCoilUnits::clear_state();
-    Fans::clear_state();
     FaultsManager::clear_state();
     FluidProperties::clear_state();
     Furnaces::clear_state();

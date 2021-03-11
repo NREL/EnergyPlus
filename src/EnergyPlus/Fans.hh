@@ -225,14 +225,6 @@ namespace Fans {
         Array1D_string FieldNames;
     };
 
-    // Object Data
-    extern Array1D<FanEquipConditions> Fan;
-    extern Array1D<NightVentPerfData> NightVentPerf;
-    extern Array1D<FanNumericFieldData> FanNumericFields;
-
-    // Functions
-    void clear_state();
-
     void SimulateFanComponents(EnergyPlusData &state,
                                std::string const &CompName,
                                bool FirstHVACIteration,
@@ -268,9 +260,9 @@ namespace Fans {
 
     void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
 
-    void GetFanVolFlow(int FanIndex, Real64 &FanVolFlow);
+    void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
 
-    Real64 GetFanPower(int FanIndex);
+    Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
     void GetFanType(EnergyPlusData &state,
                     std::string const &FanName,               // Fan name
@@ -330,7 +322,7 @@ namespace Fans {
     );
 
     Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
-                                        std::string &FanName,          // Name of the Fan
+                                        std::string const &FanName,          // Name of the Fan
                                         Real64 FanDesignAirFlowRate,   // Fan Design Volume Flow Rate [m3/s]
                                         Real64 FanDesignDeltaPress,    // Fan Design Delta Pressure [Pa]
                                         Real64 FanFaultyDeltaPressInc, // Increase of Fan Delta Pressure in the Faulty Case [Pa]
@@ -342,7 +334,7 @@ namespace Fans {
                           Real64 FanVolFlow // fan volumetric flow rate [m3/s]
     );
 
-    void SetFanAirLoopNumber(int FanIndex, int AirLoopNum);
+    void SetFanAirLoopNumber(EnergyPlusData &state, int FanIndex, int AirLoopNum);
 
     void FanInputsForDesHeatGain(EnergyPlusData &state,
                                  int const &fanIndex,
@@ -373,6 +365,10 @@ struct FansData : BaseGlobalStruct
     Array1D_bool MySizeFlag;
     Array1D_bool MyEnvrnFlag;
     Array1D_bool CheckEquipName;
+    Array1D<Fans::FanEquipConditions> Fan;
+    std::unordered_map<std::string, std::string> UniqueFanNames;
+    Array1D<Fans::NightVentPerfData> NightVentPerf;
+    Array1D<Fans::FanNumericFieldData> FanNumericFields;
 
     void clear_state() override
     {
@@ -386,6 +382,10 @@ struct FansData : BaseGlobalStruct
         this->MySizeFlag.deallocate();
         this->MyEnvrnFlag.deallocate();
         this->CheckEquipName.deallocate();
+        this->Fan.deallocate();
+        this->UniqueFanNames.clear();
+        this->NightVentPerf.deallocate();
+        this->FanNumericFields.deallocate();
     }
 };
 

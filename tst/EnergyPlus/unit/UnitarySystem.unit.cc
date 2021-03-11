@@ -452,11 +452,11 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // resize cooling coil with fan on branch
     CoilNum = 1;
-    Fans::Fan.allocate(1);
-    Fans::Fan(1).DeltaPress = 600.0;
-    Fans::Fan(1).FanEff = 0.9;
-    Fans::Fan(1).MotEff = 0.7;
-    Fans::Fan(1).MotInAirFrac = 1.0;
+    state->dataFans->Fan.allocate(1);
+    state->dataFans->Fan(1).DeltaPress = 600.0;
+    state->dataFans->Fan(1).FanEff = 0.9;
+    state->dataFans->Fan(1).MotEff = 0.7;
+    state->dataFans->Fan(1).MotInAirFrac = 1.0;
 
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelTypeEnum = DataAirSystems::structArrayLegacyFanModels;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
@@ -6082,10 +6082,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
 
     // compare fan RTF with fan PLR and global PLF
-    Real64 FanPLR = DataLoopNode::Node(InletNode).MassFlowRate / Fans::Fan(1).MaxAirMassFlowRate;
+    Real64 FanPLR = DataLoopNode::Node(InletNode).MassFlowRate / state->dataFans->Fan(1).MaxAirMassFlowRate;
     Real64 FanRTF = FanPLR / DataHVACGlobals::OnOffFanPartLoadFraction;
     EXPECT_DOUBLE_EQ(FanRTF, FanPLR);
-    EXPECT_DOUBLE_EQ(FanRTF, Fans::Fan(1).FanRuntimeFraction);
+    EXPECT_DOUBLE_EQ(FanRTF, state->dataFans->Fan(1).FanRuntimeFraction);
     EXPECT_DOUBLE_EQ(DataHVACGlobals::OnOffFanPartLoadFraction, 1.0);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
@@ -6130,11 +6130,11 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
     EXPECT_DOUBLE_EQ(DataLoopNode::Node(InletNode).MassFlowRate, DataLoopNode::Node(OutletNode).MassFlowRate);
 
     // compare fan RTF with fan PLR and global PLF
-    FanPLR = DataLoopNode::Node(InletNode).MassFlowRate / Fans::Fan(1).MaxAirMassFlowRate;
+    FanPLR = DataLoopNode::Node(InletNode).MassFlowRate / state->dataFans->Fan(1).MaxAirMassFlowRate;
     // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
     // Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
     EXPECT_EQ(1.0, DataHVACGlobals::OnOffFanPartLoadFraction);
-    EXPECT_GT(Fans::Fan(1).FanRuntimeFraction, FanPLR);
+    EXPECT_GT(state->dataFans->Fan(1).FanRuntimeFraction, FanPLR);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)

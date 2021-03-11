@@ -1590,7 +1590,7 @@ namespace EnergyPlus::WaterThermalTanks {
                 } else {
                     Fans::GetFanType(state, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
                     Fans::GetFanIndex(state, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
-                    Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
+                    Fans::GetFanVolFlow(state, HPWH.FanNum, FanVolFlow);
                 }
             }
             // issue #5630, set fan info in coils.
@@ -6108,7 +6108,7 @@ namespace EnergyPlus::WaterThermalTanks {
                 if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     FanVolFlow = HVACFan::fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->designAirVolFlowRate;
                 } else if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                    Fans::GetFanVolFlow(state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum, FanVolFlow);
+                    Fans::GetFanVolFlow(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum, FanVolFlow);
                 }
 
                 if (FanVolFlow <
@@ -9675,14 +9675,14 @@ namespace EnergyPlus::WaterThermalTanks {
         if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             FanInNode = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
         } else {
-            FanInNode = Fans::Fan(HPWH.FanNum).InletNodeNum;
+            FanInNode = state.dataFans->Fan(HPWH.FanNum).InletNodeNum;
         }
 
         DataLoopNode::Node(FanInNode).MassFlowRate = state.dataWaterThermalTanks->mdotAir;
         DataLoopNode::Node(FanInNode).MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
         DataLoopNode::Node(FanInNode).MassFlowRateMax = state.dataWaterThermalTanks->mdotAir;
         if (HPWH.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            Fans::Fan(HPWH.FanNum).MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
+            state.dataFans->Fan(HPWH.FanNum).MassFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
         } // system fan will use the inlet node max avail.
 
         if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {

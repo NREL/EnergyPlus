@@ -95,7 +95,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataFans->NumFans = 2;
-    Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
     FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
@@ -114,18 +114,18 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs:
     FanNum = 1;
-    Fan(FanNum).FanName = "Fan_1";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59;
+    state->dataFans->Fan(FanNum).FanName = "Fan_1";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
     FanNum = 2;
-    Fan(FanNum).FanName = "Fan_2";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59 * 1.2;
+    state->dataFans->Fan(FanNum).FanName = "Fan_2";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
-    Fan.deallocate();
+    state->dataFans->Fan.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_AutosizedFan)
@@ -231,7 +231,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_NO_THROW(Fans::SizeFan(*state, FanNum));
-    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    EXPECT_DOUBLE_EQ(0.114, state->dataFans->Fan(FanNum).MaxAirFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_NonAutosizedFan)
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
     int FanNum = 1;
     EXPECT_ANY_THROW(Fans::SizeFan(*state, FanNum));
-    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    EXPECT_DOUBLE_EQ(0.114, state->dataFans->Fan(FanNum).MaxAirFlowRate);
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
         "   **   ~~~   ** Invalid Fan Curve Name = \"FOULED FAN CURVE\" does not cover ",
@@ -350,7 +350,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     state->dataCurveManager->PerfCurve.allocate(state->dataCurveManager->NumCurves);
 
     state->dataFans->NumFans = 1;
-    Fan.allocate(state->dataFans->NumFans);
+    state->dataFans->Fan.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -368,20 +368,20 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Inputs: fans
     FanNum = 1;
-    Fan(FanNum).FanName = "Fan_1";
-    Fan(FanNum).FanType = "Fan:VariableVolume";
-    Fan(FanNum).MaxAirFlowRate = 18.194;
-    Fan(FanNum).DeltaPress = 1017.59;
+    state->dataFans->Fan(FanNum).FanName = "Fan_1";
+    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
+    state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
     FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(*state,
-        Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
+        state->dataFans->Fan(FanNum).FanName, state->dataFans->Fan(FanNum).MaxAirFlowRate, state->dataFans->Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * state->dataFans->Fan(FanNum).DeltaPress, CurveNum);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
-    Fan.deallocate();
+    state->dataFans->Fan.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)

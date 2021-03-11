@@ -13993,7 +13993,7 @@ namespace UnitarySystems {
         if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[this->m_FanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(this->m_FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, this->m_FanIndex);
         }
 
         Real64 elecCoolingPower = 0.0;

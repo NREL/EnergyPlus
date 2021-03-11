@@ -455,7 +455,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 Real64 flowRate;
 
-                GetFanVolFlow(fanIndex, flowRate);
+                GetFanVolFlow(state, fanIndex, flowRate);
                 flowRate *= state.dataEnvrn->StdRhoAir;
                 bool nodeErrorsFound{false};
                 int inletNode = GetFanInletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
@@ -1271,7 +1271,7 @@ namespace AirflowNetworkBalanceManager {
                         success = false;
                     }
 
-                    GetFanVolFlow(fanIndex, flowRate);
+                    GetFanVolFlow(state, fanIndex, flowRate);
                     flowRate *= state.dataEnvrn->StdRhoAir;
 
                     GetFanType(state, fan_name, fanType_Num, FanErrorFound);
@@ -9770,7 +9770,7 @@ namespace AirflowNetworkBalanceManager {
                     HVACFan::fanObjs[DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanIndex]->AirLoopNum =
                         AirflowNetworkLinkageData(i).AirLoopNum;
                 } else {
-                    SetFanAirLoopNumber(n, AirflowNetworkLinkageData(i).AirLoopNum);
+                    SetFanAirLoopNumber(state, n, AirflowNetworkLinkageData(i).AirLoopNum);
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == EPlusTypeNum_COI) {
@@ -10308,7 +10308,7 @@ namespace AirflowNetworkBalanceManager {
                                 HVACFan::fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                         } else {
                             Real64 FanFlow; // Return type
-                            GetFanVolFlow(DisSysCompCVFData(typeNum).FanIndex, FanFlow);
+                            GetFanVolFlow(state, DisSysCompCVFData(typeNum).FanIndex, FanFlow);
                             DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * state.dataEnvrn->StdRhoAir;
                         }
                     }

@@ -11229,7 +11229,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -12962,7 +12962,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
 
     // set pointer to components
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -15637,7 +15637,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
-    auto &thisFan(Fan(1));
+    auto &thisFan(state->dataFans->Fan(1));
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model

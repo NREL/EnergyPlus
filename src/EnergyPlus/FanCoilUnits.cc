@@ -2675,7 +2675,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
                 FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanCoil(FanCoilNum).ElecPower = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -3004,7 +3004,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QUnitOut));
                 FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanCoil(FanCoilNum).ElecPower = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -3339,7 +3339,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
                 FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanCoil(FanCoilNum).ElecPower = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -3361,7 +3361,7 @@ namespace FanCoilUnits {
                 FanCoil(FanCoilNum).SensCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QSensUnitOutNoATM));
                 FanCoil(FanCoilNum).TotCoolPower = std::abs(min(DataPrecisionGlobals::constant_zero, QTotUnitOut));
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanCoil(FanCoilNum).ElecPower = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanCoil(FanCoilNum).ElecPower = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -4356,7 +4356,7 @@ namespace FanCoilUnits {
                 FanFlowRatio = LowSpeedRatio;
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS);
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanElecPowerLS = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanElecPowerLS = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanElecPowerLS = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -4371,7 +4371,7 @@ namespace FanCoilUnits {
                 FanFlowRatio = HighSpeedRatio;
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxHS);
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanElecPowerHS = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanElecPowerHS = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanElecPowerHS = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -4540,7 +4540,7 @@ namespace FanCoilUnits {
                 FanFlowRatio = LowSpeedRatio;
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS);
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanElecPowerLS = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanElecPowerLS = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanElecPowerLS = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }
@@ -4555,7 +4555,7 @@ namespace FanCoilUnits {
                 FanFlowRatio = HighSpeedRatio;
                 Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxHS);
                 if (FanCoil(FanCoilNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                    FanElecPowerHS = Fans::GetFanPower(FanCoil(FanCoilNum).FanIndex);
+                    FanElecPowerHS = Fans::GetFanPower(state, FanCoil(FanCoilNum).FanIndex);
                 } else {
                     FanElecPowerHS = HVACFan::fanObjs[FanCoil(FanCoilNum).FanIndex]->fanPower();
                 }

@@ -5777,7 +5777,7 @@ namespace VariableSpeedCoils {
             }
         } else {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
-                locFanElecPower = Fans::GetFanPower(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
+                locFanElecPower = Fans::GetFanPower(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
             }
         }
 

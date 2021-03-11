@@ -2157,7 +2157,6 @@ namespace EnergyPlus::HVACManager {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using AirflowNetworkBalanceManager::ReportAirflowNetwork;
         using DataHVACGlobals::FanType_ZoneExhaust;
-        using Fans::Fan;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName3("ReportAirHeatBalance:3");
@@ -2191,6 +2190,7 @@ namespace EnergyPlus::HVACManager {
         auto &CrossMixing(state.dataHeatBal->CrossMixing);
         auto &RefDoorMixing(state.dataHeatBal->RefDoorMixing);
         auto &ZoneEquipConfig(state.dataZoneEquip->ZoneEquipConfig);
+        auto &Fan(state.dataFans->Fan);
 
         // Ensure no airflownetwork and simple calculations
         if (AirflowNetwork::SimulateAirflowNetwork == 0) return;

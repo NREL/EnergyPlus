@@ -218,7 +218,7 @@ namespace HVACUnitaryBypassVAV {
 
         QSensUnitOut = 0.0;  // probably don't need this initialization
         Real64 HeatingPower; // Power consumption of DX heating coil or electric heating coil [W]
-        
+
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
 
         // zero the fan and DX coils electricity consumption
@@ -302,7 +302,7 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(CBVAV(CBVAVNum).FanIndex);
+            locFanElecPower = Fans::GetFanPower(state, CBVAV(CBVAVNum).FanIndex);
         }
 
         CBVAV(CBVAVNum).ElecPower = locFanElecPower + DataHVACGlobals::DXElecCoolingPower + HeatingPower;
@@ -353,7 +353,7 @@ namespace HVACUnitaryBypassVAV {
 
         // find the number of each type of CBVAV unit
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
-        
+
         auto &CBVAV(state.dataHVACUnitaryBypassVAV->CBVAV);
         auto &NumCBVAV(state.dataHVACUnitaryBypassVAV->NumCBVAV);
 
@@ -613,7 +613,7 @@ namespace HVACUnitaryBypassVAV {
                     CBVAV(CBVAVNum).FanInletNodeNum = Fans::GetFanInletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, FanErrFlag);
                     fanOutletNode = Fans::GetFanOutletNode(state, CBVAV(CBVAVNum).FanType, CBVAV(CBVAVNum).FanName, ErrorsFound);
                     Fans::GetFanIndex(state, CBVAV(CBVAVNum).FanName, CBVAV(CBVAVNum).FanIndex, FanErrFlag, ObjexxFCL::Optional_string_const());
-                    Fans::GetFanVolFlow(CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
+                    Fans::GetFanVolFlow(state, CBVAV(CBVAVNum).FanIndex, CBVAV(CBVAVNum).FanVolFlow);
                 }
             }
 

@@ -3154,7 +3154,7 @@ namespace VentilatedSlab {
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             locFanElecPower = HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
         } else {
-            locFanElecPower = Fans::GetFanPower(state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
+            locFanElecPower = Fans::GetFanPower(state, state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
         }
         if ((AirMassFlow <= 0.0) && (locFanElecPower > 0.0)) {
             Node(MixoutNode).MassFlowRate = 0.0;
@@ -3332,7 +3332,7 @@ namespace VentilatedSlab {
         if (state.dataVentilatedSlab->VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = HVACFan::fanObjs[state.dataVentilatedSlab->VentSlab(Item).Fan_Index]->fanPower();
         } else {
-            state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = Fans::GetFanPower(state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
+            state.dataVentilatedSlab->VentSlab(Item).ElecFanPower = Fans::GetFanPower(state, state.dataVentilatedSlab->VentSlab(Item).Fan_Index);
         }
         state.dataVentilatedSlab->VentSlab(Item).AirMassFlowRate = AirMassFlow;
 

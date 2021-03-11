@@ -1456,7 +1456,7 @@ namespace FaultsManager {
             FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName = cAlphaArgs(3);
 
             // Check whether the specified fan exists in the fan list
-            if (UtilityRoutines::FindItemInList(cAlphaArgs(3), Fans::Fan, &Fans::FanEquipConditions::FanName) <= 0) {
+            if (UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataFans->Fan, &Fans::FanEquipConditions::FanName) <= 0) {
                 ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + " = \"" + cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
@@ -1464,9 +1464,9 @@ namespace FaultsManager {
 
             // Assign fault index to the fan object
             for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-                if (UtilityRoutines::SameString(Fans::Fan(FanNum).FanName, cAlphaArgs(3))) {
-                    Fans::Fan(FanNum).FaultyFilterFlag = true;
-                    Fans::Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
+                if (UtilityRoutines::SameString(state.dataFans->Fan(FanNum).FanName, cAlphaArgs(3))) {
+                    state.dataFans->Fan(FanNum).FaultyFilterFlag = true;
+                    state.dataFans->Fan(FanNum).FaultyFilterIndex = jFault_AirFilter;
                     break;
                 }
             }
@@ -2119,9 +2119,9 @@ namespace FaultsManager {
         FanFound = false;
 
         for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-            if (UtilityRoutines::SameString(Fan(FanNum).FanName, FanName)) {
-                FanMaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
-                FanDeltaPress = Fan(FanNum).DeltaPress;
+            if (UtilityRoutines::SameString(state.dataFans->Fan(FanNum).FanName, FanName)) {
+                FanMaxAirFlowRate = state.dataFans->Fan(FanNum).MaxAirFlowRate;
+                FanDeltaPress = state.dataFans->Fan(FanNum).DeltaPress;
                 FanFound = true;
                 break;
             }
