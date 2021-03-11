@@ -1272,7 +1272,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
                           "    Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1379,7 +1379,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_conduction_re
                           "    ,                    !- Response Factors Object Name",
                           "    GHE-Array;          !- GHE Array Object Name"});
 
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -1439,7 +1439,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_friction_factor)
                           "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -1754,7 +1754,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
                           "    Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2058,7 +2058,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
                           "    Until: 24:00,20;         !- Field 3"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2354,7 +2354,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2652,7 +2652,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2950,7 +2950,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3248,7 +3248,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3546,7 +3546,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
@@ -3844,7 +3844,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
         "    GHE-Array;          !- GHE Array Object Name"});
 
     // Envr variable
-    DisableGLHECaching = true;
+    state->dataSysVars->DisableGLHECaching = true;
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));

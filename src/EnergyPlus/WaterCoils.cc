@@ -1880,7 +1880,7 @@ namespace WaterCoils {
                 state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable = state.dataWaterCoils->WaterCoil(CoilNum).UACoilVariable;
 
                 int FaultIndex = state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex;
-                FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
+                FaultsManager::FaultPropertiesFoulingCoil &fouling = state.dataFaultsMgr->FouledCoils(FaultIndex);
                 Real64 FaultFrac = fouling.FaultFraction(state);
 
                 if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
@@ -1949,7 +1949,7 @@ namespace WaterCoils {
 
                 int FaultIndex = state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex;
 
-                FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
+                FaultsManager::FaultPropertiesFoulingCoil &fouling = state.dataFaultsMgr->FouledCoils(FaultIndex);
                 Real64 FaultFrac = fouling.FaultFraction(state);
 
                 if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {

@@ -948,7 +948,7 @@ namespace EnergyPlus::GroundHeatExchangers {
         combineShortAndLongTimestepGFunctions();
 
         // save data for later
-        if (!DataSystemVariables::DisableGLHECaching) {
+        if (!state.dataSysVars->DisableGLHECaching) {
             myCacheData["Response Factors"]["time"] = std::vector<Real64>(this->myRespFactors->time.begin(), this->myRespFactors->time.end());
             myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(this->myRespFactors->LNTTS.begin(), this->myRespFactors->LNTTS.end());
             myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(this->myRespFactors->GFNC.begin(), this->myRespFactors->GFNC.end());
@@ -1358,7 +1358,7 @@ namespace EnergyPlus::GroundHeatExchangers {
 
     void GLHEBase::makeThisGLHECacheAndCompareWithFileCache(EnergyPlusData &state)
     {
-        if (!DataSystemVariables::DisableGLHECaching) {
+        if (!state.dataSysVars->DisableGLHECaching) {
             makeThisGLHECacheStruct();
             readCacheFileAndCompareWithThisGLHECache(state);
         }

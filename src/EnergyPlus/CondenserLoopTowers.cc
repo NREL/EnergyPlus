@@ -4084,7 +4084,7 @@ namespace CondenserLoopTowers {
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyCondenserSWTOffset = state.dataFaultsMgr->FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
@@ -4096,7 +4096,7 @@ namespace CondenserLoopTowers {
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
 
             // calculate the Faulty Tower Fouling Factor using fault information
-            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
+            this->FaultyTowerFoulingFactor = state.dataFaultsMgr->FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
 
             // update the tower UA values at faulty cases
             freeConvTowerUA = FreeConvTowerUA_ff * this->FaultyTowerFoulingFactor;
@@ -4386,7 +4386,7 @@ namespace CondenserLoopTowers {
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyCondenserSWTOffset = state.dataFaultsMgr->FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
@@ -4398,7 +4398,7 @@ namespace CondenserLoopTowers {
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
 
             // calculate the Faulty Tower Fouling Factor using fault information
-            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
+            this->FaultyTowerFoulingFactor = state.dataFaultsMgr->FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
 
             // update the tower UA values at faulty cases
             freeConvTowerUA = FreeConvTowerUA_ff * this->FaultyTowerFoulingFactor;
@@ -4640,7 +4640,7 @@ namespace CondenserLoopTowers {
             Real64 TowerOutletTemp_ff = TempSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyCondenserSWTOffset = state.dataFaultsMgr->FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
@@ -4900,7 +4900,7 @@ namespace CondenserLoopTowers {
         if (this->FaultyCondenserSWTFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             int FaultIndex = this->FaultyCondenserSWTIndex;
             // calculate the sensor offset using fault information
-            this->FaultyCondenserSWTOffset = FaultsManager::FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyCondenserSWTOffset = state.dataFaultsMgr->FaultsCondenserSWTSensor(FaultIndex).CalFaultOffsetAct(state);
         }
 
         // If there is a fault of cooling tower fouling
@@ -4910,7 +4910,7 @@ namespace CondenserLoopTowers {
             Real64 HighSpeedTowerUA_ff = this->HighSpeedTowerUA;
 
             // calculate the Faulty Tower Fouling Factor using fault information
-            this->FaultyTowerFoulingFactor = FaultsManager::FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
+            this->FaultyTowerFoulingFactor = state.dataFaultsMgr->FaultsTowerFouling(FaultIndex).CalFaultyTowerFoulingFactor(state);
 
             // update the tower UA values at faulty cases
             freeConvTowerUA = FreeConvTowerUA_ff * this->FaultyTowerFoulingFactor;

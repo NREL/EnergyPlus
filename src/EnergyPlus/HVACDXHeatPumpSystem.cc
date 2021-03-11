@@ -556,7 +556,6 @@ namespace HVACDXHeatPumpSystem {
         using namespace ScheduleManager;
         using DataHVACGlobals::TempControlTol;
         using DXCoils::SimDXCoil;
-        using FaultsManager::FaultsCoilSATSensor;
 
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
@@ -633,7 +632,7 @@ namespace HVACDXHeatPumpSystem {
         if (DXHeatPumpSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXHeatPumpSystem(DXSystemNum).FaultyCoilSATIndex;
-            DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= DXHeatPumpSystem(DXSystemNum).FaultyCoilSATOffset;
         }

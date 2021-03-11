@@ -192,8 +192,6 @@ namespace EnergyPlus::HVACManager {
         using ZoneTempPredictorCorrector::DetectOscillatingZoneTemp;
         using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
         using AirflowNetworkBalanceManager::ManageAirflowNetworkBalance;
-        using DataSystemVariables::ReportDuringWarmup; // added for FMI
-        using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
         using DemandManager::ManageDemand;
         using DemandManager::UpdateDemandManagers;
         using EMSManager::ManageEMS;
@@ -449,7 +447,7 @@ namespace EnergyPlus::HVACManager {
                     UpdateFacilitySizing(state, DataGlobalConstants::CallIndicator::DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation(state);
-            } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && ReportDuringWarmup) {
+            } else if (!state.dataGlobal->KickOffSimulation && state.dataGlobal->DoOutputReporting && state.dataSysVars->ReportDuringWarmup) {
                 if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
                     state.dataEnvrn->PrintEnvrnStampWarmup = true;
                     state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;
@@ -488,7 +486,7 @@ namespace EnergyPlus::HVACManager {
                 if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeDesignDay || state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::HVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
-            } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
+            } else if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface) { // added for FMI
                 if (state.dataGlobal->BeginDayFlag && !state.dataEnvrn->PrintEnvrnStampWarmupPrinted) {
                     state.dataEnvrn->PrintEnvrnStampWarmup = true;
                     state.dataEnvrn->PrintEnvrnStampWarmupPrinted = true;

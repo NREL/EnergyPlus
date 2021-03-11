@@ -1698,7 +1698,6 @@ namespace HeatingCoils {
         // Using/Aliasing
         using DataHVACGlobals::ElecHeatingCoilPower;
         using DataHVACGlobals::TempControlTol;
-        using FaultsManager::FaultsCoilSATSensor;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1734,7 +1733,7 @@ namespace HeatingCoils {
         if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
-            HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            HeatingCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint -= HeatingCoil(CoilNum).FaultyCoilSATOffset;
         }
@@ -2080,7 +2079,6 @@ namespace HeatingCoils {
         // Using/Aliasing
         using CurveManager::CurveValue;
         using DataHVACGlobals::TempControlTol;
-        using FaultsManager::FaultsCoilSATSensor;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2121,7 +2119,7 @@ namespace HeatingCoils {
         if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
-            HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            HeatingCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint -= HeatingCoil(CoilNum).FaultyCoilSATOffset;
         }
@@ -2570,7 +2568,6 @@ namespace HeatingCoils {
 
         // Using/Aliasing
         using DataHVACGlobals::TempControlTol;
-        using FaultsManager::FaultsCoilSATSensor;
         using namespace DXCoils;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2609,7 +2606,7 @@ namespace HeatingCoils {
         if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = HeatingCoil(CoilNum).FaultyCoilSATIndex;
-            HeatingCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            HeatingCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint -= HeatingCoil(CoilNum).FaultyCoilSATOffset;
         }

@@ -1428,7 +1428,7 @@ namespace PlantChillers {
             Real64 RatedCOP_ff = this->COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -1497,7 +1497,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
@@ -1644,7 +1644,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -1759,7 +1759,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -3396,7 +3396,7 @@ namespace PlantChillers {
             Real64 COP_ff = COPLocal;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -3409,7 +3409,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
@@ -3543,7 +3543,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -3665,7 +3665,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -5301,7 +5301,7 @@ namespace PlantChillers {
             Real64 COP_ff = COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -5314,7 +5314,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
@@ -5436,7 +5436,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -5546,7 +5546,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -6702,7 +6702,7 @@ namespace PlantChillers {
             Real64 COP_ff = COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -6744,7 +6744,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOutSetPoint
             TempEvapOutSetPoint = min(state.dataLoopNodes->Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset);
             this->FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOutSetPoint;
@@ -6984,7 +6984,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -7063,7 +7063,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,

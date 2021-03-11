@@ -983,7 +983,6 @@ namespace SteamCoils {
         // Heat exchange is = Latent Heat + Sensible heat,coil effectivness is 1.0
 
         using DataHVACGlobals::TempControlTol;
-        using FaultsManager::FaultsCoilSATSensor;
         using PlantUtilities::SetComponentFlowRate;
 
         static std::string const RoutineName("CalcSteamAirCoil");
@@ -1027,7 +1026,7 @@ namespace SteamCoils {
         if (state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATIndex;
-            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempSetPoint
             TempSetPoint -= state.dataSteamCoils->SteamCoil(CoilNum).FaultyCoilSATOffset;
         }
