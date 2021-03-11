@@ -3794,9 +3794,6 @@ namespace FanCoilUnits {
         // and determines whether heating or cooling is required, then runs the hot
         // or chilled water coils.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
         using PlantUtilities::SetComponentFlowRate;

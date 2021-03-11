@@ -425,6 +425,25 @@ struct FanCoilUnitsData : BaseGlobalStruct {
     bool InitFanCoilUnitsOneTimeFlag = true;
     bool InitFanCoilUnitsCheckInZoneEquipmentListFlag = false; // True after the Zone Equipment List has been checked for items
 
+    // static variables extracted from functions
+    bool ErrorsFound = false; // Set to true if errors in input, fatal at end of routine
+    bool errFlag = false;     // Local error flag for GetOAMixerNodeNums
+    int TotalArgs = 0;  // Total number of alpha and numeric arguments (max) for a
+    bool ZoneExNodeNotFound = false; // used in error checking
+    bool ZoneInNodeNotFound = false; // used in error checking
+    int ATMixerNum = 0;              // index of air terminal mixer in the air terminal mixer data array
+    int ATMixerType = 0;             // type of air terminal mixer (1=inlet side; 2=supply side)
+    int ATMixerPriNode = 0;          // node number of the air terminal mixer primary air inlet
+    int ATMixerSecNode = 0;          // node number of the air terminal mixer secondary air inlet
+    int ATMixerOutNode = 0;          // node number of the air terminal mixer secondary air inlet
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MyPlantScanFlag;
+    Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+    int CoilWaterInletNode = 0;
+    int CoilWaterOutletNode = 0;
+    int ATMixOutNode = 0; // outlet node of ATM Mixer
+    int ZoneNode = 0;     // zone node
+
     void clear_state() override
     {
         this->NumFanCoils = 0;
@@ -439,6 +458,23 @@ struct FanCoilUnitsData : BaseGlobalStruct {
         this->FanCoilNumericFields.deallocate();
         this->InitFanCoilUnitsOneTimeFlag = true;
         this->InitFanCoilUnitsCheckInZoneEquipmentListFlag = false;
+        this->ErrorsFound = false;
+        this->errFlag = false;    
+        this->TotalArgs = 0;
+        this->ZoneExNodeNotFound = false;
+        this->ZoneInNodeNotFound = false;
+        this->ATMixerNum = 0;
+        this->ATMixerType = 0;
+        this->ATMixerPriNode = 0;
+        this->ATMixerSecNode = 0;
+        this->ATMixerOutNode = 0;
+        this->MyEnvrnFlag.clear();
+        this->MyPlantScanFlag.clear();
+        this->MyZoneEqFlag.clear();
+        this->CoilWaterInletNode = 0;
+        this->CoilWaterOutletNode = 0;
+        this->ATMixOutNode = 0;
+        this->ZoneNode = 0;    
 
     }
 };
