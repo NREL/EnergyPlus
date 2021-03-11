@@ -112,32 +112,11 @@ namespace WaterToAirHeatPumpSimple {
         Real64 RatedCapCoolSens;      // Rated/Ref Sensible Cooling Capacity [W]
         Real64 RatedPowerCool;        // Rated/Ref Cooling Power Consumption[W]
         Real64 RatedCOPCool;          // Rated/Ref Cooling COP [W/W]
-        Real64 HeatCap1;              // 1st coefficient of the Heating capacity performance curve
-        Real64 HeatCap2;              // 2nd coefficient of the Heating capacity performance curve
-        Real64 HeatCap3;              // 3rd coefficient of the Heating capacity performance curve
-        Real64 HeatCap4;              // 4th coefficient of the Heating capacity performance curve
-        Real64 HeatCap5;              // 5th coefficient of the Heating capacity performance curve
-        Real64 HeatPower1;            // 1st coefficient of the Heating power consumption curve
-        Real64 HeatPower2;            // 2nd coefficient of the Heating power consumption curve
-        Real64 HeatPower3;            // 3rd coefficient of the Heating power consumption curve
-        Real64 HeatPower4;            // 4th coefficient of the Heating power consumption curve
-        Real64 HeatPower5;            // 5th coefficient of the Heating power consumption curve
-        Real64 TotalCoolCap1;         // 1st coefficient of the Total Cooling capacity performance curve
-        Real64 TotalCoolCap2;         // 2nd coefficient of the Total Cooling capacity performance curve
-        Real64 TotalCoolCap3;         // 3rd coefficient of the Total Cooling capacity performance curve
-        Real64 TotalCoolCap4;         // 4th coefficient of the Total Cooling capacity performance curve
-        Real64 TotalCoolCap5;         // 5th coefficient of the Total Cooling capacity performance curve
-        Real64 SensCoolCap1;          // 1st coefficient of the Sensible Cooling capacity performance curve
-        Real64 SensCoolCap2;          // 2nd coefficient of the Sensible Cooling capacity performance curve
-        Real64 SensCoolCap3;          // 3rd coefficient of the Sensible Cooling capacity performance curve
-        Real64 SensCoolCap4;          // 4th coefficient of the Sensible Cooling capacity performance curve
-        Real64 SensCoolCap5;          // 5th coefficient of the Sensible Cooling capacity performance curve
-        Real64 SensCoolCap6;          // 6th coefficient of the Sensible Cooling capacity performance curve
-        Real64 CoolPower1;            // 1st coefficient of the Cooling power consumption curve
-        Real64 CoolPower2;            // 2nd coefficient of the Cooling power consumption curve
-        Real64 CoolPower3;            // 3rd coefficient of the Cooling power consumption curve
-        Real64 CoolPower4;            // 4th coefficient of the Cooling power consumption curve
-        Real64 CoolPower5;            // 5th coefficient of the Cooling power consumption curve
+        int HeatCapCurveIndex;     // Index of the heating capacity performance curve
+        int HeatPowCurveIndex;     // Index of the heating power consumption curve
+        int TotalCoolCapCurveIndex;         // Index of the Total Cooling capacity performance curve
+        int SensCoolCapCurveIndex;          // Index of the Sensible Cooling capacity performance curve
+        int CoolPowCurveIndex;              // Index of the Cooling power consumption curve
         int AirInletNodeNum;          // Node Number of the Air Inlet
         int AirOutletNodeNum;         // Node Number of the Air Outlet
         int WaterInletNodeNum;        // Node Number of the Water Onlet
@@ -173,13 +152,11 @@ namespace WaterToAirHeatPumpSimple {
               OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), Energy(0.0), EnergyLoadTotal(0.0),
               EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0), RatedWaterVolFlowRate(0.0),
               RatedAirVolFlowRate(0.0), RatedCapHeat(0.0), RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolTotal(0.0), RatedCapCoolSens(0.0),
-              RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCap1(0.0), HeatCap2(0.0), HeatCap3(0.0), HeatCap4(0.0), HeatCap5(0.0), HeatPower1(0.0),
-              HeatPower2(0.0), HeatPower3(0.0), HeatPower4(0.0), HeatPower5(0.0), TotalCoolCap1(0.0), TotalCoolCap2(0.0), TotalCoolCap3(0.0),
-              TotalCoolCap4(0.0), TotalCoolCap5(0.0), SensCoolCap1(0.0), SensCoolCap2(0.0), SensCoolCap3(0.0), SensCoolCap4(0.0), SensCoolCap5(0.0),
-              SensCoolCap6(0.0), CoolPower1(0.0), CoolPower2(0.0), CoolPower3(0.0), CoolPower4(0.0), CoolPower5(0.0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0),
-              WaterCyclingMode(0), LastOperatingMode(WaterCycling), WaterFlowMode(false), CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0),
-              Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0), HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
+              RatedPowerCool(0.0), RatedCOPCool(0.0), HeatCapCurveIndex(0), HeatPowCurveIndex(0), TotalCoolCapCurveIndex(0), 
+              SensCoolCapCurveIndex(0),CoolPowCurveIndex(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), 
+              LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), WaterCyclingMode(0), LastOperatingMode(WaterCycling), WaterFlowMode(false), 
+              CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), Twet_Rated(0.0), Gamma_Rated(0.0), MaxONOFFCyclesperHour(0.0), 
+              HPTimeConstant(0.0), FanDelayTime(0.0), reportCoilFinalSizes(true)
         {
         }
     };

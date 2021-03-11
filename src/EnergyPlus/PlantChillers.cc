@@ -174,7 +174,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric";
         state.dataPlantChillers->NumElectricChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -463,7 +463,7 @@ namespace PlantChillers {
                                                    DataIPShortCuts::cAlphaArgs(9),
                                                    "Heat Recovery Nodes");
                 if (thisChiller.DesignHeatRecVolFlowRate > 0.0) {
-                    PlantUtilities::RegisterPlantCompDesignFlow(thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
                 }
                 // Condenser flow rate must be specified for heat reclaim
                 if (thisChiller.CondenserType == DataPlant::CondenserType::AirCooled ||
@@ -1045,7 +1045,7 @@ namespace PlantChillers {
 
         Real64 tmpNomCap = this->NomCap;
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
@@ -1056,7 +1056,7 @@ namespace PlantChillers {
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+                tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -1079,7 +1079,7 @@ namespace PlantChillers {
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
@@ -1105,8 +1105,8 @@ namespace PlantChillers {
 
         Real64 tmpEvapVolFlowRate = this->EvapVolFlowRate;
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
@@ -1132,7 +1132,7 @@ namespace PlantChillers {
                                                          this->EvapVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
@@ -1160,11 +1160,11 @@ namespace PlantChillers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         Real64 tmpCondVolFlowRate = this->CondVolFlowRate;
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                                this->TempDesCondIn,
@@ -1175,7 +1175,7 @@ namespace PlantChillers {
                                                                    this->TempDesCondIn,
                                                                    state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
             } else {
                 if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
             }
@@ -1201,7 +1201,7 @@ namespace PlantChillers {
                                                          this->CondVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
@@ -1232,7 +1232,7 @@ namespace PlantChillers {
 
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
         }
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -1263,7 +1263,7 @@ namespace PlantChillers {
                                                          this->DesignHeatRecVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - this->DesignHeatRecVolFlowRate) / this->DesignHeatRecVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerElectric: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
                                                       format("User-Specified Design Heat Recovery Fluid Flow Rate of {:.5R} [m3/s]",
@@ -1281,7 +1281,7 @@ namespace PlantChillers {
                 }
             }
             // save the reference heat recovery fluid volumetric flow rate
-            PlantUtilities::RegisterPlantCompDesignFlow(this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
         }
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -1425,7 +1425,7 @@ namespace PlantChillers {
             Real64 RatedCOP_ff = this->COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -1494,7 +1494,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
@@ -1641,7 +1641,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -1756,7 +1756,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -2090,7 +2090,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:EngineDriven";
         state.dataPlantChillers->NumEngineDrivenChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -2222,9 +2222,6 @@ namespace PlantChillers {
                                                                                     DataLoopNode::NodeConnectionType_Outlet,
                                                                                     2,
                                                                                     DataLoopNode::ObjectIsNotParent);
-                // CALL
-                // TestCompSet(state, TRIM(DataIPShortCuts::cCurrentModuleObject),DataIPShortCuts::cAlphaArgs(1),DataIPShortCuts::cAlphaArgs(5),DataIPShortCuts::cAlphaArgs(6),'Condenser
-                // (Air) Nodes')
             } else if (thisChiller.CondenserType == DataPlant::CondenserType::WaterCooled) {
                 thisChiller.CondInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(5),
                                                                                    ErrorsFound,
@@ -2418,7 +2415,7 @@ namespace PlantChillers {
                 if (thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize) {
                     thisChiller.DesignHeatRecVolFlowRateWasAutoSized = true;
                 } else {
-                    PlantUtilities::RegisterPlantCompDesignFlow(thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
                 }
 
                 // Condenser flow rate must be specified for heat reclaim
@@ -2945,7 +2942,7 @@ namespace PlantChillers {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
@@ -2956,7 +2953,7 @@ namespace PlantChillers {
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+                tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -2979,7 +2976,7 @@ namespace PlantChillers {
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
@@ -3004,8 +3001,8 @@ namespace PlantChillers {
         }
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
@@ -3030,7 +3027,7 @@ namespace PlantChillers {
                                                          this->EvapVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
@@ -3058,10 +3055,10 @@ namespace PlantChillers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                                this->TempDesCondIn,
@@ -3073,7 +3070,7 @@ namespace PlantChillers {
                                                                    this->TempDesCondIn,
                                                                    state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
             } else {
                 if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
             }
@@ -3099,7 +3096,7 @@ namespace PlantChillers {
                                                          this->CondVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerEngineDriven: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
@@ -3130,7 +3127,7 @@ namespace PlantChillers {
 
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
         }
 
         // autosize support for heat recovery flow rate.
@@ -3168,7 +3165,7 @@ namespace PlantChillers {
                             }
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeEngineDrivenChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state,
@@ -3187,7 +3184,7 @@ namespace PlantChillers {
             }
             if (!this->DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
             // save the reference heat recovery fluid volumetric flow rate
-            PlantUtilities::RegisterPlantCompDesignFlow(this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
         }
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -3393,7 +3390,7 @@ namespace PlantChillers {
             Real64 COP_ff = COPLocal;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -3406,7 +3403,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
@@ -3540,7 +3537,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -3662,7 +3659,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -4025,7 +4022,7 @@ namespace PlantChillers {
         int IOStat;    // IO Status when calling get input subroutine
         bool ErrorsFound(false);
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Chiller:CombustionTurbine";
         state.dataPlantChillers->NumGTChillers = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -4300,7 +4297,7 @@ namespace PlantChillers {
                 if (thisChiller.DesignHeatRecVolFlowRate == DataSizing::AutoSize) {
                     thisChiller.DesignHeatRecVolFlowRateWasAutoSized = true;
                 } else {
-                    PlantUtilities::RegisterPlantCompDesignFlow(thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
+                    PlantUtilities::RegisterPlantCompDesignFlow(state, thisChiller.HeatRecInletNodeNum, thisChiller.DesignHeatRecVolFlowRate);
                 }
 
                 // Condenser flow rate must be specified for heat reclaim, but Why couldn't this be okay??
@@ -4812,7 +4809,7 @@ namespace PlantChillers {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
@@ -4823,7 +4820,7 @@ namespace PlantChillers {
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+                tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -4846,7 +4843,7 @@ namespace PlantChillers {
                                                          "User-Specified Nominal Capacity [W]",
                                                          this->NomCap);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - this->NomCap) / this->NomCap) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", this->NomCap));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
@@ -4872,8 +4869,8 @@ namespace PlantChillers {
         }
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
@@ -4899,7 +4896,7 @@ namespace PlantChillers {
                                                          this->EvapVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - this->EvapVolFlowRate) / this->EvapVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", this->EvapVolFlowRate));
@@ -4927,10 +4924,10 @@ namespace PlantChillers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (PltSizCondNum > 0 && PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName,
                                                                this->TempDesCondIn,
@@ -4941,7 +4938,7 @@ namespace PlantChillers {
                                                                    this->TempDesCondIn,
                                                                    state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
             } else {
                 if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
             }
@@ -4969,7 +4966,7 @@ namespace PlantChillers {
                                                          this->CondVolFlowRate);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpCondVolFlowRate - this->CondVolFlowRate) / this->CondVolFlowRate) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", this->CondVolFlowRate));
@@ -4999,7 +4996,7 @@ namespace PlantChillers {
         }
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled)
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
 
         Real64 GTEngineCapacityDes = this->NomCap / (this->engineCapacityScalar * this->COP);
         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
@@ -5025,7 +5022,7 @@ namespace PlantChillers {
                     }
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(GTEngineCapacityDes - this->GTEngineCapacity) / this->GTEngineCapacity) >
-                            DataSizing::AutoVsHardSizingThreshold) {
+                            state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "SizeGTChiller: Potential issue with equipment sizing for " + this->Name);
                             ShowContinueError(state, format("User-Specified Gas Turbine Engine Capacity of {:.2R} [W]", this->GTEngineCapacity));
                             ShowContinueError(state,
@@ -5075,7 +5072,7 @@ namespace PlantChillers {
                             }
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpHeatRecVolFlowRate - DesignHeatRecVolFlowRateUser) / DesignHeatRecVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeGasTurbineChiller: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(
                                         state,
@@ -5094,7 +5091,7 @@ namespace PlantChillers {
             }
             if (!this->DesignHeatRecVolFlowRateWasAutoSized) tmpHeatRecVolFlowRate = this->DesignHeatRecVolFlowRate;
             // save the reference heat recovery fluid volumetric flow rate
-            PlantUtilities::RegisterPlantCompDesignFlow(this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->HeatRecInletNodeNum, tmpHeatRecVolFlowRate);
         }
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -5295,7 +5292,7 @@ namespace PlantChillers {
             Real64 COP_ff = COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -5308,7 +5305,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOut;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOut
             TempEvapOut = max(this->TempLowLimitEvapOut,
                               min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset));
@@ -5430,7 +5427,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -5540,7 +5537,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -6465,7 +6462,7 @@ namespace PlantChillers {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
                 Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWLoopNum).FluidName,
                                                                DataGlobalConstants::CWInitConvTemp,
@@ -6476,7 +6473,7 @@ namespace PlantChillers {
                                                                    DataGlobalConstants::CWInitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->CWLoopNum).FluidIndex,
                                                                    RoutineName);
-                tmpNomCap = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+                tmpNomCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->NomCapWasAutoSized) tmpNomCap = 0.0;
             }
@@ -6500,7 +6497,7 @@ namespace PlantChillers {
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpNomCap));
@@ -6525,8 +6522,8 @@ namespace PlantChillers {
         }
 
         if (PltSizNum > 0) {
-            if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
-                tmpEvapVolFlowRate = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             } else {
                 if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
             }
@@ -6553,7 +6550,7 @@ namespace PlantChillers {
                                                          EvapVolFlowRateUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpEvapVolFlowRate - EvapVolFlowRateUser) / EvapVolFlowRateUser) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state,
                                                       format("User-Specified Design Chilled Water Flow Rate of {:.5R} [m3/s]", EvapVolFlowRateUser));
@@ -6581,16 +6578,16 @@ namespace PlantChillers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(this->EvapInletNodeNum, tmpEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
             if (PltSizCondNum > 0 && PltSizNum > 0) {
-                if (DataSizing::PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+                if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
                     Real64 rho = FluidProperties::GetDensityGlycol(
                         state, state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName, 29.44, state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
                         state, state.dataPlnt->PlantLoop(this->CDLoopNum).FluidName, 29.44, state.dataPlnt->PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
-                    tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (DataSizing::PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
+                    tmpCondVolFlowRate = tmpNomCap * (1.0 + 1.0 / this->COP) / (state.dataSize->PlantSizData(PltSizCondNum).DeltaT * Cp * rho);
                 } else {
                     if (this->CondVolFlowRateWasAutoSized) tmpCondVolFlowRate = 0.0;
                 }
@@ -6617,7 +6614,7 @@ namespace PlantChillers {
                                                              CondVolFlowRateUser);
                                 if (state.dataGlobal->DisplayExtraWarnings) {
                                     if ((std::abs(tmpCondVolFlowRate - CondVolFlowRateUser) / CondVolFlowRateUser) >
-                                        DataSizing::AutoVsHardSizingThreshold) {
+                                        state.dataSize->AutoVsHardSizingThreshold) {
                                         ShowMessage(state, "SizeChillerConstantCOP: Potential issue with equipment sizing for " + this->Name);
                                         ShowContinueError(
                                             state, format("User-Specified Design Condenser Water Flow Rate of {:.5R} [m3/s]", CondVolFlowRateUser));
@@ -6649,7 +6646,7 @@ namespace PlantChillers {
 
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         if (this->CondenserType == DataPlant::CondenserType::WaterCooled)
-            PlantUtilities::RegisterPlantCompDesignFlow(this->CondInletNodeNum, tmpCondVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -6694,7 +6691,7 @@ namespace PlantChillers {
             Real64 COP_ff = COP;
 
             // calculate the Faulty Chiller Fouling Factor using fault information
-            this->FaultyChillerFoulingFactor = FaultsManager::FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
+            this->FaultyChillerFoulingFactor = state.dataFaultsMgr->FaultsChillerFouling(FaultIndex).CalFoulingFactor(state);
 
             // update the Chiller nominal capacity and COP at faulty cases
             ChillerNomCap = NomCap_ff * this->FaultyChillerFoulingFactor;
@@ -6736,7 +6733,7 @@ namespace PlantChillers {
             Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
 
             // calculate the sensor offset using fault information
-            this->FaultyChillerSWTOffset = FaultsManager::FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->FaultyChillerSWTOffset = state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the TempEvapOutSetPoint
             TempEvapOutSetPoint = min(DataLoopNode::Node(this->EvapInletNodeNum).Temp, EvapOutletTemp_ff - this->FaultyChillerSWTOffset);
             this->FaultyChillerSWTOffset = EvapOutletTemp_ff - TempEvapOutSetPoint;
@@ -6976,7 +6973,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated);
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,
@@ -7055,7 +7052,7 @@ namespace PlantChillers {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
                 int FaultIndex = this->FaultyChillerSWTIndex;
                 bool VarFlowFlag = false;
-                FaultsManager::FaultsChillerSWTSensor(FaultIndex)
+                state.dataFaultsMgr->FaultsChillerSWTSensor(FaultIndex)
                     .CalFaultChillerSWT(VarFlowFlag,
                                         this->FaultyChillerSWTOffset,
                                         Cp,

@@ -508,7 +508,8 @@ namespace ConvectionCoefficients {
                                     const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     );
 
-    void CalcNusselt(int SurfNum, // Surface number
+    void CalcNusselt(EnergyPlusData &state,
+                     int SurfNum, // Surface number
                      Real64 asp,  // Aspect ratio: window height to gap width
                      Real64 tso,  // Temperature of gap surface closest to outside (K)
                      Real64 tsi,  // Temperature of gap surface closest to zone (K)
@@ -862,6 +863,14 @@ namespace ConvectionCoefficients {
                          Real64 WindDirect, // Wind direction measured clockwise from geographic North
                          Real64 RoofArea,
                          Real64 RoofPerimeter);
+
+    void CalcASTMC1340ConvCoeff(EnergyPlusData &state,
+                                int const SurfNum,                  // surface number for which coefficients are being calculated
+                                Real64 const SurfaceTemperature,    // Temperature of surface for evaluation of HcIn
+                                Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
+    );
+
+    Real64 CalcASTMC1340ConvCoeff(EnergyPlusData &state, int const SurfNum, Real64 const Tsurf, Real64 const Tair, Real64 const Vair, Real64 const Tilt);
 
 } // namespace ConvectionCoefficients
 

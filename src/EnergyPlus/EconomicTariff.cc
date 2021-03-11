@@ -1850,7 +1850,7 @@ namespace EnergyPlus::EconomicTariff {
         econVar(state.dataEconTariff->numEconVar).isArgument = false;
         econVar(state.dataEconTariff->numEconVar).isAssigned = false;
         econVar(state.dataEconTariff->numEconVar).specific = varNotYetDefined;
-        //		econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
+        //        econVar( numEconVar ).values = 0.0; //Autodesk Already initialized above
         // Autodesk Don't initialize cntMeDependOn
         econVar(state.dataEconTariff->numEconVar).Operator = 0;
         econVar(state.dataEconTariff->numEconVar).firstOperand = 1; // Autodesk Default initialization sets this to 0
@@ -3030,7 +3030,6 @@ namespace EnergyPlus::EconomicTariff {
                             // No longer pushing a zero to fix bug
                             // and push zero
                             // a = 0
-                            // CALL pushStack(a,noVar)
                         }
                     }
                 }
@@ -4057,19 +4056,16 @@ namespace EnergyPlus::EconomicTariff {
         auto &chargeSimple(state.dataEconTariff->chargeSimple);
         auto &chargeBlock(state.dataEconTariff->chargeBlock);
 
+        // Here to it is ready to assign ort->unitStyle_SQLite (not in SQLiteProcedures.cc)
+        // when ort->unitsStyle inputs should have been concretely processed and assigned.
+        // Included this here to make sure the units specifications are correctly updated. 
+        if (state.dataOutRptTab->unitsStyle_SQLite == OutputReportTabular::iUnitsStyle::NotFound) {
+            state.dataOutRptTab->unitsStyle_SQLite = state.dataOutRptTab->unitsStyle; // This is the default UseOutputControlTableStyles
+        }
+
         // compute floor area if no ABUPS
         if (state.dataOutRptTab->buildingConditionedFloorArea == 0.0) {
             DetermineBuildingFloorArea(state);
-        }
-
-        // do unit conversions if necessary
-        if (state.dataOutRptTab->unitsStyle == OutputReportTabular::iUnitsStyle::InchPound) {
-            SIunit = "[~~$~~/m2]";
-            LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
-            perAreaUnitConv = ConvertIP(state, unitConvIndex, 1.0);
-        } else {
-            perAreaUnitName = "[~~$~~/m2]";
-            perAreaUnitConv = 1.0;
         }
 
         if (state.dataEconTariff->numTariff > 0) {
@@ -4077,7 +4073,6 @@ namespace EnergyPlus::EconomicTariff {
                 DisplayString(state, "Writing Tariff Reports");
                 for (auto &e : econVar)
                     e.isReported = false;
-                // CALL selectTariff moved to the end of computeTariff.
                 showWarningsBasedOnTotal(state);
                 //---------------------------------
                 // Economics Results Summary Report
@@ -4085,67 +4080,97 @@ namespace EnergyPlus::EconomicTariff {
                 WriteReportHeaders(state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 elecFacilMeter = GetMeterIndex(state, "ELECTRICITY:FACILITY");
                 gasFacilMeter = GetMeterIndex(state, "NATURALGAS:FACILITY");
-                //---- Annual Summary
-                rowHead.allocate(3);
-                columnHead.allocate(4);
-                columnWidth.allocate(4);
-                tableBody.allocate(4, 3);
-                tableBody = "";
-                columnHead(1) = "Electricity";
-                columnHead(2) = "Natural Gas";
-                columnHead(3) = "Other";
-                columnHead(4) = "Total";
-                rowHead(1) = "Cost [~~$~~]";
-                rowHead(2) = "Cost per Total Building Area " + perAreaUnitName;
-                rowHead(3) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
-                elecTotalCost = 0.0;
-                gasTotalCost = 0.0;
-                otherTotalCost = 0.0;
-                allTotalCost = 0.0;
-                for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
-                    if (tariff(iTariff).isSelected) {
-                        allTotalCost += tariff(iTariff).totalAnnualCost;
-                        if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
-                            elecTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
-                            gasTotalCost += tariff(iTariff).totalAnnualCost;
-                        } else {
-                            otherTotalCost += tariff(iTariff).totalAnnualCost;
-                            // removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+
+                for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
+                    OutputReportTabular::iUnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
+                    bool produceTabular = true;
+                    bool produceSQLite = false;
+                    if (produceDualUnitsFlags(iUnitSystem,
+                                              state.dataOutRptTab->unitsStyle,
+                                              state.dataOutRptTab->unitsStyle_SQLite,
+                                              unitsStyle_cur,
+                                              produceTabular,
+                                              produceSQLite))
+                        break;
+
+                    // do unit conversions if necessary
+                    if (unitsStyle_cur == OutputReportTabular::iUnitsStyle::InchPound) {
+                        SIunit = "[~~$~~/m2]";
+                        LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
+                        perAreaUnitConv = ConvertIP(state, unitConvIndex, 1.0);
+                    } else {
+                        perAreaUnitName = "[~~$~~/m2]";
+                        perAreaUnitConv = 1.0;
+                    }
+
+                    //---- Annual Summary
+                    rowHead.allocate(3);
+                    columnHead.allocate(4);
+                    columnWidth.allocate(4);
+                    tableBody.allocate(4, 3);
+                    tableBody = "";
+                    columnHead(1) = "Electricity";
+                    columnHead(2) = "Natural Gas";
+                    columnHead(3) = "Other";
+                    columnHead(4) = "Total";
+                    rowHead(1) = "Cost [~~$~~]";
+                    rowHead(2) = "Cost per Total Building Area " + perAreaUnitName;
+                    rowHead(3) = "Cost per Net Conditioned Building Area " + perAreaUnitName;
+                    elecTotalCost = 0.0;
+                    gasTotalCost = 0.0;
+                    otherTotalCost = 0.0;
+                    allTotalCost = 0.0;
+                    for (iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
+                        if (tariff(iTariff).isSelected) {
+                            allTotalCost += tariff(iTariff).totalAnnualCost;
+                            if (tariff(iTariff).kindElectricMtr >= kindMeterElecSimple) {
+                                elecTotalCost += tariff(iTariff).totalAnnualCost;
+                            } else if (tariff(iTariff).reportMeterIndx == gasFacilMeter) {
+                                gasTotalCost += tariff(iTariff).totalAnnualCost;
+                            } else {
+                                otherTotalCost += tariff(iTariff).totalAnnualCost;
+                                // removed because this was confusing        columnHead(3) = tariff(iTariff)%reportMeter
+                            }
                         }
                     }
+                    tableBody(1, 1) = RealToStr(elecTotalCost, 2);
+                    tableBody(2, 1) = RealToStr(gasTotalCost, 2);
+                    tableBody(3, 1) = RealToStr(otherTotalCost, 2);
+                    tableBody(4, 1) = RealToStr(allTotalCost, 2);
+                    if (state.dataOutRptTab->buildingGrossFloorArea > 0.0) {
+                        tableBody(1, 2) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                        tableBody(2, 2) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                        tableBody(3, 2) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                        tableBody(4, 2) = RealToStr((allTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
+                    }
+                    if (state.dataOutRptTab->buildingConditionedFloorArea > 0.0) {
+                        tableBody(1, 3) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                        tableBody(2, 3) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                        tableBody(3, 3) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                        tableBody(4, 3) = RealToStr((allTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
+                    }
+                    columnWidth = 14; // array assignment - same for all columns
+                    if (produceTabular) {
+                        WriteSubtitle(state, "Annual Cost");
+                        WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
+                    }
+                    if (produceSQLite) {
+                        if (sqlite) {
+                            sqlite->createSQLiteTabularDataRecords(
+                                tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
+                        }
+                    }
+                    if (produceTabular) {
+                        if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
+                            state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
+                                tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
+                        }
+                    }
+                    columnHead.deallocate();
+                    rowHead.deallocate();
+                    columnWidth.deallocate();
+                    tableBody.deallocate();
                 }
-                tableBody(1, 1) = RealToStr(elecTotalCost, 2);
-                tableBody(2, 1) = RealToStr(gasTotalCost, 2);
-                tableBody(3, 1) = RealToStr(otherTotalCost, 2);
-                tableBody(4, 1) = RealToStr(allTotalCost, 2);
-                if (state.dataOutRptTab->buildingGrossFloorArea > 0.0) {
-                    tableBody(1, 2) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(2, 2) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(3, 2) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                    tableBody(4, 2) = RealToStr((allTotalCost / state.dataOutRptTab->buildingGrossFloorArea) * perAreaUnitConv, 2);
-                }
-                if (state.dataOutRptTab->buildingConditionedFloorArea > 0.0) {
-                    tableBody(1, 3) = RealToStr((elecTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(2, 3) = RealToStr((gasTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(3, 3) = RealToStr((otherTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                    tableBody(4, 3) = RealToStr((allTotalCost / state.dataOutRptTab->buildingConditionedFloorArea) * perAreaUnitConv, 2);
-                }
-                columnWidth = 14; // array assignment - same for all columns
-                WriteSubtitle(state, "Annual Cost");
-                WriteTable(state, tableBody, rowHead, columnHead, columnWidth);
-                if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
-                }
-                if (state.dataResultsFramework->resultsFramework->timeSeriesAndTabularEnabled()) {
-                    state.dataResultsFramework->resultsFramework->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
-                }
-                columnHead.deallocate();
-                rowHead.deallocate();
-                columnWidth.deallocate();
-                tableBody.deallocate();
                 //---- Tariff Summary
                 rowHead.allocate(state.dataEconTariff->numTariff);
                 columnHead.allocate(6);

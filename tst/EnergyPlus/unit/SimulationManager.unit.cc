@@ -269,17 +269,17 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
     EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
-    EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
 
     // Undocumented ones, see SimulationManager_OutputDiagnostics_UndocumentedFlags
     EXPECT_FALSE(state->dataEnvrn->IgnoreSolarRadiation);
     EXPECT_FALSE(state->dataEnvrn->IgnoreBeamRadiation);
     EXPECT_FALSE(state->dataEnvrn->IgnoreDiffuseRadiation);
-    EXPECT_FALSE(DataSystemVariables::DeveloperFlag);
-    EXPECT_FALSE(DataSystemVariables::TimingFlag);
+    EXPECT_FALSE(state->dataSysVars->DeveloperFlag);
+    EXPECT_FALSE(state->dataSysVars->TimingFlag);
 
     // no error message from
     EXPECT_TRUE(compare_err_stream("", true));
@@ -305,10 +305,10 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
     EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
-    EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
 
     // no error message from
     EXPECT_TRUE(compare_err_stream("", true));
@@ -345,10 +345,10 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
     EXPECT_TRUE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_FALSE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_FALSE(DataReportingFlags::MakeMirroredAttachedShading);
-    EXPECT_TRUE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_TRUE(state->dataSysVars->ReportDuringWarmup);
     EXPECT_TRUE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
-    EXPECT_TRUE(DataSystemVariables::ReportDetailedWarmupConvergence);
-    EXPECT_TRUE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+    EXPECT_TRUE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_TRUE(state->dataSysVars->ReportDuringHVACSizingSimulation);
 
     // no error message from
     EXPECT_TRUE(compare_err_stream("", true));
@@ -383,10 +383,10 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
-    EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
 
     {
         std::string const expectedError = delimited_string({
@@ -428,17 +428,17 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
     EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
-    EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
 
     // Still works
     EXPECT_TRUE(state->dataEnvrn->IgnoreSolarRadiation);
     EXPECT_TRUE(state->dataEnvrn->IgnoreBeamRadiation);
     EXPECT_TRUE(state->dataEnvrn->IgnoreDiffuseRadiation);
-    EXPECT_TRUE(DataSystemVariables::DeveloperFlag);
-    EXPECT_TRUE(DataSystemVariables::TimingFlag);
+    EXPECT_TRUE(state->dataSysVars->DeveloperFlag);
+    EXPECT_TRUE(state->dataSysVars->TimingFlag);
 
     // no error message from
     EXPECT_TRUE(compare_err_stream("", true));
@@ -467,10 +467,10 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
     EXPECT_FALSE(state->dataGlobal->DisplayZoneAirHeatBalanceOffBalance);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredDetachedShading);
     EXPECT_TRUE(DataReportingFlags::MakeMirroredAttachedShading);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringWarmup);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringWarmup);
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
-    EXPECT_FALSE(DataSystemVariables::ReportDetailedWarmupConvergence);
-    EXPECT_FALSE(DataSystemVariables::ReportDuringHVACSizingSimulation);
+    EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
+    EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
 
     // Warning that an empty key was entered
     std::string const expectedError = delimited_string({

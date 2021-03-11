@@ -923,8 +923,8 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
         outletNodeIndex = std::distance(DataLoopNode::NodeID.begin(), outletNode);
     }
     // TODO: FIXME: This is failing. Actual is -10.409381032746095, expected is 30.
-    // EXPECT_GT( DataLoopNode::Node( inletNodeIndex ).Temp, 30.0 ); // inlet node temperature
-    // EXPECT_DOUBLE_EQ( 30.0, DataLoopNode::Node( outletNodeIndex ).Temp ); // outlet node temperature
+     EXPECT_GT( DataLoopNode::Node( inletNodeIndex ).Temp, 30.0 ); // inlet node temperature
+     EXPECT_DOUBLE_EQ( 30.0, DataLoopNode::Node( outletNodeIndex ).Temp ); // outlet node temperature
 
     // input not needed for sizing (WasAutoSized = false) using NominalCapacity method but this variable should still size
     EXPECT_FALSE(state->dataCondenserLoopTowers->towers(1).HighSpeedTowerUAWasAutoSized);
@@ -3045,10 +3045,10 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    PlantManager::InitLoopEquip = true;
+    state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1000.0;
 
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;
@@ -3437,10 +3437,9 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    PlantManager::InitLoopEquip = true;
+    state->dataPlantMgr->InitLoopEquip = true;
 
     // Fake having more than small load
-    // DataSizing::PlantSizData(1).DesVolFlowRate = 1000.0;
 
     // SizingManager::ManageSizing();
 
@@ -3911,7 +3910,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     SizingManager::GetPlantSizingInput(*state);
     PlantManager::InitOneTimePlantSizingInfo(*state, 1);
     PlantManager::SizePlantLoop(*state, 1, true);
-    PlantManager::InitLoopEquip = true;
+    state->dataPlantMgr->InitLoopEquip = true;
 
     state->dataGlobal->DoingSizing = false;
     state->dataGlobal->KickOffSimulation = true;

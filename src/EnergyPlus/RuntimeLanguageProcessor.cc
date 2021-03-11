@@ -229,7 +229,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         std::string datestring; // supposedly returns blank when no date available.
 
-        // FLOW:
+
         if (InitializeOnce) {
 
             state.dataRuntimeLang->False = SetErlValueNumber(0.0);
@@ -449,7 +449,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Loop over each line of Erl code and parse based on statement keyword
 
         // Using/Aliasing
-        using DataSystemVariables::DeveloperFlag;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -484,7 +483,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         Array1D_bool ReadyForElse(IfDepthAllowed);
         Array1D_bool ReadyForEndif(IfDepthAllowed);
 
-        // FLOW:
+
         LineNum = 1;
         NestedIfDepth = 0;
         ReadyForElse = false;
@@ -519,7 +518,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 auto const SELECT_CASE_var(Keyword);
 
                 if (SELECT_CASE_var == "RETURN") {
-                    if (DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         InstructionNum = AddInstruction(state, StackNum, LineNum, RuntimeLanguageProcessor::ErlKeywordParam::KeywordReturn);
                     } else {
@@ -528,7 +527,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
-                    if (DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "SET \"{}\"\n", Line);
                     Pos = scan(Remainder, '=');
                     if (Pos == std::string::npos) {
                         AddError(state, StackNum, LineNum, "Equal sign missing for the SET instruction.");
@@ -553,7 +552,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "RUN") {
-                    if (DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "RUN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(state, StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
                     } else {
@@ -570,7 +569,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "IF") {
-                    if (DeveloperFlag) {
+                    if (state.dataSysVars->DeveloperFlag) {
                         print(state.files.debug, "IF \"{}\"\n", Line);
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
@@ -594,7 +593,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ELSEIF") {
-                    if (DeveloperFlag) {
+                    if (state.dataSysVars->DeveloperFlag) {
                         print(state.files.debug, "ELSEIF \"{}\"\n", Line);
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
@@ -630,7 +629,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
                 } else if (SELECT_CASE_var == "ELSE") {
-                    if (DeveloperFlag) {
+                    if (state.dataSysVars->DeveloperFlag) {
                         print(state.files.debug, "ELSE \"{}\"\n", Line);
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
@@ -664,7 +663,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     SavedIfInstructionNum(NestedIfDepth) = InstructionNum;
 
                 } else if (SELECT_CASE_var == "ENDIF") {
-                    if (DeveloperFlag) {
+                    if (state.dataSysVars->DeveloperFlag) {
                         print(state.files.debug, "ENDIF \"{}\"\n", Line);
                         print(state.files.debug, "NestedIf={}\n", NestedIfDepth);
                     }
@@ -698,7 +697,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     --NestedIfDepth;
 
                 } else if (SELECT_CASE_var == "WHILE") {
-                    if (DeveloperFlag) print(state.files.debug, "WHILE \"{}\"\n", Line);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "WHILE \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(state, StackNum, LineNum, "Expression missing for the WHILE instruction.");
                         ExpressionNum = 0;
@@ -718,7 +717,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ENDWHILE") {
-                    if (DeveloperFlag) print(state.files.debug, "ENDWHILE \"{}\"\n", Line);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ENDWHILE \"{}\"\n", Line);
                     if (NestedWhileDepth == 0) {
                         AddError(state, StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
                         break;
@@ -737,7 +736,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     SavedWhileExpressionNum = 0;
 
                 } else {
-                    if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", Line);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", Line);
                     AddError(state, StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
                 }
             }
@@ -785,7 +784,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         ErlStackType TempStack;
 
-        // FLOW:
+
         if (state.dataRuntimeLang->ErlStack(StackNum).NumInstructions == 0) {
             state.dataRuntimeLang->ErlStack(StackNum).Instruction.allocate(1);
             state.dataRuntimeLang->ErlStack(StackNum).NumInstructions = 1;
@@ -834,7 +833,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         ErlStackType TempStack; // temporary copy of single ErlStack
 
-        // FLOW:
+
         if (state.dataRuntimeLang->ErlStack(StackNum).NumErrors == 0) {
             state.dataRuntimeLang->ErlStack(StackNum).Error.allocate(1);
             state.dataRuntimeLang->ErlStack(StackNum).NumErrors = 1;
@@ -1029,7 +1028,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         std::string TimeString;
         std::string DuringWarmup;
 
-        // FLOW:
+
         if ((!state.dataRuntimeLang->OutputFullEMSTrace) && (!state.dataRuntimeLang->OutputEMSErrors) && (!seriousErrorFound)) return;
 
         if ((state.dataRuntimeLang->OutputEMSErrors) && (!state.dataRuntimeLang->OutputFullEMSTrace) && (!seriousErrorFound)) {
@@ -1107,7 +1106,6 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // METHODOLOGY EMPLOYED:
 
         // Using/Aliasing
-        using DataSystemVariables::DeveloperFlag;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1134,7 +1132,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Object Data
         static Array1D<TokenType> Token;
 
-        // FLOW:
+
         CountDoLooping = 0;
         NumErrors = 0;
         //  Error = 'No errors.'
@@ -1250,9 +1248,9 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 if (!ErrorFlag) {
                     Token(NumTokens).Type = TokenNumber;
                     Token(NumTokens).String = StringToken;
-                    if (DeveloperFlag) print(state.files.debug, "Number=\"{}\"\n", StringToken);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Number=\"{}\"\n", StringToken);
                     Token(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
-                    if (DeveloperFlag && ErrorFlag) print(state.files.debug, "{}\n", "Numeric error flagged");
+                    if (state.dataSysVars->DeveloperFlag && ErrorFlag) print(state.files.debug, "{}\n", "Numeric error flagged");
                     if (MinusFound) {
                         Token(NumTokens).Number = -Token(NumTokens).Number;
                         MinusFound = false;
@@ -1291,7 +1289,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 // Save the variable token
                 Token(NumTokens).Type = TokenVariable;
                 Token(NumTokens).String = StringToken;
-                if (DeveloperFlag) print(state.files.debug, "Variable=\"{}\"\n", StringToken);
+                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "Variable=\"{}\"\n", StringToken);
                 Token(NumTokens).Variable = NewEMSVariable(state, StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
@@ -1338,7 +1336,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
                     if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) ||
                         (!case_insensitive && potential_match == string)) {
-                        if (DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", potential_match);
+                        if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", potential_match);
                         Token(NumTokens).Operator = op;
                         Token(NumTokens).String = potential_match;
                         Pos += (len - 1);
@@ -1398,7 +1396,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         i_parse("@TOMORROWALBEDO", FuncTomorrowAlbedo) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
                         // was a built in function operator
                     } else { // throw error
-                        if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", String);
+                        if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", String);
                         ShowFatalError(state, "EMS Runtime Language: did not find valid input for built-in function =" + String);
                     }
                 } else {
@@ -1407,7 +1405,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                     MultFound = false;
                     DivFound = false;
 
-                    if (DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", StringToken);
+                    if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "OPERATOR \"{}\"\n", StringToken);
 
                     if (StringToken == "+") {
                         if (!OperatorProcessing) {
@@ -1448,7 +1446,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                         Token(NumTokens).String = StringToken;
                     } else {
                         // Uh OH, this should never happen! throw error
-                        if (DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", StringToken);
+                        if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "ERROR \"{}\"\n", StringToken);
                         ShowFatalError(state, "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
                     }
                 }
@@ -1459,7 +1457,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
                 // Parse a parenthesis token
                 ++Pos;
                 StringToken = NextChar;
-                if (DeveloperFlag) print(state.files.debug, "PAREN \"{}\"\n", StringToken);
+                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "PAREN \"{}\"\n", StringToken);
                 Token(NumTokens).Type = TokenParenthesis;
                 Token(NumTokens).String = StringToken;
                 if (NextChar == '(') {
@@ -1470,7 +1468,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
             } else if (is_any_of(NextChar, "\"")) {
                 // Parse a string literal token
-                if (DeveloperFlag) print(state.files.debug, "{}\n", "LITERAL STRING");
+                if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "{}\n", "LITERAL STRING");
                 ++Pos;
 
             } else {
@@ -1479,7 +1477,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         }
 
         if (NumErrors > 0) {
-            if (DeveloperFlag) print(state.files.debug, "{}\n", "ERROR OUT");
+            if (state.dataSysVars->DeveloperFlag) print(state.files.debug, "{}\n", "ERROR OUT");
             ShowFatalError(state, "EMS, previous errors cause termination.");
         }
 
@@ -1520,7 +1518,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         Array1D<TokenType> Token(TokenIN);
         Array1D<TokenType> SubTokenList;
 
-        // FLOW:
+
         ExpressionNum = 0;
         NumTokens = NumTokensIN;
 
@@ -1761,7 +1759,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // Object Data
 
-        // FLOW:
+
         if (state.dataRuntimeLang->NumExpressions == 0) {
             state.dataRuntimeLang->ErlExpression.allocate(1);
             state.dataRuntimeLang->NumExpressions = 1;
@@ -1819,7 +1817,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         auto constexpr EMSBuiltInFunction("EMS Built-In Function");
 
-        // FLOW:
+
 
         ReturnValue.Type = ValueNumber;
         ReturnValue.Number = 0.0;
@@ -2636,7 +2634,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         OutputProcessor::Unit curUnit(OutputProcessor::Unit::None);
         std::string::size_type ptr;
 
-        // FLOW:
+
         if (GetInput) { // GetInput check is redundant with the InitializeRuntimeLanguage routine
             GetInput = false;
 
@@ -3618,7 +3616,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         int RuntimeReportVarNum;
         int VariableNum;
 
-        // FLOW:
+
         for (RuntimeReportVarNum = 1; RuntimeReportVarNum <= state.dataRuntimeLang->NumEMSOutputVariables + state.dataRuntimeLang->NumEMSMeteredOutputVariables; ++RuntimeReportVarNum) {
             VariableNum = RuntimeReportVar(RuntimeReportVarNum).VariableNum;
             if (state.dataRuntimeLang->ErlVariable(VariableNum).Value.Type == ValueNumber) {
@@ -3668,7 +3666,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
 
-        // FLOW:
+
         if (present(OrigValue)) { // preserve other parts of structure and only updated Value%Number
             newValue = OrigValue;
             newValue.Number = Number;
@@ -3719,7 +3717,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
-        // FLOW:
+
 
         Value.Type = ValueString;
         Value.String = String;
@@ -3752,7 +3750,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
 
-        // FLOW:
+
         String = "";
 
         {
@@ -3798,7 +3796,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         bool Found;
         int TrendVarNum;
 
-        // FLOW:
+
         Found = false;
         std::string const UppercaseName = UtilityRoutines::MakeUPPERCase(VariableName);
 
@@ -3840,7 +3838,7 @@ namespace EnergyPlus::RuntimeLanguageProcessor {
         // PURPOSE OF THIS FUNCTION:
         // Creates new variable if it doesn't exist.  If exists, returns existing variable number.
 
-        // FLOW:
+
         int VariableNum = FindEMSVariable(state, VariableName, StackNum);
 
         if (VariableNum == 0) { // Variable does not exist anywhere yet

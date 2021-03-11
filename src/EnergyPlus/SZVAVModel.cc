@@ -125,7 +125,7 @@ namespace SZVAVModel {
         int coilAirOutletNode(0);
 
         Real64 TempSensOutput; // iterative sensible capacity [W]
-                               //		Real64 TempLatOutput; // iterative latent capacity [W]
+                               //        Real64 TempLatOutput; // iterative latent capacity [W]
 
         // set up mode specific variables to use in common function calls
         if (CoolingLoad) {
@@ -183,7 +183,7 @@ namespace SZVAVModel {
         Par(8) = double(coilFluidInletNode);
         // initialize other RegulaFalsi variables to most common state
         Par(9) = 0.0;               // minCoilFluidFlow - low fan speed water flow rate
-                                    //			Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
+                                    //            Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
         Par(11) = lowSpeedFanRatio; // ratio of low speed fan flow to max flow
         Par(12) = minAirMassFlow;   // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
         Par(14) = maxAirMassFlow;   // constant, denotes system maximum air flow rate
@@ -547,7 +547,7 @@ namespace SZVAVModel {
         int coilAirOutletNode(0);
 
         Real64 TempSensOutput; // iterative sensible capacity [W]
-                               //		Real64 TempLatOutput; // iterative latent capacity [W]
+                               //        Real64 TempLatOutput; // iterative latent capacity [W]
 
         // set up mode specific variables to use in common function calls
         if (CoolingLoad) {
@@ -605,7 +605,7 @@ namespace SZVAVModel {
         Par(8) = double(coilFluidInletNode);
         // initialize other RegulaFalsi variables to most common state
         Par(9) = 0.0;               // minCoilFluidFlow - low fan speed water flow rate
-                                    //			Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
+                                    //            Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
         Par(11) = lowSpeedFanRatio; // ratio of low speed fan flow to max flow
         Par(12) = minAirMassFlow;   // operating air flow rate, minAirMassFlow indicates low speed, maxAirMassFlow indicates full speed
         Par(14) = maxAirMassFlow;   // constant, denotes system maximum air flow rate
@@ -1037,7 +1037,7 @@ namespace SZVAVModel {
         Par[8] = double(coilFluidInletNode);
         // initialize other RegulaFalsi variables to most common state
         Par[9] = 0.0;               // minCoilFluidFlow - low fan speed water flow rate
-                                    //			Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
+                                    //            Par( 10 ) = maxCoilFluidFlow; // max water flow rate used by RegulaFalsi
         Par[11] = lowSpeedFanRatio; // ratio of low speed fan flow to max flow
         Par[12] = minAirMassFlow; // operating air flow rate, minAirMassFlow indicates low speed air flow rate, maxAirMassFlow indicates full air flow
         Par[14] = maxAirMassFlow; // constant, denotes system maximum air flow rate

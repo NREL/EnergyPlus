@@ -235,18 +235,18 @@ namespace HVACFan {
 
         Real64 tempFlow = designAirVolFlowRate;
         bool bPRINT = true;
-        DataSizing::DataAutosizable = true;
-        DataSizing::DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
-        DataSizing::DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
+        state.dataSize->DataAutosizable = true;
+        state.dataSize->DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
+        state.dataSize->DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
         designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 
-        DataSizing::DataAutosizable = true; // should be false?
-        DataSizing::DataEMSOverrideON = false;
-        DataSizing::DataEMSOverride = 0.0;
+        state.dataSize->DataAutosizable = true; // should be false?
+        state.dataSize->DataEMSOverrideON = false;
+        state.dataSize->DataEMSOverride = 0.0;
 
         if (m_designElecPowerWasAutosized) {
 
@@ -521,7 +521,7 @@ namespace HVACFan {
         }
         m_nightVentPressureDelta = numericArgs(10);
         m_nightVentFlowFraction = numericArgs(11); // not used
-        m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), DataHeatBalance::Zone);
+        m_zoneNum = UtilityRoutines::FindItemInList(alphaArgs(8), state.dataHeatBal->Zone);
         if (m_zoneNum > 0) m_heatLossesDestination = ThermalLossDestination::zoneGains;
         if (m_zoneNum == 0) {
             if (isAlphaFieldBlank(8)) {
@@ -738,9 +738,9 @@ namespace HVACFan {
         Real64 localFaultMaxAirMassFlow = 0.0;
         bool faultActive = false;
         Real64 localFaultPressureRise = 0.0;
-        if (m_faultyFilterFlag && (FaultsManager::NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+        if (m_faultyFilterFlag && (state.dataFaultsMgr->NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
             state.dataGlobal->DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
-            if (ScheduleManager::GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
                 faultActive = true;
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
                 FanDesignFlowRateDec = Fans::CalFaultyFanAirFlowReduction(state,
@@ -748,15 +748,15 @@ namespace HVACFan {
                     designAirVolFlowRate,
                     deltaPress,
                     (ScheduleManager::GetCurrentScheduleValue(state,
-                         FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
+                         state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
                      1) *
                         deltaPress,
-                    FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
+                    state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
 
                 localFaultMaxAirMassFlow = m_maxAirMassFlowRate - FanDesignFlowRateDec * m_rhoAirStdInit;
 
                 localFaultPressureRise = ScheduleManager::GetCurrentScheduleValue(state,
-                                             FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
+                                             state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
                                          deltaPress;
             }
         }
@@ -1149,24 +1149,24 @@ namespace HVACFan {
     // void
     // FanSystem::fanIsSecondaryDriver()
     //{
-    //	// this concept is used when the fan may be operating in a situation where there is airflow without it running at all
-    //	// call this when some other fan is feeding the device containing this fan, making it a secondary fan.
-    //	// example is the fan in a VS VAV air terminal used for UFAD.
-    //	fanIsSecondaryDriver = true;
+    //    // this concept is used when the fan may be operating in a situation where there is airflow without it running at all
+    //    // call this when some other fan is feeding the device containing this fan, making it a secondary fan.
+    //    // example is the fan in a VS VAV air terminal used for UFAD.
+    //    fanIsSecondaryDriver = true;
     //}
 
     // void
     // FanSystem::setFaultyFilterOn()
     //{
-    //	// call this to set flag to direct model to use fault for filter
-    //	faultyFilterFlag_ = true;
+    //    // call this to set flag to direct model to use fault for filter
+    //    faultyFilterFlag_ = true;
     //}
 
     // void
     // FanSystem::setFaultyFilterIndex( int const faultyAirFilterIndex  )
     //{
-    //	// this is the index in the FaultsFouledAirFilters structure array in FaultsManager
-    //	m_faultyFilterIndex = faultyAirFilterIndex;
+    //    // this is the index in the FaultsFouledAirFilters structure array in FaultsManager
+    //    m_faultyFilterIndex = faultyAirFilterIndex;
     //}
 
 } // namespace HVACFan

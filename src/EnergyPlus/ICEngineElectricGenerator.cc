@@ -143,7 +143,7 @@ namespace ICEngineElectricGenerator {
         Array1D<Real64> NumArray(11);   // numeric data
         static bool ErrorsFound(false); // error flag
 
-        // FLOW
+
         DataIPShortCuts::cCurrentModuleObject = "Generator:InternalCombustionEngine";
         NumICEngineGenerators = inputProcessor->getNumObjectsFound(state, DataIPShortCuts::cCurrentModuleObject);
 
@@ -275,7 +275,7 @@ namespace ICEngineElectricGenerator {
                 }
                 BranchNodeConnections::TestCompSet(state,
                     DataIPShortCuts::cCurrentModuleObject, AlphArray(1), AlphArray(8), AlphArray(9), "Heat Recovery Nodes");
-                PlantUtilities::RegisterPlantCompDesignFlow(ICEngineGenerator(genNum).HeatRecInletNodeNum,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, ICEngineGenerator(genNum).HeatRecInletNodeNum,
                                                             ICEngineGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
                 ICEngineGenerator(genNum).HeatRecActive = false;

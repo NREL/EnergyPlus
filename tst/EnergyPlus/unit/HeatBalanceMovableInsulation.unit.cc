@@ -78,9 +78,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     Real64 AbsExt;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulExt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulExt = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).SchedMovInsulExt = -1;
+    state->dataSurface->Surface(SurfNum).MaterialMovInsulExt = 1;
 
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Resistance = 1.25;
@@ -113,9 +113,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalInsideMovableInsulati
     Real64 AbsExt;
 
     SurfNum = 1;
-    DataSurfaces::Surface.allocate(SurfNum);
-    DataSurfaces::Surface(SurfNum).SchedMovInsulInt = -1;
-    DataSurfaces::Surface(SurfNum).MaterialMovInsulInt = 1;
+    state->dataSurface->Surface.allocate(SurfNum);
+    state->dataSurface->Surface(SurfNum).SchedMovInsulInt = -1;
+    state->dataSurface->Surface(SurfNum).MaterialMovInsulInt = 1;
 
     state->dataMaterial->Material.allocate(1);
     state->dataMaterial->Material(1).Resistance = 1.25;
@@ -231,18 +231,18 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     bool ErrorsFound(false);
     // set zone data
     state->dataGlobal->NumOfZones = 1;
-    DataHeatBalance::Zone.allocate(1);
-    DataHeatBalance::Zone(1).Name = "ZONE ONE";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE ONE";
     // get schedule data
     ScheduleManager::ProcessScheduleInput(*state);
     // get materials data
     HeatBalanceManager::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    EXPECT_EQ(4, DataHeatBalance::TotMaterials);
+    EXPECT_EQ(4, state->dataHeatBal->TotMaterials);
     EXPECT_EQ(state->dataMaterial->Material(4).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction data
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
-    EXPECT_EQ(1, DataHeatBalance::TotConstructs);
+    EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
     SurfaceGeometry::GetGeometryParameters(*state, ErrorsFound);
@@ -253,10 +253,10 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurfaceGeometry->SinZoneRelNorth = 0.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     // set surface data
-    DataSurfaces::TotSurfaces = 1;
+    state->dataSurface->TotSurfaces = 1;
     state->dataSurfaceGeometry->SurfaceTmp.allocate(1);
     int SurfNum = 0;
-    int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
+    int TotHTSurfs = state->dataSurface->TotSurfaces = 1;
     Array1D_string const BaseSurfCls(1, {"WALL"});
     Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(1, {DataSurfaces::SurfaceClass::Wall});
     int NeedToAddSurfaces;

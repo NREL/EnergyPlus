@@ -360,7 +360,7 @@ namespace WaterUse {
                 }
 
                 if ((NumAlphas > 6) && (!DataIPShortCuts::lAlphaFieldBlanks(7))) {
-                    state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(7), DataHeatBalance::Zone);
+                    state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone = UtilityRoutines::FindItemInList(DataIPShortCuts::cAlphaArgs(7), state.dataHeatBal->Zone);
 
                     if (state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone == 0) {
                         ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
@@ -567,14 +567,14 @@ namespace WaterUse {
                     if (state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone > 0) {
                         state.dataWaterUse->WaterConnections(WaterConnNum).PeakMassFlowRate +=
                             state.dataWaterUse->WaterEquipment(thisWaterEquipNum).PeakVolFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp) *
-                            DataHeatBalance::Zone(state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone).Multiplier *
-                            DataHeatBalance::Zone(state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone).ListMultiplier;
+                            state.dataHeatBal->Zone(state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone).Multiplier *
+                            state.dataHeatBal->Zone(state.dataWaterUse->WaterEquipment(thisWaterEquipNum).Zone).ListMultiplier;
                     } else { // can't have multipliers
                         state.dataWaterUse->WaterConnections(WaterConnNum).PeakMassFlowRate +=
                             state.dataWaterUse->WaterEquipment(thisWaterEquipNum).PeakVolFlowRate * Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp);
                     }
                 }
-                PlantUtilities::RegisterPlantCompDesignFlow(state.dataWaterUse->WaterConnections(WaterConnNum).InletNode,
+                PlantUtilities::RegisterPlantCompDesignFlow(state, state.dataWaterUse->WaterConnections(WaterConnNum).InletNode,
                                                             state.dataWaterUse->WaterConnections(WaterConnNum).PeakMassFlowRate /
                                                                 Psychrometrics::RhoH2O(DataGlobalConstants::InitConvTemp));
             }
@@ -847,10 +847,10 @@ namespace WaterUse {
         if (this->Zone > 0) {
             if (this->FlowRateFracSchedule > 0) {
                 this->TotalVolFlowRate = this->PeakVolFlowRate * ScheduleManager::GetCurrentScheduleValue(state, this->FlowRateFracSchedule) *
-                                         DataHeatBalance::Zone(this->Zone).Multiplier * DataHeatBalance::Zone(this->Zone).ListMultiplier;
+                                         state.dataHeatBal->Zone(this->Zone).Multiplier * state.dataHeatBal->Zone(this->Zone).ListMultiplier;
             } else {
                 this->TotalVolFlowRate =
-                    this->PeakVolFlowRate * DataHeatBalance::Zone(this->Zone).Multiplier * DataHeatBalance::Zone(this->Zone).ListMultiplier;
+                    this->PeakVolFlowRate * state.dataHeatBal->Zone(this->Zone).Multiplier * state.dataHeatBal->Zone(this->Zone).ListMultiplier;
             }
         } else {
             if (this->FlowRateFracSchedule > 0) {
@@ -925,7 +925,7 @@ namespace WaterUse {
                 this->SensibleEnergy = 0.0;
             } else {
                 this->SensibleRate = ScheduleManager::GetCurrentScheduleValue(state, this->SensibleFracSchedule) * this->TotalMassFlowRate *
-                                     Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - DataHeatBalFanSys::MAT(this->Zone));
+                                     Psychrometrics::CPHW(DataGlobalConstants::InitConvTemp) * (this->MixedTemp - state.dataHeatBalFanSys->MAT(this->Zone));
                 this->SensibleEnergy = this->SensibleRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
@@ -933,19 +933,19 @@ namespace WaterUse {
                 this->LatentRate = 0.0;
                 this->LatentEnergy = 0.0;
             } else {
-                Real64 ZoneHumRat = DataHeatBalFanSys::ZoneAirHumRat(this->Zone);
+                Real64 ZoneHumRat = state.dataHeatBalFanSys->ZoneAirHumRat(this->Zone);
                 Real64 ZoneHumRatSat = Psychrometrics::PsyWFnTdbRhPb(state,
-                    DataHeatBalFanSys::MAT(this->Zone), 1.0, state.dataEnvrn->OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
-                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, DataHeatBalFanSys::MAT(this->Zone), 0.0);
+                    state.dataHeatBalFanSys->MAT(this->Zone), 1.0, state.dataEnvrn->OutBaroPress, RoutineName); // Humidratio at 100% relative humidity
+                Real64 RhoAirDry = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataHeatBalFanSys->MAT(this->Zone), 0.0);
                 Real64 ZoneMassMax =
-                    (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * DataHeatBalance::Zone(this->Zone).Volume; // Max water that can be evaporated to zone
+                    (ZoneHumRatSat - ZoneHumRat) * RhoAirDry * state.dataHeatBal->Zone(this->Zone).Volume; // Max water that can be evaporated to zone
                 Real64 FlowMassMax = this->TotalMassFlowRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour; // Max water in flow
                 Real64 MoistureMassMax = min(ZoneMassMax, FlowMassMax);
 
                 this->MoistureMass = ScheduleManager::GetCurrentScheduleValue(state, this->LatentFracSchedule) * MoistureMassMax;
                 this->MoistureRate = this->MoistureMass / (DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour);
 
-                this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, DataHeatBalFanSys::MAT(this->Zone));
+                this->LatentRate = this->MoistureRate * Psychrometrics::PsyHfgAirFnWTdb(ZoneHumRat, state.dataHeatBalFanSys->MAT(this->Zone));
                 this->LatentEnergy = this->LatentRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
             }
 
@@ -1198,7 +1198,7 @@ namespace WaterUse {
             this->ReturnTemp = this->ColdSupplyTemp;
             this->WasteTemp = this->DrainTemp;
 
-        } else { // state.dataWaterUse->WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
+        } else { // WaterConnections(WaterConnNum)%TotalMassFlowRate > 0.0
 
             {
                 auto const SELECT_CASE_var(this->HeatRecoveryConfig);
@@ -1413,10 +1413,10 @@ namespace WaterUse {
             int ZoneNum = state.dataWaterUse->WaterEquipment(WaterEquipNum).Zone;
             state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleRateNoMultiplier =
                 state.dataWaterUse->WaterEquipment(WaterEquipNum).SensibleRate /
-                (DataHeatBalance::Zone(ZoneNum).Multiplier * DataHeatBalance::Zone(ZoneNum).ListMultiplier);
+                (state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
             state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentRateNoMultiplier =
                 state.dataWaterUse->WaterEquipment(WaterEquipNum).LatentRate /
-                (DataHeatBalance::Zone(ZoneNum).Multiplier * DataHeatBalance::Zone(ZoneNum).ListMultiplier);
+                (state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
         }
     }
 } // namespace WaterUse

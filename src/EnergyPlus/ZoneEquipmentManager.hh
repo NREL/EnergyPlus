@@ -122,16 +122,27 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
 
+    void CalcZoneInfiltrationFlows(EnergyPlusData &state,
+                                   int const ZoneNum,                // current zone index
+                                   Real64 &ZoneReturnAirMassFlowRate // zone total zone return air mass flow rate
+    );
+
+    void ZoneReturnFlowsMaximum(EnergyPlusData &state,
+        int const ZoneNum,
+        Real64 &MaximumZoneReturnMassFlow // maximum zone total return air mass flow rate
+    );
+
     void CalcAirFlowSimple(EnergyPlusData &state,
                            int const SysTimestepLoop = 0,              // System time step index
-                           bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
+                           bool const AdjustZoneMixingFlowFlag = false, // flags to adjust zone mxing mass flow rate
+                           bool const AdjustZoneInfiltrationFlowFlag = false // flags to djust zone infiltration air flow rate
     );
 
     void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum); // Zone Air Balance Outdoor index
 
-    void CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
+    void CalcZoneMixingFlowRateOfReceivingZone(EnergyPlusData &state, int const ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
 
-    void CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
+    void CalcZoneMixingFlowRateOfSourceZone(EnergyPlusData &state, int const ZoneNum);
 
     void CalcZoneLeavingConditions(EnergyPlusData &state, bool const FirstHVACIteration);
 

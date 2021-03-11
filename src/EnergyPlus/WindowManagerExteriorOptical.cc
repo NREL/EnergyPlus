@@ -122,43 +122,43 @@ namespace WindowManager {
     }
 
     // void InitWCE_BSDFOpticalData() {
-    // 	// SUBROUTINE INFORMATION:
-    // 	//       AUTHOR         Simon Vidanovic
-    // 	//       DATE WRITTEN   September 2016
-    // 	//       MODIFIED       na
-    // 	//       RE-ENGINEERED  na
+    //     // SUBROUTINE INFORMATION:
+    //     //       AUTHOR         Simon Vidanovic
+    //     //       DATE WRITTEN   September 2016
+    //     //       MODIFIED       na
+    //     //       RE-ENGINEERED  na
     //
-    // 	// PURPOSE OF THIS SUBROUTINE:
-    // 	// Initialize BSDF construction layers in Solar and Visible spectrum.
+    //     // PURPOSE OF THIS SUBROUTINE:
+    //     // Initialize BSDF construction layers in Solar and Visible spectrum.
     //
-    // 	auto aWinConstBSDF = CWindowConstructionsBSDF::instance();
-    // 	for ( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
-    // 		auto& construction( Construct( ConstrNum ) );
-    // 		if ( construction.isGlazingConstruction() ) {
-    // 			for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
-    // 				auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
-    // 				if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
-    // 					material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
-    // 					auto aMaterial = std::make_shared< Material::MaterialProperties >();
-    // 					*aMaterial = material;
+    //     auto aWinConstBSDF = CWindowConstructionsBSDF::instance();
+    //     for ( auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
+    //         auto& construction( Construct( ConstrNum ) );
+    //         if ( construction.isGlazingConstruction() ) {
+    //             for ( auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum ) {
+    //                 auto& material( dataMaterial.Material( construction.LayerPoint( LayNum ) ) );
+    //                 if ( material.Group != WindowGas && material.Group != WindowGasMixture &&
+    //                     material.Group != ComplexWindowGap && material.Group != ComplexWindowShade ) {
+    //                     auto aMaterial = std::make_shared< Material::MaterialProperties >();
+    //                     *aMaterial = material;
     //
-    // 					// This is necessary because rest of EnergyPlus code relies on TransDiff property
-    // 					// of construction. It will basically trigger Window optical calculations if this
-    // 					// property is >0.
-    // 					construction.TransDiff = 0.1;
+    //                     // This is necessary because rest of EnergyPlus code relies on TransDiff property
+    //                     // of construction. It will basically trigger Window optical calculations if this
+    //                     // property is >0.
+    //                     construction.TransDiff = 0.1;
     //
-    // 					auto aRange = WavelengthRange::Solar;
-    // 					auto aSolarLayer = getBSDFLayer( aMaterial, aRange );
-    // 					aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
+    //                     auto aRange = WavelengthRange::Solar;
+    //                     auto aSolarLayer = getBSDFLayer( aMaterial, aRange );
+    //                     aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aSolarLayer );
     //
-    // 					aRange = WavelengthRange::Visible;
-    // 					auto aVisibleLayer = getBSDFLayer( aMaterial, aRange );
-    // 					aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
-    // 				}
+    //                     aRange = WavelengthRange::Visible;
+    //                     auto aVisibleLayer = getBSDFLayer( aMaterial, aRange );
+    //                     aWinConstBSDF.pushBSDFLayer( aRange, ConstrNum, aVisibleLayer );
+    //                 }
     //
-    // 			}
-    // 		}
-    // 	}
+    //             }
+    //         }
+    //     }
     // }
 
     void InitWCE_SimplifiedOpticalData(EnergyPlusData &state)
@@ -175,14 +175,14 @@ namespace WindowManager {
         // Calculate optical properties of blind-type layers entered with MATERIAL:WindowBlind
         // Calculation from this is used for IR properties. Need to make sure that properties
         // are calculated with new WCE optical engine (for both blinds and screens)
-        if (TotBlinds > 0) CalcWindowBlindProperties(state);
+        if (state.dataHeatBal->TotBlinds > 0) CalcWindowBlindProperties(state);
 
         // Initialize SurfaceScreen structure
-        NumSurfaceScreens = TotScreens;
-        if (NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
+        state.dataHeatBal->NumSurfaceScreens = state.dataHeatBal->TotScreens;
+        if (state.dataHeatBal->NumSurfaceScreens > 0) CalcWindowScreenProperties(state);
 
         auto & aWinConstSimp = CWindowConstructionsSimplified::instance();
-        for (auto ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
+        for (auto ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
             auto &construction(state.dataConstruction->Construct(ConstrNum));
             if (construction.isGlazingConstruction(state)) {
                 for (auto LayNum = 1; LayNum <= construction.TotLayers; ++LayNum) {
@@ -210,12 +210,12 @@ namespace WindowManager {
         // shade. These are used to calculate zone MRT contribution from window when
         // interior blind/shade is deployed.
 
-        for (auto SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (!state.dataConstruction->Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
-            if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
-            if (state.dataConstruction->Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
-            auto ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
+        for (auto SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
+            if (!state.dataSurface->Surface(SurfNum).HeatTransSurf) continue;
+            if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
+            if (state.dataSurface->SurfWinWindowModelType(SurfNum) == WindowBSDFModel) continue; // Irrelevant for Complex Fen
+            if (state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue;    // not required
+            auto ConstrNumSh = state.dataSurface->Surface(SurfNum).activeShadedConstruction;
             if (ConstrNumSh == 0) continue;
             auto TotLay = state.dataConstruction->Construct(ConstrNumSh).TotLayers;
             auto IntShade = false;
@@ -243,20 +243,20 @@ namespace WindowManager {
                         auto TauShIR = state.dataMaterial->Material(ShadeLayPtr).TransThermal;
                         auto EpsShIR = state.dataMaterial->Material(ShadeLayPtr).AbsorpThermal;
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(1) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(1) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     if (IntBlind) {
-                        auto TauShIR = Blind(BlNum).IRFrontTrans(ISlatAng);
-                        auto EpsShIR = Blind(BlNum).IRBackEmiss(ISlatAng);
+                        auto TauShIR = state.dataHeatBal->Blind(BlNum).IRFrontTrans(ISlatAng);
+                        auto EpsShIR = state.dataHeatBal->Blind(BlNum).IRBackEmiss(ISlatAng);
                         auto RhoShIR = max(0.0, 1.0 - TauShIR - EpsShIR);
-                        SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
-                        SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
+                        state.dataSurface->SurfaceWindow(SurfNum).EffShBlindEmiss(ISlatAng) = EpsShIR * (1.0 + RhoGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR));
+                        state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss(ISlatAng) = EpsGlIR * TauShIR / (1.0 - RhoGlIR * RhoShIR);
                     }
                     // Loop over remaining slat angles only if blind with movable slats
                     if (IntShade) break; // Loop over remaining slat angles only if blind
                     if (IntBlind) {
-                        if (Blind(BlNum).SlatAngleType == FixedSlats) break;
+                        if (state.dataHeatBal->Blind(BlNum).SlatAngleType == FixedSlats) break;
                     }
                 } // End of slat angle loop
             }     // End of check if interior shade or interior blind
@@ -294,7 +294,7 @@ namespace WindowManager {
         auto aSolarSpectrum = CWCESpecturmProperties::getDefaultSolarRadiationSpectrum(state);
         std::shared_ptr<CSpectralSampleData> aSampleData = nullptr;
         if (m_MaterialProperties.GlassSpectralDataPtr > 0) {
-            aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties.GlassSpectralDataPtr);
+            aSampleData = CWCESpecturmProperties::getSpectralSample(state, m_MaterialProperties.GlassSpectralDataPtr);
         } else {
             aSampleData = CWCESpecturmProperties::getSpectralSample(m_MaterialProperties);
         }
@@ -327,10 +327,10 @@ namespace WindowManager {
     void CWCEMaterialDualBandFactory::init([[maybe_unused]] EnergyPlusData &state)
     {
         if (m_Range == WavelengthRange::Visible) {
-            m_Material = createVisibleRangeMaterial();
+            m_Material = createVisibleRangeMaterial(state);
         } else {
-            auto aVisibleRangeMaterial = createVisibleRangeMaterial();
-            auto aSolarRangeMaterial = createSolarRangeMaterial();
+            auto aVisibleRangeMaterial = createVisibleRangeMaterial(state);
+            auto aSolarRangeMaterial = createSolarRangeMaterial(state);
             // Ratio visible to solar range. It can be calculated from solar spectrum.
             auto ratio = 0.49;
             m_Material = std::make_shared<CMaterialDualBand>(aVisibleRangeMaterial, aSolarRangeMaterial, ratio);
@@ -346,10 +346,10 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createVisibleRangeMaterial(EnergyPlusData &state)
     {
         auto blindDataPtr = m_MaterialProperties.BlindDataPtr;
-        auto &blind(Blind(blindDataPtr));
+        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
@@ -364,10 +364,10 @@ namespace WindowManager {
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEVenetianBlindMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto blindDataPtr = m_MaterialProperties.BlindDataPtr;
-        auto &blind(Blind(blindDataPtr));
+        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
@@ -393,7 +393,7 @@ namespace WindowManager {
         // To enable that, it would be necessary to change input in IDF
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createVisibleRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
         auto lowLambda = aRange.minLambda();
@@ -407,7 +407,7 @@ namespace WindowManager {
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createSolarRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEScreenMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
         auto lowLambda = aRange.minLambda();
@@ -430,7 +430,7 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createVisibleRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Visible);
         auto lowLambda = aRange.minLambda();
@@ -444,7 +444,7 @@ namespace WindowManager {
         return std::make_shared<CMaterialSingleBand>(Tf, Tb, Rf, Rb, lowLambda, highLambda);
     }
 
-    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial()
+    std::shared_ptr<CMaterialSingleBand> CWCEDiffuseShadeMaterialsFactory::createSolarRangeMaterial([[maybe_unused]] EnergyPlusData &state)
     {
         auto aRange = CWavelengthRange(WavelengthRange::Solar);
         auto lowLambda = aRange.minLambda();
@@ -472,7 +472,7 @@ namespace WindowManager {
     CWCESpecularCellFactory::CWCESpecularCellFactory(const Material::MaterialProperties & t_Material) : IWCECellDescriptionFactory( t_Material ) {
     }
 
-    std::shared_ptr<ICellDescription> CWCESpecularCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCESpecularCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         return std::make_shared<CSpecularCellDescription>();
     }
@@ -485,10 +485,10 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCEVenetianBlindCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         const auto blindDataPtr = m_Material.BlindDataPtr;
-        auto &blind(Blind(blindDataPtr));
+        auto &blind(state.dataHeatBal->Blind(blindDataPtr));
         assert(blindDataPtr > 0);
 
         auto slatWidth = blind.SlatWidth;
@@ -507,7 +507,7 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<ICellDescription> CWCEScreenCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCEScreenCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         auto diameter = m_Material.Thickness; // Thickness in this case is diameter
         // ratio is not saved withing material but rather calculated from transmittance
@@ -524,7 +524,7 @@ namespace WindowManager {
     {
     }
 
-    std::shared_ptr<ICellDescription> CWCEDiffuseShadeCellFactory::getCellDescription()
+    std::shared_ptr<ICellDescription> CWCEDiffuseShadeCellFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state)
     {
         return std::make_shared<CPerfectDiffuseCellDescription>();
     }
@@ -542,7 +542,7 @@ namespace WindowManager {
         createMaterialFactory();
         auto aMaterial = m_MaterialFactory->getMaterial(state);
         assert(aMaterial != nullptr);
-        auto aCellDescription = getCellDescription();
+        auto aCellDescription = getCellDescription(state);
         assert(aCellDescription != nullptr);
 
         return std::make_pair(aMaterial, aCellDescription);
@@ -572,9 +572,9 @@ namespace WindowManager {
         return m_ScatteringLayer;
     }
 
-    std::shared_ptr<ICellDescription> CWCELayerFactory::getCellDescription() const
+    std::shared_ptr<ICellDescription> CWCELayerFactory::getCellDescription([[maybe_unused]] EnergyPlusData &state) const
     {
-        return m_CellFactory->getCellDescription();
+        return m_CellFactory->getCellDescription(state);
     }
 
     ///////////////////////////////////////////////////////////////////////////////

@@ -75,9 +75,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace OutsideEnergySources {
+namespace EnergyPlus::OutsideEnergySources {
 
     // MODULE INFORMATION:
     //       AUTHOR         Dan Fisher
@@ -88,40 +86,15 @@ namespace OutsideEnergySources {
     // PURPOSE OF THIS MODULE:
     // Module containing the routines dealing with the OutsideEnergySources
 
-    // MODULE VARIABLE DECLARATIONS:
-    int NumDistrictUnits(0);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE OutsideEnergySources
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool SimOutsideEnergyGetInputFlag(true);
-    } // namespace
-    // Object Data
-    Array1D<OutsideEnergySourceSpecs> EnergySource;
-    std::unordered_map<std::string, std::string> EnergySourceUniqueNames;
-
-    // Functions
-    void clear_state()
-    {
-        NumDistrictUnits = 0;
-        SimOutsideEnergyGetInputFlag = true;
-        EnergySource.deallocate();
-        EnergySourceUniqueNames.clear();
-    }
-
     PlantComponent *OutsideEnergySourceSpecs::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for outside energy sources if it hasn't been done already
-        if (SimOutsideEnergyGetInputFlag) {
+        if (state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag) {
             GetOutsideEnergySourcesInput(state);
-            SimOutsideEnergyGetInputFlag = false;
+            state.dataOutsideEnergySrcs->SimOutsideEnergyGetInputFlag = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &source : EnergySource) {
+        for (auto &source : state.dataOutsideEnergySrcs->EnergySource) {
             if (source.EnergyType == objectType && source.Name == objectName) {
                 return &source;
             }
@@ -175,18 +148,18 @@ namespace OutsideEnergySources {
         // GET NUMBER OF ALL EQUIPMENT TYPES
         int const NumDistrictUnitsHeat = inputProcessor->getNumObjectsFound(state, "DistrictHeating");
         int const NumDistrictUnitsCool = inputProcessor->getNumObjectsFound(state, "DistrictCooling");
-        NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
+        state.dataOutsideEnergySrcs->NumDistrictUnits = NumDistrictUnitsHeat + NumDistrictUnitsCool;
 
-        if (allocated(EnergySource)) return;
+        if (allocated(state.dataOutsideEnergySrcs->EnergySource)) return;
 
-        EnergySource.allocate(NumDistrictUnits);
-        EnergySourceUniqueNames.reserve(static_cast<unsigned>(NumDistrictUnits));
+        state.dataOutsideEnergySrcs->EnergySource.allocate(state.dataOutsideEnergySrcs->NumDistrictUnits);
+        state.dataOutsideEnergySrcs->EnergySourceUniqueNames.reserve(static_cast<unsigned>(state.dataOutsideEnergySrcs->NumDistrictUnits));
 
         bool ErrorsFound(false); // If errors detected in input
         int heatIndex = 0;
         int coolIndex = 0;
 
-        for (int EnergySourceNum = 1; EnergySourceNum <= NumDistrictUnits; ++EnergySourceNum) {
+        for (int EnergySourceNum = 1; EnergySourceNum <= state.dataOutsideEnergySrcs->NumDistrictUnits; ++EnergySourceNum) {
 
             std::string reportVarPrefix;
             std::string nodeNames;
@@ -222,14 +195,14 @@ namespace OutsideEnergySources {
                                           DataIPShortCuts::cAlphaFieldNames);
 
             if (EnergySourceNum > 1) {
-                GlobalNames::VerifyUniqueInterObjectName(state, EnergySourceUniqueNames,
+                GlobalNames::VerifyUniqueInterObjectName(state, state.dataOutsideEnergySrcs->EnergySourceUniqueNames,
                                                          DataIPShortCuts::cAlphaArgs(1),
                                                          DataIPShortCuts::cCurrentModuleObject,
                                                          DataIPShortCuts::cAlphaFieldNames(1),
                                                          ErrorsFound);
             }
-            EnergySource(EnergySourceNum).Name = DataIPShortCuts::cAlphaArgs(1);
-            EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name = DataIPShortCuts::cAlphaArgs(1);
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).InletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                              ErrorsFound,
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              DataIPShortCuts::cAlphaArgs(1),
@@ -237,7 +210,7 @@ namespace OutsideEnergySources {
                                                                                              DataLoopNode::NodeConnectionType_Inlet,
                                                                                              1,
                                                                                              DataLoopNode::ObjectIsNotParent);
-            EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).OutletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(3),
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
@@ -250,28 +223,28 @@ namespace OutsideEnergySources {
                                                DataIPShortCuts::cAlphaArgs(2),
                                                DataIPShortCuts::cAlphaArgs(3),
                                                nodeNames);
-            EnergySource(EnergySourceNum).NomCap = DataIPShortCuts::rNumericArgs(1);
-            if (EnergySource(EnergySourceNum).NomCap == DataSizing::AutoSize) {
-                EnergySource(EnergySourceNum).NomCapWasAutoSized = true;
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCap = DataIPShortCuts::rNumericArgs(1);
+            if (state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCap == DataSizing::AutoSize) {
+                state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).NomCapWasAutoSized = true;
             }
-            EnergySource(EnergySourceNum).EnergyTransfer = 0.0;
-            EnergySource(EnergySourceNum).EnergyRate = 0.0;
-            EnergySource(EnergySourceNum).EnergyType = typeOf;
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyTransfer = 0.0;
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyRate = 0.0;
+            state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).EnergyType = typeOf;
             if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
-                if (EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
-                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
+                state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = ScheduleManager::GetScheduleIndex(state, DataIPShortCuts::cAlphaArgs(4));
+                if (state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum == 0) {
+                    ShowSevereError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
                     ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) + "\" was not found.");
                     ErrorsFound = true;
                 }
-                if (!ScheduleManager::CheckScheduleValueMinMax(state, EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
-                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + EnergySource(EnergySourceNum).Name + "\", is not valid");
+                if (!ScheduleManager::CheckScheduleValueMinMax(state, state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum, ">=", 0.0)) {
+                    ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + "=\"" + state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).Name + "\", is not valid");
                     ShowContinueError(state, DataIPShortCuts::cAlphaFieldNames(4) + "=\"" + DataIPShortCuts::cAlphaArgs(4) +
                                       "\" should not have negative values.");
                     ShowContinueError(state, "Negative values will be treated as zero, and the simulation continues.");
                 }
             } else {
-                EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
+                state.dataOutsideEnergySrcs->EnergySource(EnergySourceNum).CapFractionSchedNum = DataGlobalConstants::ScheduleAlwaysOn;
             }
         }
 
@@ -326,7 +299,7 @@ namespace OutsideEnergySources {
             state.dataPlnt->PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum).MaxOutletTemp =
                 state.dataPlnt->PlantLoop(this->LoopNum).MaxTemp;
             // Register design flow rate for inlet node (helps to autosize comp setpoint op scheme flows
-            PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, state.dataPlnt->PlantLoop(this->LoopNum).MaxVolFlowRate);
 
             this->OneTimeInitFlag = false;
 
@@ -428,7 +401,7 @@ namespace OutsideEnergySources {
                                                                      DataGlobalConstants::InitConvTemp,
                                                                      state.dataPlnt->PlantLoop(this->LoopNum).FluidIndex,
                                                                      "SizeDistrict" + typeName);
-            Real64 const NomCapDes = Cp * rho * DataSizing::PlantSizData(PltSizNum).DeltaT * DataSizing::PlantSizData(PltSizNum).DesVolFlowRate;
+            Real64 const NomCapDes = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = NomCapDes;
@@ -449,7 +422,7 @@ namespace OutsideEnergySources {
                                                          "User-Specified Nominal Capacity [W]",
                                                          NomCapUser);
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(NomCapDes - NomCapUser) / NomCapUser) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + this->Name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", NomCapUser));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", NomCapDes));
@@ -530,7 +503,5 @@ namespace OutsideEnergySources {
         this->EnergyRate = std::abs(MyLoad);
         this->EnergyTransfer = this->EnergyRate * DataHVACGlobals::TimeStepSys * DataGlobalConstants::SecInHour;
     }
-
-} // namespace OutsideEnergySources
 
 } // namespace EnergyPlus

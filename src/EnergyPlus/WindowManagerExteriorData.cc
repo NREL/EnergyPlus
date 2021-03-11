@@ -70,9 +70,9 @@ using namespace MultiLayerOptics;
 
 namespace WindowManager {
 
-    bool isSurfaceHit(const int t_SurfNum, const Vector &t_Ray)
+    bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const Vector &t_Ray)
     {
-        Real64 DotProd = dot(t_Ray, Surface(t_SurfNum).NewellSurfaceNormalVector);
+        Real64 DotProd = dot(t_Ray, state.dataSurface->Surface(t_SurfNum).NewellSurfaceNormalVector);
         return (DotProd > 0);
     }
 
@@ -82,8 +82,8 @@ namespace WindowManager {
         Real64 Phi = 0;
 
         // get window tilt and azimuth
-        Real64 Gamma = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Tilt;
-        Real64 Alpha = DataGlobalConstants::DegToRadians * Surface(t_SurfNum).Azimuth;
+        Real64 Gamma = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Tilt;
+        Real64 Alpha = DataGlobalConstants::DegToRadians * state.dataSurface->Surface(t_SurfNum).Azimuth;
 
         int RadType = state.dataWindowComplexManager->Front_Incident;
 
@@ -148,7 +148,7 @@ namespace WindowManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(int const t_SampleDataPtr)
+    std::shared_ptr<CSpectralSampleData> CWCESpecturmProperties::getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -160,7 +160,7 @@ namespace WindowManager {
         // Reads spectral data value
         assert(t_SampleDataPtr != 0); // It must not be called for zero value
         std::shared_ptr<CSpectralSampleData> aSampleData = std::make_shared<CSpectralSampleData>();
-        auto spectralData = SpectralData(t_SampleDataPtr);
+        auto spectralData = state.dataHeatBal->SpectralData(t_SampleDataPtr);
         int numOfWl = spectralData.NumOfWavelengths;
         for (auto i = 1; i <= numOfWl; ++i) {
             Real64 wl = spectralData.WaveLength(i);

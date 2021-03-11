@@ -166,9 +166,9 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.0;
 
-    CurZoneEqNum = 0;
-    CurSysNum = 0;
-    CurOASysNum = 0;
+    state->dataSize->CurZoneEqNum = 0;
+    state->dataSize->CurSysNum = 0;
+    state->dataSize->CurOASysNum = 0;
     DataLoopNode::Node.allocate(10);
 
     PTUnitData thisUnit;
@@ -213,26 +213,26 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
 
-    ScheduleManager::Schedule.allocate(1);
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
-    PTUnit.allocate(1);
-    PTUnit(1) = thisUnit;
-    PTUnit(1).simASHRAEModel = true;
-    PTUnit(1).MinOATCompressorCooling = -10.0;
-    PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::PTHPUnit;
-    PTUnit(1).FanName = "TEST FAN";
-    PTUnit(1).FanType = "Fan:OnOff";
-    PTUnit(1).DXCoolCoilName = "COOLINGCOIL";
-    PTUnit(1).DXHeatCoilName = "HEATINGCOIL";
-    PTUnit(1).DXCoolCoilIndexNum = 1;
-    PTUnit(1).DXHeatCoilIndexNum = 2;
-    PTUnit(1).SchedPtr = 1;
-    PTUnit(1).FanAvailSchedPtr = 1;
-    PTUnit(1).FanPlace = BlowThru;
-    PTUnit(1).OpMode = DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
-    PackagedTerminalHeatPump::CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
-    PackagedTerminalHeatPump::CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
+    state->dataPTHP->PTUnit.allocate(1);
+    state->dataPTHP->PTUnit(1) = thisUnit;
+    state->dataPTHP->PTUnit(1).simASHRAEModel = true;
+    state->dataPTHP->PTUnit(1).MinOATCompressorCooling = -10.0;
+    state->dataPTHP->PTUnit(1).UnitType_Num = PackagedTerminalHeatPump::iPTHPType::PTHPUnit;
+    state->dataPTHP->PTUnit(1).FanName = "TEST FAN";
+    state->dataPTHP->PTUnit(1).FanType = "Fan:OnOff";
+    state->dataPTHP->PTUnit(1).DXCoolCoilName = "COOLINGCOIL";
+    state->dataPTHP->PTUnit(1).DXHeatCoilName = "HEATINGCOIL";
+    state->dataPTHP->PTUnit(1).DXCoolCoilIndexNum = 1;
+    state->dataPTHP->PTUnit(1).DXHeatCoilIndexNum = 2;
+    state->dataPTHP->PTUnit(1).SchedPtr = 1;
+    state->dataPTHP->PTUnit(1).FanAvailSchedPtr = 1;
+    state->dataPTHP->PTUnit(1).FanPlace = BlowThru;
+    state->dataPTHP->PTUnit(1).OpMode = DataHVACGlobals::ContFanCycCoil; // ensure constant fan mode is used since Init is not called
+    state->dataPTHP->CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
+    state->dataPTHP->CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
 
     state->dataBranchNodeConnections->NumCompSets = 2;
     state->dataBranchNodeConnections->CompSets.allocate(2);
@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     int AirLoopNum = 0;
     Real64 PLR = 0.0;
     int CompressorOnFlag = 0;
-    auto &SZVAVModel(PTUnit(1));
+    auto &SZVAVModel(state->dataPTHP->PTUnit(1));
     // first pass through will get objects and reset node data
     SZVAVModel::calcSZVAVModel(*state,
         SZVAVModel, UnitNum, FirstHVACIteration, CoolingLoad, HeatingLoad, QZnReq, OnOffAirFlowRatio, HXUnitOn, AirLoopNum, PLR, CompressorOnFlag);
@@ -285,9 +285,9 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     DataLoopNode::Node(5).Enthalpy = 52120.0;
 
     // turn the availability schedule on
-    Schedule(1).CurrentValue = 1.0;
-    PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
-    PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
+    state->dataPTHP->CoolingLoad = CoolingLoad;
+    state->dataPTHP->HeatingLoad = HeatingLoad;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set fan inlet max avail so fan doesn't shut down flow
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 0.2;
@@ -343,8 +343,8 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
 
     CoolingLoad = false;
     HeatingLoad = true;
-    PackagedTerminalHeatPump::CoolingLoad = CoolingLoad;
-    PackagedTerminalHeatPump::HeatingLoad = HeatingLoad;
+    state->dataPTHP->CoolingLoad = CoolingLoad;
+    state->dataPTHP->HeatingLoad = HeatingLoad;
 
     // set unit inlet node conditions for heating
     DataLoopNode::Node(1).Temp = 21.0;
@@ -430,7 +430,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
 
     std::string const idf_objects = delimited_string({
 
@@ -557,13 +557,13 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
-    DataSizing::CurZoneEqNum = 1;
+    state->dataSize->CurZoneEqNum = 1;
     InitializePsychRoutines();
     GetZoneData(*state, ErrorsFound);
-    EXPECT_EQ("WEST ZONE", Zone(1).Name);
+    EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
     GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
-    ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
     auto &thisFanCoil(FanCoil(1));
     EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
@@ -649,8 +649,8 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     state->dataEnvrn->HolidayIndex = 0;
     state->dataEnvrn->DayOfYear_Schedule = General::OrdinalDay(state->dataEnvrn->Month, state->dataEnvrn->DayOfMonth, 1);
     UpdateScheduleValues(*state);
-    ZoneEqSizing.allocate(1);
-    ZoneSizingRunDone = true;
+    state->dataSize->ZoneEqSizing.allocate(1);
+    state->dataSize->ZoneSizingRunDone = true;
     thisFanCoil.DesignHeatingCapacity = 10000.0;
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataGlobal->SysSizingCalc = true;

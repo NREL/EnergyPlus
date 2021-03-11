@@ -472,7 +472,7 @@ namespace HVACControllers {
         // Write detailed diagnostic for individual controller
         // To enable generating an individual, detailed trace file for each controller on each air loop,
         // define the environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y
-        if (TraceHVACControllerEnvFlag) {
+        if (state.dataSysVars->TraceHVACControllerEnvFlag) {
             TraceIndividualController(state, ControlNum, FirstHVACIteration, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopPass, Operation, IsConvergedFlag);
         }
     }
@@ -538,9 +538,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataSystemVariables::TraceAirLoopEnvFlag;
-        using DataSystemVariables::TraceHVACControllerEnvFlag;
-        using DataSystemVariables::TrackAirLoopEnvFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using MixedAir::CheckForControllerWaterCoil;
         using NodeInputManager::GetOnlySingleNode;
@@ -583,7 +580,7 @@ namespace HVACControllers {
         NumControllers = NumSimpleControllers;
 
         // Allocate stats data structure for each air loop and controller if needed
-        if (TrackAirLoopEnvFlag || TraceAirLoopEnvFlag || TraceHVACControllerEnvFlag) {
+        if (state.dataSysVars->TrackAirLoopEnvFlag || state.dataSysVars->TraceAirLoopEnvFlag || state.dataSysVars->TraceHVACControllerEnvFlag) {
             if (NumPrimaryAirSys > 0) {
                 NumAirLoopStats = NumPrimaryAirSys;
                 AirLoopStats.allocate(NumAirLoopStats);
@@ -847,9 +844,6 @@ namespace HVACControllers {
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
-        // Set again in ReportController() to ControllerProps(ControlNum)%NextActuatedValue
-        //  IF (FirstHVACIteration) THEN
-        // DSU3    Node(ActuatedNode)%MassFlowRate = 0.0d0
         NoFlowResetValue = 0.0;
         SetActuatedBranchFlowRate(state, NoFlowResetValue,
                                   ControllerProps(ControlNum).ActuatedNode,
@@ -931,7 +925,6 @@ namespace HVACControllers {
 
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using FaultsManager::FaultsCoilSATSensor;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::ScanPlantLoopsForNodeNum;
         using PlantUtilities::SetActuatedBranchFlowRate;
@@ -1226,7 +1219,7 @@ namespace HVACControllers {
                     if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
                         // calculate the sensor offset using fault information
                         int FaultIndex = ControllerProps(ControlNum).FaultyCoilSATIndex;
-                        ControllerProps(ControlNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+                        ControllerProps(ControlNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
                         // update the SetPointValue
                         ControllerProps(ControlNum).SetPointValue = Node(SensedNode).TempSetPoint - ControllerProps(ControlNum).FaultyCoilSATOffset;
                     }
@@ -1357,9 +1350,9 @@ namespace HVACControllers {
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
 
         if (ControllerProps(ControlNum).MaxVolFlowActuated == AutoSize) {
-            for (WaterCompNum = 1; WaterCompNum <= SaveNumPlantComps; ++WaterCompNum) {
-                if (CompDesWaterFlow(WaterCompNum).SupNode == ActuatedNode) {
-                    ControllerProps(ControlNum).MaxVolFlowActuated = CompDesWaterFlow(WaterCompNum).DesVolFlowRate;
+            for (WaterCompNum = 1; WaterCompNum <= state.dataSize->SaveNumPlantComps; ++WaterCompNum) {
+                if (state.dataSize->CompDesWaterFlow(WaterCompNum).SupNode == ActuatedNode) {
+                    ControllerProps(ControlNum).MaxVolFlowActuated = state.dataSize->CompDesWaterFlow(WaterCompNum).DesVolFlowRate;
                 }
             }
 
@@ -1723,31 +1716,6 @@ namespace HVACControllers {
                 //         - If y(xMin) < ySetPoint && y(xMax) > y(xMin), then  x = xMin
                 //         - If y(xMin) > ySetPoint && y(xMax) > y(xMin), then  x = xMax
             } else if (SELECT_CASE_var == iStatusErrorSlope) {
-                // CALL ShowSevereError('FindRootSimpleController: Root finder failed at '//TRIM(CreateHVACStepFullString()))
-                // CALL ShowContinueError(state,  &
-                //   'FindRootSimpleController: Controller name='//TRIM(ControllerProps(ControlNum)%ControllerName) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller action='//TRIM(ActionTypes(ControllerProps(ControlNum)%Action)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller setpoint='// &
-                //    TRIM(TrimSigDigits(ControllerProps(ControlNum)%SetPointValue,NumSigDigits)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Controller function is inconsistent with the specified action.' &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Min bound is '// &
-                //    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MinPoint%X,NumSigDigits))//','// &
-                //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MinPoint%Y,NumSigDigits)) &
-                //  )
-                //  CALL ShowContinueError(state,  &
-                //    'FindRootSimpleController: Max bound is '// &
-                //    'x='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%X,NumSigDigits))//','// &
-                //    'y='//TRIM(TrimSigDigits(RootFinders(ControlNum)%MaxPoint%Y,NumSigDigits)) &
-                //  )
-                //  CALL ShowFatalError(state, 'FindRootSimpleController: Preceding error causes program termination.')
                 if (!state.dataGlobal->WarmupFlag && ControllerProps(ControlNum).BadActionErrCount == 0) {
                     ++ControllerProps(ControlNum).BadActionErrCount;
                     ShowSevereError(state, "FindRootSimpleController: Controller error for controller = \"" + ControllerName + "\"");
@@ -2141,7 +2109,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PreviousSolutionIndex;
 
-        // FLOW
+
 
         // Save solution and mode for next call only if converged
         if (IsConvergedFlag) {
@@ -2356,7 +2324,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // FLOW
+
 
         // If no controllers on this air loop then we have nothig to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
@@ -2437,7 +2405,7 @@ namespace HVACControllers {
         // Current operating mode
         int Mode;
 
-        // FLOW
+
 
         ControlIndex = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum);
 
@@ -2480,7 +2448,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataSystemVariables::TrackAirLoopEnvFlag;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2494,10 +2461,10 @@ namespace HVACControllers {
         // DERIVED TYPE DEFINITIONS
         // na
 
-        // FLOW
+
 
         // Detect if statistics have been generated or not for this run
-        if (!TrackAirLoopEnvFlag) {
+        if (!state.dataSysVars->TrackAirLoopEnvFlag) {
             return;
         }
 
@@ -2557,7 +2524,7 @@ namespace HVACControllers {
         Real64 AvgIterations;
         int iModeNum;
 
-        // FLOW
+
 
         print(statisticsFile, "{},\n", ThisPrimaryAirSystem.Name);
 
@@ -2764,7 +2731,7 @@ namespace HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // FLOW
+
 
         // IF no controllers on this air loop then we have nothing to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;

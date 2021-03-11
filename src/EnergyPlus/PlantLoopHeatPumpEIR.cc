@@ -581,16 +581,16 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
         if (pltLoadSizNum > 0) {
             // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
             // these represent what the unit would size those to, whether it is doing auto-sizing or not
-            if (DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
-                tmpLoadVolFlow = DataSizing::PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
+            if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+                tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
                 if (this->companionHeatPumpCoil) {
                     tmpLoadVolFlow = max(tmpLoadVolFlow, this->companionHeatPumpCoil->loadSideDesignVolFlowRate);
                     if (this->loadSideDesignVolFlowRateWasAutoSized) this->loadSideDesignVolFlowRate = tmpLoadVolFlow;
                 }
-                tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
+                tmpCapacity = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
             } else if (this->companionHeatPumpCoil && this->companionHeatPumpCoil->loadSideDesignVolFlowRate > 0.0) {
                 tmpLoadVolFlow = this->companionHeatPumpCoil->loadSideDesignVolFlowRate;
-                tmpCapacity = Cp * rho * DataSizing::PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
+                tmpCapacity = Cp * rho * state.dataSize->PlantSizData(pltLoadSizNum).DeltaT * tmpLoadVolFlow;
             } else {
                 if (this->referenceCapacityWasAutoSized) tmpCapacity = 0.0;
                 if (this->loadSideDesignVolFlowRateWasAutoSized) tmpLoadVolFlow = 0.0;
@@ -625,7 +625,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                             }
                             // we can warn here if there is a bit mismatch between hard- and auto-sized
                             if (state.dataGlobal->DisplayExtraWarnings) {
-                                if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > DataSizing::AutoVsHardSizingThreshold) {
+                                if ((std::abs(tmpCapacity - hardSizedCapacity) / hardSizedCapacity) > state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowWarningMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                     ShowContinueError(state, format("User-Specified Nominal Capacity of {:.2R} [W]", hardSizedCapacity));
                                     ShowContinueError(state, format("differs from Design Size Nominal Capacity of {:.2R} [W]", tmpCapacity));
@@ -664,7 +664,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                             }
                             if (state.dataGlobal->DisplayExtraWarnings) {
                                 if ((std::abs(tmpLoadVolFlow - hardSizedLoadSideFlow) / hardSizedLoadSideFlow) >
-                                    DataSizing::AutoVsHardSizingThreshold) {
+                                    state.dataSize->AutoVsHardSizingThreshold) {
                                     ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                                     ShowContinueError(state,
                                                       format("User-Specified Load Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedLoadSideFlow));
@@ -771,7 +771,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
             // To get the design source flow rate, just apply the sensible heat rate equation:
             //                              Qsrc = rho_src * Vdot_src * Cp_src * DeltaT_src
             //                              Vdot_src = Q_src / (rho_src * Cp_src * DeltaT_src)
-            tmpSourceVolFlow = designSourceSideHeatTransfer / (DataSizing::PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
+            tmpSourceVolFlow = designSourceSideHeatTransfer / (state.dataSize->PlantSizData(plantSourceSizingIndex).DeltaT * CpSrc * rhoSrc);
         } else {
             // just assume it's the same as the load side if we don't have any sizing information
             tmpSourceVolFlow = tmpLoadVolFlow;
@@ -802,7 +802,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                     }
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         if ((std::abs(tmpSourceVolFlow - hardSizedSourceSideFlow) / hardSizedSourceSideFlow) >
-                            DataSizing::AutoVsHardSizingThreshold) {
+                            state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state, "EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for " + this->name);
                             ShowContinueError(state, format("User-Specified Source Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedSourceSideFlow));
                             ShowContinueError(state,
@@ -820,8 +820,8 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
 
         // register the design volume flows with the plant, only doing half of source because the companion
         // is generally on the same loop
-        PlantUtilities::RegisterPlantCompDesignFlow(this->loadSideNodes.inlet, tmpLoadVolFlow);
-        PlantUtilities::RegisterPlantCompDesignFlow(this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->loadSideNodes.inlet, tmpLoadVolFlow);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->sourceSideNodes.inlet, tmpSourceVolFlow / 0.5);
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             // create predefined report
