@@ -71,16 +71,13 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/RootFinder.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
-namespace EnergyPlus {
-
-namespace HVACControllers {
+namespace EnergyPlus::HVACControllers {
     // Module containing the controller simulation routines for the air loop
 
     // MODULE INFORMATION:
@@ -410,7 +407,12 @@ namespace HVACControllers {
                     HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
                     // Put the controller tolerance (offset) back to it's original value
                     RootFinder::SetupRootFinder(state,
-                        RootFinders(ControlNum), iSlopeDecreasing, iMethodBrent, DataPrecisionGlobals::constant_zero, 1.0e-6, ControllerProps(ControlNum).Offset);
+                                                RootFinders(ControlNum),
+                                                iSlopeDecreasing,
+                                                DataRootFinder::iMethod::Brent,
+                                                DataPrecisionGlobals::constant_zero,
+                                                1.0e-6,
+                                                ControllerProps(ControlNum).Offset);
                 }
 
                 // If a iControllerOpColdStart call, reset the actuator inlet flows
@@ -895,7 +897,7 @@ namespace HVACControllers {
         // Reset root finder
         // This is independent of the processing in InitializeRootFinder() performed in Calc() routine.
         RootFinders(ControlNum).StatusFlag = iStatusNone;
-        RootFinders(ControlNum).CurrentMethodType = iMethodNone;
+        RootFinders(ControlNum).CurrentMethodType = DataRootFinder::iMethod::None;
 
         RootFinders(ControlNum).CurrentPoint.DefinedFlag = false;
         RootFinders(ControlNum).CurrentPoint.X = 0.0;
@@ -1136,9 +1138,10 @@ namespace HVACControllers {
             {
                 auto const SELECT_CASE_var(ControllerProps(ControlNum).Action);
                 if (SELECT_CASE_var == iNormalAction) {
-                    SetupRootFinder(state, RootFinders(ControlNum),
+                    SetupRootFinder(state,
+                                    RootFinders(ControlNum),
                                     iSlopeIncreasing,
-                                    iMethodBrent,
+                                    DataRootFinder::iMethod::Brent,
                                     DataPrecisionGlobals::constant_zero,
                                     1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
@@ -1146,9 +1149,10 @@ namespace HVACControllers {
                                                                          // Y variables
 
                 } else if (SELECT_CASE_var == iReverseAction) {
-                    SetupRootFinder(state, RootFinders(ControlNum),
+                    SetupRootFinder(state,
+                                    RootFinders(ControlNum),
                                     iSlopeDecreasing,
-                                    iMethodBrent,
+                                    DataRootFinder::iMethod::Brent,
                                     DataPrecisionGlobals::constant_zero,
                                     1.0e-6,
                                     ControllerProps(ControlNum).Offset); // Slope type | Method type | TolX: no relative tolerance for X variables |
@@ -1635,8 +1639,8 @@ namespace HVACControllers {
                 // Make sure that mode of previous solution was active
                 // Make sure that proposed candidate does not conflict with current min/max range and lower/upper brackets
                 ReusePreviousSolutionFlag = ControllerProps(ControlNum).ReusePreviousSolutionFlag &&
-                                            (RootFinders(ControlNum).CurrentMethodType == iMethodBracket) && PreviousSolutionDefinedFlag &&
-                                            (PreviousSolutionMode == iModeActive) &&
+                                            (RootFinders(ControlNum).CurrentMethodType == DataRootFinder::iMethod::Bracket) &&
+                                            PreviousSolutionDefinedFlag && (PreviousSolutionMode == iModeActive) &&
                                             CheckRootFinderCandidate(RootFinders(ControlNum), PreviousSolutionValue);
 
                 if (ReusePreviousSolutionFlag) {
@@ -1993,7 +1997,7 @@ namespace HVACControllers {
                 // Should never happen
                 ShowSevereError(state, "CheckMinActiveController: Invalid controller action during " + CreateHVACStepFullString(state) + '.');
                 ShowContinueError(state, "CheckMinActiveController: Controller name=" + ControllerProps(ControlNum).ControllerName);
-                ShowContinueError(state, "CheckMinActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"");
+                ShowContinueError(state, R"(CheckMinActiveController: Valid choices are "NORMAL" or "REVERSE")");
                 ShowFatalError(state, "CheckMinActiveController: Preceding error causes program termination.");
             }
         }
@@ -2067,7 +2071,7 @@ namespace HVACControllers {
                 // Should never happen
                 ShowSevereError(state, "CheckMaxActiveController: Invalid controller action during " + CreateHVACStepFullString(state) + '.');
                 ShowContinueError(state, "CheckMaxActiveController: Controller name=" + ControllerProps(ControlNum).ControllerName);
-                ShowContinueError(state, "CheckMaxActiveController: Valid choices are \"NORMAL\" or \"REVERSE\"");
+                ShowContinueError(state, R"(CheckMaxActiveController: Valid choices are "NORMAL" or "REVERSE")");
                 ShowFatalError(state, "CheckMaxActiveController: Preceding error causes program termination.");
             }
         }
@@ -2204,13 +2208,18 @@ namespace HVACControllers {
                     if (!thisController.HumRatCtrlOverride) {
                         // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
                         if (Node(thisController.SensedNode).HumRat > (Node(thisController.SensedNode).HumRatMax + 1.0e-5)) {
-                            // Turn on humdity control and restart controller
+                            // Turn on humidity control and restart controller
                             IsConvergedFlag = false;
                             thisController.HumRatCtrlOverride = true;
                             if (thisController.Action == iReverseAction) {
                                 // Cooling coil controller should always be ReverseAction, but skip this if not
                                 RootFinder::SetupRootFinder(state,
-                                    RootFinders(ControlNum), iSlopeDecreasing, iMethodFalsePosition, DataPrecisionGlobals::constant_zero, 1.0e-6, 1.0e-5);
+                                                            RootFinders(ControlNum),
+                                                            iSlopeDecreasing,
+                                                            DataRootFinder::iMethod::FalsePosition,
+                                                            DataPrecisionGlobals::constant_zero,
+                                                            1.0e-6,
+                                                            1.0e-5);
                             }
                             // Do a cold start reset, same as iControllerOpColdStart
                             ResetController(state, ControlNum, false, IsConvergedFlag);
@@ -3485,5 +3494,3 @@ namespace HVACControllers {
     }
 
 } // namespace HVACControllers
-
-} // namespace EnergyPlus

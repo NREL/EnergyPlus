@@ -62,7 +62,7 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckConvergence)
 {
     DataRootFinder::RootFinderDataType rootFinderData;
     int slopeType = DataRootFinder::iSlopeDecreasing;
-    int methodType = DataRootFinder::iMethodBrent;
+    DataRootFinder::iMethod methodType = DataRootFinder::iMethod::Brent;
     Real64 relativeXTolerance = 0.0;
     Real64 absoluteXTolerance = 1.0e-6;
     Real64 absoluteYTolerance = 1.0e-5;
@@ -110,7 +110,7 @@ TEST_F(EnergyPlusFixture, RootFinder_CheckBracketRoundOff)
 {
     DataRootFinder::RootFinderDataType rootFinderData;
     int slopeType = DataRootFinder::iSlopeDecreasing;
-    int methodType = DataRootFinder::iMethodBrent;
+    DataRootFinder::iMethod methodType = DataRootFinder::iMethod::Brent;
     Real64 relativeXTolerance = 0.0;
     Real64 absoluteXTolerance = 1.0e-6;
     Real64 absoluteYTolerance = 1.0e-5;
