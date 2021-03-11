@@ -1249,8 +1249,6 @@ namespace HeatRecovery {
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static bool MyOneTimeAllocate( true );
         ////////////////////////////////////////////////////////////////////////////////////
-        static Array1D_bool MySetPointTest;
-        static Array1D_bool MySizeFlag;
         int ErrStat;            // error status returned by CalculateNTUfromEpsAndZ
         bool FatalError;        // fatal error flag
         bool LocalWarningError; // warning error flag
@@ -1258,17 +1256,17 @@ namespace HeatRecovery {
         //  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
 
         if (MyOneTimeAllocate) {
-            MySetPointTest.allocate(state.dataHeatRecovery->NumHeatExchangers);
-            MySizeFlag.allocate(state.dataHeatRecovery->NumHeatExchangers);
-            MySetPointTest = true;
-            MySizeFlag = true;
+            state.dataHeatRecovery->MySetPointTest.allocate(state.dataHeatRecovery->NumHeatExchangers);
+            state.dataHeatRecovery->MySizeFlag.allocate(state.dataHeatRecovery->NumHeatExchangers);
+            state.dataHeatRecovery->MySetPointTest = true;
+            state.dataHeatRecovery->MySizeFlag = true;
             MyOneTimeAllocate = false;
         }
 
-        if (!state.dataGlobal->SysSizingCalc && MySizeFlag(ExchNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataHeatRecovery->MySizeFlag(ExchNum)) {
 
             SizeHeatRecovery(state, ExchNum);
-            MySizeFlag(ExchNum) = false;
+            state.dataHeatRecovery->MySizeFlag(ExchNum) = false;
         }
 
         FatalError = false;
@@ -1481,7 +1479,7 @@ namespace HeatRecovery {
 
             } else if (SELECT_CASE_var == HX_DESICCANT_BALANCED) {
 
-                if (MySetPointTest(ExchNum)) {
+                if (state.dataHeatRecovery->MySetPointTest(ExchNum)) {
                     if (!state.dataGlobal->SysSizingCalc && DoSetPointTest) {
                         if (!state.dataHeatRecovery->CalledFromParentObject) {
                             if (Node(state.dataHeatRecovery->ExchCond(ExchNum).SecOutletNode).HumRatMax == SensedNodeFlagValue) {
@@ -1509,7 +1507,7 @@ namespace HeatRecovery {
                                 }
                             }
                         }
-                        MySetPointTest(ExchNum) = false;
+                        state.dataHeatRecovery->MySetPointTest(ExchNum) = false;
                     }
                 }
 

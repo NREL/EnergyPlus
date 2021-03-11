@@ -705,6 +705,10 @@ struct HeatRecoveryData : BaseGlobalStruct {
     bool CalledFromParentObject = true; // Indicates that HX is called from parent object (this object is not on a branch)
     Array1D_bool CheckEquipName;
 
+    // static variables
+    Array1D_bool MySetPointTest;
+    Array1D_bool MySizeFlag;
+
     Array1D<HeatRecovery::HeatExchCond> ExchCond;
     Array1D<HeatRecovery::BalancedDesDehumPerfData> BalDesDehumPerfData;
     Array1D<HeatRecovery::HeatExchCondNumericFieldData> HeatExchCondNumericFields;
@@ -726,6 +730,10 @@ struct HeatRecoveryData : BaseGlobalStruct {
         BalDesDehumPerfData.clear();
         HeatExchCondNumericFields.clear();
         BalDesDehumPerfNumericFields.clear();
+
+        // static variables
+        MySetPointTest.clear();
+        MySizeFlag.clear();
     }
 };
 
