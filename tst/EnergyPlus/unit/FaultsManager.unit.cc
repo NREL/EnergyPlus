@@ -88,7 +88,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     int CurveNum;
     int FanNum;
-    bool TestRestult;
+    bool TestResult;
 
     // Allocate
     state->dataCurveManager->NumCurves = 1;
@@ -96,7 +96,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     state->dataFans->NumFans = 2;
     Fan.allocate(state->dataFans->NumFans);
-    FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
+    state->dataFaultsMgr->FaultsFouledAirFilters.allocate(state->dataFans->NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -118,26 +118,26 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     Fan(FanNum).FanType = "Fan:VariableVolume";
     Fan(FanNum).MaxAirFlowRate = 18.194;
     Fan(FanNum).DeltaPress = 1017.59;
-    FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
-    FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
+    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
+    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
     FanNum = 2;
     Fan(FanNum).FanName = "Fan_2";
     Fan(FanNum).FanType = "Fan:VariableVolume";
     Fan(FanNum).MaxAirFlowRate = 18.194;
     Fan(FanNum).DeltaPress = 1017.59 * 1.2;
-    FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
-    FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
+    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
+    state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
 
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
     FanNum = 1;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
-    EXPECT_TRUE(TestRestult);
+    TestResult = state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
+    EXPECT_TRUE(TestResult);
     // (2)The rated operational point of Fan_2 does not fall on the fan curve
     FanNum = 2;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
-    EXPECT_FALSE(TestRestult);
+    TestResult = state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(*state);
+    EXPECT_FALSE(TestResult);
 
     // Clean up
     state->dataCurveManager->PerfCurve.deallocate();
@@ -465,8 +465,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     CheckAndReadFaults(*state);
 
     // Check
-    EXPECT_EQ(2.0, FaultsCoilSATSensor(1).Offset);
-    EXPECT_EQ("COIL:COOLING:WATER", FaultsCoilSATSensor(1).CoilType);
+    EXPECT_EQ(2.0, state->dataFaultsMgr->FaultsCoilSATSensor(1).Offset);
+    EXPECT_EQ("COIL:COOLING:WATER", state->dataFaultsMgr->FaultsCoilSATSensor(1).CoilType);
     EXPECT_TRUE(HVACControllers::ControllerProps(1).FaultyCoilSATFlag);
     EXPECT_EQ(1, HVACControllers::ControllerProps(1).FaultyCoilSATIndex);
 }
@@ -653,7 +653,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // there are two OA controller objects
     EXPECT_EQ(state->dataMixedAir->NumOAControllers, 2);
     // there are five economizer faults
-    EXPECT_EQ(FaultsManager::NumFaultyEconomizer, 5);
+    EXPECT_EQ(state->dataFaultsMgr->NumFaultyEconomizer, 5);
 
     // there are three economizer faults in the 1st OA controller
     EXPECT_EQ(state->dataMixedAir->OAController(1).NumFaultyEconomizer, 3);
@@ -897,7 +897,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     state->dataEnvrn->DayOfYear_Schedule = 1;
     ScheduleManager::UpdateScheduleValues(*state);
 
-    EXPECT_EQ(2, FaultsManager::NumFouledCoil);
+    EXPECT_EQ(2, state->dataFaultsMgr->NumFouledCoil);
     // This should also have called WaterCoil::GetWaterCoilInput
     EXPECT_EQ(3, state->dataWaterCoils->NumWaterCoils);
 
@@ -910,20 +910,20 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_NEAR(6.64, state->dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.0001);
         EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
 
-        EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
+        EXPECT_EQ(state->dataWaterCoils->WaterCoil_SimpleHeating, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
 
         // Doesn't have an Availability Schedule
-        EXPECT_EQ(-1, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
+        EXPECT_EQ(-1, state->dataFaultsMgr->FouledCoils(FaultIndex).AvaiSchedPtr);
         // Has a Severity Schedule
-        EXPECT_EQ("SEVERITYSCHED", FaultsManager::FouledCoils(FaultIndex).SeveritySchedule);
-        EXPECT_EQ(severitySchedIndex, FaultsManager::FouledCoils(FaultIndex).SeveritySchedPtr);
+        EXPECT_EQ("SEVERITYSCHED", state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedule);
+        EXPECT_EQ(severitySchedIndex, state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedPtr);
 
-        EXPECT_EQ(FaultsManager::iFouledCoil_UARated, FaultsManager::FouledCoils(FaultIndex).FoulingInputMethod);
-        EXPECT_NEAR(3.32, FaultsManager::FouledCoils(FaultIndex).UAFouled, 0.0001);
+        EXPECT_EQ(FaultsManager::iFouledCoil_UARated, state->dataFaultsMgr->FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_NEAR(3.32, state->dataFaultsMgr->FouledCoils(FaultIndex).UAFouled, 0.0001);
 
         // Check calculation
         // Expected FaultFrac * (1/UAfouled - 1 / UACoilTotal)
@@ -938,24 +938,24 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_EQ("AHU CHW COOLING COIL", state->dataWaterCoils->WaterCoil(CoilNum).Name);
         EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
 
-        EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(CoilNum, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoilNum);
+        EXPECT_EQ(state->dataWaterCoils->WaterCoil_Cooling, state->dataFaultsMgr->FouledCoils(FaultIndex).FouledCoiledType);
 
         EXPECT_TRUE(state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
         EXPECT_EQ(FaultIndex, state->dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
 
         // Has an Availabity Schedule
-        EXPECT_EQ("AVAILSCHED", FaultsManager::FouledCoils(FaultIndex).AvaiSchedule);
-        EXPECT_EQ(avaiSchedIndex, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
+        EXPECT_EQ("AVAILSCHED", state->dataFaultsMgr->FouledCoils(FaultIndex).AvaiSchedule);
+        EXPECT_EQ(avaiSchedIndex, state->dataFaultsMgr->FouledCoils(FaultIndex).AvaiSchedPtr);
         // Has a Severity Schedule
-        EXPECT_EQ("SEVERITYSCHED", FaultsManager::FouledCoils(FaultIndex).SeveritySchedule);
-        EXPECT_EQ(severitySchedIndex, FaultsManager::FouledCoils(FaultIndex).SeveritySchedPtr);
+        EXPECT_EQ("SEVERITYSCHED", state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedule);
+        EXPECT_EQ(severitySchedIndex, state->dataFaultsMgr->FouledCoils(FaultIndex).SeveritySchedPtr);
 
-        EXPECT_EQ(FaultsManager::iFouledCoil_FoulingFactor, FaultsManager::FouledCoils(FaultIndex).FoulingInputMethod);
-        EXPECT_NEAR(0.0005, FaultsManager::FouledCoils(FaultIndex).Rfw, 0.0001);
-        EXPECT_NEAR(0.0001, FaultsManager::FouledCoils(FaultIndex).Rfa, 0.0001);
-        EXPECT_NEAR(100.0, FaultsManager::FouledCoils(FaultIndex).Aout, 0.01);
-        EXPECT_NEAR(0.1, FaultsManager::FouledCoils(FaultIndex).Aratio, 0.0001);
+        EXPECT_EQ(FaultsManager::iFouledCoil_FoulingFactor, state->dataFaultsMgr->FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_NEAR(0.0005, state->dataFaultsMgr->FouledCoils(FaultIndex).Rfw, 0.0001);
+        EXPECT_NEAR(0.0001, state->dataFaultsMgr->FouledCoils(FaultIndex).Rfa, 0.0001);
+        EXPECT_NEAR(100.0, state->dataFaultsMgr->FouledCoils(FaultIndex).Aout, 0.01);
+        EXPECT_NEAR(0.1, state->dataFaultsMgr->FouledCoils(FaultIndex).Aratio, 0.0001);
 
         // Check calculation
         //Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
