@@ -321,7 +321,7 @@ namespace VentilatedSlab {
                                     Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
                                     Real64 const CoreNumbers);
 
-    Real64 SumHATsurf(int const ZoneNum); // Zone number
+    Real64 SumHATsurf(EnergyPlusData &state, int ZoneNum); // Zone number
 
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 

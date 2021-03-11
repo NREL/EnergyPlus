@@ -200,7 +200,6 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
-        using DataHeatBalance::Zone;
         using DataSizing::AutoSize;
         using Fans::GetFanAvailSchPtr;
         using Fans::GetFanDesignVolumeFlowRate;
@@ -904,7 +903,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             //   High humidity control option is YES, read in additional data
             if (UtilityRoutines::SameString(Alphas(6), "Yes")) {
 
-                HStatZoneNum = UtilityRoutines::FindItemInList(Alphas(7), Zone);
+                HStatZoneNum = UtilityRoutines::FindItemInList(Alphas(7), state.dataHeatBal->Zone);
                 thisOAController.HumidistatZoneNum = HStatZoneNum;
 
                 // Get the node number for the zone with the humidistat
@@ -1318,16 +1317,8 @@ namespace EnergyPlus::HVACStandAloneERV {
         // Obtains flow rates from the zone or system sizing arrays.
 
         // Using/Aliasing
-        using DataHeatBalance::People;
-        using DataHeatBalance::TotPeople;
-        using DataHeatBalance::Zone;
-        using DataSizing::AutoSize;
-        using DataSizing::AutoVsHardSizingThreshold;
-        using DataSizing::CurZoneEqNum;
-        using DataSizing::ZoneEqSizing;
         using Fans::SetFanData;
         using Fans::SimulateFanComponents;
-
         using HeatRecovery::SetHeatExchangerData;
         using ScheduleManager::GetScheduleMaxValue;
 
@@ -1363,34 +1354,36 @@ namespace EnergyPlus::HVACStandAloneERV {
         bool PrintFlag = true;
         bool ErrorsFound = false;
 
-        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize) {
+        auto &ZoneEqSizing(state.dataSize->ZoneEqSizing);
+
+        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == DataSizing::AutoSize) {
             IsAutoSize = true;
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             //      Sizing objects are not required for stand alone ERV
             //      CALL CheckZoneSizing('ZoneHVAC:EnergyRecoveryVentilator',StandAloneERV(StandAloneERVNum)%Name)
-            ZoneName = state.dataZoneEquip->ZoneEquipConfig(CurZoneEqNum).ZoneName;
-            ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(CurZoneEqNum).ActualZoneNum;
-            ZoneMult = Zone(ActualZoneNum).Multiplier * Zone(ActualZoneNum).ListMultiplier;
+            ZoneName = state.dataZoneEquip->ZoneEquipConfig(state.dataSize->CurZoneEqNum).ZoneName;
+            ActualZoneNum = state.dataZoneEquip->ZoneEquipConfig(state.dataSize->CurZoneEqNum).ActualZoneNum;
+            ZoneMult = state.dataHeatBal->Zone(ActualZoneNum).Multiplier * state.dataHeatBal->Zone(ActualZoneNum).ListMultiplier;
             FloorArea = 0.0;
-            if (UtilityRoutines::SameString(ZoneName, Zone(ActualZoneNum).Name)) {
-                FloorArea = Zone(ActualZoneNum).FloorArea;
+            if (UtilityRoutines::SameString(ZoneName, state.dataHeatBal->Zone(ActualZoneNum).Name)) {
+                FloorArea = state.dataHeatBal->Zone(ActualZoneNum).FloorArea;
             } else {
                 for (ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                    if (!UtilityRoutines::SameString(ZoneName, Zone(ZoneNum).Name)) continue;
-                    FloorArea = Zone(ZoneNum).FloorArea;
+                    if (!UtilityRoutines::SameString(ZoneName, state.dataHeatBal->Zone(ZoneNum).Name)) continue;
+                    FloorArea = state.dataHeatBal->Zone(ZoneNum).FloorArea;
                     break;
                 }
             }
             NumberOfPeople = 0.0;
             MaxPeopleSch = 0.0;
-            for (PeopleNum = 1; PeopleNum <= TotPeople; ++PeopleNum) {
-                if (ActualZoneNum != People(PeopleNum).ZonePtr) continue;
-                PeopleSchPtr = People(PeopleNum).NumberOfPeoplePtr;
+            for (PeopleNum = 1; PeopleNum <= state.dataHeatBal->TotPeople; ++PeopleNum) {
+                if (ActualZoneNum != state.dataHeatBal->People(PeopleNum).ZonePtr) continue;
+                PeopleSchPtr = state.dataHeatBal->People(PeopleNum).NumberOfPeoplePtr;
                 MaxPeopleSch = GetScheduleMaxValue(state, PeopleSchPtr);
-                NumberOfPeople = NumberOfPeople + (People(PeopleNum).NumberOfPeople * MaxPeopleSch);
+                NumberOfPeople = NumberOfPeople + (state.dataHeatBal->People(PeopleNum).NumberOfPeople * MaxPeopleSch);
             }
             SupplyAirVolFlowDes = FloorArea * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerFloorArea +
                                   NumberOfPeople * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AirVolFlowPerOccupant;
@@ -1404,8 +1397,8 @@ namespace EnergyPlus::HVACStandAloneERV {
             Real64 TempSize = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
             std::string SizingString = "Supply Air Flow Rate [m3/s]";
             if (IsAutoSize) {
-                DataSizing::DataConstantUsedForSizing = SupplyAirVolFlowDes;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = SupplyAirVolFlowDes;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
                 TempSize = SupplyAirVolFlowDes;
                 if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                     state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex).MaxOA =
@@ -1413,8 +1406,8 @@ namespace EnergyPlus::HVACStandAloneERV {
                     state.dataMixedAir->OAController(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ControllerIndex).MinOA = SupplyAirVolFlowDes;
                 }
             } else {
-                DataSizing::DataConstantUsedForSizing = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
-                DataSizing::DataFractionUsedForSizing = 1.0;
+                state.dataSize->DataConstantUsedForSizing = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+                state.dataSize->DataFractionUsedForSizing = 1.0;
             }
             if (TempSize > 0.0) {
                 SystemAirFlowSizer sizerSystemAirFlow;
@@ -1426,13 +1419,13 @@ namespace EnergyPlus::HVACStandAloneERV {
         }
 
         // Size ERV exhaust flow rate
-        DataSizing::DataFractionUsedForSizing = 1.0;
+        state.dataSize->DataFractionUsedForSizing = 1.0;
         IsAutoSize = false;
-        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == AutoSize) {
+        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == DataSizing::AutoSize) {
             IsAutoSize = true;
         }
 
-        if (CurZoneEqNum > 0) {
+        if (state.dataSize->CurZoneEqNum > 0) {
 
             ExhaustAirVolFlowDes = SupplyAirVolFlowDes;
 
@@ -1448,11 +1441,11 @@ namespace EnergyPlus::HVACStandAloneERV {
             Real64 TempSize = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
             if (IsAutoSize) {
                 TempSize = ExhaustAirVolFlowDes;
-                DataSizing::DataConstantUsedForSizing = ExhaustAirVolFlowDes;
+                state.dataSize->DataConstantUsedForSizing = ExhaustAirVolFlowDes;
             } else {
-                DataSizing::DataConstantUsedForSizing = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
+                state.dataSize->DataConstantUsedForSizing = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
             }
-            DataSizing::DataFractionUsedForSizing = 1.0;
+            state.dataSize->DataFractionUsedForSizing = 1.0;
             if (TempSize > 0.0) {
                 SystemAirFlowSizer sizerSystemAirFlow;
                 sizerSystemAirFlow.overrideSizingString(SizingString);
@@ -1464,14 +1457,14 @@ namespace EnergyPlus::HVACStandAloneERV {
         }
 
         // Set Zone equipment sizing data for autosizing the fans and heat exchanger
-        ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
-        ZoneEqSizing(CurZoneEqNum).OAVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
-        ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
-        ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = true;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).SystemAirFlow = true;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).DesignSizeFromParent = true;
 
         // Check supply fan flow rate or set flow rate if autosized in fan object
         IsAutoSize = false;
-        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate == AutoSize) {
+        if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate == DataSizing::AutoSize) {
             IsAutoSize = true;
         }
         DesignSAFanVolFlowRateDes = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow * state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
@@ -1481,7 +1474,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate > 0.0 && DesignSAFanVolFlowRateDes > 0.0) {
                 DesignSAFanVolFlowRateUser = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).DesignSAFanVolFlowRate;
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    if ((std::abs(DesignSAFanVolFlowRateDes - DesignSAFanVolFlowRateUser) / DesignSAFanVolFlowRateUser) > AutoVsHardSizingThreshold) {
+                    if ((std::abs(DesignSAFanVolFlowRateDes - DesignSAFanVolFlowRateUser) / DesignSAFanVolFlowRateUser) > state.dataSize->AutoVsHardSizingThreshold) {
                         ShowMessage(state, "SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator " +
                                     cFanTypes(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanType_Num) + ' ' +
                                     state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName);
@@ -1509,7 +1502,7 @@ namespace EnergyPlus::HVACStandAloneERV {
         }
 
         // now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
-        ZoneEqSizing(CurZoneEqNum).AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+        ZoneEqSizing(state.dataSize->CurZoneEqNum).AirVolFlow = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
     }
 
     void CalcStandAloneERV(EnergyPlusData &state,
@@ -1533,13 +1526,8 @@ namespace EnergyPlus::HVACStandAloneERV {
         // METHODOLOGY EMPLOYED:
         // Simulates the unit components sequentially in the air flow direction.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using DataHeatBalance::ZoneAirMassFlow;
         using Fans::SimulateFanComponents;
-
         using HeatRecovery::SimHeatRecovery;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1687,7 +1675,7 @@ namespace EnergyPlus::HVACStandAloneERV {
             //      END DO
             TotalExhaustMassFlow = Node(ExhaustInletNode).MassFlowRate;
             TotalSupplyMassFlow = Node(SupInletNode).MassFlowRate;
-            if (TotalExhaustMassFlow > TotalSupplyMassFlow && !ZoneAirMassFlow.EnforceZoneMassBalance) {
+            if (TotalExhaustMassFlow > TotalSupplyMassFlow && !state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance) {
                 ShowWarningError(state, "For " + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).UnitType + " \"" + state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name +
                                  "\" there is unbalanced exhaust air flow.");
                 ShowContinueError(state, format("... The exhaust air mass flow rate = {:.6R}", Node(ExhaustInletNode).MassFlowRate));
@@ -1748,7 +1736,7 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         if (state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!state.dataGlobal->SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, 0, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).FirstPass);
             }
         }
     }
@@ -2066,7 +2054,7 @@ namespace EnergyPlus::HVACStandAloneERV {
 
         StandSloneERVAFNException = false;
 
-        for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) { 
+        for (StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
             auto StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
             bool ErrorsFound{false};

@@ -651,7 +651,7 @@ namespace OutputReportTabular {
                            Array3D<Real64> &feneCondInstantSeq,
                            Array2D<Real64> &surfDelaySeq);
 
-    Real64 MovingAvgAtMaxTime(Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
+    Real64 MovingAvgAtMaxTime(EnergyPlusData &state, Array1S<Real64> const &dataSeq, int const &numTimeSteps, int const &maxTimeStep);
 
     void ComputeTableBodyUsingMovingAvg(EnergyPlusData &state,
                                         Array2D<Real64> &resultCells,
@@ -730,7 +730,8 @@ namespace OutputReportTabular {
 
     std::string ConvertUnicodeToUTF8(unsigned long const codepoint);
 
-    std::string ConvertToEscaped(std::string const &inString); // Input String
+    std::string ConvertToEscaped(std::string const &inString,  // Input String
+                                 bool isXML=true);             // isXML if false assumes HTML and will not convert quotes and apostrophes, for HTML4
 
     void DetermineBuildingFloorArea(EnergyPlusData &state);
 

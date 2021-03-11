@@ -178,7 +178,7 @@ namespace WeatherManager {
             auto &underwaterBoundary{state.dataWeatherManager->underwaterBoundaries[i - 1]};
             underwaterBoundary.Name = DataIPShortCuts::cAlphaArgs(1);
             underwaterBoundary.distanceFromLeadingEdge = DataIPShortCuts::rNumericArgs(1);
-            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, DataSurfaces::OSCM);
+            underwaterBoundary.OSCMIndex = UtilityRoutines::FindItemInList(underwaterBoundary.Name, state.dataSurface->OSCM);
             if (underwaterBoundary.OSCMIndex <= 0) {
                 ShowSevereError(state, "Could not match underwater boundary condition object with an Other Side Conditions Model input object.");
                 errorsFound = true;
@@ -242,11 +242,11 @@ namespace WeatherManager {
             if (thisBoundary.VelocityScheduleIndex > 0) {
                 freeStreamVelocity = ScheduleManager::GetCurrentScheduleValue(state, thisBoundary.VelocityScheduleIndex); // m/s
             }
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).TConv = curWaterTemp;
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).HConv =
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).TConv = curWaterTemp;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).HConv =
                 WeatherManager::calculateWaterBoundaryConvectionCoefficient(curWaterTemp, freeStreamVelocity, thisBoundary.distanceFromLeadingEdge);
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).TRad = curWaterTemp;
-            DataSurfaces::OSCM(thisBoundary.OSCMIndex).HRad = 0.0;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).TRad = curWaterTemp;
+            state.dataSurface->OSCM(thisBoundary.OSCMIndex).HRad = 0.0;
         }
     }
 
@@ -282,37 +282,37 @@ namespace WeatherManager {
         }
         CheckLocationValidity(state);
         if (state.dataEnvrn->varyingOrientationSchedIndex > 0) {
-            DataHeatBalance::BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(state, state.dataEnvrn->varyingOrientationSchedIndex), 360.0);
+            state.dataHeatBal->BuildingAzimuth = mod(ScheduleManager::GetCurrentScheduleValue(state, state.dataEnvrn->varyingOrientationSchedIndex), 360.0);
             state.dataSurfaceGeometry->CosBldgRelNorth =
-                std::cos(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+                std::cos(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
             state.dataSurfaceGeometry->SinBldgRelNorth =
-                std::sin(-(DataHeatBalance::BuildingAzimuth + DataHeatBalance::BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
-            for (size_t SurfNum = 1; SurfNum < DataSurfaces::Surface.size(); ++SurfNum) {
-                for (int n = 1; n <= DataSurfaces::Surface(SurfNum).Sides; ++n) {
-                    Real64 Xb = DataSurfaces::Surface(SurfNum).Vertex(n).x;
-                    Real64 Yb = DataSurfaces::Surface(SurfNum).Vertex(n).y;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).x = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).y = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
-                    DataSurfaces::Surface(SurfNum).NewVertex(n).z = DataSurfaces::Surface(SurfNum).Vertex(n).z;
+                std::sin(-(state.dataHeatBal->BuildingAzimuth + state.dataHeatBal->BuildingRotationAppendixG) * DataGlobalConstants::DegToRadians);
+            for (size_t SurfNum = 1; SurfNum < state.dataSurface->Surface.size(); ++SurfNum) {
+                for (int n = 1; n <= state.dataSurface->Surface(SurfNum).Sides; ++n) {
+                    Real64 Xb = state.dataSurface->Surface(SurfNum).Vertex(n).x;
+                    Real64 Yb = state.dataSurface->Surface(SurfNum).Vertex(n).y;
+                    state.dataSurface->Surface(SurfNum).NewVertex(n).x = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
+                    state.dataSurface->Surface(SurfNum).NewVertex(n).y = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
+                    state.dataSurface->Surface(SurfNum).NewVertex(n).z = state.dataSurface->Surface(SurfNum).Vertex(n).z;
                 }
-                Vectors::CreateNewellSurfaceNormalVector(DataSurfaces::Surface(SurfNum).NewVertex,
-                                                         DataSurfaces::Surface(SurfNum).Sides,
-                                                         DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
+                Vectors::CreateNewellSurfaceNormalVector(state.dataSurface->Surface(SurfNum).NewVertex,
+                                                         state.dataSurface->Surface(SurfNum).Sides,
+                                                         state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector);
                 Real64 SurfWorldAz = 0.0;
                 Real64 SurfTilt = 0.0;
-                Vectors::DetermineAzimuthAndTilt(DataSurfaces::Surface(SurfNum).NewVertex,
-                                                 DataSurfaces::Surface(SurfNum).Sides,
+                Vectors::DetermineAzimuthAndTilt(state.dataSurface->Surface(SurfNum).NewVertex,
+                                                 state.dataSurface->Surface(SurfNum).Sides,
                                                  SurfWorldAz,
                                                  SurfTilt,
-                                                 DataSurfaces::Surface(SurfNum).lcsx,
-                                                 DataSurfaces::Surface(SurfNum).lcsy,
-                                                 DataSurfaces::Surface(SurfNum).lcsz,
-                                                 DataSurfaces::Surface(SurfNum).GrossArea,
-                                                 DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector);
-                DataSurfaces::Surface(SurfNum).Azimuth = SurfWorldAz;
-                DataSurfaces::Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
-                DataSurfaces::Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
-                DataSurfaces::Surface(SurfNum).OutNormVec = DataSurfaces::Surface(SurfNum).NewellSurfaceNormalVector;
+                                                 state.dataSurface->Surface(SurfNum).lcsx,
+                                                 state.dataSurface->Surface(SurfNum).lcsy,
+                                                 state.dataSurface->Surface(SurfNum).lcsz,
+                                                 state.dataSurface->Surface(SurfNum).GrossArea,
+                                                 state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector);
+                state.dataSurface->Surface(SurfNum).Azimuth = SurfWorldAz;
+                state.dataSurface->Surface(SurfNum).SinAzim = std::sin(SurfWorldAz * DataGlobalConstants::DegToRadians);
+                state.dataSurface->Surface(SurfNum).CosAzim = std::cos(SurfWorldAz * DataGlobalConstants::DegToRadians);
+                state.dataSurface->Surface(SurfNum).OutNormVec = state.dataSurface->Surface(SurfNum).NewellSurfaceNormalVector;
             }
         }
     }
@@ -555,12 +555,12 @@ namespace WeatherManager {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
             }
-            if (DataSystemVariables::DDOnly && state.dataEnvrn->TotDesDays == 0) {
+            if (state.dataSysVars->DDOnly && state.dataEnvrn->TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName +
                                 "Requested Design Days only (DataSystemVariables::DDOnly) but no Design Days specified, program will terminate.");
             }
-            if (DataSystemVariables::ReverseDD && state.dataEnvrn->TotDesDays == 1) {
+            if (state.dataSysVars->ReverseDD && state.dataEnvrn->TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
                     RoutineName +
@@ -601,22 +601,22 @@ namespace WeatherManager {
             state.dataEnvrn->Month = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).StartMonth;
             state.dataGlobal->NumOfDayInEnvrn = state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).TotalDays; // Set day loop maximum from DataGlobals
             if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
-                if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
+                if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
                     if (state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::DesignDay) {
                         if (state.dataGlobal->DoDesDaySim) {
                             ShowWarningError(state, RoutineName + "Adaptive Comfort being reported during design day.");
                             Real64 GrossApproxAvgDryBulb =
                                 (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb + (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).MaxDryBulb - state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Envrn).DailyDBRange)) / 2.0;
-                            if (DataHeatBalance::AdaptiveComfortRequested_ASH55)
+                            if (state.dataHeatBal->AdaptiveComfortRequested_ASH55)
                                 ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, false, GrossApproxAvgDryBulb);
-                            if (DataHeatBalance::AdaptiveComfortRequested_CEN15251)
+                            if (state.dataHeatBal->AdaptiveComfortRequested_CEN15251)
                                 ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, false, GrossApproxAvgDryBulb);
                         }
                     } else {
                         if (state.dataGlobal->DoWeathSim || state.dataGlobal->DoDesDaySim) {
-                            if (DataHeatBalance::AdaptiveComfortRequested_ASH55)
+                            if (state.dataHeatBal->AdaptiveComfortRequested_ASH55)
                                 ThermalComfort::CalcThermalComfortAdaptiveASH55(state, true, true, 0.0);
-                            if (DataHeatBalance::AdaptiveComfortRequested_CEN15251)
+                            if (state.dataHeatBal->AdaptiveComfortRequested_CEN15251)
                                 ThermalComfort::CalcThermalComfortAdaptiveCEN15251(state, true, true, 0.0);
                         }
                     }
@@ -806,7 +806,7 @@ namespace WeatherManager {
 
                         if (!state.dataGlobal->DoingSizing && !state.dataGlobal->KickOffSimulation) {
                             if ((state.dataGlobal->KindOfSim == DataGlobalConstants::KindOfSim::RunPeriodWeather && state.dataGlobal->DoWeathSim)) {
-                                if (DataHeatBalance::AdaptiveComfortRequested_ASH55 || DataHeatBalance::AdaptiveComfortRequested_CEN15251) {
+                                if (state.dataHeatBal->AdaptiveComfortRequested_ASH55 || state.dataHeatBal->AdaptiveComfortRequested_CEN15251) {
                                     if (state.dataWeatherManager->WFAllowsLeapYears) {
                                         ShowSevereError(state, RoutineName +
                                                         "AdaptiveComfort Reporting does not work correctly with leap years in weather files.");
@@ -1732,7 +1732,7 @@ namespace WeatherManager {
             ReportMissing_RangeData(state);
         }
 
-        // set the state.dataGlobal->EndDesignDayEnvrnsFlag (dataGlobal)
+        // set the EndDesignDayEnvrnsFlag (dataGlobal)
         // True at the end of the last design day environment (last time step of last hour of last day of environ which is a design day)
         state.dataGlobal->EndDesignDayEnvrnsFlag = false;
         if (state.dataGlobal->EndEnvrnFlag) {
@@ -4319,7 +4319,7 @@ namespace WeatherManager {
 
                 int endcol = len(Line.data);
                 if (endcol > 0) {
-                    if (int(Line.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
+                    if (int(Line.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                         ShowSevereError(state, "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.",
                                         OptionalOutputFileRef(state.files.eso));
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
@@ -4710,7 +4710,7 @@ namespace WeatherManager {
             state.dataWeatherManager->Environment(Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         }
         for (int Env = 1; Env <= RPD1 + RPD2; ++Env) {
-            if (!DataSystemVariables::DDOnly) {
+            if (!state.dataSysVars->DDOnly) {
                 state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
             } else {
                 state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -4731,16 +4731,16 @@ namespace WeatherManager {
         // the last environment(s) is designated the weather environment if an annual run
         // is selected.  All of the design systems is done from the design day info
         // which will have to be completed to run the annual run.
-        if (state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
+        if (state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetRunPeriodData(state, state.dataWeatherManager->TotRunPers, ErrorsFound);
         }
 
-        if (DataSystemVariables::FullAnnualRun) {
+        if (state.dataSysVars->FullAnnualRun) {
             // GetRunPeriodData may have reset the value of TotRunPers
              state.dataWeatherManager->NumOfEnvrn = state.dataEnvrn->TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         }
 
-        if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
+        if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetSpecialDayPeriodData(state, ErrorsFound);
             GetDSTData(state, ErrorsFound);
             if (state.dataWeatherManager->IDFDaylightSaving) {
@@ -4865,7 +4865,7 @@ namespace WeatherManager {
             state.dataWeatherManager->RunPeriodInput(i).endYear = int(DataIPShortCuts::rNumericArgs(6));
             state.dataWeatherManager->RunPeriodInput(i).TreatYearsAsConsecutive = true;
 
-            if (DataSystemVariables::FullAnnualRun && i == 1) {
+            if (state.dataSysVars->FullAnnualRun && i == 1) {
                 state.dataWeatherManager->RunPeriodInput(i).startMonth = 1;
                 state.dataWeatherManager->RunPeriodInput(i).startDay = 1;
                 state.dataWeatherManager->RunPeriodInput(i).endMonth = 12;
@@ -5156,7 +5156,7 @@ namespace WeatherManager {
             }
         }
 
-        if (nRunPeriods == 0 && DataSystemVariables::FullAnnualRun) {
+        if (nRunPeriods == 0 && state.dataSysVars->FullAnnualRun) {
             ShowWarningError(state, "No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31.");
             state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
             state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -5170,7 +5170,7 @@ namespace WeatherManager {
                 SetupWeekDaysByMonth(state,
                     state.dataWeatherManager->RunPeriodInput(1).startMonth, state.dataWeatherManager->RunPeriodInput(1).startDay, state.dataWeatherManager->RunPeriodInput(1).dayOfWeek, state.dataWeatherManager->RunPeriodInput(1).monWeekDay);
             }
-        } else if (nRunPeriods > 1 && DataSystemVariables::FullAnnualRun) {
+        } else if (nRunPeriods > 1 && state.dataSysVars->FullAnnualRun) {
             nRunPeriods = 1;
         }
     }
@@ -5803,7 +5803,7 @@ namespace WeatherManager {
         state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue.dimension(TotDesDays, 0.0);
         state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue.dimension(TotDesDays, 0.0);
 
-        if (DataSystemVariables::ReverseDD && TotDesDays <= 1) {
+        if (state.dataSysVars->ReverseDD && TotDesDays <= 1) {
             ShowSevereError(state, "GetDesignDayData: Reverse Design Day requested but # Design Days <=1");
         }
 
@@ -5811,7 +5811,7 @@ namespace WeatherManager {
         for (int i = 1; i <= TotDesDays; ++i) {
 
             int EnvrnNum;
-            if (DataSystemVariables::ReverseDD) {
+            if (state.dataSysVars->ReverseDD) {
                 if (i == 1 && TotDesDays > 1) {
                     EnvrnNum = 2;
                 } else if (i == 2) {

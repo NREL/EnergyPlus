@@ -82,20 +82,20 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
     // unit test for issue #6222, test to make sure zone index in surface on which PV is placed is not zero so zone multiplier is applied properly
 
     EnergyPlus::DataPhotovoltaics::PVarray.deallocate();
-    DataHeatBalance::Zone.deallocate();
-    DataSurfaces::Surface.deallocate();
+    state->dataHeatBal->Zone.deallocate();
+    state->dataSurface->Surface.deallocate();
 
     EnergyPlus::DataPhotovoltaics::PVarray.allocate(3);
-    DataHeatBalance::Zone.allocate(2);
-    DataSurfaces::Surface.allocate(3);
+    state->dataHeatBal->Zone.allocate(2);
+    state->dataSurface->Surface.allocate(3);
 
     state->dataGlobal->NumOfZones = 2;
-    DataHeatBalance::Zone(1).Name = "Zone1";
-    DataHeatBalance::Zone(1).ListMultiplier = 1.0;
-    DataHeatBalance::Zone(1).Multiplier = 5.0;
-    DataHeatBalance::Zone(2).Name = "Zone2";
-    DataHeatBalance::Zone(2).ListMultiplier = 10.0;
-    DataHeatBalance::Zone(2).Multiplier = 1.0;
+    state->dataHeatBal->Zone(1).Name = "Zone1";
+    state->dataHeatBal->Zone(1).ListMultiplier = 1.0;
+    state->dataHeatBal->Zone(1).Multiplier = 5.0;
+    state->dataHeatBal->Zone(2).Name = "Zone2";
+    state->dataHeatBal->Zone(2).ListMultiplier = 10.0;
+    state->dataHeatBal->Zone(2).Multiplier = 1.0;
 
     EnergyPlus::DataPhotovoltaics::NumPVs = 3;
     EnergyPlus::DataPhotovoltaics::PVarray(1).SurfacePtr = 1;
@@ -105,12 +105,12 @@ TEST_F(EnergyPlusFixture, PV_ReportPV_ZoneIndexNonZero)
     EnergyPlus::DataPhotovoltaics::PVarray(3).SurfacePtr = 3;
     EnergyPlus::DataPhotovoltaics::PVarray(3).CellIntegrationMode = -9999;
 
-    DataSurfaces::Surface(1).Zone = 1;
-    DataSurfaces::Surface(1).ZoneName = "Zone1";
-    DataSurfaces::Surface(2).Zone = 0;
-    DataSurfaces::Surface(2).ZoneName = "Zone2";
-    DataSurfaces::Surface(3).Zone = 0;
-    DataSurfaces::Surface(3).ZoneName = "None";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "Zone1";
+    state->dataSurface->Surface(2).Zone = 0;
+    state->dataSurface->Surface(2).ZoneName = "Zone2";
+    state->dataSurface->Surface(3).Zone = 0;
+    state->dataSurface->Surface(3).ZoneName = "None";
 
     // Test 1: Zone 1--PV has multiplier, Zone index already set
     EnergyPlus::DataPhotovoltaics::PVarray(1).Report.DCPower = 1000.0;

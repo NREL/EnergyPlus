@@ -348,7 +348,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterHEATING {
             TestCompSet(state, ModuleCompNameUC, AlphArray(1), AlphArray(4), AlphArray(5), "Hot Water Nodes");
 
             // save the design source side flow rate for use by plant loop sizing algorithms
-            RegisterPlantCompDesignFlow(state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideInletNodeNum, 0.5 * state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideVolFlowRate);
+            RegisterPlantCompDesignFlow(state, state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideInletNodeNum, 0.5 * state.dataHPWaterToWaterHtg->GSHP(GSHPNum).SourceSideVolFlowRate);
 
         }
 

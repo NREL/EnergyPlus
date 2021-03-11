@@ -78,7 +78,6 @@ void DisplayString(EnergyPlusData &state, std::string const &String) // String t
     // na
 
     // Using/Aliasing
-    using DataSystemVariables::DeveloperFlag;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -96,7 +95,7 @@ void DisplayString(EnergyPlusData &state, std::string const &String) // String t
     if (state.dataGlobal->fMessagePtr) state.dataGlobal->fMessagePtr(String);
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(String.c_str());
 
-    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
     std::cout << String << std::endl;
 }
 
@@ -118,7 +117,6 @@ void DisplayString(EnergyPlusData &state, char const *String) // String to be di
     // na
 
     // Using/Aliasing
-    using DataSystemVariables::DeveloperFlag;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -137,7 +135,7 @@ void DisplayString(EnergyPlusData &state, char const *String) // String to be di
     if (state.dataGlobal->fMessagePtr) state.dataGlobal->fMessagePtr(String);
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(String);
 
-    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
     std::cout << String << std::endl;
 }
 
@@ -164,7 +162,6 @@ void DisplayNumberAndString(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataSystemVariables::DeveloperFlag;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -183,7 +180,7 @@ void DisplayNumberAndString(EnergyPlusData &state,
     if (state.dataGlobal->fMessagePtr) state.dataGlobal->fMessagePtr(sstm.str());
     if (state.dataGlobal->messageCallback) state.dataGlobal->messageCallback(sstm.str().c_str());
 
-    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
     std::cout << String << ' ' << Number << std::endl;
 }
 
@@ -210,7 +207,6 @@ void DisplaySimDaysProgress(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using DataSystemVariables::DeveloperFlag;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -227,7 +223,7 @@ void DisplaySimDaysProgress(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static int percent(0); // Current percent progress
 
-    if (state.dataGlobal->KickOffSimulation && !DeveloperFlag) return;
+    if (state.dataGlobal->KickOffSimulation && !state.dataSysVars->DeveloperFlag) return;
     if (TotalSimDays > 0) {
         percent = nint(((float)CurrentSimDay / (float)TotalSimDays) * 100.0);
         percent = min(percent, 100);

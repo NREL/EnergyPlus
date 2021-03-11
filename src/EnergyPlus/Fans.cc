@@ -320,7 +320,7 @@ namespace Fans {
         int MaxNumbers;
 
         state.dataFans->GetFanInputFlag = false;
-        // Flow
+
         MaxAlphas = 0;
         MaxNumbers = 0;
         NumSimpFan = inputProcessor->getNumObjectsFound(state, "Fan:ConstantVolume");
@@ -1016,7 +1016,6 @@ namespace Fans {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataSizing::CurSysNum;
         using DataZoneEquipment::CheckZoneEquipmentList;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1050,8 +1049,8 @@ namespace Fans {
             SizeFan(state, FanNum);
             // Set the loop cycling flag
             if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-                if (CurSysNum > 0) {
-                    state.dataAirLoop->AirLoopControlInfo(CurSysNum).CyclingFan = true;
+                if (state.dataSize->CurSysNum > 0) {
+                    state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).CyclingFan = true;
                 }
             }
 
@@ -1220,11 +1219,11 @@ namespace Fans {
         SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
 
         TempFlow = Fan(FanNum).MaxAirFlowRate;
-        DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
+        state.dataSize->DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
         CompType = Fan(FanNum).FanType;
         CompName = Fan(FanNum).FanName;
-        DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
-        DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
+        state.dataSize->DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
+        state.dataSize->DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
@@ -1232,9 +1231,9 @@ namespace Fans {
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
         Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(state, TempFlow, errorsFound);
 
-        DataAutosizable = true;
-        DataEMSOverrideON = false;
-        DataEMSOverride = 0.0;
+        state.dataSize->DataAutosizable = true;
+        state.dataSize->DataEMSOverrideON = false;
+        state.dataSize->DataEMSOverride = 0.0;
 
         FanVolFlow = Fan(FanNum).MaxAirFlowRate; // Maximum volumetric airflow through fan [m3/s at standard conditions]
         if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
@@ -1469,12 +1468,12 @@ namespace Fans {
             int jFault_AirFilter = Fan(FanNum).FaultyFilterIndex;
 
             // Check fault availability schedules
-            if (!FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-                ShowSevereError(state, "FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
-                ShowContinueError(state, "Invalid Fan Curve Name = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
+            if (!state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
+                ShowSevereError(state, "FaultModel:Fouling:AirFilter = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name + "\"");
+                ShowContinueError(state, "Invalid Fan Curve Name = \"" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve +
                                   "\" does not cover ");
                 ShowContinueError(state, "the operational point of Fan " + Fan(FanNum).FanName);
-                ShowFatalError(state, "SizeFan: Invalid FaultModel:Fouling:AirFilter=" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name);
+                ShowFatalError(state, "SizeFan: Invalid FaultModel:Fouling:AirFilter=" + state.dataFaultsMgr->FaultsFouledAirFilters(jFault_AirFilter).Name);
             }
         }
 
@@ -1563,7 +1562,7 @@ namespace Fans {
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
             // Check fault availability schedules
-            if (GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
                 FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
@@ -1571,14 +1570,14 @@ namespace Fans {
                     Fan(FanNum).FanName,
                     Fan(FanNum).MaxAirFlowRate,
                     Fan(FanNum).DeltaPress,
-                    (GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
+                    (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
                         Fan(FanNum).DeltaPress,
-                    FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
+                    state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
                 // Update MassFlow & DeltaPress of the fan
                 MassFlow = min(MassFlow, Fan(FanNum).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir);
                 DeltaPress =
-                    GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * Fan(FanNum).DeltaPress;
+                    GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * Fan(FanNum).DeltaPress;
             }
         }
 
@@ -1721,7 +1720,7 @@ namespace Fans {
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
             // Check fault availability schedules
-            if (GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
                 FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
@@ -1729,15 +1728,15 @@ namespace Fans {
                     Fan(FanNum).FanName,
                     Fan(FanNum).MaxAirFlowRate,
                     Fan(FanNum).DeltaPress,
-                    (GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
+                    (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
                         Fan(FanNum).DeltaPress,
-                    FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
+                    state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
                 // Update MassFlow & DeltaPress of the fan
                 MaxAirFlowRate = Fan(FanNum).MaxAirFlowRate - FanDesignFlowRateDec;
                 MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
                 DeltaPress =
-                    GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * Fan(FanNum).DeltaPress;
+                    GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * Fan(FanNum).DeltaPress;
             }
         }
 
@@ -1900,7 +1899,7 @@ namespace Fans {
             int iFault = Fan(FanNum).FaultyFilterIndex;
 
             // Check fault availability schedules
-            if (GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).AvaiSchedPtr) > 0.0) {
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
 
                 FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
@@ -1908,14 +1907,14 @@ namespace Fans {
                     Fan(FanNum).FanName,
                     Fan(FanNum).MaxAirFlowRate,
                     Fan(FanNum).DeltaPress,
-                    (GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
+                    (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) - 1) *
                         Fan(FanNum).DeltaPress,
-                    FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
+                    state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterFanCurvePtr);
 
                 // Update MassFlow & DeltaPress of the fan
                 MaxAirMassFlowRate = Fan(FanNum).MaxAirMassFlowRate - FanDesignFlowRateDec * RhoAir;
                 DeltaPress =
-                    GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * Fan(FanNum).DeltaPress;
+                    GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(iFault).FaultyAirFilterPressFracSchePtr) * Fan(FanNum).DeltaPress;
             }
         }
 
@@ -3160,9 +3159,6 @@ namespace Fans {
         //              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
 
         // REFERENCES: EnergyPlus Engineering Reference
-
-        // Using/Aliasing
-        using DataSizing::CurSysNum;
 
         // Return value
         Real64 DesignHeatGain; // returned heat gain of matched fan [W]

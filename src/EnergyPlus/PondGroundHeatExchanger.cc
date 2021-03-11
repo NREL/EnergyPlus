@@ -432,7 +432,7 @@ namespace EnergyPlus::PondGroundHeatExchanger {
                                                this->LoopSideNum,
                                                this->BranchNum,
                                                this->CompNum);
-            PlantUtilities::RegisterPlantCompDesignFlow(this->InletNodeNum, this->DesignMassFlowRate / rho);
+            PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
 
             this->MyFlag = false;
         }

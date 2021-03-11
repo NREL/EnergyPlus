@@ -1369,9 +1369,9 @@ CurrentModuleObject, PlantOpSchemeName);
 
                         if (rNumericArgs(CompNumN) == AutoSize) {
                             int Num = 1;
-                            for (; Num <= SaveNumPlantComps; ++Num) {
-                                CompInNode = CompDesWaterFlow(Num).SupNode;
-                                CompFlowRate = CompDesWaterFlow(Num).DesVolFlowRate;
+                            for (; Num <= state.dataSize->SaveNumPlantComps; ++Num) {
+                                CompInNode = state.dataSize->CompDesWaterFlow(Num).SupNode;
+                                CompFlowRate = state.dataSize->CompDesWaterFlow(Num).DesVolFlowRate;
                                 if (CompInNode == state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum) {
                                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = CompFlowRate;
                                 } else {
@@ -2142,7 +2142,7 @@ CurrentModuleObject, PlantOpSchemeName);
         //       MODIFIED       na
         //       RE-ENGINEERED  July 2010
         //                      Sept 2010 B. Griffith, retain actual sign of load values
-        //						July 2014 M. Mitchell, added SequentialUniformPLR and UniformPLR schemes
+        //                        July 2014 M. Mitchell, added SequentialUniformPLR and UniformPLR schemes
 
         // PURPOSE OF THIS SUBROUTINE: This subroutine distributes the load
         // to plant equipment according to one of two distribution schemes:

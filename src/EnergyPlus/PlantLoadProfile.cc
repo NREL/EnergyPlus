@@ -203,7 +203,7 @@ namespace EnergyPlus::PlantLoadProfile {
         }
 
         if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
-            RegisterPlantCompDesignFlow(InletNode, this->PeakVolFlowRate);
+            RegisterPlantCompDesignFlow(state, InletNode, this->PeakVolFlowRate);
             this->InitSizing = false;
         }
 
