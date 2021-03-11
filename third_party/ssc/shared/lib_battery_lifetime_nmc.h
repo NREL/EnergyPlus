@@ -54,6 +54,7 @@ struct lifetime_nmc_state {
     // for complex cycling of battery, b1 = summation of b1_dt * dt_day over a day
     // lifetime capacity updated after 24 hours elapse.
 
+    double cum_dt;      // cumulated dt elapsed
     double b1_dt;
     double b2_dt;
     double b3_dt;

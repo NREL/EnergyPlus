@@ -383,7 +383,7 @@ double voltage_dynamic_t::calculate_max_discharge_w(double q, double qmax, doubl
     q /= params->num_strings;
     qmax /= params->num_strings;
 
-    double current = 0., vol = 0;
+    double current = q * 0.5, vol = 0;
     double incr = q / 10;
     double max_p = 0, max_I = 0;
     while (current * params->dt_hr < q - tolerance && vol >= 0) {

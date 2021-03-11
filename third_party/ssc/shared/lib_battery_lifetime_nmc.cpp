@@ -36,6 +36,7 @@ void lifetime_nmc_t::initialize() {
     state->nmc_li_neg->dq_relative_neg_old = 0;
     state->nmc_li_neg->DOD_max = 0;
     state->nmc_li_neg->n_cycles_prev_day = 0;
+    state->nmc_li_neg->cum_dt = 0;
     state->nmc_li_neg->b1_dt = b1_ref;
     state->nmc_li_neg->b2_dt = b2_ref;
     state->nmc_li_neg->b3_dt = b3_ref;
@@ -185,6 +186,7 @@ void lifetime_nmc_t::runLifetimeModels(size_t lifetimeIndex, bool charge_changed
     state->nmc_li_neg->b1_dt += b1_dt_el;
     state->nmc_li_neg->b2_dt += b2_dt_el;
     state->nmc_li_neg->b3_dt += b3_dt_el;
+    state->nmc_li_neg->cum_dt += dt_day;
 
     // computations for q_neg
     double c2_dt_el = c2_ref * exp(-(Ea_c2 / Rug) * (1. / T_battery - 1. / T_ref))
@@ -194,12 +196,13 @@ void lifetime_nmc_t::runLifetimeModels(size_t lifetimeIndex, bool charge_changed
     state->nmc_li_neg->c2_dt += c2_dt_el;
 
     // Run capacity degradation model after every 24 hours
-    if (lifetimeIndex % ts_per_day == ts_per_day - (size_t)(1. / params->dt_hr)) {
+    if (fabs(state->nmc_li_neg->cum_dt - 1.) < 1e-7) {
         state->nmc_li_neg->q_relative_li = runQli(T_battery);
         state->nmc_li_neg->q_relative_neg = runQneg();
         state->q_relative = fmin(state->nmc_li_neg->q_relative_li, state->nmc_li_neg->q_relative_neg);
 
         // reset DOD_max for cycle tracking
+        state->nmc_li_neg->cum_dt = 0;
         if (state->n_cycles - state->nmc_li_neg->n_cycles_prev_day > 0)
             state->nmc_li_neg->DOD_max = DOD;
         state->nmc_li_neg->n_cycles_prev_day = state->n_cycles;

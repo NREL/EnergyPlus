@@ -222,6 +222,7 @@ void write_battery_state(const battery_state& state, var_table* vt) {
         vt->assign_match_case("dq_relative_neg_old", lifetime->nmc_li_neg->dq_relative_neg_old);
         vt->assign_match_case("DOD_max", lifetime->nmc_li_neg->DOD_max);
         vt->assign_match_case("n_cycles_prev_day", lifetime->nmc_li_neg->n_cycles_prev_day);
+        vt->assign_match_case("cum_dt", lifetime->nmc_li_neg->cum_dt);
         vt->assign_match_case("b1_dt", lifetime->nmc_li_neg->b1_dt);
         vt->assign_match_case("b2_dt", lifetime->nmc_li_neg->b2_dt);
         vt->assign_match_case("b3_dt", lifetime->nmc_li_neg->b3_dt);
@@ -305,6 +306,7 @@ void read_battery_state(battery_state& state, var_table* vt) {
         vt_get_number(vt, "dq_relative_neg_old", &lifetime->nmc_li_neg->dq_relative_neg_old);
         vt_get_number(vt, "DOD_max", &lifetime->nmc_li_neg->DOD_max);
         vt_get_int(vt, "n_cycles_prev_day", &lifetime->nmc_li_neg->n_cycles_prev_day);
+        vt_get_number(vt, "cum_dt", &lifetime->nmc_li_neg->cum_dt);
         vt_get_number(vt, "b1_dt", &lifetime->nmc_li_neg->b1_dt);
         vt_get_number(vt, "b2_dt", &lifetime->nmc_li_neg->b2_dt);
         vt_get_number(vt, "b3_dt", &lifetime->nmc_li_neg->b3_dt);
