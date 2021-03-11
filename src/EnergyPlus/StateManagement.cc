@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
@@ -134,7 +133,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataIPShortCuts::clear_state();
     DataLoopNode::clear_state();
     DataMoistureBalance::clear_state();
-    DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
     DataStringGlobals::clear_state();

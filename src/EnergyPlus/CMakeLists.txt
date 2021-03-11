@@ -193,7 +193,6 @@ set(SRC
     DataLoopNode.hh
     DataMoistureBalance.cc
     DataMoistureBalance.hh
-    DataMoistureBalanceEMPD.cc
     DataMoistureBalanceEMPD.hh
     DataOutputs.cc
     DataOutputs.hh
