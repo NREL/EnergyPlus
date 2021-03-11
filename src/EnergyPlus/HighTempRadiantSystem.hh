@@ -67,39 +67,20 @@ namespace HighTempRadiantSystem {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    extern std::string const cGas;
-    extern std::string const cNaturalGas;
-    extern std::string const cElectric;
-    extern std::string const cElectricity;
-    extern int const Gas;
-    extern int const Electric;
-    extern std::string const cMATControl;         // Control for using mean air temperature
-    extern std::string const cMRTControl;         // Control for using mean radiant temperature
-    extern std::string const cOperativeControl;   // Control for using operative temperature
-    extern std::string const cMATSPControl;       // Control for to MAT setpoint
-    extern std::string const cMRTSPControl;       // Control for to MRT setpoint
-    extern std::string const cOperativeSPControl; // Control for operative temperature setpoint
-    extern int const MATControl;
-    extern int const MRTControl;
-    extern int const OperativeControl;
-    extern int const MATSPControl;
-    extern int const MRTSPControl;
-    extern int const OperativeSPControl;
+
+    int constexpr Gas = 1;
+    int constexpr Electric = 2;
+
+    int constexpr MATControl = 1001;
+    int constexpr MRTControl = 1002;
+    int constexpr OperativeControl = 1003;
+    int constexpr MATSPControl = 1004;
+    int constexpr MRTSPControl = 1005;
+    int constexpr OperativeSPControl = 1006;
 
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    // Standard, run-of-the-mill variables...
-    extern int NumOfHighTempRadSys;              // Number of hydronic low tempererature radiant systems
-    extern Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
-    // Record keeping variables used to calculate QHTRadSrcAvg locally
-    extern Array1D<Real64> LastQHTRadSrc;      // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-    extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HighTempRadiantSystem
 
@@ -164,10 +145,6 @@ namespace HighTempRadiantSystem {
         }
     };
 
-    // Object Data
-    extern Array1D<HighTempRadiantSystemData> HighTempRadSys;
-    extern Array1D<HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
-
     // Functions
     void clear_state();
 
@@ -208,9 +185,36 @@ namespace HighTempRadiantSystem {
 
 struct HighTempRadiantSystemData : BaseGlobalStruct {
 
+    // Standard, run-of-the-mill variables...
+    int NumOfHighTempRadSys;              // Number of hydronic low tempererature radiant systems
+    Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
+    Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
+    Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
+    // Record keeping variables used to calculate QHTRadSrcAvg locally
+    Array1D<Real64> LastQHTRadSrc;        // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastSysTimeElapsed;   // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastTimeStepSys;      // Need to keep the last value in case we are still iterating
+    Array1D_bool MySizeFlag;
+    Array1D_bool CheckEquipName;
+
+    // Object Data
+    Array1D<HighTempRadiantSystem::HighTempRadiantSystemData> HighTempRadSys;
+    Array1D<HighTempRadiantSystem::HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
+
     void clear_state() override
     {
+        // TODO initialize and clear NumOfHighTempRadSys
+        QHTRadSource.clear();
+        QHTRadSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQHTRadSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        MySizeFlag.clear();
+        CheckEquipName.clear();
 
+        HighTempRadSys.clear();
+        HighTempRadSysNumericFields.clear();
     }
 };
 

@@ -113,24 +113,16 @@ namespace HighTempRadiantSystem {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-    std::string const cGas("Gas");
-    std::string const cNaturalGas("NaturalGas");
-    std::string const cElectric("Electric");
-    std::string const cElectricity("Electricity");
-    int const Gas(1);
-    int const Electric(2);
-    std::string const cMATControl("MeanAirTemperature");                   // Control for using mean air temperature
-    std::string const cMRTControl("MeanRadiantTemperature");               // Control for using mean radiant temperature
-    std::string const cOperativeControl("OperativeTemperature");           // Control for using operative temperature
-    std::string const cMATSPControl("MeanAirTemperatureSetpoint");         // Control for to MAT setpoint
-    std::string const cMRTSPControl("MeanRadiantTemperatureSetpoint");     // Control for to MRT setpoint
-    std::string const cOperativeSPControl("OperativeTemperatureSetpoint"); // Control for operative temperature setpoint
-    int const MATControl(1001);
-    int const MRTControl(1002);
-    int const OperativeControl(1003);
-    int const MATSPControl(1004);
-    int const MRTSPControl(1005);
-    int const OperativeSPControl(1006);
+    constexpr const char * cGas("Gas");
+    constexpr const char * cNaturalGas("NaturalGas");
+    constexpr const char * cElectric("Electric");
+    constexpr const char * cElectricity("Electricity");
+    constexpr const char * cMATControl("MeanAirTemperature");                   // Control for using mean air temperature
+    constexpr const char * cMRTControl("MeanRadiantTemperature");               // Control for using mean radiant temperature
+    constexpr const char * cOperativeControl("OperativeTemperature");           // Control for using operative temperature
+    constexpr const char * cMATSPControl("MeanAirTemperatureSetpoint");         // Control for to MAT setpoint
+    constexpr const char * cMRTSPControl("MeanRadiantTemperatureSetpoint");     // Control for to MRT setpoint
+    constexpr const char * cOperativeSPControl("OperativeTemperatureSetpoint"); // Control for operative temperature setpoint
 
     // MODULE VARIABLE DECLARATIONS:
     // Standard, run-of-the-mill variables...
