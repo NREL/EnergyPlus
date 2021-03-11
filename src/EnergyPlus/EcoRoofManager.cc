@@ -134,9 +134,6 @@ namespace EcoRoofManager {
         using ConvectionCoefficients::SetExtConvectionCoeff;
         using ConvectionCoefficients::SetIntConvectionCoeff;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Kv(0.4);           // Von Karmen's constant (source FASST)
         Real64 const rch(0.63);         // Turbulent Schimdt Number
@@ -158,20 +155,12 @@ namespace EcoRoofManager {
         //  INTEGER :: OSCScheduleIndex    ! Index number for OSC ConstTempSurfaceName
         Real64 Tgk;          // Ground temperature in Kelvin
         Real64 Ta;                // current air temperature
-        static Real64 Zog(0.001); // Ground roughness length scale (m)
-        static Real64 Za(2.0);    // Instrument height where atmospheric wind speed is measured (m)
         Real64 Ws;                // Wind Speed (m/s)
         Real64 Waf;               // Windspeed within canopy (m/s)
-
         Real64 Latm; // Long Wave Radiation (W/m^2)
         Real64 qaf;  // mixing ratio of air near canopy
-
         Real64 qg;                 // mixing ratio of air at surface.
-        static Real64 Lf;          // latent heat flux
-        static Real64 Vfluxf(0.0); // Water evapotr. rate associated with latent heat from vegetation [m/s]
         Real64 RS;                 // shortwave radiation
-        static Real64 Qsoil(0.0);  // heat flux from the soil layer
-
         Real64 EpsilonOne;
         // unused1208  REAL(r64) :: e
         Real64 eair;
@@ -187,13 +176,9 @@ namespace EcoRoofManager {
         Real64 Zo;               // foliage roughness length (m)
         Real64 Cfhn;             // transfer coefficient at near-neutral conditions
         Real64 Cf;               // bulk Transfer coefficient, equation 10 page 6 (FASST).
-        static Real64 sheatf;    // sensible heat flux coeff for foliage (W/m^2K)
-        static Real64 sensiblef; // sensible heat transfer TO foliage (W/m^2) DJS Jan 2011
         Real64 ra;               // Aerodynamic Resistance
-
         Real64 f1inv; // intermediate calculation variable
         Real64 f2inv; // intermediate calculation variable
-
         Real64 f1;   // intermediate calculation variable
         Real64 f2;   // intermediate calculation variable
         Real64 r_s;  // Minimum Stomatal Resistance, specific to each plant
@@ -202,7 +187,6 @@ namespace EcoRoofManager {
         Real64 esf;  // the saturation vapor pressure (Pa)
         Real64 qsf;  // Saturation specific humidity at leaf temperature (qfsat)
         Real64 Lef;  // Latent heat of vaporation at leaf surface temperature (J/kg)
-
         Real64 Desf;             // Derivative of Saturation vapor pressure
         Real64 dqf;              // Derivative of saturation specific humidity
         Real64 dqg;              // this is given by Clausius-Clapeyron equation
@@ -221,8 +205,6 @@ namespace EcoRoofManager {
         Real64 Ce;               // bulk transfer coefficient (this is in fact Ceg in equation 28 main report)
         Real64 Gammah;           // latent heat exchange stability correction factor
         Real64 Chg;              // in fact it is the same as Ce (=Ceg) is transfer coefficient (but wot?)
-        static Real64 sheatg;    // intermediate calculation variable - sensible flux coef (W/m^2K for ground)
-        static Real64 sensibleg; // sensible heat flux TO ground (w/m^2) DJS Jan 2011
         Real64 T3G;              // intermediate variable in the equation for Tg
         Real64 T2G;              // intermediate variable in the equation for Tg
         Real64 LeafTK;           // the current leaf's temperature (Kelvin)
@@ -231,8 +213,6 @@ namespace EcoRoofManager {
         Real64 Tif;              // previous leaf temperature
         Real64 rn;               // rn is the combined effect of both stomatal and aerodynamic resistances
         // in fact this is called r'' in the main report
-        static Real64 Lg(0.0);     // latent heat flux from ground surface
-        static Real64 Vfluxg(0.0); // Water evapotr. rate associated with latent heat from ground surface [m/s]
         Real64 T1G;                // intermediate variable in the equation for Tg
         Real64 Qsoilpart1;         // intermediate variable for evaluating Qsoil (part without the unknown)
         Real64 Qsoilpart2;         // intermediate variable for evaluating Qsoil (part coeff of the ground temperature)
@@ -335,15 +315,42 @@ namespace EcoRoofManager {
                                 "State",
                                 "Environment");
             SetupOutputVariable(state,
-                "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensibleg, "Zone", "State", "Environment");
+                "Green Roof Soil Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, state.dataEcoRoofMgr->sensibleg, "Zone", "State", "Environment");
             SetupOutputVariable(state,
-                "Green Roof Vegetation Sensible Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, sensiblef, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Vegetation Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxf, "Zone", "State", "Environment");
-            SetupOutputVariable(state, "Green Roof Soil Moisture Transfer Rate", OutputProcessor::Unit::m_s, Vfluxg, "Zone", "State", "Environment");
+                                "Green Roof Vegetation Sensible Heat Transfer Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                state.dataEcoRoofMgr->sensiblef,
+                                "Zone",
+                                "State",
+                                "Environment");
             SetupOutputVariable(state,
-                "Green Roof Vegetation Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lf, "Zone", "State", "Environment");
+                                "Green Roof Vegetation Moisture Transfer Rate",
+                                OutputProcessor::Unit::m_s,
+                                state.dataEcoRoofMgr->Vfluxf,
+                                "Zone",
+                                "State",
+                                "Environment");
             SetupOutputVariable(state,
-                "Green Roof Soil Latent Heat Transfer Rate per Area", OutputProcessor::Unit::W_m2, Lg, "Zone", "State", "Environment");
+                                "Green Roof Soil Moisture Transfer Rate",
+                                OutputProcessor::Unit::m_s,
+                                state.dataEcoRoofMgr->Vfluxg,
+                                "Zone",
+                                "State",
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Vegetation Latent Heat Transfer Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                state.dataEcoRoofMgr->Lf,
+                                "Zone",
+                                "State",
+                                "Environment");
+            SetupOutputVariable(state,
+                                "Green Roof Soil Latent Heat Transfer Rate per Area",
+                                OutputProcessor::Unit::W_m2,
+                                state.dataEcoRoofMgr->Lg,
+                                "Zone",
+                                "State",
+                                "Environment");
 
             SetupOutputVariable(state,
                                 "Green Roof Cumulative Precipitation Depth",
@@ -419,8 +426,8 @@ namespace EcoRoofManager {
             state.dataEcoRoofMgr->Tfold = OutDryBulbTempAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             state.dataEcoRoofMgr->Tg = 10.0;
             state.dataEcoRoofMgr->Tf = 10.0;
-            Vfluxf = 0.0;
-            Vfluxg = 0.0;
+            state.dataEcoRoofMgr->Vfluxf = 0.0;
+            state.dataEcoRoofMgr->Vfluxg = 0.0;
             state.dataEcoRoofMgr->CumRunoff = 0.0;
             state.dataEcoRoofMgr->CumET = 0.0;
             state.dataEcoRoofMgr->CumPrecip = 0.0;
@@ -444,14 +451,14 @@ namespace EcoRoofManager {
                             state.dataEcoRoofMgr->MoistureMax,
                             state.dataEcoRoofMgr->MoistureResidual,
                             state.dataEcoRoofMgr->SoilThickness,
-                            Vfluxf,
-                            Vfluxg,
+                            state.dataEcoRoofMgr->Vfluxf,
+                            state.dataEcoRoofMgr->Vfluxg,
                             ConstrNum,
                             state.dataEcoRoofMgr->Alphag,
                             unit,
                             state.dataEcoRoofMgr->Tg,
                             state.dataEcoRoofMgr->Tf,
-                            Qsoil);
+                            state.dataEcoRoofMgr->Qsoil);
 
             Ta = OutDryBulbTempAt(state, state.dataSurface->Surface(SurfNum).Centroid.z); // temperature outdoor - Surface is dry, use normal correlation
             state.dataEcoRoofMgr->Tg = state.dataEcoRoofMgr->Tgold;
@@ -498,12 +505,14 @@ namespace EcoRoofManager {
             if (Zo < 0.02) Zo = 0.02;         // limit based on p.7 TR-04-25 and Table 2
 
             // transfer coefficient at near-neutral condition Cfhn
-            Cfhn = pow_2(Kv / std::log((Za - Zd) / Zo));                      // Equation 12, page 7, FASST Model
+            Cfhn = pow_2(Kv / std::log((state.dataEcoRoofMgr->Za - Zd) / Zo)); // Equation 12, page 7, FASST Model
             Waf = 0.83 * std::sqrt(Cfhn) * sigmaf * Ws + (1.0 - sigmaf) * Ws; // Wind Speed inside foliage. Equation #6, FASST model
             Cf = 0.01 * (1.0 + 0.3 / Waf);                                    // The bulk Transfer coefficient, equation 10 page 6.
-            sheatf = state.dataEcoRoofMgr->e0 +
+            state.dataEcoRoofMgr->sheatf = state.dataEcoRoofMgr->e0 +
                      1.1 * state.dataEcoRoofMgr->LAI * Rhoaf * Cpa * Cf * Waf; // Intermediate calculation for Sensible Heat Transfer
-            sensiblef = sheatf * (Taf - state.dataEcoRoofMgr->Tf); // DJS Jan 2011 sensible flux TO foliage into air (Frankenstein 2004, eqn7)
+            state.dataEcoRoofMgr->sensiblef =
+                state.dataEcoRoofMgr->sheatf *
+                (Taf - state.dataEcoRoofMgr->Tf); // DJS Jan 2011 sensible flux TO foliage into air (Frankenstein 2004, eqn7)
             // sourced from Frankenstein et al (2004a). Added e0 windless correction factor.
             // an early version had (1.0-0.7)*sigmaf in calc of sensiblef... how did that get there!?! Fixed.
 
@@ -582,7 +591,7 @@ namespace EcoRoofManager {
 
             // Average density of air with respect to ground surface and air temperature
             Rhoag = (Rhoa + Rhog) / 2.0;
-            Rib = 2.0 * g1 * Za * (Taf - state.dataEcoRoofMgr->Tg) / ((Tafk + Tgk) * pow_2(Waf)); // Richardson Number
+            Rib = 2.0 * g1 * state.dataEcoRoofMgr->Za * (Taf - state.dataEcoRoofMgr->Tg) / ((Tafk + Tgk) * pow_2(Waf)); // Richardson Number
 
             // Compute the stability factor Gammah
             if (Rib < 0.0) {
@@ -595,25 +604,27 @@ namespace EcoRoofManager {
             }
 
             if (RoughSurf == VerySmooth) { //  6= very smooth, 5=smooth, 4= med. sm. ,3= med. rough. , 2= rough, 1= Very rough
-                Zog = 0.0008;
+                state.dataEcoRoofMgr->Zog = 0.0008;
             } else if (RoughSurf == Smooth) {
-                Zog = 0.0010;
+                state.dataEcoRoofMgr->Zog = 0.0010;
             } else if (RoughSurf == MediumSmooth) {
-                Zog = 0.0015;
+                state.dataEcoRoofMgr->Zog = 0.0015;
             } else if (RoughSurf == MediumRough) {
-                Zog = 0.0020;
+                state.dataEcoRoofMgr->Zog = 0.0020;
             } else if (RoughSurf == Rough) {
-                Zog = 0.0030;
+                state.dataEcoRoofMgr->Zog = 0.0030;
             } else { // VeryRough
-                Zog = 0.005;
+                state.dataEcoRoofMgr->Zog = 0.005;
             }
 
-            Chng = pow_2(Kv / std::log(Za / Zog)) / rch; // bulk transfer coefficient near ground
+            Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground
             Chg = Gammah * ((1.0 - sigmaf) * Chng + sigmaf * Cfhn);
-            sheatg = state.dataEcoRoofMgr->e0 + Rhoag * Cpa * Chg * Waf; // added the e0 windless correction
-            sensibleg = sheatg * (Taf - state.dataEcoRoofMgr->Tg);       // sensible flux TO soil (W/m^2) DJS Jan 2011 (eqn. 32 in Frankenstein 2004)
+            state.dataEcoRoofMgr->sheatg = state.dataEcoRoofMgr->e0 + Rhoag * Cpa * Chg * Waf; // added the e0 windless correction
+            state.dataEcoRoofMgr->sensibleg =
+                state.dataEcoRoofMgr->sheatg *
+                (Taf - state.dataEcoRoofMgr->Tg); // sensible flux TO soil (W/m^2) DJS Jan 2011 (eqn. 32 in Frankenstein 2004)
 
-            Chne = pow_2(Kv / std::log(Za / Zog)) / rche;
+            Chne = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rche;
             Ce = Gammah * ((1.0 - sigmaf) * Chne + sigmaf * Cfhn); // this is in fact Ceg in eq (28)
 
             // we can approximate Gammae by Gammah (Supported by FASST Veg Models p. 15)
@@ -622,8 +633,8 @@ namespace EcoRoofManager {
             qg = Mg * qsg + (1.0 - Mg) * qaf; // eq main report (13)
             // According to FASST documentation this is correct.
             // The following also used Rhoaf and Rhoag respectively... shouldn't these be water densities??!!
-            Lf = Lef * state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Waf * rn * (qaf - qsf); // This had Leg but should be Lef...
-            Lg = Ce * Leg * Waf * Rhoag * (qaf - qg) * Mg;        // In the FASST documentation there is NO Mg. However, in looking
+            state.dataEcoRoofMgr->Lf = Lef * state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Waf * rn * (qaf - qsf); // This had Leg but should be Lef...
+            state.dataEcoRoofMgr->Lg = Ce * Leg * Waf * Rhoag * (qaf - qg) * Mg; // In the FASST documentation there is NO Mg. However, in looking
             // back at the Deardorff 1978 paper it appears that an alpha = Mg term is
             // used to distinguish from POTENTIAL and ACTUAL ground surface evaporation...
             // the Lf and Lg calculations are NOT used in this formulation
@@ -632,10 +643,12 @@ namespace EcoRoofManager {
             // a sign difference !!! (qsf -qaf) and (qg - qaf) ?!
             // These may be useful, however for telling the UpdateSoilProps routine
             // how much evaporation has taken place...
-            Vfluxf = -1.0 * Lf / Lef / 990.0; // water evapotranspire rate [m/s]
-            Vfluxg = -1.0 * Lg / Leg / 990.0; // water evapotranspire rate [m/s]
-            if (Vfluxf < 0.0) Vfluxf = 0.0;   // According to FASST Veg. Models p. 11, eqn 26-27, if Qfsat > qaf the actual
-            if (Vfluxg < 0.0) Vfluxg = 0.0;   // evaporative fluxes should be set to zero (delta_c = 1 or 0).
+            state.dataEcoRoofMgr->Vfluxf = -1.0 * state.dataEcoRoofMgr->Lf / Lef / 990.0; // water evapotranspire rate [m/s]
+            state.dataEcoRoofMgr->Vfluxg = -1.0 * state.dataEcoRoofMgr->Lg / Leg / 990.0; // water evapotranspire rate [m/s]
+            if (state.dataEcoRoofMgr->Vfluxf < 0.0)
+                state.dataEcoRoofMgr->Vfluxf = 0.0;               // According to FASST Veg. Models p. 11, eqn 26-27, if Qfsat > qaf the actual
+            if (state.dataEcoRoofMgr->Vfluxg < 0.0)
+                state.dataEcoRoofMgr->Vfluxg = 0.0; // evaporative fluxes should be set to zero (delta_c = 1 or 0).
 
             // P1, P2, P3 correspond to first, second and third terms of equation 37 in the main report.
 
@@ -654,17 +667,18 @@ namespace EcoRoofManager {
                          (-sigmaf * state.dataEcoRoofMgr->epsilonf * Sigma -
                           sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma / EpsilonOne) *
                         pow_4(LeafTK) +
-                     sheatf * (1.0 - 0.7 * sigmaf) * (Ta + DataGlobalConstants::KelvinConv) +
+                     state.dataEcoRoofMgr->sheatf * (1.0 - 0.7 * sigmaf) * (Ta + DataGlobalConstants::KelvinConv) +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * (((0.6 * sigmaf * rn) / dOne) - 1.0) * (qsf - LeafTK * dqf) +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * ((0.1 * sigmaf * Mg) / dOne) * (qsg - SoilTK * dqg);
                 P2 = 4.0 * (sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma) * pow_3(SoilTK) / EpsilonOne +
-                     0.1 * sigmaf * sheatf + state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * (0.1 * sigmaf * Mg) / dOne * dqg;
+                     0.1 * sigmaf * state.dataEcoRoofMgr->sheatf +
+                     state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * (0.1 * sigmaf * Mg) / dOne * dqg;
                 P3 = 4.0 *
                          (-sigmaf * state.dataEcoRoofMgr->epsilonf * Sigma -
                           (sigmaf * state.dataEcoRoofMgr->epsilonf * Sigma * state.dataEcoRoofMgr->epsilong) / EpsilonOne) *
                          pow_3(LeafTK) +
-                     (0.6 * sigmaf - 1.0) * sheatf +
+                     (0.6 * sigmaf - 1.0) * state.dataEcoRoofMgr->sheatf +
                      state.dataEcoRoofMgr->LAI * Rhoaf * Cf * Lef * Waf * rn * (((0.6 * sigmaf * rn) / dOne) - 1.0) * dqf;
 
                 // T1G, T2G, & T3G corresponds to first, second & third terms of equation 38
@@ -678,7 +692,8 @@ namespace EcoRoofManager {
                           (-(1.0 - sigmaf) * state.dataEcoRoofMgr->epsilong * Sigma -
                            sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma / EpsilonOne) *
                           pow_4(SoilTK) +
-                      sheatg * (1.0 - 0.7 * sigmaf) * (Ta + DataGlobalConstants::KelvinConv) + Rhoag * Ce * Leg * Waf * Mg * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
+                      state.dataEcoRoofMgr->sheatg * (1.0 - 0.7 * sigmaf) * (Ta + DataGlobalConstants::KelvinConv) +
+                      Rhoag * Ce * Leg * Waf * Mg * ((1.0 - 0.7 * sigmaf) / dOne) * qa +
                       Rhoag * Ce * Leg * Waf * Mg * (0.1 * sigmaf * Mg / dOne - Mg) * (qsg - SoilTK * dqg) +
                       Rhoag * Ce * Leg * Waf * Mg * (0.6 * sigmaf * rn / dOne) * (qsf - LeafTK * dqf) + Qsoilpart1 +
                       Qsoilpart2 * (DataGlobalConstants::KelvinConv); // finished by T1G
@@ -687,10 +702,11 @@ namespace EcoRoofManager {
                           (-(1.0 - sigmaf) * state.dataEcoRoofMgr->epsilong * Sigma -
                            sigmaf * state.dataEcoRoofMgr->epsilonf * state.dataEcoRoofMgr->epsilong * Sigma / EpsilonOne) *
                           pow_3(SoilTK) +
-                      (0.1 * sigmaf - 1.0) * sheatg + Rhoag * Ce * Leg * Waf * Mg * (0.1 * sigmaf * Mg / dOne - Mg) * dqg - Qsoilpart2;
+                      (0.1 * sigmaf - 1.0) * state.dataEcoRoofMgr->sheatg + Rhoag * Ce * Leg * Waf * Mg * (0.1 * sigmaf * Mg / dOne - Mg) * dqg -
+                      Qsoilpart2;
 
                 T3G = (4.0 * (sigmaf * state.dataEcoRoofMgr->epsilong * state.dataEcoRoofMgr->epsilonf * Sigma) / EpsilonOne) * pow_3(LeafTK) +
-                      0.6 * sigmaf * sheatg +
+                      0.6 * sigmaf * state.dataEcoRoofMgr->sheatg +
                       Rhoag * Ce * Leg * Waf * Mg * (0.6 * sigmaf * rn / dOne) * dqf;
 
                 LeafTK = 0.5 * (LeafTK + (P1 * T2G - P2 * T1G) / (-P3 * T2G + T3G * P2)); // take avg of old and new each iteration
@@ -703,7 +719,8 @@ namespace EcoRoofManager {
                 // difference scheme this loop structure should be removed.
 
             }                                                                 // This loop does an iterative solution of the simultaneous equations
-            Qsoil = -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - DataGlobalConstants::KelvinConv)); // This is heat flux INTO top of the soil
+            state.dataEcoRoofMgr->Qsoil =
+                -1.0 * (Qsoilpart1 - Qsoilpart2 * (SoilTK - DataGlobalConstants::KelvinConv)); // This is heat flux INTO top of the soil
             state.dataEcoRoofMgr->Tfold = LeafTK - DataGlobalConstants::KelvinConv;
             state.dataEcoRoofMgr->Tgold = SoilTK - DataGlobalConstants::KelvinConv;
 

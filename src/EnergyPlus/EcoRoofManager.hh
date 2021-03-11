@@ -126,7 +126,17 @@ struct EcoRoofManagerData : BaseGlobalStruct {
     Real64 StomatalResistanceMin;     // s/m . ! Minimum stomatal resistance is unique for each veg. type.
     Real64 f3 = 1.0;                  // As the value of gd for tall grass is 0, then f3 = 1
     // ECMWF 2002 CY25R1 report has gd=0.0 for all veg except trees where gd=0.03.
-
+    Real64 Zog = 0.001;         // Ground roughness length scale (m)
+    Real64 Za = 2.0;            // Instrument height where atmospheric wind speed is measured (m)
+    Real64 Lf = 0.0;                 // latent heat flux
+    Real64 Vfluxf = 0.0;        // Water evapotr. rate associated with latent heat from vegetation [m/s]
+    Real64 Qsoil = 0.0;         // heat flux from the soil layer
+    Real64 sheatf = 0.0;             // sensible heat flux coeff for foliage (W/m^2K)
+    Real64 sensiblef = 0.0;          // sensible heat transfer TO foliage (W/m^2) DJS Jan 2011
+    Real64 sheatg = 0.0;             // intermediate calculation variable - sensible flux coef (W/m^2K for ground)
+    Real64 sensibleg = 0.0;          // sensible heat flux TO ground (w/m^2) DJS Jan 2011
+    Real64 Lg = 0.0;            // latent heat flux from ground surface
+    Real64 Vfluxg = 0.0;        // Water evapotr. rate associated with latent heat from ground surface [m/s]
 
     void clear_state() override
     {
@@ -151,7 +161,18 @@ struct EcoRoofManagerData : BaseGlobalStruct {
         this->MeanRootMoisture = 0.0;
         this->SoilThickness = 0.2;
         this->StomatalResistanceMin;
-        this->f3 = 1.0;                  
+        this->f3 = 1.0;   
+        this->Zog = 0.001;
+        this->Za = 2.0;
+        this->Lf = 0.0;
+        this->Vfluxf = 0.0;
+        this->Qsoil = 0.0;
+        this->sheatf = 0.0;
+        this->sensiblef = 0.0;
+        this->sheatg = 0.0;
+        this->sensibleg = 0.0;
+        this->Lg = 0.0;
+        this->Vfluxg = 0.0;    
     }
 };
 
