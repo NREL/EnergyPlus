@@ -5316,7 +5316,6 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace WindowManager;
         using namespace SolarShading;
-        using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DaylightingDevices::InitDaylightingDevices;
         using OutAirNodeManager::SetOutAirNodes;
         //  USE DataRoomAirModel, ONLY: IsZoneDV,IsZoneCV,HVACMassFlow, ZoneDVMixedFlag
