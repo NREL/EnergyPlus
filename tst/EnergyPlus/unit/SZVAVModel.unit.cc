@@ -565,7 +565,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
-    auto &thisFanCoil(FanCoil(1));
+    auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     EXPECT_EQ("ASHRAE90VARIABLEFAN", thisFanCoil.CapCtrlMeth);
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
     EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
@@ -672,7 +672,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     AirLoopNum = 0;
     CompressorOnFlag = 0;
     FirstHVACIteration = true;
-    auto &SZVAVModel(FanCoil(FanCoilNum));
+    auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 
     // test 1: 1000 W heating load
     zSysEDemand.RemainingOutputReqToCoolSP = 1000.0;
