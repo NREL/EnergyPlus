@@ -1016,7 +1016,6 @@ namespace HVACDXSystem {
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
-        using FaultsManager::FaultsCoilSATSensor;
 
         using General::SolveRoot;
         using TempSolveRoot::SolveRoot;
@@ -1113,7 +1112,7 @@ namespace HVACDXSystem {
         if (DXCoolingSystem(DXSystemNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
             // calculate the sensor offset using fault information
             int FaultIndex = DXCoolingSystem(DXSystemNum).FaultyCoilSATIndex;
-            DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= DXCoolingSystem(DXSystemNum).FaultyCoilSATOffset;
         }

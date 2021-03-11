@@ -1839,7 +1839,6 @@ namespace EvaporativeCoolers {
 
         // USE STATEMENTS:
         //     Use DataEnvironment, ONLY: OutDryBulbTemp, OutWetBulbTemp, OutHumRat, OutBaroPress
-        using FaultsManager::FaultsEvapCoolerFouling;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 StageEff; // Stage Efficiency of the Heat Exchanger
@@ -1879,7 +1878,7 @@ namespace EvaporativeCoolers {
                 Real64 StageEff_ff = StageEff;
 
                 // calculate the Faulty Evaporative Cooler Fouling Factor using fault information
-                EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFactor = FaultsEvapCoolerFouling(FaultIndex).CalFoulingFactor(state);
+                EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFactor = state.dataFaultsMgr->FaultsEvapCoolerFouling(FaultIndex).CalFoulingFactor(state);
 
                 // update the StageEff at faulty cases
                 StageEff = StageEff_ff * EvapCond(EvapCoolNum).FaultyEvapCoolerFoulingFactor;

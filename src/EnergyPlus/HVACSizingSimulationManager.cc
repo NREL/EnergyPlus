@@ -203,7 +203,6 @@ std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
 void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 {
-    using DataSystemVariables::ReportDuringHVACSizingSimulation;
     using EMSManager::ManageEMS;
     using ExteriorEnergyUse::ManageExteriorEnergyUse;
     using PlantPipingSystemsManager::SimulateGroundDomains;
@@ -249,7 +248,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
             if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
-            if (ReportDuringHVACSizingSimulation) {
+            if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
                 if (sqlite) {
                     sqlite->sqliteBegin();
                     sqlite->createSQLiteEnvironmentPeriodRecord(
@@ -357,7 +356,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                 } // ... End hour loop.
                 if (sqlite) {
-                    if (ReportDuringHVACSizingSimulation) {
+                    if (state.dataSysVars->ReportDuringHVACSizingSimulation) {
                         sqlite->sqliteCommit(); // one transaction per day
                     } else {
                         sqlite->sqliteRollback(); // Cancel transaction

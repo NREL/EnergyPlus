@@ -3905,23 +3905,23 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Apply offset for faulty therostats
-            if ((NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+            if ((state.dataFaultsMgr->NumFaultyThermostat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 //  loop through the FaultsThermostatOffset objects to find the one for the zone
-                for (int iFault = 1; iFault <= NumFaultyThermostat; ++iFault) {
+                for (int iFault = 1; iFault <= state.dataFaultsMgr->NumFaultyThermostat; ++iFault) {
 
-                    if (UtilityRoutines::SameString(state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).Name, FaultsThermostatOffset(iFault).FaultyThermostatName)) {
+                    if (UtilityRoutines::SameString(state.dataZoneCtrls->TempControlledZone(RelativeZoneNum).Name, state.dataFaultsMgr->FaultsThermostatOffset(iFault).FaultyThermostatName)) {
 
                         // Check fault availability schedules
-                        if (GetCurrentScheduleValue(state, FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
 
                             // Check fault severity schedules to update the reference thermostat offset
                             double rSchVal = 1.0;
                             double offsetUpdated;
-                            if (FaultsThermostatOffset(iFault).SeveritySchedPtr >= 0) {
-                                rSchVal = GetCurrentScheduleValue(state, FaultsThermostatOffset(iFault).SeveritySchedPtr);
+                            if (state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr >= 0) {
+                                rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr);
                             }
-                            offsetUpdated = rSchVal * FaultsThermostatOffset(iFault).Offset;
+                            offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFault).Offset;
 
                             // Positive offset means the sensor reading is higher than the actual value
                             state.dataHeatBalFanSys->TempZoneThermostatSetPoint(ActualZoneNum) -= offsetUpdated;
@@ -4391,15 +4391,15 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
             }
 
             // Apply offsets for faulty humidistats
-            if ((NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
+            if ((state.dataFaultsMgr->NumFaultyHumidistat > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 //  loop through the FaultsHumidistatOffset objects to find the one for the zone
-                for (int iFault = 1; iFault <= NumFaultyHumidistat; ++iFault) {
+                for (int iFault = 1; iFault <= state.dataFaultsMgr->NumFaultyHumidistat; ++iFault) {
 
                     if (UtilityRoutines::SameString(state.dataZoneCtrls->HumidityControlZone(HumidControlledZoneNum).ControlName,
-                                                    FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
+                                                    state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatName)) {
 
-                        if (UtilityRoutines::SameString(FaultsHumidistatOffset(iFault).FaultyHumidistatType, "ThermostatOffsetDependent")) {
+                        if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyHumidistatType, "ThermostatOffsetDependent")) {
                             // For Humidistat Offset Type I: ThermostatOffsetDependent
 
                             bool IsThermostatFound = false;
@@ -4410,24 +4410,24 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             double faultZoneWDehumidifyingSetPoint;
 
                             // Get the offset value of the corresponding thermostat fault object
-                            if (NumFaultyThermostat > 0) {
+                            if (state.dataFaultsMgr->NumFaultyThermostat > 0) {
 
                                 //  loop through the FaultsThermostatOffset objects to find the one causes the Humidistat Offset
-                                for (int iFaultThermo = 1; iFaultThermo <= NumFaultyThermostat; ++iFaultThermo) {
+                                for (int iFaultThermo = 1; iFaultThermo <= state.dataFaultsMgr->NumFaultyThermostat; ++iFaultThermo) {
 
-                                    if (UtilityRoutines::SameString(FaultsHumidistatOffset(iFault).FaultyThermostatName,
-                                                                    FaultsThermostatOffset(iFaultThermo).Name)) {
+                                    if (UtilityRoutines::SameString(state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyThermostatName,
+                                                                    state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Name)) {
                                         IsThermostatFound = true;
 
                                         // Check fault availability schedules
-                                        if (GetCurrentScheduleValue(state, FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) > 0.0) {
+                                        if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) > 0.0) {
 
                                             // Check fault severity schedules to update the reference thermostat offset
                                             double rSchVal = 1.0;
-                                            if (FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr >= 0) {
-                                                rSchVal = GetCurrentScheduleValue(state, FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr);
+                                            if (state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr >= 0) {
+                                                rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr);
                                             }
-                                            offsetThermostat = rSchVal * FaultsThermostatOffset(iFaultThermo).Offset;
+                                            offsetThermostat = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Offset;
                                         }
 
                                         // Stop searching the FaultsThermostatOffset object for the Humidistat Offset
@@ -4438,9 +4438,10 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
 
                             // The FaultsThermostatOffset specified in the FaultHumidistatOffset is not found
                             if (!IsThermostatFound) {
-                                ShowSevereError(state, "FaultModel:HumidistatOffset = \"" + FaultsHumidistatOffset(iFault).Name +
-                                                "\" invalid Reference Humidistat Offset Name = \"" +
-                                                FaultsHumidistatOffset(iFault).FaultyThermostatName + "\" not found.");
+                                ShowSevereError(state,
+                                                "FaultModel:HumidistatOffset = \"" + state.dataFaultsMgr->FaultsHumidistatOffset(iFault).Name +
+                                                    "\" invalid Reference Humidistat Offset Name = \"" +
+                                                    state.dataFaultsMgr->FaultsHumidistatOffset(iFault).FaultyThermostatName + "\" not found.");
                                 ShowFatalError(state, "Errors getting FaultModel input data.  Preceding condition(s) cause termination.");
                             }
 
@@ -4469,15 +4470,15 @@ namespace EnergyPlus::ZoneTempPredictorCorrector {
                             // For Humidistat Offset Type II: ThermostatOffsetIndependent
 
                             // Check fault availability schedules
-                            if (GetCurrentScheduleValue(state, FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
 
                                 // Check fault severity schedules to update the reference humidistat offset
                                 double rSchVal = 1.0;
                                 double offsetUpdated;
-                                if (FaultsHumidistatOffset(iFault).SeveritySchedPtr >= 0) {
-                                    rSchVal = GetCurrentScheduleValue(state, FaultsHumidistatOffset(iFault).SeveritySchedPtr);
+                                if (state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr >= 0) {
+                                    rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr);
                                 }
-                                offsetUpdated = rSchVal * FaultsHumidistatOffset(iFault).Offset;
+                                offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsHumidistatOffset(iFault).Offset;
 
                                 // Positive offset means the sensor reading is higher than the actual value
                                 ZoneRHHumidifyingSetPoint -= offsetUpdated;

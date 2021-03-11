@@ -555,12 +555,12 @@ namespace WeatherManager {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + "No Design Days or Run Period(s) specified, program will terminate.");
             }
-            if (DataSystemVariables::DDOnly && state.dataEnvrn->TotDesDays == 0) {
+            if (state.dataSysVars->DDOnly && state.dataEnvrn->TotDesDays == 0) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName +
                                 "Requested Design Days only (DataSystemVariables::DDOnly) but no Design Days specified, program will terminate.");
             }
-            if (DataSystemVariables::ReverseDD && state.dataEnvrn->TotDesDays == 1) {
+            if (state.dataSysVars->ReverseDD && state.dataEnvrn->TotDesDays == 1) {
                 ErrorsFound = true;
                 ShowSevereError(state,
                     RoutineName +
@@ -4319,7 +4319,7 @@ namespace WeatherManager {
 
                 int endcol = len(Line.data);
                 if (endcol > 0) {
-                    if (int(Line.data[endcol - 1]) == DataSystemVariables::iUnicode_end) {
+                    if (int(Line.data[endcol - 1]) == state.dataSysVars->iUnicode_end) {
                         ShowSevereError(state, "OpenWeatherFile: EPW Weather File appears to be a Unicode or binary file.",
                                         OptionalOutputFileRef(state.files.eso));
                         ShowContinueError(state, "...This file cannot be read by this program. Please save as PC or Unix file and try again");
@@ -4710,7 +4710,7 @@ namespace WeatherManager {
             state.dataWeatherManager->Environment(Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::DesignDay;
         }
         for (int Env = 1; Env <= RPD1 + RPD2; ++Env) {
-            if (!DataSystemVariables::DDOnly) {
+            if (!state.dataSysVars->DDOnly) {
                 state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodDesign;
             } else {
                 state.dataWeatherManager->Environment(state.dataEnvrn->TotDesDays + Env).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -4731,16 +4731,16 @@ namespace WeatherManager {
         // the last environment(s) is designated the weather environment if an annual run
         // is selected.  All of the design systems is done from the design day info
         // which will have to be completed to run the annual run.
-        if (state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
+        if (state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetRunPeriodData(state, state.dataWeatherManager->TotRunPers, ErrorsFound);
         }
 
-        if (DataSystemVariables::FullAnnualRun) {
+        if (state.dataSysVars->FullAnnualRun) {
             // GetRunPeriodData may have reset the value of TotRunPers
              state.dataWeatherManager->NumOfEnvrn = state.dataEnvrn->TotDesDays + state.dataWeatherManager->TotRunPers + RPD1 + RPD2;
         }
 
-        if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || DataSystemVariables::FullAnnualRun) {
+        if (RPD1 >= 1 || RPD2 >= 1 || state.dataWeatherManager->TotRunPers >= 1 || state.dataSysVars->FullAnnualRun) {
             GetSpecialDayPeriodData(state, ErrorsFound);
             GetDSTData(state, ErrorsFound);
             if (state.dataWeatherManager->IDFDaylightSaving) {
@@ -4865,7 +4865,7 @@ namespace WeatherManager {
             state.dataWeatherManager->RunPeriodInput(i).endYear = int(DataIPShortCuts::rNumericArgs(6));
             state.dataWeatherManager->RunPeriodInput(i).TreatYearsAsConsecutive = true;
 
-            if (DataSystemVariables::FullAnnualRun && i == 1) {
+            if (state.dataSysVars->FullAnnualRun && i == 1) {
                 state.dataWeatherManager->RunPeriodInput(i).startMonth = 1;
                 state.dataWeatherManager->RunPeriodInput(i).startDay = 1;
                 state.dataWeatherManager->RunPeriodInput(i).endMonth = 12;
@@ -5156,7 +5156,7 @@ namespace WeatherManager {
             }
         }
 
-        if (nRunPeriods == 0 && DataSystemVariables::FullAnnualRun) {
+        if (nRunPeriods == 0 && state.dataSysVars->FullAnnualRun) {
             ShowWarningError(state, "No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31.");
             state.dataWeatherManager->Environment.redimension(++ state.dataWeatherManager->NumOfEnvrn);
             state.dataWeatherManager->Environment( state.dataWeatherManager->NumOfEnvrn).KindOfEnvrn = DataGlobalConstants::KindOfSim::RunPeriodWeather;
@@ -5170,7 +5170,7 @@ namespace WeatherManager {
                 SetupWeekDaysByMonth(state,
                     state.dataWeatherManager->RunPeriodInput(1).startMonth, state.dataWeatherManager->RunPeriodInput(1).startDay, state.dataWeatherManager->RunPeriodInput(1).dayOfWeek, state.dataWeatherManager->RunPeriodInput(1).monWeekDay);
             }
-        } else if (nRunPeriods > 1 && DataSystemVariables::FullAnnualRun) {
+        } else if (nRunPeriods > 1 && state.dataSysVars->FullAnnualRun) {
             nRunPeriods = 1;
         }
     }
@@ -5803,7 +5803,7 @@ namespace WeatherManager {
         state.dataWeatherManager->SPSiteDiffuseSolarScheduleValue.dimension(TotDesDays, 0.0);
         state.dataWeatherManager->SPSiteSkyTemperatureScheduleValue.dimension(TotDesDays, 0.0);
 
-        if (DataSystemVariables::ReverseDD && TotDesDays <= 1) {
+        if (state.dataSysVars->ReverseDD && TotDesDays <= 1) {
             ShowSevereError(state, "GetDesignDayData: Reverse Design Day requested but # Design Days <=1");
         }
 
@@ -5811,7 +5811,7 @@ namespace WeatherManager {
         for (int i = 1; i <= TotDesDays; ++i) {
 
             int EnvrnNum;
-            if (DataSystemVariables::ReverseDD) {
+            if (state.dataSysVars->ReverseDD) {
                 if (i == 1 && TotDesDays > 1) {
                     EnvrnNum = 2;
                 } else if (i == 2) {
