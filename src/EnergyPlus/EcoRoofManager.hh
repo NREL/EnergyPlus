@@ -102,10 +102,56 @@ struct EcoRoofManagerData : BaseGlobalStruct {
     bool EcoRoofbeginFlag = true;
     bool CalcEcoRoofMyEnvrnFlag = true;
 
+    // static variables extracted from functions
+    int FirstEcoSurf = 0; // Indicates lowest numbered surface that is an ecoroof, used to determine WHEN to updatesoilProps...
+    bool QuickConductionSurf = false; // indicator for quick conduction surface
+    Real64 LAI = 0.2;                 // Leaf area index
+    Real64 epsilonf = 0.95;           // Leaf Emisivity
+    Real64 epsilong = 0.95;           // Soil Emisivity
+    Real64 Alphag = 0.3;              // Ground Albedo
+    Real64 Alphaf = 0.2;              // Leaf Albedo (reflectivity to solar radiation)
+    Real64 e0 = 2.0;                  // Windless lower limit of exchange coefficient (from FASST docs)
+    Real64 RH = 50.0;                 // Relative humidity (%)
+    Real64 Pa = 101325.0;             // Atmospheric Pressure (PA)
+    Real64 Tg = 10.0;                 // Ground Surface temperature C ***** FROM PREVIOUS TIME STEP
+    Real64 Tf = 10.0;                 // Leaf temperature C ***** FROM PREVIOUS TIME STEP
+    Real64 Zf = 0.2; // Height of plants (m)
+    // DJS Oct 2007 release - note I got rid of the initialization of moisture and meanrootmoisture here as these
+    // values are now set at beginning of each new DD and each new warm-up loop.
+    Real64 Moisture = 0.0;                  // m^3/m^3.The moisture content in the soil is the value provided by a user
+    Real64 MoistureResidual = 0.05;   // m^3/m^3. Residual & maximum water contents are unique to each material. See Frankenstein et al (2004b) for data.
+    Real64 MoistureMax = 0.5;         // Maximum volumetric moisture content (porosity) m^3/m^3
+    Real64 MeanRootMoisture = 0.0;    // Mean value of root moisture m^3/m^3
+    Real64 SoilThickness = 0.2;       // Soil thickness (m)
+    Real64 StomatalResistanceMin;     // s/m . ! Minimum stomatal resistance is unique for each veg. type.
+    Real64 f3 = 1.0;                  // As the value of gd for tall grass is 0, then f3 = 1
+    // ECMWF 2002 CY25R1 report has gd=0.0 for all veg except trees where gd=0.03.
+
+
     void clear_state() override
     {
         this->EcoRoofbeginFlag = true;
         this->CalcEcoRoofMyEnvrnFlag = true;
+        this->FirstEcoSurf = 0;
+        this->QuickConductionSurf = false;
+        this->LAI = 0.2;
+        this->epsilonf = 0.95;
+        this->epsilong = 0.95;
+        this->Alphag = 0.3;
+        this->Alphaf = 0.2;
+        this->e0 = 2.0;
+        this->RH = 50.0;
+        this->Pa = 101325.0;
+        this->Tg = 10.0;
+        this->Tf = 10.0;
+        this->Zf = 0.2;
+        this->Moisture = 0.0;
+        this->MoistureResidual = 0.05;
+        this->MoistureMax = 0.5;
+        this->MeanRootMoisture = 0.0;
+        this->SoilThickness = 0.2;
+        this->StomatalResistanceMin;
+        this->f3 = 1.0;                  
     }
 };
 
