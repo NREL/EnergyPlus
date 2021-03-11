@@ -770,7 +770,7 @@ namespace EcoRoofManager {
         using namespace DataSurfaces;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
+        static Real64 const depth_fac((161240.0 * std::pow(2.0, -2.3)) / 60.0);
 
         // Soil Parameters from Reference listed in the code:
         Real64 const alpha(23.0); // These parameters are empirical constants
