@@ -201,7 +201,6 @@ set(SRC
     DataPhotovoltaics.hh
     DataPrecisionGlobals.cc
     DataPrecisionGlobals.hh
-    DataReportingFlags.cc
     DataReportingFlags.hh
     DataRoomAirModel.cc
     DataRoomAirModel.hh

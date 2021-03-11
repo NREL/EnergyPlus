@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -77,7 +76,6 @@
 #include <EnergyPlus/EvaporativeFluidCoolers.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
@@ -140,7 +138,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataMoistureBalanceEMPD::clear_state();
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
-    DataReportingFlags::clear_state();
     DataStringGlobals::clear_state();
     DataSurfaceLists::clear_state();
     DataSystemVariables::clear_state();

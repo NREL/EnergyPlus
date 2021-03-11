@@ -275,9 +275,6 @@ namespace SurfaceGeometry {
         using namespace DataVectorTypes;
         using namespace OutputReportPredefined;
 
-        using namespace DataReportingFlags;
-
-
         static std::string const RoutineName("SetUpZoneGeometry: ");
 
         Real64 AverageHeight; // Used to keep track of average height of a surface/zone
@@ -2730,7 +2727,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using namespace DataReportingFlags;
 
         using ScheduleManager::CheckScheduleValueMinMax;
         using ScheduleManager::GetScheduleIndex;
@@ -2873,7 +2869,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex.allocate(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
                 GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, rNumericArgs({2, _}));
                 CheckConvexity(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
-                if (MakeMirroredDetachedShading) {
+                if (state.dataReportFlag->MakeMirroredDetachedShading) {
                     MakeMirrorSurface(state, SurfNum);
                 }
             }
@@ -2896,11 +2892,10 @@ namespace SurfaceGeometry {
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Gets the simple, rectantular detached surfaces.
+        // Gets the simple, rectangular detached surfaces.
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-        using namespace DataReportingFlags;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Array1D_string const cModuleObjects(2, {"Shading:Site", "Shading:Building"});
@@ -2986,7 +2981,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                 }
 
-                if (MakeMirroredDetachedShading) {
+                if (state.dataReportFlag->MakeMirroredDetachedShading) {
                     MakeMirrorSurface(state, SurfNum);
                 }
             }
@@ -5407,7 +5402,6 @@ namespace SurfaceGeometry {
         using ScheduleManager::GetScheduleIndex;
         using ScheduleManager::GetScheduleMaxValue;
         using ScheduleManager::GetScheduleMinValue;
-        using namespace DataReportingFlags;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int IOStat;     // IO Status when calling get input subroutine
@@ -5560,7 +5554,7 @@ namespace SurfaceGeometry {
             //    SurfaceTmp(SurfNum)%BaseSurfName='  '
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = 0;
             // SurfaceTmp(SurfNum)%ZoneName='  '
-            if (MakeMirroredAttachedShading) {
+            if (state.dataReportFlag->MakeMirroredAttachedShading) {
                 MakeMirrorSurface(state, SurfNum);
             }
         }
@@ -5587,8 +5581,6 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataIPShortCuts;
-
-        using namespace DataReportingFlags;
         using namespace Vectors;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5751,7 +5743,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = 0;
 
                     // and mirror
-                    if (MakeMirroredAttachedShading) {
+                    if (state.dataReportFlag->MakeMirroredAttachedShading) {
                         MakeMirrorSurface(state, SurfNum);
                     }
 
@@ -5830,7 +5822,7 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = 0;
 
                         // and mirror
-                        if (MakeMirroredAttachedShading) {
+                        if (state.dataReportFlag->MakeMirroredAttachedShading) {
                             MakeMirrorSurface(state, SurfNum);
                         }
                     } else {
@@ -5921,7 +5913,7 @@ namespace SurfaceGeometry {
                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = 0;
 
                         // and mirror
-                        if (MakeMirroredAttachedShading) {
+                        if (state.dataReportFlag->MakeMirroredAttachedShading) {
                             MakeMirrorSurface(state, SurfNum);
                         }
                     } else {

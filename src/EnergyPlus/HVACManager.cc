@@ -127,7 +127,6 @@ namespace EnergyPlus::HVACManager {
     using namespace DataHVACGlobals;
     using namespace DataLoopNode;
     using namespace DataAirLoop;
-    using namespace DataReportingFlags;
 
     int HVACManageIteration(0); // counts iterations to enforce maximum iteration limit
     int RepIterAir(0);
@@ -456,17 +455,17 @@ namespace EnergyPlus::HVACManager {
                 }
                 if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
                 if (state.dataEnvrn->PrintEnvrnStampWarmup) {
-                    if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
+                    if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
                         print(state.files.mtr, "{}\n", EndOfHeaderString);
-                        PrintEndDataDictionary = false;
+                        state.dataReportFlag->PrintEndDataDictionary = false;
                     }
                     if (state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
 
                         print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                              "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -474,7 +473,7 @@ namespace EnergyPlus::HVACManager {
                         print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                              "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -495,16 +494,16 @@ namespace EnergyPlus::HVACManager {
                 }
                 if (!state.dataGlobal->BeginDayFlag) state.dataEnvrn->PrintEnvrnStampWarmupPrinted = false;
                 if (state.dataEnvrn->PrintEnvrnStampWarmup) {
-                    if (PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
+                    if (state.dataReportFlag->PrintEndDataDictionary && state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso, "{}\n", EndOfHeaderString);
                         print(state.files.mtr, "{}\n", EndOfHeaderString);
-                        PrintEndDataDictionary = false;
+                        state.dataReportFlag->PrintEndDataDictionary = false;
                     }
                     if (state.dataGlobal->DoOutputReporting && !PrintedWarmup) {
                         print(state.files.eso,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                              "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -512,7 +511,7 @@ namespace EnergyPlus::HVACManager {
                         print(state.files.mtr,
                               EnvironmentStampFormatStr,
                               "1",
-                              "Warmup {" + cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
+                              "Warmup {" + state.dataReportFlag->cWarmupDay + "} " + state.dataEnvrn->EnvironmentName,
                               state.dataEnvrn->Latitude,
                               state.dataEnvrn->Longitude,
                               state.dataEnvrn->TimeZoneNumber,
@@ -540,8 +539,8 @@ namespace EnergyPlus::HVACManager {
 
         // DO FINAL UPDATE OF RECORD KEEPING VARIABLES
         // Report the Node Data to Aid in Debugging
-        if (DebugOutput) {
-            if (EvenDuringWarmup) {
+        if (state.dataReportFlag->DebugOutput) {
+            if (state.dataReportFlag->EvenDuringWarmup) {
                 ReportDebug = true;
             } else {
                 ReportDebug = !state.dataGlobal->WarmupFlag;
