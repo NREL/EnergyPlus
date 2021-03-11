@@ -617,6 +617,9 @@ namespace EnergyPlus::HeatBalanceKivaManager {
             kivaWeather.dryBulb.push_back(DryBulb);
             kivaWeather.windSpeed.push_back(WindSpeed);
 
+            if (OpaqueSkyCover >= 99.0) {
+                OpaqueSkyCover = state.dataWeatherManager->Missing.OpaqSkyCvr;
+            }
             Real64 OSky = OpaqueSkyCover;
             Real64 TDewK = min(DryBulb, DewPoint) + DataGlobalConstants::KelvinConv;
             Real64 ESky =
