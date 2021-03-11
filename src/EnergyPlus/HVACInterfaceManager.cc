@@ -66,9 +66,7 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus {
-
-namespace HVACInterfaceManager {
+namespace EnergyPlus::HVACInterfaceManager {
 
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
@@ -86,38 +84,6 @@ namespace HVACInterfaceManager {
     // module as a last step.  The node information is passed across the
     // interface boundary and the logical flag is set if the nodes across
     // from each other are not within tolerance.
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Common Pipe Recirc Flow Directions
-    int const NoRecircFlow(0);
-    int const PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
-    int const SecondaryRecirc(2); // flow from Supply-inlet/Demand-oulet to Supply-outlet/demand-inlet
-
-    int const FlowTypeNotSet(9);
-    int const ConstantFlow(10);
-    int const VariableFlow(11);
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    bool CommonPipeSetupFinished(false);
-
-    // Object Data
-    Array1D<CommonPipeData> PlantCommonPipe;
-
-    // MODULE SUBROUTINES:
-
-    // Functions
 
     void UpdateHVACInterface(EnergyPlusData &state,
                              int const AirLoopNum, // airloop number for which air loop this is
@@ -137,11 +103,12 @@ namespace HVACInterfaceManager {
 
         // METHODOLOGY EMPLOYED:
         // This is a simple "forward" interface where all of the properties
-        // from the outlet of one side of the loop get transfered directly
+        // from the outlet of one side of the loop get transferred directly
         // to the inlet node of the corresponding other side of the loop.
 
         using DataLoopNode::Node;
-        static Array1D<Real64> TmpRealARR(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
+
+        Array1D<Real64> TmpRealARR(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
         Real64 DeltaEnergy;
 
         if ((CalledFrom == DataConvergParams::iCalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
@@ -423,25 +390,13 @@ namespace HVACInterfaceManager {
         // flow or energy are out of tolerance.  This in effect checks flow and
         // ~.25C temperature difference.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::DemandSide;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdatePlantLoopInterface");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 OldTankOutletTemp;
@@ -450,8 +405,6 @@ namespace HVACInterfaceManager {
         Real64 Cp;
         Real64 MixedOutletTemp;
         int ThisLoopSideInletNode;
-
-
 
         auto &convergence(state.dataConvergeParams->PlantConvergence(LoopNum));
 
@@ -601,18 +554,9 @@ namespace HVACInterfaceManager {
         using DataLoopNode::Node;
         using FluidProperties::GetSpecificHeatGlycol;
 
-        // Locals
-        // SUBROUTINE ARGUMENTS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const FracTotLoopMass(0.5); // Fraction of total loop mass assigned to the half loop
         static std::string const RoutineName("UpdateHalfLoopInletTemp");
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankOutletLoopSide;    // inlet loopsidenumber
@@ -629,8 +573,6 @@ namespace HVACInterfaceManager {
         Real64 ThisTankMass;
         Real64 TankFinalTemp;
         Real64 TankAverageTemp;
-
-
 
         // find tank inlet and outlet nodes
         TankOutletLoopSide = 3 - TankInletLoopSide;
@@ -771,14 +713,6 @@ namespace HVACInterfaceManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateCommonPipe");
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int TankOutletLoopSide;    // inlet loopsidenumber
         int TankInletNode;         // inlet loop side outlet node
@@ -795,8 +729,6 @@ namespace HVACInterfaceManager {
         Real64 ThisTankMass;
         Real64 TankFinalTemp;
         Real64 TankAverageTemp;
-
-
 
         // find tank inlet and outlet nodes
         TankOutletLoopSide = 3 - TankInletLoopSide;
@@ -895,7 +827,7 @@ namespace HVACInterfaceManager {
         //       MODIFIED       B. Griffith, Jan 2010 clean up setup to allow mixing common pipe modes
         //                      B. Griffith, Mar 2010 add LoopNum arg and simplify
         //       RE-ENGINEERED  D. Fisher, Sept. 2010
-        //                      B. Griffitth, Oct 2011, major rewrite for plant upgrade
+        //                      B. Griffith, Oct 2011, major rewrite for plant upgrade
 
         // PURPOSE OF THIS SUBROUTINE:
         // To determine the conditions in common pipe viz., the flow flow temperature and direction of flow.
@@ -906,39 +838,34 @@ namespace HVACInterfaceManager {
         // called from "Demand to Supply" interface or "Supply to Demand" interface. Update the node temperatures
         // accordingly.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataLoopNode::Node;
         using namespace DataPlant;
 
-        // SUBROUTINE ARGUMENT DEFINITIONS
-
-        // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS
-        static Real64 MdotPri(0.0);      // flow rate on primary side kg/s
-        static Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
-        static Real64 MdotPriRCLeg(0.0); // flow rate of primary recirculation thru common pipe kg/s
-        static Real64 MdotSecRCLeg(0.0); // flow rate of secondary recirculation thru common pipe kg/s
-        static Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
-        static Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
-        static Real64 TempPriOutTankOut(0.0);
-        static Real64 TempSecOutTankOut(0.0);
-        static int NodeNumPriOut(0);
-        static int NodeNumSecOut(0);
-        static int NodeNumPriIn(0);
-        static int NodeNumSecIn(0);
+        Real64 MdotPri(0.0);      // flow rate on primary side kg/s
+        Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
+        Real64 MdotPriRCLeg(0.0); // flow rate of primary recirculation thru common pipe kg/s
+        Real64 MdotSecRCLeg(0.0); // flow rate of secondary recirculation thru common pipe kg/s
+        Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
+        Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
+        Real64 TempPriOutTankOut(0.0);
+        Real64 TempSecOutTankOut(0.0);
+        int NodeNumPriOut(0);
+        int NodeNumSecOut(0);
+        int NodeNumPriIn(0);
+        int NodeNumSecIn(0);
         int CPFlowDir; // flow direction in single common pipe
-        static Array1D_bool MyEnvrnFlag;
-        static bool OneTimeData(true);
         Real64 CommonPipeTemp;
 
+        auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
+        auto &MyEnvrnFlag(state.dataHVACInterfaceMgr->MyEnvrnFlag_SingleCommonPipe);
+
         // One time call to set up report variables and set common pipe 'type' flag
-        if (OneTimeData) {
-            if (!CommonPipeSetupFinished) SetupCommonPipes(state);
+        if (state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe) {
+            if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
             MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
-            OneTimeData = false;
+            state.dataHVACInterfaceMgr->OneTimeData_SingleCommonPipe = false;
         }
 
         // fill local node indexes
@@ -1038,7 +965,7 @@ namespace HVACInterfaceManager {
 
         // METHODOLOGY EMPLOYED:
         // calculate mixed temperatures and various flow rates
-        // sequential subsitution of system of equations
+        // sequential substitution of system of equations
 
         // REFERENCES:
         // reimplementation of CheckTwoWayCommonPipeConditions by Sankaranarayanan K P Jan 2007
@@ -1050,54 +977,42 @@ namespace HVACInterfaceManager {
         using DataPlant::SupplySide;
         using PlantUtilities::SetActuatedBranchFlowRate;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const DemandLedPrimaryInletUpdate(101);
         int const DemandLedSecondaryInletUpdate(102);
         int const SupplyLedPrimaryInletUpdate(103);
         int const SupplyLedSecondaryInletUpdate(104);
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
-        static bool OneTimeData(true);
         int CurCallingCase;              // local temporary
-        static Real64 MdotPri(0.0);      // flow rate on primary side kg/s
-        static Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
-        static Real64 MdotPriToSec(0.0); // flow rate between primary and secondary side kg/s
-        static Real64 MdotPriRCLeg(0.0); // flow rate on primary recirculation common pipe kg/s
-        static Real64 MdotSecRCLeg(0.0); // flow rate on secondary recirculation common pipe kg/s
-        static Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
-        static Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
-        static Real64 TempPriOutTankOut(0.0);
-        static Real64 TempSecOutTankOut(0.0);
-        static Real64 TempCPPrimaryCntrlSetPoint(0.0);
-        // REAL(r64)  :: TempCPCntrlCurrent  = 0.0d0
-        static Real64 TempCPSecondaryCntrlSetPoint(0.0);
-        // REAL(r64)  :: TempCPCntrlCurrent  = 0.0d0
-        static int NodeNumPriOut(0);
-        static int NodeNumSecOut(0);
-        static int NodeNumPriIn(0);
-        static int NodeNumSecIn(0);
+        Real64 MdotPri(0.0);      // flow rate on primary side kg/s
+        Real64 MdotSec(0.0);      // flow rate on secondary side kg/s
+        Real64 MdotPriToSec(0.0); // flow rate between primary and secondary side kg/s
+        Real64 MdotPriRCLeg(0.0); // flow rate on primary recirculation common pipe kg/s
+        Real64 MdotSecRCLeg(0.0); // flow rate on secondary recirculation common pipe kg/s
+        Real64 TempSecInlet(0.0); // temperature at secondary inlet deg C
+        Real64 TempPriInlet(0.0); // temperature at primary inlet deg C
+        Real64 TempPriOutTankOut(0.0);
+        Real64 TempSecOutTankOut(0.0);
+        Real64 TempCPPrimaryCntrlSetPoint(0.0);
+        Real64 TempCPSecondaryCntrlSetPoint(0.0);
+        int NodeNumPriOut(0);
+        int NodeNumSecOut(0);
+        int NodeNumPriIn(0);
+        int NodeNumSecIn(0);
+        constexpr int MaxIterLimitCaseA(8);
+        constexpr int MaxIterLimitCaseB(4);
 
-        static int MaxIterLimitCaseA(8);
-        static int MaxIterLimitCaseB(4);
+        int loop; // iteration loop counter
 
-        int loop; // interation loop counter
-        //  INTEGER    :: loop2
+        auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
+        auto &MyEnvrnFlag(state.dataHVACInterfaceMgr->MyEnvrnFlag_TwoWayCommonPipe);
 
         // one time setups
-        if (OneTimeData) {
-            if (!CommonPipeSetupFinished) SetupCommonPipes(state);
+        if (state.dataHVACInterfaceMgr->OneTimeData_TwoWayCommonPipe) {
+            if (!state.dataHVACInterfaceMgr->CommonPipeSetupFinished) SetupCommonPipes(state);
             MyEnvrnFlag.dimension(state.dataPlnt->TotNumLoops, true);
-            OneTimeData = false;
+            state.dataHVACInterfaceMgr->OneTimeData_TwoWayCommonPipe = false;
         }
 
         // fill local node indexes
@@ -1196,13 +1111,9 @@ namespace HVACInterfaceManager {
                     if ((PlantCommonPipe(LoopNum).SupplySideInletPumpType == VariableFlow) && (CurCallingCase == SupplyLedPrimaryInletUpdate)) {
                         // MdotPri is a variable to be calculated and flow request needs to be made
                         if (std::abs(TempCPPrimaryCntrlSetPoint) > DeltaTempTol) {
-                            //          Do loop2 = 1, MaxIterLimitCaseA
-                            //            MdotPri = (MdotSec *  TempSecInlet +  MdotPriRCLeg *TempPriOutTankOut - MdotSecRCLeg * TempSecOutTankOut ) &
-                            //                          /  (TempPriOutTankOut )
 
                             MdotPri = (MdotPriRCLeg * TempPriOutTankOut + MdotPriToSec * TempSecOutTankOut) / (TempCPPrimaryCntrlSetPoint);
 
-                            //   ENDDO
                             if (MdotPri < DataBranchAirLoopPlant::MassFlowTolerance) MdotPri = 0.0;
                         } else {
                             MdotPri = MdotSec;
@@ -1292,30 +1203,13 @@ namespace HVACInterfaceManager {
         // PURPOSE OF THIS SUBROUTINE:
         // collect allocation, outputs, and other set up for common pipes
 
-        // METHODOLOGY EMPLOYED:
-        // <description>
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataPlant;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CurLoopNum; // local do loop counter
+
+        auto &PlantCommonPipe(state.dataHVACInterfaceMgr->PlantCommonPipe);
 
         PlantCommonPipe.allocate(state.dataPlnt->TotNumLoops);
 
@@ -1407,9 +1301,7 @@ namespace HVACInterfaceManager {
             }
         }
 
-        CommonPipeSetupFinished = true;
+        state.dataHVACInterfaceMgr->CommonPipeSetupFinished = true;
     }
-
-} // namespace HVACInterfaceManager
 
 } // namespace EnergyPlus
