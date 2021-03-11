@@ -1165,11 +1165,11 @@ namespace UnitarySystems {
             if ((!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
 
                 // check FaultsManager if connection exists
-                FaultsManager::SetFaultyCoilSATSensor(this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);
+                FaultsManager::SetFaultyCoilSATSensor(state, this->UnitType, this->Name, this->m_FaultyCoilSATFlag, this->m_FaultyCoilSATIndex);
                 if (this->m_FaultyCoilSATFlag) {
                     if (this->m_ControlType != ControlType::Setpoint) {
-                        ShowWarningError(state, FaultsManager::FaultsCoilSATSensor(this->m_FaultyCoilSATIndex).FaultType + ": " +
-                                         FaultsManager::FaultsCoilSATSensor(this->m_FaultyCoilSATIndex).Name);
+                        ShowWarningError(state, state.dataFaultsMgr->FaultsCoilSATSensor(this->m_FaultyCoilSATIndex).FaultType + ": " +
+                                         state.dataFaultsMgr->FaultsCoilSATSensor(this->m_FaultyCoilSATIndex).Name);
                         ShowContinueError(state, "For : " + this->UnitType + ": " + this->Name);
                         ShowContinueError(state, "The specified unitary system is not controlled on leaving air temperature. The coil SAT sensor "
                                           "fault model will not be applied.");
@@ -11374,7 +11374,7 @@ namespace UnitarySystems {
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
-            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->m_FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
@@ -12671,7 +12671,7 @@ namespace UnitarySystems {
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
-            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->m_FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
@@ -13268,7 +13268,7 @@ namespace UnitarySystems {
         if (this->m_FaultyCoilSATFlag) {
             // calculate the sensor offset using fault information
             int FaultIndex = this->m_FaultyCoilSATIndex;
-            this->m_FaultyCoilSATOffset = FaultsManager::FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+            this->m_FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
             // update the DesOutTemp
             DesOutTemp -= this->m_FaultyCoilSATOffset;
         }
