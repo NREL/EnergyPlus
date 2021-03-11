@@ -1841,8 +1841,18 @@ namespace FuelCellElectricGenerator {
                 Acc, MaxIter, SolverFlag, tmpTprodGas, boundFunc, DataGenerators::MinProductGasTemp, DataGenerators::MaxProductGasTemp, Par);
 
             if (SolverFlag == -2) {
-
-                ShowWarningError(state, "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive");
+                ++this->SolverErr_Type2_Iter;
+                if (this->SolverErr_Type2_Iter == 1) {
+                    ShowWarningError(state, "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive");
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive",
+                        this->SolverErr_Type2_IterIndex);
+                } else {
+                    ShowRecurringWarningErrorAtEnd(state,
+                                                   "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive",
+                                                   this->SolverErr_Type2_IterIndex);
+                }
             }
             if (SolverFlag == -1) {
                 ++this->SolverErr_Type1_Iter;
