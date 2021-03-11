@@ -2037,14 +2037,6 @@ namespace EnergyPlus::SystemReports {
                                     "Sum",
                                     state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
-                 SetupOutputVariable(state,
-                                    "Air System Mechanical Ventilation Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
-                                    state.dataAirLoop->AirLoopFlow(SysIndex).OAFlow,
-                                    "HVAC",
-                                    "Average",
-                                    state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
-
                SetupOutputVariable(state,
                                     "Air System Mechanical Ventilation Flow Rate",
                                     OutputProcessor::Unit::m3_s,
