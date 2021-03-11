@@ -1845,7 +1845,18 @@ namespace FuelCellElectricGenerator {
                 ShowWarningError(state, "CalcFuelCellGeneratorModel: Root Solver problem, flag = -2, check signs, all positive");
             }
             if (SolverFlag == -1) {
-                ShowWarningError(state, "CalcFuelCellGeneratorModel: Root Solver problem, flag = -1, check accuracy and iterations, did not converge");
+                ++this->SolverErr_Type1_Iter;
+                if (this->SolverErr_Type1_Iter == 1) {
+                    ShowWarningError(state, "CalcFuelCellGeneratorModel: Root Solver problem, flag = -1, check accuracy and iterations, did not converge");
+                    ShowRecurringWarningErrorAtEnd(state,
+                        "CalcFuelCellGeneratorModel: Root Solver problem, flag = -1, check accuracy and iterations, did not converge",
+                        this->SolverErr_Type1_IterIndex);
+                } else {
+                    ShowRecurringWarningErrorAtEnd(
+                        state,
+                        "CalcFuelCellGeneratorModel: Root Solver problem, flag = -1, check accuracy and iterations, did not converge",
+                        this->SolverErr_Type1_IterIndex);
+                }
             }
             if (SolverFlag > 0) {
                 this->FCPM.TprodGasLeavingFCPM = tmpTprodGas;
