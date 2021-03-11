@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataUCSDSharedData.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
@@ -136,7 +135,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     DataOutputs::clear_state();
     DataPhotovoltaics::clear_state();
     DataStringGlobals::clear_state();
-    DataSurfaceLists::clear_state();
     DataSystemVariables::clear_state();
     DataUCSDSharedData::clear_state();
     DataViewFactorInformation::clear_state();
