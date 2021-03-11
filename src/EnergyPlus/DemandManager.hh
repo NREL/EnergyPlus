@@ -67,7 +67,8 @@ struct EnergyPlusData;
 namespace DemandManager {
 
     // MODULE PARAMETER DEFINITIONS:
-    enum class ManagerType {
+    enum class ManagerType
+    {
         Unassigned,
         ManagerTypeExtLights,
         ManagerTypeLights,
@@ -76,14 +77,16 @@ namespace DemandManager {
         ManagerTypeVentilation
     };
 
-    enum class ManagePriorityType {
+    enum class ManagePriorityType
+    {
         Unassigned,
         ManagerPrioritySequential,
         ManagerPriorityOptimal,
         ManagerPriorityAll
     };
 
-    enum class Limit {
+    enum class Limit
+    {
         Unassigned,
         ManagerLimitOff,
         ManagerLimitFixed,
@@ -91,14 +94,16 @@ namespace DemandManager {
         ManagerLimitReductionRatio
     };
 
-    enum class Selection {
+    enum class Selection
+    {
         Unassigned,
         ManagerSelectionAll,
         ManagerSelectionMany,
         ManagerSelectionOne
     };
 
-    enum class DemandAction {
+    enum class DemandAction
+    {
         CheckCanReduce,
         SetLimit,
         ClearLimit
@@ -108,32 +113,32 @@ namespace DemandManager {
     struct DemandManagerListData
     {
         // Members
-        std::string Name;         // Name of DEMAND MANAGER LIST
-        int Meter;                // Index to meter to demand limit
-        int LimitSchedule;        // Schedule index for demand limit
-        Real64 SafetyFraction;    // Multiplier applied to demand limit schedule
-        int BillingSchedule;      // Schedule index for billing month periods
-        Real64 BillingPeriod;     // Current billing period value
-        int PeakSchedule;         // Schedule index for billing month periods
-        int AveragingWindow;      // Number of timesteps for averaging demand window
-        Array1D<Real64> History;  // Demand window history
-        ManagePriorityType ManagerPriority;      // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
-        int NumOfManager = 0;         // Number of DEMAND MANAGERs
-        Array1D_int Manager;      // Indexes for DEMAND MANAGERs
-        Real64 MeterDemand;       // Meter demand at this timestep
-        Real64 AverageDemand;     // Current demand over the demand window
-        Real64 PeakDemand;        // Peak demand in the billing month so far
-        Real64 ScheduledLimit;    // Scheduled demand limit
-        Real64 DemandLimit;       // Scheduled demand limit * Safety Fraction
-        Real64 AvoidedDemand;     // Demand avoided by active DEMAND MANAGERs
-        Real64 OverLimit;         // Amount that demand limit is exceeded
-        Real64 OverLimitDuration; // Number of hours that demand limit is exceeded
+        std::string Name;                   // Name of DEMAND MANAGER LIST
+        int Meter;                          // Index to meter to demand limit
+        int LimitSchedule;                  // Schedule index for demand limit
+        Real64 SafetyFraction;              // Multiplier applied to demand limit schedule
+        int BillingSchedule;                // Schedule index for billing month periods
+        Real64 BillingPeriod;               // Current billing period value
+        int PeakSchedule;                   // Schedule index for billing month periods
+        int AveragingWindow;                // Number of timesteps for averaging demand window
+        Array1D<Real64> History;            // Demand window history
+        ManagePriorityType ManagerPriority; // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
+        int NumOfManager = 0;               // Number of DEMAND MANAGERs
+        Array1D_int Manager;                // Indexes for DEMAND MANAGERs
+        Real64 MeterDemand;                 // Meter demand at this timestep
+        Real64 AverageDemand;               // Current demand over the demand window
+        Real64 PeakDemand;                  // Peak demand in the billing month so far
+        Real64 ScheduledLimit;              // Scheduled demand limit
+        Real64 DemandLimit;                 // Scheduled demand limit * Safety Fraction
+        Real64 AvoidedDemand;               // Demand avoided by active DEMAND MANAGERs
+        Real64 OverLimit;                   // Amount that demand limit is exceeded
+        Real64 OverLimitDuration;           // Number of hours that demand limit is exceeded
 
         // Default Constructor
         DemandManagerListData()
             : Meter(0), LimitSchedule(0), SafetyFraction(1.0), BillingSchedule(0), BillingPeriod(0.0), PeakSchedule(0), AveragingWindow(1),
-              ManagerPriority(ManagePriorityType::Unassigned), MeterDemand(0.0), AverageDemand(0.0), PeakDemand(0.0), ScheduledLimit(0.0), DemandLimit(0.0), AvoidedDemand(0.0),
-              OverLimit(0.0), OverLimitDuration(0.0)
+              ManagerPriority(ManagePriorityType::Unassigned), MeterDemand(0.0), AverageDemand(0.0), PeakDemand(0.0), ScheduledLimit(0.0),
+              DemandLimit(0.0), AvoidedDemand(0.0), OverLimit(0.0), OverLimitDuration(0.0)
         {
         }
     };
@@ -142,7 +147,7 @@ namespace DemandManager {
     {
         // Members
         std::string Name;      // Name of DEMAND MANAGER
-        ManagerType Type;              // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
+        ManagerType Type;      // Type of DEMAND MANAGER (:LIGHTS, :ELECTRICEQUIPMENT, etc.)
         int DemandManagerList; // Reference to parent DEMAND MANAGER LIST for error checking
         bool CanReduceDemand;  // Flag to indicate whether manager can reduce demand
         int AvailSchedule;     // Schedule index pointer for Availability Schedule
@@ -169,9 +174,10 @@ namespace DemandManager {
 
         // Default Constructor
         DemandManagerData()
-            : Type(ManagerType::Unassigned), DemandManagerList(0), CanReduceDemand(false), AvailSchedule(0), Available(false), Activate(false), Active(false),
-              LimitControl(Limit::Unassigned), SelectionControl(Selection::Unassigned), LimitDuration(0), ElapsedTime(0), RotationDuration(0), ElapsedRotationTime(0), RotatedLoadNum(0),
-              LowerLimit(0.0), UpperLimit(0.0), NumOfLoads(0), FixedRate(0.0), ReductionRatio(0.0)
+            : Type(ManagerType::Unassigned), DemandManagerList(0), CanReduceDemand(false), AvailSchedule(0), Available(false), Activate(false),
+              Active(false), LimitControl(Limit::Unassigned), SelectionControl(Selection::Unassigned), LimitDuration(0), ElapsedTime(0),
+              RotationDuration(0), ElapsedRotationTime(0), RotatedLoadNum(0), LowerLimit(0.0), UpperLimit(0.0), NumOfLoads(0), FixedRate(0.0),
+              ReductionRatio(0.0)
         {
         }
     };
@@ -203,28 +209,41 @@ namespace DemandManager {
 
 } // namespace DemandManager
 
-struct DemandManagerData : BaseGlobalStruct {
+struct DemandManagerData : BaseGlobalStruct
+{
     int NumDemandManagerList = 0;
     int NumDemandMgr = 0;
     int DemandManagerExtIterations = 0;
     int DemandManagerHBIterations = 0;
     int DemandManagerHVACIterations = 0;
-    bool GetInput = true; // Flag to prevent input from being read multiple times
+    bool GetInput = true;       // Flag to prevent input from being read multiple times
+    bool firstTime = true;      // Flag to allow Demand Manager List to simulate at least once
+    bool ResimExt = false;      // Flag to resimulate the exterior energy use simulation
+    bool ResimHB = false;       // Flag to resimulate the heat balance simulation (including HVAC)
+    bool ResimHVAC = false;     // Flag to resimulate the HVAC simulation
+    bool BeginDemandSim = true; // TRUE in the first timestep after warmup of a new environment
+    bool ClearHistory = true;   // TRUE in the first timestep during warmup of a new environment
     Array1D<DemandManager::DemandManagerListData> DemandManagerList;
     Array1D<DemandManager::DemandManagerData> DemandMgr;
     std::unordered_map<std::string, std::string> UniqueDemandMgrNames;
 
     void clear_state() override
     {
-        NumDemandManagerList = 0;
-        NumDemandMgr = 0;
-        DemandManagerExtIterations = 0;
-        DemandManagerHBIterations = 0;
-        DemandManagerHVACIterations = 0;
-        GetInput = true;
-        DemandManagerList.deallocate();
-        DemandMgr.deallocate();
-        UniqueDemandMgrNames.clear();
+        this->NumDemandManagerList = 0;
+        this->NumDemandMgr = 0;
+        this->DemandManagerExtIterations = 0;
+        this->DemandManagerHBIterations = 0;
+        this->DemandManagerHVACIterations = 0;
+        this->GetInput = true;
+        this->firstTime = true;
+        this->ResimExt = false;
+        this->ResimHB = false;
+        this->ResimHVAC = false;
+        this->BeginDemandSim = true;
+        this->ClearHistory = true;
+        this->DemandManagerList.deallocate();
+        this->DemandMgr.deallocate();
+        this->UniqueDemandMgrNames.clear();
     }
 };
 
