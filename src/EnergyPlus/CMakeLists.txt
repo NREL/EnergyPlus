@@ -198,7 +198,6 @@ set(SRC
     DataOutputs.hh
     DataPhotovoltaics.cc
     DataPhotovoltaics.hh
-    DataPrecisionGlobals.cc
     DataPrecisionGlobals.hh
     DataReportingFlags.hh
     DataRoomAirModel.cc
