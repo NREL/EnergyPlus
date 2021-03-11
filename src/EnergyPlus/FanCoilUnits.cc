@@ -1055,9 +1055,6 @@ namespace FanCoilUnits {
         int AirRelNode;     // relief air node number in fan coil loop
         Real64 RhoAir;      // air density at InNode
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
         Real64 rho;
         bool errFlag;
 
@@ -1066,27 +1063,27 @@ namespace FanCoilUnits {
         // Do the one time initializations
         if (state.dataFanCoilUnits->InitFanCoilUnitsOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
+            state.dataFanCoilUnits->MyEnvrnFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
             state.dataFanCoilUnits->MySizeFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
-            MyPlantScanFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
-            MyZoneEqFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
-            MyEnvrnFlag = true;
+            state.dataFanCoilUnits->MyPlantScanFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
+            state.dataFanCoilUnits->MyZoneEqFlag.allocate(state.dataFanCoilUnits->NumFanCoils);
+            state.dataFanCoilUnits->MyEnvrnFlag = true;
             state.dataFanCoilUnits->MySizeFlag = true;
-            MyPlantScanFlag = true;
-            MyZoneEqFlag = true;
+            state.dataFanCoilUnits->MyPlantScanFlag = true;
+            state.dataFanCoilUnits->MyZoneEqFlag = true;
             state.dataFanCoilUnits->InitFanCoilUnitsOneTimeFlag = false;
         }
 
         if (allocated(ZoneComp)) {
-            if (MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
+            if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
                 ZoneComp(FanCoil4Pipe_Num).ZoneCompAvailMgrs(FanCoilNum).AvailManagerListName = FanCoil(FanCoilNum).AvailManagerListName;
                 ZoneComp(FanCoil4Pipe_Num).ZoneCompAvailMgrs(FanCoilNum).ZoneNum = ZoneNum;
-                MyZoneEqFlag(FanCoilNum) = false;
+                state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
             }
             FanCoil(FanCoilNum).AvailStatus = ZoneComp(FanCoil4Pipe_Num).ZoneCompAvailMgrs(FanCoilNum).AvailStatus;
         }
 
-        if (MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
+        if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {
             errFlag = false;
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
                 ScanPlantLoopsForObject(state,
@@ -1148,7 +1145,7 @@ namespace FanCoilUnits {
                 ShowFatalError(state, "InitFanCoilUnits: FanCoil=" + FanCoil(FanCoilNum).Name + ", invalid cooling coil type. Program terminated.");
             }
 
-            MyPlantScanFlag(FanCoilNum) = false;
+            state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) = false;
         }
 
         if (!state.dataFanCoilUnits->InitFanCoilUnitsCheckInZoneEquipmentListFlag && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -1160,7 +1157,8 @@ namespace FanCoilUnits {
             }
         }
 
-        if (!state.dataGlobal->SysSizingCalc && state.dataFanCoilUnits->MySizeFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
+        if (!state.dataGlobal->SysSizingCalc && state.dataFanCoilUnits->MySizeFlag(FanCoilNum) &&
+            !state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum)) {
 
             SizeFanCoilUnit(state, FanCoilNum, ControlledZoneNum);
 
@@ -1168,7 +1166,8 @@ namespace FanCoilUnits {
         }
 
         // Do the Begin Environment initializations
-        if (state.dataGlobal->BeginEnvrnFlag && MyEnvrnFlag(FanCoilNum) && !MyPlantScanFlag(FanCoilNum)) {
+        if (state.dataGlobal->BeginEnvrnFlag && state.dataFanCoilUnits->MyEnvrnFlag(FanCoilNum) &&
+            !state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum)) {
             InNode = FanCoil(FanCoilNum).AirInNode;
             OutNode = FanCoil(FanCoilNum).AirOutNode;
             OutsideAirNode = FanCoil(FanCoilNum).OutsideAirNode;
@@ -1230,11 +1229,11 @@ namespace FanCoilUnits {
             Node(OutNode).MassFlowRateMin = 0.0;
             Node(InNode).MassFlowRateMax = FanCoil(FanCoilNum).MaxAirMassFlow;
             Node(InNode).MassFlowRateMin = 0.0;
-            MyEnvrnFlag(FanCoilNum) = false;
+            state.dataFanCoilUnits->MyEnvrnFlag(FanCoilNum) = false;
         } // end one time inits
 
         if (!state.dataGlobal->BeginEnvrnFlag) {
-            MyEnvrnFlag(FanCoilNum) = true;
+            state.dataFanCoilUnits->MyEnvrnFlag(FanCoilNum) = true;
         }
 
         // These initializations are done every iteration
