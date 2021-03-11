@@ -1329,8 +1329,6 @@ namespace FanCoilUnits {
         int PltSizCoolNum;  // index of plant sizing object for 1st cooling loop
         bool ErrorsFound;   // TRUE if errors foind during sizing
         Real64 DesCoilLoad; // coil load used for sizing [W]
-        static int CoilWaterInletNode(0);
-        static int CoilWaterOutletNode(0);
         std::string CoolingCoilName;
         std::string CoolingCoilType;
         Real64 rho;
@@ -1703,11 +1701,16 @@ namespace FanCoilUnits {
                                                      FanCoil(FanCoilNum).MaxHotWaterVolFlow);
                     }
                 } else {
-                    CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", FanCoil(FanCoilNum).HCoilName, ErrorsFound);
-                    CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", FanCoil(FanCoilNum).HCoilName, ErrorsFound);
+                    state.dataFanCoilUnits->CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", FanCoil(FanCoilNum).HCoilName, ErrorsFound);
+                    state.dataFanCoilUnits->CoilWaterOutletNode =
+                        WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", FanCoil(FanCoilNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(state,
-                            "Coil:Heating:Water", FanCoil(FanCoilNum).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                                                           "Coil:Heating:Water",
+                                                           FanCoil(FanCoilNum).HCoilName,
+                                                           state.dataFanCoilUnits->CoilWaterInletNode,
+                                                           state.dataFanCoilUnits->CoilWaterOutletNode,
+                                                           ErrorsFound);
                         CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", FanCoil(FanCoilNum).HCoilName, ErrorsFound);
                         if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -1878,10 +1881,16 @@ namespace FanCoilUnits {
                     CoolingCoilName = FanCoil(FanCoilNum).CCoilName;
                     CoolingCoilType = FanCoil(FanCoilNum).CCoilType;
                 }
-                CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
-                CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                state.dataFanCoilUnits->CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                state.dataFanCoilUnits->CoilWaterOutletNode =
+                    WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 if (IsAutoSize) {
-                    PltSizCoolNum = MyPlantSizingIndex(state, CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
+                    PltSizCoolNum = MyPlantSizingIndex(state,
+                                                       CoolingCoilType,
+                                                       CoolingCoilName,
+                                                       state.dataFanCoilUnits->CoilWaterInletNode,
+                                                       state.dataFanCoilUnits->CoilWaterOutletNode,
+                                                       ErrorsFound);
                     CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                         WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -3509,23 +3518,9 @@ namespace FanCoilUnits {
         using SingleDuct::SimATMixer;
         using WaterCoils::SimulateWaterCoilComponents;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;                // unit air outlet node
         int InletNode;                 // unit air inlet node
-        static int ATMixOutNode(0);    // outlet node of ATM Mixer
-        static int ZoneNode(0);        // zone node
         Real64 AirMassFlow;            // total mass flow through the unit
         Real64 PartLoad;               // if PLR present PartLoad = PLR
         Real64 OASchedValue;           // value of OASchedValue, =1 if not schedule
@@ -3543,7 +3538,7 @@ namespace FanCoilUnits {
 
         OutletNode = FanCoil(FanCoilNum).AirOutNode;
         InletNode = FanCoil(FanCoilNum).AirInNode;
-        ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
+        state.dataFanCoilUnits->ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
 
         // Assume the unit is able to vary the flow. A cycling unit is treated as
         // if it were variable flow, with the flow being the averaqe flow over the time step
@@ -3565,7 +3560,7 @@ namespace FanCoilUnits {
         }
 
         if (FanCoil(FanCoilNum).ATMixerExists) {
-            ATMixOutNode = FanCoil(FanCoilNum).ATMixerOutNode;
+            state.dataFanCoilUnits->ATMixOutNode = FanCoil(FanCoilNum).ATMixerOutNode;
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_InletSide) {
                 // set the primary air inlet mass flow rate
                 Node(FanCoil(FanCoilNum).ATMixerPriNode).MassFlowRate =
@@ -3760,10 +3755,18 @@ namespace FanCoilUnits {
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
                 // Now calculate the ATM mixer if it is on the supply side of the zone unit
                 SimATMixer(state, FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
-                CalcZoneSensibleOutput(Node(ATMixOutNode).MassFlowRate, Node(ATMixOutNode).Temp, Node(ZoneNode).Temp, Node(ZoneNode).HumRat, LoadMet);
+                CalcZoneSensibleOutput(Node(state.dataFanCoilUnits->ATMixOutNode).MassFlowRate,
+                                       Node(state.dataFanCoilUnits->ATMixOutNode).Temp,
+                                       Node(state.dataFanCoilUnits->ZoneNode).Temp,
+                                       Node(state.dataFanCoilUnits->ZoneNode).HumRat,
+                                       LoadMet);
             } else {
                 // ATM Mixer on inlet side
-                CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(ZoneNode).Temp, Node(ZoneNode).HumRat, LoadMet);
+                CalcZoneSensibleOutput(AirMassFlow,
+                                       Node(OutletNode).Temp,
+                                       Node(state.dataFanCoilUnits->ZoneNode).Temp,
+                                       Node(state.dataFanCoilUnits->ZoneNode).HumRat,
+                                       LoadMet);
             }
         } else {
             CalcZoneSensibleOutput(AirMassFlow, Node(OutletNode).Temp, Node(InletNode).Temp, Node(InletNode).HumRat, LoadMet);
