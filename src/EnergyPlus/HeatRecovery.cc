@@ -326,7 +326,7 @@ namespace HeatRecovery {
         int IOStatus;                                                   // Used in GetObjectItem
         static bool ErrorsFound(false);                                 // Set to true if errors in input, fatal at end of routine
         static std::string HeatExchPerfType;                            // Desiccant balanced heat exchanger performance data type
-        static std::string const RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
+        constexpr const char * RoutineName("GetHeatRecoveryInput: "); // include trailing blank space
 
         state.dataHeatRecovery->NumAirToAirPlateExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:FlatPlate");
         state.dataHeatRecovery->NumAirToAirGenericExchs = inputProcessor->getNumObjectsFound(state, "HeatExchanger:AirToAir:SensibleAndLatent");
@@ -1209,7 +1209,7 @@ namespace HeatRecovery {
         }
 
         if (ErrorsFound) {
-            ShowFatalError(state, RoutineName + "Errors found in input.  Program terminates.");
+            ShowFatalError(state, format("{}Errors found in input.  Program terminates.",RoutineName));
         }
     }
 
@@ -1566,7 +1566,7 @@ namespace HeatRecovery {
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const RoutineName("SizeHeatRecovery");
+        constexpr const char * RoutineName("SizeHeatRecovery");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool PrintFlag;           // true when sizing information is reported in the eio file
@@ -2567,13 +2567,13 @@ namespace HeatRecovery {
         Real64 MinHumRatNeeded;         // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
         Real64 HXPartLoadRatio;         // local heat exchanger part-load ratio
         Real64 TestSaturationEnthalpy;  // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-        static std::string const ThisSub("CalcDesiccantBalancedHeatExch:  "); // Used to pass to Psyc routines
-        static std::string const ThisSubTSat("CalcDesiccantBalancedHeatExch:   TSat");
-        static std::string const ThisSubTSatFullLoadOutTemp("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp");
-        static std::string const ThisSubTSatFullLoadOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat");
-        static std::string const ThisSubSecOutHumRat("CalcDesiccantBalancedHeatExch:   SecOutHumRat");
-        static std::string const ThisSubTestSatSec("CalcDesiccantBalancedHeatExch:   TestSatSec");
-        static std::string const ThisSubTSatSecOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat");
+        constexpr const char * ThisSub("CalcDesiccantBalancedHeatExch:  "); // Used to pass to Psyc routines
+        constexpr const char * ThisSubTSat("CalcDesiccantBalancedHeatExch:   TSat");
+        constexpr const char * ThisSubTSatFullLoadOutTemp("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp");
+        constexpr const char * ThisSubTSatFullLoadOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat");
+        constexpr const char * ThisSubSecOutHumRat("CalcDesiccantBalancedHeatExch:   SecOutHumRat");
+        constexpr const char * ThisSubTestSatSec("CalcDesiccantBalancedHeatExch:   TestSatSec");
+        constexpr const char * ThisSubTSatSecOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat");
 
         Real64 AverageMassFlowRate; // average of supply (regen) and secondary (process) mass flow rates [kg/s]
         bool EconomizerActiveFlag;  // local representing the economizer status when PRESENT
