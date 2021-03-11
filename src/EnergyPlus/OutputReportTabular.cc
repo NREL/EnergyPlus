@@ -6162,30 +6162,28 @@ namespace EnergyPlus::OutputReportTabular {
                 state.dataSysRpts->SysPreDefRep(iSys).SysTimeVentUnoccTotal);
             // Average Outdoor Air During Occupancy by Airloop
             if (state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal > 0.0) {
+                Real64 totTimeOccSec = state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal * SecInHour;
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlMechVent,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc /
-                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc / totTimeOccSec,
                                  4);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlNatVent,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc /
-                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc / totTimeOccSec,
                                  4);
                 PreDefTableEntry(
                     state,
                     state.dataOutRptPredefined->pdchOaOccAlTotVent,
                     state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
                     (state.dataSysRpts->SysPreDefRep(iSys).SysMechVentTotalOcc + state.dataSysRpts->SysPreDefRep(iSys).SysNatVentTotalOcc) /
-                        state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                        totTimeOccSec,
                     4);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlSumDynTrgVent,
                                  state.dataAirSystemsData->PrimaryAirSystems(iSys).Name,
-                                 state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc /
-                                     state.dataSysRpts->SysPreDefRep(iSys).SysTimeOccupiedTotal,
+                                 state.dataSysRpts->SysPreDefRep(iSys).SysTargetVentTotalVozOcc / totTimeOccSec,
                                  4);
                 PreDefTableEntry(state,
                                  state.dataOutRptPredefined->pdchOaOccAlTmBelow,

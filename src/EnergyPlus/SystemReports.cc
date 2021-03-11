@@ -2037,12 +2037,20 @@ namespace EnergyPlus::SystemReports {
                                     "Sum",
                                     state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
-                SetupOutputVariable(state,
+                 SetupOutputVariable(state,
+                                    "Air System Mechanical Ventilation Mass Flow Rate",
+                                    OutputProcessor::Unit::kg_s,
+                                    state.dataAirLoop->AirLoopFlow(SysIndex).OAFlow,
+                                    "HVAC",
+                                    "Average",
+                                    state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
+
+               SetupOutputVariable(state,
                                     "Air System Mechanical Ventilation Flow Rate",
                                     OutputProcessor::Unit::m3_s,
                                     state.dataSysRpts->SysMechVentFlow(SysIndex),
                                     "HVAC",
-                                    "Sum",
+                                    "Average",
                                     state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
                 SetupOutputVariable(state,
@@ -2050,7 +2058,7 @@ namespace EnergyPlus::SystemReports {
                                     OutputProcessor::Unit::m3_s,
                                     state.dataSysRpts->SysNatVentFlow(SysIndex),
                                     "HVAC",
-                                    "Sum",
+                                    "Average",
                                     state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
                 SetupOutputVariable(state,
@@ -2058,7 +2066,7 @@ namespace EnergyPlus::SystemReports {
                                     OutputProcessor::Unit::m3_s,
                                     state.dataSysRpts->SysTargetVentilationFlowVoz(SysIndex),
                                     "HVAC",
-                                    "Sum",
+                                    "Average",
                                     state.dataAirSystemsData->PrimaryAirSystems(SysIndex).Name);
 
                 SetupOutputVariable(state,
@@ -4779,17 +4787,18 @@ namespace EnergyPlus::SystemReports {
 
         // loop over air loops
         for (int sysNum = 1; sysNum <= NumPrimaryAirSys; ++sysNum){
-            Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow * state.dataEnvrn->StdRhoAir;
+            Real64 mechVentFlow = state.dataAirLoop->AirLoopFlow(sysNum).OAFlow / state.dataEnvrn->StdRhoAir;
             state.dataSysRpts->SysMechVentFlow(sysNum) = mechVentFlow;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotal += mechVentFlow;
-            state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotal += state.dataSysRpts->SysNatVentFlow(sysNum);;
+            state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotal += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+            state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotal +=
+                state.dataSysRpts->SysNatVentFlow(sysNum) * TimeStepSys * DataGlobalConstants::SecInHour;
             // set time mechanical+natural ventilation is below, at, or above target Voz-dyn
             // MJWToDo - InfilVolume should be NatVentVolume or similar after this is split in AFN
             Real64 totMechNatVentVolFlowStdRho =
                 mechVentFlow + state.dataSysRpts->SysNatVentFlow(sysNum);
 
             Real64 targetFlowVoz = state.dataSysRpts->SysTargetVentilationFlowVoz(sysNum);
-            state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVoz += targetFlowVoz;
+            state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVoz += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
             // Allow 1% tolerance
             if (totMechNatVentVolFlowStdRho < (0.99 * targetFlowVoz)) {
                 state.dataSysRpts->SysTimeBelowVozDyn(sysNum) = TimeStepSys;
@@ -4805,9 +4814,9 @@ namespace EnergyPlus::SystemReports {
             }
             if (state.dataSysRpts->SysAnyZoneOccupied(sysNum)) {
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeOccupiedTotal += TimeStepSys;
-                state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotalOcc += mechVentFlow;
-                state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotalOcc += state.dataSysRpts->SysNatVentFlow(sysNum);
-                state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVozOcc += targetFlowVoz;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysMechVentTotalOcc += mechVentFlow * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysNatVentTotalOcc += state.dataSysRpts->SysNatVentFlow(sysNum) * TimeStepSys * DataGlobalConstants::SecInHour;
+                state.dataSysRpts->SysPreDefRep(sysNum).SysTargetVentTotalVozOcc += targetFlowVoz * TimeStepSys * DataGlobalConstants::SecInHour;
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeBelowVozDynTotalOcc += state.dataSysRpts->SysTimeBelowVozDyn(sysNum);
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotalOcc += state.dataSysRpts->SysTimeAboveVozDyn(sysNum);
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotalOcc += state.dataSysRpts->SysTimeAtVozDyn(sysNum);
