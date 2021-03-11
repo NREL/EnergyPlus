@@ -4021,11 +4021,8 @@ namespace EnergyPlus::ZoneEquipmentManager {
                         if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingThenReturn) {
 
                             // Calculate return air flow rate using mass conservation equation
-                            AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
-                            AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
-                            Real64 zoneReturnFlowMax = 0.0;
-                            ZoneReturnFlowsMaximum(state, ZoneNum, zoneReturnFlowMax);
-                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneReturnFlowMax);
+                            AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
+                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, state.dataZoneEquip->ZoneEquipConfig(ZoneNum).AirLoopDesSupply);
                             // add adjust zone return node air flow calc
                             CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
                             state.dataHeatBal->MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
@@ -4037,13 +4034,10 @@ namespace EnergyPlus::ZoneEquipmentManager {
                     } else if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnOnly ||
                                state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnThenMixing) {
 
-                        Real64 zoneReturnFlowMax = 0.0;
                         Real64 AdjustedTotalReturnMassFlow = 0;
                         // Calculate return air flow rate using mass conservation equation
-                        AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
-                        AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
-                        ZoneReturnFlowsMaximum(state, ZoneNum, zoneReturnFlowMax);
-                        AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneReturnFlowMax);
+                        AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
+                        AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, state.dataZoneEquip->ZoneEquipConfig(ZoneNum).AirLoopDesSupply);
 
                         // add adjust zone return node air flow calculation
                         CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
@@ -4059,9 +4053,9 @@ namespace EnergyPlus::ZoneEquipmentManager {
                                 state.dataHeatBal->MassConservation(ZoneNum).MixingMassFlowRate - state.dataHeatBal->MassConservation(ZoneNum).MixingSourceMassFlowRate;
 
                             // Calculate return air flow rate using mass conservation equation
-                            AdjustedTotalReturnMassFlow = TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate;
-                            AdjustedTotalReturnMassFlow = max(0.0, AdjustedTotalReturnMassFlow);
-                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneReturnFlowMax);
+                            AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
+                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, state.dataZoneEquip->ZoneEquipConfig(ZoneNum).AirLoopDesSupply);
+
                             // add adjust zone return node air flow calc
                             CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
                             state.dataHeatBal->MassConservation(ZoneNum).RetMassFlowRate = FinalTotalReturnMassFlow;
@@ -4367,23 +4361,6 @@ namespace EnergyPlus::ZoneEquipmentManager {
                 }
             } else {
                 FinalTotalReturnMassFlow = totReturnFlow;
-            }
-        }
-    }
-
-
-    void ZoneReturnFlowsMaximum(EnergyPlusData &state,
-        int const ZoneNum,
-        Real64 &MaximumZoneReturnMassFlow // maximum zone total return air mass flow rate
-    )
-    {
-        MaximumZoneReturnMassFlow = 0.0;
-        // sets the zone return node maximum flow rate to the airloop design supply flow rate
-        for (int returnNum = 1; returnNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumReturnNodes; ++returnNum) {
-            int airLoop = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeAirLoopNum(returnNum);
-            if (airLoop > 0) {
-                auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(airLoop));
-                MaximumZoneReturnMassFlow = thisAirLoopFlow.DesSupply;
             }
         }
     }
