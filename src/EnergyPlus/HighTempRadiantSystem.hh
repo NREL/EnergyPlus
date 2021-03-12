@@ -68,8 +68,11 @@ namespace HighTempRadiantSystem {
     // Data
     // MODULE PARAMETER DEFINITIONS:
 
-    int constexpr Gas = 1;
-    int constexpr Electric = 2;
+    enum class RadHeaterType {
+        Unassigned,
+        Gas,
+        Electric
+    };
 
     int constexpr MATControl = 1001;
     int constexpr MRTControl = 1002;
@@ -95,7 +98,7 @@ namespace HighTempRadiantSystem {
         int SchedPtr;           // index to schedule
         std::string ZoneName;   // Name of zone the system is serving
         int ZonePtr;            // Point to this zone in the Zone derived type
-        int HeaterType;         // Type of heater (gas or electric)
+        RadHeaterType HeaterType;         // Type of heater (gas or electric)
         Real64 MaxPowerCapac;   // Maximum capacity of the radiant heater in Watts
         Real64 CombustionEffic; // Combustion efficiency (only valid for a gas heater)
         Real64 FracRadiant;     // Fraction of heater power that is given off as radiant heat
@@ -127,7 +130,7 @@ namespace HighTempRadiantSystem {
 
         // Default Constructor
         HighTempRadiantSystemData()
-            : SchedPtr(0), ZonePtr(0), HeaterType(0), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0), FracLatent(0.0), FracLost(0.0),
+            : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Unassigned), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0), FracLatent(0.0), FracLost(0.0),
               FracConvect(0.0), ControlType(0), ThrottlRange(0.0), SetptSchedPtr(0), FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0),
               ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0), HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
@@ -186,7 +189,7 @@ namespace HighTempRadiantSystem {
 struct HighTempRadiantSystemData : BaseGlobalStruct {
 
     // Standard, run-of-the-mill variables...
-    int NumOfHighTempRadSys;              // Number of hydronic low tempererature radiant systems
+    int NumOfHighTempRadSys = 0;              // Number of hydronic low tempererature radiant systems
     Array1D<Real64> QHTRadSource;         // Need to keep the last value in case we are still iterating
     Array1D<Real64> QHTRadSrcAvg;         // Need to keep the last value in case we are still iterating
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to the SumHATsurf for all the walls in a zone with no source
@@ -203,7 +206,7 @@ struct HighTempRadiantSystemData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        // TODO initialize and clear NumOfHighTempRadSys
+        NumOfHighTempRadSys = 0;
         QHTRadSource.clear();
         QHTRadSrcAvg.clear();
         ZeroSourceSumHATsurf.clear();
