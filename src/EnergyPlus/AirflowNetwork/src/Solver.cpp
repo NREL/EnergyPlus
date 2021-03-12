@@ -88,19 +88,9 @@ namespace AirflowNetwork {
     // Walton, G. N., 1989, "AIRNET - A Computer Program for Building Airflow Network Modeling,"
     // NISTIR 89-4072, National Institute of Standards and Technology, Gaithersburg, Maryland
 
-    // OTHER NOTES: none
-
-    // USE STATEMENTS:
-
-    // Using/Aliasing
-    using DataSurfaces::Surface;
-
-    //std::vector<AirProperties> properties;
-
     // Data
     int NetworkNumOfLinks(0);
     int NetworkNumOfNodes(0);
-
     int const NrInt(20); // Number of intervals for a large opening
 
     // Common block AFEDAT
@@ -196,7 +186,7 @@ namespace AirflowNetwork {
         // Network array size is allocated based on the network of air distribution system.
         // If multizone airflow is simulated only, the array size is allocated based on the multizone network.
 
-        // FLOW:
+
         NetworkNumOfLinks = AirflowNetworkNumOfLinks;
         NetworkNumOfNodes = AirflowNetworkNumOfNodes;
 
@@ -361,7 +351,7 @@ namespace AirflowNetwork {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        // FLOW:
+
         for (int i = 1; i <= NetworkNumOfNodes; ++i) {
             ID(i) = i;
         }
@@ -425,7 +415,7 @@ namespace AirflowNetwork {
         int N1;
         int N2;
 
-        // FLOW:
+
         // Initialize "IK".
         for (i = 1; i <= NetworkNumOfNodes + 1; ++i) {
             IK(i) = 0;
@@ -499,7 +489,7 @@ namespace AirflowNetwork {
         // static ObjexxFCL::gio::Fmt Format_903("(1X,A6,I5,3F14.6)");
         // static ObjexxFCL::gio::Fmt Format_907("(,/,' CPU seconds for ',A,F12.3)");
 
-        // FLOW:
+
 
         // Initialize pressure for pressure control and for Initialization Type = LinearInitializationMethod
         if ((AirflowNetworkSimu.InitFlag == 0) || (PressureSetFlag > 0 && AirflowNetworkFanActivated)) {
@@ -675,7 +665,7 @@ namespace AirflowNetwork {
 
         //auto &outputFile = std::cout;
 
-        // FLOW:
+
         ACC1 = 0.0;
         ACCEL = 0;
         NSYM = 0;
@@ -876,7 +866,7 @@ namespace AirflowNetwork {
         std::array<Real64, 2> F{{0.0, 0.0}};
         std::array<Real64, 2> DF{{0.0, 0.0}};
 
-        // FLOW:
+
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMF(n) = 0.0;
             SUMAF(n) = 0.0;
@@ -1082,7 +1072,7 @@ namespace AirflowNetwork {
         Real64 RhoCor;
 
 
-        // FLOW:
+
         // Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
         RhozNorm = AIRDENSITY(state, 101325.0, 20.0, 0.0);
         VisczNorm = 1.71432e-5 + 4.828e-8 * 20.0;
@@ -1195,7 +1185,7 @@ namespace AirflowNetwork {
         Real64 FTT;
         Real64 RE;
 
-        // FLOW:
+
         // Get component properties
         Real64 ed = Rough / Diameter;
         Real64 area = Diameter * Diameter * DataGlobalConstants::Pi / 4.0;
@@ -1361,7 +1351,7 @@ namespace AirflowNetwork {
         Real64 SDOT;
         Real64 SUMD;
 
-        // FLOW:
+
         AD(1) = 1.0 / AD(1);
         JHK = 1;
         for (k = 2; k <= NEQ; ++k) {
@@ -1499,7 +1489,7 @@ namespace AirflowNetwork {
         Real64 SDOT;
         Real64 T1;
 
-        // FLOW:
+
         JHK = 1;
         for (k = 2; k <= NEQ; ++k) {
             JHK1 = IK(k + 1);
@@ -1593,7 +1583,7 @@ namespace AirflowNetwork {
         int k;
         int L;
 
-        // FLOW:
+
         // K = row number, L = column number.
         if (FLAG > 1) {
             k = LM[0];
@@ -1663,7 +1653,7 @@ namespace AirflowNetwork {
 
         // Formats
 
-        // FLOW:
+
         // Write values for debug
         print(UOUT, " {}", S);
         for (i = 1; i <= n; ++i) {
@@ -1717,7 +1707,7 @@ namespace AirflowNetwork {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
 
-        // FLOW:
+
         print(UOUT, " {}", S);
         for (i = 1; i <= n; ++i) {
             print(UOUT, " {:15.7E}", V(i));
@@ -1822,7 +1812,7 @@ namespace AirflowNetwork {
         int i;
         int k;
 
-        // FLOW:
+
         // Initialization
         delzF = 0.0;
         delzT = 0.0;
@@ -2018,7 +2008,7 @@ namespace AirflowNetwork {
         Real64 RhoREF;
         Real64 CONV;
 
-        // FLOW:
+
         RhoREF = AIRDENSITY(state, PSea, state.dataEnvrn->OutDryBulbTemp, state.dataEnvrn->OutHumRat);
 
         CONV = state.dataEnvrn->Latitude * 2.0 * DataGlobalConstants::Pi / 360.0;
@@ -2035,8 +2025,8 @@ namespace AirflowNetwork {
         for (i = 1; i <= Nl; ++i) {
             // Check surface tilt
             if (i <= Nl - NumOfLinksIntraZone) { // Revised by L.Gu, on 9 / 29 / 10
-                if (AirflowNetworkLinkageData(i).DetOpenNum > 0 && Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
-                    Hfl(i) = Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
+                if (AirflowNetworkLinkageData(i).DetOpenNum > 0 && state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).Tilt < 90) {
+                    Hfl(i) = state.dataSurface->Surface(MultizoneSurfaceData(i).SurfNum).SinTilt;
                 }
             }
             // Initialisation
@@ -2286,7 +2276,7 @@ namespace AirflowNetwork {
         Real64 dz;
         Real64 rho;
 
-        // FLOW:
+
         dz = z - z0;
         rho = (Rho0 + beta * dz / 2.0);
         psz = -Pz0 * (1.0 - std::exp(-dz * rho * g / Pz0)); // Differential pressure from z to z0 [Pa]
@@ -2353,7 +2343,7 @@ namespace AirflowNetwork {
         static int L(0);
         static int ilayptr(0);
 
-        // FLOW:
+
         Dp = 0.0;
         Rho0 = Rho;
         X0 = X;

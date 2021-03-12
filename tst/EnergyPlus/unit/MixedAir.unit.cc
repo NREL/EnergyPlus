@@ -735,20 +735,20 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
-    OARequirements.allocate(1);
-    OARequirements(1).Name = "CM DSOA WEST ZONE";
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerPerson = 0.003149;
-    OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
 
-    ZoneAirDistribution.allocate(1);
-    ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
-    ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
 
-    Zone.allocate(1);
-    Zone(1).Name = "WEST ZONE";
-    Zone(1).FloorArea = 10.0;
-    Zone(1).ZoneContamControllerSchedIndex = 4;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "WEST ZONE";
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).ZoneContamControllerSchedIndex = 4;
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
@@ -766,17 +766,17 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     state->dataMixedAir->OAController(1).MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7;
     state->dataMixedAir->VentilationMechanical(1).SchPtr = 1;
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
-    Schedule(2).CurrentValue = 1.0;
-    TotPeople = 1;
-    People.allocate(1);
-    People(1).Name = "WestPeople";
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 3;
-    Zone(1).TotOccupants = 3;
-    Schedule(4).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(1);
+    state->dataHeatBal->People(1).Name = "WestPeople";
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 3;
+    state->dataHeatBal->Zone(1).TotOccupants = 3;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
     state->dataContaminantBalance->OutdoorCO2 = 400;
@@ -800,8 +800,8 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     EXPECT_NEAR(0.0194359, state->dataMixedAir->OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.009527, state->dataMixedAir->OAController(1).MinOAFracLimit, 0.00001);
 
-    OARequirements(1).OAFlowMethod = 9;
-    state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1) = OARequirements(1).OAFlowMethod;
+    state->dataSize->OARequirements(1).OAFlowMethod = 9;
+    state->dataMixedAir->VentilationMechanical(1).ZoneOAFlowMethod(1) = state->dataSize->OARequirements(1).OAFlowMethod;
     state->dataAirLoop->NumOASystems = 1;
 
     state->dataAirLoop->OutsideAirSys.allocate(1);
@@ -946,10 +946,10 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
-    OARequirements.allocate(1);
-    ZoneAirDistribution.allocate(1);
-    ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
-    ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
@@ -1233,8 +1233,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     state->dataAirLoop->AirLoopFlow(AirloopNum).DesSupply = 1.0 * state->dataEnvrn->StdRhoAir;
     state->dataEnvrn->StdRhoAir = 1.2;
     state->dataEnvrn->OutBaroPress = 101250.0;
-    DataSizing::SysSizingRunDone = false;
-    DataSizing::CurSysNum = 1;
+    state->dataSize->SysSizingRunDone = false;
+    state->dataSize->CurSysNum = 1;
 
     GetOutsideAirSysInputs(*state);
     EXPECT_EQ(1, state->dataAirLoop->NumOASystems);
@@ -1348,7 +1348,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
     ; // OA inlet (actuated) air nodes, dry air
 
     state->dataMixedAir->OAController(1).CoolCoilFreezeCheck = true;
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     state->dataMixedAir->OAController(OAControllerNum).CalcOAController(*state, AirLoopNum, true);
 
@@ -1461,8 +1461,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
 
     ControllerNum = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE1";
     state->dataGlobal->NumOfZones = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -1593,8 +1593,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     state->dataMixedAir->OAController.allocate(state->dataMixedAir->NumOAControllers);
 
     ControllerNum = 1;
-    Zone.allocate(1);
-    Zone(1).Name = "ZONE1";
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ZONE1";
     state->dataGlobal->NumOfZones = 1;
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ActualZoneNum = 1;
@@ -5284,8 +5284,8 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     EXPECT_EQ(1.5, OAMassFlow);
 
     // Case 4 - System OA method = IndoorAirQualityProcedureCombined, SOAM_IAQPCOM, set zone OA schedules to alwaysoff
-    ScheduleManager::Schedule.allocate(1);
-    ScheduleManager::Schedule(1).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule.allocate(1);
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.0;
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(1) = 1;
     state->dataMixedAir->VentilationMechanical(1).ZoneOASchPtr(2) = 1;
 
@@ -5295,7 +5295,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     EXPECT_EQ(0.0, OAMassFlow);
 
     state->dataContaminantBalance->ZoneSysContDemand.deallocate();
-    ScheduleManager::Schedule.deallocate();
+    state->dataScheduleMgr->Schedule.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
@@ -5454,20 +5454,20 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
     int NumZones(6);
     for (int index = 1; index <= NumZones; ++index) {
-        DataHeatBalance::Zone(index).FloorArea = DataHeatBalance::Zone(index).UserEnteredFloorArea;
+        state->dataHeatBal->Zone(index).FloorArea = state->dataHeatBal->Zone(index).UserEnteredFloorArea;
     }
 
     Real64 SysMassFlow(0.0);          // System supply mass flow rate [kg/s]
     Real64 OAMassFlow(0.0);           // OA mass flow rate [kg/s]
     state->dataEnvrn->StdRhoAir = 1.0; // For convenience so mass flow returned will equal volume flows input
 
-    DataHeatBalance::ZoneIntGain.allocate(NumZones);
-    DataHeatBalance::ZoneIntGain(1).NOFOCC = 10;
-    DataHeatBalance::ZoneIntGain(2).NOFOCC = 2;
-    DataHeatBalance::ZoneIntGain(3).NOFOCC = 3;
-    DataHeatBalance::ZoneIntGain(4).NOFOCC = 4;
-    DataHeatBalance::ZoneIntGain(5).NOFOCC = 20;
-    DataHeatBalance::ZoneIntGain(6).NOFOCC = 6;
+    state->dataHeatBal->ZoneIntGain.allocate(NumZones);
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 10;
+    state->dataHeatBal->ZoneIntGain(2).NOFOCC = 2;
+    state->dataHeatBal->ZoneIntGain(3).NOFOCC = 3;
+    state->dataHeatBal->ZoneIntGain(4).NOFOCC = 4;
+    state->dataHeatBal->ZoneIntGain(5).NOFOCC = 20;
+    state->dataHeatBal->ZoneIntGain(6).NOFOCC = 6;
 
     SizingManager::GetOARequirements(*state);
     GetOAControllerInputs(*state);
@@ -5498,21 +5498,21 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
 
     // Case 2 - Turn off Zone 4-6
     OAMassFlow = 0.0;
-    ScheduleManager::Schedule(4).CurrentValue = 0.0;
-    ScheduleManager::Schedule(5).CurrentValue = 0.0;
-    ScheduleManager::Schedule(6).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(5).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 0.0;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_NEAR(41.0, OAMassFlow, 0.00001);
 
     // Case 3 - Turn off remaining zones
     OAMassFlow = 0.0;
-    ScheduleManager::Schedule(1).CurrentValue = 0.0;
-    ScheduleManager::Schedule(2).CurrentValue = 0.0;
-    ScheduleManager::Schedule(3).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 0.0;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 0.0;
     state->dataMixedAir->VentilationMechanical(1).CalcMechVentController(*state, SysMassFlow, OAMassFlow);
     EXPECT_EQ(0.0, OAMassFlow);
 
-    DataHeatBalance::ZoneIntGain.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
@@ -5598,21 +5598,21 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataAirLoop->AirLoopControlInfo(1).LoopFlowRateSet = true;
-    OARequirements.allocate(1);
-    OARequirements(1).Name = "CM DSOA WEST ZONE";
-    OARequirements(1).OAFlowMethod = OAFlowSum;
-    OARequirements(1).OAFlowPerPerson = 0.003149;
-    OARequirements(1).OAFlowPerArea = 0.000407;
-    OARequirements(1).OAPropCtlMinRateSchPtr = 8;
+    state->dataSize->OARequirements.allocate(1);
+    state->dataSize->OARequirements(1).Name = "CM DSOA WEST ZONE";
+    state->dataSize->OARequirements(1).OAFlowMethod = OAFlowSum;
+    state->dataSize->OARequirements(1).OAFlowPerPerson = 0.003149;
+    state->dataSize->OARequirements(1).OAFlowPerArea = 0.000407;
+    state->dataSize->OARequirements(1).OAPropCtlMinRateSchPtr = 8;
 
-    ZoneAirDistribution.allocate(1);
-    ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
-    ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
+    state->dataSize->ZoneAirDistribution.allocate(1);
+    state->dataSize->ZoneAirDistribution(1).Name = "CM DSZAD WEST ZONE";
+    state->dataSize->ZoneAirDistribution(1).ZoneADEffSchPtr = 4;
 
-    Zone.allocate(1);
-    Zone(1).Name = "WEST ZONE";
-    Zone(1).FloorArea = 10.0;
-    Zone(1).ZoneContamControllerSchedIndex = 4;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "WEST ZONE";
+    state->dataHeatBal->Zone(1).FloorArea = 10.0;
+    state->dataHeatBal->Zone(1).ZoneContamControllerSchedIndex = 4;
 
     state->dataAirLoop->AirLoopFlow.allocate(1);
     state->dataAirLoop->AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
@@ -5630,18 +5630,18 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     state->dataMixedAir->OAController(1).MaxOAMassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataAirLoop->AirLoopFlow(1).DesSupply = 1.7;
     state->dataMixedAir->VentilationMechanical(1).SchPtr = 1;
-    Schedule(1).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 1.0;
 
     state->dataMixedAir->VentilationMechanical(1).ZoneADEffSchPtr(1) = 2;
-    Schedule(2).CurrentValue = 1.0;
-    TotPeople = 1;
-    People.allocate(1);
-    People(1).Name = "WestPeople";
-    People(1).ZonePtr = 1;
-    People(1).NumberOfPeople = 3;
-    Zone(1).TotOccupants = 3;
-    Schedule(3).CurrentValue = 0.1;
-    Schedule(4).CurrentValue = 1.0;
+    state->dataScheduleMgr->Schedule(2).CurrentValue = 1.0;
+    state->dataHeatBal->TotPeople = 1;
+    state->dataHeatBal->People.allocate(1);
+    state->dataHeatBal->People(1).Name = "WestPeople";
+    state->dataHeatBal->People(1).ZonePtr = 1;
+    state->dataHeatBal->People(1).NumberOfPeople = 3;
+    state->dataHeatBal->Zone(1).TotOccupants = 3;
+    state->dataScheduleMgr->Schedule(3).CurrentValue = 0.1;
+    state->dataScheduleMgr->Schedule(4).CurrentValue = 1.0;
     state->dataContaminantBalance->ZoneCO2GainFromPeople.allocate(1);
     state->dataContaminantBalance->ZoneCO2GainFromPeople(1) = 3.82E-8;
     state->dataContaminantBalance->OutdoorCO2 = 400;
@@ -5659,14 +5659,14 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Node(10).MassFlowRate = 1.7 * state->dataEnvrn->StdRhoAir;
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    ZoneIntGain.allocate(1);
-    ZoneIntGain(1).NOFOCC = 0.1;
-    Schedule(5).CurrentValue = 900.0;
-    Schedule(6).CurrentValue = 300.0;
-    Schedule(7).CurrentValue = 900.0;
-    Zone(1).ZoneMinCO2SchedIndex = 6;
-    Zone(1).ZoneMaxCO2SchedIndex = 7;
-    Schedule(8).CurrentValue = 0.01;
+    state->dataHeatBal->ZoneIntGain.allocate(1);
+    state->dataHeatBal->ZoneIntGain(1).NOFOCC = 0.1;
+    state->dataScheduleMgr->Schedule(5).CurrentValue = 900.0;
+    state->dataScheduleMgr->Schedule(6).CurrentValue = 300.0;
+    state->dataScheduleMgr->Schedule(7).CurrentValue = 900.0;
+    state->dataHeatBal->Zone(1).ZoneMinCO2SchedIndex = 6;
+    state->dataHeatBal->Zone(1).ZoneMaxCO2SchedIndex = 7;
+    state->dataScheduleMgr->Schedule(8).CurrentValue = 0.01;
 
     state->dataMixedAir->OAController(1).CalcOAController(*state, 1, true);
 
@@ -5688,18 +5688,18 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     state->dataAirLoop->AirLoopControlInfo.deallocate();
-    OARequirements.deallocate();
-    ZoneAirDistribution.deallocate();
-    Zone.deallocate();
+    state->dataSize->OARequirements.deallocate();
+    state->dataSize->ZoneAirDistribution.deallocate();
+    state->dataHeatBal->Zone.deallocate();
     state->dataAirLoop->AirLoopFlow.deallocate();
-    People.deallocate();
+    state->dataHeatBal->People.deallocate();
     state->dataContaminantBalance->ZoneAirCO2.deallocate();
     state->dataZoneEquip->ZoneEquipConfig.deallocate();
     Node.deallocate();
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.deallocate();
     state->dataContaminantBalance->ZoneCO2GainFromPeople.deallocate();
     state->dataContaminantBalance->ContaminantControlledZone.deallocate();
-    ZoneIntGain.deallocate();
+    state->dataHeatBal->ZoneIntGain.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)

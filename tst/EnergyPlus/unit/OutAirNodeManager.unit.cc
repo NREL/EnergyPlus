@@ -64,10 +64,10 @@ using namespace EnergyPlus::OutAirNodeManager;
 
 TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
 {
-    NumOutsideAirNodes = 3;
-    OutsideAirNodeList.allocate(3);
+    state->dataOutAirNodeMgr->NumOutsideAirNodes = 3;
+    state->dataOutAirNodeMgr->OutsideAirNodeList.allocate(3);
     DataLoopNode::Node.allocate(3);
-    ScheduleManager::Schedule.allocate(2);
+    state->dataScheduleMgr->Schedule.allocate(2);
 
     state->dataEnvrn->OutDryBulbTemp = 25.0;
     state->dataEnvrn->OutWetBulbTemp = 15.0;
@@ -76,10 +76,10 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
     state->dataEnvrn->OutBaroPress = 101325;
     state->dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutWetBulbTemp, state->dataEnvrn->OutBaroPress);
 
-    ScheduleManager::Schedule(1).CurrentValue = 24.0;
-    OutsideAirNodeList(1) = 1;
-    OutsideAirNodeList(2) = 2;
-    OutsideAirNodeList(3) = 3;
+    state->dataScheduleMgr->Schedule(1).CurrentValue = 24.0;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(1) = 1;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(2) = 2;
+    state->dataOutAirNodeMgr->OutsideAirNodeList(3) = 3;
     // Scheduled value
     DataLoopNode::Node(1).IsLocalNode = true;
     DataLoopNode::Node(1).OutAirDryBulbSchedNum = 1;

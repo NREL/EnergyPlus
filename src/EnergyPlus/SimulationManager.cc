@@ -226,7 +226,6 @@ namespace SimulationManager {
         using SizingManager::ManageSizing;
         using SystemReports::CreateEnergyReportStructure;
         using SystemReports::ReportAirLoopConnections;
-        using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
         using OutputProcessor::ResetAccumulationWhenWarmupComplete;
         using PlantPipingSystemsManager::CheckIfAnyBasements;
@@ -270,7 +269,7 @@ namespace SimulationManager {
             sqlite->sqliteCommit();
         }
 
-        // FLOW:
+
         PostIPProcessing(state);
 
         InitializePsychRoutines();
@@ -281,7 +280,7 @@ namespace SimulationManager {
         DisplayPerfSimulationFlag = false;
         DoWeatherInitReporting = false;
         state.dataSimulationManager->RunPeriodsInInput =
-            (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || FullAnnualRun);
+            (inputProcessor->getNumObjectsFound(state, "RunPeriod") > 0 || inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles(state);
@@ -1063,7 +1062,7 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
                                 MakeMirroredAttachedShading = false;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
-                                ReportDuringWarmup = true;
+                                state.dataSysVars->ReportDuringWarmup = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
                                 state.dataEnvrn->DisplayWeatherMissingDataWarnings = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
@@ -1073,13 +1072,13 @@ namespace SimulationManager {
                             } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
                                 state.dataEnvrn->IgnoreDiffuseRadiation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
-                                DeveloperFlag = true;
+                                state.dataSysVars->DeveloperFlag = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
-                                TimingFlag = true;
+                                state.dataSysVars->TimingFlag = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
-                                ReportDetailedWarmupConvergence = true;
+                                state.dataSysVars->ReportDetailedWarmupConvergence = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
-                                ReportDuringHVACSizingSimulation = true;
+                                state.dataSysVars->ReportDuringHVACSizingSimulation = true;
                             } else if (UtilityRoutines::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
                                 continue;
                                 //        CreateMinimalSurfaceVariables=.TRUE.
@@ -1161,11 +1160,11 @@ namespace SimulationManager {
                 if (Alphas(6) == "YES") state.dataGlobal->DoHVACSizingSimulation = true;
             }
         }
-        if (DDOnly) {
+        if (state.dataSysVars->DDOnly) {
             state.dataGlobal->DoDesDaySim = true;
             state.dataGlobal->DoWeathSim = false;
         }
-        if (FullAnnualRun) {
+        if (state.dataSysVars->FullAnnualRun) {
             state.dataGlobal->DoDesDaySim = false;
             state.dataGlobal->DoWeathSim = true;
         }
@@ -1256,15 +1255,15 @@ namespace SimulationManager {
                             advancedModeUsed = true;
                         }
                         if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
-                            DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
+                            state.dataHeatBal->MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
                             ShowWarningError(
                                 state,
                                 format("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: {:.4R}",
-                                       DataHeatBalance::MaxAllowedDelTemp));
+                                       state.dataHeatBal->MaxAllowedDelTemp));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
-                            ShowContinueError(state, "...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
+                            ShowContinueError(state, "...Care should be used when using the Advanced Override Mode. Results may be significantly different "
                                               "than a simulation not using this mode.");
                         } else {
                             ShowWarningError(state,
@@ -1284,12 +1283,12 @@ namespace SimulationManager {
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
-                        DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
+                        state.dataHeatBal->OverrideZoneAirSolutionAlgo = true;
                     }
                     if (overrideMinNumWarmupDays) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
-                        DataHeatBalance::MinNumberOfWarmupDays = 1;
+                        state.dataHeatBal->MinNumberOfWarmupDays = 1;
                     }
                     if (overrideBeginEnvResetSuppress) {
                         ShowWarningError(state, "Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
@@ -1314,7 +1313,7 @@ namespace SimulationManager {
                     if (overrideMaxAllowedDelTemp) {
                         ShowWarningError(state,
                             "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
-                        DataHeatBalance::MaxAllowedDelTemp = 0.1;
+                        state.dataHeatBal->MaxAllowedDelTemp = 0.1;
                     }
                 }
             }
@@ -1399,12 +1398,12 @@ namespace SimulationManager {
         }
         Alphas(3) = overrideModeValue;
         Alphas(4) = fmt::to_string(state.dataGlobal->NumOfTimeStepInHour);
-        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+        if (state.dataHeatBal->OverrideZoneAirSolutionAlgo) {
             Alphas(5) = "Yes";
         } else {
             Alphas(5) = "No";
         }
-        Alphas(6) = fmt::to_string(DataHeatBalance::MinNumberOfWarmupDays);
+        Alphas(6) = fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays);
         if (state.dataEnvrn->forceBeginEnvResetSuppress) {
             Alphas(7) = "Yes";
         } else {
@@ -1412,7 +1411,7 @@ namespace SimulationManager {
         }
         Alphas(8) = format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0);
         Alphas(9) = format("{:.3R}", state.dataConvergeParams->MaxZoneTempDiff);
-        Alphas(10) = format("{:.4R}", DataHeatBalance::MaxAllowedDelTemp);
+        Alphas(10) = format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
                                 "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
                                 "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
@@ -1467,11 +1466,11 @@ namespace SimulationManager {
         }
         UtilityRoutines::appendPerfLog(state, "Override Mode", currentOverrideModeValue);
         UtilityRoutines::appendPerfLog(state, "Number of Timesteps per Hour", fmt::to_string(state.dataGlobal->NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog(state, "Minimum Number of Warmup Days", fmt::to_string(state.dataHeatBal->MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog(state, "SuppressAllBeginEnvironmentResets", bool_to_string(state.dataEnvrn->forceBeginEnvResetSuppress));
         UtilityRoutines::appendPerfLog(state, "Minimum System Timestep", format("{:.1R}", state.dataConvergeParams->MinTimeStepSys * 60.0));
         UtilityRoutines::appendPerfLog(state, "MaxZoneTempDiff", format("{:.2R}", state.dataConvergeParams->MaxZoneTempDiff));
-        UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", DataHeatBalance::MaxAllowedDelTemp));
+        UtilityRoutines::appendPerfLog(state, "MaxAllowedDelTemp", format("{:.4R}", state.dataHeatBal->MaxAllowedDelTemp));
     }
 
     std::string bool_to_string(bool logical)
@@ -1798,7 +1797,7 @@ namespace SimulationManager {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // FLOW:
+
         state.dataGlobal->StdOutputRecordCount = 0;
         state.files.eso.ensure_open(state, "OpenOutputFiles", state.files.outputControl.eso);
         print(state.files.eso, "Program Version,{}\n", VerString);
@@ -1839,24 +1838,10 @@ namespace SimulationManager {
         // Using/Aliasing
         using namespace DataOutputs;
         using namespace DataRuntimeLanguage;
-        using DataHeatBalance::CondFDRelaxFactor;
-        using DataHeatBalance::CondFDRelaxFactorInput;
-
-        using namespace DataSystemVariables; // , ONLY: MaxNumberOfThreads,NumberIntRadThreads,iEnvSetThreads
-        using DataSurfaces::MaxVerticesPerSurface;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
+        using namespace DataSystemVariables;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         std::string cEnvSetThreads;
@@ -1882,11 +1867,11 @@ namespace SimulationManager {
         print(state.files.audit, variable_fmt, "maxUniqueKeyCount", state.dataOutRptTab->maxUniqueKeyCount);
         print(state.files.audit, variable_fmt, "maxNumberOfFigures", state.dataSolarShading->maxNumberOfFigures);
         print(state.files.audit, variable_fmt, "MAXHCArrayBounds", state.dataSolarShading->MAXHCArrayBounds);
-        print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
+        print(state.files.audit, variable_fmt, "MaxVerticesPerSurface", state.dataSurface->MaxVerticesPerSurface);
         print(state.files.audit, variable_fmt, "NumReportList", state.dataOutputProcessor->NumReportList);
         print(state.files.audit, variable_fmt, "InstMeterCacheSize", state.dataOutputProcessor->InstMeterCacheSize);
-        if (SutherlandHodgman) {
-            if (SlaterBarsky) {
+        if (state.dataSysVars->SutherlandHodgman) {
+            if (state.dataSysVars->SlaterBarsky) {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
             } else {
                 print(state.files.audit, " {}\n", "ClippingAlgorithm=SutherlandHodgman");
@@ -1934,10 +1919,10 @@ namespace SimulationManager {
             state.files.eso.del();
         }
 
-        if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
+        if (state.dataHeatBal->AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
                 state.files.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
-            print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
+            print(state.files.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", state.dataHeatBal->CondFDRelaxFactorInput, state.dataHeatBal->CondFDRelaxFactor);
         }
         // Report number of threads to eio file
         static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
@@ -1946,50 +1931,50 @@ namespace SimulationManager {
                                               "Parallel Sims");
         print(state.files.eio, "{}\n", ThreadingHeader);
         static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
-        if (Threading) {
-            if (iEnvSetThreads == 0) {
+        if (state.dataSysVars->Threading) {
+            if (state.dataSysVars->iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";
             } else {
-                cEnvSetThreads = fmt::to_string(iEnvSetThreads);
+                cEnvSetThreads = fmt::to_string(state.dataSysVars->iEnvSetThreads);
             }
-            if (iepEnvSetThreads == 0) {
+            if (state.dataSysVars->iepEnvSetThreads == 0) {
                 cepEnvSetThreads = "Not Set";
             } else {
-                cepEnvSetThreads = fmt::to_string(iepEnvSetThreads);
+                cepEnvSetThreads = fmt::to_string(state.dataSysVars->iepEnvSetThreads);
             }
-            if (iIDFSetThreads == 0) {
+            if (state.dataSysVars->iIDFSetThreads == 0) {
                 cIDFSetThreads = "Not Set";
             } else {
-                cIDFSetThreads = fmt::to_string(iIDFSetThreads);
+                cIDFSetThreads = fmt::to_string(state.dataSysVars->iIDFSetThreads);
             }
-            if (lnumActiveSims) {
+            if (state.dataSysVars->lnumActiveSims) {
                 print(state.files.eio,
                       ThreadReport,
                       "Yes",
-                      MaxNumberOfThreads,
+                      state.dataSysVars->MaxNumberOfThreads,
                       cEnvSetThreads,
                       cepEnvSetThreads,
                       cIDFSetThreads,
-                      NumberIntRadThreads,
-                      iNominalTotSurfaces,
-                      inumActiveSims);
+                      state.dataSysVars->NumberIntRadThreads,
+                      state.dataSysVars->iNominalTotSurfaces,
+                      state.dataSysVars->inumActiveSims);
             } else {
                 print(state.files.eio,
                       ThreadReport,
                       "Yes",
-                      MaxNumberOfThreads,
+                      state.dataSysVars->MaxNumberOfThreads,
                       cEnvSetThreads,
                       cepEnvSetThreads,
                       cIDFSetThreads,
-                      NumberIntRadThreads,
-                      iNominalTotSurfaces,
+                      state.dataSysVars->NumberIntRadThreads,
+                      state.dataSysVars->iNominalTotSurfaces,
                       "N/A");
             }
         } else { // no threading
-            if (lnumActiveSims) {
-                print(state.files.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
+            if (state.dataSysVars->lnumActiveSims) {
+                print(state.files.eio, ThreadReport, "No", state.dataSysVars->MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", state.dataSysVars->inumActiveSims);
             } else {
-                print(state.files.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
+                print(state.files.eio, ThreadReport, "No", state.dataSysVars->MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
             }
         }
 
@@ -2062,7 +2047,7 @@ namespace SimulationManager {
 
             state.dataGlobal->TimeStep = 1;
 
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             state.dataGlobal->BeginTimeStepFlag = true;
 
@@ -2079,7 +2064,7 @@ namespace SimulationManager {
             state.dataGlobal->BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - 2nd timestep 1:" + state.dataEnvrn->EnvironmentName);
 
             ManageWeather(state);
 
@@ -2093,7 +2078,7 @@ namespace SimulationManager {
             state.dataGlobal->TimeStep = state.dataGlobal->NumOfTimeStepInHour;
             state.dataGlobal->EndEnvrnFlag = true;
 
-            if (DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
+            if (state.dataSysVars->DeveloperFlag) DisplayString(state, "Initializing Simulation - hour 24 timestep 1:" + state.dataEnvrn->EnvironmentName);
             ManageWeather(state);
 
             ManageExteriorEnergyUse(state);
@@ -2256,8 +2241,6 @@ namespace SimulationManager {
         using namespace DataPlant;
         using namespace DataZoneEquipment;
         using DualDuct::ReportDualDuctConnections;
-        using OutAirNodeManager::NumOutsideAirNodes;
-        using OutAirNodeManager::OutsideAirNodeList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         constexpr static auto errstring("**error**");
@@ -2275,12 +2258,12 @@ namespace SimulationManager {
         // Report outside air node names on the Branch-Node Details file
         print(state.files.bnd, "{}\n", "! ===============================================================");
         print(state.files.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
-        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
-        if (NumOutsideAirNodes > 0) {
+        print(state.files.bnd, " #Outdoor Air Nodes,{}\n", state.dataOutAirNodeMgr->NumOutsideAirNodes);
+        if (state.dataOutAirNodeMgr->NumOutsideAirNodes > 0) {
             print(state.files.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
-        for (int Count = 1; Count <= NumOutsideAirNodes; ++Count) {
-            print(state.files.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
+        for (int Count = 1; Count <= state.dataOutAirNodeMgr->NumOutsideAirNodes; ++Count) {
+            print(state.files.bnd, " Outdoor Air Node,{},{}\n", state.dataOutAirNodeMgr->OutsideAirNodeList(Count), NodeID(state.dataOutAirNodeMgr->OutsideAirNodeList(Count)));
         }
         // Component Sets
         print(state.files.bnd, "{}\n", "! ===============================================================");
@@ -3074,7 +3057,6 @@ void Resimulate(EnergyPlusData &state,
     using HVACManager::SimHVAC;
     using RefrigeratedCase::ManageRefrigeratedCaseRacks;
     using ZoneTempPredictorCorrector::ManageZoneAirUpdates;
-    using DataHeatBalance::ZoneAirMassFlow;
     using DataHVACGlobals::UseZoneTimeStepHistory; // , InitDSwithZoneHistory
     using ZoneContaminantPredictorCorrector::ManageZoneContaminanUpdates;
     using namespace ZoneEquipmentManager;
@@ -3082,7 +3064,7 @@ void Resimulate(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneTempChange(0.0); // Dummy variable needed for calling ManageZoneAirUpdates
 
-    // FLOW:
+
     if (ResimExt) {
         ManageExteriorEnergyUse(state);
 
@@ -3107,7 +3089,7 @@ void Resimulate(EnergyPlusData &state,
         // HVAC simulation
         ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
-        CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
+        CalcAirFlowSimple(state, 0, state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance, state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance);
         ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (state.dataContaminantBalance->Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);

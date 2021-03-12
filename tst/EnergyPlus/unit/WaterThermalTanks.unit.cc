@@ -1037,8 +1037,8 @@ TEST_F(EnergyPlusFixture, HPWHSizing)
     ASSERT_FALSE(ErrorsFound);
     DataHVACGlobals::TimeStepSys = 1;
     SetPredefinedTables(*state);
-    DataHeatBalFanSys::MAT.allocate(1);
-    DataHeatBalFanSys::MAT(1) = 20.0;
+    state->dataHeatBalFanSys->MAT.allocate(1);
+    state->dataHeatBalFanSys->MAT(1) = 20.0;
     WaterThermalTanks::SimHeatPumpWaterHeater(*state, "Zone4HeatPumpWaterHeater", true, SenseLoadMet, LatLoadMet, CompIndex);
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataWaterThermalTanks->HPWaterHeater(1).OperatingAirFlowRate);
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1));
@@ -1702,7 +1702,7 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -2172,7 +2172,6 @@ TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 
 TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
-    using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
@@ -2367,7 +2366,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -2407,7 +2406,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     Tank.TimeElapsed = 0.0;
     Desuperheater.SetPointTemp = 55;
     Desuperheater.Mode = 1;
-    DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 0;
+    state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity = 0;
     state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     Tank.Mode = 0;
@@ -2423,7 +2422,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_EQ(Tank.TankTemp, 50);
 
     // Assumed next iteration with FirstHVAC condition not changed
-    DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
+    state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
     Tank.TankTemp = 20.0; // Assumed Tank temperature from previous iteration
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
@@ -2439,7 +2438,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     // Assumed next iteration with FirstHVAC condition not changed
     FirstHVAC = false;
     Tank.TankTemp = 20.0;
-    DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
+    state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
     Tank.CalcDesuperheaterWaterHeater(*state, FirstHVAC);
     // Flag changed from false to true
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
@@ -2568,24 +2567,68 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
         "    14067.4113682534,        !- Gross Rated Total Cooling Capacity {W}",
         "    10297.3451215615,        !- Gross Rated Sensible Cooling Capacity {W}",
         "    5.3555091458258,         !- Gross Rated Cooling COP",
-        "    -3.9160645386,           !- Total Cooling Capacity Coefficient 1",
-        "    7.042944024,             !- Total Cooling Capacity Coefficient 2",
-        "    -2.270589372,            !- Total Cooling Capacity Coefficient 3",
-        "    0,                       !- Total Cooling Capacity Coefficient 4",
-        "    0,                       !- Total Cooling Capacity Coefficient 5",
-        "    26.7839398084,           !- Sensible Cooling Capacity Coefficient 1",
-        "    0,                       !- Sensible Cooling Capacity Coefficient 2",
-        "    -23.832385974,           !- Sensible Cooling Capacity Coefficient 3",
-        "    -1.115743914,            !- Sensible Cooling Capacity Coefficient 4",
-        "    0,                       !- Sensible Cooling Capacity Coefficient 5",
-        "    0,                       !- Sensible Cooling Capacity Coefficient 6",
-        "    -6.2337364523,           !- Cooling Power Consumption Coefficient 1",
-        "    1.610096238,             !- Cooling Power Consumption Coefficient 2",
-        "    5.317076448,             !- Cooling Power Consumption Coefficient 3",
-        "    0,                       !- Cooling Power Consumption Coefficient 4",
-        "    0,                       !- Cooling Power Consumption Coefficient 5",
+        "    TotCoolCapCurve,         !- Total Cooling Capacity Curve Name",
+        "    SensCoolCapCurve,        !- Sensible Cooling Name",
+        "    CoolPowCurve,           !- Cooling Power Consumption Curve Name",
         "    1000,                    !- Nominal Time for Condensate Removal to Begin {s}",
         "    1.5;                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+
+        "Curve:QuintLinear,",
+        "  SensCoolCapCurve,     ! Curve Name",
+        "  26.7839398084,        ! CoefficientC1",
+        "  0,                    ! CoefficientC2",
+        "  -23.832385974,        ! CoefficientC3",
+        "  -1.115743914,         ! CoefficientC4",
+        "  0,                    ! CoefficientC5",
+        "  0,                    ! CoefficientC6",
+        "  0.,                   ! Minimum Value of v",
+        "  100.,                 ! Maximum Value of v",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+        
+        "Curve:QuadLinear,",
+        "  TotCoolCapCurve,      ! Curve Name",
+        "  -3.9160645386,        ! CoefficientC1",
+        "  7.042944024,          ! CoefficientC2",
+        "  -2.270589372,         ! CoefficientC3",
+        "  0,                    ! CoefficientC4",
+        "  0,                    ! CoefficientC5",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
+        
+        "Curve:QuadLinear,",
+        "  CoolPowCurve,         ! Curve Name",
+        "  -6.2337364523,        ! CoefficientC1",
+        "  1.610096238,          ! CoefficientC2",
+        "  5.317076448,          ! CoefficientC3",
+        "  0,                    ! CoefficientC4",
+        "  0,                    ! CoefficientC5",
+        "  0.,                   ! Minimum Value of w",
+        "  100.,                 ! Maximum Value of w",
+        "  0.,                   ! Minimum Value of x",
+        "  100.,                 ! Maximum Value of x",
+        "  0.,                   ! Minimum Value of y",
+        "  100.,                 ! Maximum Value of y",
+        "  0,                    ! Minimum Value of z",
+        "  100,                  ! Maximum Value of z",
+        "  0.,                   ! Minimum Curve Output",
+        "  38.;                  ! Maximum Curve Output",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -2597,7 +2640,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -2622,8 +2665,8 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
     // Test if the new data Structure for water to air heat pump coils successfully initialized
-    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
-    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).Name, "GSHP_COIL1");
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).SourceType, "Coil:Cooling:WaterToAirHeatPump:EquationFit");
     // Air node
     Node(5).MassFlowRate = 0.005;
     Node(5).Temp = 28.0;
@@ -2650,11 +2693,11 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(*state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
     WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
-    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
-    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
+    state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
     WaterToAirHeatPumpSimple::CalcHPCoolingSimple(*state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
-    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
+    EXPECT_EQ(state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource, state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = state->dataWaterThermalTanks->WaterHeaterDesuperheater(Tank.DesuperheaterNum);
@@ -2681,7 +2724,7 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     state->dataGlobal->TimeStepZone = 1. / 60.;
     TimeStepSys = state->dataGlobal->TimeStepZone;
     SysTimeElapsed = 0.0;
-    DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
+    state->dataHeatBal->HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
     state->dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
     Tank.initialize(*state, true);
     Tank.SetPointTemp = 45;
@@ -2991,7 +3034,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -3009,8 +3052,8 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(*state));
     // Source name and type successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(1).Name, "MULTISPEED_COIL");
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(1).SourceType, "Coil:Cooling:DX:MultiSpeed");
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(1).Name, "MULTISPEED_COIL");
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(1).SourceType, "Coil:Cooling:DX:MultiSpeed");
 
     // Initiate conditions for multispeed coil calculation
     state->dataEnvrn->OutDryBulbTemp = 32.0;
@@ -3028,7 +3071,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     state->dataDXCoils->DXCoil(1).InletAirHumRat = 0.005;
     state->dataDXCoils->DXCoil(1).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(27.0, 0.005);
     state->dataDXCoils->DXCoil(1).SchedPtr = 1;
-    ScheduleManager::Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
+    state->dataScheduleMgr->Schedule(state->dataDXCoils->DXCoil(1).SchedPtr).CurrentValue = 1.0; // enable the VRF condenser
     state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
@@ -3036,7 +3079,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     DXCoils::CalcMultiSpeedDXCoilCooling(*state, DXNum, 1, 1, 2, 1, 1, 1);
 
     // Source availably heat successfully passed to DataHeatBalance::HeatReclaimDXCoil data struct
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, state->dataDXCoils->DXCoil(DXNum).TotalCoolingEnergyRate + state->dataDXCoils->DXCoil(DXNum).ElecCoolingPower);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity, state->dataDXCoils->DXCoil(DXNum).TotalCoolingEnergyRate + state->dataDXCoils->DXCoil(DXNum).ElecCoolingPower);
 
     // Now move to the water thermal tank calculation
     WaterThermalTanks::WaterThermalTankData &Tank = state->dataWaterThermalTanks->WaterThermalTank(TankNum);
@@ -3068,10 +3111,10 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     // if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
     EXPECT_GE(Desuperheater.DXSysPLR, Desuperheater.DesuperheaterPLR);
     // used desuperheater reclaim heat is successfully stored in HeatReclaimDXCoil data struct
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(Tank.DesuperheaterNum), Desuperheater.HeaterRate);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(Tank.DesuperheaterNum), Desuperheater.HeaterRate);
     // Desuperheater heater rate is correctly calculated
     EXPECT_EQ(Desuperheater.HeaterRate,
-              (DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity) / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR * 0.25);
+              (state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity) / Desuperheater.DXSysPLR * Desuperheater.DesuperheaterPLR * 0.25);
 
     // Test the float mode
     Tank.SavedTankTemp = 61.0;
@@ -3150,7 +3193,7 @@ TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -3401,7 +3444,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 
 TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 {
-    using DataHeatBalance::HeatReclaimDXCoil;
     using DataHVACGlobals::SysTimeElapsed;
     using DataHVACGlobals::TimeStepSys;
     using DataLoopNode::Node;
@@ -3644,7 +3686,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     state->dataGlobal->NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     state->dataGlobal->MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput(*state);
-    ScheduleManager::ScheduleInputProcessed = true;
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
 
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->HourOfDay = 1;
@@ -3692,7 +3734,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
         desuperheater.Mode = 1;
     }
 
-    DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
+    state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
     state->dataDXCoils->DXCoil(DXNum).PartLoadRatio = 1.0;
 
     // first tank heat reclaim
@@ -3701,9 +3743,9 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     // Reclaim efficiency applied correctly
     EXPECT_EQ(Desuperheater1.HeaterRate, 500 * 0.1);
     // Results stored in ata structs
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, 500);
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(desuperheaterNum1), Desuperheater1.HeaterRate);
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeatTotal, Desuperheater1.HeaterRate);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity, 500);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(desuperheaterNum1), Desuperheater1.HeaterRate);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeatTotal, Desuperheater1.HeaterRate);
     // Energy balance through tank and desuperheater functions
     EXPECT_NEAR(Tank1.SourceRate, Desuperheater1.HeaterRate, Tank1.SourceRate * 0.05);
 
@@ -3712,9 +3754,9 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     // Reclaim efficiency applied correctly
     EXPECT_EQ(Desuperheater2.HeaterRate, 500 * 0.15);
     // Results stored in ata structs
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity, 500);
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(desuperheaterNum2), Desuperheater2.HeaterRate);
-    EXPECT_EQ(DataHeatBalance::HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeatTotal,
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).AvailCapacity, 500);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeat(desuperheaterNum2), Desuperheater2.HeaterRate);
+    EXPECT_EQ(state->dataHeatBal->HeatReclaimDXCoil(DXNum).WaterHeatingDesuperheaterReclaimedHeatTotal,
               Desuperheater1.HeaterRate + Desuperheater2.HeaterRate);
     // Energy balance through tank and desuperheater functions
     EXPECT_NEAR(Tank2.SourceRate, Desuperheater2.HeaterRate, Tank2.SourceRate * 0.05);

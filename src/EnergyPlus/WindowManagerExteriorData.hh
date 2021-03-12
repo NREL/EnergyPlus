@@ -109,7 +109,7 @@ namespace WindowManager {
     using Layers_Map = std::map<int, IGU_Layers>;
 
     // Test if surface is hit by beam defined with vector
-    bool isSurfaceHit(const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
+    bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const DataVectorTypes::Vector &t_Ray);
 
     // Converts world coordinates (E+) into local surface coordinates that suites better for
     // WCE operations. Return values are angles Theta and Phi that are used to define WCE direction
@@ -125,7 +125,7 @@ namespace WindowManager {
     class CWCESpecturmProperties
     {
     public:
-        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(int const t_SampleDataPtr);
+        static std::shared_ptr<SpectralAveraging::CSpectralSampleData> getSpectralSample(EnergyPlusData &state, int const t_SampleDataPtr);
         static std::shared_ptr<SpectralAveraging::CSpectralSampleData>
         getSpectralSample(Material::MaterialProperties const &t_MaterialProperties);
         static std::shared_ptr<FenestrationCommon::CSeries> getDefaultSolarRadiationSpectrum(EnergyPlusData &state);

@@ -241,7 +241,6 @@ namespace EnergyPlus::SetPointManager {
         // Use the Get routines from the InputProcessor module.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataZoneEquipment::GetSystemNodeNumberForZone;
         using General::FindNumberInList;
 
@@ -893,7 +892,7 @@ namespace EnergyPlus::SetPointManager {
             }
 
             // get the actual zone number of the control zone
-            state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
             if (state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -994,7 +993,7 @@ namespace EnergyPlus::SetPointManager {
             }
 
             // get the actual zone number of the control zone
-            state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
             if (state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -1094,7 +1093,7 @@ namespace EnergyPlus::SetPointManager {
             }
 
             // get the actual zone number of the control zone
-            state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), Zone);
+            state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataHeatBal->Zone);
             if (state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) + "\".");
@@ -3063,7 +3062,7 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
             state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(state, cAlphaArgs(2));
             // get the actual zone number of the control zone
-            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataSetPointManager->SZOneStageCoolingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
@@ -3161,7 +3160,7 @@ namespace EnergyPlus::SetPointManager {
             state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneName = cAlphaArgs(2);
             state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetSystemNodeNumberForZone(state, cAlphaArgs(2));
             // get the actual zone number of the control zone
-            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), Zone);
+            state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataHeatBal->Zone);
             if (state.dataSetPointManager->SZOneStageHeatingSetPtMgr(SetPtMgrNum).ControlZoneNum == 0) {
                 ShowSevereError(state, RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid field.");
                 ShowContinueError(state, "..invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) + "\".");
@@ -3561,7 +3560,6 @@ namespace EnergyPlus::SetPointManager {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataHeatBalance::Zone;
         using DataHVACGlobals::NumCondLoops;
         using DataHVACGlobals::NumPlantLoops;
         using namespace DataPlant;
@@ -3689,7 +3687,7 @@ namespace EnergyPlus::SetPointManager {
                         // still need to validate...
                         if (state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) == 0) { // didn't find
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name + "\", invalid zone");
-                            ShowContinueError(state, "could not find Controlled Zone=" + Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                            ShowContinueError(state, "could not find Controlled Zone=" + state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
                             ErrorsFound = true;
                         } else {
                             // make sure humidity controlled zone
@@ -3703,7 +3701,7 @@ namespace EnergyPlus::SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in Zone=" +
-                                                  Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                                                  state.dataHeatBal->Zone(state.dataSetPointManager->SZMinHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -3725,7 +3723,7 @@ namespace EnergyPlus::SetPointManager {
                         // still need to validate...
                         if (state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).CtrlZoneNum(SetZoneNum) == 0) { // didn't find
                             ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name + "\", invalid zone");
-                            ShowContinueError(state, "could not find Controlled Zone=" + Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                            ShowContinueError(state, "could not find Controlled Zone=" + state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
                             ErrorsFound = true;
                         } else {
                             // make sure humidity controlled zone
@@ -3739,7 +3737,7 @@ namespace EnergyPlus::SetPointManager {
                                 ShowSevereError(state, cSetPointManagerType + "=\"" + state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).Name +
                                                 "\", invalid humidistat specification");
                                 ShowContinueError(state, "could not locate Humidistat in Zone=" +
-                                                  Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
+                                                  state.dataHeatBal->Zone(state.dataSetPointManager->SZMaxHumSetPtMgr(SetPtMgrNum).ZoneNum(SetZoneNum)).Name);
                                 ErrorsFound = true;
                             }
                         }
@@ -4001,7 +3999,7 @@ namespace EnergyPlus::SetPointManager {
                             state.dataSetPointManager->MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                         }
                         // Commented out as we are using %NumZonesCooled instead of %NumZonesHeated for all systems for now
-                        // IF (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated == 0) THEN
+                        // IF (AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated == 0) THEN
                         //  CALL ShowSevereError(state, TRIM(cSetPointManagerType)//': Air Loop provides no heating ' // &
                         //                       TRIM(MZAverageHeatingSetPtMgr(SetPtMgrNum)%Name))
                         //  CALL ShowContinueError(state, 'Occurs in Setpoint Manager='//TRIM(MZAverageHeatingSetPtMgr(SetPtMgrNum)%Name))
@@ -6137,14 +6135,14 @@ namespace EnergyPlus::SetPointManager {
         SetPointTemp = this->MinSetTemp;
 
         for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
-            // DO ZonesHeatedIndex=1,state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
-            // Using state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
+            // DO ZonesHeatedIndex=1,AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
+            // Using AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
 
             // The data for number of zones heated is included in the data structure of the variable
-            // "state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" for all systems.  The data structure
-            // "state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated" applies to Dual Duct System only and
+            // "AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" for all systems.  The data structure
+            // "AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated" applies to Dual Duct System only and
             // if used will limit the application of this setpoint manager to other systems.  Thus,
-            // the "state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" data is used instead.
+            // the "AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" data is used instead.
 
             CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
             ZoneInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
@@ -8095,7 +8093,7 @@ namespace EnergyPlus::SetPointManager {
         int SetPtMgrNum; // loop counter for each set point manager
         int NumNode;     // loop counter for each node and specific control type
 
-        // FLOW:
+
 
         // First time called, get the input for all the setpoint managers
         if (state.dataSetPointManager->GetInputFlag) {

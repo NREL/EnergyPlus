@@ -979,22 +979,22 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = 3;
     state->dataPlnt->PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = "CHILLED WATER COIL";
 
-    DataSizing::NumPltSizInput = 1;
-    DataSizing::PlantSizData.allocate(1);
-    DataSizing::PlantSizData(1).DeltaT = 5.0;
-    DataSizing::PlantSizData(1).ExitTemp = 6.0;
-    DataSizing::PlantSizData(1).PlantLoopName = "CHW LOOP";
-    DataSizing::PlantSizData(1).LoopType = DataSizing::CoolingLoop;
-    DataSizing::PlantSizData(1).DesVolFlowRate = 1.0;
+    state->dataSize->NumPltSizInput = 1;
+    state->dataSize->PlantSizData.allocate(1);
+    state->dataSize->PlantSizData(1).DeltaT = 5.0;
+    state->dataSize->PlantSizData(1).ExitTemp = 6.0;
+    state->dataSize->PlantSizData(1).PlantLoopName = "CHW LOOP";
+    state->dataSize->PlantSizData(1).LoopType = DataSizing::CoolingLoop;
+    state->dataSize->PlantSizData(1).DesVolFlowRate = 1.0;
 
     state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
     state->dataPlnt->PlantFirstSizesOkayToReport = true;
     state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
-    DataSizing::UnitarySysEqSizing.allocate(1);
-    DataSizing::UnitarySysEqSizing(1).CoolingCapacity = false;
-    DataSizing::UnitarySysEqSizing(1).HeatingCapacity = false;
-    DataSizing::UnitarySysEqSizing.deallocate();
+    state->dataSize->UnitarySysEqSizing.allocate(1);
+    state->dataSize->UnitarySysEqSizing(1).CoolingCapacity = false;
+    state->dataSize->UnitarySysEqSizing(1).HeatingCapacity = false;
+    state->dataSize->UnitarySysEqSizing.deallocate();
 
     bool SimZoneEquipment(false);
     // compare_err_stream("", true); // reset error stream

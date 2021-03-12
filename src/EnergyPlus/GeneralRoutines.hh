@@ -62,8 +62,6 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-void GeneralRoutines_clear_state();
-
 void ControlCompOutput(EnergyPlusData &state,
                        std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
@@ -94,14 +92,15 @@ void CheckSysSizing(EnergyPlusData &state,
                     std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void CheckThisAirSystemForSizing(int const AirLoopNum, bool &AirLoopWasSized);
+void CheckThisAirSystemForSizing(EnergyPlusData &state, int const AirLoopNum, bool &AirLoopWasSized);
 
 void CheckZoneSizing(EnergyPlusData &state,
                      std::string const &CompType, // Component Type (e.g. Chiller:Electric)
                      std::string const &CompName  // Component Name (e.g. Big Chiller)
 );
 
-void CheckThisZoneForSizing(int const ZoneNum, // zone index to be checked
+void CheckThisZoneForSizing(EnergyPlusData &state,
+                            int const ZoneNum, // zone index to be checked
                             bool &ZoneWasSized);
 
 void ValidateComponent(EnergyPlusData &state,
@@ -193,9 +192,11 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
 
 struct GeneralRoutinesData : BaseGlobalStruct {
 
+    bool MyICSEnvrnFlag = true;
+
     void clear_state() override
     {
-
+        this->MyICSEnvrnFlag = true;
     }
 };
 
