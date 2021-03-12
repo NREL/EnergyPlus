@@ -556,11 +556,9 @@ namespace SolarReflectionManager {
 
         // METHODOLOGY EMPLOYED: call worker routine depending on solar calculation method
 
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
-
         static int IHr(0); // Hour number
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
                 DisplayString(state, "Calculating Beam-to-Diffuse Exterior Solar Reflection Factors");
             } else {
@@ -804,7 +802,6 @@ namespace SolarReflectionManager {
         // REFERENCES: na
 
         // Using/Aliasing
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS: na
@@ -815,7 +812,7 @@ namespace SolarReflectionManager {
         static int IHr(0); // Hour number
 
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
                 DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
             } else {
@@ -1041,7 +1038,6 @@ namespace SolarReflectionManager {
         // reflection of sky diffuse solar radiation from obstructions and ground.
 
         // Using/Aliasing
-        using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int RecSurfNum(0);   // Receiving surface number
@@ -1133,7 +1129,7 @@ namespace SolarReflectionManager {
                             }
                         }
 
-                        if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                        if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                             SkyReflSolRadiance = state.dataSurface->Surface(HitPtSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(HitPtSurfNumX) *
                                                  state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum);
                         } else {
