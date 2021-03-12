@@ -209,9 +209,9 @@ namespace HighTempRadiantSystem {
 
         {
             auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-            if ((SELECT_CASE_var == MATControl) || (SELECT_CASE_var == MRTControl) || (SELECT_CASE_var == OperativeControl)) {
+            if ((SELECT_CASE_var == RadControlType::MATControl) || (SELECT_CASE_var == RadControlType::MRTControl) || (SELECT_CASE_var == RadControlType::OperativeControl)) {
                 CalcHighTempRadiantSystem(state, RadSysNum);
-            } else if ((SELECT_CASE_var == MATSPControl) || (SELECT_CASE_var == MRTSPControl) || (SELECT_CASE_var == OperativeSPControl)) {
+            } else if ((SELECT_CASE_var == RadControlType::MATSPControl) || (SELECT_CASE_var == RadControlType::MRTSPControl) || (SELECT_CASE_var == RadControlType::OperativeSPControl)) {
                 CalcHighTempRadiantSystemSP(state, FirstHVACIteration, RadSysNum);
             }
         }
@@ -477,22 +477,22 @@ namespace HighTempRadiantSystem {
 
             // Process the temperature control type
             if (UtilityRoutines::SameString(cAlphaArgs(6), cMATControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = MATControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MATControl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), cMRTControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = MRTControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MRTControl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), cOperativeControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = OperativeControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeControl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), cMATSPControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = MATSPControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MATSPControl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), cMRTSPControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = MRTSPControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::MRTSPControl;
             } else if (UtilityRoutines::SameString(cAlphaArgs(6), cOperativeSPControl)) {
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = OperativeSPControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeSPControl;
             } else {
                 ShowWarningError(state, "Invalid " + cAlphaFieldNames(6) + " = " + cAlphaArgs(6));
                 ShowContinueError(state, "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
                 ShowContinueError(state, "Control reset to OPERATIVE control for this " + cCurrentModuleObject);
-                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = OperativeControl;
+                state.dataHighTempRadSys->HighTempRadSys(Item).ControlType = RadControlType::OperativeControl;
             }
 
             state.dataHighTempRadSys->HighTempRadSys(Item).ThrottlRange = rNumericArgs(8);
@@ -904,11 +904,11 @@ namespace HighTempRadiantSystem {
             // Determine the fraction of maximum power to the unit (limiting the fraction range from zero to unity)
             {
                 auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == MATControl) {
+                if (SELECT_CASE_var == RadControlType::MATControl) {
                     HeatFrac = (OffTemp - state.dataHeatBalFanSys->MAT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-                } else if (SELECT_CASE_var == MRTControl) {
+                } else if (SELECT_CASE_var == RadControlType::MRTControl) {
                     HeatFrac = (OffTemp - state.dataHeatBal->MRT(ZoneNum)) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
-                } else if (SELECT_CASE_var == OperativeControl) {
+                } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
                     OpTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                     HeatFrac = (OffTemp - OpTemp) / state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ThrottlRange;
                 }
@@ -1009,11 +1009,11 @@ namespace HighTempRadiantSystem {
             // Determine the proper temperature on which to control
             {
                 auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-                if (SELECT_CASE_var == MATSPControl) {
+                if (SELECT_CASE_var == RadControlType::MATSPControl) {
                     ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                } else if (SELECT_CASE_var == MRTSPControl) {
+                } else if (SELECT_CASE_var == RadControlType::MRTSPControl) {
                     ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
-                } else if (SELECT_CASE_var == OperativeSPControl) {
+                } else if (SELECT_CASE_var == RadControlType::OperativeSPControl) {
                     ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                 } else {
                     assert(false);
@@ -1051,11 +1051,11 @@ namespace HighTempRadiantSystem {
                     // Redetermine the current value of the controlling temperature
                     {
                         auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-                        if (SELECT_CASE_var == MATControl) {
+                        if (SELECT_CASE_var == RadControlType::MATControl) {
                             ZoneTemp = state.dataHeatBalFanSys->MAT(ZoneNum);
-                        } else if (SELECT_CASE_var == MRTControl) {
+                        } else if (SELECT_CASE_var == RadControlType::MRTControl) {
                             ZoneTemp = state.dataHeatBal->MRT(ZoneNum);
-                        } else if (SELECT_CASE_var == OperativeControl) {
+                        } else if (SELECT_CASE_var == RadControlType::OperativeControl) {
                             ZoneTemp = 0.5 * (state.dataHeatBalFanSys->MAT(ZoneNum) + state.dataHeatBal->MRT(ZoneNum));
                         }
                     }
@@ -1154,7 +1154,7 @@ namespace HighTempRadiantSystem {
 
         {
             auto const SELECT_CASE_var(state.dataHighTempRadSys->HighTempRadSys(RadSysNum).ControlType);
-            if ((SELECT_CASE_var == MATControl) || (SELECT_CASE_var == MRTControl) || (SELECT_CASE_var == OperativeControl)) {
+            if ((SELECT_CASE_var == RadControlType::MATControl) || (SELECT_CASE_var == RadControlType::MRTControl) || (SELECT_CASE_var == RadControlType::OperativeControl)) {
                 // Only need to do this for the non-SP controls (SP has already done this enough)
                 // Now, distribute the radiant energy of all systems to the appropriate
                 // surfaces, to people, and the air; determine the latent portion

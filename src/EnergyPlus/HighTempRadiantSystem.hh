@@ -74,12 +74,15 @@ namespace HighTempRadiantSystem {
         Electric
     };
 
-    int constexpr MATControl = 1001;
-    int constexpr MRTControl = 1002;
-    int constexpr OperativeControl = 1003;
-    int constexpr MATSPControl = 1004;
-    int constexpr MRTSPControl = 1005;
-    int constexpr OperativeSPControl = 1006;
+    enum class RadControlType : int {
+        Unassigned = 0,
+        MATControl = 1001,
+        MRTControl = 1002,
+        OperativeControl = 1003,
+        MATSPControl = 1004,
+        MRTSPControl = 1005,
+        OperativeSPControl = 1006
+    };
 
     // DERIVED TYPE DEFINITIONS:
 
@@ -106,7 +109,7 @@ namespace HighTempRadiantSystem {
         Real64 FracLost;        // Fraction of heater power that is lost to the outside environment
         Real64 FracConvect;     // Fraction of heater power that is given off as convective heat
         // (by definition this is 1 minus the sum of all other fractions)
-        int ControlType;                   // Control type for the system (MAT, MRT, or op temp)
+        RadControlType ControlType;                   // Control type for the system (MAT, MRT, or op temp)
         Real64 ThrottlRange;               // Throttling range for heating [C]
         std::string SetptSched;            // Schedule name for the zone setpoint temperature
         int SetptSchedPtr;                 // Schedule index for the zone setpoint temperature
@@ -131,7 +134,7 @@ namespace HighTempRadiantSystem {
         // Default Constructor
         HighTempRadiantSystemData()
             : SchedPtr(0), ZonePtr(0), HeaterType(RadHeaterType::Unassigned), MaxPowerCapac(0.0), CombustionEffic(0.0), FracRadiant(0.0), FracLatent(0.0), FracLost(0.0),
-              FracConvect(0.0), ControlType(0), ThrottlRange(0.0), SetptSchedPtr(0), FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0),
+              FracConvect(0.0), ControlType(RadControlType::Unassigned), ThrottlRange(0.0), SetptSchedPtr(0), FracDistribPerson(0.0), TotSurfToDistrib(0), ElecPower(0.0),
               ElecEnergy(0.0), GasPower(0.0), GasEnergy(0.0), HeatPower(0.0), HeatEnergy(0.0), HeatingCapMethod(0), ScaledHeatingCapacity(0.0)
         {
         }
