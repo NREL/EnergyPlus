@@ -56,6 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
@@ -446,7 +447,7 @@ namespace WaterCoils {
     );
 
     void CheckForSensorAndSetPointNode(EnergyPlusData &state, int const SensorNodeNum, // controller sensor node number
-                                       int const ControlledVar, // controlled variable type
+                                       HVACControllers::iCtrl const &ControlledVar, // controlled variable type
                                        bool &NodeNotFound       // true if matching air outlet node not found
     );
 

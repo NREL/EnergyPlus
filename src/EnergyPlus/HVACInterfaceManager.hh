@@ -67,7 +67,7 @@ namespace HVACInterfaceManager {
     // Common Pipe Recirc Flow Directions
     constexpr int NoRecircFlow(0);
     constexpr int PrimaryRecirc(1);   // flow from Supply-outlet/Demand-inlet to Supply-inlet/demand-outlet
-    constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-oulet to Supply-outlet/demand-inlet
+    constexpr int SecondaryRecirc(2); // flow from Supply-inlet/Demand-outlet to Supply-outlet/demand-inlet
 
     constexpr int FlowTypeNotSet(9);
     constexpr int ConstantFlow(10);

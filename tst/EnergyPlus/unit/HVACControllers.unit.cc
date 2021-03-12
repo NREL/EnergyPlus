@@ -696,7 +696,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     bool isConverged = true;
     int const controlNum = 1;
     auto &thisController(ControllerProps(1));
-    thisController.ControlVar = HVACControllers::iTemperatureAndHumidityRatio;
+    thisController.ControlVar = HVACControllers::iCtrl::TemperatureAndHumidityRatio;
     thisController.Offset = 0.0001;
     int sensedNode = 1;
     thisController.SensedNode = sensedNode;
@@ -775,7 +775,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     thisController.IsSetPointDefinedFlag = true;
     thisController.NumCalcCalls = 5;
     DataLoopNode::Node(sensedNode).HumRat = DataLoopNode::Node(sensedNode).HumRatMax - 0.001;
-    thisController.ControlVar = HVACControllers::iTemperature;
+    thisController.ControlVar = HVACControllers::iCtrl::Temperature;
 
     HVACControllers::CheckTempAndHumRatCtrl(*state, controlNum, isConverged);
     EXPECT_TRUE(isConverged);

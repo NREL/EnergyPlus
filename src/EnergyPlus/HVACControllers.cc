@@ -159,9 +159,6 @@ namespace EnergyPlus::HVACControllers {
     // Check the subroutines SolveAirLoopControllers() and ReSolveAirLoopControllers()
     // invoked in the subroutine SimAirLoop() for the actual calling sequences.
 
-    // REFERENCES:
-    // na
-
     // OTHER NOTES:
     // To enable runtime statistics tracking for each air loop, define the environment variable
     // TRACK_AIRLOOP=YES or TRACK_AIRLOOP=Y.
@@ -181,24 +178,12 @@ namespace EnergyPlus::HVACControllers {
     using namespace DataHVACControllers;
     using namespace DataRootFinder;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     // Number of significant digits to display in error messages for floating-point numbers
-    Real64 const SomeFloatingPoint(1.0);
+    constexpr Real64 SomeFloatingPoint(1.0);
     int const NumSigDigits(PRECISION(SomeFloatingPoint));
-
-    // Parameters for controls used here
-    int const iNoControlVariable(0);
-    int const iTemperature(1);
-    int const iHumidityRatio(2);
-    int const iTemperatureAndHumidityRatio(3);
-    int const iFlow(4);
 
     int const CoilType_Cooling(1);
     int const CoilType_Heating(2);
-
-    Array1D_string const
-        ControlVariableTypes({0, 4}, {"No control variable", "Temperature", "Humidity ratio", "Temperature and humidity ratio", "Flow rate"});
 
     // DERIVED TYPE DEFINITIONS
 
@@ -218,29 +203,6 @@ namespace EnergyPlus::HVACControllers {
     // Flag set to make sure you get input once
     bool GetControllerInputFlag(true);
 
-    // SUBROUTINE Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Algorithms for the Simple Controller
-
-    // Statistics routines
-
-    // Trace routines for all controllers on each air loop
-
-    // Trace routines for each individual controller
-
-    // Misc routines
-
     // Object Data
     Array1D<ControllerPropsType> ControllerProps;
     Array1D<RootFinderDataType> RootFinders;
@@ -251,10 +213,22 @@ namespace EnergyPlus::HVACControllers {
         bool InitControllerSetPointCheckFlag(true);
     } // namespace
 
-    // MODULE SUBROUTINES:
-    //*************************************************************************
-
-    // Functions
+    std::string ControlVariableTypes(iCtrl const &c)
+    {
+        switch (c) {
+        case iCtrl::NoControlVariable:
+            return "No control variable";
+        case iCtrl::Temperature:
+            return "Temperature";
+        case iCtrl::HumidityRatio:
+            return "Humidity ratio";
+        case iCtrl::TemperatureAndHumidityRatio:
+            return "Temperature and humidity ratio";
+        case iCtrl::Flow:
+            return "Flow rate";
+        }
+        return "no controller type found";
+    }
 
     // Needed for unit tests, should not be normally called.
     void clear_state()
@@ -380,7 +354,7 @@ namespace EnergyPlus::HVACControllers {
             // NOTE: Never allow speculative warm restart with dual humidity ratio and temperature control
             //       because the actual setpoint depends on the current temperature and max hum ratio at
             //       the sensed node, and therefore might not be known until after one air loop simulation.
-            if (ControllerProps(ControlNum).ControlVar == iTemperatureAndHumidityRatio) {
+            if (ControllerProps(ControlNum).ControlVar == iCtrl::TemperatureAndHumidityRatio) {
                 AllowWarmRestartFlag = false;
             } else {
                 AllowWarmRestartFlag = true;
@@ -631,11 +605,11 @@ namespace EnergyPlus::HVACControllers {
                 {
                     auto const SELECT_CASE_var(AlphArray(2));
                     if (SELECT_CASE_var == "TEMPERATURE") {
-                        ControllerProps(Num).ControlVar = iTemperature;
+                        ControllerProps(Num).ControlVar = iCtrl::Temperature;
                     } else if (SELECT_CASE_var == "HUMIDITYRATIO") {
-                        ControllerProps(Num).ControlVar = iHumidityRatio;
+                        ControllerProps(Num).ControlVar = iCtrl::HumidityRatio;
                     } else if (SELECT_CASE_var == "TEMPERATUREANDHUMIDITYRATIO") {
-                        ControllerProps(Num).ControlVar = iTemperatureAndHumidityRatio;
+                        ControllerProps(Num).ControlVar = iCtrl::TemperatureAndHumidityRatio;
                         //        CASE ('FLOW')
                         //          ControllerProps(Num)%ControlVar  = iFlow
                     } else {
@@ -653,11 +627,11 @@ namespace EnergyPlus::HVACControllers {
                     ControllerProps(Num).Action = 0;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
-                    ShowSevereError(state, "...Invalid " + cAlphaFields(3) + "=\"" + AlphArray(3) + "\", must be \"Normal\", \"Reverse\" or blank.");
+                    ShowSevereError(state, "...Invalid " + cAlphaFields(3) + "=\"" + AlphArray(3) + R"(", must be "Normal", "Reverse" or blank.)");
                     ErrorsFound = true;
                 }
                 if (AlphArray(4) == "FLOW") {
-                    ControllerProps(Num).ActuatorVar = iFlow;
+                    ControllerProps(Num).ActuatorVar = iCtrl::Flow;
                 } else {
                     ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ShowContinueError(state, "...Invalid " + cAlphaFields(4) + "=\"" + AlphArray(4) + "\", only FLOW is allowed.");
@@ -684,7 +658,7 @@ namespace EnergyPlus::HVACControllers {
 
                 if (ControllerProps(Num).SensedNode > 0) {
 
-                    if (ControllerProps(Num).ControlVar == iHumidityRatio || ControllerProps(Num).ControlVar == iTemperatureAndHumidityRatio) {
+                    if (ControllerProps(Num).ControlVar == iCtrl::HumidityRatio || ControllerProps(Num).ControlVar == iCtrl::TemperatureAndHumidityRatio) {
                         ResetHumidityRatioCtrlVarType(state, ControllerProps(Num).SensedNode);
                     }
                     CheckForSensorAndSetPointNode(state, ControllerProps(Num).SensedNode, ControllerProps(Num).ControlVar, NodeNotFound);
@@ -699,7 +673,7 @@ namespace EnergyPlus::HVACControllers {
                         EMSSetPointErrorFlag = false;
                         {
                             auto const SELECT_CASE_var(ControllerProps(Num).ControlVar);
-                            if (SELECT_CASE_var == iTemperature) {
+                            if (SELECT_CASE_var == iCtrl::Temperature) {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
@@ -710,7 +684,7 @@ namespace EnergyPlus::HVACControllers {
                                         ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                                     }
                                 }
-                            } else if (SELECT_CASE_var == iHumidityRatio) {
+                            } else if (SELECT_CASE_var == iCtrl::HumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
@@ -721,7 +695,7 @@ namespace EnergyPlus::HVACControllers {
                                         ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                                     }
                                 }
-                            } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
+                            } else if (SELECT_CASE_var == iCtrl::TemperatureAndHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(state, ControllerProps(Num).SensedNode, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
@@ -817,26 +791,8 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine resets the actuator inlet flows.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using PlantUtilities::SetActuatedBranchFlowRate;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
@@ -961,7 +917,7 @@ namespace EnergyPlus::HVACControllers {
                 SensedNode = ControllerProps(ControllerIndex).SensedNode;
                 {
                     auto const SELECT_CASE_var(ControllerProps(ControllerIndex).ControlVar);
-                    if (SELECT_CASE_var == iTemperature) { // 'Temperature'
+                    if (SELECT_CASE_var == iCtrl::Temperature) { // 'Temperature'
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing temperature setpoint for controller type=" +
@@ -996,7 +952,7 @@ namespace EnergyPlus::HVACControllers {
                                 //              SetPointErrorFlag = .TRUE.
                             }
                         }
-                    } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
+                    } else if (SELECT_CASE_var == iCtrl::HumidityRatio) { // 'HumidityRatio'
                         ControllerProps(ControllerIndex).HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
                         if ((ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType::HumRat &&
                              Node(SensedNode).HumRatSetPoint == SensedNodeFlagValue) ||
@@ -1032,7 +988,7 @@ namespace EnergyPlus::HVACControllers {
                                               "setpoint at the controller sensed node.");
                             SetPointErrorFlag = true;
                         }
-                    } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
+                    } else if (SELECT_CASE_var == iCtrl::TemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
                         if (Node(SensedNode).TempSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing temperature setpoint for controller type=" +
@@ -1079,7 +1035,7 @@ namespace EnergyPlus::HVACControllers {
                                 }
                             }
                         }
-                    } else if (SELECT_CASE_var == iFlow) { // 'Flow'
+                    } else if (SELECT_CASE_var == iCtrl::Flow) { // 'Flow'
                         if (Node(SensedNode).MassFlowRateSetPoint == SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowSevereError(state, "HVACControllers: Missing mass flow rate setpoint for controller type=" +
@@ -1212,7 +1168,7 @@ namespace EnergyPlus::HVACControllers {
 
         {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).ControlVar);
-            if (SELECT_CASE_var == iTemperature) { // 'Temperature'
+            if (SELECT_CASE_var == iCtrl::Temperature) { // 'Temperature'
                 ControllerProps(ControlNum).SensedValue = Node(SensedNode).Temp;
                 // Done once per HVAC step
                 if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
@@ -1229,7 +1185,7 @@ namespace EnergyPlus::HVACControllers {
                     }
                 }
 
-            } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
+            } else if (SELECT_CASE_var == iCtrl::TemperatureAndHumidityRatio) { // 'TemperatureAndHumidityRatio'
                 if (ControllerProps(ControlNum).HumRatCtrlOverride) {
                     // Humidity ratio control
                     ControllerProps(ControlNum).SensedValue = Node(SensedNode).HumRat;
@@ -1249,7 +1205,7 @@ namespace EnergyPlus::HVACControllers {
                     ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
                 }
 
-            } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
+            } else if (SELECT_CASE_var == iCtrl::HumidityRatio) { // 'HumidityRatio'
                 ControllerProps(ControlNum).SensedValue = Node(SensedNode).HumRat;
                 // Done once per HVAC step
                 if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
@@ -1264,7 +1220,7 @@ namespace EnergyPlus::HVACControllers {
                     ControllerProps(ControlNum).IsSetPointDefinedFlag = true;
                 }
 
-            } else if (SELECT_CASE_var == iFlow) { // 'Flow'
+            } else if (SELECT_CASE_var == iCtrl::Flow) { // 'Flow'
                 ControllerProps(ControlNum).SensedValue = Node(SensedNode).MassFlowRate;
                 // Done once per HVAC step
                 if (!ControllerProps(ControlNum).IsSetPointDefinedFlag) {
@@ -1279,7 +1235,7 @@ namespace EnergyPlus::HVACControllers {
 
         {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).ActuatorVar);
-            if (SELECT_CASE_var == iFlow) { // 'Flow'
+            if (SELECT_CASE_var == iCtrl::Flow) { // 'Flow'
                 // At the beginning of every time step the value is reset to the User Input
                 // The interface managers can reset the Max or Min to available values during the time step
                 // and these will then be the new setpoint limits for the controller to work within.
@@ -1329,23 +1285,8 @@ namespace EnergyPlus::HVACControllers {
         // METHODOLOGY EMPLOYED:
         // Obtains flow rates from the actuated node. Should have been set by the water coils.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using namespace DataSizing;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode; // node number of actuated node
@@ -1388,12 +1329,6 @@ namespace EnergyPlus::HVACControllers {
         }
     }
 
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
     void CalcSimpleController(EnergyPlusData &state,
                               int const ControlNum,
                               bool const FirstHVACIteration,
@@ -1431,36 +1366,15 @@ namespace EnergyPlus::HVACControllers {
         //                        mode.
         //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine needs a description.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
         using RootFinder::CheckRootFinderCandidate;
         using RootFinder::InitializeRootFinder;
 
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // Set to TRUE if current controller is converged; FALSE if more iteration are needed.
         // Note that an error in the root finding process can be mapped onto IsConvergedFlag=TRUE
         // to avoid continue iterating.
         // TRUE if air loop is up-to-date meaning that the current node values are consistent (air loop evaluated)
         // Only used within the Calc routines
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
@@ -1569,26 +1483,8 @@ namespace EnergyPlus::HVACControllers {
         // - Updates IsConvergedFlag depending ou iteration status.
         // - Sets next actuated value to try in ControllerProps(ControlNum)%NextActuatedValue
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
-
         using RootFinder::CheckRootFinderCandidate;
         using RootFinder::IterateRootFinder;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
@@ -1728,16 +1624,16 @@ namespace EnergyPlus::HVACControllers {
                                       ActionTypes(ControllerProps(ControlNum).Action));
                     ShowContinueError(state, "  Actuator will be set to maximum action");
                     ShowContinueError(state, "Controller control type=" + ControlVariableTypes(ControllerProps(ControlNum).ControlVar));
-                    if (ControllerProps(ControlNum).ControlVar == iTemperature) {
+                    if (ControllerProps(ControlNum).ControlVar == iCtrl::Temperature) {
                         ShowContinueError(state, format("Controller temperature setpoint = {:.2T} [C]", ControllerProps(ControlNum).SetPointValue));
                         ShowContinueError(state, format("Controller sensed temperature = {:.2T} [C]", ControllerProps(ControlNum).SensedValue));
-                    } else if (ControllerProps(ControlNum).ControlVar == iHumidityRatio) {
+                    } else if (ControllerProps(ControlNum).ControlVar == iCtrl::HumidityRatio) {
                         ShowContinueError(
                             state,
                             format("Controller humidity ratio setpoint = {:.2T} [kgWater/kgDryAir]", ControllerProps(ControlNum).SetPointValue));
                         ShowContinueError(
                             state, format("Controller sensed humidity ratio = {:.2T} [kgWater/kgDryAir]", ControllerProps(ControlNum).SensedValue));
-                    } else if (ControllerProps(ControlNum).ControlVar == iTemperatureAndHumidityRatio) {
+                    } else if (ControllerProps(ControlNum).ControlVar == iCtrl::TemperatureAndHumidityRatio) {
                         ShowContinueError(state, format("Controller temperature setpoint = {:.2T} [C]", ControllerProps(ControlNum).SetPointValue));
                         ShowContinueError(state, format("Controller sensed temperature = {:.2T} [C]", ControllerProps(ControlNum).SensedValue));
                         ShowContinueError(state,
@@ -1746,17 +1642,17 @@ namespace EnergyPlus::HVACControllers {
                         ShowContinueError(state,
                                           format("Controller sensed humidity ratio = {:.2T} [kgWater/kgDryAir]",
                                                  Node(ControllerProps(ControlNum).SensedNode).HumRat));
-                    } else if (ControllerProps(ControlNum).ControlVar == iFlow) {
+                    } else if (ControllerProps(ControlNum).ControlVar == iCtrl::Flow) {
                         ShowContinueError(state,
                                           format("Controller mass flow rate setpoint = {:.2T} [kg/s]", ControllerProps(ControlNum).SetPointValue));
                         ShowContinueError(state, format("Controller sensed mass flow rate = {:.2T} [kg/s]", ControllerProps(ControlNum).SensedValue));
                     } else {
                         // bad control variable input checked in input routine
                     }
-                    if (ControllerProps(ControlNum).ActuatorVar == iFlow) {
+                    if (ControllerProps(ControlNum).ActuatorVar == iCtrl::Flow) {
                         ShowContinueError(
                             state, format("Controller actuator mass flow rate set to {:.2T} [kg/s]", ControllerProps(ControlNum).MaxAvailActuated));
-                        if (ControllerProps(ControlNum).ControlVar == iTemperature) {
+                        if (ControllerProps(ControlNum).ControlVar == iCtrl::Temperature) {
                             ShowContinueError(
                                 state, format("Controller actuator temperature = {:.2T} [C]", Node(ControllerProps(ControlNum).ActuatedNode).Temp));
                             ShowContinueError(state, "  Note: Chilled water coils should be reverse action and the entering chilled");
@@ -1807,25 +1703,7 @@ namespace EnergyPlus::HVACControllers {
         // state.
         // PRECONDITION: Setpoint must be known. See ControllerProps%IsSetPointDefinedFlag
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // Using/Aliasing
-
         using RootFinder::CheckRootFinderConvergence;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
@@ -1942,32 +1820,8 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS FUNCTION:
         // Returns true if controller is min-constrained. false otherwise.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckMinActiveController;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         CheckMinActiveController = false;
 
@@ -2016,32 +1870,8 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS FUNCTION:
         // Returns true if controller is max-constrained. false otherwise.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool CheckMaxActiveController;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         CheckMaxActiveController = false;
 
@@ -2091,29 +1921,8 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS SUBROUTINE:
         // Updates solution trackers if simple controller is converged.
 
-        // METHODOLOGY EMPLOYED:
-
-        // REFERENCES:
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PreviousSolutionIndex;
-
-
 
         // Save solution and mode for next call only if converged
         if (IsConvergedFlag) {
@@ -2147,26 +1956,8 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine updates the actuated node with the next candidate value.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using PlantUtilities::SetActuatedBranchFlowRate;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
@@ -2179,7 +1970,7 @@ namespace EnergyPlus::HVACControllers {
         // Set the actuated node of the Controller
         {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).ActuatorVar);
-            if (SELECT_CASE_var == iFlow) { // 'Flow'
+            if (SELECT_CASE_var == iCtrl::Flow) { // 'Flow'
                 SetActuatedBranchFlowRate(state, ControllerProps(ControlNum).NextActuatedValue,
                                           ControllerProps(ControlNum).ActuatedNode,
                                           ControllerProps(ControlNum).ActuatedNodePlantLoopNum,
@@ -2194,16 +1985,13 @@ namespace EnergyPlus::HVACControllers {
         }
     }
 
-    //        End of Update subroutines for the Controller Module
-    // *****************************************************************************
-
     void CheckTempAndHumRatCtrl(EnergyPlusData &state, int const ControlNum, bool &IsConvergedFlag)
     {
 
         {
             auto &thisController(ControllerProps(ControlNum));
             if (IsConvergedFlag) {
-                if (thisController.ControlVar == iTemperatureAndHumidityRatio) {
+                if (thisController.ControlVar == iCtrl::TemperatureAndHumidityRatio) {
                     // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
                     if (!thisController.HumRatCtrlOverride) {
                         // For humidity control tolerance, always use 0.0001 which is roughly equivalent to a 0.015C change in dewpoint
@@ -2250,27 +2038,6 @@ namespace EnergyPlus::HVACControllers {
         // - IsConvergedFlag
         // - IsUpToDateFlag
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
-
         ControllerProps(ControlNum).NextActuatedValue = NextActuatedValue;
         ControllerProps(ControlNum).Mode = Mode;
         IsConvergedFlag = true;
@@ -2283,9 +2050,6 @@ namespace EnergyPlus::HVACControllers {
             IsUpToDateFlag = true;
         }
     }
-
-    // Beginning of Statistics subroutines for the Controller Module
-    // *****************************************************************************
 
     void TrackAirLoopControllers(EnergyPlusData &state,
         int const AirLoopNum, int const WarmRestartStatus, int const AirLoopIterMax, int const AirLoopIterTot, int const AirLoopNumCalls)
@@ -2302,18 +2066,8 @@ namespace EnergyPlus::HVACControllers {
         // Used to produce objective metrics when analyzing runtime performance
         // of HVAC controllers for different implementations.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         // See CONTROLLER_WARM_RESTART_<> parameters in DataHVACControllers.cc
@@ -2324,16 +2078,8 @@ namespace EnergyPlus::HVACControllers {
         // Aggregated number of iterations performed by controllers on this air loop (per call to SimAirLoop)
         // Number of times SimAirLoopComponents() has been invoked
 
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
-
-
 
         // If no controllers on this air loop then we have nothig to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
@@ -2385,36 +2131,14 @@ namespace EnergyPlus::HVACControllers {
         // Used to produce objective metrics when analyzing runtime performance
         // of HVAC controllers for different implementations.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // Corresponding index in ControllerProps array
         int ControlIndex;
         // Number of iterations needed to solve this controller
         int IterationCount;
         // Current operating mode
         int Mode;
-
-
 
         ControlIndex = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum);
 
@@ -2449,28 +2173,7 @@ namespace EnergyPlus::HVACControllers {
         // Writes runtime statistics for controllers on all air loops
         // to a CSV file named "statistics.HVACControllers.csv".
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-
 
         // Detect if statistics have been generated or not for this run
         if (!state.dataSysVars->TrackAirLoopEnvFlag) {
@@ -2502,26 +2205,7 @@ namespace EnergyPlus::HVACControllers {
         // Writes runtime statistics for controllers on the specified air loop
         // to the specified file.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using namespace DataAirSystems;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirLoopControlNum;
@@ -2532,8 +2216,6 @@ namespace EnergyPlus::HVACControllers {
         int MaxIterations;
         Real64 AvgIterations;
         int iModeNum;
-
-
 
         print(statisticsFile, "{},\n", ThisPrimaryAirSystem.Name);
 
@@ -2633,9 +2315,6 @@ namespace EnergyPlus::HVACControllers {
         }
     }
 
-    // Beginning of Tracing subroutines for the Controller Module
-    // *****************************************************************************
-
     void SetupAirLoopControllersTracer(EnergyPlusData &state, int const AirLoopNum)
     {
 
@@ -2649,10 +2328,6 @@ namespace EnergyPlus::HVACControllers {
         // Opens main trace file for controllers on specific air loop
         // and writes header row with titles.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
         // Open main controller trace file for each air loop
@@ -2716,31 +2391,12 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine writes diagnostic to the trace file attached to each air loop.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // TRUE when primary air system & controllers simulation has converged;
         // Number of times SimAirLoopComponents() has been invoked
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
-
-
 
         // IF no controllers on this air loop then we have nothing to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
@@ -2787,32 +2443,13 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS SUBROUTINE:
         // Writes current iteration time stamp to specified trace file.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using DataHVACGlobals::FirstTimeStepSysFlag;
         using General::LogicalToInteger;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         // TRUE when primary air system and controllers simulation has converged;
         // Number of times SimAirLoopComponents() has been invoked
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // na
 
         // Write step stamp to air loop trace file after reset
         // Note that we do not go to the next line
@@ -2845,26 +2482,6 @@ namespace EnergyPlus::HVACControllers {
         // This subroutine writes convergence diagnostic to the air loop trace file
         // for the specified controller index.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
         int SensedNode;
@@ -2895,25 +2512,7 @@ namespace EnergyPlus::HVACControllers {
         // Opens individual controller trace file for the specified controller
         // and writes header row.
 
-        // METHODOLOGY EMPLOYED:
-        // Needs description, as appropriate.
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using RootFinder::WriteRootFinderTraceHeader;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         const auto TraceFileName = "controller." + ControllerProps(ControlNum).ControllerName + ".csv";
         auto &TraceFile = *ControllerProps(ControlNum).TraceFile;
@@ -2957,28 +2556,8 @@ namespace EnergyPlus::HVACControllers {
         // This subroutine writes convergence diagnostic to the trace file for the specified
         // controller.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::LogicalToInteger;
-
         using RootFinder::WriteRootFinderTrace;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
@@ -3125,29 +2704,11 @@ namespace EnergyPlus::HVACControllers {
         // This function creates a string describing the current time stamp of the system
         // time step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using General::CreateTimeString;
         using General::GetCurrentHVACTime;
 
         // Return value
         std::string OutputString;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         std::string Buffer;
@@ -3173,29 +2734,8 @@ namespace EnergyPlus::HVACControllers {
         // time stamp for the system time step.
         // It is used in error messages only.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         // Return value
         std::string OutputString;
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
 
         OutputString = state.dataEnvrn->EnvironmentName + ", " + MakeHVACTimeIntervalString(state);
 
@@ -3215,38 +2755,16 @@ namespace EnergyPlus::HVACControllers {
         // This function creates a string describing the current time interval of the system
         // time step.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using General::CreateHVACTimeIntervalString;
 
         // Return value
         std::string OutputString;
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         OutputString = stripped(CreateHVACTimeIntervalString(state));
 
         return OutputString;
     }
-
-    //        End of Tracing subroutines for the Controller Module
 
     void CheckControllerListOrder(EnergyPlusData &state)
     {
@@ -3361,26 +2879,6 @@ namespace EnergyPlus::HVACControllers {
         // PURPOSE OF THIS FUNCTION:
         // This subroutine checks that the water inlet node number is matched by
         // the actuator node number of some water coil
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ControlNum;

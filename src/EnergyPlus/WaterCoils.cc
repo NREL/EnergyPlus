@@ -6015,9 +6015,9 @@ namespace WaterCoils {
     }
 
     void CheckForSensorAndSetPointNode(EnergyPlusData &state,
-                                       int const SensorNodeNum, // controller sensor node number
-                                       int const ControlledVar, // controlled variable type
-                                       bool &NodeNotFound       // true if matching air outlet node not found
+                                       int const SensorNodeNum,                     // controller sensor node number
+                                       HVACControllers::iCtrl const &ControlledVar, // controlled variable type
+                                       bool &NodeNotFound                           // true if matching air outlet node not found
     )
     {
 
@@ -6031,33 +6031,13 @@ namespace WaterCoils {
         // This subroutine checks that the sensor node number matches the air outlet node number
         // of some water coils
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using SetPointManager::iCtrlVarType;
         using SetPointManager::NodeHasSPMCtrlVarType;
 
-        // USE HVACControllers,     ONLY: iTemperature, iHumidityRatio, iTemperatureAndHumidityRatio
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("CheckForSensorAndSetpointNode: ");
-        int const iTemperature(1);
-        int const iHumidityRatio(2);
-        int const iTemperatureAndHumidityRatio(3);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;             // water coil index
@@ -6094,7 +6074,7 @@ namespace WaterCoils {
                 EMSSetPointErrorFlag = false;
                 {
                     auto const SELECT_CASE_var(ControlledVar);
-                    if (SELECT_CASE_var == iTemperature) {
+                    if (SELECT_CASE_var == HVACControllers::iCtrl::Temperature) {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
@@ -6106,7 +6086,7 @@ namespace WaterCoils {
                                 ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
-                    } else if (SELECT_CASE_var == iHumidityRatio) {
+                    } else if (SELECT_CASE_var == HVACControllers::iCtrl::HumidityRatio) {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
@@ -6118,7 +6098,7 @@ namespace WaterCoils {
                                 ShowContinueError(state, " ..Specify the setpoint and the sensor on the coil air outlet node when possible.");
                             }
                         }
-                    } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
+                    } else if (SELECT_CASE_var == HVACControllers::iCtrl::TemperatureAndHumidityRatio) {
                         CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, EMSManager::SPControlType::iTemperatureSetPoint, EMSSetPointErrorFlag);
                         DataLoopNode::NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
