@@ -65,11 +65,11 @@ namespace DataLoopNode {
     // Data
     // MODULE PARAMETER DEFINITIONS:
       
-    constexpr int NodeType_Unknown(0);  // 'blank'
-    constexpr int NodeType_Air(1);      // 'Air'
-    constexpr int NodeType_Water(2);     // 'Water'
-    constexpr int NodeType_Steam(3);     // 'Steam'
-    constexpr int NodeType_Electric(4);   // 'Electric'
+    constexpr int NodeType_Unknown(0);        // 'blank'
+    constexpr int NodeType_Air(1);            // 'Air'
+    constexpr int NodeType_Water(2);          // 'Water'
+    constexpr int NodeType_Steam(3);          // 'Steam'
+    constexpr int NodeType_Electric(4);       // 'Electric'
     
     constexpr int NumValidConnectionTypes(15);
 
@@ -97,7 +97,7 @@ namespace DataLoopNode {
     constexpr bool ObjectIsNotParent(false);
     constexpr bool IncrementFluidStreamYes(true);
 
-    constexpr const char *ValidNodeFluidTypes(int const intNodeType) // Valid Fluid Types for Nodes
+    constexpr const char *ValidNodeFluidTypes(int const intNodeType)        // Valid Fluid Types for Nodes
     {
         switch (intNodeType) {
         case NodeType_Unknown:
@@ -120,7 +120,7 @@ namespace DataLoopNode {
         }
     }
 
-    constexpr const char *ValidConnectionTypes(int const intNodeConnectionType) // Valid Connection Types for Nodes
+    constexpr const char *ValidConnectionTypes(int const intNodeConnectionType)     // Valid Connection Types for Nodes
     {
 
         switch (intNodeConnectionType) {
@@ -178,31 +178,31 @@ namespace DataLoopNode {
     struct NodeData
     {
         // Members
-        int FluidType;               // must be one of the valid parameters
-        int FluidIndex;              // For Fluid Properties
-        Real64 Temp;                 // {C}
-        Real64 TempMin;              // {C}
-        Real64 TempMax;              // {C}
-        Real64 TempSetPoint;         // {C}
-        Real64 TempLastTimestep;     // [C}
-        Real64 MassFlowRateRequest;  // {kg/s}
-        Real64 MassFlowRate;         // {kg/s}
-        Real64 MassFlowRateMin;      // {kg/s}
-        Real64 MassFlowRateMax;      // {kg/s}
-        Real64 MassFlowRateMinAvail; // {kg/s}
-        Real64 MassFlowRateMaxAvail; // {kg/s}
-        Real64 MassFlowRateSetPoint; // {kg/s}
-        Real64 Quality;              // {0.0-1.0 vapor fraction/percent}
-        Real64 Press;                // {Pa}
-        Real64 Enthalpy;             // {J/kg}
-        Real64 EnthalpyLastTimestep; // {J/kg}
-        Real64 HumRat;               // {}
-        Real64 HumRatMin;            // {}
-        Real64 HumRatMax;            // {}
-        Real64 HumRatSetPoint;       // {}
-        Real64 TempSetPointHi;       // {C}
-        Real64 TempSetPointLo;       // {C}
-        Real64 Height;               // {m}
+        int FluidType;                      // must be one of the valid parameters
+        int FluidIndex;                     // For Fluid Properties
+        Real64 Temp;                        // {C}
+        Real64 TempMin;                     // {C}
+        Real64 TempMax;                     // {C}
+        Real64 TempSetPoint;                // {C}
+        Real64 TempLastTimestep;            // [C}
+        Real64 MassFlowRateRequest;         // {kg/s}
+        Real64 MassFlowRate;                // {kg/s}
+        Real64 MassFlowRateMin;             // {kg/s}
+        Real64 MassFlowRateMax;             // {kg/s}
+        Real64 MassFlowRateMinAvail;        // {kg/s}
+        Real64 MassFlowRateMaxAvail;        // {kg/s}
+        Real64 MassFlowRateSetPoint;        // {kg/s}
+        Real64 Quality;                     // {0.0-1.0 vapor fraction/percent}
+        Real64 Press;                       // {Pa}
+        Real64 Enthalpy;                    // {J/kg}
+        Real64 EnthalpyLastTimestep;        // {J/kg}
+        Real64 HumRat;                      // {}
+        Real64 HumRatMin;                   // {}
+        Real64 HumRatMax;                   // {}
+        Real64 HumRatSetPoint;              // {}
+        Real64 TempSetPointHi;              // {C}
+        Real64 TempSetPointLo;              // {C}
+        Real64 Height;                      // {m}
 
         //  Following are for Outdoor Air Nodes Scheduled Properties
         bool IsLocalNode;
@@ -212,24 +212,24 @@ namespace DataLoopNode {
         int OutAirWindDirSchedNum;
 
         //  Following are for Outdoor Air Nodes "read only"
-        Real64 OutAirDryBulb;              // {C}
-        bool EMSOverrideOutAirDryBulb;     // if true, the EMS is calling to override outdoor air node drybulb setting
-        Real64 EMSValueForOutAirDryBulb;   // value EMS is directing to use for outdoor air node's drybulb {C}
-        Real64 OutAirWetBulb;              // {C}
-        bool EMSOverrideOutAirWetBulb;     // if true, the EMS is calling to override outdoor air node wetbulb setting
-        Real64 EMSValueForOutAirWetBulb;   // value EMS is directing to use for outdoor air node's wetbulb {C}
-        Real64 OutAirWindSpeed;            // {m/s}
-        bool EMSOverrideOutAirWindSpeed;   // if true, the EMS is calling to override outdoor air node wind speed setting
-        Real64 EMSValueForOutAirWindSpeed; // value EMS is directing to use for outdoor air node's drybulb {m/s}
-        Real64 OutAirWindDir;              // {degree}
-        bool EMSOverrideOutAirWindDir;     // if true, the EMS is calling to override outdoor air node wind direction setting
-        Real64 EMSValueForOutAirWindDir;   // value EMS is directing to use for outdoor air node's wind directio {degree}
+        Real64 OutAirDryBulb;                   // {C}
+        bool EMSOverrideOutAirDryBulb;          // if true, the EMS is calling to override outdoor air node drybulb setting
+        Real64 EMSValueForOutAirDryBulb;        // value EMS is directing to use for outdoor air node's drybulb {C}
+        Real64 OutAirWetBulb;                   // {C}
+        bool EMSOverrideOutAirWetBulb;          // if true, the EMS is calling to override outdoor air node wetbulb setting
+        Real64 EMSValueForOutAirWetBulb;        // value EMS is directing to use for outdoor air node's wetbulb {C}
+        Real64 OutAirWindSpeed;                 // {m/s}
+        bool EMSOverrideOutAirWindSpeed;        // if true, the EMS is calling to override outdoor air node wind speed setting
+        Real64 EMSValueForOutAirWindSpeed;      // value EMS is directing to use for outdoor air node's drybulb {m/s}
+        Real64 OutAirWindDir;                   // {degree}
+        bool EMSOverrideOutAirWindDir;          // if true, the EMS is calling to override outdoor air node wind direction setting
+        Real64 EMSValueForOutAirWindDir;        // value EMS is directing to use for outdoor air node's wind directio {degree}
         // Contaminant
-        Real64 CO2;                // {ppm}
-        Real64 CO2SetPoint;        // {ppm}
-        Real64 GenContam;          // {ppm}
-        Real64 GenContamSetPoint;  // {ppm}
-        bool SPMNodeWetBulbRepReq; // Set to true when node has SPM which follows wetbulb
+        Real64 CO2;                             // {ppm}
+        Real64 CO2SetPoint;                     // {ppm}
+        Real64 GenContam;                       // {ppm}
+        Real64 GenContamSetPoint;               // {ppm}
+        bool SPMNodeWetBulbRepReq;              // Set to true when node has SPM which follows wetbulb
 
         // error message flag
         bool plantNodeErrorMsgIssued;
@@ -250,31 +250,31 @@ namespace DataLoopNode {
         }
 
         // Member Constructor
-        NodeData(int const FluidType,               // must be one of the valid parameters
-                 int const FluidIndex,              // For Fluid Properties
-                 Real64 const Temp,                 // {C}
-                 Real64 const TempMin,              // {C}
-                 Real64 const TempMax,              // {C}
-                 Real64 const TempSetPoint,         // {C}
-                 Real64 const TempLastTimestep,     // [C}
-                 Real64 const MassFlowRateRequest,  // {kg/s}
-                 Real64 const MassFlowRate,         // {kg/s}
-                 Real64 const MassFlowRateMin,      // {kg/s}
-                 Real64 const MassFlowRateMax,      // {kg/s}
-                 Real64 const MassFlowRateMinAvail, // {kg/s}
-                 Real64 const MassFlowRateMaxAvail, // {kg/s}
-                 Real64 const MassFlowRateSetPoint, // {kg/s}
-                 Real64 const Quality,              // {0.0-1.0 vapor fraction/percent}
-                 Real64 const Press,                // {Pa}
-                 Real64 const Enthalpy,             // {J/kg}
-                 Real64 const EnthalpyLastTimestep, // {J/kg}
-                 Real64 const HumRat,               // {}
-                 Real64 const HumRatMin,            // {}
-                 Real64 const HumRatMax,            // {}
-                 Real64 const HumRatSetPoint,       // {}
-                 Real64 const TempSetPointHi,       // {C}
-                 Real64 const TempSetPointLo,       // {C}
-                 Real64 const Height,               // {m}
+        NodeData(int const FluidType,                     // must be one of the valid parameters
+                 int const FluidIndex,                    // For Fluid Properties
+                 Real64 const Temp,                       // {C}
+                 Real64 const TempMin,                    // {C}
+                 Real64 const TempMax,                    // {C}
+                 Real64 const TempSetPoint,               // {C}
+                 Real64 const TempLastTimestep,           // [C}
+                 Real64 const MassFlowRateRequest,        // {kg/s}
+                 Real64 const MassFlowRate,               // {kg/s}
+                 Real64 const MassFlowRateMin,            // {kg/s}
+                 Real64 const MassFlowRateMax,            // {kg/s}
+                 Real64 const MassFlowRateMinAvail,       // {kg/s}
+                 Real64 const MassFlowRateMaxAvail,       // {kg/s}
+                 Real64 const MassFlowRateSetPoint,       // {kg/s}
+                 Real64 const Quality,                    // {0.0-1.0 vapor fraction/percent}
+                 Real64 const Press,                      // {Pa}
+                 Real64 const Enthalpy,                   // {J/kg}
+                 Real64 const EnthalpyLastTimestep,       // {J/kg}
+                 Real64 const HumRat,                     // {}
+                 Real64 const HumRatMin,                  // {}
+                 Real64 const HumRatMax,                  // {}
+                 Real64 const HumRatSetPoint,             // {}
+                 Real64 const TempSetPointHi,             // {C}
+                 Real64 const TempSetPointLo,             // {C}
+                 Real64 const Height,                     // {m}
                  bool const IsLocalNode,
                  int const OutAirDryBulbSchedNum,         // schedule value in {C}
                  int const OutAirWetBulbSchedNum,         // schedule value in {C}
@@ -296,7 +296,7 @@ namespace DataLoopNode {
                  Real64 const CO2SetPoint,                // {ppm}
                  Real64 const GenContam,                  // {ppm}
                  Real64 const GenContamSetPoint,          // {ppm}
-                 bool const SPMNodeWetBulbRepReq,          // Set to true when node has SPM which follows wetbulb
+                 bool const SPMNodeWetBulbRepReq,         // Set to true when node has SPM which follows wetbulb
                  bool const plantNodeErrorMsgIssued
                  )
             : FluidType(FluidType), FluidIndex(FluidIndex), Temp(Temp), TempMin(TempMin), TempMax(TempMax), TempSetPoint(TempSetPoint),
