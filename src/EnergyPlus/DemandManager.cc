@@ -96,6 +96,13 @@ namespace EnergyPlus::DemandManager {
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ListNum;
+        static bool firstTime;      // Flag to allow Demand Manager List to simulate at least once
+        static bool ResimExt;       // Flag to resimulate the exterior energy use simulation
+        static bool ResimHB;        // Flag to resimulate the heat balance simulation (including HVAC)
+        static bool ResimHVAC;      // Flag to resimulate the HVAC simulation
+        static bool BeginDemandSim; // TRUE in the first timestep after warmup of a new environment
+        static bool ClearHistory;   // TRUE in the first timestep during warmup of a new environment
+
 
         if (state.dataDemandManager->GetInput && !state.dataGlobal->DoingSizing) {
             GetDemandManagerInput(state);
@@ -106,8 +113,8 @@ namespace EnergyPlus::DemandManager {
         if (state.dataDemandManager->NumDemandManagerList > 0) {
 
             if (state.dataGlobal->WarmupFlag) {
-                state.dataDemandManager->BeginDemandSim = true;
-                if (state.dataDemandManager->ClearHistory) {
+                BeginDemandSim = true;
+                if (ClearHistory) {
                     // Clear historical variables
                     for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
                         state.dataDemandManager->DemandManagerList(ListNum).History = 0.0;
@@ -129,31 +136,37 @@ namespace EnergyPlus::DemandManager {
                         e.RotatedLoadNum = 0;
                     }
                 }
-                state.dataDemandManager->ClearHistory = false;
+                ClearHistory = false;
             }
 
             if (!state.dataGlobal->WarmupFlag && !state.dataGlobal->DoingSizing) {
 
-                if (state.dataDemandManager->BeginDemandSim) {
-                    state.dataDemandManager->BeginDemandSim = false;
-                    state.dataDemandManager->ClearHistory = true;
+                if (BeginDemandSim) {
+                    BeginDemandSim = false;
+                    ClearHistory = true;
                 }
 
                 state.dataDemandManager->DemandManagerExtIterations = 0;
                 state.dataDemandManager->DemandManagerHBIterations = 0;
                 state.dataDemandManager->DemandManagerHVACIterations = 0;
 
-                while (state.dataDemandManager->firstTime || state.dataDemandManager->ResimExt || state.dataDemandManager->ResimHB || state.dataDemandManager->ResimHVAC) {
-                    state.dataDemandManager->firstTime = false;
+                firstTime = true;
+                ResimExt = false;
+                ResimHB = false;
+                ResimHVAC = false;
 
-                    Resimulate(state, state.dataDemandManager->ResimExt, state.dataDemandManager->ResimHB, state.dataDemandManager->ResimHVAC);
-                    state.dataDemandManager->ResimExt = false;
-                    state.dataDemandManager->ResimHB = false;
-                    state.dataDemandManager->ResimHVAC = false;
+                while (firstTime || ResimExt || ResimHB || ResimHVAC) {
+                    firstTime = false;
+
+                    Resimulate(state, ResimExt, ResimHB, ResimHVAC);
+                    ResimExt = false;
+                    ResimHB = false;
+                    ResimHVAC = false;
 
                     SurveyDemandManagers(state); // Determines which Demand Managers can reduce demand
 
                     for (ListNum = 1; ListNum <= state.dataDemandManager->NumDemandManagerList; ++ListNum) {
+                        SimulateDemandManagerList(state, ListNum, ResimExt, ResimHB, ResimHVAC);
                     } // ListNum
 
                     ActivateDemandManagers(state); // Sets limits on loads
@@ -199,6 +212,7 @@ namespace EnergyPlus::DemandManager {
 
         auto & DemandManagerList(state.dataDemandManager->DemandManagerList);
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
+
 
         DemandManagerList(ListNum).ScheduledLimit = GetCurrentScheduleValue(state, DemandManagerList(ListNum).LimitSchedule);
         DemandManagerList(ListNum).DemandLimit = DemandManagerList(ListNum).ScheduledLimit * DemandManagerList(ListNum).SafetyFraction;
@@ -314,7 +328,7 @@ namespace EnergyPlus::DemandManager {
         Array1D_string AlphArray; // Character string data
         Array1D<Real64> NumArray; // Numeric data
         std::string Units;        // String for meter units
-        bool ErrorsFound(false);
+        static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
 
 
@@ -577,10 +591,11 @@ namespace EnergyPlus::DemandManager {
         int IOStat;               // IO Status when calling get input subroutine
         Array1D_string AlphArray; // Character string data
         Array1D<Real64> NumArray; // Numeric data
-        bool ErrorsFound(false);
+        static bool ErrorsFound(false);
         std::string CurrentModuleObject; // for ease in renaming.
         int Item;
         int Item1;
+
 
         MaxAlphas = 0;
         MaxNums = 0;
@@ -1349,6 +1364,12 @@ namespace EnergyPlus::DemandManager {
         //       MODIFIED       na
         //       RE-ENGINEERED  na
 
+        // PURPOSE OF THIS SUBROUTINE:
+
+        // METHODOLOGY EMPLOYED:
+
+        // USE STATEMENTS:
+
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int MgrNum;
@@ -1358,6 +1379,7 @@ namespace EnergyPlus::DemandManager {
         bool CanReduceDemand;
 
         auto & DemandMgr(state.dataDemandManager->DemandMgr);
+
 
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
@@ -1458,11 +1480,15 @@ namespace EnergyPlus::DemandManager {
         for (MgrNum = 1; MgrNum <= state.dataDemandManager->NumDemandMgr; ++MgrNum) {
 
             // Check availability
+            //    IF (DemandMgr(MgrNum)%AvailSchedule .EQ. 0) THEN
+            //      Available = .TRUE.  ! No schedule defaults to available
+            //    ELSE
             if (GetCurrentScheduleValue(state, DemandMgr(MgrNum).AvailSchedule) > 0.0) {
                 Available = true;
             } else {
                 Available = false;
             }
+            //    END IF
 
             DemandMgr(MgrNum).Available = Available;
 
@@ -1567,8 +1593,14 @@ namespace EnergyPlus::DemandManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates report variables.
 
+        // METHODOLOGY EMPLOYED:
+        // Standard EnergyPlus methodology.
+
         // Using/Aliasing
         using ScheduleManager::GetCurrentScheduleValue;
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 BillingPeriod;
