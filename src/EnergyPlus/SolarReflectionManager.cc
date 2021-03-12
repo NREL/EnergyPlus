@@ -823,19 +823,6 @@ namespace SolarReflectionManager {
         // METHODOLOGY EMPLOYED:
         // call worker routine as appropriate
 
-        // REFERENCES: na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS: na
-        // INTERFACE BLOCK SPECIFICATIONS: na
-        // DERIVED TYPE DEFINITIONS: na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int IHr(0); // Hour number
-
-
         if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginSimFlag) {
                 DisplayString(state, "Calculating Beam-to-Beam Exterior Solar Reflection Factors");
@@ -844,9 +831,10 @@ namespace SolarReflectionManager {
             }
             state.dataSurface->ReflFacBmToBmSolObs = 0.0;
             state.dataSurface->CosIncAveBmToBmSolObs = 0.0;
-            for (IHr = 1; IHr <= 24; ++IHr) {
-                FigureBeamSolSpecularReflFactors(state, IHr);
-            }    // End of IHr loop
+            for (state.dataSolarReflectionManager->NumHr = 1; state.dataSolarReflectionManager->NumHr <= 24;
+                 ++state.dataSolarReflectionManager->NumHr) {
+                FigureBeamSolSpecularReflFactors(state, state.dataSolarReflectionManager->NumHr);
+            }    // End of NumHr loop
         } else { // timestep integrated solar, use current hour of day
             state.dataSurface->ReflFacBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
             state.dataSurface->CosIncAveBmToBmSolObs(state.dataGlobal->HourOfDay, {1, state.dataSurface->TotSurfaces}) = 0.0;
@@ -882,43 +870,20 @@ namespace SolarReflectionManager {
         using General::POLYF;
 
         // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Vector3<Real64> SunVec(0.0);            // Unit vector to sun
-        static Vector3<Real64> SunVecMir(0.0);         // Unit vector to sun mirrored by a reflecting surface
-        static Vector3<Real64> RecPt(0.0);             // Receiving point (m)
-        static Vector3<Real64> HitPtRefl(0.0);         // Hit point on a reflecting surface (m)
         Array1D<Real64> ReflBmToDiffSolObs(state.dataSurface->MaxRecPts); // Irradiance at a receiving point for
         // beam solar diffusely reflected from obstructions, divided by
         // beam normal irradiance
         // unused  INTEGER           :: RayNum               =0   ! Ray number
         bool hitRefl;                                // True iff reflecting surface is hit
         bool hitObs;                                 // True iff obstruction is hit
-        static Vector3<Real64> HitPtObs(0.0);        // Hit point on obstruction (m)
         bool hitObsRefl;                             // True iff obstruction hit between rec. pt. and reflection point
-        static Vector3<Real64> ReflNorm(0.0);        // Unit normal to reflecting surface
         Array1D<Real64> ReflBmToBmSolObs(state.dataSurface->MaxRecPts); // Irradiance at a receiving point for
         // beam solar specularly reflected from obstructions, divided by
         // beam normal irradiance
         Real64 ReflDistanceSq;                            // Distance squared from receiving point to hit point on a reflecting surface (m)
         Real64 ReflDistance;                              // Distance from receiving point to hit point on a reflecting surface (m)
-        static Real64 SpecReflectance(0.0);               // Specular reflectance of a reflecting surface
-        static int ConstrNumRefl(0);                      // Construction number of a reflecting surface
-        static Real64 CosIncAngRefl(0.0);                 // Cosine of incidence angle of beam on reflecting surface
-        static Real64 CosIncAngRec(0.0);                  // Angle of incidence of reflected beam on receiving surface
-        static Real64 ReflFac(0.0);                       // Contribution to specular reflection factor
         Array1D<Real64> ReflFacTimesCosIncSum(state.dataSurface->MaxRecPts); // Sum of ReflFac times CosIncAngRefl
-        static Real64 CosIncWeighted(0.0);                // Cosine of incidence angle on receiving surf weighted by reflection factor
 
         ReflBmToDiffSolObs = 0.0;
         ReflFacTimesCosIncSum = 0.0;
@@ -926,7 +891,7 @@ namespace SolarReflectionManager {
         if (state.dataSurface->SUNCOSHR(iHour, 3) < DataEnvironment::SunIsUpValue) return; // Skip if sun is below horizon
 
         // Unit vector to sun
-        SunVec = state.dataSurface->SUNCOSHR(iHour, {1, 3});
+        state.dataSolarReflectionManager->SunVec = state.dataSurface->SUNCOSHR(iHour, {1, 3});
 
         for (int RecSurfNum = 1; RecSurfNum <= state.dataSolarReflectionManager->TotSolReflRecSurf; ++RecSurfNum) {
             int const SurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).SurfNum; // Heat transfer surface number corresponding to RecSurfNum
@@ -943,30 +908,48 @@ namespace SolarReflectionManager {
                         // Skip if window and not sunlit
                         if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window && state.dataHeatBal->SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
                         // Check if sun is in front of this reflecting surface.
-                        ReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;
-                        CosIncAngRefl = dot(SunVec, ReflNorm);
-                        if (CosIncAngRefl < 0.0) continue;
+                        state.dataSolarReflectionManager->ReflNorm = state.dataSurface->Surface(ReflSurfNum).OutNormVec;
+                        state.dataSolarReflectionManager->CosIncAngRefl =
+                            dot(state.dataSolarReflectionManager->SunVec, state.dataSolarReflectionManager->ReflNorm);
+                        if (state.dataSolarReflectionManager->CosIncAngRefl < 0.0) continue;
 
                         // Get sun position unit vector for mirror image of sun in reflecting surface
-                        SunVecMir = SunVec - 2.0 * dot(SunVec, ReflNorm) * ReflNorm;
+                        state.dataSolarReflectionManager->SunVecMir =
+                            state.dataSolarReflectionManager->SunVec -
+                            2.0 * dot(state.dataSolarReflectionManager->SunVec, state.dataSolarReflectionManager->ReflNorm) *
+                                state.dataSolarReflectionManager->ReflNorm;
                         // Angle of incidence of reflected beam on receiving surface
-                        CosIncAngRec = dot(state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec, SunVecMir);
-                        if (CosIncAngRec <= 0.0) continue;
+                        state.dataSolarReflectionManager->CosIncAngRec =
+                            dot(state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec, state.dataSolarReflectionManager->SunVecMir);
+                        if (state.dataSolarReflectionManager->CosIncAngRec <= 0.0) continue;
                         for (int RecPtNum = 1; RecPtNum <= NumRecPts; ++RecPtNum) {
                             // See if ray from receiving point to mirrored sun hits the reflecting surface
-                            RecPt = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt(RecPtNum);
-                            PierceSurface(state, ReflSurfNum, RecPt, SunVecMir, HitPtRefl, hitRefl);
+                            state.dataSolarReflectionManager->RecPt = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).RecPt(RecPtNum);
+                            PierceSurface(state,
+                                          ReflSurfNum,
+                                          state.dataSolarReflectionManager->RecPt,
+                                          state.dataSolarReflectionManager->SunVecMir,
+                                          state.dataSolarReflectionManager->HitPtRefl,
+                                          hitRefl);
                             if (hitRefl) { // Reflecting surface was hit
-                                ReflDistanceSq = distance_squared(HitPtRefl, RecPt);
+                                ReflDistanceSq =
+                                    distance_squared(state.dataSolarReflectionManager->HitPtRefl, state.dataSolarReflectionManager->RecPt);
                                 ReflDistance = std::sqrt(ReflDistanceSq);
                                 // Determine if ray from receiving point to hit point is obstructed
                                 hitObsRefl = false;
                                 for (int loop2 = 1, loop2_end = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NumPossibleObs; loop2 <= loop2_end; ++loop2) {
                                     int const ObsSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop2);
                                     if (ObsSurfNum == ReflSurfNum || ObsSurfNum == state.dataSurface->Surface(ReflSurfNum).BaseSurf) continue;
-                                    PierceSurface(state, ObsSurfNum, RecPt, SunVecMir, ReflDistance, HitPtObs, hitObs); // ReflDistance cutoff added
+                                    PierceSurface(state,
+                                                  ObsSurfNum,
+                                                  state.dataSolarReflectionManager->RecPt,
+                                                  state.dataSolarReflectionManager->SunVecMir,
+                                                  ReflDistance,
+                                                  state.dataSolarReflectionManager->HitPtObs,
+                                                  hitObs); // ReflDistance cutoff added
                                     if (hitObs) { // => Could skip distance check (unless < vs <= ReflDistance really matters)
-                                        if (distance_squared(HitPtObs, RecPt) < ReflDistanceSq) {
+                                        if (distance_squared(state.dataSolarReflectionManager->HitPtObs, state.dataSolarReflectionManager->RecPt) <
+                                            ReflDistanceSq) {
                                             hitObsRefl = true;
                                             break;
                                         }
@@ -985,7 +968,12 @@ namespace SolarReflectionManager {
                                         // Loop over possible obstructions for this window
                                         for (int loop2 = 1, loop2_end = state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).NumPossibleObs; loop2 <= loop2_end; ++loop2) {
                                             int const ObsSurfNum = state.dataSolarReflectionManager->SolReflRecSurf(ReflSurfRecNum).PossibleObsSurfNums(loop2);
-                                            PierceSurface(state, ObsSurfNum, HitPtRefl, SunVec, HitPtObs, hitObs);
+                                            PierceSurface(state,
+                                                          ObsSurfNum,
+                                                          state.dataSolarReflectionManager->HitPtRefl,
+                                                          state.dataSolarReflectionManager->SunVec,
+                                                          state.dataSolarReflectionManager->HitPtObs,
+                                                          hitObs);
                                             if (hitObs) break;
                                         }
                                     }
@@ -1001,7 +989,12 @@ namespace SolarReflectionManager {
                                             if (ObsSurfNum == ReflSurfNum - 1) continue;
                                         }
 
-                                        PierceSurface(state, ObsSurfNum, HitPtRefl, SunVec, HitPtObs, hitObs);
+                                        PierceSurface(state,
+                                                      ObsSurfNum,
+                                                      state.dataSolarReflectionManager->HitPtRefl,
+                                                      state.dataSolarReflectionManager->SunVec,
+                                                      state.dataSolarReflectionManager->HitPtObs,
+                                                      hitObs);
                                         if (hitObs) break;
                                     }
                                 }
@@ -1009,22 +1002,31 @@ namespace SolarReflectionManager {
                                 if (hitObs) continue; // Obstruction hit between reflection hit point and sun; go to next receiving pt.
 
                                 // No obstructions. Calculate reflected beam irradiance at receiving pt. from this reflecting surface.
-                                SpecReflectance = 0.0;
+                                state.dataSolarReflectionManager->SpecReflectance = 0.0;
                                 if (state.dataSurface->Surface(ReflSurfNum).Class == SurfaceClass::Window) {
-                                    ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).Construction;
-                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    state.dataSolarReflectionManager->ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).Construction;
+                                    state.dataSolarReflectionManager->SpecReflectance =
+                                        POLYF(std::abs(state.dataSolarReflectionManager->CosIncAngRefl),
+                                        state.dataConstruction->Construct(state.dataSolarReflectionManager->ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (state.dataSurface->Surface(ReflSurfNum).ShadowingSurf && state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0) {
-                                    ConstrNumRefl = state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingConstruct;
-                                    SpecReflectance = state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingFrac *
-                                                      POLYF(std::abs(CosIncAngRefl), state.dataConstruction->Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    state.dataSolarReflectionManager->ConstrNumRefl =
+                                        state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingConstruct;
+                                    state.dataSolarReflectionManager->SpecReflectance =
+                                        state.dataSurface->Surface(ReflSurfNum).ShadowSurfGlazingFrac *
+                                        POLYF(std::abs(state.dataSolarReflectionManager->CosIncAngRefl),
+                                            state.dataConstruction->Construct(state.dataSolarReflectionManager->ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 // Angle of incidence of reflected beam on receiving surface
-                                CosIncAngRec = dot(state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec, SunVecMir);
-                                ReflFac = SpecReflectance * CosIncAngRec;
+                                state.dataSolarReflectionManager->CosIncAngRec =
+                                    dot(state.dataSolarReflectionManager->SolReflRecSurf(RecSurfNum).NormVec,
+                                        state.dataSolarReflectionManager->SunVecMir);
+                                state.dataSolarReflectionManager->ReflFac =
+                                    state.dataSolarReflectionManager->SpecReflectance * state.dataSolarReflectionManager->CosIncAngRec;
                                 // Contribution to specular reflection factor
-                                ReflBmToBmSolObs(RecPtNum) += ReflFac;
-                                ReflFacTimesCosIncSum(RecPtNum) += ReflFac * CosIncAngRec;
+                                ReflBmToBmSolObs(RecPtNum) += state.dataSolarReflectionManager->ReflFac;
+                                ReflFacTimesCosIncSum(RecPtNum) +=
+                                    state.dataSolarReflectionManager->ReflFac * state.dataSolarReflectionManager->CosIncAngRec;
                             } // End of check if reflecting surface was hit
                         }     // End of loop over receiving points
                     }         // End of check if valid reflecting surface
@@ -1033,11 +1035,11 @@ namespace SolarReflectionManager {
 
                 for (int RecPtNum = 1; RecPtNum <= NumRecPts; ++RecPtNum) {
                     if (ReflBmToBmSolObs(RecPtNum) != 0.0) {
-                        CosIncWeighted = ReflFacTimesCosIncSum(RecPtNum) / ReflBmToBmSolObs(RecPtNum);
+                        state.dataSolarReflectionManager->CosIncWeighted = ReflFacTimesCosIncSum(RecPtNum) / ReflBmToBmSolObs(RecPtNum);
                     } else {
-                        CosIncWeighted = 0.0;
+                        state.dataSolarReflectionManager->CosIncWeighted = 0.0;
                     }
-                    state.dataSurface->CosIncAveBmToBmSolObs(iHour, SurfNum) += CosIncWeighted;
+                    state.dataSurface->CosIncAveBmToBmSolObs(iHour, SurfNum) += state.dataSolarReflectionManager->CosIncWeighted;
                     state.dataSurface->ReflFacBmToBmSolObs(iHour, SurfNum) += ReflBmToBmSolObs(RecPtNum);
                 }
                 state.dataSurface->ReflFacBmToBmSolObs(iHour, SurfNum) /= double(NumRecPts);

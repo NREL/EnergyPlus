@@ -144,6 +144,19 @@ struct SolarReflectionManagerData : BaseGlobalStruct {
     Real64 BmReflSolRadiance = 0.0;      // Solar radiance at hit point due to incident beam, divided by beam normal irradiance
     Real64 dReflBeamToDiffSol = 0.0;     // Contribution to reflection factor at a receiving point from beam solar reflected from a hit point
     Real64 SunLitFract = 0.0;            // Sunlit fraction
+    int NumHr = 0;                 // Hour number
+    Vector3<Real64> SunVec;  // Unit vector to sun
+    Vector3<Real64> SunVecMir; // Unit vector to sun mirrored by a reflecting surface
+    Vector3<Real64> RecPt;     // Receiving point (m)
+    Vector3<Real64> HitPtRefl; // Hit point on a reflecting surface (m)
+    Vector3<Real64> HitPtObs;  // Hit point on obstruction (m)
+    Vector3<Real64> ReflNorm;  // Unit normal to reflecting surface
+    Real64 SpecReflectance = 0.0;    // Specular reflectance of a reflecting surface
+    int ConstrNumRefl = 0;           // Construction number of a reflecting surface
+    Real64 CosIncAngRefl = 0.0;      // Cosine of incidence angle of beam on reflecting surface
+    Real64 CosIncAngRec = 0.0;       // Angle of incidence of reflected beam on receiving surface
+    Real64 ReflFac = 0.0;            // Contribution to specular reflection factor
+    Real64 CosIncWeighted = 0.0;     // Cosine of incidence angle on receiving surf weighted by reflection factor
 
 
     void clear_state() override
@@ -163,7 +176,20 @@ struct SolarReflectionManagerData : BaseGlobalStruct {
         this->CosIncBmAtHitPt2 = 0.0;
         this->BmReflSolRadiance = 0.0;
         this->dReflBeamToDiffSol = 0.0;
-        this->SunLitFract = 0.0;       
+        this->SunLitFract = 0.0;    
+        this->NumHr = 0;
+        this->SunVec = 0.0;
+        this->SunVecMir = 0.0;
+        this->RecPt = 0.0;
+        this->HitPtRefl = 0.0;
+        this->HitPtObs = 0.0;
+        this->ReflNorm = 0.0;
+        this->SpecReflectance = 0.0;
+        this->ConstrNumRefl = 0;
+        this->CosIncAngRefl = 0.0;
+        this->CosIncAngRec = 0.0;
+        this->ReflFac = 0.0;
+        this->CosIncWeighted = 0.0;    
     }
 
     // Default Constructor
