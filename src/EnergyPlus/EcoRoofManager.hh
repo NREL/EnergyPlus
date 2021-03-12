@@ -123,7 +123,7 @@ struct EcoRoofManagerData : BaseGlobalStruct {
     Real64 MoistureMax = 0.5;         // Maximum volumetric moisture content (porosity) m^3/m^3
     Real64 MeanRootMoisture = 0.0;    // Mean value of root moisture m^3/m^3
     Real64 SoilThickness = 0.2;       // Soil thickness (m)
-    Real64 StomatalResistanceMin;     // s/m . ! Minimum stomatal resistance is unique for each veg. type.
+    Real64 StomatalResistanceMin = 0.0;     // s/m . ! Minimum stomatal resistance is unique for each veg. type.
     Real64 f3 = 1.0;                  // As the value of gd for tall grass is 0, then f3 = 1
     // ECMWF 2002 CY25R1 report has gd=0.0 for all veg except trees where gd=0.03.
     Real64 Zog = 0.001;         // Ground roughness length scale (m)
@@ -180,7 +180,7 @@ struct EcoRoofManagerData : BaseGlobalStruct {
         this->MoistureMax = 0.5;
         this->MeanRootMoisture = 0.0;
         this->SoilThickness = 0.2;
-        this->StomatalResistanceMin;
+        this->StomatalResistanceMin = 0.0;
         this->f3 = 1.0;   
         this->Zog = 0.001;
         this->Za = 2.0;
