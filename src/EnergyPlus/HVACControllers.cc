@@ -182,17 +182,6 @@ namespace EnergyPlus::HVACControllers {
     constexpr Real64 SomeFloatingPoint(1.0);
     int const NumSigDigits(PRECISION(SomeFloatingPoint));
 
-    int const CoilType_Cooling(1);
-    int const CoilType_Heating(2);
-
-    // DERIVED TYPE DEFINITIONS
-
-    // Type describing a controller's properties
-
-    // Type describing a controller's runtime statistics over the course of the simulation
-
-    // Type describing an air loop's runtime statistics over the course of the simulation
-
     // MODULE VARIABLE DECLARATIONS:
     int NumControllers(0);  // The number of controllers found in the Input
     int NumAirLoopStats(0); // Same size as NumPrimaryAirSys if controllers
@@ -542,8 +531,7 @@ namespace EnergyPlus::HVACControllers {
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject; // for ease in getting objects
-        static bool ErrorsFound(false);
-        int iNodeType;             // for checking actuator node type
+        bool ErrorsFound(false);
         bool NodeNotFound;         // flag true if the sensor node is on the coil air outlet node
         bool EMSSetPointErrorFlag; // flag true is EMS is used to set node setpoints
 
@@ -726,13 +714,14 @@ namespace EnergyPlus::HVACControllers {
 
         // check that actuator nodes are matched by a water coil inlet node
         for (Num = 1; Num <= NumSimpleControllers; ++Num) {
+            iCoilType iNodeType;
             CheckActuatorNode(state, ControllerProps(Num).ActuatedNode, iNodeType, ActuatorNodeNotFound);
             if (ActuatorNodeNotFound) {
                 ErrorsFound = true;
                 ShowSevereError(state, RoutineName + CurrentModuleObject + "=\"" + ControllerProps(Num).ControllerName + "\":");
                 ShowContinueError(state, "...the actuator node must also be a water inlet node of a water coil");
             } else { // Node found, check type and action
-                if (iNodeType == CoilType_Cooling) {
+                if (iNodeType == iCoilType::Cooling) {
                     if (ControllerProps(Num).Action == 0) {
                         ControllerProps(Num).Action = iReverseAction;
                     } else if (ControllerProps(Num).Action == iNormalAction) {
@@ -741,7 +730,7 @@ namespace EnergyPlus::HVACControllers {
                         ShowContinueError(state, "...overriding user input action with Reverse Action.");
                         ControllerProps(Num).Action = iReverseAction;
                     }
-                } else if (iNodeType == CoilType_Heating) {
+                } else if (iNodeType == iCoilType::Heating) {
                     if (ControllerProps(Num).Action == 0) {
                         ControllerProps(Num).Action = iNormalAction;
                     } else if (ControllerProps(Num).Action == iReverseAction) {

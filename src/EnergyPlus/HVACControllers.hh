@@ -87,8 +87,12 @@ namespace HVACControllers {
         Flow,
     };
 
-    extern int const CoilType_Cooling;
-    extern int const CoilType_Heating;
+    enum class iCoilType
+    {
+        Unassigned,
+        Cooling,
+        Heating,
+    };
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumControllers;  // The number of controllers found in the Input

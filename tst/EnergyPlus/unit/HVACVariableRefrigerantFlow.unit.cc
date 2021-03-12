@@ -8074,8 +8074,8 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     state->dataWaterCoils->WaterCoil.allocate(state->dataWaterCoils->NumWaterCoils);
     state->dataWaterCoils->WaterCoil(CoilNum).Name = thisVRFTU.SuppHeatCoilName;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;

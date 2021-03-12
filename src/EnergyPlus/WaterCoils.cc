@@ -366,7 +366,7 @@ namespace WaterCoils {
             }
 
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Heating";
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating; // 'Heating'
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating; // 'Heating'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "SIMPLE";
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilModel_Simple; // 'SIMPLE'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_SimpleHeating;
@@ -514,7 +514,7 @@ namespace WaterCoils {
             }
 
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Cooling";
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Cooling; // 'Cooling'
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling; // 'Cooling'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "DETAILED FLAT FIN";
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilModel_Detailed; // 'DETAILED FLAT FIN'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_DetFlatFinCooling;
@@ -696,7 +696,7 @@ namespace WaterCoils {
             }
 
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilTypeA = "Cooling";
-            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Cooling; // 'Cooling'
+            state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling; // 'Cooling'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModelA = "Cooling";
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state.dataWaterCoils->CoilModel_Cooling; // 'Cooling'
             state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state.dataWaterCoils->WaterCoil_Cooling;
@@ -1088,7 +1088,7 @@ namespace WaterCoils {
             DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
             DesUARangeCheck(CoilNum) = (-1568.6 * state.dataWaterCoils->WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Cooling) { // 'Cooling'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == HVACControllers::iCoilType::Cooling) { // 'Cooling'
                 Node(WaterInletNode).Temp = 5.0;
 
                 Cp = GetSpecificHeatGlycol(state,
@@ -1103,7 +1103,7 @@ namespace WaterCoils {
                 Node(WaterInletNode).HumRat = 0.0;
             }
 
-            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Heating) { // 'Heating'
+            if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == HVACControllers::iCoilType::Heating) { // 'Heating'
                 Node(WaterInletNode).Temp = 60.0;
 
                 Cp = GetSpecificHeatGlycol(state,
@@ -2064,7 +2064,7 @@ namespace WaterCoils {
         auto &OASysEqSizing(state.dataSize->OASysEqSizing);
 
         // cooling coils
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Cooling && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
+        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == HVACControllers::iCoilType::Cooling && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
             // find the appropriate Plant Sizing object
             PltSizCoolNum = PlantUtilities::MyPlantSizingIndex(state, "chilled water coil",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).Name,
@@ -2073,7 +2073,7 @@ namespace WaterCoils {
                                                                LoopErrorsFound);
         }
 
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Cooling) { // 'Cooling'
+        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == HVACControllers::iCoilType::Cooling) { // 'Cooling'
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                 state.dataSize->DataWaterCoilSizCoolDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
@@ -2428,7 +2428,7 @@ namespace WaterCoils {
         } // end cooling coil IF
 
         // if this is a heating coil
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Heating && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
+        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == HVACControllers::iCoilType::Heating && state.dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize) {
             // find the appropriate heating Plant Sizing object
             PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(state, "hot water coil",
                                                                state.dataWaterCoils->WaterCoil(CoilNum).Name,
@@ -2437,7 +2437,7 @@ namespace WaterCoils {
                                                                LoopErrorsFound);
         }
 
-        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == state.dataWaterCoils->CoilType_Heating) {
+        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType == HVACControllers::iCoilType::Heating) {
 
             if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                 // use water design deltaT specified in the heating water coils
@@ -5976,9 +5976,10 @@ namespace WaterCoils {
         return CoilDesAirFlow;
     }
 
-    void CheckActuatorNode(EnergyPlusData &state, int const ActuatorNodeNum, // input actuator node number
-                           int &iNodeType,            // Cooling or Heating or 0
-                           bool &NodeNotFound         // true if matching water inlet node not found
+    void CheckActuatorNode(EnergyPlusData &state,
+                           int const ActuatorNodeNum,            // input actuator node number
+                           HVACControllers::iCoilType &iNodeType, // Cooling or Heating or 0
+                           bool &NodeNotFound                    // true if matching water inlet node not found
     )
     {
 
@@ -6003,7 +6004,7 @@ namespace WaterCoils {
         }
 
         WhichCoil = 0;
-        iNodeType = 0;
+        iNodeType = HVACControllers::iCoilType::Unassigned;
         NodeNotFound = true;
         for (CoilNum = 1; CoilNum <= state.dataWaterCoils->NumWaterCoils; ++CoilNum) {
             if (state.dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum == ActuatorNodeNum) {

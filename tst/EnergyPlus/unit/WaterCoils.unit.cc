@@ -210,7 +210,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Cooling Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = AutoSize;
@@ -292,7 +292,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
 
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Heating Coil";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp = AutoSize;
@@ -323,7 +323,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     state->dataSize->FinalSysSizing(1).MassFlowAtCoolPeak = state->dataSize->FinalSysSizing(1).DesMainVolFlow * state->dataEnvrn->StdRhoAir;
 
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Heating Coil 2";
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirTemp = AutoSize;
@@ -444,9 +444,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Water Heating Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
@@ -596,9 +596,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Water Heating Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
@@ -752,9 +752,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Water Heating Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
@@ -868,7 +868,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterSimpleSizing)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Simple Water Cooling Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_Cooling; // Coil:Cooling:Water
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
 
@@ -969,7 +969,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailedSizing)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Detailed Water Cooling Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_DetFlatFinCooling; // Coil:Cooling:Water:DetailedGeometry
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Detailed;
 
@@ -1082,7 +1082,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Detailed Water Cooling Coil";
 
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_DetFlatFinCooling; // Coil:Cooling:Water:DetailedGeometry
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Detailed;
 
@@ -1264,9 +1264,9 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     int CoilNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Test Simple Water Heating Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
     state->dataWaterCoils->WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).DesInletAirTemp = AutoSize;
@@ -1363,8 +1363,8 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     state->dataWaterCoils->WaterCoil(CoilNum).Name = "Water Heating Coil";
     state->dataWaterCoils->WaterCoil(CoilNum).WaterLoopNum = 1;
     state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num = state->dataWaterCoils->WaterCoil_SimpleHeating; // Coil:Heating:Water
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilType_Heating;
-    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state->dataWaterCoils->CoilType_Heating;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilModel = state->dataWaterCoils->CoilModel_Cooling;
+    state->dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = HVACControllers::iCoilType::Heating;
     state->dataWaterCoils->WaterCoil(CoilNum).SchedPtr = DataGlobalConstants::ScheduleAlwaysOn;
 
     state->dataWaterCoils->WaterCoil(CoilNum).RequestingAutoSize = true;
