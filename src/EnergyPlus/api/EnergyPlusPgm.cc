@@ -258,7 +258,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 #endif
 #endif
 
-    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
+    state.dataSysVars->Time_Start = DataTimings::epElapsedTime();
 #ifdef EP_Detailed_Timings
     epStartTime("EntireRun=");
 #endif
@@ -282,7 +282,7 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
         return errStatus;
     }
 
-    DataSystemVariables::TestAllPaths = true;
+    state.dataSysVars->TestAllPaths = true;
 
     DisplayString(state, "EnergyPlus Starting");
     DisplayString(state, DataStringGlobals::VerString);

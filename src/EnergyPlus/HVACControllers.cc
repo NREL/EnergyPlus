@@ -472,7 +472,7 @@ namespace HVACControllers {
         // Write detailed diagnostic for individual controller
         // To enable generating an individual, detailed trace file for each controller on each air loop,
         // define the environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y
-        if (TraceHVACControllerEnvFlag) {
+        if (state.dataSysVars->TraceHVACControllerEnvFlag) {
             TraceIndividualController(state, ControlNum, FirstHVACIteration, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopPass, Operation, IsConvergedFlag);
         }
     }
@@ -538,9 +538,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataSystemVariables::TraceAirLoopEnvFlag;
-        using DataSystemVariables::TraceHVACControllerEnvFlag;
-        using DataSystemVariables::TrackAirLoopEnvFlag;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using MixedAir::CheckForControllerWaterCoil;
         using NodeInputManager::GetOnlySingleNode;
@@ -583,7 +580,7 @@ namespace HVACControllers {
         NumControllers = NumSimpleControllers;
 
         // Allocate stats data structure for each air loop and controller if needed
-        if (TrackAirLoopEnvFlag || TraceAirLoopEnvFlag || TraceHVACControllerEnvFlag) {
+        if (state.dataSysVars->TrackAirLoopEnvFlag || state.dataSysVars->TraceAirLoopEnvFlag || state.dataSysVars->TraceHVACControllerEnvFlag) {
             if (NumPrimaryAirSys > 0) {
                 NumAirLoopStats = NumPrimaryAirSys;
                 AirLoopStats.allocate(NumAirLoopStats);
@@ -928,7 +925,6 @@ namespace HVACControllers {
 
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
-        using FaultsManager::FaultsCoilSATSensor;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::ScanPlantLoopsForNodeNum;
         using PlantUtilities::SetActuatedBranchFlowRate;
@@ -1223,7 +1219,7 @@ namespace HVACControllers {
                     if (ControllerProps(ControlNum).FaultyCoilSATFlag && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) && (!state.dataGlobal->KickOffSimulation)) {
                         // calculate the sensor offset using fault information
                         int FaultIndex = ControllerProps(ControlNum).FaultyCoilSATIndex;
-                        ControllerProps(ControlNum).FaultyCoilSATOffset = FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
+                        ControllerProps(ControlNum).FaultyCoilSATOffset = state.dataFaultsMgr->FaultsCoilSATSensor(FaultIndex).CalFaultOffsetAct(state);
                         // update the SetPointValue
                         ControllerProps(ControlNum).SetPointValue = Node(SensedNode).TempSetPoint - ControllerProps(ControlNum).FaultyCoilSATOffset;
                     }
@@ -2452,7 +2448,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using DataHVACGlobals::NumPrimaryAirSys;
-        using DataSystemVariables::TrackAirLoopEnvFlag;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2469,7 +2464,7 @@ namespace HVACControllers {
 
 
         // Detect if statistics have been generated or not for this run
-        if (!TrackAirLoopEnvFlag) {
+        if (!state.dataSysVars->TrackAirLoopEnvFlag) {
             return;
         }
 

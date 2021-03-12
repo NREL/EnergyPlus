@@ -628,7 +628,6 @@ namespace OutputProcessor {
         //        \object-list ScheduleNames
 
         // Using/Aliasing
-        using DataSystemVariables::MinReportFrequency;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -653,13 +652,13 @@ namespace OutputProcessor {
         op->GetOutputInputFlag = false;
 
         // First check environment variable to see of possible override for minimum reporting frequency
-        if (MinReportFrequency != "") {
+        if (state.dataSysVars->MinReportFrequency != "") {
             // Formats
             static constexpr auto Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
             static constexpr auto Format_801(" Minimum Reporting Frequency, {},{}\n");
-            op->minimumReportFrequency = determineFrequency(state, MinReportFrequency);
+            op->minimumReportFrequency = determineFrequency(state, state.dataSysVars->MinReportFrequency);
             print(state.files.eio, Format_800);
-            print(state.files.eio, Format_801, frequencyNotice(StoreType::Averaged, op->minimumReportFrequency), MinReportFrequency);
+            print(state.files.eio, Format_801, frequencyNotice(StoreType::Averaged, op->minimumReportFrequency), state.dataSysVars->MinReportFrequency);
         }
 
         cCurrentModuleObject = "Output:Variable";
@@ -4468,7 +4467,7 @@ namespace OutputProcessor {
 
         static char s[129];
 
-        if (DataSystemVariables::UpdateDataDuringWarmupExternalInterface && !DataSystemVariables::ReportDuringWarmup) return;
+        if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
         dtoa(repValue, s);
 
@@ -4574,8 +4573,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataSystemVariables::ReportDuringWarmup;
-        using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4592,7 +4589,7 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        if (UpdateDataDuringWarmupExternalInterface && !ReportDuringWarmup) return;
+        if (state.dataSysVars->UpdateDataDuringWarmupExternalInterface && !state.dataSysVars->ReportDuringWarmup) return;
 
         if (intVar.Report && intVar.frequency == reportType && intVar.Stored) {
             if (intVar.NumStored > 0.0) {
