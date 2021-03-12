@@ -738,9 +738,9 @@ namespace HVACFan {
         Real64 localFaultMaxAirMassFlow = 0.0;
         bool faultActive = false;
         Real64 localFaultPressureRise = 0.0;
-        if (m_faultyFilterFlag && (FaultsManager::NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
+        if (m_faultyFilterFlag && (state.dataFaultsMgr->NumFaultyAirFilter > 0) && (!state.dataGlobal->WarmupFlag) && (!state.dataGlobal->DoingSizing) &&
             state.dataGlobal->DoWeathSim && (!m_eMSMaxMassFlowOverrideOn) && (!m_eMSFanPressureOverrideOn)) {
-            if (ScheduleManager::GetCurrentScheduleValue(state, FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
+            if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).AvaiSchedPtr) > 0) {
                 faultActive = true;
                 Real64 FanDesignFlowRateDec = 0; // Decrease of the Fan Design Volume Flow Rate [m3/sec]
                 FanDesignFlowRateDec = Fans::CalFaultyFanAirFlowReduction(state,
@@ -748,15 +748,15 @@ namespace HVACFan {
                     designAirVolFlowRate,
                     deltaPress,
                     (ScheduleManager::GetCurrentScheduleValue(state,
-                         FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
+                         state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) -
                      1) *
                         deltaPress,
-                    FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
+                    state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterFanCurvePtr);
 
                 localFaultMaxAirMassFlow = m_maxAirMassFlowRate - FanDesignFlowRateDec * m_rhoAirStdInit;
 
                 localFaultPressureRise = ScheduleManager::GetCurrentScheduleValue(state,
-                                             FaultsManager::FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
+                                             state.dataFaultsMgr->FaultsFouledAirFilters(m_faultyFilterIndex).FaultyAirFilterPressFracSchePtr) *
                                          deltaPress;
             }
         }

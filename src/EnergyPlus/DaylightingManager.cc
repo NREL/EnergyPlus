@@ -385,7 +385,6 @@ namespace EnergyPlus::DaylightingManager {
         // Based on DOE-2.1E subroutine DCOF.
 
         // Using/Aliasing
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
 
@@ -436,7 +435,7 @@ namespace EnergyPlus::DaylightingManager {
         //-----------------------------------------!
         // Detailed daylighting factor calculation !
         //-----------------------------------------!
-        if (!DetailedSolarTimestepIntegration && !state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration && !state.dataGlobal->KickOffSizing && !state.dataGlobal->KickOffSimulation) {
             if (state.dataGlobal->WarmupFlag) {
                 DisplayString(state, "Calculating Detailed Daylighting Factors, Start Date=" + state.dataEnvrn->CurMnDy);
             } else {
@@ -474,7 +473,7 @@ namespace EnergyPlus::DaylightingManager {
         }
 
         // Zero daylighting factor arrays
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             state.dataDaylightingManager->TDDTransVisBeam = 0.0;
             state.dataDaylightingManager->TDDFluxInc = 0.0;
             state.dataDaylightingManager->TDDFluxTrans = 0.0;
@@ -484,7 +483,7 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingManager->TDDFluxTrans(state.dataGlobal->HourOfDay, {1, 4}, {1, state.dataDaylightingDevicesData->NumOfTDDPipes}) = 0.0;
         }
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             if (state.dataGlobal->BeginDayFlag) {
                 // Calculate hourly sun angles, clear sky zenith luminance, and exterior horizontal illuminance
                 state.dataDaylightingManager->PHSUN = 0.0;
@@ -787,7 +786,6 @@ namespace EnergyPlus::DaylightingManager {
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::SafeDivide;
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> W2;     // Second vertex of window
@@ -876,7 +874,7 @@ namespace EnergyPlus::DaylightingManager {
         state.dataDaylightingData->ZoneDaylight(ZoneNum).BackLumFromWinAtRefPt = 0.0;
         state.dataDaylightingData->ZoneDaylight(ZoneNum).SourceLumFromWinAtRefPt = 0.0;
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
 
             state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylIllFacSky = 0.0;
             state.dataDaylightingData->ZoneDaylight(ZoneNum).DaylSourceFacSky = 0.0;
@@ -1020,7 +1018,7 @@ namespace EnergyPlus::DaylightingManager {
                         // Sun position counter. Used to avoid calculating various quantities
                         // that do not depend on sun position.
 
-                        if (!DetailedSolarTimestepIntegration) {
+                        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                             ISunPos = 0;
                             for (IHR = 1; IHR <= 24; ++IHR) {
 
@@ -1122,7 +1120,7 @@ namespace EnergyPlus::DaylightingManager {
 
                 ILB = BRef + IL;
 
-                if (!DetailedSolarTimestepIntegration) {
+                if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                     ISunPos = 0;
                     for (IHR = 1; IHR <= 24; ++IHR) {
                         FigureRefPointDayltgFactorsToAddIllums(state, ZoneNum, ILB, IHR, ISunPos, IWin, loopwin, NWX, NWY, ICtrl);
@@ -1168,7 +1166,6 @@ namespace EnergyPlus::DaylightingManager {
         using General::BlindBeamBeamTrans;
 
         using General::SafeDivide;
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Vector3<Real64> W2;      // Second vertex of window
@@ -1265,7 +1262,7 @@ namespace EnergyPlus::DaylightingManager {
             state.dataDaylightingData->IllumMapCalc(MapNum).IllumFromWinAtMapPt = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).BackLumFromWinAtMapPt = 0.0;
             state.dataDaylightingData->IllumMapCalc(MapNum).SourceLumFromWinAtMapPt = 0.0;
-            if (!DetailedSolarTimestepIntegration) {
+            if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylIllFacSky = 0.0;
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylSourceFacSky = 0.0;
                 state.dataDaylightingData->IllumMapCalc(MapNum).DaylBackFacSky = 0.0;
@@ -1414,7 +1411,7 @@ namespace EnergyPlus::DaylightingManager {
 
                             // Sun position counter. Used to avoid calculating various quantities
                             // that do not depend on sun position.
-                            if (!DetailedSolarTimestepIntegration) {
+                            if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                                 ISunPos = 0;
                                 for (IHR = 1; IHR <= 24; ++IHR) {
                                     FigureDayltgCoeffsAtPointsForSunPosition(state,
@@ -1510,7 +1507,7 @@ namespace EnergyPlus::DaylightingManager {
                         } // End of window Y-element loop, IY
                     }     // End of window X-element loop, IX
 
-                    if (!DetailedSolarTimestepIntegration) {
+                    if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
                         // Loop again over hourly sun positions and calculate daylight factors by adding
                         // direct and inter-reflected illum components, then dividing by exterior horiz illum.
                         // Also calculate corresponding glare factors.
@@ -1580,7 +1577,6 @@ namespace EnergyPlus::DaylightingManager {
         // switch as need to serve both reference points and map points based on calledFrom
 
         // Using/Aliasing
-        using DataSystemVariables::DetailedSolarTimestepIntegration;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
         using General::SafeDivide;
@@ -1922,7 +1918,7 @@ namespace EnergyPlus::DaylightingManager {
             }
         }
 
-        if (!DetailedSolarTimestepIntegration) {
+        if (!state.dataSysVars->DetailedSolarTimestepIntegration) {
             // Initialize sky and sun components of direct illuminance (arrays EDIRSK, EDIRSU, EDIRSUdisk)
             // and average window luminance (arrays AVWLSK, AVWLSU, AVWLSUdisk), at ref pt.
             state.dataDaylightingManager->EDIRSK = 0.0;
@@ -3108,7 +3104,6 @@ namespace EnergyPlus::DaylightingManager {
         // METHODOLOGY EMPLOYED:
         // switch as need to serve both reference points and map points based on calledFrom
 
-        using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using General::BlindBeamBeamTrans;
         using General::POLYF;
 
@@ -3297,7 +3292,7 @@ namespace EnergyPlus::DaylightingManager {
                 if (state.dataSurface->Surface(NearestHitSurfNum).ShadowingSurf) {
                     if (dot(Ray, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                 }
-                if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                     SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                 } else {
                     SkyReflVisLum =
@@ -7154,7 +7149,6 @@ namespace EnergyPlus::DaylightingManager {
         // Based on DOE-2.1E subroutine DREFLT.
 
         // Using/Aliasing
-        using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
         using DaylightingDevices::TransTDD;
         using General::BlindBeamBeamTrans;
         using General::InterpProfAng;
@@ -7505,7 +7499,7 @@ namespace EnergyPlus::DaylightingManager {
                         if (state.dataSurface->Surface(NearestHitSurfNum).ShadowingSurf) {
                             if (dot(U, state.dataSurface->Surface(NearestHitSurfNum).OutNormVec) > 0.0) NearestHitSurfNumX = NearestHitSurfNum + 1;
                         }
-                        if (!DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
+                        if (!state.dataSysVars->DetailedSkyDiffuseAlgorithm || !state.dataSurface->ShadingTransmittanceVaries || state.dataHeatBal->SolarDistribution == MinimalShadowing) {
                             SkyReflVisLum = ObsVisRefl * state.dataSurface->Surface(NearestHitSurfNumX).ViewFactorSky * state.dataHeatBal->DifShdgRatioIsoSky(NearestHitSurfNumX) / DataGlobalConstants::Pi;
                         } else {
                             SkyReflVisLum =
