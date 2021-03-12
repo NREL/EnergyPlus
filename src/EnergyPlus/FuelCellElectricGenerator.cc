@@ -1549,10 +1549,15 @@ namespace FuelCellElectricGenerator {
             if (this->FCPM.NdotFuel <= 0.0) { // just pass through, domain probably collapsed in modeling
                 state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM = state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress;
             } else {
-                state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM =
-                    ((1.0 - state.dataGenerator->FuelSupply(this->FuelSupNum).CompPowerLossFactor) *
-                     state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl / (this->FCPM.NdotFuel * Cp * 1000.0)) +
-                    state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress; // 1000 Cp units mol-> kmol
+                if (state.dataGenerator->FuelSupply(this->FuelSupNum).NumConstituents == 0) {
+                    state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM =
+                        state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress;
+                } else {
+                    state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoFCPM =
+                        ((1.0 - state.dataGenerator->FuelSupply(this->FuelSupNum).CompPowerLossFactor) *
+                         state.dataGenerator->FuelSupply(this->FuelSupNum).PfuelCompEl / (this->FCPM.NdotFuel * Cp * 1000.0)) +
+                        state.dataGenerator->FuelSupply(this->FuelSupNum).TfuelIntoCompress; // 1000 Cp units mol-> kmol
+                }
             }
             // calc skin losses from fuel compressor
             state.dataGenerator->FuelSupply(this->FuelSupNum).QskinLoss =
