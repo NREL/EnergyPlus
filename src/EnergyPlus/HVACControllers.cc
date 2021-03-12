@@ -182,26 +182,6 @@ namespace EnergyPlus::HVACControllers {
     constexpr Real64 SomeFloatingPoint(1.0);
     int const NumSigDigits(PRECISION(SomeFloatingPoint));
 
-    // MODULE VARIABLE DECLARATIONS:
-    int NumControllers(0);  // The number of controllers found in the Input
-    int NumAirLoopStats(0); // Same size as NumPrimaryAirSys if controllers
-    // are defined, 0 otherwise.
-    // all controllers per air loop
-    Array1D_bool CheckEquipName;
-
-    // Flag set to make sure you get input once
-    bool GetControllerInputFlag(true);
-
-    // Object Data
-    Array1D<ControllerPropsType> ControllerProps;
-    Array1D<RootFinderDataType> RootFinders;
-    Array1D<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
-
-    namespace {
-        bool InitControllerOneTimeFlag(true);
-        bool InitControllerSetPointCheckFlag(true);
-    } // namespace
-
     std::string ControlVariableTypes(iCtrl const &c)
     {
         switch (c) {
@@ -217,21 +197,6 @@ namespace EnergyPlus::HVACControllers {
             return "Flow rate";
         }
         return "no controller type found";
-    }
-
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
-    {
-        NumControllers = 0;
-        NumAirLoopStats = 0;
-        GetControllerInputFlag = true;
-        InitControllerOneTimeFlag = true;
-        InitControllerSetPointCheckFlag = true;
-
-        ControllerProps.deallocate();
-        RootFinders.deallocate();
-        AirLoopStats.deallocate();
-        CheckEquipName.deallocate();
     }
 
     void ManageControllers(EnergyPlusData &state,
@@ -278,10 +243,15 @@ namespace EnergyPlus::HVACControllers {
         int ControlNum;
         int ControllerType;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & NumControllers(state.dataHVACControllers->NumControllers);
+        auto & CheckEquipName(state.dataHVACControllers->CheckEquipName);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+
         // Obtains and Allocates Controller related parameters from input file
-        if (GetControllerInputFlag) { // First time subroutine has been entered
+        if (state.dataHVACControllers->GetControllerInputFlag) { // First time subroutine has been entered
             GetControllerInput(state);
-            GetControllerInputFlag = false;
+            state.dataHVACControllers->GetControllerInputFlag = false;
         }
 
         if (ControllerIndex == 0) {
@@ -366,8 +336,8 @@ namespace EnergyPlus::HVACControllers {
             auto const SELECT_CASE_var(Operation);
             if (SELECT_CASE_var == iControllerOpColdStart) {
                 // For temperature and humidity control reset humidity control override if it was set
-                if (HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride) {
-                    HVACControllers::ControllerProps(ControlNum).HumRatCtrlOverride = false;
+                if (ControllerProps(ControlNum).HumRatCtrlOverride) {
+                    ControllerProps(ControlNum).HumRatCtrlOverride = false;
                     // Put the controller tolerance (offset) back to it's original value
                     RootFinder::SetupRootFinder(state,
                                                 RootFinders(ControlNum),
@@ -423,7 +393,7 @@ namespace EnergyPlus::HVACControllers {
                     auto const SELECT_CASE_var1(ControllerType);
                     if (SELECT_CASE_var1 == ControllerSimple_Type) { // 'Controller:WaterCoil'
                         CheckSimpleController(state, ControlNum, IsConvergedFlag);
-                        SaveSimpleController(ControlNum, FirstHVACIteration, IsConvergedFlag);
+                        SaveSimpleController(state, ControlNum, FirstHVACIteration, IsConvergedFlag);
                     } else {
                         ShowFatalError(state, "Invalid controller type in ManageControllers=" + ControllerProps(ControlNum).ControllerType);
                     }
@@ -534,6 +504,13 @@ namespace EnergyPlus::HVACControllers {
         bool ErrorsFound(false);
         bool NodeNotFound;         // flag true if the sensor node is on the coil air outlet node
         bool EMSSetPointErrorFlag; // flag true is EMS is used to set node setpoints
+
+        auto & NumControllers(state.dataHVACControllers->NumControllers);
+        auto & NumAirLoopStats(state.dataHVACControllers->NumAirLoopStats);
+        auto & AirLoopStats(state.dataHVACControllers->AirLoopStats);
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+        auto & CheckEquipName(state.dataHVACControllers->CheckEquipName);
 
         // All the controllers are loaded into the same derived type, both the PI and Limit
         // These controllers are separate objects and loaded sequentially, but will
@@ -788,6 +765,9 @@ namespace EnergyPlus::HVACControllers {
         int SensedNode;
         Real64 NoFlowResetValue;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
 
@@ -884,10 +864,16 @@ namespace EnergyPlus::HVACControllers {
         int ActuatedNode;
         int SensedNode;
         int ControllerIndex;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantIndexsFlag;
         Real64 rho; // local fluid density
+
+        auto & NumControllers(state.dataHVACControllers->NumControllers);
+        auto & InitControllerOneTimeFlag(state.dataHVACControllers->InitControllerOneTimeFlag);
+        auto & InitControllerSetPointCheckFlag(state.dataHVACControllers->InitControllerSetPointCheckFlag);
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+        auto & MyEnvrnFlag(state.dataHVACControllers->MyEnvrnFlag);
+        auto & MySizeFlag(state.dataHVACControllers->MySizeFlag);
+        auto & MyPlantIndexsFlag(state.dataHVACControllers->MyPlantIndexsFlag);
 
         if (InitControllerOneTimeFlag) {
 
@@ -1104,7 +1090,7 @@ namespace EnergyPlus::HVACControllers {
                                                                          // ATolX: absolute tolerance for X variables | ATolY: absolute tolerance for
                                                                          // Y variables
                 } else {
-                    ShowFatalError(state, "InitController: Invalid controller action. Valid choices are \"Normal\" or \"Reverse\"");
+                    ShowFatalError(state, R"(InitController: Invalid controller action. Valid choices are "Normal" or "Reverse")");
                 }
             }
 
@@ -1281,6 +1267,8 @@ namespace EnergyPlus::HVACControllers {
         int ActuatedNode; // node number of actuated node
         int WaterCompNum;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
 
         if (ControllerProps(ControlNum).MaxVolFlowActuated == AutoSize) {
@@ -1369,6 +1357,9 @@ namespace EnergyPlus::HVACControllers {
         int ActuatedNode;
         int SensedNode;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+
         // Increment counter
         ++ControllerProps(ControlNum).NumCalcCalls;
 
@@ -1379,7 +1370,7 @@ namespace EnergyPlus::HVACControllers {
         // Check to see if the component is running; if not converged and return.  This check will be done
         // by looking at the component mass flow rate at the sensed node.
         if (Node(SensedNode).MassFlowRate == 0.0) {
-            ExitCalcController(ControlNum, DataPrecisionGlobals::constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
+            ExitCalcController(state, ControlNum, DataPrecisionGlobals::constant_zero, iModeOff, IsConvergedFlag, IsUpToDateFlag);
             return;
         }
 
@@ -1485,6 +1476,9 @@ namespace EnergyPlus::HVACControllers {
         int PreviousSolutionMode;
         Real64 PreviousSolutionValue;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+
         // Obtain actuated and sensed nodes
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
@@ -1542,17 +1536,17 @@ namespace EnergyPlus::HVACControllers {
 
             } else if ((SELECT_CASE_var == iStatus::OK) || (SELECT_CASE_var == iStatus::OKRoundOff)) {
                 // Indicate convergence with base value (used to obtain DeltaSensed!)
-                ExitCalcController(ControlNum, RootFinders(ControlNum).XCandidate, iModeActive, IsConvergedFlag, IsUpToDateFlag);
+                ExitCalcController(state, ControlNum, RootFinders(ControlNum).XCandidate, iModeActive, IsConvergedFlag, IsUpToDateFlag);
 
             } else if (SELECT_CASE_var == iStatus::OKMin) {
                 // Indicate convergence with min value
                 // Should be the same as ControllerProps(ControlNum)%MinAvailActuated
-                ExitCalcController(ControlNum, RootFinders(ControlNum).MinPoint.X, iModeMinActive, IsConvergedFlag, IsUpToDateFlag);
+                ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, iModeMinActive, IsConvergedFlag, IsUpToDateFlag);
 
             } else if (SELECT_CASE_var == iStatus::OKMax) {
                 // Indicate convergence with max value
                 // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
-                ExitCalcController(ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
+                ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
 
             } else if (SELECT_CASE_var == iStatus::ErrorSingular) {
                 // Indicate inactive mode with min actuated value
@@ -1562,7 +1556,7 @@ namespace EnergyPlus::HVACControllers {
                 //       with       RootFinders(ControlNum)%MinPoint%X
                 //       which is the same as (see SUBROUTINE InitController)
                 //                  ControllerProps(ControlNum)%MinAvailActuated
-                ExitCalcController(ControlNum, RootFinders(ControlNum).MinPoint.X, iModeInactive, IsConvergedFlag, IsUpToDateFlag);
+                ExitCalcController(state, ControlNum, RootFinders(ControlNum).MinPoint.X, iModeInactive, IsConvergedFlag, IsUpToDateFlag);
 
                 // Abnormal case: should never happen
             } else if (SELECT_CASE_var == iStatus::ErrorRange) {
@@ -1662,7 +1656,7 @@ namespace EnergyPlus::HVACControllers {
                 }
                 // Indicate convergence with min value
                 // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
-                ExitCalcController(ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
+                ExitCalcController(state, ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
 
             } else {
                 // Should never happen
@@ -1698,6 +1692,9 @@ namespace EnergyPlus::HVACControllers {
         int ActuatedNode;
         int SensedNode;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+        auto & RootFinders(state.dataHVACControllers->RootFinders);
+
         // Obtain actuated and sensed nodes
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
@@ -1709,7 +1706,7 @@ namespace EnergyPlus::HVACControllers {
             auto const SELECT_CASE_var(ControllerProps(ControlNum).Mode);
             if (SELECT_CASE_var == iModeOff) {
                 // Check whether the component is running
-                // This check is perfomed by looking at the component mass flow rate at the sensed node.
+                // This check is performed by looking at the component mass flow rate at the sensed node.
                 // Since the components have been simulated before getting here, if they are zero they should be OFF.
                 if (Node(SensedNode).MassFlowRate == 0.0) {
                     if (ControllerProps(ControlNum).ActuatedValue == 0.0) {
@@ -1814,6 +1811,8 @@ namespace EnergyPlus::HVACControllers {
 
         CheckMinActiveController = false;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+
         // Check that actuated value is the min avail actuated value
         if (ControllerProps(ControlNum).ActuatedValue != ControllerProps(ControlNum).MinAvailActuated) {
             CheckMinActiveController = false;
@@ -1864,6 +1863,8 @@ namespace EnergyPlus::HVACControllers {
 
         CheckMaxActiveController = false;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+
         // Check that actuated value is the max avail actuated value
         if (ControllerProps(ControlNum).ActuatedValue != ControllerProps(ControlNum).MaxAvailActuated) {
             CheckMaxActiveController = false;
@@ -1898,7 +1899,7 @@ namespace EnergyPlus::HVACControllers {
         return CheckMaxActiveController;
     }
 
-    void SaveSimpleController(int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag)
+    void SaveSimpleController(EnergyPlusData &state, int const ControlNum, bool const FirstHVACIteration, bool const IsConvergedFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1912,6 +1913,8 @@ namespace EnergyPlus::HVACControllers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PreviousSolutionIndex;
+
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
 
         // Save solution and mode for next call only if converged
         if (IsConvergedFlag) {
@@ -1952,6 +1955,8 @@ namespace EnergyPlus::HVACControllers {
         int ActuatedNode;
         int SensedNode;
 
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+
         // Set the sensed and actuated node numbers
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
         SensedNode = ControllerProps(ControlNum).SensedNode;
@@ -1978,7 +1983,7 @@ namespace EnergyPlus::HVACControllers {
     {
 
         {
-            auto &thisController(ControllerProps(ControlNum));
+            auto &thisController(state.dataHVACControllers->ControllerProps(ControlNum));
             if (IsConvergedFlag) {
                 if (thisController.ControlVar == iCtrl::TemperatureAndHumidityRatio) {
                     // For temperature and humidity control, after temperature control is converged, check if humidity setpoint is met
@@ -1991,7 +1996,7 @@ namespace EnergyPlus::HVACControllers {
                             if (thisController.Action == iReverseAction) {
                                 // Cooling coil controller should always be ReverseAction, but skip this if not
                                 RootFinder::SetupRootFinder(state,
-                                                            RootFinders(ControlNum),
+                                                            state.dataHVACControllers->RootFinders(ControlNum),
                                                             iSlopeDecreasing,
                                                             DataRootFinder::iMethod::FalsePosition,
                                                             DataPrecisionGlobals::constant_zero,
@@ -2007,7 +2012,7 @@ namespace EnergyPlus::HVACControllers {
         }
     }
 
-    void ExitCalcController(int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag)
+    void ExitCalcController(EnergyPlusData &state, int const ControlNum, Real64 const NextActuatedValue, int const Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2026,6 +2031,8 @@ namespace EnergyPlus::HVACControllers {
         // - controller mode
         // - IsConvergedFlag
         // - IsUpToDateFlag
+
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
 
         ControllerProps(ControlNum).NextActuatedValue = NextActuatedValue;
         ControllerProps(ControlNum).Mode = Mode;
@@ -2070,10 +2077,12 @@ namespace EnergyPlus::HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
-        // If no controllers on this air loop then we have nothig to do
+        auto & AirLoopStats(state.dataHVACControllers->AirLoopStats);
+
+        // If no controllers on this air loop then we have nothing to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
         // To avoid tracking statistics in case of no air loop or no HVAC controllers are defined
-        if (NumAirLoopStats == 0) return;
+        if (state.dataHVACControllers->NumAirLoopStats == 0) return;
 
         // Update performance statistics for air loop
         ++AirLoopStats(AirLoopNum).NumCalls;
@@ -2129,6 +2138,9 @@ namespace EnergyPlus::HVACControllers {
         // Current operating mode
         int Mode;
 
+        auto & AirLoopStats(state.dataHVACControllers->AirLoopStats);
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
+
         ControlIndex = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(AirLoopControlNum);
 
         // We use NumCalcCalls instead of the iteration counter used in SolveAirLoopControllers()
@@ -2175,7 +2187,7 @@ namespace EnergyPlus::HVACControllers {
         // note that the AirLoopStats object does not seem to be initialized when this code
         // is executed and it causes a crash here
         for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            WriteAirLoopStatistics(statisticsFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum), AirLoopStats(AirLoopNum));
+            WriteAirLoopStatistics(statisticsFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum), state.dataHVACControllers->AirLoopStats(AirLoopNum));
         }
     }
 
@@ -2322,6 +2334,8 @@ namespace EnergyPlus::HVACControllers {
         // Open main controller trace file for each air loop
         const auto TraceFileName = "controller." + state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name + ".csv";
 
+        auto & AirLoopStats(state.dataHVACControllers->AirLoopStats);
+
         // Store file unit in air loop stats
         AirLoopStats(AirLoopNum).TraceFile->fileName = TraceFileName;
         AirLoopStats(AirLoopNum).TraceFile->open();
@@ -2387,10 +2401,12 @@ namespace EnergyPlus::HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ControllerNum;
 
+        auto & AirLoopStats(state.dataHVACControllers->AirLoopStats);
+
         // IF no controllers on this air loop then we have nothing to do
         if (state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers == 0) return;
         // To avoid tracking statistics in case of no air loop or no HVAC controllers are defined
-        if (NumAirLoopStats == 0) return;
+        if (state.dataHVACControllers->NumAirLoopStats == 0) return;
 
         // Setup trace file on first call only
         if (AirLoopStats(AirLoopNum).FirstTraceFlag) {
@@ -2408,7 +2424,7 @@ namespace EnergyPlus::HVACControllers {
 
         // Loop over the air sys controllers and write diagnostic to trace file
         for (ControllerNum = 1; ControllerNum <= state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).NumControllers; ++ControllerNum) {
-            TraceAirLoopController(TraceFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(ControllerNum));
+            TraceAirLoopController(state, TraceFile, state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).ControllerIndex(ControllerNum));
         }
 
         // Go to next line
@@ -2458,7 +2474,7 @@ namespace EnergyPlus::HVACControllers {
               LogicalToInteger(AirLoopConverged));
     }
 
-    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum)
+    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int const ControlNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2474,6 +2490,8 @@ namespace EnergyPlus::HVACControllers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ActuatedNode;
         int SensedNode;
+
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
 
         // Set the sensed and actuated node numbers
         ActuatedNode = ControllerProps(ControlNum).ActuatedNode;
@@ -2502,6 +2520,8 @@ namespace EnergyPlus::HVACControllers {
         // and writes header row.
 
         using RootFinder::WriteRootFinderTraceHeader;
+
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
 
         const auto TraceFileName = "controller." + ControllerProps(ControlNum).ControllerName + ".csv";
         auto &TraceFile = *ControllerProps(ControlNum).TraceFile;
@@ -2552,6 +2572,8 @@ namespace EnergyPlus::HVACControllers {
         int ActuatedNode;
         int SensedNode;
         bool SkipLineFlag;
+
+        auto & ControllerProps(state.dataHVACControllers->ControllerProps);
 
         // Setup individual trace file on first trace only
         if (ControllerProps(ControlNum).FirstTraceFlag) {
@@ -2635,7 +2657,7 @@ namespace EnergyPlus::HVACControllers {
                 // X | Y | setpoint | DeltaSensed = Y - YRoot | Offset | Mode | IsConvergedFlag
 
                 // Append trace for root finder
-                WriteRootFinderTrace(TraceFile, RootFinders(ControlNum));
+                WriteRootFinderTrace(TraceFile, state.dataHVACControllers->RootFinders(ControlNum));
 
                 // Finally skip line
                 print(TraceFile, "\n");
@@ -2803,9 +2825,9 @@ namespace EnergyPlus::HVACControllers {
                         if (UtilityRoutines::SameString(state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerType(ContrlNum), "CONTROLLER:WATERCOIL")) {
                             ++SensedNodeIndex;
                             foundControl = UtilityRoutines::FindItemInList(
-                                state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerName(ContrlNum), ControllerProps, &ControllerPropsType::ControllerName);
+                                state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).ControllerName(ContrlNum), state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
                             if (foundControl > 0) {
-                                ContrlSensedNodeNums(1, SensedNodeIndex) = ControllerProps(foundControl).SensedNode;
+                                ContrlSensedNodeNums(1, SensedNodeIndex) = state.dataHVACControllers->ControllerProps(foundControl).SensedNode;
                             }
                         }
                     }
@@ -2872,14 +2894,14 @@ namespace EnergyPlus::HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ControlNum;
 
-        if (GetControllerInputFlag) {
+        if (state.dataHVACControllers->GetControllerInputFlag) {
             GetControllerInput(state);
-            GetControllerInputFlag = false;
+            state.dataHVACControllers->GetControllerInputFlag = false;
         }
 
         NodeNotFound = true;
-        for (ControlNum = 1; ControlNum <= NumControllers; ++ControlNum) {
-            if (ControllerProps(ControlNum).ActuatedNode == WaterInletNodeNum) {
+        for (ControlNum = 1; ControlNum <= state.dataHVACControllers->NumControllers; ++ControlNum) {
+            if (state.dataHVACControllers->ControllerProps(ControlNum).ActuatedNode == WaterInletNodeNum) {
                 NodeNotFound = false;
             }
         }
@@ -2904,17 +2926,17 @@ namespace EnergyPlus::HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ControlNum;
 
-        if (GetControllerInputFlag) {
+        if (state.dataHVACControllers->GetControllerInputFlag) {
             GetControllerInput(state);
-            GetControllerInputFlag = false;
+            state.dataHVACControllers->GetControllerInputFlag = false;
         }
 
         ControllerName = " ";
         ControllerIndex = 0;
-        for (ControlNum = 1; ControlNum <= NumControllers; ++ControlNum) {
-            if (ControllerProps(ControlNum).ActuatedNode == WaterInletNodeNum) {
+        for (ControlNum = 1; ControlNum <= state.dataHVACControllers->NumControllers; ++ControlNum) {
+            if (state.dataHVACControllers->ControllerProps(ControlNum).ActuatedNode == WaterInletNodeNum) {
                 ControllerIndex = ControlNum;
-                ControllerName = ControllerProps(ControlNum).ControllerName;
+                ControllerName = state.dataHVACControllers->ControllerProps(ControlNum).ControllerName;
                 break;
             }
         }
@@ -2943,15 +2965,15 @@ namespace EnergyPlus::HVACControllers {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int ControlNum;
 
-        if (GetControllerInputFlag) {
+        if (state.dataHVACControllers->GetControllerInputFlag) {
             GetControllerInput(state);
-            GetControllerInputFlag = false;
+            state.dataHVACControllers->GetControllerInputFlag = false;
         }
 
         NodeNotFound = true;
-        ControlNum = UtilityRoutines::FindItemInList(ControllerName, ControllerProps, &ControllerPropsType::ControllerName);
-        if (ControlNum > 0 && ControlNum <= NumControllers) {
-            WaterInletNodeNum = ControllerProps(ControlNum).ActuatedNode;
+        ControlNum = UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
+        if (ControlNum > 0 && ControlNum <= state.dataHVACControllers->NumControllers) {
+            WaterInletNodeNum = state.dataHVACControllers->ControllerProps(ControlNum).ActuatedNode;
             NodeNotFound = false;
         }
     }
@@ -2966,12 +2988,12 @@ namespace EnergyPlus::HVACControllers {
 
         // This subroutine finds the controllers actuator node number
 
-        if (GetControllerInputFlag) {
+        if (state.dataHVACControllers->GetControllerInputFlag) {
             GetControllerInput(state);
-            GetControllerInputFlag = false;
+            state.dataHVACControllers->GetControllerInputFlag = false;
         }
 
-        int ControllerIndex = UtilityRoutines::FindItemInList(ControllerName, ControllerProps, &ControllerPropsType::ControllerName);
+        int ControllerIndex = UtilityRoutines::FindItemInList(ControllerName, state.dataHVACControllers->ControllerProps, &ControllerPropsType::ControllerName);
         if (ControllerIndex == 0) {
             ShowFatalError(state, "ManageControllers: Invalid controller=" + ControllerName +
                            ". The only valid controller type for an AirLoopHVAC is Controller:WaterCoil.");

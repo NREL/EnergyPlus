@@ -80,7 +80,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
@@ -159,7 +158,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     HeatingCoils::clear_state();
     HighTempRadiantSystem::clear_state();
     Humidifiers::clear_state();
-    HVACControllers::clear_state();
     HVACCooledBeam::clear_state();
     HVACDuct::clear_state();
     HVACDXSystem::clear_state();

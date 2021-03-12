@@ -94,18 +94,6 @@ namespace HVACControllers {
         Heating,
     };
 
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumControllers;  // The number of controllers found in the Input
-    extern int NumAirLoopStats; // Same size as NumPrimaryAirSys if controllers
-    // are defined, 0 otherwise.
-    // all controllers per air loop
-    extern Array1D_bool CheckEquipName;
-
-    // Flag set to make sure you get input once
-    extern bool GetControllerInputFlag;
-
-    // Types
-
     struct SolutionTrackerType
     {
         // Members
@@ -264,16 +252,6 @@ namespace HVACControllers {
         }
     };
 
-    // Object Data
-    extern Array1D<ControllerPropsType> ControllerProps;
-    extern Array1D<RootFinderDataType> RootFinders;
-    extern Array1D<AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
-
-    // Functions
-
-    // Needed for unit tests, should not be normally called.
-    void clear_state();
-
     void ManageControllers(EnergyPlusData &state,
                            std::string const &ControllerName,
                            int &ControllerIndex,
@@ -317,11 +295,11 @@ namespace HVACControllers {
 
     void CheckTempAndHumRatCtrl(EnergyPlusData &state, int ControlNum, bool &IsConvergedFlag);
 
-    void SaveSimpleController(int ControlNum, bool FirstHVACIteration, bool IsConvergedFlag);
+    void SaveSimpleController(EnergyPlusData &state, int ControlNum, bool FirstHVACIteration, bool IsConvergedFlag);
 
     void UpdateController(EnergyPlusData &state, int ControlNum);
 
-    void ExitCalcController(int ControlNum, Real64 NextActuatedValue, int Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
+    void ExitCalcController(EnergyPlusData &state, int ControlNum, Real64 NextActuatedValue, int Mode, bool &IsConvergedFlag, bool &IsUpToDateFlag);
 
     void TrackAirLoopControllers(
         EnergyPlusData &state, int AirLoopNum, int WarmRestartStatus, int AirLoopIterMax, int AirLoopIterTot, int AirLoopNumCalls);
@@ -345,7 +323,7 @@ namespace HVACControllers {
     void TraceIterationStamp(
         EnergyPlusData &state, InputOutputFile &TraceFile, bool FirstHVACIteration, int AirLoopPass, bool AirLoopConverged, int AirLoopNumCalls);
 
-    void TraceAirLoopController(InputOutputFile &TraceFile, int ControlNum);
+    void TraceAirLoopController(EnergyPlusData &state, InputOutputFile &TraceFile, int ControlNum);
 
     void SetupIndividualControllerTracer(EnergyPlusData &state, int ControlNum);
 
@@ -390,9 +368,34 @@ namespace HVACControllers {
 
 struct HVACControllersData : BaseGlobalStruct
 {
+    int NumControllers = 0;  // The number of controllers found in the Input
+    int NumAirLoopStats = 0; // Same size as NumPrimaryAirSys if controllers
+    Array1D_bool CheckEquipName;
+    bool GetControllerInputFlag = true;
+    bool InitControllerOneTimeFlag = true;
+    bool InitControllerSetPointCheckFlag = true;
+    Array1D<HVACControllers::ControllerPropsType> ControllerProps;
+    Array1D<HVACControllers::RootFinderDataType> RootFinders;
+    Array1D<HVACControllers::AirLoopStatsType> AirLoopStats; // Statistics array to analyze computational profile for
+    Array1D_bool MyEnvrnFlag;
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyPlantIndexsFlag;
+
 
     void clear_state() override
     {
+        this->NumControllers = 0;
+        this->NumAirLoopStats = 0;
+        this->CheckEquipName.deallocate();
+        this->GetControllerInputFlag = true;
+        this->InitControllerOneTimeFlag = true;
+        this->InitControllerSetPointCheckFlag = true;
+        this->ControllerProps.deallocate();
+        this->RootFinders.deallocate();
+        this->AirLoopStats.deallocate();
+        this->MyEnvrnFlag.deallocate();
+        this->MySizeFlag.deallocate();
+        this->MyPlantIndexsFlag.deallocate();
     }
 };
 

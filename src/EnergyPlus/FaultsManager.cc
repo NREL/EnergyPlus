@@ -873,13 +873,13 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     }
                     // Read in controller input if not done yet
-                    if (HVACControllers::GetControllerInputFlag) {
+                    if (state.dataHVACControllers->GetControllerInputFlag) {
                         HVACControllers::GetControllerInput(state);
-                        HVACControllers::GetControllerInputFlag = false;
+                        state.dataHVACControllers->GetControllerInputFlag = false;
                     }
                     // Check the controller name
                     int ControlNum = UtilityRoutines::FindItemInList(state.dataFaultsMgr->FaultsCoilSATSensor(jFault_CoilSAT).WaterCoilControllerName,
-                                                                     HVACControllers::ControllerProps,
+                                                                     state.dataHVACControllers->ControllerProps,
                                                                      &HVACControllers::ControllerPropsType::ControllerName);
                     if (ControlNum <= 0) {
                         ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
@@ -887,11 +887,11 @@ namespace FaultsManager {
                         ErrorsFound = true;
                     } else {
                         // Link the controller with the fault model
-                        HVACControllers::ControllerProps(ControlNum).FaultyCoilSATFlag = true;
-                        HVACControllers::ControllerProps(ControlNum).FaultyCoilSATIndex = jFault_CoilSAT;
+                        state.dataHVACControllers->ControllerProps(ControlNum).FaultyCoilSATFlag = true;
+                        state.dataHVACControllers->ControllerProps(ControlNum).FaultyCoilSATIndex = jFault_CoilSAT;
 
                         // Check whether the controller match the coil
-                        if (HVACControllers::ControllerProps(ControlNum).SensedNode != state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
+                        if (state.dataHVACControllers->ControllerProps(ControlNum).SensedNode != state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
                             ShowSevereError(state, cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
                                             cAlphaArgs(6) + "\" does not match " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5));
                             ErrorsFound = true;

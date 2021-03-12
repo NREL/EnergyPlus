@@ -407,7 +407,6 @@ namespace EnergyPlus::MixedAir {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using HeatRecovery::SimHeatRecovery;
         using Humidifiers::SimHumidifier;
-        using HVACControllers::ControllerProps;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
@@ -478,7 +477,7 @@ namespace EnergyPlus::MixedAir {
                                              state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
@@ -495,7 +494,7 @@ namespace EnergyPlus::MixedAir {
                                              state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
@@ -517,7 +516,7 @@ namespace EnergyPlus::MixedAir {
                                              state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex,
                                              false);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(state.dataWaterCoils->WaterCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
@@ -546,7 +545,7 @@ namespace EnergyPlus::MixedAir {
                                              HXAssistedCoil(CompIndex).ControllerIndex,
                                              true);
                     // set flag to tell HVAC controller it will be simulated only in SolveWaterCoilController()
-                    ControllerProps(HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
+                    state.dataHVACControllers->ControllerProps(HXAssistedCoil(CompIndex).ControllerIndex).BypassControllerCalc = true;
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'

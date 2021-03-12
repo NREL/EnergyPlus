@@ -139,13 +139,13 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
-    // ControllerProps always expects the control variable type to be "HumididtyRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType::HumRat, ControllerProps(1).HumRatCntrlType);
+    // ControllerProps always expects the control variable type to be "HumidityRatio"
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType::HumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
 
-    ASSERT_EQ(ControllerProps.size(), 1u);
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
+    ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, DataSizing::AutoSize);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
@@ -212,12 +212,12 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataSetPointManager->AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, ControllerProps(1).HumRatCntrlType);
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType);
 
     // test index for air loop controllers
     // before controllers are simulated, AirLoopControllerIndex = 0
-    ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(0, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
     ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers);
     ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1));
-    ASSERT_EQ(1, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(1, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
@@ -360,8 +360,8 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
 
     GetControllerInput(*state);
     // check ControllerProps control variable is set to "MaximumHumidityRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, ControllerProps(1).SensedNode);
-    ASSERT_EQ(iCtrlVarType::MaxHumRat, ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
+    state->dataHVACControllers->ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(*state, state->dataHVACControllers->ControllerProps(1).SensedNode);
+    ASSERT_EQ(iCtrlVarType::MaxHumRat, state->dataHVACControllers->ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
@@ -691,11 +691,11 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
 }
 TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
 {
-    HVACControllers::ControllerProps.allocate(1);
-    HVACControllers::RootFinders.allocate(1);
+    state->dataHVACControllers->ControllerProps.allocate(1);
+    state->dataHVACControllers->RootFinders.allocate(1);
     bool isConverged = true;
     int const controlNum = 1;
-    auto &thisController(ControllerProps(1));
+    auto &thisController(state->dataHVACControllers->ControllerProps(1));
     thisController.ControlVar = HVACControllers::iCtrl::TemperatureAndHumidityRatio;
     thisController.Offset = 0.0001;
     int sensedNode = 1;
@@ -843,10 +843,10 @@ TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
 
     GetControllerInput(*state);
 
-    ASSERT_EQ(ControllerProps.size(), 1u);
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+    ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
@@ -918,14 +918,14 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
 
     GetControllerInput(*state);
 
-    ASSERT_EQ(ControllerProps.size(), 1u);
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).Offset, DataSizing::AutoSize);
-    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+    ASSERT_EQ(state->dataHVACControllers->ControllerProps.size(), 1u);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, DataSizing::AutoSize);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 
     // test index for air loop controllers
     // before controllers are simulated, AirLoopControllerIndex = 0
-    ASSERT_EQ(0, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(0, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 
     OutputReportPredefined::SetPredefinedTables(*state);
     state->dataSimAirServingZones->GetAirLoopInputFlag = false;
@@ -1006,18 +1006,18 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     // after controllers are simulated, AirLoopControllerIndex = index to this controller on this air loop (e.g., n of num contollers on air loop)
     ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).NumControllers);
     ASSERT_EQ(1, state->dataAirSystemsData->PrimaryAirSystems(1).ControllerIndex(1));
-    ASSERT_EQ(1, ControllerProps(1).AirLoopControllerIndex);
+    ASSERT_EQ(1, state->dataHVACControllers->ControllerProps(1).AirLoopControllerIndex);
 
     // This should have been autosized to zero
-    EXPECT_EQ(ControllerProps(1).MaxVolFlowActuated, 0.0);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MaxVolFlowActuated, 0.0);
     // This should have been reset to zero
-    EXPECT_EQ(ControllerProps(1).MinVolFlowActuated, 0.0);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 
     Real64 expectedOffset = (0.001 / (2100.0 * DataHVACGlobals::SmallWaterVolFlow)) * (DataConvergParams::HVACEnergyToler / 10.0);
     // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
     expectedOffset = min(0.1 * DataConvergParams::HVACTemperatureToler, expectedOffset);
     EXPECT_EQ(expectedOffset, 0.1 * DataConvergParams::HVACTemperatureToler);
-    EXPECT_EQ(ControllerProps(1).Offset, expectedOffset);
+    EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).Offset, expectedOffset);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** InitController: Controller:WaterCoil=\"CW COIL CONTROLLER\", Maximum Actuated Flow is zero.",
