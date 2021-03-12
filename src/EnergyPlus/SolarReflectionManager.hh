@@ -125,8 +125,45 @@ struct SolarReflectionManagerData : BaseGlobalStruct {
 
     Array1D<SolarReflectionManager::SolReflRecSurfData> SolReflRecSurf;
 
+    // static variables extracted from functions
+    int IHr = 0; // Hour number
+    Vector3<Real64> SunVec; // Unit vector to sun
+    int RecSurfNum = 0;           // Receiving surface number
+    int SurfNum = 0;              // Heat transfer surface number corresponding to RecSurfNum
+    int RecPtNum = 0;             // Receiving point number
+    int NumRecPts = 0;            // Number of receiving points on a receiving surface
+    int HitPtSurfNum = 0;         // Surface number of hit point: -1 = ground,
+    // 0 = sky or obstruction with receiving point below ground level,
+    // >0 = obstruction with receiving point above ground level
+    int RayNum = 0;                      // Ray number
+    Vector3<Real64> OriginThisRay; // Origin point of a ray (m)
+    Vector3<Real64> ObsHitPt;      // Hit point on obstruction (m)
+    int ObsSurfNum = 0;                  // Obstruction surface number
+    Real64 CosIncBmAtHitPt = 0.0;        // Cosine of incidence angle of beam solar at hit point
+    Real64 CosIncBmAtHitPt2 = 0.0;       // Cosine of incidence angle of beam solar at hit point, the mirrored shading surface
+    Real64 BmReflSolRadiance = 0.0;      // Solar radiance at hit point due to incident beam, divided by beam normal irradiance
+    Real64 dReflBeamToDiffSol = 0.0;     // Contribution to reflection factor at a receiving point from beam solar reflected from a hit point
+    Real64 SunLitFract = 0.0;            // Sunlit fraction
+
+
     void clear_state() override
     {
+        this->IHr = 0;
+        this->SunVec = 0.0;
+        this->RecSurfNum = 0;     
+        this->SurfNum = 0;    
+        this->RecPtNum = 0; 
+        this->NumRecPts = 0;
+        this->HitPtSurfNum = 0;
+        this->RayNum = 0;
+        this->OriginThisRay = 0.0;
+        this->ObsHitPt = 0.0;
+        this->ObsSurfNum = 0;
+        this->CosIncBmAtHitPt = 0.0;
+        this->CosIncBmAtHitPt2 = 0.0;
+        this->BmReflSolRadiance = 0.0;
+        this->dReflBeamToDiffSol = 0.0;
+        this->SunLitFract = 0.0;       
     }
 
     // Default Constructor
