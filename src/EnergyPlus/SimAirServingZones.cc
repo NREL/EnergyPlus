@@ -7061,7 +7061,6 @@ namespace EnergyPlus::SimAirServingZones {
         using Psychrometrics::PsyHFnTdbW;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        constexpr const char * RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 TempSize;           // autosized value

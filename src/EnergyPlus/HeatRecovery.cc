@@ -2565,7 +2565,6 @@ namespace HeatRecovery {
         Real64 MinHumRatNeeded;         // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
         Real64 HXPartLoadRatio;         // local heat exchanger part-load ratio
         Real64 TestSaturationEnthalpy;  // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-        constexpr const char * ThisSub("CalcDesiccantBalancedHeatExch:  "); // Used to pass to Psyc routines
         constexpr const char * ThisSubTSat("CalcDesiccantBalancedHeatExch:   TSat");
         constexpr const char * ThisSubTSatFullLoadOutTemp("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp");
         constexpr const char * ThisSubTSatFullLoadOutHumRat("CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat");

@@ -255,7 +255,6 @@ namespace HighTempRadiantSystem {
         Real64 const MinFraction(0.0);         // Limit the lowest allowed fraction for heat transfer parts
         Real64 const MinThrottlingRange(0.5);  // Smallest throttling range allowed in degrees Celsius
         //  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
-        constexpr const char * RoutineName("GetHighTempRadiantSystem: "); // include trailing blank space
         int const iHeatCAPMAlphaNum(4);                   // get input index to High Temperature Radiant system heating capacity sizing method
         int const iHeatDesignCapacityNumericNum(1);       // get input index to High Temperature Radiant system heating capacity
         int const iHeatCapacityPerFloorAreaNumericNum(2); // get input index to High Temperature Radiant system heating capacity per floor area sizing
