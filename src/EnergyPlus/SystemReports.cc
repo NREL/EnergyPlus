@@ -2210,7 +2210,7 @@ namespace EnergyPlus::SystemReports {
                                 OutputProcessor::Unit::m3_s,
                                 state.dataSysRpts->ZoneTargetVentilationFlowVoz(ZoneIndex),
                                 "HVAC",
-                                "Sum",
+                                "Average",
                                 state.dataZoneEquip->ZoneEquipConfig(ZoneIndex).ZoneName);
 
             SetupOutputVariable(state, "Zone Ventilation Below Target Voz Time",
@@ -4813,6 +4813,7 @@ namespace EnergyPlus::SystemReports {
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAboveVozDynTotalOcc += state.dataSysRpts->SysTimeAboveVozDyn(sysNum);
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeAtVozDynTotalOcc += state.dataSysRpts->SysTimeAtVozDyn(sysNum);
             } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
+                state.dataSysRpts->SysTimeVentUnocc(sysNum) = TimeStepSys;
                 state.dataSysRpts->SysPreDefRep(sysNum).SysTimeVentUnoccTotal += TimeStepSys;
             }
 
