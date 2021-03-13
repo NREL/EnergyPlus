@@ -343,7 +343,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
             state.dataPackagedThermalStorageCoil->TESCoil(item).StorageCapacitySizingFactor = rNumericArgs(3);
 
             state.dataPackagedThermalStorageCoil->TESCoil(item).StorageAmbientNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
 
             ZoneIndexTrial = FindControlledZoneIndexFromSystemNodeNumberForZone(state, state.dataPackagedThermalStorageCoil->TESCoil(item).StorageAmbientNodeNum);
             if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
@@ -359,9 +359,9 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
             state.dataPackagedThermalStorageCoil->TESCoil(item).RatedEvapAirVolFlowRate = rNumericArgs(6);
 
             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapAirInletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
             state.dataPackagedThermalStorageCoil->TESCoil(item).EvapAirOutletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(9), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                cAlphaArgs(9), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(8), cAlphaArgs(9), "Air Nodes");
 
             {
@@ -1353,7 +1353,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                                                                   ErrorsFound,
                                                                   cCurrentModuleObject,
                                                                   state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
-                                                                  NodeType_Air,
+                                                                  DataLoopNode::NodeFluidType::Air,
                                                                   NodeConnectionType_OutsideAirReference,
                                                                   1,
                                                                   ObjectIsNotParent);
@@ -1361,7 +1361,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                                                                    ErrorsFound,
                                                                    cCurrentModuleObject,
                                                                    state.dataPackagedThermalStorageCoil->TESCoil(item).Name,
-                                                                   NodeType_Air,
+                                                                   DataLoopNode::NodeFluidType::Air,
                                                                    NodeConnectionType_ReliefAir,
                                                                    1,
                                                                    ObjectIsNotParent);
@@ -1426,7 +1426,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 
             if (!lAlphaFieldBlanks(62)) {
                 state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantInletNodeNum = GetOnlySingleNode(state,
-                    cAlphaArgs(62), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                    cAlphaArgs(62), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
                 state.dataPackagedThermalStorageCoil->TESCoil(item).TESPlantConnectionAvailable = true;
             } else {
@@ -1437,7 +1437,7 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
                                                                         ErrorsFound,
                                                                         cCurrentModuleObject,
                                                                         cAlphaArgs(1),
-                                                                        NodeType_Water,
+                                                                        DataLoopNode::NodeFluidType::Water,
                                                                         NodeConnectionType_Outlet,
                                                                         2,
                                                                         ObjectIsNotParent);

@@ -482,10 +482,10 @@ namespace EnergyPlus::SimAirServingZones {
             AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum.allocate(AirToZoneNodeInfo(AirSysNum).NumReturnNodes);
             // fill the return air node arrays with node numbers
             AirToZoneNodeInfo(AirSysNum).AirLoopReturnNodeNum(1) =
-                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
             if (!lAlphaBlanks(7)) {
                 AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = GetOnlySingleNode(state,
-                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
             } else {
                 // If no return path, set this to zero to trigger special handling when calling UpdateHVACInterface
                 AirToZoneNodeInfo(AirSysNum).ZoneEquipReturnNodeNum(1) = 0;
@@ -580,7 +580,7 @@ namespace EnergyPlus::SimAirServingZones {
                         NumNodes,
                         NodeNums,
                         ErrInList,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         CurrentModuleObject,
                         PrimaryAirSystems(AirSysNum).Name,
                         NodeConnectionType_Inlet,
@@ -620,7 +620,7 @@ namespace EnergyPlus::SimAirServingZones {
                         NumNodes,
                         NodeNums,
                         ErrInList,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         CurrentModuleObject,
                         PrimaryAirSystems(AirSysNum).Name,
                         NodeConnectionType_Outlet,

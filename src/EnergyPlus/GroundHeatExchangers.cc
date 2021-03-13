@@ -142,11 +142,11 @@ namespace EnergyPlus::GroundHeatExchangers {
 
         // get inlet node num
         this->inletNodeNum = NodeInputManager::GetOnlySingleNode(
-            state, inletNodeName, errorsFound, this->moduleName, this->name, NodeType_Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+            state, inletNodeName, errorsFound, this->moduleName, this->name, DataLoopNode::NodeFluidType::Water, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
         // get outlet node num
         this->outletNodeNum = NodeInputManager::GetOnlySingleNode(
-            state, outletNodeName, errorsFound, this->moduleName, this->name, NodeType_Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+            state, outletNodeName, errorsFound, this->moduleName, this->name, DataLoopNode::NodeFluidType::Water, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
         this->available = true;
         this->on = true;
@@ -271,7 +271,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                  errorsFound,
                                                                  this->moduleName,
                                                                  objName,
-                                                                 NodeType_Water,
+                                                                 DataLoopNode::NodeFluidType::Water,
                                                                  NodeConnectionType_Inlet,
                                                                  1,
                                                                  ObjectIsNotParent);
@@ -283,7 +283,7 @@ namespace EnergyPlus::GroundHeatExchangers {
                                                                   errorsFound,
                                                                   this->moduleName,
                                                                   objName,
-                                                                  NodeType_Water,
+                                                                  DataLoopNode::NodeFluidType::Water,
                                                                   NodeConnectionType_Outlet,
                                                                   1,
                                                                   ObjectIsNotParent);

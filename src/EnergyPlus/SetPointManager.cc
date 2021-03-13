@@ -858,9 +858,9 @@ namespace EnergyPlus::SetPointManager {
                                          state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -959,9 +959,9 @@ namespace EnergyPlus::SetPointManager {
                                          state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(
-                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(
-                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -1059,9 +1059,9 @@ namespace EnergyPlus::SetPointManager {
                                          state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).MinSetTemp));
             }
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
@@ -1145,7 +1145,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -1175,7 +1175,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         ErrInList,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_Sensor,
@@ -1253,7 +1253,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -1283,7 +1283,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         ErrInList,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_Sensor,
@@ -1364,18 +1364,18 @@ namespace EnergyPlus::SetPointManager {
                 ErrorsFound = true;
             }
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(
-                state, cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanInNode = GetOnlySingleNode(
-                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).FanOutNode = GetOnlySingleNode(
-                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                state, cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(6),
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -1417,9 +1417,9 @@ namespace EnergyPlus::SetPointManager {
 
             if (NumAlphas > 7) {
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilInNode = GetOnlySingleNode(state,
-                    cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    cAlphaArgs(7), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).CoolCoilOutNode = GetOnlySingleNode(state,
-                    cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    cAlphaArgs(8), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 if (NumNums == 1) {
                     state.dataSetPointManager->MixedAirSetPtMgr(SetPtMgrNum).MinCoolCoilOutTemp = rNumericArgs(1);
                 }
@@ -1518,20 +1518,20 @@ namespace EnergyPlus::SetPointManager {
             }
 
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).RefNode = GetOnlySingleNode(state,
-                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(3), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).MixedOutNode = GetOnlySingleNode(state,
-                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(4), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).OAInNode = GetOnlySingleNode(state,
-                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(5), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             state.dataSetPointManager->OAPretreatSetPtMgr(SetPtMgrNum).ReturnInNode = GetOnlySingleNode(state,
-                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                cAlphaArgs(6), ErrorsFound, cCurrentModuleObject, cAlphaArgs(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             NodeListError = false;
             GetNodeNums(state,
                         cAlphaArgs(7),
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -1646,7 +1646,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -1748,7 +1748,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -1859,7 +1859,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -2009,7 +2009,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -2092,7 +2092,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -2175,7 +2175,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -2259,7 +2259,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -2343,7 +2343,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -2427,7 +2427,7 @@ namespace EnergyPlus::SetPointManager {
                         NumNodes,
                         NodeNums,
                         NodeListError,
-                        NodeType_Air,
+                        DataLoopNode::NodeFluidType::Air,
                         cCurrentModuleObject,
                         cAlphaArgs(1),
                         NodeConnectionType_SetPoint,
@@ -4689,9 +4689,9 @@ namespace EnergyPlus::SetPointManager {
                         }
                     } else {
                         // If reference node is a water node, then set RefTypeMode to NodeDryBulb
-                        if (state.dataLoopNodes->Node(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).FluidType == NodeType_Water) {
+                        if (state.dataLoopNodes->Node(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).FluidType == DataLoopNode::NodeFluidType::Water) {
                             state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode = ReferenceTempType::DryBulb;
-                        } else if (state.dataLoopNodes->Node(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).FluidType == NodeType_Air) {
+                        } else if (state.dataLoopNodes->Node(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).FluidType == DataLoopNode::NodeFluidType::Air) {
                             if (state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefTypeMode == ReferenceTempType::WetBulb) {
                                 state.dataLoopNodes->Node(state.dataSetPointManager->FollowSysNodeTempSetPtMgr(SetPtMgrNum).RefNodeNum).SPMNodeWetBulbRepReq = true;
                             }

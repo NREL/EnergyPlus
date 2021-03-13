@@ -534,7 +534,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                              ErrorsFound,
                                                                                              CurrentModuleObject,
                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                                                             NodeType_Air,
+                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                              NodeConnectionType_Inlet,
                                                                                              1,
                                                                                              ObjectIsParent);
@@ -542,7 +542,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         ErrorsFound,
                                                         CurrentModuleObject,
                                                         HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                        NodeType_Air,
+                                                        DataLoopNode::NodeFluidType::Air,
                                                         NodeConnectionType_Internal,
                                                         1,
                                                         ObjectIsParent);
@@ -550,7 +550,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                            ErrorsFound,
                                                                                            CurrentModuleObject,
                                                                                            HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                                                           NodeType_Air,
+                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                            NodeConnectionType_Internal,
                                                                                            1,
                                                                                            ObjectIsParent);
@@ -558,7 +558,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                               ErrorsFound,
                                                                                               CurrentModuleObject,
                                                                                               HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                                                              NodeType_Air,
+                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                               NodeConnectionType_Outlet,
                                                                                               1,
                                                                                               ObjectIsParent);
@@ -721,7 +721,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                              ErrorsFound,
                                                                                              CurrentModuleObject,
                                                                                              HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                                                             NodeType_Air,
+                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                              NodeConnectionType_Inlet,
                                                                                              1,
                                                                                              ObjectIsParent);
@@ -729,7 +729,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                         ErrorsFound,
                                                         CurrentModuleObject,
                                                         HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                        NodeType_Air,
+                                                        DataLoopNode::NodeFluidType::Air,
                                                         NodeConnectionType_Internal,
                                                         1,
                                                         ObjectIsParent);
@@ -737,7 +737,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                            ErrorsFound,
                                                                                            CurrentModuleObject,
                                                                                            HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                                                           NodeType_Air,
+                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                            NodeConnectionType_Internal,
                                                                                            1,
                                                                                            ObjectIsParent);
@@ -745,7 +745,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                                                               ErrorsFound,
                                                                                               CurrentModuleObject,
                                                                                               HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                                                              NodeType_Air,
+                                                                                              DataLoopNode::NodeFluidType::Air,
                                                                                               NodeConnectionType_Outlet,
                                                                                               1,
                                                                                               ObjectIsParent);

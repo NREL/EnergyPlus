@@ -308,7 +308,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                             Get_ErrorsFound,
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
-                                                                            DataLoopNode::NodeType_Water,
+                                                                            DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType_Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
@@ -316,7 +316,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                             Get_ErrorsFound,
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
-                                                                            DataLoopNode::NodeType_Water,
+                                                                            DataLoopNode::NodeFluidType::Water,
                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
@@ -326,7 +326,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                            Get_ErrorsFound,
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
-                                                                           DataLoopNode::NodeType_Water,
+                                                                           DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType_Inlet,
                                                                            3,
                                                                            DataLoopNode::ObjectIsNotParent);
@@ -334,7 +334,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                            Get_ErrorsFound,
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
-                                                                           DataLoopNode::NodeType_Water,
+                                                                           DataLoopNode::NodeFluidType::Water,
                                                                            DataLoopNode::NodeConnectionType_Outlet,
                                                                            3,
                                                                            DataLoopNode::ObjectIsNotParent);
@@ -416,7 +416,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               DataLoopNode::NodeType_Water,
+                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType_Inlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);
@@ -424,7 +424,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               DataLoopNode::NodeType_Water,
+                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);
@@ -434,7 +434,7 @@ namespace EnergyPlus::ChillerGasAbsorption {
                                                                                Get_ErrorsFound,
                                                                                cCurrentModuleObject,
                                                                                cAlphaArgs(1),
-                                                                               DataLoopNode::NodeType_Air,
+                                                                               DataLoopNode::NodeFluidType::Air,
                                                                                DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                                2,
                                                                                DataLoopNode::ObjectIsNotParent);

@@ -1490,7 +1490,6 @@ namespace AirflowNetworkBalanceManager {
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using DataLoopNode::NodeConnectionType_Inlet;
-        using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
         using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
         using MixedAir::GetOAMixerNumber;
@@ -2318,7 +2317,7 @@ namespace AirflowNetworkBalanceManager {
                                                     ErrorsFound,
                                                     CurrentModuleObject,
                                                     "AirflowNetwork:Multizone:Surface",
-                                                    NodeType_Air,
+                                                    DataLoopNode::NodeFluidType::Air,
                                                     NodeConnectionType_Inlet,
                                                     1,
                                                     ObjectIsParent);

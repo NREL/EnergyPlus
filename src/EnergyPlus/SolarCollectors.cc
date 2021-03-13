@@ -352,7 +352,7 @@ namespace SolarCollectors {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
+                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType_Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -360,7 +360,7 @@ namespace SolarCollectors {
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
+                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType_Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
@@ -607,7 +607,7 @@ namespace SolarCollectors {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Water,
+                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType_Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -615,7 +615,7 @@ namespace SolarCollectors {
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          DataIPShortCuts::cAlphaArgs(1),
-                                                                                         DataLoopNode::NodeType_Water,
+                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType_Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);

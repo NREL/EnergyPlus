@@ -3979,7 +3979,7 @@ namespace InternalHeatGains {
                     }
                 } else {
                     state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum = GetOnlySingleNode(state,
-                        AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                        AlphaName(14), ErrorsFound, CurrentModuleObject, AlphaName(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 }
 
                 // check supply air node for matches with zone equipment supply air node

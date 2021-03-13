@@ -241,7 +241,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                     ErrorsFound,
                                                                                                     cCurrentModuleObject,
                                                                                                     cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeType_Water,
+                                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
@@ -249,7 +249,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                      ErrorsFound,
                                                                                                      cCurrentModuleObject,
                                                                                                      cAlphaArgs(1),
-                                                                                                     DataLoopNode::NodeType_Water,
+                                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
@@ -263,7 +263,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                     ErrorsFound,
                                                                                                     cCurrentModuleObject,
                                                                                                     cAlphaArgs(1),
-                                                                                                    DataLoopNode::NodeType_Water,
+                                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                                                                     2,
                                                                                                     DataLoopNode::ObjectIsNotParent);
@@ -271,7 +271,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                                      ErrorsFound,
                                                                                                      cCurrentModuleObject,
                                                                                                      cAlphaArgs(1),
-                                                                                                     DataLoopNode::NodeType_Water,
+                                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
                                                                                                      2,
                                                                                                      DataLoopNode::ObjectIsNotParent);
@@ -349,7 +349,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                                                             ErrorsFound,
                                                                                             cCurrentModuleObject,
                                                                                             cAlphaArgs(1),
-                                                                                            DataLoopNode::NodeType_Water,
+                                                                                            DataLoopNode::NodeFluidType::Water,
                                                                                             DataLoopNode::NodeConnectionType_Sensor,
                                                                                             1,
                                                                                             DataLoopNode::ObjectIsNotParent);
@@ -429,7 +429,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                             ErrorsFound,
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
-                                                            DataLoopNode::NodeType_Water,
+                                                            DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType_Actuator,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);
@@ -447,7 +447,7 @@ namespace EnergyPlus::PlantHeatExchangerFluidToFluid {
                                                             ErrorsFound,
                                                             cCurrentModuleObject,
                                                             cAlphaArgs(1),
-                                                            DataLoopNode::NodeType_Water,
+                                                            DataLoopNode::NodeFluidType::Water,
                                                             DataLoopNode::NodeConnectionType_Actuator,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);

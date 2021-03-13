@@ -279,7 +279,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                            ErrorsFound,
                                                                            cCurrentModuleObject,
                                                                            cAlphaArgs(1),
-                                                                           NodeType_Air,
+                                                                           DataLoopNode::NodeFluidType::Air,
                                                                            NodeConnectionType_Outlet,
                                                                            1,
                                                                            ObjectIsNotParent);
@@ -294,7 +294,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     ErrorsFound,
                                                                                     cCurrentModuleObject,
                                                                                     cAlphaArgs(1),
-                                                                                    NodeType_Air,
+                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                     NodeConnectionType_Inlet,
                                                                                     1,
                                                                                     ObjectIsNotParent);
@@ -304,7 +304,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                     ErrorsFound,
                                                                                     cCurrentModuleObject,
                                                                                     cAlphaArgs(1),
-                                                                                    NodeType_Air,
+                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                     NodeConnectionType_Outlet,
                                                                                     1,
                                                                                     ObjectIsNotParent);
@@ -319,7 +319,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                                   ErrorsFound,
                                                                                   cCurrentModuleObject,
                                                                                   cAlphaArgs(1),
-                                                                                  NodeType_Air,
+                                                                                  DataLoopNode::NodeFluidType::Air,
                                                                                   NodeConnectionType_Inlet,
                                                                                   1,
                                                                                   ObjectIsNotParent);
@@ -483,7 +483,7 @@ void GetPurchasedAir(EnergyPlusData &state)
                                                                             ErrorsFound,
                                                                             cCurrentModuleObject,
                                                                             cAlphaArgs(1),
-                                                                            NodeType_Air,
+                                                                            DataLoopNode::NodeFluidType::Air,
                                                                             NodeConnectionType_Outlet,
                                                                             1,
                                                                             ObjectIsNotParent);

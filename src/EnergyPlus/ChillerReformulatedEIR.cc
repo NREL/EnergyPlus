@@ -328,7 +328,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                        ErrorsFound,
                                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                                        DataIPShortCuts::cAlphaArgs(1),
-                                                                                                       DataLoopNode::NodeType_Water,
+                                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
@@ -336,7 +336,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                         ErrorsFound,
                                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeType_Water,
+                                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                                                         1,
                                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -364,7 +364,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                        ErrorsFound,
                                                                                                        DataIPShortCuts::cCurrentModuleObject,
                                                                                                        DataIPShortCuts::cAlphaArgs(1),
-                                                                                                       DataLoopNode::NodeType_Water,
+                                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                                                        2,
                                                                                                        DataLoopNode::ObjectIsNotParent);
@@ -372,7 +372,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                         ErrorsFound,
                                                                                                         DataIPShortCuts::cCurrentModuleObject,
                                                                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                                                                        DataLoopNode::NodeType_Water,
+                                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                                                         2,
                                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -506,7 +506,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                                                               ErrorsFound,
                                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                                              DataLoopNode::NodeType_Water,
+                                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                                               DataLoopNode::NodeConnectionType_Inlet,
                                                                                                               3,
                                                                                                               DataLoopNode::ObjectIsNotParent);
@@ -520,7 +520,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                         ErrorsFound,
                                                         DataIPShortCuts::cCurrentModuleObject,
                                                         DataIPShortCuts::cAlphaArgs(1),
-                                                        DataLoopNode::NodeType_Water,
+                                                        DataLoopNode::NodeFluidType::Water,
                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                         3,
                                                         DataLoopNode::ObjectIsNotParent);
@@ -578,7 +578,7 @@ namespace EnergyPlus::ChillerReformulatedEIR {
                                                                 ErrorsFound,
                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                 DataIPShortCuts::cAlphaArgs(1),
-                                                                DataLoopNode::NodeType_Water,
+                                                                DataLoopNode::NodeFluidType::Water,
                                                                 DataLoopNode::NodeConnectionType_Sensor,
                                                                 1,
                                                                 DataLoopNode::ObjectIsNotParent);

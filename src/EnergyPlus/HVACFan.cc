@@ -440,7 +440,7 @@ namespace HVACFan {
                                                            errorsFound,
                                                            locCurrentModuleObject,
                                                            alphaArgs(1),
-                                                           DataLoopNode::NodeType_Air,
+                                                           DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::NodeConnectionType_Inlet,
                                                            1,
                                                            DataLoopNode::ObjectIsNotParent);
@@ -448,7 +448,7 @@ namespace HVACFan {
                                                             errorsFound,
                                                             locCurrentModuleObject,
                                                             alphaArgs(1),
-                                                            DataLoopNode::NodeType_Air,
+                                                            DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                             1,
                                                             DataLoopNode::ObjectIsNotParent);

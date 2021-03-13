@@ -236,7 +236,7 @@ namespace TranspiredCollector {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeConnectionType_Outlet;
         using DataLoopNode::NodeConnectionType_Sensor;
-        using DataLoopNode::NodeType_Air;
+        using DataLoopNode::NodeFluidType::Air;
         using DataLoopNode::ObjectIsNotParent;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;
@@ -359,7 +359,7 @@ namespace TranspiredCollector {
                                                                            ErrorsFound,
                                                                            CurrentModuleObject,
                                                                            AlphasSplit(1),
-                                                                           NodeType_Air,
+                                                                           DataLoopNode::NodeFluidType::Air,
                                                                            NodeConnectionType_Inlet,
                                                                            NumOASys,
                                                                            ObjectIsNotParent);
@@ -368,7 +368,7 @@ namespace TranspiredCollector {
                                                                             ErrorsFound,
                                                                             CurrentModuleObject,
                                                                             AlphasSplit(1),
-                                                                            NodeType_Air,
+                                                                            DataLoopNode::NodeFluidType::Air,
                                                                             NodeConnectionType_Outlet,
                                                                             NumOASys,
                                                                             ObjectIsNotParent);
@@ -381,7 +381,7 @@ namespace TranspiredCollector {
                                                                              ErrorsFound,
                                                                              CurrentModuleObject,
                                                                              AlphasSplit(1),
-                                                                             NodeType_Air,
+                                                                             DataLoopNode::NodeFluidType::Air,
                                                                              NodeConnectionType_Sensor,
                                                                              1,
                                                                              ObjectIsNotParent);
@@ -390,7 +390,7 @@ namespace TranspiredCollector {
                                                                           ErrorsFound,
                                                                           CurrentModuleObject,
                                                                           AlphasSplit(1),
-                                                                          NodeType_Air,
+                                                                          DataLoopNode::NodeFluidType::Air,
                                                                           NodeConnectionType_Sensor,
                                                                           1,
                                                                           ObjectIsNotParent);
@@ -431,15 +431,15 @@ namespace TranspiredCollector {
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = 0;
 
                 state.dataTranspiredCollector->UTSC(Item).InletNode(1) = GetOnlySingleNode(state,
-                    Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                    Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).OutletNode(1) = GetOnlySingleNode(state,
-                    Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                    Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
                 state.dataTranspiredCollector->UTSC(Item).ControlNode(1) = GetOnlySingleNode(state,
-                    Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = GetOnlySingleNode(state,
-                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
+                    Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent);
             } // no splitter
 
             state.dataTranspiredCollector->UTSC(Item).FreeHeatSetPointSchedPtr = GetScheduleIndex(state, Alphas(8));

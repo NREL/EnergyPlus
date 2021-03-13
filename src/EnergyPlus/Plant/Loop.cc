@@ -103,8 +103,8 @@ namespace EnergyPlus::DataPlant {
         // calculate a demand based on mass flow times specific heat times delta T
 
         // Using/Aliasing
-        using DataLoopNode::NodeType_Steam;
-        using DataLoopNode::NodeType_Water;
+        using DataLoopNode::NodeFluidType::Steam;
+        using DataLoopNode::NodeFluidType::Water;
         using DataPlant::LoopDemandTol;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -135,7 +135,7 @@ namespace EnergyPlus::DataPlant {
         TargetTemp = state.dataLoopNodes->Node(this->TempSetPointNodeNum).Temp;
         MassFlowRate = state.dataLoopNodes->Node(this->TempSetPointNodeNum).MassFlowRate;
 
-        if (this->FluidType == NodeType_Water) {
+        if (this->FluidType == DataLoopNode::NodeFluidType::Water) {
 
             Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
@@ -181,7 +181,7 @@ namespace EnergyPlus::DataPlant {
                 }
             }
 
-        } else if (this->FluidType == NodeType_Steam) {
+        } else if (this->FluidType == DataLoopNode::NodeFluidType::Steam) {
 
             Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 

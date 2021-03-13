@@ -332,7 +332,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          ErrorsFound,
                                                          state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                          cAlphaArgs(1),
-                                                         NodeType_Air,
+                                                         DataLoopNode::NodeFluidType::Air,
                                                          NodeConnectionType_Inlet,
                                                          1,
                                                          ObjectIsParent,
@@ -342,7 +342,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          ErrorsFound,
                                                          state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                          cAlphaArgs(1),
-                                                         NodeType_Air,
+                                                         DataLoopNode::NodeFluidType::Air,
                                                          NodeConnectionType_Inlet,
                                                          1,
                                                          ObjectIsParent,
@@ -352,7 +352,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                        ErrorsFound,
                                                        state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                        cAlphaArgs(1),
-                                                       NodeType_Air,
+                                                       DataLoopNode::NodeFluidType::Air,
                                                        NodeConnectionType_Outlet,
                                                        1,
                                                        ObjectIsParent,
@@ -362,7 +362,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                            ErrorsFound,
                                                            state.dataPowerInductionUnits->PIU(PIUNum).UnitType,
                                                            cAlphaArgs(1),
-                                                           NodeType_Air,
+                                                           DataLoopNode::NodeFluidType::Air,
                                                            NodeConnectionType_Internal,
                                                            1,
                                                            ObjectIsParent,
@@ -526,7 +526,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          ErrorsFound,
                                                          cCurrentModuleObject,
                                                          cAlphaArgs(1),
-                                                         NodeType_Air,
+                                                         DataLoopNode::NodeFluidType::Air,
                                                          NodeConnectionType_Inlet,
                                                          1,
                                                          ObjectIsParent,
@@ -536,7 +536,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                          ErrorsFound,
                                                          cCurrentModuleObject,
                                                          cAlphaArgs(1),
-                                                         NodeType_Air,
+                                                         DataLoopNode::NodeFluidType::Air,
                                                          NodeConnectionType_Inlet,
                                                          1,
                                                          ObjectIsParent,
@@ -546,7 +546,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                        ErrorsFound,
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
-                                                       NodeType_Air,
+                                                       DataLoopNode::NodeFluidType::Air,
                                                        NodeConnectionType_Outlet,
                                                        1,
                                                        ObjectIsParent,
@@ -556,7 +556,7 @@ namespace EnergyPlus::PoweredInductionUnits {
                                                            ErrorsFound,
                                                            cCurrentModuleObject,
                                                            cAlphaArgs(1),
-                                                           NodeType_Air,
+                                                           DataLoopNode::NodeFluidType::Air,
                                                            NodeConnectionType_Internal,
                                                            1,
                                                            ObjectIsParent,
@@ -577,7 +577,7 @@ namespace EnergyPlus::PoweredInductionUnits {
             //    END IF
             //    PIU(PIUNum)%HotControlNode  = &
             //      GetOnlySingleNode(state, cAlphaArgs(11),ErrorsFound,TRIM(cCurrentModuleObject),cAlphaArgs(1), &
-            //                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
+            //                        DataLoopNode::NodeFluidType::Water,NodeConnectionType_Actuator,1,ObjectIsParent)
             //  END IF
             if (state.dataPowerInductionUnits->PIU(PIUNum).HCoilType_Num == iHCoilType::SimpleHeating) {
                 state.dataPowerInductionUnits->PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);

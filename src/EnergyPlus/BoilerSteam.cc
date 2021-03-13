@@ -251,7 +251,7 @@ namespace BoilerSteam {
                                                                                 ErrorsFound,
                                                                                 DataIPShortCuts::cCurrentModuleObject,
                                                                                 DataIPShortCuts::cAlphaArgs(1),
-                                                                                DataLoopNode::NodeType_Steam,
+                                                                                DataLoopNode::NodeFluidType::Steam,
                                                                                 DataLoopNode::NodeConnectionType_Inlet,
                                                                                 1,
                                                                                 DataLoopNode::ObjectIsNotParent);
@@ -260,7 +260,7 @@ namespace BoilerSteam {
                                                                                  ErrorsFound,
                                                                                  DataIPShortCuts::cCurrentModuleObject,
                                                                                  DataIPShortCuts::cAlphaArgs(1),
-                                                                                 DataLoopNode::NodeType_Steam,
+                                                                                 DataLoopNode::NodeFluidType::Steam,
                                                                                  DataLoopNode::NodeConnectionType_Outlet,
                                                                                  1,
                                                                                  DataLoopNode::ObjectIsNotParent);

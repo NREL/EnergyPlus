@@ -229,7 +229,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
                                                                                          ErrorsFound,
                                                                                          "Zone",
                                                                                          "BeamTest",
-                                                                                         DataLoopNode::NodeType_Air,
+                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::NodeConnectionType_ZoneNode,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent,

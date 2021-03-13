@@ -2273,7 +2273,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Node identification reserved for future use.  Currently exchange energy directly with zone outside any air system
                     // AirChillerSet(SetID)%NodeNumInlet = &
                     //       NodeInputManager::GetOnlySingleNode(state, Alphas(AlphaNum),ErrorsFound,TRIM(CurrentModuleObject), &
-                    //                    AirChillerSet(SetID)%Name,DataLoopNode::NodeType_Air,DataLoopNode::NodeConnectionType_Inlet,1,DataLoopNode::ObjectIsNotParent)
+                    //                    AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType_Inlet,1,DataLoopNode::ObjectIsNotParent)
                 }
 
                 ++AlphaNum;
@@ -2283,7 +2283,7 @@ namespace EnergyPlus::RefrigeratedCase {
                     // Node identification reserved for future use.  Currently exchange energy directly with zone outside any air system
                     // AirChillerSet(SetID)%NodeNumOutlet = &
                     //         NodeInputManager::GetOnlySingleNode(state, Alphas(AlphaNum),ErrorsFound,TRIM(CurrentModuleObject), &
-                    //                      AirChillerSet(SetID)%Name,DataLoopNode::NodeType_Air,DataLoopNode::NodeConnectionType_Outlet,1,DataLoopNode::ObjectIsNotParent)
+                    //                      AirChillerSet(SetID)%Name,DataLoopNode::NodeFluidType::Air,DataLoopNode::NodeConnectionType_Outlet,1,DataLoopNode::ObjectIsNotParent)
                 }
 
                 // An extensible list is used to enter the individual names of each chiller in the set.
@@ -2493,7 +2493,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
-                                                                                        DataLoopNode::NodeType_Water,
+                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType_Inlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -2501,7 +2501,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                          ErrorsFound,
                                                                                          CurrentModuleObject,
                                                                                          Alphas(1),
-                                                                                         DataLoopNode::NodeType_Water,
+                                                                                         DataLoopNode::NodeFluidType::Water,
                                                                                          DataLoopNode::NodeConnectionType_Outlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsNotParent);
@@ -2635,7 +2635,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                               ErrorsFound,
                                                                               CurrentModuleObject,
                                                                               Alphas(1),
-                                                                                                DataLoopNode::NodeType_Air,
+                                                                                                DataLoopNode::NodeFluidType::Air,
                                                                                                 DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                               1,
                                                                                                 DataLoopNode::ObjectIsParent);
@@ -2927,7 +2927,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                    ErrorsFound,
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
-                                                                    DataLoopNode::NodeType_Air,
+                                                                    DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                                    1,
                                                                     DataLoopNode::ObjectIsParent);
@@ -3091,7 +3091,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                ErrorsFound,
                                                                                CurrentModuleObject,
                                                                                Alphas(1),
-                                                                                                 DataLoopNode::NodeType_Air,
+                                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                                  DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                                1,
                                                                                                  DataLoopNode::ObjectIsParent);
@@ -3249,7 +3249,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                        ErrorsFound,
                                                                                        CurrentModuleObject,
                                                                                        Alphas(1),
-                                                                                       DataLoopNode::NodeType_Water,
+                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                                        1,
                                                                                        DataLoopNode::ObjectIsNotParent);
@@ -3257,7 +3257,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                         ErrorsFound,
                                                                                         CurrentModuleObject,
                                                                                         Alphas(1),
-                                                                                        DataLoopNode::NodeType_Water,
+                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                                         1,
                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -3567,7 +3567,7 @@ namespace EnergyPlus::RefrigeratedCase {
                                                                                  ErrorsFound,
                                                                                  CurrentModuleObject,
                                                                                  Alphas(1),
-                                                                    DataLoopNode::NodeType_Air,
+                                                                    DataLoopNode::NodeFluidType::Air,
                                                                     DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                                  1,
                                                                     DataLoopNode::ObjectIsParent);

@@ -463,7 +463,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                    ErrorsFound,
                                                                                    CurrentModuleObject,
                                                                                    Alphas(1),
-                                                                                   NodeType_Air,
+                                                                                   DataLoopNode::NodeFluidType::Air,
                                                                                    NodeConnectionType_Inlet,
                                                                                    1,
                                                                                    ObjectIsParent);
@@ -471,7 +471,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                     ErrorsFound,
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
-                                                                                    NodeType_Air,
+                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                     NodeConnectionType_Outlet,
                                                                                     1,
                                                                                     ObjectIsParent);
@@ -479,7 +479,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                     ErrorsFound,
                                                                                     CurrentModuleObject,
                                                                                     Alphas(1),
-                                                                                    NodeType_Air,
+                                                                                    DataLoopNode::NodeFluidType::Air,
                                                                                     NodeConnectionType_Inlet,
                                                                                     2,
                                                                                     ObjectIsParent);
@@ -487,7 +487,7 @@ namespace EnergyPlus::HVACStandAloneERV {
                                                                                      ErrorsFound,
                                                                                      CurrentModuleObject,
                                                                                      Alphas(1),
-                                                                                     NodeType_Air,
+                                                                                     DataLoopNode::NodeFluidType::Air,
                                                                                      NodeConnectionType_ReliefAir,
                                                                                      2,
                                                                                      ObjectIsParent);

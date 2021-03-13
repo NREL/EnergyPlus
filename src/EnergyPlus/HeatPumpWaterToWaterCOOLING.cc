@@ -331,7 +331,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                      ErrorsFound,
                                                                      "HeatPump:WaterToWater Cooling",
                                                                      AlphArray(1),
-                                                                     NodeType_Water,
+                                                                     DataLoopNode::NodeFluidType::Water,
                                                                      NodeConnectionType_Inlet,
                                                                      1,
                                                                      ObjectIsNotParent);
@@ -340,7 +340,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                       ErrorsFound,
                                                                       "HeatPump:WaterToWater Cooling",
                                                                       AlphArray(1),
-                                                                      NodeType_Water,
+                                                                      DataLoopNode::NodeFluidType::Water,
                                                                       NodeConnectionType_Outlet,
                                                                       1,
                                                                       ObjectIsNotParent);
@@ -349,7 +349,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                    ErrorsFound,
                                                                    "HeatPump:WaterToWater Cooling",
                                                                    AlphArray(1),
-                                                                   NodeType_Water,
+                                                                   DataLoopNode::NodeFluidType::Water,
                                                                    NodeConnectionType_Inlet,
                                                                    2,
                                                                    ObjectIsNotParent);
@@ -358,7 +358,7 @@ namespace EnergyPlus::HeatPumpWaterToWaterCOOLING {
                                                                     ErrorsFound,
                                                                     "HeatPump:WaterToWater Cooling",
                                                                     AlphArray(1),
-                                                                    NodeType_Water,
+                                                                    DataLoopNode::NodeFluidType::Water,
                                                                     NodeConnectionType_Outlet,
                                                                     2,
                                                                     ObjectIsNotParent);

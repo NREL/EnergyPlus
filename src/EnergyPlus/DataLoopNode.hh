@@ -64,12 +64,6 @@ namespace DataLoopNode {
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
-      
-    constexpr int NodeType_Unknown(0);        // 'blank'
-    constexpr int NodeType_Air(1);            // 'Air'
-    constexpr int NodeType_Water(2);          // 'Water'
-    constexpr int NodeType_Steam(3);          // 'Steam'
-    constexpr int NodeType_Electric(4);       // 'Electric'
    
     enum class NodeFluidType
     {
@@ -109,19 +103,19 @@ namespace DataLoopNode {
     constexpr const char *ValidNodeFluidTypes(NodeFluidType const NodeFluidType) // Valid Fluid Types for Nodes
     {
         switch (NodeFluidType) {
-        case NodeFluidType:
+        case NodeFluidType::blank:
             return "blank";
 
-        case NodeType_Air:
+        case NodeFluidType::Air:
             return "Air";
 
-        case NodeType_Water:
+        case NodeFluidType::Water:
             return "Water";
 
-        case NodeType_Steam:
+        case NodeFluidType::Steam:
             return "Steam";
 
-        case NodeType_Electric:
+        case NodeFluidType::Electric:
             return "Electric";
 
         default:
@@ -245,7 +239,7 @@ namespace DataLoopNode {
 
         // Default Constructor
         NodeData()
-            : FluidType(0), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue), TempLastTimestep(0.0),
+            : FluidType(NodeFluidType::blank), FluidIndex(0), Temp(0.0), TempMin(0.0), TempMax(0.0), TempSetPoint(SensedNodeFlagValue), TempLastTimestep(0.0),
               MassFlowRateRequest(0.0), MassFlowRate(0.0), MassFlowRateMin(0.0), MassFlowRateMax(SensedNodeFlagValue), MassFlowRateMinAvail(0.0),
               MassFlowRateMaxAvail(0.0), MassFlowRateSetPoint(0.0), Quality(0.0), Press(0.0), Enthalpy(0.0), EnthalpyLastTimestep(0.0), HumRat(0.0),
               HumRatMin(SensedNodeFlagValue), HumRatMax(SensedNodeFlagValue), HumRatSetPoint(SensedNodeFlagValue),
@@ -259,7 +253,7 @@ namespace DataLoopNode {
         }
 
         // Member Constructor
-        NodeData(int const FluidType,                     // must be one of the valid parameters
+        NodeData(NodeFluidType const FluidType,           // must be one of the valid parameters
                  int const FluidIndex,                    // For Fluid Properties
                  Real64 const Temp,                       // {C}
                  Real64 const TempMin,                    // {C}

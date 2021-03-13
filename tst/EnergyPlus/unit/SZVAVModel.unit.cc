@@ -275,7 +275,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
                                         ErrorsFound,
                                         "PTUnit",
                                         "PTUnit",
-                                        DataLoopNode::NodeType_Air,
+                                        DataLoopNode::NodeFluidType::Air,
                                         DataLoopNode::NodeConnectionType_Inlet,
                                         1,
                                         DataLoopNode::ObjectIsNotParent);

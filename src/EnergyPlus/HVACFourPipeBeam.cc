@@ -95,8 +95,8 @@ namespace FourPipeBeam {
         using BranchNodeConnections::TestCompSet;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeType_Air;
-        using DataLoopNode::NodeType_Water;
+        using DataLoopNode::NodeFluidType::Air;
+        using DataLoopNode::NodeFluidType::Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataLoopNode::ObjectIsParent;
         using NodeInputManager::GetOnlySingleNode;
@@ -193,7 +193,7 @@ namespace FourPipeBeam {
                                                    ErrorsFound,
                                                    cCurrentModuleObject,
                                                    cAlphaArgs(1),
-                                                   NodeType_Air,
+                                                   DataLoopNode::NodeFluidType::Air,
                                                    NodeConnectionType_Inlet,
                                                    1,
                                                    ObjectIsNotParent,
@@ -202,7 +202,7 @@ namespace FourPipeBeam {
                                                     ErrorsFound,
                                                     cCurrentModuleObject,
                                                     cAlphaArgs(1),
-                                                    NodeType_Air,
+                                                    DataLoopNode::NodeFluidType::Air,
                                                     NodeConnectionType_Outlet,
                                                     1,
                                                     ObjectIsNotParent,
@@ -223,7 +223,7 @@ namespace FourPipeBeam {
                                                       ErrorsFound,
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
-                                                      NodeType_Water,
+                                                      DataLoopNode::NodeFluidType::Water,
                                                       NodeConnectionType_Inlet,
                                                       2,
                                                       ObjectIsParent,
@@ -232,7 +232,7 @@ namespace FourPipeBeam {
                                                        ErrorsFound,
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
-                                                       NodeType_Water,
+                                                       DataLoopNode::NodeFluidType::Water,
                                                        NodeConnectionType_Outlet,
                                                        2,
                                                        ObjectIsParent,
@@ -254,7 +254,7 @@ namespace FourPipeBeam {
                                                       ErrorsFound,
                                                       cCurrentModuleObject,
                                                       cAlphaArgs(1),
-                                                      NodeType_Water,
+                                                      DataLoopNode::NodeFluidType::Water,
                                                       NodeConnectionType_Inlet,
                                                       2,
                                                       ObjectIsParent,
@@ -263,7 +263,7 @@ namespace FourPipeBeam {
                                                        ErrorsFound,
                                                        cCurrentModuleObject,
                                                        cAlphaArgs(1),
-                                                       NodeType_Water,
+                                                       DataLoopNode::NodeFluidType::Water,
                                                        NodeConnectionType_Outlet,
                                                        2,
                                                        ObjectIsParent,

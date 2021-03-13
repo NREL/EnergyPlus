@@ -408,9 +408,9 @@ namespace UnitVentilator {
             // Because there is overlap between the nodes that are parent and non-parent, use a different
             // object type for the non parent nodes
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirInNode =
-                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsParent);
             state.dataUnitVentilators->UnitVent(UnitVentNum).AirOutNode =
-                GetOnlySingleNode(state, Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
+                GetOnlySingleNode(state, Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             // Get AirTerminal mixer data
             GetATMixer(state,
@@ -431,7 +431,7 @@ namespace UnitVentilator {
                                                                     ErrorsFound,
                                                                     CurrentModuleObject + "-OA MIXER",
                                                                     Alphas(1),
-                                                                    NodeType_Air,
+                                                                    DataLoopNode::NodeFluidType::Air,
                                                                     NodeConnectionType_Inlet,
                                                                     1,
                                                                     ObjectIsNotParent);
@@ -546,7 +546,7 @@ namespace UnitVentilator {
                                                                          ErrorsFound,
                                                                          CurrentModuleObject + "-OA MIXER",
                                                                          Alphas(1),
-                                                                         NodeType_Air,
+                                                                         DataLoopNode::NodeFluidType::Air,
                                                                          NodeConnectionType_OutsideAirReference,
                                                                          1,
                                                                          ObjectIsNotParent);
@@ -561,7 +561,7 @@ namespace UnitVentilator {
                                                                         ErrorsFound,
                                                                         CurrentModuleObject + "-OA MIXER",
                                                                         Alphas(1),
-                                                                        NodeType_Air,
+                                                                        DataLoopNode::NodeFluidType::Air,
                                                                         NodeConnectionType_ReliefAir,
                                                                         1,
                                                                         ObjectIsNotParent);
@@ -570,7 +570,7 @@ namespace UnitVentilator {
                                                                          ErrorsFound,
                                                                          CurrentModuleObject + "-OA MIXER",
                                                                          Alphas(1),
-                                                                         NodeType_Air,
+                                                                         DataLoopNode::NodeFluidType::Air,
                                                                          NodeConnectionType_Outlet,
                                                                          1,
                                                                          ObjectIsNotParent);

@@ -127,8 +127,8 @@ namespace EnergyPlus::NodeInputManager {
             state.dataNodeInputMgr->GetNodeInputFlag = false;
         }
 
-        if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
-            NodeFluidType != NodeType_Steam && NodeFluidType != DataLoopNode::NodeFluidType::blank) {
+        if (NodeFluidType != DataLoopNode::NodeFluidType::Air && NodeFluidType != DataLoopNode::NodeFluidType::Water && NodeFluidType != DataLoopNode::NodeFluidType::Electric &&
+            NodeFluidType != DataLoopNode::NodeFluidType::Steam && NodeFluidType != DataLoopNode::NodeFluidType::blank) {
             ShowSevereError(state, RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
             ShowContinueError(state, format("..Invalid FluidType={}", NodeFluidType));
             ErrorsFound = true;
@@ -281,8 +281,8 @@ namespace EnergyPlus::NodeInputManager {
                                         "System",
                                         "Average",
                                         NodeID(NumNode));
-                    if (Node(NumNode).FluidType == NodeType_Air ||
-                        Node(NumNode).FluidType == NodeType_Water) { // setup volume flow rate report for actual/current density
+                    if (Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Air ||
+                        Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Water) { // setup volume flow rate report for actual/current density
                         SetupOutputVariable(state, "System Node Current Density Volume Flow Rate",
                                             OutputProcessor::Unit::m3_s,
                                             state.dataLoopNodes->MoreNodeInfo(NumNode).VolFlowRateCrntRho,
@@ -592,8 +592,8 @@ namespace EnergyPlus::NodeInputManager {
         // Return value
         int AssignNodeNumber;
 
-        if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
-            NodeFluidType != NodeType_Steam && NodeFluidType != DataLoopNode::NodeFluidType::blank) {
+        if (NodeFluidType != DataLoopNode::NodeFluidType::Air && NodeFluidType != DataLoopNode::NodeFluidType::Water && NodeFluidType != DataLoopNode::NodeFluidType::Electric &&
+            NodeFluidType != DataLoopNode::NodeFluidType::Steam && NodeFluidType != DataLoopNode::NodeFluidType::blank) {
             ShowSevereError(state, format("AssignNodeNumber: Invalid FluidType={}", NodeFluidType));
             ErrorsFound = true;
             ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
@@ -1046,7 +1046,7 @@ namespace EnergyPlus::NodeInputManager {
                 ReportSpecificHeat = true;
             }
             // calculate the volume flow rate
-            if (state.dataLoopNodes->Node(iNode).FluidType == NodeType_Air) {
+            if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Air) {
                 state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirStdInit;
                 // if Node%Press was reliable could be used here.
                 RhoAirCurrent = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
@@ -1079,7 +1079,7 @@ namespace EnergyPlus::NodeInputManager {
                 } else {
                     state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
                 }
-            } else if (state.dataLoopNodes->Node(iNode).FluidType == NodeType_Water) {
+            } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Water) {
 
                 if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) && (state.dataLoopNodes->Node(iNode).FluidIndex <= NumOfGlycols))) {
                     rho = RhoWaterStdInit;
@@ -1110,7 +1110,7 @@ namespace EnergyPlus::NodeInputManager {
                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = Cp; // always fill since cp already always being calculated anyway
                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 100.0;
-            } else if (state.dataLoopNodes->Node(iNode).FluidType == NodeType_Steam) {
+            } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Steam) {
                 if (state.dataLoopNodes->Node(iNode).Quality == 1.0) {
                     SteamDensity = GetSatDensityRefrig(state,
                                                        fluidNameSteam,
@@ -1135,7 +1135,7 @@ namespace EnergyPlus::NodeInputManager {
                     state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
-            } else if (state.dataLoopNodes->Node(iNode).FluidType == NodeType_Electric) {
+            } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Electric) {
                 state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = 0.0;
                 state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = 0.0;
                 state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;

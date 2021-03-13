@@ -1001,7 +1001,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                    ErrorsFound,
                                                                                                    CurrentModuleObject,
                                                                                                    AlphArray(1),
-                                                                                                   NodeType_Water,
+                                                                                                   DataLoopNode::NodeFluidType::Water,
                                                                                                    NodeConnectionType_Sensor,
                                                                                                    1,
                                                                                                    ObjectIsNotParent);
@@ -1351,7 +1351,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                                                                                                             ErrorsFound,
                                                                                                                             CurrentModuleObject,
                                                                                                                             cAlphaArgs(1),
-                                                                                                                            NodeType_Water,
+                                                                                                                            DataLoopNode::NodeFluidType::Water,
                                                                                                                             NodeConnectionType_Sensor,
                                                                                                                             1,
                                                                                                                             ObjectIsNotParent);
@@ -1361,7 +1361,7 @@ CurrentModuleObject, PlantOpSchemeName);
                                               ErrorsFound,
                                               CurrentModuleObject,
                                               cAlphaArgs(1),
-                                              NodeType_Water,
+                                              DataLoopNode::NodeFluidType::Water,
                                               NodeConnectionType_Sensor,
                                               1,
                                               ObjectIsNotParent);

@@ -432,16 +432,16 @@ namespace DesiccantDehumidifiers {
             // Desiccant wheel is not called out as a separate component, its nodes must be connected
             // as ObjectIsNotParent.  But for the Regen fan, the nodes are connected as ObjectIsParent
             DesicDehum(DesicDehumNum).ProcAirInNode = GetOnlySingleNode(state,
-                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
+                Alphas(3), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent);
 
             DesicDehum(DesicDehumNum).ProcAirOutNode = GetOnlySingleNode(state,
-                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                Alphas(4), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
 
             DesicDehum(DesicDehumNum).RegenAirInNode = GetOnlySingleNode(state,
-                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
+                Alphas(5), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Inlet, 2, ObjectIsNotParent);
 
             DesicDehum(DesicDehumNum).RegenFanInNode = GetOnlySingleNode(state,
-                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Internal, 2, ObjectIsParent);
+                Alphas(6), ErrorsFound, CurrentModuleObject, Alphas(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Internal, 2, ObjectIsParent);
 
             if (UtilityRoutines::SameString(Alphas(7), "LEAVING HUMRAT:BYPASS")) {
                 ShowWarningError(state, RoutineName + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -822,7 +822,7 @@ namespace DesiccantDehumidifiers {
                                                                         ErrorsFound,
                                                                         DesicDehum(DesicDehumNum).DehumType,
                                                                         DesicDehum(DesicDehumNum).Name,
-                                                                        NodeType_Air,
+                                                                        DataLoopNode::NodeFluidType::Air,
                                                                         NodeConnectionType_Inlet,
                                                                         1,
                                                                         ObjectIsParent);
@@ -840,7 +840,7 @@ namespace DesiccantDehumidifiers {
                                                                          ErrorsFound,
                                                                          DesicDehum(DesicDehumNum).DehumType,
                                                                          DesicDehum(DesicDehumNum).Name,
-                                                                         NodeType_Air,
+                                                                         DataLoopNode::NodeFluidType::Air,
                                                                          NodeConnectionType_Outlet,
                                                                          1,
                                                                          ObjectIsParent);
@@ -865,7 +865,7 @@ namespace DesiccantDehumidifiers {
                                                                          ErrorsFound,
                                                                          DesicDehum(DesicDehumNum).DehumType,
                                                                          DesicDehum(DesicDehumNum).Name,
-                                                                         NodeType_Air,
+                                                                         DataLoopNode::NodeFluidType::Air,
                                                                          NodeConnectionType_Sensor,
                                                                          1,
                                                                          ObjectIsNotParent);
@@ -1213,7 +1213,7 @@ namespace DesiccantDehumidifiers {
                                                                              ErrorsFound,
                                                                              DesicDehum(DesicDehumNum).DehumType,
                                                                              DesicDehum(DesicDehumNum).Name,
-                                                                             NodeType_Air,
+                                                                             DataLoopNode::NodeFluidType::Air,
                                                                              NodeConnectionType_Inlet,
                                                                              1,
                                                                              ObjectIsParent);
@@ -1221,7 +1221,7 @@ namespace DesiccantDehumidifiers {
                                                                               ErrorsFound,
                                                                               DesicDehum(DesicDehumNum).DehumType,
                                                                               DesicDehum(DesicDehumNum).Name,
-                                                                              NodeType_Air,
+                                                                              DataLoopNode::NodeFluidType::Air,
                                                                               NodeConnectionType_Outlet,
                                                                               1,
                                                                               ObjectIsParent);
@@ -1261,7 +1261,7 @@ namespace DesiccantDehumidifiers {
                                                                               ErrorsFound,
                                                                               DesicDehum(DesicDehumNum).DehumType,
                                                                               DesicDehum(DesicDehumNum).Name,
-                                                                              NodeType_Air,
+                                                                              DataLoopNode::NodeFluidType::Air,
                                                                               NodeConnectionType_Outlet,
                                                                               1,
                                                                               ObjectIsParent);
@@ -1270,7 +1270,7 @@ namespace DesiccantDehumidifiers {
                                                                                  ErrorsFound,
                                                                                  DesicDehum(DesicDehumNum).DehumType,
                                                                                  DesicDehum(DesicDehumNum).Name,
-                                                                                 NodeType_Air,
+                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                  NodeConnectionType_Inlet,
                                                                                  1,
                                                                                  ObjectIsParent);
@@ -1289,7 +1289,7 @@ namespace DesiccantDehumidifiers {
                                                                                  ErrorsFound,
                                                                                  DesicDehum(DesicDehumNum).DehumType,
                                                                                  DesicDehum(DesicDehumNum).Name,
-                                                                                 NodeType_Air,
+                                                                                 DataLoopNode::NodeFluidType::Air,
                                                                                  NodeConnectionType_Inlet,
                                                                                  1,
                                                                                  ObjectIsParent);
@@ -1437,7 +1437,7 @@ namespace DesiccantDehumidifiers {
                                           ErrorsFound,
                                           DesicDehum(DesicDehumNum).DehumType,
                                           DesicDehum(DesicDehumNum).Name,
-                                          NodeType_Air,
+                                          DataLoopNode::NodeFluidType::Air,
                                           NodeConnectionType_OutsideAirReference,
                                           2,
                                           ObjectIsNotParent);

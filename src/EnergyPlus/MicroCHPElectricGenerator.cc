@@ -314,7 +314,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               AlphArray(1),
-                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType_Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
@@ -322,7 +322,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                                ErrorsFound,
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                AlphArray(1),
-                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
@@ -335,7 +335,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                             ErrorsFound,
                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                             AlphArray(1),
-                                                                                            DataLoopNode::NodeType_Air,
+                                                                                            DataLoopNode::NodeFluidType::Air,
                                                                                             DataLoopNode::NodeConnectionType_Inlet,
                                                                                             2,
                                                                                             DataLoopNode::ObjectIsNotParent);
@@ -345,7 +345,7 @@ namespace EnergyPlus::MicroCHPElectricGenerator {
                                                                                              ErrorsFound,
                                                                                              DataIPShortCuts::cCurrentModuleObject,
                                                                                              AlphArray(1),
-                                                                                             DataLoopNode::NodeType_Air,
+                                                                                             DataLoopNode::NodeFluidType::Air,
                                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                                              2,
                                                                                              DataLoopNode::ObjectIsNotParent);

@@ -142,7 +142,7 @@ namespace ChillerIndirectAbsorption {
         int HeatInputFCondTempPtr;             // Index to generator heat input as a function of absorber temp
         int HeatInputFEvapTempPtr;             // Index to generator heat input as a function of absorber temp
         int ErrCount2;                         // error counter
-        int GenHeatSourceType;                 // Generator heat source type, NodeType_Steam=3 or NodeType_Water=2
+        int GenHeatSourceType;                 // Generator heat source type, DataLoopNode::NodeFluidType::Steam=3 or DataLoopNode::NodeFluidType::Water=2
         int SteamFluidIndex;                   // index to generator fluid type
         bool Available;                        // need an array of logicals--load identifiers of available equipment
         bool ON;                               // simulate the machine at it's operating part load ratio

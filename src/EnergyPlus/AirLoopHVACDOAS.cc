@@ -165,7 +165,7 @@ namespace AirLoopHVACDOAS {
                                                                               errorsFound,
                                                                               cCurrentModuleObject,
                                                                               thisObjectName,
-                                                                              DataLoopNode::NodeType_Air,
+                                                                              DataLoopNode::NodeFluidType::Air,
                                                                               DataLoopNode::NodeConnectionType_Outlet,
                                                                               1,
                                                                               DataLoopNode::ObjectIsParent);

@@ -198,7 +198,7 @@ namespace CTElectricGenerator {
                                                                                           ErrorsFound,
                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                           AlphArray(1),
-                                                                                          DataLoopNode::NodeType_Electric,
+                                                                                          DataLoopNode::NodeFluidType::Electric,
                                                                                           DataLoopNode::NodeConnectionType_Electric,
                                                                                           1,
                                                                                           DataLoopNode::ObjectIsNotParent);
@@ -266,7 +266,7 @@ namespace CTElectricGenerator {
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               AlphArray(1),
-                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType_Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
@@ -278,7 +278,7 @@ namespace CTElectricGenerator {
                                                                                                ErrorsFound,
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                AlphArray(1),
-                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
@@ -320,7 +320,7 @@ namespace CTElectricGenerator {
                                                                                       ErrorsFound,
                                                                                       DataIPShortCuts::cCurrentModuleObject,
                                                                                       AlphArray(1),
-                                                                                      DataLoopNode::NodeType_Air,
+                                                                                      DataLoopNode::NodeFluidType::Air,
                                                                                       DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                                                       1,
                                                                                       DataLoopNode::ObjectIsNotParent);

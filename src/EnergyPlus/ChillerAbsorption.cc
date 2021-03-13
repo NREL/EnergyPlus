@@ -291,7 +291,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType_Inlet,
                                                                                               1,
                                                                                               DataLoopNode::ObjectIsNotParent);
@@ -299,7 +299,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                ErrorsFound,
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                DataIPShortCuts::cAlphaArgs(1),
-                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                1,
                                                                                                DataLoopNode::ObjectIsNotParent);
@@ -313,7 +313,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                               ErrorsFound,
                                                                                               DataIPShortCuts::cCurrentModuleObject,
                                                                                               DataIPShortCuts::cAlphaArgs(1),
-                                                                                              DataLoopNode::NodeType_Water,
+                                                                                              DataLoopNode::NodeFluidType::Water,
                                                                                               DataLoopNode::NodeConnectionType_Inlet,
                                                                                               2,
                                                                                               DataLoopNode::ObjectIsNotParent);
@@ -321,7 +321,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                ErrorsFound,
                                                                                                DataIPShortCuts::cCurrentModuleObject,
                                                                                                DataIPShortCuts::cAlphaArgs(1),
-                                                                                               DataLoopNode::NodeType_Water,
+                                                                                               DataLoopNode::NodeFluidType::Water,
                                                                                                DataLoopNode::NodeConnectionType_Outlet,
                                                                                                2,
                                                                                                DataLoopNode::ObjectIsNotParent);
@@ -334,9 +334,9 @@ namespace EnergyPlus::ChillerAbsorption {
             if (NumAlphas > 8) {
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater") ||
                     UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "HotWater")) {
-                    thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Water;
+                    thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Water;
                 } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), fluidNameSteam) || DataIPShortCuts::cAlphaArgs(9).empty()) {
-                    thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
+                    thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
                 } else {
                     ShowSevereError(state, "Invalid " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
                     ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
@@ -344,17 +344,17 @@ namespace EnergyPlus::ChillerAbsorption {
                     ErrorsFound = true;
                 }
             } else {
-                thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
+                thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
             }
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(6) && !DataIPShortCuts::lAlphaFieldBlanks(7)) {
                 thisChiller.GenInputOutputNodesUsed = true;
-                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
+                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                     thisChiller.GeneratorInletNodeNum = NodeInputManager::GetOnlySingleNode(state, DataIPShortCuts::cAlphaArgs(6),
                                                                                                            ErrorsFound,
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            DataIPShortCuts::cAlphaArgs(1),
-                                                                                                           DataLoopNode::NodeType_Water,
+                                                                                                           DataLoopNode::NodeFluidType::Water,
                                                                                                            DataLoopNode::NodeConnectionType_Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
@@ -362,7 +362,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                             ErrorsFound,
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
-                                                                                                            DataLoopNode::NodeType_Water,
+                                                                                                            DataLoopNode::NodeFluidType::Water,
                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
@@ -377,7 +377,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                            ErrorsFound,
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            DataIPShortCuts::cAlphaArgs(1),
-                                                                                                           DataLoopNode::NodeType_Steam,
+                                                                                                           DataLoopNode::NodeFluidType::Steam,
                                                                                                            DataLoopNode::NodeConnectionType_Inlet,
                                                                                                            3,
                                                                                                            DataLoopNode::ObjectIsNotParent);
@@ -385,7 +385,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                                                                             ErrorsFound,
                                                                                                             DataIPShortCuts::cCurrentModuleObject,
                                                                                                             DataIPShortCuts::cAlphaArgs(1),
-                                                                                                            DataLoopNode::NodeType_Steam,
+                                                                                                            DataLoopNode::NodeFluidType::Steam,
                                                                                                             DataLoopNode::NodeConnectionType_Outlet,
                                                                                                             3,
                                                                                                             DataLoopNode::ObjectIsNotParent);
@@ -403,11 +403,11 @@ namespace EnergyPlus::ChillerAbsorption {
                 ShowContinueError(state, "..." + DataIPShortCuts::cAlphaFieldNames(7) + " = " + DataIPShortCuts::cAlphaArgs(7));
                 ErrorsFound = true;
             } else {
-                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
+                if (thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                     ShowWarningError(state, DataIPShortCuts::cCurrentModuleObject + ", Name=" + DataIPShortCuts::cAlphaArgs(1));
                     ShowContinueError(state, "...Generator fluid type must be Steam if generator inlet/outlet nodes are blank.");
                     ShowContinueError(state, "...Generator fluid type is set to Steam and the simulation continues.");
-                    thisChiller.GenHeatSourceType = DataLoopNode::NodeType_Steam;
+                    thisChiller.GenHeatSourceType = DataLoopNode::NodeFluidType::Steam;
                 }
             }
 
@@ -457,7 +457,7 @@ namespace EnergyPlus::ChillerAbsorption {
             }
 
             if (thisChiller.GeneratorVolFlowRate == 0.0 &&
-                thisChiller.GenHeatSourceType == DataLoopNode::NodeType_Water) {
+                thisChiller.GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 ShowSevereError(state, format("Invalid {}={:.2R}", DataIPShortCuts::cNumericFieldNames(16), DataIPShortCuts::rNumericArgs(16)));
                 ShowContinueError(state, "Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError(state, "...Generator water flow rate must be greater than 0 when absorber generator fluid type is hot water.");
@@ -532,7 +532,7 @@ namespace EnergyPlus::ChillerAbsorption {
             "Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->Report.CondOutletTemp, "System", "Average", this->Name);
         SetupOutputVariable(state, "Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.Condmdot, "System", "Average", this->Name);
 
-        if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+        if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
             SetupOutputVariable(state,
                 "Chiller Hot Water Consumption Rate", OutputProcessor::Unit::W, this->Report.QGenerator, "System", "Average", this->Name);
             SetupOutputVariable(state, "Chiller Source Hot Water Energy",
@@ -735,7 +735,7 @@ namespace EnergyPlus::ChillerAbsorption {
 
         if (this->GeneratorInletNodeNum > 0) {
 
-            if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                         DataGlobalConstants::HWInitConvTemp,
@@ -743,7 +743,7 @@ namespace EnergyPlus::ChillerAbsorption {
                                                         RoutineName);
 
                 this->GenMassFlowRateMax = rho * this->GeneratorVolFlowRate;
-            } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
+            } else if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) {
 
                 this->QGenerator = (this->SteamLoadCoef(1) + this->SteamLoadCoef(2) + this->SteamLoadCoef(3)) * this->NomCap;
 
@@ -901,7 +901,7 @@ namespace EnergyPlus::ChillerAbsorption {
         int PltSizNum = state.dataPlnt->PlantLoop(this->CWLoopNum).PlantSizNum;
         int PltSizCondNum = state.dataPlnt->PlantLoop(this->CDLoopNum).PlantSizNum;
 
-        if (this->GenHeatSourceType == DataLoopNode::NodeType_Steam) {
+        if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) {
             if (this->GeneratorInletNodeNum > 0 && this->GeneratorOutletNodeNum > 0) {
                 PltSizSteamNum = PlantUtilities::MyPlantSizingIndex(state,
                     moduleObjectType, this->Name, this->GeneratorInletNodeNum, this->GeneratorOutletNodeNum, LoopErrorsFound);
@@ -1168,10 +1168,10 @@ namespace EnergyPlus::ChillerAbsorption {
         // save the design condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
         PlantUtilities::RegisterPlantCompDesignFlow(state, this->CondInletNodeNum, tmpCondVolFlowRate);
 
-        if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Steam) ||
-            (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Water)) {
+        if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) ||
+            (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water)) {
             if (this->EvapVolFlowRate >= DataHVACGlobals::TimeStepSys && tmpNomCap > 0.0) {
-                if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+                if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                     Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                             state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
                                                                             state.dataSize->PlantSizData(PltSizHeatingNum).ExitTemp,
@@ -1321,9 +1321,9 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (this->GeneratorDeltaTempWasAutoSized) {
-            if (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 this->GeneratorDeltaTemp = max(0.5, state.dataSize->PlantSizData(PltSizHeatingNum).DeltaT);
-            } else if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            } else if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->GenLoopNum).FluidName,
@@ -1648,7 +1648,7 @@ namespace EnergyPlus::ChillerAbsorption {
         }
 
         if (this->GeneratorInletNodeNum > 0) {
-            if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
+            if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 Real64 GenMassFlowRate = 0.0;
                 //  Hot water plant is used for the generator
                 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,

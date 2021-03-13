@@ -1103,7 +1103,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                        nodeErrorsFound,
                                                                                        cCurrentModuleObject,
                                                                                        thisPLHP.name,
-                                                                                       DataLoopNode::NodeType_Water,
+                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                        DataLoopNode::NodeConnectionType_Inlet,
                                                                                        flowPath1,
                                                                                        DataLoopNode::ObjectIsNotParent);
@@ -1111,7 +1111,7 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                                                                                         nodeErrorsFound,
                                                                                         cCurrentModuleObject,
                                                                                         thisPLHP.name,
-                                                                                        DataLoopNode::NodeType_Water,
+                                                                                        DataLoopNode::NodeFluidType::Water,
                                                                                         DataLoopNode::NodeConnectionType_Outlet,
                                                                                         flowPath1,
                                                                                         DataLoopNode::ObjectIsNotParent);
@@ -1120,12 +1120,12 @@ namespace EnergyPlus::EIRPlantLoopHeatPumps {
                     int condenserNodeConnectionType_Outlet = 0;
                     if (condenserType == "WATERSOURCE") {
                         thisPLHP.waterSource = true;
-                        condenserNodeType = DataLoopNode::NodeType_Water;
+                        condenserNodeType = DataLoopNode::NodeFluidType::Water;
                         condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_Inlet;
                         condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_Outlet;
                     } else if (condenserType == "AIRSOURCE") {
                         thisPLHP.airSource = true;
-                        condenserNodeType = DataLoopNode::NodeType_Air;
+                        condenserNodeType = DataLoopNode::NodeFluidType::Air;
                         condenserNodeConnectionType_Inlet = DataLoopNode::NodeConnectionType_OutsideAir;
                         condenserNodeConnectionType_Outlet = DataLoopNode::NodeConnectionType_OutsideAir;
                     } else {

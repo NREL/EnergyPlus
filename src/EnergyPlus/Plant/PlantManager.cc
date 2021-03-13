@@ -380,14 +380,14 @@ namespace EnergyPlus::PlantManager {
                 this_loop.Name = Alpha(1); // Load the Plant Loop Name
 
                 if (UtilityRoutines::SameString(Alpha(2), "STEAM")) {
-                    this_loop.FluidType = NodeType_Steam;
+                    this_loop.FluidType = DataLoopNode::NodeFluidType::Steam;
                     this_loop.FluidName = Alpha(2);
                 } else if (UtilityRoutines::SameString(Alpha(2), "WATER")) {
-                    this_loop.FluidType = NodeType_Water;
+                    this_loop.FluidType = DataLoopNode::NodeFluidType::Water;
                     this_loop.FluidName = Alpha(2);
                     this_loop.FluidIndex = FindGlycol(state, Alpha(2));
                 } else if (UtilityRoutines::SameString(Alpha(2), "USERDEFINEDFLUIDTYPE")) {
-                    this_loop.FluidType = NodeType_Water;
+                    this_loop.FluidType = DataLoopNode::NodeFluidType::Water;
                     this_loop.FluidName = Alpha(3);
                     // check for valid fluid name
                     NumFluids = CheckFluidPropertyName(state, Alpha(3));
@@ -408,7 +408,7 @@ namespace EnergyPlus::PlantManager {
                                      CurrentModuleObject + '=' + Alpha(1));
                     ShowContinueError(state, "Will default to Water.");
 
-                    this_loop.FluidType = NodeType_Water;
+                    this_loop.FluidType = DataLoopNode::NodeFluidType::Water;
                     this_loop.FluidName = "WATER";
                     this_loop.FluidIndex = FindGlycol(state, "WATER");
                 }
@@ -495,7 +495,7 @@ namespace EnergyPlus::PlantManager {
                     if (UtilityRoutines::SameString(Alpha(16), "SingleSetpoint")) {
                         this_loop.LoopDemandCalcScheme = DataPlant::iLoopDemandCalcScheme::SingleSetPoint;
                     } else if (UtilityRoutines::SameString(Alpha(16), "DualSetpointDeadband")) {
-                        if (this_loop.FluidType == NodeType_Steam) {
+                        if (this_loop.FluidType == DataLoopNode::NodeFluidType::Steam) {
                             ShowWarningError(state,
                                     RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid choice.");
                             ShowContinueError(state, cAlphaFieldNames(16) + "=\"" + Alpha(16) + "\" not valid for " +
@@ -2499,13 +2499,13 @@ namespace EnergyPlus::PlantManager {
                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.TemperatureHistory = 0.0;
                         state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).OutletNode.MassFlowRateHistory = 0.0;
 
-                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType != NodeType_Steam) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType != DataLoopNode::NodeFluidType::Steam) {
                             Cp = GetSpecificHeatGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
                                                        state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
                             StartEnthalpy = Cp * LoopSetPointTemp;
                         }
                         // Use Min/Max flow rates to initialize loop
-                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Water) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
                             rho = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LoopSetPointTemp,
                                                    state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineNameAlt);
 
@@ -2513,7 +2513,7 @@ namespace EnergyPlus::PlantManager {
                             LoopMinMassFlowRate = state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate * rho;
                         }
                         // use saturated liquid of steam at the loop setpoint temp as the starting enthalpy for a water loop
-                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Steam) {
+                        if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
                             SteamTemp = 100.0;
                             SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, SteamTemp, 1.0,
                                                                state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
@@ -3154,10 +3154,10 @@ namespace EnergyPlus::PlantManager {
             }
 
             // should now have plant volume, calculate plant volume's mass for fluid type
-            if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Water) {
+            if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
                 FluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp,
                                                 state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-            } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Steam) {
+            } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                                    RoutineName);
             } else {
@@ -3283,10 +3283,10 @@ namespace EnergyPlus::PlantManager {
             }
 
             // should now have plant volume, calculate plant volume's mass for fluid type
-            if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Water) {
+            if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Water) {
                 FluidDensity = GetDensityGlycol(state, state.dataPlnt->PlantLoop(LoopNum).FluidName, DataGlobalConstants::InitConvTemp,
                                                 state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
-            } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == NodeType_Steam) {
+            } else if (state.dataPlnt->PlantLoop(LoopNum).FluidType == DataLoopNode::NodeFluidType::Steam) {
                 FluidDensity = GetSatDensityRefrig(state, fluidNameSteam, 100.0, 1.0, state.dataPlnt->PlantLoop(LoopNum).FluidIndex,
                                                    RoutineName);
             } else {

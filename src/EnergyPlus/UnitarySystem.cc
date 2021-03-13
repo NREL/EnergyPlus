@@ -2800,7 +2800,7 @@ namespace UnitarySystems {
                                                                             errorsFound,
                                                                             cCurrentModuleObject,
                                                                             thisObjectName,
-                                                                            DataLoopNode::NodeType_Air,
+                                                                            DataLoopNode::NodeFluidType::Air,
                                                                             DataLoopNode::NodeConnectionType_Inlet,
                                                                             1,
                                                                             DataLoopNode::ObjectIsParent);
@@ -2812,7 +2812,7 @@ namespace UnitarySystems {
                                                                              errorsFound,
                                                                              cCurrentModuleObject,
                                                                              thisObjectName,
-                                                                             DataLoopNode::NodeType_Air,
+                                                                             DataLoopNode::NodeFluidType::Air,
                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsParent);
@@ -6742,7 +6742,7 @@ namespace UnitarySystems {
                                                                                          errFlag,
                                                                                          cCurrentModuleObject,
                                                                                          thisObjectName,
-                                                                                         DataLoopNode::NodeType_Air,
+                                                                                         DataLoopNode::NodeFluidType::Air,
                                                                                          DataLoopNode::NodeConnectionType_Inlet,
                                                                                          1,
                                                                                          DataLoopNode::ObjectIsParent);
@@ -6781,7 +6781,7 @@ namespace UnitarySystems {
                                                                                                  errFlag,
                                                                                                  cCurrentModuleObject,
                                                                                                  thisObjectName,
-                                                                                                 DataLoopNode::NodeType_Water,
+                                                                                                 DataLoopNode::NodeFluidType::Water,
                                                                                                  DataLoopNode::NodeConnectionType_Inlet,
                                                                                                  3,
                                                                                                  DataLoopNode::ObjectIsNotParent);
@@ -6789,7 +6789,7 @@ namespace UnitarySystems {
                                                                                                   errFlag,
                                                                                                   cCurrentModuleObject,
                                                                                                   thisObjectName,
-                                                                                                  DataLoopNode::NodeType_Water,
+                                                                                                  DataLoopNode::NodeFluidType::Water,
                                                                                                   DataLoopNode::NodeConnectionType_Outlet,
                                                                                                   3,
                                                                                                   DataLoopNode::ObjectIsNotParent);

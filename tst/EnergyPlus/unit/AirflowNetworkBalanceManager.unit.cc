@@ -15687,7 +15687,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
 
     state->dataLoopNodes->NumOfNodes = 1;
     state->dataLoopNodes->Node.allocate(1);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(1);
     state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
@@ -15755,7 +15755,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
 
     state->dataLoopNodes->NumOfNodes = 1;
     state->dataLoopNodes->Node.allocate(2);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(1);
     state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
     bool errFlag{false};
@@ -20182,11 +20182,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportZoneE
     // Create air nodes
     state->dataLoopNodes->NumOfNodes = 5;
     state->dataLoopNodes->Node.allocate(5);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(5);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
@@ -20322,11 +20322,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportZoneERV
     // Create air nodes
     state->dataLoopNodes->NumOfNodes = 5;
     state->dataLoopNodes->Node.allocate(5);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(5);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
@@ -20454,11 +20454,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportUnbalan
     // Create air nodes
     state->dataLoopNodes->NumOfNodes = 5;
     state->dataLoopNodes->Node.allocate(5);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(4).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(5).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(5);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
@@ -20595,9 +20595,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestNoZoneEqpSupportHPWH)
     // Create air nodes
     state->dataLoopNodes->NumOfNodes = 3;
     state->dataLoopNodes->Node.allocate(3);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(3);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
@@ -20709,9 +20709,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWH)
     // Create air nodes
     state->dataLoopNodes->NumOfNodes = 3;
     state->dataLoopNodes->Node.allocate(3);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(3);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};
@@ -20816,9 +20816,9 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestZoneEqpSupportHPWHZon
     // Create air nodes
     state->dataLoopNodes->NumOfNodes = 3;
     state->dataLoopNodes->Node.allocate(3);
-    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeType_Air;
-    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeType_Air;
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(2).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->Node(3).FluidType = DataLoopNode::NodeFluidType::Air;
     state->dataLoopNodes->NodeID.allocate(3);
     state->dataLoopNodes->NodeID(1) = "ZONE 1 AIR NODE";
     bool errFlag{false};

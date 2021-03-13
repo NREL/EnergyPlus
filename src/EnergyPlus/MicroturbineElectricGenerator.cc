@@ -409,7 +409,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                     ErrorsFound,
                                                                                                     DataIPShortCuts::cCurrentModuleObject,
                                                                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
-                                                                                                    DataLoopNode::NodeType_Water,
+                                                                                                    DataLoopNode::NodeFluidType::Water,
                                                                                                     DataLoopNode::NodeConnectionType_Inlet,
                                                                                                     1,
                                                                                                     DataLoopNode::ObjectIsNotParent);
@@ -420,7 +420,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                      ErrorsFound,
                                                                                                      DataIPShortCuts::cCurrentModuleObject,
                                                                                                      state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
-                                                                                                     DataLoopNode::NodeType_Water,
+                                                                                                     DataLoopNode::NodeFluidType::Water,
                                                                                                      DataLoopNode::NodeConnectionType_Outlet,
                                                                                                      1,
                                                                                                      DataLoopNode::ObjectIsNotParent);
@@ -633,7 +633,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           AlphArray(1),
-                                                                                                          DataLoopNode::NodeType_Air,
+                                                                                                          DataLoopNode::NodeFluidType::Air,
                                                                                                           DataLoopNode::NodeConnectionType_Inlet,
                                                                                                           2,
                                                                                                           DataLoopNode::ObjectIsNotParent);
@@ -653,7 +653,7 @@ namespace EnergyPlus::MicroturbineElectricGenerator {
                                                                                                            ErrorsFound,
                                                                                                            DataIPShortCuts::cCurrentModuleObject,
                                                                                                            AlphArray(1),
-                                                                                                           DataLoopNode::NodeType_Air,
+                                                                                                           DataLoopNode::NodeFluidType::Air,
                                                                                                            DataLoopNode::NodeConnectionType_Outlet,
                                                                                                            2,
                                                                                                            DataLoopNode::ObjectIsNotParent);

@@ -224,7 +224,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                       ErrorsFound,
                                                                                                       cCurrentModuleObject,
                                                                                                       AlphArray(1),
-                                                                                                      DataLoopNode::NodeType_Water,
+                                                                                                      DataLoopNode::NodeFluidType::Water,
                                                                                                       DataLoopNode::NodeConnectionType_Inlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
@@ -232,7 +232,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                        ErrorsFound,
                                                                                                        cCurrentModuleObject,
                                                                                                        AlphArray(1),
-                                                                                                       DataLoopNode::NodeType_Water,
+                                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                                        DataLoopNode::NodeConnectionType_Outlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
@@ -267,7 +267,7 @@ namespace EnergyPlus::FluidCoolers {
                                                         ErrorsFound,
                                                         cCurrentModuleObject,
                                                         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
-                                                        DataLoopNode::NodeType_Air,
+                                                        DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                         1,
                                                         DataLoopNode::ObjectIsNotParent);
@@ -311,7 +311,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                       ErrorsFound,
                                                                                                       cCurrentModuleObject,
                                                                                                       AlphArray(1),
-                                                                                                      DataLoopNode::NodeType_Water,
+                                                                                                      DataLoopNode::NodeFluidType::Water,
                                                                                                       DataLoopNode::NodeConnectionType_Inlet,
                                                                                                       1,
                                                                                                       DataLoopNode::ObjectIsNotParent);
@@ -319,7 +319,7 @@ namespace EnergyPlus::FluidCoolers {
                                                                                                        ErrorsFound,
                                                                                                        cCurrentModuleObject,
                                                                                                        AlphArray(1),
-                                                                                                       DataLoopNode::NodeType_Water,
+                                                                                                       DataLoopNode::NodeFluidType::Water,
                                                                                                        DataLoopNode::NodeConnectionType_Outlet,
                                                                                                        1,
                                                                                                        DataLoopNode::ObjectIsNotParent);
@@ -375,7 +375,7 @@ namespace EnergyPlus::FluidCoolers {
                                                         ErrorsFound,
                                                         cCurrentModuleObject,
                                                         state.dataFluidCoolers->SimpleFluidCooler(FluidCoolerNum).Name,
-                                                        DataLoopNode::NodeType_Air,
+                                                        DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::NodeConnectionType_OutsideAirReference,
                                                         1,
                                                         DataLoopNode::ObjectIsNotParent);

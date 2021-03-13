@@ -213,7 +213,7 @@ namespace EnergyPlus::MixerComponent {
             state.dataMixerComponent->MixerCond(MixerNum).MixerName = AlphArray(1);
 
             state.dataMixerComponent->MixerCond(MixerNum).OutletNode = GetOnlySingleNode(state,
-                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
+                AlphArray(2), ErrorsFound, CurrentModuleObject, AlphArray(1), DataLoopNode::NodeFluidType::Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent);
             state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
 
             for (auto &e : state.dataMixerComponent->MixerCond)
@@ -250,7 +250,7 @@ namespace EnergyPlus::MixerComponent {
                                                                            ErrorsFound,
                                                                            CurrentModuleObject,
                                                                            AlphArray(1),
-                                                                           NodeType_Air,
+                                                                           DataLoopNode::NodeFluidType::Air,
                                                                            NodeConnectionType_Inlet,
                                                                            1,
                                                                            ObjectIsNotParent);
