@@ -142,7 +142,8 @@ namespace ChillerIndirectAbsorption {
         int HeatInputFCondTempPtr;             // Index to generator heat input as a function of absorber temp
         int HeatInputFEvapTempPtr;             // Index to generator heat input as a function of absorber temp
         int ErrCount2;                         // error counter
-        int GenHeatSourceType;                 // Generator heat source type, DataLoopNode::NodeFluidType::Steam=3 or DataLoopNode::NodeFluidType::Water=2
+        DataLoopNode::NodeFluidType GenHeatSourceType; // Generator heat source type, DataLoopNode::NodeFluidType::Steam=3 or
+                                                        // DataLoopNode::NodeFluidType::Water=2
         int SteamFluidIndex;                   // index to generator fluid type
         bool Available;                        // need an array of logicals--load identifiers of available equipment
         bool ON;                               // simulate the machine at it's operating part load ratio
@@ -202,7 +203,8 @@ namespace ChillerIndirectAbsorption {
               GeneratorDeltaTempWasAutoSized(true), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), GeneratorInputCurvePtr(0), PumpPowerCurvePtr(0), CapFCondenserTempPtr(0),
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
-              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
+              GenHeatSourceType(DataLoopNode::NodeFluidType::blank), SteamFluidIndex(0), Available(false), ON(false),
+              FlowMode(DataPlant::FlowMode::Unassigned), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), MinCondInletTempCtr(0), MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0),

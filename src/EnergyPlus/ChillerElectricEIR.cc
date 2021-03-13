@@ -417,7 +417,7 @@ namespace EnergyPlus::ChillerElectricEIR {
                                                                                                           ErrorsFound,
                                                                                                           DataIPShortCuts::cCurrentModuleObject,
                                                                                                           DataIPShortCuts::cAlphaArgs(1),
-                                                                                                          DataLoopNode::NodeFluidType,
+                                                                                                          DataLoopNode::NodeFluidType::blank,
                                                                                                           DataLoopNode::NodeConnectionType_Outlet,
                                                                                                           2,
                                                                                                           DataLoopNode::ObjectIsNotParent);

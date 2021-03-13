@@ -95,8 +95,6 @@ namespace FourPipeBeam {
         using BranchNodeConnections::TestCompSet;
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeConnectionType_Outlet;
-        using DataLoopNode::NodeFluidType::Air;
-        using DataLoopNode::NodeFluidType::Water;
         using DataLoopNode::ObjectIsNotParent;
         using DataLoopNode::ObjectIsParent;
         using NodeInputManager::GetOnlySingleNode;

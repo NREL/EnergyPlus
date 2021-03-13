@@ -9577,7 +9577,7 @@ namespace AirflowNetworkBalanceManager {
         // Eliminate nodes with fluidtype = water
         for (k = 1; k <= state.dataLoopNodes->NumOfNodes; ++k) {
             if (NodeFound(k)) continue;
-            if (state.dataLoopNodes->Node(k).FluidType == 2) {
+            if (state.dataLoopNodes->Node(k).FluidType == DataLoopNode::NodeFluidType::Water) {
                 NodeFound(k) = true;
             }
         }

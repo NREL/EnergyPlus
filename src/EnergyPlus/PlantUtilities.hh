@@ -149,7 +149,7 @@ namespace PlantUtilities {
                                                      int TypeOfNum,                 // Component's type index
                                                      int InletNodeNum,              // Component's inlet node pointer
                                                      int OutletNodeNum,             // Component's outlet node pointer
-                                                     int HeatSourceType,            // Type of fluid in Generator loop
+                                                     DataLoopNode::NodeFluidType HeatSourceType, // Type of fluid in Generator loop
                                                      Real64 ModelGeneratorHeatRate, // model's generator heat rate (W)
                                                      Real64 ModelMassFlowRate,      // model's generator mass flow rate (kg/s)
                                                      bool FirstHVACIteration);
